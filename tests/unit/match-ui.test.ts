@@ -250,9 +250,9 @@ describe("M3 production worker controller", () => {
       expect(s).not.toMatch(
         /fixtureAutopilotStep|runFixtureT20|applyT20FixtureResolution|Math\.random/,
       );
-    expect(page).not.toMatch(
-      /getRandomValues|randomUUID|createT20Session|executeT20Command/,
-    );
+    expect(page).not.toMatch(/getRandomValues|createT20Session|executeT20Command|Math\.random/);
+    expect(page.match(/crypto\.randomUUID\(\)/g)).toHaveLength(1);
+    expect(page).toContain("lcxxvi-writer-owner");
     expect(page.match(/new Worker\(/g)).toHaveLength(1);
   });
 });

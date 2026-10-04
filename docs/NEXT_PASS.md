@@ -1,5 +1,7 @@
-# Finish M3 human acceptance, then scope M4
+# Next pass: Pass 10 / M5A ODI exhibition
 
-Open the prebuilt browser application and complete one full T20 without developer tools. Record the browser/version, build commit, result, keyboard or mouse use, any blocked decisions, and final replay verification. Automated tests do not impersonate a human tester.
+Entry condition: retain all accepted M4 durability/replay gates and record the outstanding M3 human playthrough separately. Do not weaken T20 persistence to add a format.
 
-Only after M3 acceptance should Pass 09/M4 add IndexedDB atomic durability, manual slots, import/export and crash recovery. Keep save controls disabled until independent interrupted-write, duplicate-command, crash/replay and version-compatibility gates pass. Preserve worker authority, private seed handling, engine/event-chain versions and original 160-player world. Tactical opponent AI, calibration, other formats, DLS and the separate fantasy world are outside M4.
+Bounded objective: add a 50-over ODI exhibition profile using the existing scorer, deterministic random service, conditional delivery generator, event-chain/replay model and persistence framework. Define and test ODI powerplay/field/quota/innings terminal rules and format-specific model phase selection. Keep limited-overs rain/DLS disabled until an independently verified DLS adapter exists.
+
+Do not add the red-ball session clock in the same pass. Red-ball should follow as M5B because sessions, declarations, follow-on and lost time materially expand the state machine.

@@ -1,0 +1,135 @@
+{
+  "pass": "PASS_09",
+  "milestone": "M4_PERSISTENCE",
+  "verdict": "PASS_AUTOMATED_M4",
+  "formalM3HumanAcceptance": "PENDING",
+  "date": "2026-10-04",
+  "baseline": {
+    "pass08ReportedSourceCommit": "dca7ff0070f0c89c3e680cb9fd4ae684304a29bd",
+    "localImportedBaselineCommit": "764ffb5"
+  },
+  "environment": {
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "node": "v22.16.0",
+    "npm": "10.9.2",
+    "python": "3.13.5",
+    "chromium": "144.0.7559.96",
+    "firefoxFreshPass09": "BLOCKED_NOT_INSTALLED"
+  },
+  "versions": {
+    "saveSchema": "LC_SAVE_V1",
+    "archive": "LC_ARCHIVE_V1",
+    "ui": "LC_T20_UI_V2",
+    "engine": "LC_T20_MATCH_V1",
+    "eventChain": "LC_T20_EVENT_CHAIN_V1",
+    "random": "SHA256_COUNTER_V1",
+    "model": "synthetic-alpha-01",
+    "modelStatus": "SYNTHETIC_ALPHA",
+    "rules": "LC_T20_01"
+  },
+  "pins": {
+    "worldHash": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+    "rulesHash": "7c67aec8e3aef8be7b849775d83bad64847338e03326848ec1f1d0d99c6fa745",
+    "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+    "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a"
+  },
+  "hashes": {
+    "packageLockSha256": "1aa457c6023ae96090da9ba9501972ad9a992f3b1c6aa186000da927cdc0551e",
+    "scoringCorpusSha256": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+    "randomVectorsSha256": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+    "probabilityVectorsSha256": "976e1f4c5b5b8401c743e5b22b4db430e54fb6640424b5813634d77e90118f4d",
+    "generatorStagePackFileSha256": "e07481d4d4eb74309d8e81a2daa92e5333ca3ff0d20bd8b2ce276ca7115ad799",
+    "generatorVectorsSha256": "99b9a6eacd1526159d0ecc1e0627dd88e71b7712b03bad9306ee047b1e9f0dcf",
+    "t20SeedCorpusSha256": "14fd1f01736fdfeed5686c927ea4570ac08591fe36552edf2a66ba0243f20014",
+    "t20OracleFileSha256": "f84e04d9b364cfd3b925767028c521a499f4da3528f309563e72b53f8965af33",
+    "worldFileSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257"
+  },
+  "gates": [
+    {
+      "name": "clean_install",
+      "command": "npm ci --offline --cache <pinned-pass-cache>",
+      "status": "PASS",
+      "detail": "208 packages installed in 3s from the pinned dependency cache and package-lock"
+    },
+    {
+      "name": "schemas",
+      "status": "PASS",
+      "detail": "98 generated JSON Schemas verified"
+    },
+    {
+      "name": "build",
+      "status": "PASS"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS"
+    },
+    {
+      "name": "lint_boundaries",
+      "status": "PASS",
+      "detail": "seven package dependency and ambient API boundaries passed"
+    },
+    {
+      "name": "scoring_fixtures",
+      "status": "PASS",
+      "detail": "45 delivery, 45 ledger observations matched; 29 invalid resolutions rejected"
+    },
+    {
+      "name": "determinism_vectors",
+      "status": "PASS",
+      "detail": "24 random-address and 8 state-hash vectors"
+    },
+    {
+      "name": "probability_vectors",
+      "status": "PASS",
+      "detail": "1601-entry Decimal LUT, 15 mass/draw vectors, 4 boundaries"
+    },
+    {
+      "name": "generator_vectors",
+      "status": "PASS",
+      "detail": "9 independently hashed generator fixtures"
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "415/415 across 13 files"
+    },
+    {
+      "name": "m4_chromium",
+      "status": "PASS",
+      "detail": "6/6 persistence/recovery/adversarial browser tests"
+    },
+    {
+      "name": "m3_ui_chromium",
+      "status": "PASS",
+      "detail": "3/3 current UI tests, executed as one full-match run plus two isolated acceptance runs"
+    },
+    {
+      "name": "node_100_match_corpus",
+      "status": "PASS",
+      "detail": "100/100 replay + command resimulation, totalAttempts=22051, recordsSha256=e8b45493cd3389fe2f05a509a17c8dc316eeb80a83dc30375596f4f0b5b360ae"
+    },
+    {
+      "name": "prebuilt_server",
+      "status": "PASS",
+      "detail": "dependency-free Node server served production build on 127.0.0.1:4180"
+    },
+    {
+      "name": "fresh_firefox_pass09",
+      "status": "BLOCKED",
+      "detail": "Firefox executable is not installed in this execution environment. No fresh Pass 09 Firefox claim is made."
+    },
+    {
+      "name": "human_m3_acceptance",
+      "status": "PENDING",
+      "detail": "A person has not been represented as completing the formal M3 acceptance checklist."
+    }
+  ],
+  "knownLimitations": [
+    "Persistence is local IndexedDB only. No cloud account or remote synchronisation exists.",
+    "V0.1 has one live local save schema. Unknown local/archive versions and unsupported engine/model/rule pins are rejected; no historical v1-to-v2 migration is needed yet.",
+    "Portable archives embed no custom packs because V0.1 has no enabled custom-pack save dependency. Built-in world/model/rule identities are pinned and validated.",
+    "Formal save/load p95 budgets were not benchmarked on the technical design reference laptop, so no performance-budget claim is made.",
+    "ODI, red-ball, DLS, league management, training, tactical opponent AI and empirical calibration remain outside Pass 09."
+  ]
+}

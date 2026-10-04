@@ -1,0 +1,23 @@
+{
+  "baselineReportedPass08Commit": "dca7ff0070f0c89c3e680cb9fd4ae684304a29bd",
+  "sourceCommit": "SEE_SOURCE_COMMIT.txt_IN_RELEASE_PACKAGE",
+  "schemaCount": 98,
+  "unitTests": 415,
+  "m4BrowserTests": 6,
+  "uiBrowserTests": 3,
+  "nodeCorpusMatches": 100,
+  "packageLockSha256": "1aa457c6023ae96090da9ba9501972ad9a992f3b1c6aa186000da927cdc0551e",
+  "scoringCorpusSha256": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+  "randomVectorsSha256": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+  "probabilityVectorsSha256": "976e1f4c5b5b8401c743e5b22b4db430e54fb6640424b5813634d77e90118f4d",
+  "generatorStagePackFileSha256": "e07481d4d4eb74309d8e81a2daa92e5333ca3ff0d20bd8b2ce276ca7115ad799",
+  "generatorVectorsSha256": "99b9a6eacd1526159d0ecc1e0627dd88e71b7712b03bad9306ee047b1e9f0dcf",
+  "t20SeedCorpusSha256": "14fd1f01736fdfeed5686c927ea4570ac08591fe36552edf2a66ba0243f20014",
+  "t20OracleFileSha256": "f84e04d9b364cfd3b925767028c521a499f4da3528f309563e72b53f8965af33",
+  "worldFileSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "exponentialLutSha256": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+  "worldCanonicalSha256": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+  "rulesHash": "7c67aec8e3aef8be7b849775d83bad64847338e03326848ec1f1d0d99c6fa745",
+  "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a"
+}

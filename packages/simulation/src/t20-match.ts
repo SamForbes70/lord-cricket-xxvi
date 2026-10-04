@@ -10,7 +10,7 @@ import {
 import {FIELD_REGISTRY,T20_POWERPLAY_SLOTS,T20_LATER_SLOTS,T20_CONDITION_POLICY,
   MODEL_PACK_SHA256,DELIVERY_STAGE_PACK_SHA256,EXP_LUT_SHA256,isBowlingCapable,FROZEN_WORLD_PINS} from "@lcxxvi/data";
 import {validateInningsLedger,contextFromLedger,reduceInningsLedger,selectInningsBatter,selectInningsBowler,scoreDelivery} from "@lcxxvi/domain";
-import {type FrozenT20Setup,isVerifiedFrozenT20Setup} from "./world-setup.js";
+import {type FrozenT20Setup,isVerifiedFrozenT20Setup,validateT20MatchSetup} from "./world-setup.js";
 import {createRandomService,createStateHasher,canonicalStateBytes,sha256Hex} from "./determinism.js";
 import {generateDelivery,expectedGeneratorPhase,generatorRuleHash} from "./generator.js";
 import {EXP_LUT_VERSION,PROBABILITY_MODEL_ID} from "@lcxxvi/contracts";
@@ -408,4 +408,63 @@ export function createT20CorpusRequest(raw:unknown,baseRaw:unknown,world:WorldPa
   }) as T20MatchSetupRequest["selectedTeams"];
   return T20MatchSetupRequestSchema.parse({...base,setup:{...base.setup,gameId:`g-${record.caseId}`,
     matchId:`m-${record.caseId}`,seed:record.seed,teamIds:record.teamIds,groundId:record.groundId},selectedTeams:selections});
+}
+
+/**
+ * Rebuild a persisted session through the same validated setup and command path used by live play.
+ * Persisted core state is never trusted directly: commands are resimulated and every event byte/hash,
+ * receipt, revision and terminal core state must match the stored snapshot.
+ */
+export function rehydrateT20Session(
+  raw: unknown,
+  worldBytes: Readonly<Uint8Array>,
+  manifestInput: unknown,
+): T20Session {
+  assert(!!raw && typeof raw === "object" && !Array.isArray(raw), "SAVE_SHAPE");
+  const stored = raw as Partial<T20Session>;
+  const candidateSetup = stored.setup as FrozenT20Setup | undefined;
+  assert(!!candidateSetup && candidateSetup.setupVersion === "LC_T20_SETUP_V1", "SAVE_SETUP");
+  assert(Array.isArray(candidateSetup.teams) && candidateSetup.teams.length === 2, "SAVE_TEAMS");
+  const setup = validateT20MatchSetup(
+    {
+      setupVersion: "LC_T20_SETUP_V1",
+      setup: {
+        schemaVersion: "1.0.0",
+        gameId: candidateSetup.gameId,
+        matchId: candidateSetup.matchId,
+        format: "T20",
+        worldPackId: FROZEN_WORLD_PINS.worldPackId,
+        rulesId: candidateSetup.versions.rules,
+        modelId: candidateSetup.versions.model,
+        randomId: candidateSetup.versions.random,
+        seed: candidateSetup.seed,
+        teamIds: candidateSetup.teams.map((t) => t.teamId),
+        groundId: candidateSetup.ground.groundId,
+        capabilities: { limitedOversRain: false, superOver: false, injuries: false, prediction: false },
+      },
+      worldFileSha256: FROZEN_WORLD_PINS.worldFileSha256,
+      worldCanonicalSha256: candidateSetup.versions.worldHash,
+      rulesHash: candidateSetup.versions.rulesHash,
+      modelHash: candidateSetup.versions.modelHash,
+      stagePackHash: candidateSetup.stagePackHash,
+      selectedTeams: candidateSetup.teams.map((t) => ({
+        teamId: t.teamId,
+        playerIds: [...t.playerIds],
+        captainId: t.captainId,
+        keeperId: t.keeperId,
+      })),
+    },
+    worldBytes,
+    manifestInput,
+  );
+  assert(Array.isArray(stored.commands), "SAVE_COMMANDS");
+  let rebuilt = createT20Session(setup);
+  for (const rawCommand of stored.commands) rebuilt = executeT20Command(rebuilt, rawCommand).session;
+  assert(typeof stored.revision === "number" && rebuilt.revision === stored.revision, "SAVE_REVISION");
+  assert(Array.isArray(stored.events) && hash(rebuilt.events) === hash(stored.events), "SAVE_EVENTS");
+  assert(stored.core !== undefined && hash(rebuilt.core) === hash(stored.core), "SAVE_CORE");
+  assert(stored.receipts !== undefined && hash(rebuilt.receipts) === hash(stored.receipts), "SAVE_RECEIPTS");
+  assert(stored.executionManifest !== undefined && hash(rebuilt.executionManifest) === hash(stored.executionManifest), "SAVE_MANIFEST");
+  assert(stored.genesisHash === rebuilt.genesisHash && stored.lastEventHash === rebuilt.lastEventHash, "SAVE_CHAIN");
+  return rebuilt;
 }

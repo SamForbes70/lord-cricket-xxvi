@@ -155,16 +155,19 @@ test("desktop essential strip, 150% scale, reduced motion, narrow view and long 
   for (const scale of ["100", "150"]) {
     await page.getByLabel("Text scale").selectOption(scale);
     await page.evaluate(() => window.scrollTo(0, 0));
-    for (const locator of [
-      page.getByTestId("scorestrip"),
-      page.getByTestId("active"),
-      page.getByTestId("target"),
-      page.locator(".decision-top"),
-    ]) {
+    for (const [name, locator] of [
+      ["scorestrip", page.getByTestId("scorestrip")],
+      ["active", page.getByTestId("active")],
+      ["target", page.getByTestId("target")],
+      ["decision-top", page.locator(".decision-top")],
+    ] as const) {
       const box = await locator.boundingBox();
-      expect(box).not.toBeNull();
-      expect(box!.y).toBeGreaterThanOrEqual(0);
-      expect(box!.y + box!.height).toBeLessThanOrEqual(768);
+      expect(box, `${name} has a box`).not.toBeNull();
+      expect(box!.y, `${name} starts in viewport`).toBeGreaterThanOrEqual(0);
+      expect(
+        box!.y + box!.height,
+        `${name} ends in viewport at ${scale}%`,
+      ).toBeLessThanOrEqual(768);
     }
     await shot(page, browserName, `desktop-${scale}`);
   }
@@ -198,14 +201,10 @@ test("desktop essential strip, 150% scale, reduced motion, narrow view and long 
   ).toBe(true);
   await shot(page, browserName, "long-name-150");
   await page
-    .getByRole("button", { name: "Save match", exact: true })
+    .getByRole("button", { name: "Save copy" })
     .scrollIntoViewIfNeeded();
-  await expect(
-    page.getByRole("button", { name: "Save match", exact: true }),
-  ).toBeDisabled();
-  await expect(
-    page.getByText("Unavailable until M4 durability and recovery tests pass."),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save copy" })).toBeEnabled();
+  await expect(page.getByTestId("save-status")).toContainText("Saved");
 });
 
 test("selection validity, tactics acceptance and explicit rejection of invalid named fields", async ({

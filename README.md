@@ -1,8 +1,8 @@
-# Lord Cricket XXVI | Pass 08 / M3 interactive T20
+# Lord Cricket XXVI | Pass 09 / M4 persistence
 
-A manual, browser-based fictional T20 exhibition on the accepted Pass 07B deterministic engine. Choose two teams, select each XI, nominate captains and keepers, call the toss, choose innings, select every incoming batter and bowler, set supported tactics, and finish both innings. One worker owns the match. Both sides are manually controlled; no tactical opponent AI is supplied.
+A manual browser-based fictional T20 exhibition on the accepted deterministic engine, now with local durable saves, recovery and portable `.lcxxvi` archives. One Web Worker owns authoritative match state. The page renders accepted-event projections and never becomes a second match reducer.
 
-**Model status: SYNTHETIC_ALPHA.** Custom game rules, no certified ICC compliance or empirical realism. Original approved world: 160 players, eight squads and eight grounds. The separate Sam Forbes fantasy pack is not included or silently applied. DLS, ODI/red-ball, league/training and durable saving remain unavailable.
+**Model status: SYNTHETIC_ALPHA.** Custom game rules, no certified ICC compliance or empirical realism. Original approved world: 160 players, eight squads and eight grounds. DLS, ODI/red-ball, league/training, tactical opponent AI and empirical calibration remain unavailable.
 
 ## Run
 
@@ -14,39 +14,52 @@ npm run build
 npm run dev
 ```
 
-Open the local URL printed by Vite. Use the normal page, not `/engineering.html`, which retains the historical contract-check shell. The separate **Playable Build** archive includes precompiled assets and a dependency-free Node server: extract it and run `node start.mjs`, then open `http://127.0.0.1:4180`.
+Open the local URL printed by Vite. `/engineering.html` retains the historical engineering shell. A packaged playable build uses `node start.mjs` and requires no npm install.
 
-## Play one match
+## Play and save
 
-1. Review the two suggested XIs or select replacements. Keep exactly 11, an eligible keeper, a captain and at least five bowlers in each XI.
-2. Confirm the teams, call heads or tails and choose bat/bowl for the toss winner.
-3. Select opening batters and a bowler. Change aggression, bowling effort/line/length or named field if desired. Only stock variation is supported.
-4. Use **Next delivery** or **Finish over**. Respond to the next-decision prompt after wickets and completed overs. Disabled players show why they cannot be selected.
-5. At the result, review both innings and choose **Verify replay and scorecard**. Change commentary/layout/scale and verify again; event and scorecard hashes should match.
+1. Select both XIs, captains and keepers, then confirm the teams.
+2. Call the toss, choose the first innings, select batters and bowlers, set supported tactics and advance by delivery or over.
+3. Every accepted setup/command is durably committed before the UI acknowledges it. Reloading resumes the last committed revision.
+4. **Save copy** creates a manual local slot. **Export** creates a `.lcxxvi` archive. **Import** stages and validates an archive before it becomes visible.
+5. A second tab opens an active save read-only while the writer lease is held. Three checkpoint generations are retained; a corrupt newest checkpoint is recovered into a new slot without overwriting the damaged source.
 
-Keyboard: Tab and Shift+Tab move between controls; Enter activates buttons; Space toggles XI checkboxes; arrow keys change select values. The next decision receives focus when the match phase changes. Text scale supports 100%, 125% and 150%. Reduced-motion preferences are respected.
-
-**This is a session-only build.** Reloading or closing loses the match. Save remains disabled until M4 passes its own crash/replay acceptance tests. Do not interpret a completed match or successful in-memory replay as durable storage.
+`.lcxxvi` imports validate archive bounds, paths, CRCs, byte counts, SHA-256 hashes and pinned engine/event-chain/PRNG/model/rules/world identities. The stored T20 core is not trusted directly: resume revalidates setup and resimulates the stored command history, then compares revision, event bytes/hashes, receipts, manifest and terminal core state.
 
 ## Verification
 
+Core gates:
+
 ```sh
-npx playwright install chromium firefox
-npm run verify:07b
-npm run test:ui
+npm run schemas:check
+npm run build
+npm run typecheck
+npm run lint
+npm run fixtures:audit
+npm run fixtures:engine
+npm run vectors:check
+npm run probability:check
+npm run generator:check
+npm test
 ```
 
-`verify:07b` reruns all 16 inherited gates and 10 M2 gates, including the full 100-match Node/Chromium/Firefox page-and-worker corpus. `test:ui` exercises production UI keyboard completion, display changes, scorecard/event replay identity, responsive/150%/reduced-motion/long-name layouts, setup validation and visible field rejection in both browsers.
+M4 browser gate:
 
-See `docs/verification-pass08`, `docs/decisions/017-m3-worker-owned-human-session.md`, and the Pass 08 report. Automated browser navigation is recorded explicitly as automation, not an invented human playtest. The final human acceptance record is completed by a person playing a whole match without developer tools.
+```sh
+npx playwright test --config playwright.m4.config.ts
+```
+
+The M4 browser suite covers reload/resume, single-writer multi-tab behaviour, manual copy/export/import, corrupt-checkpoint recovery, rollback after durable-write failure, injected interrupted transactions and duplicate-command rejection. The inherited M3 UI suite remains under `npm run test:ui`.
+
+The formal M3 human acceptance record remains separate: automated testing does not represent a person as having completed the match.
 
 ## Architecture and boundaries
 
-- `apps/web/src/match`: strict revisioned UI protocol, private worker controller and public projection.
-- `apps/web/src/main.tsx`: public view rendering and form drafts; no gameplay random calls or independent match state.
-- `packages/simulation`: unchanged `LC_T20_MATCH_V1` engine and replay.
-- `packages/domain`, `packages/contracts`, `packages/data`: unchanged scorer, 98 generated schemas, frozen rules/model/stage and world.
-- `apps/batch`: inherited headless CLI; fixture autopilot remains separate from human commands.
-- `tests/ui` and `tests/unit/match-ui.test.ts`: additive M3 evidence.
+- `apps/web/src/match`: revisioned UI protocol and durable worker boundary.
+- `packages/persistence`: IndexedDB repository, writer leases, rolling checkpoints, canonical hashes and `.lcxxvi` archive validation.
+- `packages/simulation`: unchanged `LC_T20_MATCH_V1` gameplay engine plus deterministic save rehydration through command resimulation.
+- `packages/domain`, `packages/contracts`, `packages/data`: scoring, contracts, frozen model/rules/world data.
+- `tests/m4`: persistence and recovery browser acceptance.
+- `tests/unit/persistence-m4.test.ts`: deterministic rehydration and portable archive tamper tests.
 
-Repository provenance is a verified source archive import of accepted commit `04fac1b7c9c66ea4807b28dda6026e546cb2a5ae`, not a clone containing that commit's original git history.
+Pass 09 does not add ODI, red-ball, DLS, league management, training, tactical AI or calibration.

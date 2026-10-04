@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › tests/ui/match.spec.ts:210:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (3.3s)
+
+  1 passed (6.0s)

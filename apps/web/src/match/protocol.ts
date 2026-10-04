@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { SaveSummary } from "@lcxxvi/persistence";
 import {
   T20CommandSchema,
   T20TeamSelectionSchema,
@@ -8,7 +9,7 @@ import {
   type BowlingPlan,
 } from "@lcxxvi/contracts";
 
-export const UI_VERSION = "LC_T20_UI_V1" as const;
+export const UI_VERSION = "LC_T20_UI_V2" as const;
 // Shared build identity. No seed, setup object, random service or private diagnostics cross this boundary.
 export const PINS = Object.freeze({
   engine: "LC_T20_MATCH_V1",
@@ -18,6 +19,17 @@ export const PINS = Object.freeze({
   modelHash: "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
   stagePackHash:
     "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+});
+
+export const ARCHIVE_PINS = Object.freeze({
+  engine: PINS.engine,
+  eventChain: PINS.eventChain,
+  random: "SHA256_COUNTER_V1",
+  model: "synthetic-alpha-01",
+  modelHash: PINS.modelHash,
+  rules: "LC_T20_01",
+  rulesHash: PINS.rulesHash,
+  worldHash: PINS.worldHash,
 });
 const base = {
   version: z.literal(UI_VERSION),
@@ -39,6 +51,12 @@ export const RequestSchema = z.discriminatedUnion("type", [
     command: T20CommandSchema,
   }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
+  z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
+  z.strictObject({ ...base, type: z.literal("MANUAL_SAVE"), title: z.string().trim().min(1).max(80) }),
+  z.strictObject({ ...base, type: z.literal("LOAD_SAVE"), saveId: z.string().min(1).max(160) }),
+  z.strictObject({ ...base, type: z.literal("DELETE_SAVE"), saveId: z.string().min(1).max(160) }),
+  z.strictObject({ ...base, type: z.literal("EXPORT_SAVE"), saveId: z.string().min(1).max(160).nullable() }),
+  z.strictObject({ ...base, type: z.literal("IMPORT_SAVE"), archive: z.instanceof(Uint8Array) }),
 ]);
 export type Request = z.infer<typeof RequestSchema>;
 export type Selection = z.infer<typeof T20TeamSelectionSchema>;
@@ -105,6 +123,15 @@ export type Verification = {
   humanRequests: number;
   systemAutopilotRequests: 0;
 };
+export type PersistenceView = {
+  saveId: string | null;
+  durableRevision: number | null;
+  savedAt: string | null;
+  readOnly: boolean;
+  recovered: boolean;
+  recoveredFromGeneration: number | null;
+  saves: SaveSummary[];
+};
 export type Response = {
   version: typeof UI_VERSION;
   requestId: string;
@@ -114,4 +141,6 @@ export type Response = {
   view: View | null;
   error: string | null;
   verification: Verification | null;
+  persistence?: PersistenceView;
+  archive?: Uint8Array | null;
 };

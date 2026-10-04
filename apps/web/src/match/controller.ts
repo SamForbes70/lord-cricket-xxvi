@@ -11,6 +11,7 @@ import {
   canonicalStateBytes,
   sha256Hex,
   validateT20Field,
+  rehydrateT20Session,
 } from "@lcxxvi/simulation";
 import {
   FIELD_REGISTRY,
@@ -36,6 +37,7 @@ export function createMatchController(
   worldBytes: Uint8Array,
   manifest: unknown,
   privateSeed: () => string,
+  privateIdentity: () => { gameId: string; matchId: string } = () => ({ gameId: "human-exhibition", matchId: "human-t20" }),
 ) {
   const { world } = verifyFrozenWorldBytes(worldBytes, manifest);
   const catalog: Catalog = {
@@ -273,7 +275,35 @@ export function createMatchController(
       engineActorId: cmd.actorId,
     });
   }
+  function restore(raw: unknown): void {
+    session = rehydrateT20Session(raw, worldBytes, manifest);
+    seen.clear();
+    audit.splice(0, audit.length, ...session.commands.map((cmd) => ({
+      requestId: cmd.commandId,
+      origin: "HUMAN" as const,
+      commandKind: cmd.kind,
+      engineActorId: cmd.actorId,
+    })));
+  }
+  function snapshot(): T20Session | null {
+    return session ? structuredClone(session) : null;
+  }
+  function currentResponse(requestId: string, error: string | null = null): Response {
+    return {
+      version: UI_VERSION,
+      requestId,
+      revision: session?.revision ?? 0,
+      pins: PINS,
+      catalog: session ? null : structuredClone(catalog),
+      view: view(),
+      error,
+      verification: null,
+    };
+  }
   return {
+    restore,
+    snapshot,
+    currentResponse,
     handle(raw: unknown): Response {
       let id = "invalid",
         error: string | null = null,
@@ -288,7 +318,7 @@ export function createMatchController(
             throw new Error("Request ID already used with different content.");
           return structuredClone(prior.response);
         }
-        if (request.expectedRevision !== (session?.revision ?? 0))
+        if (request.type !== "BOOT" && request.expectedRevision !== (session?.revision ?? 0))
           throw new Error(
             "Stale revision. Review the current decision and try again.",
           );
@@ -299,8 +329,7 @@ export function createMatchController(
               setupVersion: "LC_T20_SETUP_V1",
               setup: {
                 schemaVersion: "1.0.0",
-                gameId: "human-exhibition",
-                matchId: "human-t20",
+                ...privateIdentity(),
                 format: "T20",
                 worldPackId: FROZEN_WORLD_PINS.worldPackId,
                 rulesId: "LC_T20_01",

@@ -10,6 +10,7 @@ import {
   type Request,
   type Response,
   type Verification,
+  type PersistenceView,
 } from "./match/protocol.js";
 import "./styles.css";
 
@@ -30,6 +31,7 @@ function App() {
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
   const [verification, setVerification] = useState<Verification | null>(null);
+  const [persistence, setPersistence] = useState<PersistenceView | null>(null);
   const [scale, setScale] = useState("100"),
     [commentary, setCommentary] = useState("full"),
     [density, setDensity] = useState("comfortable");
@@ -50,8 +52,19 @@ function App() {
     });
   }
   useEffect(() => {
+    const ownerKey = "lcxxvi-writer-owner";
+    const navigation = performance.getEntriesByType("navigation")[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    let owner =
+      navigation?.type === "reload" ? sessionStorage.getItem(ownerKey) : null;
+    if (!owner) {
+      owner = `tab-${crypto.randomUUID()}`;
+      sessionStorage.setItem(ownerKey, owner);
+    }
     const w = new Worker(new URL("./match/match.worker.ts", import.meta.url), {
       type: "module",
+      name: owner,
     });
     worker.current = w;
     w.onmessage = (e: MessageEvent<Response>) => {
@@ -67,24 +80,35 @@ function App() {
         );
         return;
       }
-      if (
-        r.requestId !== inflight.current ||
-        r.revision < currentRevision.current
-      )
-        return;
+      if (r.requestId !== inflight.current) return;
       inflight.current = null;
       currentRevision.current = r.revision;
+      serial.current = Math.max(serial.current, 10000 + r.revision);
       setBusy(false);
       setError(r.error ?? "");
       if (r.catalog) setCatalog(r.catalog);
       setView(r.view);
       setVerification(r.verification);
+      if (r.persistence) setPersistence(r.persistence);
+      if (r.archive) {
+        const archiveBytes = new Uint8Array(r.archive.byteLength);
+        archiveBytes.set(r.archive);
+        const blob = new Blob([archiveBytes.buffer], {
+          type: "application/zip",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `lord-cricket-${new Date().toISOString().slice(0, 10)}.lcxxvi`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
     };
     const failed = () => {
       setFatal(true);
       setBusy(false);
       setError(
-        "The match worker stopped. This session cannot continue. Reload to start a new match; durable recovery is not available.",
+        "The match worker stopped. Reload to recover the last durable checkpoint.",
       );
     };
     w.onerror = failed;
@@ -105,16 +129,20 @@ function App() {
       decisionRef.current?.focus({ preventScroll: true });
     }
   }, [view]);
-  useEffect(() => {
-    const warn = (e: BeforeUnloadEvent) => {
-      if (view && view.phase !== "COMPLETE") {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [view]);
+
+  function saveCopy() {
+    if (!view) return;
+    const title = `${view.teams[0]?.name ?? "Team 1"} v ${view.teams[1]?.name ?? "Team 2"} · ${new Date().toLocaleString()}`;
+    send({ type: "MANUAL_SAVE", title });
+  }
+  function exportSave(saveId: string | null = null) {
+    send({ type: "EXPORT_SAVE", saveId });
+  }
+  async function importFile(file: File | null) {
+    if (!file || inflight.current || fatal) return;
+    const archive = new Uint8Array(await file.arrayBuffer());
+    send({ type: "IMPORT_SAVE", archive });
+  }
   function act(action: Action) {
     if (!view || inflight.current || fatal) return;
     const i = view.innings[view.activeIndex]?.innings;
@@ -204,11 +232,23 @@ function App() {
             <option value="compact">Compact</option>
           </select>
         </label>
-        <span>Session only. Closing or reloading loses play.</span>
+        <span className="save-status" data-testid="save-status">
+          {persistence?.readOnly
+            ? "Read only · another tab owns this save"
+            : persistence?.savedAt
+              ? `Saved · ${new Date(persistence.savedAt).toLocaleTimeString()}`
+              : "Local autosave ready"}
+        </span>
       </div>
       {error && (
         <p className="error" role="alert" tabIndex={-1}>
           {error}
+        </p>
+      )}
+      {persistence?.recovered && (
+        <p className="recovery" role="status">
+          Recovered from the previous valid checkpoint. The damaged source save
+          was preserved.
         </p>
       )}
       {!view && (
@@ -349,7 +389,7 @@ function App() {
                 {busy ? "Applying…" : "Up to date"}
               </span>
             </div>
-            <fieldset disabled={busy || fatal}>
+            <fieldset disabled={busy || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
                 <div className="actions">
@@ -623,13 +663,96 @@ function App() {
           </div>
         </>
       )}
+      <section className="save-manager" aria-label="Save files">
+        <div className="save-file-actions">
+          {view && (
+            <>
+              <button
+                type="button"
+                disabled={busy || fatal || persistence?.readOnly}
+                onClick={saveCopy}
+              >
+                Save copy
+              </button>
+              <button
+                type="button"
+                disabled={busy || fatal}
+                onClick={() => exportSave(null)}
+              >
+                Export current
+              </button>
+            </>
+          )}
+          <label className="import-control">
+            Import .lcxxvi
+            <input
+              aria-label="Import saved game"
+              type="file"
+              accept=".lcxxvi,application/zip"
+              disabled={busy || fatal}
+              onChange={(e) => {
+                void importFile(e.target.files?.[0] ?? null);
+                e.currentTarget.value = "";
+              }}
+            />
+          </label>
+        </div>
+        {persistence && persistence.saves.length > 0 && (
+          <details className="saved-games" open={!view}>
+            <summary>Saved games ({persistence.saves.length})</summary>
+            <div className="section-heading">
+              <p className="eyebrow">SAVED GAMES</p>
+              <h2>Continue or manage a match</h2>
+            </div>
+            <div className="save-list">
+              {persistence.saves.map((save) => (
+                <article key={save.saveId} className="save-card">
+                  <div>
+                    <strong>{save.title}</strong>
+                    <p>
+                      {save.phase.replaceAll("_", " ")} · revision{" "}
+                      {save.revision} ·{" "}
+                      {new Date(save.updatedAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="actions">
+                    <button
+                      disabled={
+                        busy || fatal || save.saveId === persistence.saveId
+                      }
+                      onClick={() =>
+                        send({ type: "LOAD_SAVE", saveId: save.saveId })
+                      }
+                    >
+                      {save.saveId === persistence.saveId ? "Current" : "Load"}
+                    </button>
+                    <button
+                      disabled={busy || fatal}
+                      onClick={() => exportSave(save.saveId)}
+                    >
+                      Export
+                    </button>
+                    <button
+                      disabled={busy || fatal}
+                      onClick={() =>
+                        send({ type: "DELETE_SAVE", saveId: save.saveId })
+                      }
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </details>
+        )}
+      </section>
       <footer>
-        <button disabled aria-describedby="save-reason">
-          Save match
-        </button>
-        <span id="save-reason">
-          Unavailable until M4 durability and recovery tests pass.
-        </span>
+        <p>
+          Autosaves and manual copies are stored locally in this browser.
+          Portable .lcxxvi exports include the deterministic match history and
+          pinned engine/model/rules identity required for validated resume.
+        </p>
         <p>
           Original world: 160 fictional players, 8 squads. Custom game rules; no
           certified ICC compliance or empirical realism. DLS, other formats,

@@ -145,7 +145,7 @@ label {
   justify-content: flex-start;
   border-block: 1px solid #d6d5c8;
   padding: 8px 0;
-  margin: 12px 0;
+  margin: 8px 0;
   flex-wrap: wrap;
   font-size: 0.8em;
 }
@@ -270,7 +270,7 @@ label {
   margin-bottom: 4px;
 }
 .decision {
-  margin: 16px 0;
+  margin: 8px 0 16px;
   background: #fffcf3;
   border: 1px solid #b7bea9;
   border-left: 5px solid #b08a42;
@@ -498,5 +498,101 @@ code {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Pass 09 persistence */
+.save-status {
+  font-weight: 700;
+}
+.recovery {
+  margin: 0.65rem 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #b7bea9;
+  background: #fffdf6;
+  font-weight: 700;
+}
+.save-manager {
+  margin: 1.25rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid #d6d5c8;
+}
+.save-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.save-file-actions button,
+.import-control {
+  font: inherit;
+}
+.save-file-actions button {
+  border: 1px solid #6b8276;
+  background: #fff;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+}
+.save-file-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.import-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #6b8276;
+  background: #fff;
+  padding: 0.3rem 0.55rem;
+  border-radius: 0.3rem;
+}
+.import-control input {
+  max-width: 12rem;
+}
+.saved-games {
+  margin: 0.5rem 0 1.25rem;
+}
+.saved-games summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.35rem 0;
+}
+.saved-games[open] summary {
+  margin-bottom: 0.75rem;
+}
+.section-heading h2 {
+  margin-top: 0.1rem;
+}
+.save-list {
+  display: grid;
+  gap: 0.55rem;
+}
+.save-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #d3d8c9;
+  background: #fffdf6;
+}
+.save-card p {
+  margin: 0.2rem 0 0;
+}
+.save-card .actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+@media (max-width: 700px) {
+  .save-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .import-control {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

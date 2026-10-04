@@ -1,4 +1,5 @@
 import { defineConfig } from "@playwright/test";
+const chromiumExecutable = process.env.LCXXVI_CHROMIUM_EXECUTABLE;
 export default defineConfig({
   testDir: "./tests/ui",
   outputDir: "test-results-ui",
@@ -6,7 +7,20 @@ export default defineConfig({
   expect: { timeout: 10000 },
   workers: 1,
   projects: [
-    { name: "chromium", use: { browserName: "chromium" } },
+    {
+      name: "chromium",
+      use: {
+        browserName: "chromium",
+        ...(chromiumExecutable
+          ? {
+              launchOptions: {
+                executablePath: chromiumExecutable,
+                args: ["--no-sandbox"],
+              },
+            }
+          : {}),
+      },
+    },
     { name: "firefox", use: { browserName: "firefox" } },
   ],
   use: {
@@ -24,6 +38,9 @@ export default defineConfig({
   },
   reporter: [
     ["list"],
-    ["json", { outputFile: "docs/verification-pass08/browser-results.json" }],
+    [
+      "json",
+      { outputFile: "docs/verification-pass09/ui-browser-results.json" },
+    ],
   ],
 });
