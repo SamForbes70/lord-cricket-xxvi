@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "LC_ODI_EVENT_CHAIN_V1"
+    },
+    "genesisHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "finalEventHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "finalStateHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "eventCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "executionManifestHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "version",
+    "genesisHash",
+    "finalEventHash",
+    "finalStateHash",
+    "eventCount",
+    "executionManifestHash"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ODIEventChainManifest:1",
+  "title": "ODIEventChainManifest"
+}

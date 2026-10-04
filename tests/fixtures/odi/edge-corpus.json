@@ -1,0 +1,21 @@
+{
+  "version": "LC_ODI_EDGE_CORPUS_V1",
+  "rulesId": "LC_ODI_01",
+  "status": "CUSTOM_GAME_PROFILE",
+  "cases": [
+    {"id":"ODI-ALLOC-300","category":"INNINGS_LIMIT","expected":{"legalBalls":300}},
+    {"id":"ODI-BOWLER-60","category":"BOWLER_QUOTA","expected":{"maxLegalBalls":60}},
+    {"id":"ODI-FIELD-01","category":"FIELD_PHASE","legalBallFrom":0,"legalBallTo":59,"expected":{"maxOutside":2}},
+    {"id":"ODI-FIELD-02","category":"FIELD_PHASE","legalBallFrom":60,"legalBallTo":239,"expected":{"maxOutside":4}},
+    {"id":"ODI-FIELD-03","category":"FIELD_PHASE","legalBallFrom":240,"legalBallTo":299,"expected":{"maxOutside":5}},
+    {"id":"ODI-MODEL-01","category":"MODEL_PHASE","legalBallFrom":0,"legalBallTo":59,"expected":{"phase":"ODI_EARLY"}},
+    {"id":"ODI-MODEL-02","category":"MODEL_PHASE","legalBallFrom":60,"legalBallTo":239,"expected":{"phase":"ODI_MIDDLE"}},
+    {"id":"ODI-MODEL-03","category":"MODEL_PHASE","legalBallFrom":240,"legalBallTo":299,"expected":{"phase":"ODI_LATE"}},
+    {"id":"ODI-FREE-HIT","category":"FREE_HIT","expected":{"afterNoBall":true,"persistsAcrossWide":true}},
+    {"id":"ODI-NO-CONSECUTIVE","category":"BOWLER_ROTATION","expected":{"sameBowlerConsecutiveOvers":false}},
+    {"id":"ODI-RAIN-GATE","category":"RAIN","expected":{"enabled":false,"dlsEnabled":false}},
+    {"id":"ODI-TERMINAL-BALL","category":"TERMINATION","expected":{"noLegalBallAfter":300}},
+    {"id":"ODI-REPLAY","category":"DETERMINISM","expected":{"replayHashEqual":true,"resimulationEqual":true}},
+    {"id":"ODI-PERSISTENCE","category":"PERSISTENCE","expected":{"rehydrateEqual":true,"portableArchive":true}}
+  ]
+}

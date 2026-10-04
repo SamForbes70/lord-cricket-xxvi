@@ -46,3 +46,16 @@ export const T20MatchSetupRequestSchema = z.strictObject({
 export type DefaultWorldManifest = z.infer<typeof DefaultWorldManifestSchema>;
 export type T20TeamSelection = z.infer<typeof T20TeamSelectionSchema>;
 export type T20MatchSetupRequest = z.infer<typeof T20MatchSetupRequestSchema>;
+/** Pass 10 / M5A ODI setup uses the same XI selection shape with a distinct version boundary. */
+export const ODIMatchSetupRequestSchema = z.strictObject({
+  setup: MatchSetupManifestSchema,
+  worldFileSha256: HashSchema,
+  worldCanonicalSha256: HashSchema,
+  rulesHash: HashSchema,
+  modelHash: HashSchema,
+  stagePackHash: HashSchema,
+  setupVersion: z.literal("LC_ODI_SETUP_V1"),
+  selectedTeams: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
+});
+export type ODIMatchSetupRequest = z.infer<typeof ODIMatchSetupRequestSchema>;
+

@@ -1,0 +1,33 @@
+{
+  "pass": "10",
+  "milestone": "M5A_ODI_EXHIBITION",
+  "baselineCommit": "6b0a190b34c5c674820c935d0e062c047dcdd498",
+  "environment": {
+    "node": "v22.16.0",
+    "npm": "10.9.2",
+    "python": "3.13.5",
+    "chromium": "144.0.7559.96",
+    "firefox": "NOT_INSTALLED"
+  },
+  "gates": [
+    {"name":"clean_install","command":"npm ci --offline --cache /mnt/data/lcxxvi-pass09/npmcache-final","status":"PASS","packages":208},
+    {"name":"schemas","command":"npm run schemas:check","status":"PASS","count":106},
+    {"name":"build","command":"npm run build","status":"PASS"},
+    {"name":"typecheck","command":"npm run typecheck","status":"PASS"},
+    {"name":"lint_boundaries","command":"npm run lint","status":"PASS","boundaries":7},
+    {"name":"scoring_regression","command":"npm run fixtures:engine","status":"PASS","deliveries":45,"ledgers":45,"invalidRejected":29},
+    {"name":"determinism_vectors","command":"npm run vectors:check","status":"PASS","random":24,"stateHash":8},
+    {"name":"probability_vectors","command":"npm run probability:check","status":"PASS","lutEntries":1601,"massDrawVectors":15,"boundaries":4},
+    {"name":"generator_vectors","command":"npm run generator:check","status":"PASS","fixtures":9},
+    {"name":"unit_suite","command":"npm test","status":"PASS","tests":425,"files":14},
+    {"name":"odi_rules","command":"npm run odi:rules","status":"PASS","tests":10},
+    {"name":"odi_chromium","command":"LCXXVI_CHROMIUM_PATH=/usr/bin/chromium npx playwright test --config playwright.m5a.config.ts","status":"PASS","tests":1},
+    {"name":"m4_chromium_regression","command":"LCXXVI_CHROMIUM_PATH=/usr/bin/chromium npx playwright test --config playwright.m4.config.ts","status":"PASS","tests":6},
+    {"name":"m3_t20_chromium_keyboard","status":"PASS","tests":1},
+    {"name":"m3_t20_chromium_layout_tactics","status":"PASS","tests":2},
+    {"name":"firefox_pass10","status":"BLOCKED","reason":"No Firefox executable installed in the verification environment"},
+    {"name":"formal_m3_human_acceptance","status":"PENDING","reason":"Automated tests do not substitute for a recorded human playthrough"}
+  ],
+  "boundedVerdict": "PASS",
+  "overallM5": "PARTIAL_PENDING_M5B_RED_BALL"
+}

@@ -1,0 +1,18 @@
+{
+  "fixture": "tests/fixtures/world/odi-valid-setup.json",
+  "engine": "LC_ODI_MATCH_V1",
+  "eventChain": "LC_ODI_EVENT_CHAIN_V1",
+  "rules": "LC_ODI_01",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "revision": 188,
+  "eventCount": 630,
+  "lastEventHash": "7cbe21f02090eff296ff875fdf6f1563d5e173e4389b75633f00ff5e28a39ad2",
+  "finalStateHash": "d21a3d0d5eca5471f7c51c271095eccbe72e2465ea41253c67e90a3bd4db3f16",
+  "executionManifestHash": "3fd55341b4d04b482d2800c49a279d6f62daa7fe56e5f4f4adcf10dd52a252cb",
+  "innings": [
+    {"teamId":"team-01","runs":152,"wickets":10,"legalBalls":208,"overs":"34.4"},
+    {"teamId":"team-02","runs":142,"wickets":10,"legalBalls":230,"overs":"38.2","targetToWin":153}
+  ],
+  "result": {"kind":"WIN","winnerTeamId":"team-01","marginType":"RUNS","marginRuns":10},
+  "note": "Deterministic synthetic regression observation only. It is not evidence of empirical cricket realism."
+}

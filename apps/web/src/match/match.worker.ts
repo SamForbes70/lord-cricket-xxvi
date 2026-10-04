@@ -1,15 +1,17 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
 import { canonicalJson } from "@lcxxvi/contracts";
-import type { T20Session } from "@lcxxvi/simulation";
+import type { T20Session, ODISession } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
   createPortableArchive,
   readPortableArchive,
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
+import { createODIMatchController } from "./controller-odi.js";
 import {
   ARCHIVE_PINS,
+  ODI_ARCHIVE_PINS,
   RequestSchema,
   UI_VERSION,
   type Request,
@@ -23,7 +25,11 @@ let activeSaveId: string | null = null;
 let readOnly = false;
 let recovered = false;
 let recoveredFromGeneration: number | null = null;
-let controller = makeController();
+type AnySession = T20Session | ODISession;
+type MatchController =
+  | ReturnType<typeof createMatchController>
+  | ReturnType<typeof createODIMatchController>;
+let controller: MatchController = makeController();
 let initialised = false;
 
 function randomHex(bytesCount: number): string {
@@ -43,15 +49,21 @@ function privateIdentity() {
   const token = randomHex(12);
   return { gameId: `game-${token}`, matchId: `match-${token}` };
 }
-function makeController() {
-  return createMatchController(
-    worldBytes,
-    manifest,
-    privateSeed,
-    privateIdentity,
-  );
+function makeController(format: "T20" | "ODI" = "T20"): MatchController {
+  return format === "ODI"
+    ? createODIMatchController(
+        worldBytes,
+        manifest,
+        privateSeed,
+        privateIdentity,
+      )
+    : createMatchController(worldBytes, manifest, privateSeed, privateIdentity);
 }
-function metadata(session: T20Session) {
+function sessionFormat(raw: unknown): "T20" | "ODI" {
+  const value = raw as { setup?: { format?: unknown } };
+  return value?.setup?.format === "ODI" ? "ODI" : "T20";
+}
+function metadata(session: AnySession) {
   return {
     matchGameId: String(session.setup.gameId),
     matchId: String(session.setup.matchId),
@@ -64,11 +76,11 @@ function metadata(session: T20Session) {
     completed: session.core.phase === "COMPLETE",
   };
 }
-function defaultTitle(session: T20Session): string {
+function defaultTitle(session: AnySession): string {
   return `${session.setup.teams[0].name} v ${session.setup.teams[1].name}`;
 }
 
-function durableHistoryFromSession(session: T20Session) {
+function durableHistoryFromSession(session: AnySession) {
   return session.commands.map((command) => {
     const request =
       command.kind === "CONFIRM_TEAMS"
@@ -77,6 +89,7 @@ function durableHistoryFromSession(session: T20Session) {
             requestId: command.commandId,
             expectedRevision: command.expectedRevision,
             type: "START" as const,
+            format: session.setup.format,
             selections: session.setup.teams.map((team) => ({
               teamId: team.teamId,
               playerIds: [...team.playerIds],
@@ -127,7 +140,7 @@ async function decorate(
 async function restoreSave(saveId: string): Promise<void> {
   const loaded = await repository.load(saveId);
   if (!loaded) throw new Error("Save not found.");
-  controller = makeController();
+  controller = makeController(sessionFormat(loaded.session));
   controller.restore(loaded.session);
   recovered = loaded.recovered;
   recoveredFromGeneration = loaded.recoveredFromGeneration;
@@ -185,7 +198,7 @@ async function rollback(error: unknown, requestId: string): Promise<Response> {
     try {
       const loaded = await repository.load(activeSaveId);
       if (loaded) {
-        controller = makeController();
+        controller = makeController(sessionFormat(loaded.session));
         controller.restore(loaded.session);
       }
     } catch {
@@ -381,10 +394,14 @@ async function handlePersistence(request: Request): Promise<Response | null> {
     try {
       const loaded = await repository.load(saveId);
       if (!loaded) throw new Error("Save not found.");
+      const archivePins =
+        sessionFormat(loaded.session) === "ODI"
+          ? ODI_ARCHIVE_PINS
+          : ARCHIVE_PINS;
       const archive = await createPortableArchive(
         loaded.session,
         loaded.summary,
-        ARCHIVE_PINS,
+        archivePins,
         nowIso(),
       );
       return decorate(controller.currentResponse(request.requestId), archive);
@@ -399,8 +416,13 @@ async function handlePersistence(request: Request): Promise<Response | null> {
   }
   if (request.type === "IMPORT_SAVE") {
     try {
-      const imported = await readPortableArchive(request.archive, ARCHIVE_PINS);
-      const validationController = makeController();
+      const imported = await readPortableArchive(request.archive, [
+        ARCHIVE_PINS,
+        ODI_ARCHIVE_PINS,
+      ]);
+      const validationController = makeController(
+        sessionFormat(imported.session),
+      );
       validationController.restore(imported.session);
       const session = validationController.snapshot()!;
       const target = `import-${randomHex(10)}`;
@@ -450,6 +472,8 @@ async function handle(raw: unknown): Promise<Response> {
   const persistenceResponse = await handlePersistence(request);
   if (persistenceResponse) return persistenceResponse;
   if (request.type === "BOOT") return decorate(controller.handle(request));
+  if (request.type === "START" && !controller.snapshot())
+    controller = makeController(request.format);
   if (request.type === "COMMAND" && activeSaveId) {
     const prior = await repository.command(
       activeSaveId,

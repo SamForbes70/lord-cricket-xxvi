@@ -1,23 +1,23 @@
-# Capability matrix: Pass 09 / M4
+# Capability matrix: Pass 10 / M5A
 
 | Capability | Status and boundary |
 | --- | --- |
 | M0 approved world | Original 160 players, 8 squads, 8 grounds; unchanged gameplay data |
 | M1 scorer | Inherited supported scoring rules; unchanged |
-| M2 match engine | `LC_T20_MATCH_V1`; unchanged rules/model/stage and `LC_T20_EVENT_CHAIN_V1` |
-| M3 manual browser exhibition | Implemented automated capability; formal human acceptance record remains pending |
-| UI authority | One worker; strict revisioned HUMAN requests; seed never returned in public views |
-| M4 atomic persistence | Implemented with IndexedDB command-batch commits and durable acknowledgement |
-| Autosave/resume | Implemented for every accepted manual setup/command; reload restores last durable revision |
-| Checkpoints/recovery | Three rolling generations; bad newest checksum recovers an older valid generation into a new save while preserving the damaged source |
-| Multi-tab writer safety | One writer lease; additional tab is read-only; storage revision is checked transactionally |
-| Manual saves | Local copy slots implemented |
-| Portable saves | `.lcxxvi` ZIP export/import implemented with staged validation, hashes, size/path/file-count checks and version pins |
-| Save rehydration | Stored core is not trusted; setup is revalidated and command history resimulated before hash/state comparison |
+| T20 engine | `LC_T20_MATCH_V1`; inherited event-chain/hash regressions unchanged |
+| ODI engine | `LC_ODI_MATCH_V1`; one 50-over innings per team, deterministic event stream and replay |
+| ODI innings allocation | 300 legal balls unless all out or chase completes first |
+| ODI bowler quota | 60 legal balls per bowler; same bowler cannot bowl consecutive overs |
+| ODI field phases | Max 2 outside balls 0-59; max 4 outside 60-239; max 5 outside 240-299 |
+| ODI model phases | `ODI_EARLY`, `ODI_MIDDLE`, `ODI_LATE` at the same legal-ball boundaries |
+| ODI named fields | ODI-only registry adds `long-off`, allowing an actual five-outfielder late-innings field without altering T20 choices |
+| ODI browser exhibition | Implemented through normal production UI; both teams manually controlled |
+| M4 persistence | Retained for T20 and ODI: atomic autosave, resume, checkpoints, leases, manual slots and `.lcxxvi` export/import |
+| Portable archive pins | Import accepts only an explicitly supported T20 or ODI engine/rules/event-chain pin set |
 | Tactical opponent AI | Unavailable; both teams are controlled manually |
-| Variation | Stock only |
-| M5 other formats | Deferred |
+| Limited-overs rain / DLS | Disabled; no target is invented or approximated |
+| Red-ball M5B | Deferred |
 | M6 league/training | Deferred |
-| M7 tactical AI/calibration | Deferred; SYNTHETIC_ALPHA |
-| DLS, empirical realism, certified ICC rules | Disabled/unclaimed |
-| Sam Forbes 161-player fantasy pack | Not included; later explicit opt-in pack with version/hash required |
+| M7 tactical AI/calibration | Deferred; `SYNTHETIC_ALPHA` |
+| Certified ICC rules / empirical realism | Unclaimed |
+| Formal M3 human acceptance | Still pending as a separate acceptance record |

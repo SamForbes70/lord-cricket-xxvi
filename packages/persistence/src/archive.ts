@@ -311,7 +311,7 @@ export async function createPortableArchive(
 
 export async function readPortableArchive(
   bytes: Uint8Array,
-  expected: ArchivePins,
+  expected: ArchivePins | readonly ArchivePins[],
 ): Promise<{
   session: unknown;
   summary: SaveSummary;
@@ -377,9 +377,17 @@ export async function readPortableArchive(
     "ARCHIVE_PINS",
   );
   const manifestPins = manifest.pins as unknown as Record<string, unknown>;
-  for (const [key, value] of Object.entries(expected))
-    if (manifestPins[key] !== value)
-      throw new Error(`ARCHIVE_PIN_UNSUPPORTED_${key}`);
+  if (Array.isArray(expected)) {
+    const matches = expected.some((pins) =>
+      Object.entries(pins).every(([key, value]) => manifestPins[key] === value),
+    );
+    if (!matches) throw new Error("ARCHIVE_PINS_UNSUPPORTED");
+  } else {
+    for (const [key, value] of Object.entries(expected)) {
+      if (manifestPins[key] !== value)
+        throw new Error(`ARCHIVE_PIN_UNSUPPORTED_${key}`);
+    }
+  }
   for (const name of ["game.json", "events.ndjson"] as const) {
     const data = files.get(name)!,
       meta = manifest.files[name];

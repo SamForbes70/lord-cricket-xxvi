@@ -180,5 +180,5 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(98); // inherited 91 stay byte-identical (see t20:inventory)
+  expect(names).toHaveLength(106); // inherited 98 plus eight additive ODI schemas
 });

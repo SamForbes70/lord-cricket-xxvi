@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium-m5a] › tests/m5/odi-ui.spec.ts:21:1 › ODI exhibition starts, advances and resumes durably (6.7s)
+
+  1 passed (8.8s)

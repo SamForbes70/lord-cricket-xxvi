@@ -1,0 +1,16 @@
+
+Running 3 tests using 1 worker
+
+chromium keyboard step [33m0[39m AWAITING_INNINGS
+chromium keyboard step [33m10[39m READY
+chromium keyboard step [33m20[39m AWAITING_BOWLER
+chromium keyboard step [33m30[39m READY
+chromium keyboard step [33m40[39m READY
+chromium keyboard step [33m50[39m READY
+chromium keyboard step [33m60[39m AWAITING_BATTER
+chromium keyboard step [33m70[39m READY
+chromium keyboard step [33m80[39m AWAITING_BOWLER
+chromium keyboard step [33m90[39m AWAITING_BOWLER
+chromium keyboard step [33m100[39m AWAITING_BOWLER
+chromium keyboard step [33m110[39m AWAITING_BOWLER
+  ✓  1 [chromium] › tests/ui/match.spec.ts:56:1 › a full keyboard-only human-command match, replay identity and terminal controls (31.2s)

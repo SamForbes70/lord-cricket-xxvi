@@ -161,3 +161,34 @@ export const T20_LATER_SLOTS = [
   "deep-square-leg",
   "fine-leg",
 ] as const;
+
+/** ODI-only registry extends the inherited T20 names without changing T20 field choices. */
+export const ODI_FIELD_REGISTRY = FieldRegistrySchema.parse({
+  registryId: "LC_ODI_FIELD_01",
+  referenceHand: "R",
+  positions: [
+    ...FIELD_REGISTRY.positions,
+    {
+      slotId: "long-off",
+      sector: 4,
+      angleDegrees: 190,
+      depth: "DEEP",
+      insideCircle: false,
+      legSide: false,
+      behindSquare: false,
+    },
+  ],
+});
+export const ODI_POWERPLAY_SLOTS = T20_POWERPLAY_SLOTS;
+export const ODI_MIDDLE_SLOTS = T20_LATER_SLOTS;
+export const ODI_LATE_SLOTS = [
+  "deep-cover",
+  "long-off",
+  "long-on",
+  "deep-square-leg",
+  "fine-leg",
+  "point",
+  "cover",
+  "mid-on",
+  "midwicket",
+] as const;

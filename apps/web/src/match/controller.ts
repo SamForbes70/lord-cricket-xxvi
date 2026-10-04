@@ -37,7 +37,10 @@ export function createMatchController(
   worldBytes: Uint8Array,
   manifest: unknown,
   privateSeed: () => string,
-  privateIdentity: () => { gameId: string; matchId: string } = () => ({ gameId: "human-exhibition", matchId: "human-t20" }),
+  privateIdentity: () => { gameId: string; matchId: string } = () => ({
+    gameId: "human-exhibition",
+    matchId: "human-t20",
+  }),
 ) {
   const { world } = verifyFrozenWorldBytes(worldBytes, manifest);
   const catalog: Catalog = {
@@ -190,6 +193,7 @@ export function createMatchController(
           : `${tn(r.winnerTeamId)} won by ${r.marginRuns ?? r.marginWickets} ${r.marginType?.toLowerCase()}`
         : null;
     return {
+      format: "T20",
       revision: s.revision,
       phase: c.phase,
       nextDecision: decision[c.phase as keyof typeof decision] ?? c.phase,
@@ -278,17 +282,24 @@ export function createMatchController(
   function restore(raw: unknown): void {
     session = rehydrateT20Session(raw, worldBytes, manifest);
     seen.clear();
-    audit.splice(0, audit.length, ...session.commands.map((cmd) => ({
-      requestId: cmd.commandId,
-      origin: "HUMAN" as const,
-      commandKind: cmd.kind,
-      engineActorId: cmd.actorId,
-    })));
+    audit.splice(
+      0,
+      audit.length,
+      ...session.commands.map((cmd) => ({
+        requestId: cmd.commandId,
+        origin: "HUMAN" as const,
+        commandKind: cmd.kind,
+        engineActorId: cmd.actorId,
+      })),
+    );
   }
   function snapshot(): T20Session | null {
     return session ? structuredClone(session) : null;
   }
-  function currentResponse(requestId: string, error: string | null = null): Response {
+  function currentResponse(
+    requestId: string,
+    error: string | null = null,
+  ): Response {
     return {
       version: UI_VERSION,
       requestId,
@@ -318,11 +329,16 @@ export function createMatchController(
             throw new Error("Request ID already used with different content.");
           return structuredClone(prior.response);
         }
-        if (request.type !== "BOOT" && request.expectedRevision !== (session?.revision ?? 0))
+        if (
+          request.type !== "BOOT" &&
+          request.expectedRevision !== (session?.revision ?? 0)
+        )
           throw new Error(
             "Stale revision. Review the current decision and try again.",
           );
         if (request.type === "START") {
+          if (request.format !== "T20")
+            throw new Error("T20 controller received a non-T20 start.");
           if (session) throw new Error("A match is already in progress.");
           const setup = validateT20MatchSetup(
             {

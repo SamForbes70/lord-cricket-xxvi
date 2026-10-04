@@ -5,6 +5,7 @@ import {
   T20TeamSelectionSchema,
   type T20Command,
   type T20Scorecard,
+  type ODIScorecard,
   type InningsLedger,
   type BowlingPlan,
 } from "@lcxxvi/contracts";
@@ -21,6 +22,15 @@ export const PINS = Object.freeze({
     "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
 });
 
+export const ODI_PINS = Object.freeze({
+  engine: "LC_ODI_MATCH_V1",
+  eventChain: "LC_ODI_EVENT_CHAIN_V1",
+  worldHash: PINS.worldHash,
+  rulesHash: "81f8ec39a793e3761dac2d477a7fc7d4981df2e69b262e88160cb93141c28ee5",
+  modelHash: PINS.modelHash,
+  stagePackHash: PINS.stagePackHash,
+});
+
 export const ARCHIVE_PINS = Object.freeze({
   engine: PINS.engine,
   eventChain: PINS.eventChain,
@@ -30,6 +40,16 @@ export const ARCHIVE_PINS = Object.freeze({
   rules: "LC_T20_01",
   rulesHash: PINS.rulesHash,
   worldHash: PINS.worldHash,
+});
+export const ODI_ARCHIVE_PINS = Object.freeze({
+  engine: ODI_PINS.engine,
+  eventChain: ODI_PINS.eventChain,
+  random: "SHA256_COUNTER_V1",
+  model: "synthetic-alpha-01",
+  modelHash: ODI_PINS.modelHash,
+  rules: "LC_ODI_01",
+  rulesHash: ODI_PINS.rulesHash,
+  worldHash: ODI_PINS.worldHash,
 });
 const base = {
   version: z.literal(UI_VERSION),
@@ -41,6 +61,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({
     ...base,
     type: z.literal("START"),
+    format: z.enum(["T20", "ODI"]).default("T20"),
     selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
     groundId: z.string().min(1),
   }),
@@ -52,11 +73,31 @@ export const RequestSchema = z.discriminatedUnion("type", [
   }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
   z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
-  z.strictObject({ ...base, type: z.literal("MANUAL_SAVE"), title: z.string().trim().min(1).max(80) }),
-  z.strictObject({ ...base, type: z.literal("LOAD_SAVE"), saveId: z.string().min(1).max(160) }),
-  z.strictObject({ ...base, type: z.literal("DELETE_SAVE"), saveId: z.string().min(1).max(160) }),
-  z.strictObject({ ...base, type: z.literal("EXPORT_SAVE"), saveId: z.string().min(1).max(160).nullable() }),
-  z.strictObject({ ...base, type: z.literal("IMPORT_SAVE"), archive: z.instanceof(Uint8Array) }),
+  z.strictObject({
+    ...base,
+    type: z.literal("MANUAL_SAVE"),
+    title: z.string().trim().min(1).max(80),
+  }),
+  z.strictObject({
+    ...base,
+    type: z.literal("LOAD_SAVE"),
+    saveId: z.string().min(1).max(160),
+  }),
+  z.strictObject({
+    ...base,
+    type: z.literal("DELETE_SAVE"),
+    saveId: z.string().min(1).max(160),
+  }),
+  z.strictObject({
+    ...base,
+    type: z.literal("EXPORT_SAVE"),
+    saveId: z.string().min(1).max(160).nullable(),
+  }),
+  z.strictObject({
+    ...base,
+    type: z.literal("IMPORT_SAVE"),
+    archive: z.instanceof(Uint8Array),
+  }),
 ]);
 export type Request = z.infer<typeof RequestSchema>;
 export type Selection = z.infer<typeof T20TeamSelectionSchema>;
@@ -83,6 +124,7 @@ export type Catalog = {
 };
 export type Candidate = { id: string; name: string; reason: string };
 export type View = {
+  format: "T20" | "ODI";
   revision: number;
   phase: string;
   nextDecision: string;
@@ -108,7 +150,7 @@ export type View = {
   positions: string[];
   advanceReason: string;
   commentary: { sequence: number; text: string; short: string }[];
-  scorecard: T20Scorecard | null;
+  scorecard: T20Scorecard | ODIScorecard | null;
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;

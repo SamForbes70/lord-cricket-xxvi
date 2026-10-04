@@ -265,8 +265,8 @@ function App() {
             <Setup
               catalog={catalog}
               busy={busy || fatal}
-              start={(selections, groundId) =>
-                send({ type: "START", selections, groundId })
+              start={(format, selections, groundId) =>
+                send({ type: "START", format, selections, groundId })
               }
             />
           ) : (
@@ -283,7 +283,7 @@ function App() {
           >
             <div>
               <p>
-                {view.ground} · T20 ·{" "}
+                {view.ground} · {view.format} ·{" "}
                 {i ? `Innings ${view.activeIndex + 1}` : "Pre-match"}
               </p>
               <h2>
@@ -295,7 +295,10 @@ function App() {
                 {i ? `${i.runs}/${i.wickets}` : "Ready for the toss"}
               </strong>
               {i && (
-                <span className="over">{overs(i.legalBalls)} / 20 overs</span>
+                <span className="over">
+                  {overs(i.legalBalls)} / {view.format === "ODI" ? 50 : 20}{" "}
+                  overs
+                </span>
               )}
             </div>
             <div className="target" data-testid="target">
@@ -304,7 +307,11 @@ function App() {
               {i?.targetToWin != null && (
                 <p>
                   {Math.max(0, i.targetToWin - i.runs)} needed ·{" "}
-                  {Math.max(0, 120 - i.legalBalls)} balls left
+                  {Math.max(
+                    0,
+                    (view.format === "ODI" ? 300 : 120) - i.legalBalls,
+                  )}{" "}
+                  balls left
                 </p>
               )}
               {view.activeIndex === 1 && (
@@ -529,7 +536,9 @@ function App() {
           {view.resultText && (
             <section className="result">
               <h2>{view.resultText}</h2>
-              <p>One complete fictional T20. Review both innings below.</p>
+              <p>
+                One complete fictional {view.format}. Review both innings below.
+              </p>
               <button
                 disabled={busy || fatal}
                 onClick={() => send({ type: "VERIFY" })}
@@ -754,9 +763,10 @@ function App() {
           pinned engine/model/rules identity required for validated resume.
         </p>
         <p>
-          Original world: 160 fictional players, 8 squads. Custom game rules; no
-          certified ICC compliance or empirical realism. DLS, other formats,
-          careers and tactical AI are unavailable.
+          Original world: 160 fictional players, 8 squads. T20 and ODI
+          exhibition use custom game rules; no certified ICC compliance or
+          empirical realism. DLS, red-ball, careers and tactical AI are
+          unavailable.
         </p>
       </footer>
     </main>
@@ -769,13 +779,18 @@ function Setup({
 }: {
   catalog: Catalog;
   busy: boolean;
-  start: (teams: [Selection, Selection], ground: string) => void;
+  start: (
+    format: "T20" | "ODI",
+    teams: [Selection, Selection],
+    ground: string,
+  ) => void;
 }) {
   const [teams, setTeams] = useState<[Selection, Selection]>([
     structuredClone(catalog.teams[0]!.suggested),
     structuredClone(catalog.teams[1]!.suggested),
   ]);
   const [ground, setGround] = useState(catalog.grounds[0]!.id);
+  const [format, setFormat] = useState<"T20" | "ODI">("T20");
   const reasons = teams
     .map((s, index) => {
       const t = catalog.teams.find((t) => t.id === s.teamId)!;
@@ -910,6 +925,17 @@ function Setup({
           })}
         </div>
         <label>
+          Format{" "}
+          <select
+            aria-label="Format"
+            value={format}
+            onChange={(e) => setFormat(e.target.value as "T20" | "ODI")}
+          >
+            <option value="T20">T20 · 20 overs</option>
+            <option value="ODI">ODI · 50 overs</option>
+          </select>
+        </label>
+        <label>
           Ground{" "}
           <select
             aria-label="Ground"
@@ -931,7 +957,7 @@ function Setup({
           className="primary"
           disabled={reasons.length > 0}
           aria-describedby="setup-reasons"
-          onClick={() => start(teams, ground)}
+          onClick={() => start(format, teams, ground)}
         >
           Confirm XIs and start
         </button>

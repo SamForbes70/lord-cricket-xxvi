@@ -17,3 +17,5 @@ export * from "./probability.js";
 export * from "./generator.js";
 export * from "./world-setup.js";
 export * from "./t20-match.js";
+
+export * from "./odi-match.js";
