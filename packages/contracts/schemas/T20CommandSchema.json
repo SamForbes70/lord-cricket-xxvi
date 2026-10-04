@@ -1,0 +1,547 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "CONFIRM_TEAMS"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "CALL_TOSS"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "call": {
+              "type": "string",
+              "enum": [
+                "HEADS",
+                "TAILS"
+              ]
+            }
+          },
+          "required": [
+            "teamId",
+            "call"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "CHOOSE_INNINGS"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "choice": {
+              "type": "string",
+              "enum": [
+                "BAT",
+                "BOWL"
+              ]
+            }
+          },
+          "required": [
+            "teamId",
+            "choice"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "SET_BATTER"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "playerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "required": [
+            "teamId",
+            "playerId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "SET_BOWLER"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "bowlerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "required": [
+            "teamId",
+            "bowlerId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "SET_FIELD"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "fieldSlots": {
+              "minItems": 9,
+              "maxItems": 9,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "slotId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  }
+                },
+                "required": [
+                  "slotId",
+                  "playerId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "teamId",
+            "fieldSlots"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "SET_BATTING_PLAN"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "playerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "aggression": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "intent": {
+              "type": "string",
+              "enum": [
+                "NORMAL",
+                "ROTATE",
+                "PROTECT"
+              ]
+            }
+          },
+          "required": [
+            "playerId",
+            "aggression",
+            "intent"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "SET_BOWLING_PLAN"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "bowlerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "line": {
+              "type": "string",
+              "enum": [
+                "OFF",
+                "STUMPS",
+                "LEG"
+              ]
+            },
+            "length": {
+              "type": "string",
+              "enum": [
+                "YORKER",
+                "FULL",
+                "GOOD",
+                "SHORT"
+              ]
+            },
+            "variationId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "effort": {
+              "type": "string",
+              "enum": [
+                "CONSERVE",
+                "NORMAL",
+                "MAXIMUM"
+              ]
+            }
+          },
+          "required": [
+            "bowlerId",
+            "line",
+            "length",
+            "variationId",
+            "effort"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "ADVANCE"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "type": "string",
+              "enum": [
+                "DELIVERY",
+                "OVER"
+              ]
+            }
+          },
+          "required": [
+            "scope"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commandId",
+        "expectedRevision",
+        "actorId",
+        "kind",
+        "payload"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$id": "urn:lcxxvi:T20Command:1",
+  "title": "T20Command"
+}

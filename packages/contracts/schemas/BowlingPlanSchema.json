@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "bowlerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "line": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "STUMPS",
+        "LEG"
+      ]
+    },
+    "length": {
+      "type": "string",
+      "enum": [
+        "YORKER",
+        "FULL",
+        "GOOD",
+        "SHORT"
+      ]
+    },
+    "variationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "effort": {
+      "type": "string",
+      "enum": [
+        "CONSERVE",
+        "NORMAL",
+        "MAXIMUM"
+      ]
+    }
+  },
+  "required": [
+    "bowlerId",
+    "line",
+    "length",
+    "variationId",
+    "effort"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:BowlingPlan:1",
+  "title": "BowlingPlan"
+}

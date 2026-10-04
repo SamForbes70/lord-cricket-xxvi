@@ -1,0 +1,171 @@
+{
+  "verifiedAt": "2026-09-26T03:45:42.960Z",
+  "node": "v22.16.0",
+  "npm": "10.9.2 (observed before failed installation)",
+  "offlineEvidenceMode": true,
+  "platform": "linux",
+  "architecture": "x64",
+  "firefoxContentSandboxDisabled": false,
+  "lockfileSha256": "44e63e6db495d897f28cda25e4338839abded362cdeaa84b6bd8a5f0ddcd17df",
+  "schemaVersion": "1.0.0",
+  "scoringImplemented": true,
+  "randomServiceImplemented": true,
+  "randomVersion": "SHA256_COUNTER_V1",
+  "stateHashVersion": "LC_CANONICAL_JSON_V1_SHA256",
+  "randomSamplerImplemented": true,
+  "samplerScope": "VERSIONED_CATEGORICAL_ONLY",
+  "conditionalDeliveryGeneratorImplemented": true,
+  "conditionalDeliveryGeneratorVerified": false,
+  "generatorVersion": "LC_CONDITIONAL_DELIVERY_V1",
+  "generatorStagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "probabilityVersion": "LC_INTEGER_PROBABILITY_V1",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "lutHash": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+  "scoringEngine": "LC_SCORING_V1",
+  "matchEngineImplemented": false,
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Complete seeded T20 orchestration, only after all Pass 06 mandatory gates pass",
+  "gates": [
+    {
+      "gate": "installation",
+      "command": "npm ci (earlier failed attempt; see installation.log)",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "Recorded npm ci failure; dependencies unavailable. Re-run standard verification after registry access returns."
+    },
+    {
+      "gate": "schemas",
+      "command": "npm run schemas:check",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    },
+    {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    },
+    {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    },
+    {
+      "gate": "fixtures",
+      "command": "npm run fixtures:audit",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    },
+    {
+      "gate": "scorer",
+      "command": "npm run fixtures:engine",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    },
+    {
+      "gate": "vectors",
+      "command": "python3 scripts/check-determinism-vectors.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 622
+    },
+    {
+      "gate": "probability-vectors",
+      "command": "python3 scripts/reference_probability.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 644
+    },
+    {
+      "gate": "generator-vectors",
+      "command": "python3 scripts/check-generator-vectors.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 650
+    },
+    {
+      "gate": "unit",
+      "command": "npm test",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    },
+    {
+      "gate": "smoke",
+      "command": "npm run smoke",
+      "exitCode": null,
+      "status": "BLOCKED",
+      "elapsedMs": 0,
+      "reason": "BLOCKED: npm ci did not complete; production dependencies not installed"
+    }
+  ],
+  "supplementalGates": [
+    {
+      "gate": "schema-metaschema",
+      "status": "PASS_LIMITED",
+      "command": "python3 scripts/check-generator-json-schemas.py",
+      "schemas": 88,
+      "distinctGeneratorOutputClasses": 10,
+      "log": "independent-schema-mirror.log"
+    },
+    {
+      "gate": "transpiled-generator-scorer",
+      "status": "PASS_LIMITED",
+      "command": "GENERATOR_OFFLINE_CASES=1200 node scripts/offline-generator-check.mjs",
+      "scenarios": 1200,
+      "targetedEdgeCases": 11,
+      "log": "offline-generator-check.log",
+      "shimCaveat": "Identity Zod parser and Node SHA-256 in place of unavailable pinned production dependencies"
+    },
+    {
+      "gate": "prior-probability-transpiled",
+      "status": "PASS_LIMITED",
+      "command": "node scripts/offline-probability-check.mjs",
+      "log": "prior-offline-probability.log"
+    },
+    {
+      "gate": "package-architecture",
+      "status": "PASS_LIMITED",
+      "command": "node scripts/check-boundaries.mjs (temporary global-TypeScript symlink removed afterward)",
+      "log": "architecture-boundaries.log"
+    },
+    {
+      "gate": "source-syntax",
+      "status": "PASS_LIMITED",
+      "command": "global TS 5.8.3 transpile 9 changed TS/TSX files",
+      "log": "source-syntax-check.log"
+    },
+    {
+      "gate": "offline-audit",
+      "status": "LIMITED_NO_FRESH_ADVISORY_COVERAGE",
+      "command": "npm audit --offline --json",
+      "log": "dependency-audit.json"
+    }
+  ],
+  "overall": "BLOCKED",
+  "pass": "06.0",
+  "baselineFrozen": false,
+  "readyForPass07": false
+}

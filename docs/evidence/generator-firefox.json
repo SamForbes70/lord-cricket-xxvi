@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "browser": "firefox",
+  "version": "142.0.1",
+  "vectors": 9,
+  "mainThreadAndWorker": true,
+  "predictionIsolation": true,
+  "errorRecovery": true
+}

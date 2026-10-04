@@ -1,0 +1,168 @@
+{
+  "kind": "GENERATE_DELIVERY",
+  "generatorVersion": "LC_CONDITIONAL_DELIVERY_V1",
+  "stagePackId": "synthetic-alpha-01-delivery-v1",
+  "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+  "randomVersion": "SHA256_COUNTER_V1",
+  "probabilityVersion": "LC_INTEGER_PROBABILITY_V1",
+  "modelId": "synthetic-alpha-01",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "lutVersion": "LC_EXP_LUT_V1",
+  "lutHash": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+  "rulesHash": "7c67aec8e3aef8be7b849775d83bad64847338e03326848ec1f1d0d99c6fa745",
+  "matchId": "match-pass06-demo",
+  "seed": "pass06-independent-base",
+  "attemptOrdinal": 12,
+  "format": "T20",
+  "phase": "T20_EARLY",
+  "context": {
+    "rulesId": "LC_T20_01",
+    "inningsIndex": 0,
+    "deliveryIndex": 12,
+    "battingTeamId": "team-A",
+    "bowlingTeamId": "team-B",
+    "strikerId": "p1",
+    "nonStrikerId": "p2",
+    "bowlerId": "b1",
+    "keeperId": "keeper",
+    "outfieldIds": [
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6",
+      "f7",
+      "f8",
+      "f9"
+    ],
+    "endsBefore": {
+      "north": "p1",
+      "south": "p2"
+    },
+    "strikerEnd": "NORTH",
+    "runs": 100,
+    "wickets": 2,
+    "legalBalls": 10,
+    "allocatedBalls": 120,
+    "targetToWin": null,
+    "freeHitPending": false,
+    "ballAgeLegalBalls": 10
+  },
+  "bowling": {
+    "bowlingStyle": "MEDIUM",
+    "controlRating": 60,
+    "movementRating": 55,
+    "fatigueBp": 1000,
+    "line": "STUMPS",
+    "intendedLength": "GOOD",
+    "effort": "NORMAL",
+    "variationId": "stock"
+  },
+  "batting": {
+    "defenceRating": 58,
+    "timingRating": 65,
+    "powerRating": 60,
+    "rotationRating": 55,
+    "vsPaceRating": 60,
+    "vsSpinRating": 55,
+    "aggression": 2,
+    "intent": "NORMAL",
+    "attemptedStroke": true,
+    "shotSectorWeights": [
+      1200,
+      1100,
+      1300,
+      1400,
+      1500,
+      1000,
+      1200,
+      1300
+    ]
+  },
+  "conditions": {
+    "seamBp": 5000,
+    "turnBp": 5000
+  },
+  "field": {
+    "keeper": {
+      "keepingRating": 60,
+      "catchingRating": 65,
+      "throwingRating": 55
+    },
+    "slots": [
+      {
+        "playerId": "f1",
+        "sector": 0,
+        "depth": "INNER",
+        "role": "SLIP",
+        "catchingRating": 55,
+        "throwingRating": 55
+      },
+      {
+        "playerId": "f2",
+        "sector": 1,
+        "depth": "MIDDLE",
+        "role": "GULLY",
+        "catchingRating": 60,
+        "throwingRating": 59
+      },
+      {
+        "playerId": "f3",
+        "sector": 2,
+        "depth": "DEEP",
+        "role": "NORMAL",
+        "catchingRating": 65,
+        "throwingRating": 63
+      },
+      {
+        "playerId": "f4",
+        "sector": 3,
+        "depth": "INNER",
+        "role": "NORMAL",
+        "catchingRating": 55,
+        "throwingRating": 67
+      },
+      {
+        "playerId": "f5",
+        "sector": 4,
+        "depth": "MIDDLE",
+        "role": "NORMAL",
+        "catchingRating": 60,
+        "throwingRating": 55
+      },
+      {
+        "playerId": "f6",
+        "sector": 5,
+        "depth": "DEEP",
+        "role": "NORMAL",
+        "catchingRating": 65,
+        "throwingRating": 59
+      },
+      {
+        "playerId": "f7",
+        "sector": 6,
+        "depth": "INNER",
+        "role": "NORMAL",
+        "catchingRating": 55,
+        "throwingRating": 63
+      },
+      {
+        "playerId": "f8",
+        "sector": 7,
+        "depth": "MIDDLE",
+        "role": "NORMAL",
+        "catchingRating": 60,
+        "throwingRating": 67
+      },
+      {
+        "playerId": "f9",
+        "sector": 0,
+        "depth": "DEEP",
+        "role": "NORMAL",
+        "catchingRating": 65,
+        "throwingRating": 55
+      }
+    ]
+  }
+}

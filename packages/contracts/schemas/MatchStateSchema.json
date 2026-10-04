@@ -1,0 +1,1162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "matchId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "versions": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "engine": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "random": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "rules": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "rulesHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "modelHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "worldHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "schema",
+        "engine",
+        "random",
+        "rules",
+        "rulesHash",
+        "model",
+        "modelHash",
+        "worldHash"
+      ],
+      "additionalProperties": false
+    },
+    "seed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "T20",
+        "ODI",
+        "RED_BALL"
+      ]
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "SETUP",
+        "TOSS",
+        "AWAITING_INNINGS",
+        "READY",
+        "AWAITING_BATTER",
+        "AWAITING_BOWLER",
+        "INTERVAL",
+        "WEATHER_DELAY",
+        "COMPLETE"
+      ]
+    },
+    "teamIds": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    },
+    "xi": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      },
+      "additionalProperties": {
+        "minItems": 11,
+        "maxItems": 11,
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "playerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "name": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{1,80}$"
+            },
+            "birthDate": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            },
+            "batHand": {
+              "type": "string",
+              "enum": [
+                "R",
+                "L"
+              ]
+            },
+            "bowlHand": {
+              "type": "string",
+              "enum": [
+                "R",
+                "L"
+              ]
+            },
+            "bowlingStyle": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "FAST",
+                    "MEDIUM",
+                    "OFF_SPIN",
+                    "LEG_SPIN",
+                    "SLOW_LEFT_ARM",
+                    "LEFT_ARM_WRIST"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "BATTER",
+                "BOWLER",
+                "ALLROUNDER",
+                "KEEPER"
+              ]
+            },
+            "skills": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": [
+                  "T20",
+                  "ODI",
+                  "RED_BALL"
+                ]
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "defence": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "timing": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "power": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "rotation": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "vsPace": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "vsSpin": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "control": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "movement": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "variation": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "stamina": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "catching": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "groundFielding": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "throwing": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "keeping": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "defence",
+                  "timing",
+                  "power",
+                  "rotation",
+                  "vsPace",
+                  "vsSpin",
+                  "control",
+                  "movement",
+                  "variation",
+                  "stamina",
+                  "catching",
+                  "groundFielding",
+                  "throwing",
+                  "keeping"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "variations": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              }
+            },
+            "shotSectorWeights": {
+              "minItems": 8,
+              "maxItems": 8,
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "exposureBalls": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": [
+                  "T20",
+                  "ODI",
+                  "RED_BALL"
+                ]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "provenance": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "FICTIONAL",
+                    "LICENSED",
+                    "USER_SUPPLIED"
+                  ]
+                },
+                "sourceId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "sourceHash": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "confidenceBp": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                }
+              },
+              "required": [
+                "kind",
+                "sourceId",
+                "sourceHash",
+                "confidenceBp"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "playerId",
+            "name",
+            "birthDate",
+            "batHand",
+            "bowlHand",
+            "bowlingStyle",
+            "role",
+            "skills",
+            "variations",
+            "shotSectorWeights",
+            "exposureBalls",
+            "provenance"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "inningsOrder": {
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "innings": {
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "battingTeamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "bowlingTeamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "runs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "wickets": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "legalBalls": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "deliveryAttempts": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "targetToWin": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "allocatedBalls": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extras": {
+            "type": "object",
+            "properties": {
+              "wides": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "noBalls": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "byes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "legByes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "penalties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "wides",
+              "noBalls",
+              "byes",
+              "legByes",
+              "penalties"
+            ],
+            "additionalProperties": false
+          },
+          "northBatterId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "southBatterId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "strikerEnd": {
+            "type": "string",
+            "enum": [
+              "NORTH",
+              "SOUTH"
+            ]
+          },
+          "battingOrder": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "dismissed": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "bowlerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previousOverBowlerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bowlerLegalBalls": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "freeHitPending": {
+            "type": "boolean"
+          },
+          "ballAgeLegalBalls": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "complete": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "index",
+          "battingTeamId",
+          "bowlingTeamId",
+          "runs",
+          "wickets",
+          "legalBalls",
+          "deliveryAttempts",
+          "targetToWin",
+          "allocatedBalls",
+          "extras",
+          "northBatterId",
+          "southBatterId",
+          "strikerEnd",
+          "battingOrder",
+          "dismissed",
+          "bowlerId",
+          "previousOverBowlerId",
+          "bowlerLegalBalls",
+          "freeHitPending",
+          "ballAgeLegalBalls",
+          "complete"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "activeInningsIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "clock": {
+      "type": "object",
+      "properties": {
+        "day": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "localSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 86399
+        },
+        "dayLegalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "finalHourActive": {
+          "type": "boolean"
+        },
+        "finalHourBallsRequired": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "finalHourBallsDelivered": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "pendingInterval": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "LUNCH",
+                "TEA",
+                "STUMPS"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "day",
+        "localSeconds",
+        "dayLegalBalls",
+        "finalHourActive",
+        "finalHourBallsRequired",
+        "finalHourBallsDelivered",
+        "pendingInterval"
+      ],
+      "additionalProperties": false
+    },
+    "tactics": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "battingPlans": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "playerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "aggression": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4
+                },
+                "intent": {
+                  "type": "string",
+                  "enum": [
+                    "NORMAL",
+                    "ROTATE",
+                    "PROTECT"
+                  ]
+                }
+              },
+              "required": [
+                "playerId",
+                "aggression",
+                "intent"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bowlingPlan": {
+            "type": "object",
+            "properties": {
+              "bowlerId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "line": {
+                "type": "string",
+                "enum": [
+                  "OFF",
+                  "STUMPS",
+                  "LEG"
+                ]
+              },
+              "length": {
+                "type": "string",
+                "enum": [
+                  "YORKER",
+                  "FULL",
+                  "GOOD",
+                  "SHORT"
+                ]
+              },
+              "variationId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "effort": {
+                "type": "string",
+                "enum": [
+                  "CONSERVE",
+                  "NORMAL",
+                  "MAXIMUM"
+                ]
+              }
+            },
+            "required": [
+              "bowlerId",
+              "line",
+              "length",
+              "variationId",
+              "effort"
+            ],
+            "additionalProperties": false
+          },
+          "fieldSlots": {
+            "minItems": 9,
+            "maxItems": 9,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slotId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "playerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                }
+              },
+              "required": [
+                "slotId",
+                "playerId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextBatterId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "delegation": {
+            "type": "object",
+            "properties": {
+              "battingOrder": {
+                "type": "boolean"
+              },
+              "bowlerSelection": {
+                "type": "boolean"
+              },
+              "battingTactics": {
+                "type": "boolean"
+              },
+              "bowlingTactics": {
+                "type": "boolean"
+              },
+              "declarations": {
+                "type": "boolean"
+              },
+              "followOn": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "battingOrder",
+              "bowlerSelection",
+              "battingTactics",
+              "bowlingTactics",
+              "declarations",
+              "followOn"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "battingPlans",
+          "bowlingPlan",
+          "fieldSlots",
+          "nextBatterId",
+          "delegation"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "conditions": {
+      "type": "object",
+      "properties": {
+        "pitch": {
+          "type": "object",
+          "properties": {
+            "seamBp": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "turnBp": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "variabilityBp": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "moistureBp": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "wearPoints": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "seamBp",
+            "turnBp",
+            "variabilityBp",
+            "moistureBp",
+            "wearPoints"
+          ],
+          "additionalProperties": false
+        },
+        "weather": {
+          "type": "string",
+          "enum": [
+            "DRY",
+            "OVERCAST",
+            "RAIN",
+            "UNSAFE_LIGHT"
+          ]
+        },
+        "outfieldSpeedBp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "ballId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "ballAgeLegalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "weatherScheduleId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      },
+      "required": [
+        "pitch",
+        "weather",
+        "outfieldSpeedBp",
+        "ballId",
+        "ballAgeLegalBalls",
+        "weatherScheduleId"
+      ],
+      "additionalProperties": false
+    },
+    "fatigueBp": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000
+      }
+    },
+    "result": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "WIN"
+                },
+                "winnerTeamId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "marginType": {
+                  "type": "string",
+                  "const": "RUNS"
+                },
+                "marginRuns": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "marginWickets": {
+                  "type": "null"
+                },
+                "completionReason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "kind",
+                "winnerTeamId",
+                "marginType",
+                "marginRuns",
+                "marginWickets",
+                "completionReason"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "WIN"
+                },
+                "winnerTeamId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "marginType": {
+                  "type": "string",
+                  "const": "WICKETS"
+                },
+                "marginRuns": {
+                  "type": "null"
+                },
+                "marginWickets": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                },
+                "completionReason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "kind",
+                "winnerTeamId",
+                "marginType",
+                "marginRuns",
+                "marginWickets",
+                "completionReason"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "WIN"
+                },
+                "winnerTeamId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "marginType": {
+                  "type": "string",
+                  "const": "INNINGS"
+                },
+                "marginRuns": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "marginWickets": {
+                  "type": "null"
+                },
+                "completionReason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "kind",
+                "winnerTeamId",
+                "marginType",
+                "marginRuns",
+                "marginWickets",
+                "completionReason"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "TIE",
+                    "DRAW",
+                    "NO_RESULT"
+                  ]
+                },
+                "winnerTeamId": {
+                  "type": "null"
+                },
+                "marginType": {
+                  "type": "null"
+                },
+                "marginRuns": {
+                  "type": "null"
+                },
+                "marginWickets": {
+                  "type": "null"
+                },
+                "completionReason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              },
+              "required": [
+                "kind",
+                "winnerTeamId",
+                "marginType",
+                "marginRuns",
+                "marginWickets",
+                "completionReason"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "matchId",
+    "revision",
+    "versions",
+    "seed",
+    "format",
+    "phase",
+    "teamIds",
+    "xi",
+    "inningsOrder",
+    "innings",
+    "activeInningsIndex",
+    "clock",
+    "tactics",
+    "conditions",
+    "fatigueBp",
+    "result"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:MatchState:1",
+  "title": "MatchState"
+}

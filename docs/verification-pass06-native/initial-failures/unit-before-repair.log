@@ -1,0 +1,217 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass06-repair/repo[39m
+
+ [32m✓[39m tests/unit/scoring-kernel.test.ts [2m([22m[2m134 tests[22m[2m)[22m[33m 385[2mms[22m[39m
+ [31m❯[39m tests/unit/probability.test.ts [2m([22m[2m23 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 319[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mpins the exact synthetic pack and independently generated LUT[32m 21[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'halves'[32m 8[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'thirds-largest-remainder'[32m 9[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'quarter-half-quarter'[32m 3[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'mask-and-cumulative-plateau'[32m 2[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'explicit-zero-weight'[32m 2[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'positive-and-negative-terms'[32m 3[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'rounding-ties-away'[32m 8[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'lut-rounding-half-step'[32m 5[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'logit-clip-after-sum'[32m 2[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'exp-low-positive-zero-mass'[32m 2[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'synthetic-neutral-legality'[32m 2[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'synthetic-t20-early-contact'[32m 11[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'mask-all-but-one'[32m 1[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'legality-leg-line-maximum-effort'[32m 3[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mmatches independent integer mass and SHA draw: 'contact-t20-late-attack'[32m 1[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22msupports exact hand-worked cumulative interval boundaries[32m 1[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mrounds each signed term with ties away from zero before summation and clips only after[32m 0[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22muses positive weights only to establish legal mask and reference maximum[32m 1[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mrejects duplicate IDs, model or LUT mismatches, illegal stage reuse and invalid mass[32m 13[2mms[22m[39m
+[31m   [31m×[31m integer probability model[2m > [22mrejects unsafe arithmetic, fractional features and unknown properties in both validators[39m[32m 190[2mms[22m[39m
+[31m     → schema with key or id "urn:lcxxvi:NormaliseCategoriesRequest:1" already exists[39m
+   [32m✓[39m integer probability model[2m > [22mbuilds versioned F2 legality and F3 contact coefficient inputs independently[32m 9[2mms[22m[39m
+   [32m✓[39m integer probability model[2m > [22mleaves original draws unchanged after unrelated calls and prediction-domain requests[32m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/generator.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 219[2mms[22m[39m
+ [32m✓[39m tests/unit/random-service.test.ts [2m([22m[2m44 tests[22m[2m)[22m[32m 168[2mms[22m[39m
+ [32m✓[39m tests/unit/determinism.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [31m❯[39m tests/unit/contracts.test.ts [2m([22m[2m29 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 2295[2mms[22m[39m
+   [33m[2m✓[22m[39m normative Appendix A/B/G boundary[2m > [22maccepts Appendix B command unchanged in both validators [33m 353[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22maccepts aggression 0[32m 1[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22maccepts aggression 1[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22maccepts aggression 2[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22maccepts aggression 3[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22maccepts aggression 4[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects malformed aggression -1[32m 4[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects malformed aggression 5[32m 1[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects malformed aggression 1.5[32m 1[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects malformed aggression 3[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects malformed aggression null[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects malformed aggression Infinity[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects malformed aggression NaN[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects unknown root and nested fields[32m 1[2mms[22m[39m
+[31m   [31m×[31m normative Appendix A/B/G boundary[2m > [22mrejects missing and unsafe counters[39m[32m 13[2mms[22m[39m
+[31m     → expected 82 to be 84 // Object.is equality[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mpreserves Unicode names through 80 code points[32m 3[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrequires all three format profiles and all skill fields[32m 2[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mchecks true calendar dates and positive sector total[32m 3[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mchecks nine unique field players and slots[32m 3[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mchecks keyed batting plans[32m 0[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22maccepts nullable delivery fields and rejects invalid sectors[32m 42[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrequires one-based event sequences and full SHA256 hashes[32m 3[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects arbitrary administrative payloads and unknown discriminators[32m 2[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrequires unused result margins to be null[32m 4[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mpins all three custom rule manifests with rain disabled[32m 27[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects portable archive traversal and excess size[32m 4[2mms[22m[39m
+   [32m✓[39m normative Appendix A/B/G boundary[2m > [22mrejects unsupported versions or mismatched content hashes[32m 4[2mms[22m[39m
+   [33m[2m✓[22m[39m every generated schema compiles with strict AJV 2020-12 [33m 1810[2mms[22m[39m
+   [32m✓[39m generated tuples reject missing and excess entries just like runtime[32m 5[2mms[22m[39m
+ [31m❯[39m tests/unit/scoring-fixtures.test.ts [2m([22m[2m84 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 2246[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF01: Wide at five legal balls[32m 6[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF02: No-ball hit for four[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF03: No-ball with two byes[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF04: Single on sixth legal ball[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF05: Striker caught on sixth ball[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF06: Free hit followed by wide[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF07: Winning automatic wide[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF08: Two needed, legal six[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mF09: All out level in chase[32m 3[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO1: Run-out after one completed run, attempting second[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO1-SIXTH: Run-out after one completed run, attempting second[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO2: Run-out after one completed run, attempting second[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO2-SIXTH: Run-out after one completed run, attempting second[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO3: Run-out after one completed run, attempting second[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO3-SIXTH: Run-out after one completed run, attempting second[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO4: Run-out after one completed run, attempting second[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mRO4-SIXTH: Run-out after one completed run, attempting second[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS01: Legal dot[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS02: Two bat runs[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS03: Single bye[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS04: Four leg-byes[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS05: Wide boundary[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS06: Free hit followed by another no-ball[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS07: Free-hit aerial ball stopped[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS08: Early dead ball[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS09: Caught and bowled[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS10: STUMPED on a wide[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS11: HIT_WICKET on a wide[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS12: Winning automatic no-ball[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS13: Red-ball no-ball[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS14: Target reached on final allocated ball[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS15: Legal BOWLED[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS16: Legal LBW[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS17: Legal HIT_WICKET[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS18: Run-out on a free hit[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS19: First innings allocation exhausted[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS20: Legal four[32m 1[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS21: Single leg-bye[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS22: Wide plus completed single[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS23: No-ball and single off bat[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS24: No-ball and two leg-byes[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS25: No-ball run-out after one completed bat run[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS26: Wide run-out after one completed run[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS27: ODI delivered no-ball[32m 0[2mms[22m[39m
+   [32m✓[39m hand-authored valid resolution cases[2m > [22mS28: Three completed bat runs[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI01: Wide and no-ball together[32m 2[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI02: Bat runs and byes together[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI03: Byes and leg-byes together[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI04: Leg-bye without attempted stroke[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI05: Caught on no-ball[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI06: Bowled on free hit[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI07: LBW on wide[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI08: Non-striker caught[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI09: Run-out receives unknown fielder[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI10: Boundary with physical running[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI11: No-ball automatic run incorrectly swaps ends[32m 6[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI12: Duplicate starting batters[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI13: Dead ball scores[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI14: Penalty scoring reserved[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI15: Negative run count[32m 2[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI16: Fractional physical run count[32m 6[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI17: Illegal unknown property[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI18: Score overflow[32m 3[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI19: Post-winning-extra contact not truncated[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI20: Premature immediate penalty[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI21: Allotted balls already exhausted[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI22: Red-ball free-hit state[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI23: Stumping by outfielder[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI24: Catch without bat contact[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI25: Dismissed batter still occupies an end[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI26: Both ends assigned to survivor[32m 4[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI27: Attempt index before legal-ball count[32m 1[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI28: Limited-overs profile with unlimited allocation[32m 2[2mms[22m[39m
+   [32m✓[39m invalid input rejects without mutation[2m > [22mI29: Third T20 innings[32m 1[2mms[22m[39m
+   [32m✓[39m locks all Appendix D cases and fixture IDs to a reviewed digest[32m 77[2mms[22m[39m
+   [33m[2m✓[22m[39m validates the entire corpus against independent emitted JSON Schema [33m 495[2mms[22m[39m
+   [32m✓[39m never allows derived event fields at the resolution input boundary[32m 1[2mms[22m[39m
+   [33m[2m✓[22m[39m runs a real scorer comparison gate against the retained corpus [33m 1536[2mms[22m[39m
+   [32m✓[39m future observation harness rejects corrupted score, strike and bowler credit[32m 28[2mms[22m[39m
+   [32m✓[39m covers both run-out batters and ends at ordinary and sixth-ball boundaries[32m 3[2mms[22m[39m
+   [32m✓[39m independently pins red-ball expected margins, targets and completion distinctions[32m 2[2mms[22m[39m
+   [32m✓[39m pins the five independently authored clock expectations[32m 1[2mms[22m[39m
+   [32m✓[39m distinguishes reserved persistence/NRR expectations from executed subsystems[32m 1[2mms[22m[39m
+[31m   [31m×[31m accounts for all exported schema definitions[39m[32m 11[2mms[22m[39m
+[31m     → expected [ 'CounterSchema', …(87) ] to have a length of 84 but got 88[39m
+ [32m✓[39m tests/unit/defaults.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/contracts.test.ts[2m > [22mnormative Appendix A/B/G boundary[2m > [22mrejects missing and unsafe counters
+[31m[1mAssertionError[22m: expected 82 to be 84 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 84[39m
+[31m+ 82[39m
+
+[36m [2m❯[22m tests/unit/contracts.test.ts:[2m53:15[22m[39m
+    [90m 51| [39m  [34mit[39m([32m"rejects missing and unsafe counters"[39m[33m,[39m () [33m=>[39m {
+    [90m 52| [39m    [35mconst[39m { expectedRevision[33m:[39m _[33m,[39m [33m...[39mmissing } [33m=[39m command[33m;[39m
+    [90m 53| [39m    [34mexpect[39m(_)[33m.[39m[34mtoBe[39m([34m84[39m)[33m;[39m
+    [90m   | [39m              [31m^[39m
+    [90m 54| [39m    [34mexpect[39m(c[33m.[39m[33mCommandSchema[39m[33m.[39m[34msafeParse[39m(missing)[33m.[39msuccess)[33m.[39m[34mtoBe[39m([35mfalse[39m)[33m;[39m
+    [90m 55| [39m    expect(c.CounterSchema.safeParse(Number.MAX_SAFE_INTEGER + 1).succ…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/probability.test.ts[2m > [22minteger probability model[2m > [22mrejects unsafe arithmetic, fractional features and unknown properties in both validators
+[31m[1mError[22m: schema with key or id "urn:lcxxvi:NormaliseCategoriesRequest:1" already exists[39m
+[90m [2m❯[22m Ajv2020._checkUnique node_modules/ajv/lib/core.ts:[2m731:13[22m[39m
+[90m [2m❯[22m Ajv2020._addSchema node_modules/ajv/lib/core.ts:[2m722:24[22m[39m
+[90m [2m❯[22m Ajv2020.compile node_modules/ajv/lib/core.ts:[2m388:22[22m[39m
+[36m [2m❯[22m compiled tests/unit/probability.test.ts:[2m45:14[22m[39m
+    [90m 43| [39m[35mconst[39m ajv [33m=[39m [35mnew[39m [33mAjv2020[39m[33m.[39m[35mdefault[39m({ strict[33m:[39m [35mtrue[39m[33m,[39m allErrors[33m:[39m [35mtrue[39m })[33m;[39m
+    [90m 44| [39m[35mfunction[39m [34mcompiled[39m(name[33m:[39m string) {
+    [90m 45| [39m  return ajv.compile(JSON.parse(readFileSync(`packages/contracts/schem…
+    [90m   | [39m             [31m^[39m
+    [90m 46| [39m}
+    [90m 47| [39m
+[90m [2m❯[22m tests/unit/probability.test.ts:[2m137:14[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/scoring-fixtures.test.ts[2m > [22maccounts for all exported schema definitions
+[31m[1mAssertionError[22m: expected [ 'CounterSchema', …(87) ] to have a length of 84 but got 88[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 84[39m
+[31m+ 88[39m
+
+[36m [2m❯[22m tests/unit/scoring-fixtures.test.ts:[2m183:17[22m[39m
+    [90m181| [39m    )
+    [90m182| [39m    [33m.[39m[34mmap[39m(([name]) [33m=>[39m name)[33m;[39m
+    [90m183| [39m  [34mexpect[39m(names)[33m.[39m[34mtoHaveLength[39m([34m84[39m)[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m184| [39m})[33m;[39m
+    [90m185| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (8)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m339 passed[39m[22m[90m (342)[39m
+[2m   Start at [22m 09:26:01
+[2m   Duration [22m 5.80s[2m (transform 1.05s, setup 0ms, collect 5.01s, tests 5.66s, environment 10ms, prepare 1.41s)[22m
+

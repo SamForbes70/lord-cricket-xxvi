@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-09-25T11:49:05.209239+00:00",
+  "nodeRuntime": "v22.16.0",
+  "note": "Supplementary offline evidence; production npm/TypeScript workspace/Zod/Vitest/Playwright gates BLOCKED",
+  "gates": [
+    {
+      "gate": "independent-random",
+      "command": "python3 scripts/check-determinism-vectors.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "gate": "independent-probability",
+      "command": "python3 scripts/reference_probability.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "gate": "probability-schema-mirror",
+      "command": "python3 scripts/probability-schema-reference.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "gate": "independent-json-schema",
+      "command": "python3 scripts/check-probability-json-schemas.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "gate": "transpiled-algorithm-shim",
+      "command": "node scripts/offline-probability-check.mjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "gate": "isolated-semantic-types",
+      "command": "node scripts/offline-typecheck-probability.mjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "gate": "package-boundaries",
+      "command": "node scripts/offline-boundary-check.mjs",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "integrity": {
+    "scoringCorpusSha256": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+    "scoringIndexSha256": "0ca2b7885349d506ca0313884c1c1572a269c9c6ebb647f61b308410bc57a19e",
+    "determinismVectorsSha256": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+    "modelPackSha256": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+    "lutSha256": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+    "schemaCount": 84
+  }
+}

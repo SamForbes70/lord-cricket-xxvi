@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "BOWLED",
+        "LBW",
+        "CAUGHT",
+        "RUN_OUT",
+        "STUMPED",
+        "HIT_WICKET"
+      ]
+    },
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "creditedBowlerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fielderId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "wicketEnd": {
+      "type": "string",
+      "enum": [
+        "NORTH",
+        "SOUTH"
+      ]
+    }
+  },
+  "required": [
+    "kind",
+    "playerId",
+    "creditedBowlerId",
+    "fielderId",
+    "wicketEnd"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:Dismissal:1",
+  "title": "Dismissal"
+}

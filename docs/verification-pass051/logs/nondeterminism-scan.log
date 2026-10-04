@@ -1,0 +1,9 @@
+
+=== nondeterminism scan ===
+scripts/offline-boundary-check.mjs:31:   if(ts.isPropertyAccessExpression(node)&&['Math.random','Date.now'].includes(node.getText(sf)))throw Error(`Nondeterminism: ${file}`);
+scripts/verify.mjs:23:  const started = Date.now();
+scripts/verify.mjs:63:    elapsedMs: Date.now() - started,
+scripts/verify.mjs:68:  verifiedAt: new Date().toISOString(),
+scripts/check-boundaries.mjs:66:        ["Math.random", "Date.now"].includes(node.getText(source))
+tests/unit/random-service.test.ts:164:    new Date(),
+tests/unit/determinism.test.ts:24:    new Date(),

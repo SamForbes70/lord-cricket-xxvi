@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "modelId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "SYNTHETIC_ALPHA",
+        "EMPIRICALLY_VALIDATED"
+      ]
+    },
+    "randomId": {
+      "type": "string",
+      "const": "SHA256_COUNTER_V1"
+    },
+    "fixedPointScale": {
+      "type": "number",
+      "const": 10000
+    },
+    "expLutHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "featureSpecHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "variationIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "effects": {
+      "type": "object",
+      "properties": {
+        "overAroundWicket": {
+          "type": "boolean",
+          "const": false
+        },
+        "individualVariations": {
+          "type": "boolean",
+          "const": false
+        },
+        "moisture": {
+          "type": "boolean",
+          "const": false
+        },
+        "geometryEffects": {
+          "type": "boolean",
+          "const": false
+        },
+        "outfieldSpeed": {
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": [
+        "overAroundWicket",
+        "individualVariations",
+        "moisture",
+        "geometryEffects",
+        "outfieldSpeed"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "modelId",
+    "schemaVersion",
+    "status",
+    "randomId",
+    "fixedPointScale",
+    "expLutHash",
+    "featureSpecHash",
+    "variationIds",
+    "effects"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ModelManifest:1",
+  "title": "ModelManifest"
+}

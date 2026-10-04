@@ -1,0 +1,20 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.4 /workspace/scratch/80699785a943/lord-cricket-xxvi
+
+ ✓ tests/unit/determinism.test.ts (6 tests) 7ms
+ ✓ tests/unit/defaults.test.ts (3 tests) 5ms
+ ✓ tests/unit/scoring-fixtures.test.ts (84 tests) 664ms
+   ✓ provides a failing future engine gate instead of pretending the scorer ran  440ms
+ ✓ tests/unit/contracts.test.ts (29 tests) 710ms
+   ✓ every generated schema compiles with strict AJV 2020-12  560ms
+
+ Test Files  4 passed (4)
+      Tests  122 passed (122)
+   Start at  18:54:19
+   Duration  1.24s (transform 360ms, setup 0ms, collect 976ms, tests 1.39s, environment 1ms, prepare 282ms)
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

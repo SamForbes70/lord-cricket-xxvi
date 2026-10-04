@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "gameId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "matchId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "T20",
+        "ODI",
+        "RED_BALL"
+      ]
+    },
+    "worldPackId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "rulesId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "modelId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "randomId": {
+      "type": "string",
+      "const": "SHA256_COUNTER_V1"
+    },
+    "seed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "teamIds": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    },
+    "groundId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "limitedOversRain": {
+          "type": "boolean",
+          "const": false
+        },
+        "superOver": {
+          "type": "boolean",
+          "const": false
+        },
+        "injuries": {
+          "type": "boolean",
+          "const": false
+        },
+        "prediction": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "limitedOversRain",
+        "superOver",
+        "injuries",
+        "prediction"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "gameId",
+    "matchId",
+    "format",
+    "worldPackId",
+    "rulesId",
+    "modelId",
+    "randomId",
+    "seed",
+    "teamIds",
+    "groundId",
+    "capabilities"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:MatchSetupManifest:1",
+  "title": "MatchSetupManifest"
+}

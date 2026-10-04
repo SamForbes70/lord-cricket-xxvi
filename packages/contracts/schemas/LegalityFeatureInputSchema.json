@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "controlRating": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "fatigueBp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "line": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "STUMPS",
+        "LEG"
+      ]
+    },
+    "effort": {
+      "type": "string",
+      "enum": [
+        "CONSERVE",
+        "NORMAL",
+        "MAXIMUM"
+      ]
+    }
+  },
+  "required": [
+    "controlRating",
+    "fatigueBp",
+    "line",
+    "effort"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:LegalityFeatureInput:1",
+  "title": "LegalityFeatureInput"
+}

@@ -1,0 +1,4 @@
+
+added 208 packages in 2s
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn deprecated eslint@9.37.0: This version is no longer supported. Please see https://eslint.org/version-support for other options.

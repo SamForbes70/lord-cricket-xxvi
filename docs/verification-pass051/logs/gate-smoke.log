@@ -1,0 +1,8 @@
+
+> lord-cricket-xxvi@0.1.0 smoke
+> playwright test
+
+error: unknown command 'test'
+
+EXIT_CODE=1
+ELAPSED_MS=2492

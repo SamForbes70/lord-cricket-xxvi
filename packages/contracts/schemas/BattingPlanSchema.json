@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "aggression": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "NORMAL",
+        "ROTATE",
+        "PROTECT"
+      ]
+    }
+  },
+  "required": [
+    "playerId",
+    "aggression",
+    "intent"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:BattingPlan:1",
+  "title": "BattingPlan"
+}

@@ -1,0 +1,24 @@
+
+> lord-cricket-xxvi@0.1.0 fixtures:engine
+> node --import tsx scripts/audit-fixtures.ts --require-scorer
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "PASS",
+  "matchedDeliveryCases": 45,
+  "matchedLedgerCases": 45,
+  "rejectedByScorer": 29,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Conditional Delivery Generator"
+}

@@ -1,0 +1,23 @@
+name: verify
+on: [push, pull_request]
+jobs:
+  pass07a:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
+      - run: npm run verify:07a
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pass07a-verification
+          path: docs/verification-pass07a/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,21 @@
+{
+  "verification": "OFFLINE_LIMITED_WITH_IDENTITY_ZOD_AND_NODE_SHA_SHIMS",
+  "passed": 1200,
+  "failures": [],
+  "selected": {
+    "LEGAL:NONE:STOP": 782,
+    "LEGAL:NONE:NONE": 323,
+    "WIDE:NONE:NONE": 11,
+    "LEGAL:CAUGHT:CATCH": 57,
+    "LEGAL:BOWLED:NONE": 6,
+    "LEGAL:NONE:DROP": 15,
+    "LEGAL:RUN_OUT:RUN_OUT": 2,
+    "NO_BALL:NONE:STOP": 2,
+    "NO_BALL:NONE:NONE": 1,
+    "LEGAL:LBW:NONE": 1
+  },
+  "edgeChecks": 11,
+  "frozenVectorFixtures": 9,
+  "frozenVectorStageAddresses": 48,
+  "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a"
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "probabilityVersion": {
+      "type": "string",
+      "const": "LC_INTEGER_PROBABILITY_V1"
+    },
+    "modelId": {
+      "type": "string",
+      "const": "synthetic-alpha-01"
+    },
+    "modelHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "lutVersion": {
+      "type": "string",
+      "const": "LC_EXP_LUT_V1"
+    },
+    "lutHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "categories": {
+      "minItems": 1,
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "baseWeight": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "interceptBp": {
+            "type": "integer",
+            "minimum": -200000,
+            "maximum": 200000
+          },
+          "terms": {
+            "maxItems": 32,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "coefficientBp": {
+                  "type": "integer",
+                  "minimum": -100000,
+                  "maximum": 100000
+                },
+                "featureBp": {
+                  "type": "integer",
+                  "minimum": -20000,
+                  "maximum": 20000
+                }
+              },
+              "required": [
+                "coefficientBp",
+                "featureBp"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "baseWeight",
+          "allowed",
+          "interceptBp",
+          "terms"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "probabilityVersion",
+    "modelId",
+    "modelHash",
+    "lutVersion",
+    "lutHash",
+    "categories"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ProbabilityContext:1",
+  "title": "ProbabilityContext"
+}

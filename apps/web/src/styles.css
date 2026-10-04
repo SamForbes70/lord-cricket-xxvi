@@ -1,0 +1,502 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #18362d;
+  background: #f3f0e7;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 22px 34px;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0 0 0.55em;
+}
+h1 {
+  font-family: Georgia, serif;
+  font-size: 2em;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+h1 span {
+  color: #966928;
+}
+h2 {
+  font-size: 1.2em;
+}
+h3 {
+  font-size: 1.05em;
+  margin-top: 0.8em;
+}
+p,
+li {
+  line-height: 1.45;
+}
+button,
+select,
+input {
+  font: inherit;
+}
+button,
+select {
+  border: 1px solid #6b8276;
+  border-radius: 5px;
+  padding: 0.5em 0.7em;
+  min-height: 42px;
+}
+select {
+  max-width: 100%;
+  background: #fff;
+  color: #19392d;
+}
+button {
+  cursor: pointer;
+  color: #143c2d;
+  background: #fff;
+  font-weight: 600;
+}
+button:hover:enabled {
+  background: #e4eddf;
+}
+button.primary {
+  background: #194b38;
+  color: white;
+  border-color: #194b38;
+}
+button:disabled {
+  cursor: not-allowed;
+  color: #63716a;
+  background: #e6e8e2;
+  border-color: #b4bcb4;
+}
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #a65015;
+  outline-offset: 3px;
+}
+h2:focus {
+  outline: 2px solid #a65015;
+  outline-offset: 4px;
+}
+label {
+  display: block;
+  line-height: 1.4;
+}
+label select {
+  display: block;
+  width: 100%;
+  margin: 4px 0 10px;
+}
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+legend {
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+small {
+  display: block;
+  font-size: 0.82em;
+  line-height: 1.35;
+  color: #57685b;
+}
+strong,
+th,
+button,
+label {
+  overflow-wrap: anywhere;
+}
+.masthead,
+.preferences,
+.decision-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.eyebrow {
+  font-size: 0.7em;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+}
+.alpha {
+  font-size: 0.7em;
+  letter-spacing: 0.08em;
+  border: 1px solid #8b815c;
+  padding: 8px;
+  white-space: nowrap;
+}
+.preferences {
+  justify-content: flex-start;
+  border-block: 1px solid #d6d5c8;
+  padding: 8px 0;
+  margin: 12px 0;
+  flex-wrap: wrap;
+  font-size: 0.8em;
+}
+.preferences label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.preferences select {
+  display: inline-block;
+  width: auto;
+  margin: 0;
+  min-height: 34px;
+  padding: 4px;
+}
+.preferences > span {
+  margin-left: auto;
+  color: #655f4b;
+}
+.intro {
+  max-width: 770px;
+  margin: 30px 0;
+}
+.intro h2 {
+  font:
+    2em Georgia,
+    serif;
+}
+.team-grid,
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.panel {
+  background: #fffdf6;
+  border: 1px solid #d3d8c9;
+  border-radius: 8px;
+  padding: 18px;
+  min-width: 0;
+}
+.squad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 15px 0;
+}
+.player-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.player-choice input {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+.roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.setup > fieldset > label {
+  max-width: 500px;
+  margin-top: 20px;
+}
+.scorestrip {
+  background: #163d30;
+  color: #fff8df;
+  padding: 18px 24px;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+}
+.scorestrip p {
+  font-size: 0.8em;
+  color: #d3ddc8;
+}
+.scorestrip h2 {
+  font-size: 1em;
+  font-weight: 500;
+}
+.score {
+  font-size: 2.4em;
+  line-height: 1.1;
+  font-family: Georgia, serif;
+}
+.over {
+  margin-left: 18px;
+}
+.target {
+  min-width: 190px;
+  border-left: 1px solid #52715b;
+  padding-left: 24px;
+}
+.target span {
+  display: block;
+  font-size: 0.85em;
+}
+.target strong {
+  font-size: 1.7em;
+}
+.active {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  gap: 24px;
+  padding: 16px 20px;
+  background: #e5eadd;
+  border: 1px solid #c9d3bf;
+  border-radius: 0 0 8px 8px;
+}
+.active span {
+  display: block;
+  text-transform: uppercase;
+  font-size: 0.7em;
+  letter-spacing: 0.1em;
+  margin-bottom: 7px;
+}
+.active p {
+  font-size: 0.92em;
+  margin-bottom: 4px;
+}
+.decision {
+  margin: 16px 0;
+  background: #fffcf3;
+  border: 1px solid #b7bea9;
+  border-left: 5px solid #b08a42;
+  padding: 16px 20px;
+  border-radius: 5px;
+}
+.working {
+  font-size: 0.75em;
+  white-space: nowrap;
+}
+.actions,
+.advance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+.advance span {
+  font-size: 0.82em;
+  flex: 1;
+  min-width: 170px;
+}
+.candidates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.candidates button {
+  width: 100%;
+  text-align: left;
+  font-size: 0.9em;
+}
+.candidates small {
+  margin-top: 3px;
+}
+.tactics {
+  margin-bottom: 20px;
+}
+.tactic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 28px;
+}
+.tactic-grid label {
+  font-size: 0.85em;
+}
+.tactic-grid p {
+  font-size: 0.82em;
+}
+.result {
+  padding: 24px;
+  background: #e4ecd9;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+.result h2 {
+  font-size: 1.5em;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+  table-layout: fixed;
+  margin: 14px 0;
+}
+caption {
+  text-align: left;
+  font-weight: 700;
+  padding-bottom: 8px;
+}
+th,
+td {
+  padding: 9px 4px;
+  border-bottom: 1px solid #e1e3d9;
+  text-align: right;
+}
+th:first-child {
+  width: 48%;
+  text-align: left;
+}
+thead th {
+  font-size: 0.85em;
+}
+tbody th {
+  font-weight: 500;
+}
+article + article {
+  margin-top: 30px;
+}
+.commentary ol {
+  padding-left: 2.5em;
+  max-height: 720px;
+  overflow: auto;
+}
+.commentary li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e3db;
+  font-size: 0.9em;
+}
+footer {
+  border-top: 1px solid #c5cbbd;
+  margin-top: 28px;
+  padding: 20px 0;
+  font-size: 0.8em;
+}
+footer span {
+  margin-left: 12px;
+}
+footer p {
+  margin-top: 15px;
+  color: #566351;
+}
+.error {
+  background: #ffe8da;
+  border: 2px solid #a3421d;
+  padding: 15px;
+  margin: 12px 0;
+}
+.verification {
+  margin-top: 16px;
+}
+code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.8em;
+  margin: 8px 0;
+}
+.density-compact .panel {
+  padding: 12px;
+}
+.density-compact td,
+.density-compact th {
+  padding: 5px;
+}
+.skip {
+  position: absolute;
+  top: -200px;
+  background: white;
+  padding: 12px;
+  z-index: 2;
+}
+.skip:focus {
+  top: 8px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (max-width: 800px) {
+  main {
+    padding: 16px;
+  }
+  .masthead {
+    align-items: flex-start;
+  }
+  h1 {
+    font-size: 1.6em;
+  }
+  .team-grid,
+  .details-grid,
+  .tactic-grid {
+    grid-template-columns: 1fr;
+  }
+  .candidates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .active {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .active > div:last-child {
+    grid-column: 1/-1;
+  }
+  .preferences > span {
+    margin: 0;
+  }
+  .scorestrip {
+    padding: 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .target {
+    border-left: 0;
+    border-top: 1px solid #52715b;
+    padding: 10px 0 0;
+    min-width: 0;
+  }
+  .score {
+    font-size: 2em;
+  }
+  .over {
+    display: block;
+    margin: 8px 0 0;
+  }
+  .squad,
+  .roles {
+    grid-template-columns: 1fr;
+  }
+  .alpha {
+    font-size: 0.55em;
+  }
+  .decision-top {
+    align-items: flex-start;
+  }
+  .decision {
+    padding: 14px;
+  }
+  .actions button,
+  .advance button {
+    flex: 1;
+  }
+  footer span {
+    display: block;
+    margin: 8px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

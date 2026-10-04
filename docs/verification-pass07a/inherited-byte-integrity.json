@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "priorSchemasByteIdentical": 88,
+  "currentSchemaCount": 91,
+  "newSchemaCount": 3,
+  "frozenFilesChecked": 7,
+  "failures": [],
+  "originalPass06SourceZipSha256": "95e71cb5aae066885f73594d788e6df2edc54b4a1a6a49c12b365cc104af5648",
+  "originalPackagedCommit": "484ac3ed56a1ffbd99c858fb34c8487e3a529b35"
+}

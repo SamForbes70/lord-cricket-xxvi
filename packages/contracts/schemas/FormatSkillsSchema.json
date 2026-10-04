@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "defence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "timing": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "power": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "rotation": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "vsPace": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "vsSpin": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "control": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "movement": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "variation": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "stamina": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "catching": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "groundFielding": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "throwing": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "keeping": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    }
+  },
+  "required": [
+    "defence",
+    "timing",
+    "power",
+    "rotation",
+    "vsPace",
+    "vsSpin",
+    "control",
+    "movement",
+    "variation",
+    "stamina",
+    "catching",
+    "groundFielding",
+    "throwing",
+    "keeping"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:FormatSkills:1",
+  "title": "FormatSkills"
+}

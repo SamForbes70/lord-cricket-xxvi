@@ -1,0 +1,8 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run
+
+sh: 1: vitest: not found
+
+EXIT_CODE=127
+ELAPSED_MS=359

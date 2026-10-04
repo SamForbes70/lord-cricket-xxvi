@@ -1,0 +1,139 @@
+{
+  "randomVersion": "SHA256_COUNTER_V1",
+  "generatorVersion": "LC_FICTIONAL_WORLD_GENERATOR_V1",
+  "seed": "lcxxvi-fictional-eight-v1-20260927",
+  "vectors": [
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p001",
+        "eventOrdinal": 0,
+        "stageName": "GIVEN_NAME",
+        "drawIndex": 0
+      },
+      "expectedUint32": 2894007988
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p001",
+        "eventOrdinal": 0,
+        "stageName": "SKILL_DEFENCE",
+        "drawIndex": 0
+      },
+      "expectedUint32": 3049862109
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p001",
+        "eventOrdinal": 2,
+        "stageName": "SKILL_KEEPING",
+        "drawIndex": 0
+      },
+      "expectedUint32": 482416256
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p016",
+        "eventOrdinal": 0,
+        "stageName": "GIVEN_NAME",
+        "drawIndex": 0
+      },
+      "expectedUint32": 1174016346
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p016",
+        "eventOrdinal": 0,
+        "stageName": "SKILL_DEFENCE",
+        "drawIndex": 0
+      },
+      "expectedUint32": 537432496
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p016",
+        "eventOrdinal": 2,
+        "stageName": "SKILL_KEEPING",
+        "drawIndex": 0
+      },
+      "expectedUint32": 572703099
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p081",
+        "eventOrdinal": 0,
+        "stageName": "GIVEN_NAME",
+        "drawIndex": 0
+      },
+      "expectedUint32": 5898481
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p081",
+        "eventOrdinal": 0,
+        "stageName": "SKILL_DEFENCE",
+        "drawIndex": 0
+      },
+      "expectedUint32": 2628824515
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p081",
+        "eventOrdinal": 2,
+        "stageName": "SKILL_KEEPING",
+        "drawIndex": 0
+      },
+      "expectedUint32": 3015688226
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p160",
+        "eventOrdinal": 0,
+        "stageName": "GIVEN_NAME",
+        "drawIndex": 0
+      },
+      "expectedUint32": 1360683409
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p160",
+        "eventOrdinal": 0,
+        "stageName": "SKILL_DEFENCE",
+        "drawIndex": 0
+      },
+      "expectedUint32": 2036585255
+    },
+    {
+      "address": {
+        "seed": "lcxxvi-fictional-eight-v1-20260927",
+        "domain": "WORLD_GENERATION",
+        "entityId": "p160",
+        "eventOrdinal": 2,
+        "stageName": "SKILL_KEEPING",
+        "drawIndex": 0
+      },
+      "expectedUint32": 640361679
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+88 JSON Schemas verified

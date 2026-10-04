@@ -1,0 +1,53 @@
+{
+  "context": {
+    "rulesId": "LC_T20_01",
+    "inningsIndex": 0,
+    "deliveryIndex": 12,
+    "battingTeamId": "team-A",
+    "bowlingTeamId": "team-B",
+    "strikerId": "p1",
+    "nonStrikerId": "p2",
+    "bowlerId": "b1",
+    "keeperId": "keeper",
+    "outfieldIds": ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9"],
+    "endsBefore": {
+      "north": "p1",
+      "south": "p2"
+    },
+    "strikerEnd": "NORTH",
+    "runs": 100,
+    "wickets": 2,
+    "legalBalls": 10,
+    "allocatedBalls": 120,
+    "targetToWin": null,
+    "freeHitPending": false,
+    "ballAgeLegalBalls": 10
+  },
+  "resolution": {
+    "stage": "DELIVERY",
+    "legality": "NO_BALL",
+    "batRuns": 4,
+    "extras": {
+      "wides": 0,
+      "noBalls": 1,
+      "byes": 0,
+      "legByes": 0,
+      "penalties": 0
+    },
+    "completedRuns": 0,
+    "attemptedRuns": 0,
+    "boundary": "FOUR",
+    "dismissal": null,
+    "endsAfter": {
+      "north": "p1",
+      "south": "p2"
+    },
+    "batContact": true,
+    "attemptedStroke": true,
+    "shotSector": 4,
+    "trajectory": "GROUND",
+    "executedLength": "GOOD",
+    "fieldOutcome": "NONE",
+    "elapsedSeconds": 40
+  }
+}

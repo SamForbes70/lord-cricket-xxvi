@@ -1,0 +1,9 @@
+{
+  "packageLockSha256": "44e63e6db495d897f28cda25e4338839abded362cdeaa84b6bd8a5f0ddcd17df",
+  "targetPlatform": "linux",
+  "targetArchitecture": "x64",
+  "targetPackages": 193,
+  "npmCacheTarSha256": "d86668c461883e091b12caf388f5a891e852f46f3a8ac332efebb2f6a38b8e93",
+  "createdAt": "2026-09-26T06:16:42.133378+00:00",
+  "source": "Pass 06.0 exact resolved URLs; npm ci will enforce all SRI values"
+}

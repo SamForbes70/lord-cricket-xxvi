@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "WIN"
+        },
+        "winnerTeamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "marginType": {
+          "type": "string",
+          "const": "RUNS"
+        },
+        "marginRuns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "marginWickets": {
+          "type": "null"
+        },
+        "completionReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "kind",
+        "winnerTeamId",
+        "marginType",
+        "marginRuns",
+        "marginWickets",
+        "completionReason"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "WIN"
+        },
+        "winnerTeamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "marginType": {
+          "type": "string",
+          "const": "WICKETS"
+        },
+        "marginRuns": {
+          "type": "null"
+        },
+        "marginWickets": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "completionReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "kind",
+        "winnerTeamId",
+        "marginType",
+        "marginRuns",
+        "marginWickets",
+        "completionReason"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "WIN"
+        },
+        "winnerTeamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "marginType": {
+          "type": "string",
+          "const": "INNINGS"
+        },
+        "marginRuns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "marginWickets": {
+          "type": "null"
+        },
+        "completionReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "kind",
+        "winnerTeamId",
+        "marginType",
+        "marginRuns",
+        "marginWickets",
+        "completionReason"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "TIE",
+            "DRAW",
+            "NO_RESULT"
+          ]
+        },
+        "winnerTeamId": {
+          "type": "null"
+        },
+        "marginType": {
+          "type": "null"
+        },
+        "marginRuns": {
+          "type": "null"
+        },
+        "marginWickets": {
+          "type": "null"
+        },
+        "completionReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "kind",
+        "winnerTeamId",
+        "marginType",
+        "marginRuns",
+        "marginWickets",
+        "completionReason"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$id": "urn:lcxxvi:MatchResult:1",
+  "title": "MatchResult"
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "registryId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "referenceHand": {
+      "type": "string",
+      "const": "R"
+    },
+    "positions": {
+      "minItems": 9,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "sector": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7
+          },
+          "angleDegrees": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 359
+          },
+          "depth": {
+            "type": "string",
+            "enum": [
+              "INNER",
+              "MIDDLE",
+              "DEEP"
+            ]
+          },
+          "insideCircle": {
+            "type": "boolean"
+          },
+          "legSide": {
+            "type": "boolean"
+          },
+          "behindSquare": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "slotId",
+          "sector",
+          "angleDegrees",
+          "depth",
+          "insideCircle",
+          "legSide",
+          "behindSquare"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "registryId",
+    "referenceHand",
+    "positions"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:FieldRegistry:1",
+  "title": "FieldRegistry"
+}

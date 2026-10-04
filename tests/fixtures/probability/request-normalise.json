@@ -1,0 +1,31 @@
+{
+  "kind": "NORMALISE_CATEGORIES",
+  "probabilityVersion": "LC_INTEGER_PROBABILITY_V1",
+  "modelId": "synthetic-alpha-01",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "lutVersion": "LC_EXP_LUT_V1",
+  "lutHash": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+  "categories": [
+    {
+      "id": "LEGAL",
+      "baseWeight": 9820,
+      "allowed": true,
+      "interceptBp": 0,
+      "terms": []
+    },
+    {
+      "id": "WIDE",
+      "baseWeight": 130,
+      "allowed": true,
+      "interceptBp": 0,
+      "terms": []
+    },
+    {
+      "id": "NO_BALL",
+      "baseWeight": 50,
+      "allowed": true,
+      "interceptBp": 0,
+      "terms": []
+    }
+  ]
+}

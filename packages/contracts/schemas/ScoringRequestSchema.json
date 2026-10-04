@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "context": {
+      "type": "object",
+      "properties": {
+        "rulesId": {
+          "type": "string",
+          "enum": [
+            "LC_T20_01",
+            "LC_ODI_01",
+            "LC_RED5_01"
+          ]
+        },
+        "inningsIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "deliveryIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "battingTeamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "bowlingTeamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "strikerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "nonStrikerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "bowlerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "keeperId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "outfieldIds": {
+          "minItems": 9,
+          "maxItems": 9,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "endsBefore": {
+          "type": "object",
+          "properties": {
+            "north": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "south": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "required": [
+            "north",
+            "south"
+          ],
+          "additionalProperties": false
+        },
+        "strikerEnd": {
+          "type": "string",
+          "enum": [
+            "NORTH",
+            "SOUTH"
+          ]
+        },
+        "runs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wickets": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        },
+        "legalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "allocatedBalls": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetToWin": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "freeHitPending": {
+          "type": "boolean"
+        },
+        "ballAgeLegalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "rulesId",
+        "inningsIndex",
+        "deliveryIndex",
+        "battingTeamId",
+        "bowlingTeamId",
+        "strikerId",
+        "nonStrikerId",
+        "bowlerId",
+        "keeperId",
+        "outfieldIds",
+        "endsBefore",
+        "strikerEnd",
+        "runs",
+        "wickets",
+        "legalBalls",
+        "allocatedBalls",
+        "targetToWin",
+        "freeHitPending",
+        "ballAgeLegalBalls"
+      ],
+      "additionalProperties": false
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": [
+            "DELIVERY",
+            "IMMEDIATE_PENALTY"
+          ]
+        },
+        "legality": {
+          "type": "string",
+          "enum": [
+            "LEGAL",
+            "WIDE",
+            "NO_BALL",
+            "DEAD"
+          ]
+        },
+        "batRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "extras": {
+          "type": "object",
+          "properties": {
+            "wides": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "noBalls": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "byes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "legByes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "penalties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "wides",
+            "noBalls",
+            "byes",
+            "legByes",
+            "penalties"
+          ],
+          "additionalProperties": false
+        },
+        "completedRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "attemptedRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "boundary": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "FOUR",
+            "SIX"
+          ]
+        },
+        "dismissal": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "BOWLED",
+                    "LBW",
+                    "CAUGHT",
+                    "RUN_OUT",
+                    "STUMPED",
+                    "HIT_WICKET"
+                  ]
+                },
+                "playerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "fielderId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "wicketEnd": {
+                  "type": "string",
+                  "enum": [
+                    "NORTH",
+                    "SOUTH"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "playerId",
+                "fielderId",
+                "wicketEnd"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endsAfter": {
+          "type": "object",
+          "properties": {
+            "north": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "south": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "north",
+            "south"
+          ],
+          "additionalProperties": false
+        },
+        "batContact": {
+          "type": "boolean"
+        },
+        "attemptedStroke": {
+          "type": "boolean"
+        },
+        "shotSector": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 7
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trajectory": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "GROUND",
+                "AERIAL",
+                "EDGE"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "executedLength": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "YORKER",
+                "FULL",
+                "GOOD",
+                "SHORT",
+                "FULL_TOSS"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fieldOutcome": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "STOP",
+            "DROP",
+            "CATCH",
+            "MISS",
+            "RUN_OUT"
+          ]
+        },
+        "elapsedSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "stage",
+        "legality",
+        "batRuns",
+        "extras",
+        "completedRuns",
+        "attemptedRuns",
+        "boundary",
+        "dismissal",
+        "endsAfter",
+        "batContact",
+        "attemptedStroke",
+        "shotSector",
+        "trajectory",
+        "executedLength",
+        "fieldOutcome",
+        "elapsedSeconds"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "context",
+    "resolution"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ScoringRequest:1",
+  "title": "ScoringRequest"
+}

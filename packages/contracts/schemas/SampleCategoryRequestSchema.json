@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "probabilityVersion": {
+      "type": "string",
+      "const": "LC_INTEGER_PROBABILITY_V1"
+    },
+    "modelId": {
+      "type": "string",
+      "const": "synthetic-alpha-01"
+    },
+    "modelHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "lutVersion": {
+      "type": "string",
+      "const": "LC_EXP_LUT_V1"
+    },
+    "lutHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "categories": {
+      "minItems": 1,
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "baseWeight": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "interceptBp": {
+            "type": "integer",
+            "minimum": -200000,
+            "maximum": 200000
+          },
+          "terms": {
+            "maxItems": 32,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "coefficientBp": {
+                  "type": "integer",
+                  "minimum": -100000,
+                  "maximum": 100000
+                },
+                "featureBp": {
+                  "type": "integer",
+                  "minimum": -20000,
+                  "maximum": 20000
+                }
+              },
+              "required": [
+                "coefficientBp",
+                "featureBp"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "baseWeight",
+          "allowed",
+          "interceptBp",
+          "terms"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "kind": {
+      "type": "string",
+      "const": "SAMPLE_CATEGORY"
+    },
+    "stageName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "randomVersion": {
+      "type": "string",
+      "const": "SHA256_COUNTER_V1"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "seed": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "MATCH_DELIVERY",
+            "TOSS",
+            "WEATHER",
+            "AI_TIE_BREAK",
+            "CAREER_TRAINING",
+            "WORLD_GENERATION",
+            "PREDICTION"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "eventOrdinal": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "stageName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "drawIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "seed",
+        "domain",
+        "entityId",
+        "eventOrdinal",
+        "stageName",
+        "drawIndex"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "probabilityVersion",
+    "modelId",
+    "modelHash",
+    "lutVersion",
+    "lutHash",
+    "categories",
+    "kind",
+    "stageName",
+    "randomVersion",
+    "address"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SampleCategoryRequest:1",
+  "title": "SampleCategoryRequest"
+}

@@ -1,0 +1,15 @@
+{
+  "id":"LC_T20_INDEPENDENT_RULE_GOLDENS_V1",
+  "provenance":"Hand-authored rule expectations from the V0.1 custom T20 profile, never inferred by calling the production scorer",
+  "scenarios":[
+    {"id":"ALL_OUT_ZERO_WINNING_WIDE","firstInnings":{"runs":0,"wickets":10},"chase":{"runs":1,"wickets":0,"legalBalls":0,"attempts":1,"wides":1},"result":{"kind":"WIN","marginType":"WICKETS","marginWickets":10}},
+    {"id":"ALL_OUT_ZERO_WINNING_BOUNDARY","firstInnings":{"runs":0,"wickets":10},"chase":{"runs":4,"wickets":0,"legalBalls":1},"fullBoundaryRuns":4},
+    {"id":"ALL_OUT_ZERO_ALL_OUT_LEVEL","firstInnings":{"runs":0,"wickets":10},"chase":{"runs":0,"wickets":10},"result":{"kind":"TIE","winnerTeamId":null}},
+    {"id":"SIXTH_BALL_WICKET","legalBalls":6,"wickets":1,"firstRequiredDecision":"AWAITING_BATTER","followingDecision":"AWAITING_BOWLER"},
+    {"id":"WINNING_LAST_BALL","legalBalls":120,"targetToWin":1,"chaseRuns":1,"result":"WIN","maxFurtherDeliveries":0},
+    {"id":"FIRST_INNINGS_ALLOCATION","legalBalls":120,"wickets":0,"runs":0,"targetToWin":1},
+    {"id":"FREE_HIT_NO_BALL_WIDE_LEGAL","attempts":3,"legalBalls":1,"freeHitPendingAfterNoBall":true,"freeHitPendingAfterWide":true,"freeHitPendingAfterLegal":false},
+    {"id":"BOWLER_QUOTA","quotaLegalBalls":24,"minimumDistinctEligibleBowlers":5,"consecutiveOverSameBowler":"REJECT"},
+    {"id":"PITCH_WEAR","wideDelta":0,"noBallDelta":0,"legalDelta":1}
+  ]
+}

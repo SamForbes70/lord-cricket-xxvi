@@ -1,0 +1,24 @@
+
+> lord-cricket-xxvi@0.1.0 smoke
+> playwright test
+
+
+Running 15 tests using 2 workers
+
+  ✓   2 [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (383ms)
+  ✓   1 [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play (640ms)
+  ✓   3 [chromium] › tests/smoke/determinism.spec.ts:115:1 › compiled batch random/hash commands match frozen outputs and reject bad requests (497ms)
+  ✓   4 [chromium] › tests/smoke/app.spec.ts:43:1 › compiled batch app reports accurate capabilities and rejects unsupported commands (695ms)
+  ✓   5 [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors (355ms)
+  ✓   6 [chromium] › tests/smoke/app.spec.ts:82:1 › compiled scoring CLI exercises production scorer and rejects malformed requests (316ms)
+  ✓   7 [chromium] › tests/smoke/generator.spec.ts:44:1 › compiled batch generator command hands validated resolution to scoring adapter (353ms)
+  ✓   8 [chromium] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (223ms)
+  ✓   9 [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors (293ms)
+  ✓  11 [chromium] › tests/smoke/probability.spec.ts:64:1 › compiled batch probability command matches independent vector and rejects a wrong request (467ms)
+  ✓  10 [chromium] › tests/smoke/world.spec.ts:25:1 › compiled batch validates frozen world, immutable setup and rejects tampered input (728ms)
+  ✓  12 [firefox-determinism] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (1.2s)
+  ✓  13 [firefox-determinism] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors (1.3s)
+  ✓  14 [firefox-determinism] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors (609ms)
+  ✓  15 [firefox-determinism] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (443ms)
+
+  15 passed (8.5s)

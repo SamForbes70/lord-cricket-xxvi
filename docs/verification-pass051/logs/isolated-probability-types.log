@@ -1,0 +1,3 @@
+PASS offline strict semantic check: production probability.ts against contract-shaped types, generated pack.ts, TS 5.8.3
+EXIT_CODE=0
+ELAPSED_MS=1855

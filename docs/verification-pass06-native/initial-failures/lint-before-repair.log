@@ -1,0 +1,18 @@
+
+> lord-cricket-xxvi@0.1.0 lint
+> eslint . && node scripts/check-boundaries.mjs
+
+
+/mnt/data/lcxxvi-pass06-repair/repo/packages/simulation/src/generator.ts
+  17:8  error  'RandomService' is defined but never used  @typescript-eslint/no-unused-vars
+
+/mnt/data/lcxxvi-pass06-repair/repo/scripts/offline-generator-check.mjs
+  37:38  error  'Buffer' is not defined  no-undef
+  61:8   error  'Buffer' is not defined  no-undef
+  62:8   error  'Buffer' is not defined  no-undef
+
+/mnt/data/lcxxvi-pass06-repair/repo/tests/smoke/generator.spec.ts
+  16:34  error  'i' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 5 problems (5 errors, 0 warnings)
+

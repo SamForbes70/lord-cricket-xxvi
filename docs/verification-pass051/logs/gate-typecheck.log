@@ -1,0 +1,178 @@
+
+> lord-cricket-xxvi@0.1.0 typecheck
+> tsc -b --pretty false && tsc -p tsconfig.tools.json --noEmit
+
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'chai'.
+  The file is in the program because:
+    Entry point for implicit type library 'chai'
+error TS2688: Cannot find type definition file for 'deep-eql'.
+  The file is in the program because:
+    Entry point for implicit type library 'deep-eql'
+error TS2688: Cannot find type definition file for 'estree'.
+  The file is in the program because:
+    Entry point for implicit type library 'estree'
+error TS2688: Cannot find type definition file for 'json-schema'.
+  The file is in the program because:
+    Entry point for implicit type library 'json-schema'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point for implicit type library 'node'
+error TS2688: Cannot find type definition file for 'react'.
+  The file is in the program because:
+    Entry point for implicit type library 'react'
+error TS2688: Cannot find type definition file for 'react-dom'.
+  The file is in the program because:
+    Entry point for implicit type library 'react-dom'
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point of type library 'node' specified in compilerOptions
+
+EXIT_CODE=1
+ELAPSED_MS=1864

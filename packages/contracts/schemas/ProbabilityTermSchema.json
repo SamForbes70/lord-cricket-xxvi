@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "coefficientBp": {
+      "type": "integer",
+      "minimum": -100000,
+      "maximum": 100000
+    },
+    "featureBp": {
+      "type": "integer",
+      "minimum": -20000,
+      "maximum": 20000
+    }
+  },
+  "required": [
+    "coefficientBp",
+    "featureBp"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ProbabilityTerm:1",
+  "title": "ProbabilityTerm"
+}

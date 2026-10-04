@@ -1,0 +1,1109 @@
+{
+  "version": "LC_INTEGER_PROBABILITY_V1",
+  "modelId": "synthetic-alpha-01",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "lutHash": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+  "cases": [
+    {
+      "id": "halves",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "B",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 2147483648,
+          "cumulative": 2147483648
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 2147483648,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 0,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 3582474252,
+      "selectedIndex": 1,
+      "selectedCategoryId": "B"
+    },
+    {
+      "id": "thirds-largest-remainder",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "B",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "C",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 1431655766,
+          "cumulative": 1431655766
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 1431655765,
+          "cumulative": 2863311531
+        },
+        {
+          "id": "C",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 1431655765,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 1,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 1713322459,
+      "selectedIndex": 1,
+      "selectedCategoryId": "B"
+    },
+    {
+      "id": "quarter-half-quarter",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "B",
+          "baseWeight": 2,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "C",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 1073741824,
+          "cumulative": 1073741824
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 2147483648,
+          "cumulative": 3221225472
+        },
+        {
+          "id": "C",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 1073741824,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 2,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 3852129553,
+      "selectedIndex": 2,
+      "selectedCategoryId": "C"
+    },
+    {
+      "id": "mask-and-cumulative-plateau",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "B",
+          "baseWeight": 99,
+          "allowed": false,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "C",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 2147483648,
+          "cumulative": 2147483648
+        },
+        {
+          "id": "B",
+          "allowed": false,
+          "logitBp": null,
+          "lutIndex": null,
+          "mass": 0,
+          "cumulative": 2147483648
+        },
+        {
+          "id": "C",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 2147483648,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 3,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 3875873416,
+      "selectedIndex": 2,
+      "selectedCategoryId": "C"
+    },
+    {
+      "id": "explicit-zero-weight",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "B",
+          "baseWeight": 0,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "C",
+          "baseWeight": 3,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 1073741824,
+          "cumulative": 1073741824
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": null,
+          "lutIndex": null,
+          "mass": 0,
+          "cumulative": 1073741824
+        },
+        {
+          "id": "C",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 3221225472,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 4,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 1636225598,
+      "selectedIndex": 2,
+      "selectedCategoryId": "C"
+    },
+    {
+      "id": "positive-and-negative-terms",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 100,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": 5000,
+              "featureBp": 5000
+            },
+            {
+              "coefficientBp": -5000,
+              "featureBp": 2500
+            }
+          ]
+        },
+        {
+          "id": "B",
+          "baseWeight": 100,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": 5000,
+              "featureBp": -5000
+            }
+          ]
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 1250,
+          "lutIndex": 0,
+          "mass": 2550665555,
+          "cumulative": 2550665555
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": -2500,
+          "lutIndex": 38,
+          "mass": 1744301741,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 5,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 215224482,
+      "selectedIndex": 0,
+      "selectedCategoryId": "A"
+    },
+    {
+      "id": "rounding-ties-away",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": 1,
+              "featureBp": 5000
+            }
+          ]
+        },
+        {
+          "id": "B",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": -1,
+              "featureBp": 5000
+            }
+          ]
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 1,
+          "lutIndex": 0,
+          "mass": 2147483648,
+          "cumulative": 2147483648
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": -1,
+          "lutIndex": 0,
+          "mass": 2147483648,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 6,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 2173635584,
+      "selectedIndex": 1,
+      "selectedCategoryId": "B"
+    },
+    {
+      "id": "lut-rounding-half-step",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": 100,
+              "featureBp": 5000
+            }
+          ]
+        },
+        {
+          "id": "B",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 50,
+          "lutIndex": 0,
+          "mass": 2158220977,
+          "cumulative": 2158220977
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 1,
+          "mass": 2136746319,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 7,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 1333475812,
+      "selectedIndex": 0,
+      "selectedCategoryId": "A"
+    },
+    {
+      "id": "logit-clip-after-sum",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 200000,
+          "terms": [
+            {
+              "coefficientBp": 100000,
+              "featureBp": 10000
+            },
+            {
+              "coefficientBp": -100000,
+              "featureBp": 10000
+            }
+          ]
+        },
+        {
+          "id": "B",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": -200000,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 80000,
+          "lutIndex": 0,
+          "mass": 4294966813,
+          "cumulative": 4294966813
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": -80000,
+          "lutIndex": 1600,
+          "mass": 483,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 8,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 3209992478,
+      "selectedIndex": 0,
+      "selectedCategoryId": "A"
+    },
+    {
+      "id": "exp-low-positive-zero-mass",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 1000000000,
+          "allowed": true,
+          "interceptBp": 80000,
+          "terms": []
+        },
+        {
+          "id": "B",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": -80000,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": true,
+          "logitBp": 80000,
+          "lutIndex": 0,
+          "mass": 4294967296,
+          "cumulative": 4294967296
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": -80000,
+          "lutIndex": 1600,
+          "mass": 0,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 9,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 3386660382,
+      "selectedIndex": 0,
+      "selectedCategoryId": "A"
+    },
+    {
+      "id": "synthetic-neutral-legality",
+      "categories": [
+        {
+          "id": "LEGAL",
+          "baseWeight": 9820,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "WIDE",
+          "baseWeight": 130,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "NO_BALL",
+          "baseWeight": 50,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "LEGAL",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 4217657885,
+          "cumulative": 4217657885
+        },
+        {
+          "id": "WIDE",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 55834575,
+          "cumulative": 4273492460
+        },
+        {
+          "id": "NO_BALL",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 21474836,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 10,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 3087453087,
+      "selectedIndex": 0,
+      "selectedCategoryId": "LEGAL"
+    },
+    {
+      "id": "synthetic-t20-early-contact",
+      "categories": [
+        {
+          "id": "MISS",
+          "baseWeight": 1250,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "PAD",
+          "baseWeight": 700,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "GROUND",
+          "baseWeight": 5900,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "AERIAL",
+          "baseWeight": 1500,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "EDGE",
+          "baseWeight": 645,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "HIT_WICKET",
+          "baseWeight": 5,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "MISS",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 536870912,
+          "cumulative": 536870912
+        },
+        {
+          "id": "PAD",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 300647711,
+          "cumulative": 837518623
+        },
+        {
+          "id": "GROUND",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 2534030705,
+          "cumulative": 3371549328
+        },
+        {
+          "id": "AERIAL",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 644245094,
+          "cumulative": 4015794422
+        },
+        {
+          "id": "EDGE",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 277025390,
+          "cumulative": 4292819812
+        },
+        {
+          "id": "HIT_WICKET",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 2147484,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 11,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 1369143069,
+      "selectedIndex": 2,
+      "selectedCategoryId": "GROUND"
+    },
+    {
+      "id": "mask-all-but-one",
+      "categories": [
+        {
+          "id": "A",
+          "baseWeight": 3,
+          "allowed": false,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "B",
+          "baseWeight": 0,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "C",
+          "baseWeight": 1,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        }
+      ],
+      "masses": [
+        {
+          "id": "A",
+          "allowed": false,
+          "logitBp": null,
+          "lutIndex": null,
+          "mass": 0,
+          "cumulative": 0
+        },
+        {
+          "id": "B",
+          "allowed": true,
+          "logitBp": null,
+          "lutIndex": null,
+          "mass": 0,
+          "cumulative": 0
+        },
+        {
+          "id": "C",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 0,
+          "mass": 4294967296,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 12,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 525040612,
+      "selectedIndex": 2,
+      "selectedCategoryId": "C"
+    },
+    {
+      "id": "legality-leg-line-maximum-effort",
+      "categories": [
+        {
+          "id": "LEGAL",
+          "baseWeight": 9820,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": []
+        },
+        {
+          "id": "WIDE",
+          "baseWeight": 130,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": -7000,
+              "featureBp": 6000
+            },
+            {
+              "coefficientBp": 5000,
+              "featureBp": 2000
+            },
+            {
+              "coefficientBp": 2000,
+              "featureBp": 10000
+            },
+            {
+              "coefficientBp": 1500,
+              "featureBp": 10000
+            },
+            {
+              "coefficientBp": -1000,
+              "featureBp": 0
+            }
+          ]
+        },
+        {
+          "id": "NO_BALL",
+          "baseWeight": 50,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": -5000,
+              "featureBp": 6000
+            },
+            {
+              "coefficientBp": 4000,
+              "featureBp": 2000
+            },
+            {
+              "coefficientBp": 1500,
+              "featureBp": 10000
+            },
+            {
+              "coefficientBp": -1000,
+              "featureBp": 0
+            }
+          ]
+        }
+      ],
+      "masses": [
+        {
+          "id": "LEGAL",
+          "allowed": true,
+          "logitBp": 0,
+          "lutIndex": 3,
+          "mass": 4217413789,
+          "cumulative": 4217413789
+        },
+        {
+          "id": "WIDE",
+          "allowed": true,
+          "logitBp": 300,
+          "lutIndex": 0,
+          "mass": 57531661,
+          "cumulative": 4274945450
+        },
+        {
+          "id": "NO_BALL",
+          "allowed": true,
+          "logitBp": -700,
+          "lutIndex": 10,
+          "mass": 20021846,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 13,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 448429067,
+      "selectedIndex": 0,
+      "selectedCategoryId": "LEGAL"
+    },
+    {
+      "id": "contact-t20-late-attack",
+      "categories": [
+        {
+          "id": "MISS",
+          "baseWeight": 1350,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": -4000,
+              "featureBp": 4000
+            },
+            {
+              "coefficientBp": 2500,
+              "featureBp": 20000
+            },
+            {
+              "coefficientBp": 2500,
+              "featureBp": 5000
+            }
+          ]
+        },
+        {
+          "id": "PAD",
+          "baseWeight": 500,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": -3000,
+              "featureBp": 4000
+            },
+            {
+              "coefficientBp": 2000,
+              "featureBp": 5000
+            }
+          ]
+        },
+        {
+          "id": "GROUND",
+          "baseWeight": 5000,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": 3500,
+              "featureBp": -2000
+            },
+            {
+              "coefficientBp": -1500,
+              "featureBp": 20000
+            }
+          ]
+        },
+        {
+          "id": "AERIAL",
+          "baseWeight": 2500,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": 4500,
+              "featureBp": 20000
+            },
+            {
+              "coefficientBp": 2500,
+              "featureBp": 6000
+            }
+          ]
+        },
+        {
+          "id": "EDGE",
+          "baseWeight": 645,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": -4000,
+              "featureBp": -2000
+            },
+            {
+              "coefficientBp": 2500,
+              "featureBp": 20000
+            },
+            {
+              "coefficientBp": 3000,
+              "featureBp": 5000
+            }
+          ]
+        },
+        {
+          "id": "HIT_WICKET",
+          "baseWeight": 5,
+          "allowed": true,
+          "interceptBp": 0,
+          "terms": [
+            {
+              "coefficientBp": 1000,
+              "featureBp": 20000
+            }
+          ]
+        }
+      ],
+      "masses": [
+        {
+          "id": "MISS",
+          "allowed": true,
+          "logitBp": 4650,
+          "lutIndex": 59,
+          "mass": 630349975,
+          "cumulative": 630349975
+        },
+        {
+          "id": "PAD",
+          "allowed": true,
+          "logitBp": -200,
+          "lutIndex": 107,
+          "mass": 144462998,
+          "cumulative": 774812973
+        },
+        {
+          "id": "GROUND",
+          "allowed": true,
+          "logitBp": -3700,
+          "lutIndex": 142,
+          "mass": 1018013544,
+          "cumulative": 1792826517
+        },
+        {
+          "id": "AERIAL",
+          "allowed": true,
+          "logitBp": 10500,
+          "lutIndex": 0,
+          "mass": 2105822320,
+          "cumulative": 3898648837
+        },
+        {
+          "id": "EDGE",
+          "allowed": true,
+          "logitBp": 7300,
+          "lutIndex": 32,
+          "mass": 394518339,
+          "cumulative": 4293167176
+        },
+        {
+          "id": "HIT_WICKET",
+          "allowed": true,
+          "logitBp": 2000,
+          "lutIndex": 85,
+          "mass": 1800120,
+          "cumulative": 4294967296
+        }
+      ],
+      "address": {
+        "seed": "pass05-independent",
+        "domain": "MATCH_DELIVERY",
+        "entityId": "match-0001",
+        "eventOrdinal": 14,
+        "stageName": "legality",
+        "drawIndex": 0
+      },
+      "draw": 4209044941,
+      "selectedIndex": 4,
+      "selectedCategoryId": "EDGE"
+    }
+  ],
+  "boundaries": [
+    {
+      "draw": 0,
+      "index": 0,
+      "id_": "A"
+    },
+    {
+      "draw": 2147483647,
+      "index": 0,
+      "id_": "A"
+    },
+    {
+      "draw": 2147483648,
+      "index": 1,
+      "id_": "B"
+    },
+    {
+      "draw": 4294967295,
+      "index": 1,
+      "id_": "B"
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+{
+  "resultVersion": "PASS_05_1_VERIFICATION_V1",
+  "overallStatus": "BLOCKED",
+  "environment": {
+    "node": "v22.16.0",
+    "npm": "10.9.2",
+    "python": "3.13.5",
+    "platform": "linux",
+    "architecture": "x64",
+    "systemChromium": "144.0.7559.96",
+    "firefox": "NOT_AVAILABLE/NOT_VERIFIED"
+  },
+  "installation": {
+    "command": "npm ci",
+    "status": "BLOCKED",
+    "exitCode": null,
+    "elapsedMs": null,
+    "reason": "Exact clean install did not complete; registry DNS returns EAI_AGAIN and npm cache has no zod 4.1.12 tarball (ENOTCACHED).",
+    "diagnostics": [
+      "logs/npm-ping.log",
+      "logs/npm-ci-offline.log",
+      "logs/npm-ci.log"
+    ]
+  },
+  "mandatoryGates": [
+    {
+      "gate": "installation",
+      "command": "npm ci",
+      "exitCode": null,
+      "elapsedMs": null,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Registry DNS EAI_AGAIN; authorised local cache/mirror unavailable."
+    },
+    {
+      "gate": "schemas",
+      "command": "npm run schemas:check",
+      "exitCode": 1,
+      "elapsedMs": 534,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": 1,
+      "elapsedMs": 2976,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    },
+    {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 1,
+      "elapsedMs": 1864,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    },
+    {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exitCode": 127,
+      "elapsedMs": 355,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    },
+    {
+      "gate": "fixtures",
+      "command": "npm run fixtures:audit",
+      "exitCode": 1,
+      "elapsedMs": 505,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    },
+    {
+      "gate": "scorer",
+      "command": "npm run fixtures:engine",
+      "exitCode": 1,
+      "elapsedMs": 532,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    },
+    {
+      "gate": "vectors",
+      "command": "npm run vectors:check",
+      "exitCode": 0,
+      "elapsedMs": 1738,
+      "testCount": 32,
+      "status": "PASS"
+    },
+    {
+      "gate": "probability-vectors",
+      "command": "npm run probability:check",
+      "exitCode": 0,
+      "elapsedMs": 1844,
+      "testCount": 19,
+      "status": "PASS"
+    },
+    {
+      "gate": "unit",
+      "command": "npm test",
+      "exitCode": 127,
+      "elapsedMs": 359,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    },
+    {
+      "gate": "smoke",
+      "command": "npm run smoke",
+      "exitCode": 1,
+      "elapsedMs": 2492,
+      "testCount": null,
+      "status": "BLOCKED",
+      "reason": "Clean npm installation unavailable; command cannot execute against the pinned production dependency set."
+    }
+  ],
+  "supplementaryGates": [
+    {
+      "gate": "independent-random-reference",
+      "command": "python3 scripts/check-determinism-vectors.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 1508,
+      "testCount": 32
+    },
+    {
+      "gate": "independent-probability-reference",
+      "command": "python3 scripts/reference_probability.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 1517,
+      "testCount": 19
+    },
+    {
+      "gate": "probability-schema-mirror",
+      "command": "python3 scripts/probability-schema-reference.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 1344,
+      "testCount": 13
+    },
+    {
+      "gate": "independent-json-schema",
+      "command": "python3 scripts/check-probability-json-schemas.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 4383,
+      "testCount": 84,
+      "additionalPayloadCases": 11
+    },
+    {
+      "gate": "offline-bundle",
+      "command": "python3 scripts/offline-verify.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 13851,
+      "testCount": 7
+    },
+    {
+      "gate": "offline-package-boundaries",
+      "command": "node scripts/offline-boundary-check.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 863,
+      "testCount": 23
+    },
+    {
+      "gate": "transpiled-probability",
+      "command": "node scripts/offline-probability-check.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 956,
+      "testCount": 19
+    },
+    {
+      "gate": "isolated-probability-types",
+      "command": "node scripts/offline-typecheck-probability.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 1855,
+      "testCount": 1
+    },
+    {
+      "gate": "dependency-vulnerability-audit",
+      "command": "npm audit --package-lock-only --omit=dev",
+      "status": "BLOCKED",
+      "exitCode": 1,
+      "elapsedMs": null,
+      "testCount": null,
+      "reason": "npm audit endpoint unavailable because registry DNS returns EAI_AGAIN."
+    }
+  ],
+  "immutableBaseline": {
+    "packageLockSha256": "345dcb447876aa6f94df9e01d650af7c7153aed3063e28fabf3522e153d7af6e",
+    "scoringCorpusSha256": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+    "scoringIndexSha256": "0ca2b7885349d506ca0313884c1c1572a269c9c6ebb647f61b308410bc57a19e",
+    "randomVectorsSha256": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+    "probabilityVectorsSha256": "976e1f4c5b5b8401c743e5b22b4db430e54fb6640424b5813634d77e90118f4d",
+    "modelPackSha256": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+    "expLutSha256": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+    "schemaCount": 84,
+    "scoringCorpusCaseCount": 87,
+    "randomAddressVectorCount": 24,
+    "stateHashVectorCount": 8,
+    "probabilityCaseCount": 15,
+    "probabilityBoundaryCount": 4
+  },
+  "versions": {
+    "scoringEngine": "LC_SCORING_V1",
+    "randomVersion": "SHA256_COUNTER_V1",
+    "stateHashVersion": "LC_CANONICAL_JSON_V1_SHA256",
+    "probabilityVersion": "LC_INTEGER_PROBABILITY_V1",
+    "lutVersion": "LC_EXP_LUT_V1",
+    "modelId": "synthetic-alpha-01",
+    "modelStatus": "SYNTHETIC_ALPHA"
+  },
+  "repairs": [
+    {
+      "id": "DOC-DRIFT-001",
+      "status": "CORRECTED",
+      "compatibilityImpact": "NONE",
+      "deterministicOutputImpact": "NONE",
+      "schemaImpact": "NONE",
+      "description": "README/workspace and contract coverage contained stale earlier-pass capability descriptions."
+    },
+    {
+      "id": "VERIFY-ENV-001",
+      "status": "OPEN/BLOCKED",
+      "compatibilityImpact": "NONE",
+      "deterministicOutputImpact": "NONE",
+      "schemaImpact": "NONE",
+      "description": "Clean npm install and npm audit cannot reach registry; no authorised local cache contains required package tarballs."
+    },
+    {
+      "id": "VERIFY-RUNNER-002",
+      "status": "OBSERVED",
+      "compatibilityImpact": "NONE",
+      "deterministicOutputImpact": "NONE",
+      "schemaImpact": "NONE",
+      "description": "Repository verify orchestrator did not terminate cleanly around the environment-hung npm ci in this container; individual gates were recorded with external hard limits."
+    }
+  ],
+  "milestones": {
+    "M0": "PARTIALLY_COMPLETE",
+    "M1": "SUPPORTED_SCORING_SCOPE_IMPLEMENTED_BUT_CURRENT_GATE_BLOCKED",
+    "M2": "INCOMPLETE"
+  },
+  "playable": false,
+  "readyForPass06": false
+}

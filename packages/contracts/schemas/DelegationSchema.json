@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "battingOrder": {
+      "type": "boolean"
+    },
+    "bowlerSelection": {
+      "type": "boolean"
+    },
+    "battingTactics": {
+      "type": "boolean"
+    },
+    "bowlingTactics": {
+      "type": "boolean"
+    },
+    "declarations": {
+      "type": "boolean"
+    },
+    "followOn": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "battingOrder",
+    "bowlerSelection",
+    "battingTactics",
+    "bowlingTactics",
+    "declarations",
+    "followOn"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:Delegation:1",
+  "title": "Delegation"
+}

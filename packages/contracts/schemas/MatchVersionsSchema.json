@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "engine": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "random": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "rules": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "rulesHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "modelHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "engine",
+    "random",
+    "rules",
+    "rulesHash",
+    "model",
+    "modelHash",
+    "worldHash"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:MatchVersions:1",
+  "title": "MatchVersions"
+}

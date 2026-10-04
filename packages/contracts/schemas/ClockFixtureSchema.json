@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reasoning": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "trigger": {
+      "type": "string",
+      "enum": [
+        "WICKET",
+        "INNINGS_COMPLETED",
+        "RAIN_DELAY",
+        "NEW_BALL",
+        "TARGET_REACHED"
+      ]
+    },
+    "before": {
+      "type": "object",
+      "properties": {
+        "clock": {
+          "type": "object",
+          "properties": {
+            "day": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "localSeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 86399
+            },
+            "dayLegalBalls": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "finalHourActive": {
+              "type": "boolean"
+            },
+            "finalHourBallsRequired": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "finalHourBallsDelivered": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "pendingInterval": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "LUNCH",
+                    "TEA",
+                    "STUMPS"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "day",
+            "localSeconds",
+            "dayLegalBalls",
+            "finalHourActive",
+            "finalHourBallsRequired",
+            "finalHourBallsDelivered",
+            "pendingInterval"
+          ],
+          "additionalProperties": false
+        },
+        "inningsLegalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "ballAgeLegalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "runs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "targetToWin": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "clock",
+        "inningsLegalBalls",
+        "ballAgeLegalBalls",
+        "runs",
+        "targetToWin"
+      ],
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "attemptSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wicketSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "overSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "delaySeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "replacementSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "batRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "attemptSeconds",
+        "wicketSeconds",
+        "overSeconds",
+        "delaySeconds",
+        "replacementSeconds",
+        "batRuns"
+      ],
+      "additionalProperties": false
+    },
+    "expected": {
+      "type": "object",
+      "properties": {
+        "clock": {
+          "type": "object",
+          "properties": {
+            "day": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "localSeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 86399
+            },
+            "dayLegalBalls": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "finalHourActive": {
+              "type": "boolean"
+            },
+            "finalHourBallsRequired": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "finalHourBallsDelivered": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "pendingInterval": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "LUNCH",
+                    "TEA",
+                    "STUMPS"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "day",
+            "localSeconds",
+            "dayLegalBalls",
+            "finalHourActive",
+            "finalHourBallsRequired",
+            "finalHourBallsDelivered",
+            "pendingInterval"
+          ],
+          "additionalProperties": false
+        },
+        "inningsLegalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "ballAgeLegalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "SETUP",
+            "TOSS",
+            "AWAITING_INNINGS",
+            "READY",
+            "AWAITING_BATTER",
+            "AWAITING_BOWLER",
+            "INTERVAL",
+            "WEATHER_DELAY",
+            "COMPLETE"
+          ]
+        },
+        "nextAction": {
+          "type": "string",
+          "enum": [
+            "SELECT_BATTER",
+            "START_NEXT_INNINGS",
+            "ADVANCE",
+            "NONE"
+          ]
+        },
+        "intervalSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        }
+      },
+      "required": [
+        "clock",
+        "inningsLegalBalls",
+        "ballAgeLegalBalls",
+        "phase",
+        "nextAction",
+        "intervalSeconds",
+        "events"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "id",
+    "source",
+    "description",
+    "reasoning",
+    "tags",
+    "trigger",
+    "before",
+    "input",
+    "expected"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ClockFixture:1",
+  "title": "ClockFixture"
+}

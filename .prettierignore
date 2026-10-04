@@ -1,0 +1,16 @@
+node_modules
+**/dist
+packages/contracts/schemas
+package-lock.json
+docs/verification
+*.log
+playwright-report
+test-results
+
+tests/fixtures/scoring/corpus.json
+docs/verification-pass01
+
+docs/verification-pass02
+
+docs/verification-pass03
+tests/fixtures/determinism/vectors.json

@@ -1,0 +1,3 @@
+PASS: 24 random-address and 8 state-hash vectors independently verified
+EXIT_CODE=0
+ELAPSED_MS=1508

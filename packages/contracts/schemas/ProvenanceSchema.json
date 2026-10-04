@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "FICTIONAL",
+        "LICENSED",
+        "USER_SUPPLIED"
+      ]
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "sourceHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "confidenceBp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    }
+  },
+  "required": [
+    "kind",
+    "sourceId",
+    "sourceHash",
+    "confidenceBp"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:Provenance:1",
+  "title": "Provenance"
+}

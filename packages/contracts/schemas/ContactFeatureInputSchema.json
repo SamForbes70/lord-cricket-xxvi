@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "phase": {
+      "type": "string",
+      "enum": [
+        "T20_EARLY",
+        "T20_MIDDLE",
+        "T20_LATE",
+        "ODI_EARLY",
+        "ODI_MIDDLE",
+        "ODI_LATE",
+        "RED_BALL"
+      ]
+    },
+    "defenceRating": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "timingRating": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "powerRating": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "effectiveMovementBp": {
+      "type": "integer",
+      "minimum": -10000,
+      "maximum": 10000
+    },
+    "aggression": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4
+    }
+  },
+  "required": [
+    "phase",
+    "defenceRating",
+    "timingRating",
+    "powerRating",
+    "effectiveMovementBp",
+    "aggression"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ContactFeatureInput:1",
+  "title": "ContactFeatureInput"
+}

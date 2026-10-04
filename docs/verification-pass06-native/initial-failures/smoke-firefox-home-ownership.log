@@ -1,0 +1,86 @@
+
+> lord-cricket-xxvi@0.1.0 smoke
+> playwright test
+
+
+Running 12 tests using 2 workers
+
+  ✓   2 [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (1.5s)
+  ✓   1 [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play (2.1s)
+  ✓   3 [chromium] › tests/smoke/determinism.spec.ts:115:1 › compiled batch random/hash commands match frozen outputs and reject bad requests (1.8s)
+  ✓   4 [chromium] › tests/smoke/app.spec.ts:43:1 › compiled batch app reports accurate capabilities and rejects unsupported commands (2.5s)
+  ✓   5 [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors (1.1s)
+  ✓   6 [chromium] › tests/smoke/app.spec.ts:79:1 › compiled scoring CLI exercises production scorer and rejects malformed requests (1.0s)
+  ✓   7 [chromium] › tests/smoke/generator.spec.ts:44:1 › compiled batch generator command hands validated resolution to scoring adapter (1.1s)
+  ✓   8 [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors (869ms)
+  ✘  10 [firefox-determinism] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (6ms)
+  ✓   9 [chromium] › tests/smoke/probability.spec.ts:64:1 › compiled batch probability command matches independent vector and rejects a wrong request (1.6s)
+  ✘  11 [firefox-determinism] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors (10ms)
+  ✘  12 [firefox-determinism] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors (6ms)
+
+
+  1) [firefox-determinism] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    ╔══════════════════════════════════════════════════════════════════════════════════╗
+    ║ Firefox is unable to launch if the $HOME folder isn't owned by the current user. ║
+    ║ Workaround: Set the HOME=/root environment variable when running Playwright.     ║
+    ╚══════════════════════════════════════════════════════════════════════════════════╝
+    Call log:
+    [2m  - <launching> /mnt/data/lcxxvi-pass06-repair/browser-cache/browsers/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-NkmkSh -juggler-pipe -silent[22m
+    [2m  - <launched> pid=3649[22m
+    [2m  - [pid=3649][err] Running Nightly as root in a regular user's session is not supported.  ($HOME is /home/oai which is owned by oai.)[22m
+    [2m  - [pid=3649] <process did exit: exitCode=1, signal=null>[22m
+    [2m  - [pid=3649] starting temporary directories cleanup[22m
+    [2m  - [pid=3649] <gracefully close start>[22m
+    [2m  - [pid=3649] finished temporary directories cleanup[22m
+    [2m  - [pid=3649] <gracefully close end>[22m
+
+
+  2) [firefox-determinism] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    ╔══════════════════════════════════════════════════════════════════════════════════╗
+    ║ Firefox is unable to launch if the $HOME folder isn't owned by the current user. ║
+    ║ Workaround: Set the HOME=/root environment variable when running Playwright.     ║
+    ╚══════════════════════════════════════════════════════════════════════════════════╝
+    Call log:
+    [2m  - <launching> /mnt/data/lcxxvi-pass06-repair/browser-cache/browsers/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-RuyzCj -juggler-pipe -silent[22m
+    [2m  - <launched> pid=3688[22m
+    [2m  - [pid=3688][err] Running Nightly as root in a regular user's session is not supported.  ($HOME is /home/oai which is owned by oai.)[22m
+    [2m  - [pid=3688] <process did exit: exitCode=1, signal=null>[22m
+    [2m  - [pid=3688] starting temporary directories cleanup[22m
+    [2m  - [pid=3688] <gracefully close start>[22m
+    [2m  - [pid=3688] finished temporary directories cleanup[22m
+    [2m  - [pid=3688] <gracefully close end>[22m
+
+
+  3) [firefox-determinism] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    ╔══════════════════════════════════════════════════════════════════════════════════╗
+    ║ Firefox is unable to launch if the $HOME folder isn't owned by the current user. ║
+    ║ Workaround: Set the HOME=/root environment variable when running Playwright.     ║
+    ╚══════════════════════════════════════════════════════════════════════════════════╝
+    Call log:
+    [2m  - <launching> /mnt/data/lcxxvi-pass06-repair/browser-cache/browsers/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-tXvU5P -juggler-pipe -silent[22m
+    [2m  - <launched> pid=3692[22m
+    [2m  - [pid=3692][err] Running Nightly as root in a regular user's session is not supported.  ($HOME is /home/oai which is owned by oai.)[22m
+    [2m  - [pid=3692] <process did exit: exitCode=1, signal=null>[22m
+    [2m  - [pid=3692] starting temporary directories cleanup[22m
+    [2m  - [pid=3692] <gracefully close start>[22m
+    [2m  - [pid=3692] finished temporary directories cleanup[22m
+    [2m  - [pid=3692] <gracefully close end>[22m
+
+
+  3 failed
+    [firefox-determinism] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+    [firefox-determinism] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+    [firefox-determinism] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+  9 passed (19.9s)

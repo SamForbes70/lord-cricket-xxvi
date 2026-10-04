@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "sector": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7
+    },
+    "depth": {
+      "type": "string",
+      "enum": [
+        "INNER",
+        "MIDDLE",
+        "DEEP"
+      ]
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "NORMAL",
+        "SLIP",
+        "GULLY"
+      ]
+    },
+    "catchingRating": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "throwingRating": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    }
+  },
+  "required": [
+    "playerId",
+    "sector",
+    "depth",
+    "role",
+    "catchingRating",
+    "throwingRating"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:GeneratorFieldSlot:1",
+  "title": "GeneratorFieldSlot"
+}

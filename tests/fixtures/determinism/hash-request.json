@@ -1,0 +1,13 @@
+{
+  "kind": "HASH_STATE",
+  "version": "LC_CANONICAL_JSON_V1_SHA256",
+  "value": {
+    "revision": 7,
+    "innings": {
+      "runs": 105,
+      "wickets": 2,
+      "freeHitPending": true
+    },
+    "ids": ["p1", "p2"]
+  }
+}

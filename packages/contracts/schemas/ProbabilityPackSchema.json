@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "modelId": {
+          "type": "string",
+          "const": "synthetic-alpha-01"
+        },
+        "schemaVersion": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "status": {
+          "type": "string",
+          "const": "SYNTHETIC_ALPHA"
+        },
+        "randomId": {
+          "type": "string",
+          "const": "SHA256_COUNTER_V1"
+        },
+        "fixedPointScale": {
+          "type": "number",
+          "const": 10000
+        },
+        "expLutHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "featureSpecHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "variationIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "effects": {
+          "type": "object",
+          "properties": {
+            "overAroundWicket": {
+              "type": "boolean",
+              "const": false
+            },
+            "individualVariations": {
+              "type": "boolean",
+              "const": false
+            },
+            "moisture": {
+              "type": "boolean",
+              "const": false
+            },
+            "geometryEffects": {
+              "type": "boolean",
+              "const": false
+            },
+            "outfieldSpeed": {
+              "type": "boolean",
+              "const": false
+            }
+          },
+          "required": [
+            "overAroundWicket",
+            "individualVariations",
+            "moisture",
+            "geometryEffects",
+            "outfieldSpeed"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "modelId",
+        "schemaVersion",
+        "status",
+        "randomId",
+        "fixedPointScale",
+        "expLutHash",
+        "featureSpecHash",
+        "variationIds",
+        "effects"
+      ],
+      "additionalProperties": false
+    },
+    "probabilityVersion": {
+      "type": "string",
+      "const": "LC_INTEGER_PROBABILITY_V1"
+    },
+    "lutVersion": {
+      "type": "string",
+      "const": "LC_EXP_LUT_V1"
+    },
+    "lutScale": {
+      "type": "string",
+      "const": "1000000000000"
+    },
+    "lutStepBp": {
+      "type": "number",
+      "const": 100
+    },
+    "lutMinDeltaBp": {
+      "type": "number",
+      "const": -160000
+    },
+    "lutMaxDeltaBp": {
+      "type": "number",
+      "const": 0
+    },
+    "logitMinBp": {
+      "type": "number",
+      "const": -80000
+    },
+    "logitMaxBp": {
+      "type": "number",
+      "const": 80000
+    },
+    "coefficients": {
+      "type": "object",
+      "properties": {
+        "legality": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": -100000,
+              "maximum": 100000
+            }
+          }
+        },
+        "contact": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": -100000,
+              "maximum": 100000
+            }
+          }
+        }
+      },
+      "required": [
+        "legality",
+        "contact"
+      ],
+      "additionalProperties": false
+    },
+    "featureSpec": {
+      "type": "object",
+      "properties": {
+        "maxTerms": {
+          "type": "number",
+          "const": 32
+        },
+        "fixedPointScale": {
+          "type": "number",
+          "const": 10000
+        },
+        "termMultiplyRounding": {
+          "type": "string",
+          "const": "NEAREST_TIES_AWAY_FROM_ZERO"
+        },
+        "accumulationOrder": {
+          "type": "string",
+          "const": "INTERCEPT_TERMS_IN_ARRAY_ORDER"
+        },
+        "clipTiming": {
+          "type": "string",
+          "const": "AFTER_SUM"
+        },
+        "lutDeltaRounding": {
+          "type": "string",
+          "const": "NEAREST_TIES_AWAY_FROM_ZERO"
+        },
+        "categoryOrder": {
+          "type": "string",
+          "const": "AS_SUPPLIED"
+        },
+        "massAllocation": {
+          "type": "string",
+          "const": "LARGEST_REMAINDER_CATEGORY_INDEX"
+        }
+      },
+      "required": [
+        "maxTerms",
+        "fixedPointScale",
+        "termMultiplyRounding",
+        "accumulationOrder",
+        "clipTiming",
+        "lutDeltaRounding",
+        "categoryOrder",
+        "massAllocation"
+      ],
+      "additionalProperties": false
+    },
+    "expLutValues": {
+      "minItems": 1601,
+      "maxItems": 1601,
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000000000000
+      }
+    },
+    "baselines": {
+      "type": "object",
+      "properties": {
+        "legality": {
+          "minItems": 3,
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "baseWeight": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              }
+            },
+            "required": [
+              "id",
+              "baseWeight"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "contact": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "additionalProperties": {
+            "minItems": 6,
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "baseWeight": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                }
+              },
+              "required": [
+                "id",
+                "baseWeight"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      "required": [
+        "legality",
+        "contact"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "manifest",
+    "probabilityVersion",
+    "lutVersion",
+    "lutScale",
+    "lutStepBp",
+    "lutMinDeltaBp",
+    "lutMaxDeltaBp",
+    "logitMinBp",
+    "logitMaxBp",
+    "coefficients",
+    "featureSpec",
+    "expLutValues",
+    "baselines"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ProbabilityPack:1",
+  "title": "ProbabilityPack"
+}

@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "sourcePass06ArchiveSha256": "88d4b71bf7df8847779ad0f90c8c53f966508c0c9191ca816f7f26505e8f02fd",
+  "frozenHashes": {
+    "package-lock.json": {
+      "expectedSha256": "44e63e6db495d897f28cda25e4338839abded362cdeaa84b6bd8a5f0ddcd17df",
+      "actualSha256": "44e63e6db495d897f28cda25e4338839abded362cdeaa84b6bd8a5f0ddcd17df",
+      "unchanged": true
+    },
+    "tests/fixtures/scoring/corpus.json": {
+      "expectedSha256": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+      "actualSha256": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+      "unchanged": true
+    },
+    "tests/fixtures/scoring/index.json": {
+      "expectedSha256": "0ca2b7885349d506ca0313884c1c1572a269c9c6ebb647f61b308410bc57a19e",
+      "actualSha256": "0ca2b7885349d506ca0313884c1c1572a269c9c6ebb647f61b308410bc57a19e",
+      "unchanged": true
+    },
+    "tests/fixtures/determinism/vectors.json": {
+      "expectedSha256": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+      "actualSha256": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+      "unchanged": true
+    },
+    "tests/fixtures/probability/vectors.json": {
+      "expectedSha256": "976e1f4c5b5b8401c743e5b22b4db430e54fb6640424b5813634d77e90118f4d",
+      "actualSha256": "976e1f4c5b5b8401c743e5b22b4db430e54fb6640424b5813634d77e90118f4d",
+      "unchanged": true
+    },
+    "packages/data/src/probability-pack.ts": {
+      "expectedSha256": "f63bc07186fe0e449995520ae155020d310b335f95e4b887e8f1bd1058e77b9c",
+      "actualSha256": "f63bc07186fe0e449995520ae155020d310b335f95e4b887e8f1bd1058e77b9c",
+      "unchanged": true
+    }
+  },
+  "preExistingSchemaCount": 84,
+  "preExistingSchemasByteIdentical": true,
+  "newSchemaCount": 4,
+  "regeneratedZodMirrorNames": [
+    "GeneratedDeliverySchema.json",
+    "GeneratorTraceStageSchema.json"
+  ],
+  "currentSchemaCount": 88,
+  "generatorReferenceVectorSha256": "99b9a6eacd1526159d0ecc1e0627dd88e71b7712b03bad9306ee047b1e9f0dcf",
+  "stagePackSourceSha256": "b7ed7365b98e4fe65df08f8c15a02127d7ef399a9063bbc60cab34a2ed1b8f7b",
+  "schemaVersion": "1.0.0"
+}

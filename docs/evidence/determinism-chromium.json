@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "browser": "chromium",
+  "browserVersion": "141.0.7390.37",
+  "node": "v22.16.0",
+  "addressVectors": 24,
+  "stateVectors": 8,
+  "mainThreadAndWorker": true,
+  "invalidRequestRecovery": true,
+  "predictionIsolation": true
+}

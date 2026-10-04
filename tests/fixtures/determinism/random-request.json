@@ -1,0 +1,12 @@
+{
+  "kind": "RANDOM",
+  "version": "SHA256_COUNTER_V1",
+  "address": {
+    "seed": "s1",
+    "domain": "MATCH_DELIVERY",
+    "entityId": "m1",
+    "eventOrdinal": 7,
+    "stageName": "legality",
+    "drawIndex": 0
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "baseWeight": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000000
+    },
+    "allowed": {
+      "type": "boolean"
+    },
+    "interceptBp": {
+      "type": "integer",
+      "minimum": -200000,
+      "maximum": 200000
+    },
+    "terms": {
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "coefficientBp": {
+            "type": "integer",
+            "minimum": -100000,
+            "maximum": 100000
+          },
+          "featureBp": {
+            "type": "integer",
+            "minimum": -20000,
+            "maximum": 20000
+          }
+        },
+        "required": [
+          "coefficientBp",
+          "featureBp"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "baseWeight",
+    "allowed",
+    "interceptBp",
+    "terms"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ProbabilityCategory:1",
+  "title": "ProbabilityCategory"
+}

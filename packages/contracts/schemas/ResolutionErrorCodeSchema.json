@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "INVALID_STRUCTURE",
+    "INVALID_CONTEXT",
+    "UNSUPPORTED_PENALTY",
+    "INVALID_EXTRAS",
+    "INVALID_BOUNDARY",
+    "INVALID_RUNNING",
+    "INVALID_DISMISSAL",
+    "INVALID_ENDS",
+    "INVALID_IMMEDIATE_PENALTY",
+    "UNSAFE_TOTAL"
+  ],
+  "$id": "urn:lcxxvi:ResolutionErrorCode:1",
+  "title": "ResolutionErrorCode"
+}

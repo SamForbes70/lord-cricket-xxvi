@@ -1,0 +1,24 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass06-repair/repo[39m
+
+ [32m✓[39m tests/unit/probability.test.ts [2m([22m[2m23 tests[22m[2m)[22m[33m 315[2mms[22m[39m
+ [32m✓[39m tests/unit/scoring-kernel.test.ts [2m([22m[2m134 tests[22m[2m)[22m[33m 483[2mms[22m[39m
+ [32m✓[39m tests/unit/generator.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 258[2mms[22m[39m
+ [32m✓[39m tests/unit/random-service.test.ts [2m([22m[2m44 tests[22m[2m)[22m[32m 137[2mms[22m[39m
+ [32m✓[39m tests/unit/determinism.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m tests/unit/contracts.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 1925[2mms[22m[39m
+   [33m[2m✓[22m[39m every generated schema compiles with strict AJV 2020-12 [33m 1577[2mms[22m[39m
+ [32m✓[39m tests/unit/defaults.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/scoring-fixtures.test.ts [2m([22m[2m84 tests[22m[2m)[22m[33m 2354[2mms[22m[39m
+   [33m[2m✓[22m[39m validates the entire corpus against independent emitted JSON Schema [33m 639[2mms[22m[39m
+   [33m[2m✓[22m[39m runs a real scorer comparison gate against the retained corpus [33m 1560[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m      Tests [22m [1m[32m342 passed[39m[22m[90m (342)[39m
+[2m   Start at [22m 09:41:16
+[2m   Duration [22m 6.08s[2m (transform 1.13s, setup 0ms, collect 5.18s, tests 5.50s, environment 10ms, prepare 1.61s)[22m
+

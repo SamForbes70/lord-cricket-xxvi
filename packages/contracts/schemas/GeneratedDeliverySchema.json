@@ -1,0 +1,445 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "GENERATED_DELIVERY"
+    },
+    "generatorVersion": {
+      "type": "string",
+      "const": "LC_CONDITIONAL_DELIVERY_V1"
+    },
+    "modelHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "stagePackHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "internalOnly": {
+      "type": "boolean",
+      "const": true
+    },
+    "trace": {
+      "minItems": 2,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stageName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "seed": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "domain": {
+                "type": "string",
+                "enum": [
+                  "MATCH_DELIVERY",
+                  "TOSS",
+                  "WEATHER",
+                  "AI_TIE_BREAK",
+                  "CAREER_TRAINING",
+                  "WORLD_GENERATION",
+                  "PREDICTION"
+                ]
+              },
+              "entityId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "eventOrdinal": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "stageName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "drawIndex": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "seed",
+              "domain",
+              "entityId",
+              "eventOrdinal",
+              "stageName",
+              "drawIndex"
+            ],
+            "additionalProperties": false
+          },
+          "draw": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "selectedCategoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "categories": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "allowed": {
+                  "type": "boolean"
+                },
+                "logitBp": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "lutIndex": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "mass": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "cumulative": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "id",
+                "allowed",
+                "logitBp",
+                "lutIndex",
+                "mass",
+                "cumulative"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "stageName",
+          "address",
+          "draw",
+          "selectedCategoryId",
+          "categories"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": [
+            "DELIVERY",
+            "IMMEDIATE_PENALTY"
+          ]
+        },
+        "legality": {
+          "type": "string",
+          "enum": [
+            "LEGAL",
+            "WIDE",
+            "NO_BALL",
+            "DEAD"
+          ]
+        },
+        "batRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "extras": {
+          "type": "object",
+          "properties": {
+            "wides": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "noBalls": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "byes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "legByes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "penalties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "wides",
+            "noBalls",
+            "byes",
+            "legByes",
+            "penalties"
+          ],
+          "additionalProperties": false
+        },
+        "completedRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "attemptedRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "boundary": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "FOUR",
+            "SIX"
+          ]
+        },
+        "dismissal": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "BOWLED",
+                    "LBW",
+                    "CAUGHT",
+                    "RUN_OUT",
+                    "STUMPED",
+                    "HIT_WICKET"
+                  ]
+                },
+                "playerId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "fielderId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "wicketEnd": {
+                  "type": "string",
+                  "enum": [
+                    "NORTH",
+                    "SOUTH"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "playerId",
+                "fielderId",
+                "wicketEnd"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endsAfter": {
+          "type": "object",
+          "properties": {
+            "north": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "south": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "north",
+            "south"
+          ],
+          "additionalProperties": false
+        },
+        "batContact": {
+          "type": "boolean"
+        },
+        "attemptedStroke": {
+          "type": "boolean"
+        },
+        "shotSector": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 7
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trajectory": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "GROUND",
+                "AERIAL",
+                "EDGE"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "executedLength": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "YORKER",
+                "FULL",
+                "GOOD",
+                "SHORT",
+                "FULL_TOSS"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fieldOutcome": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "STOP",
+            "DROP",
+            "CATCH",
+            "MISS",
+            "RUN_OUT"
+          ]
+        },
+        "elapsedSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "stage",
+        "legality",
+        "batRuns",
+        "extras",
+        "completedRuns",
+        "attemptedRuns",
+        "boundary",
+        "dismissal",
+        "endsAfter",
+        "batContact",
+        "attemptedStroke",
+        "shotSector",
+        "trajectory",
+        "executedLength",
+        "fieldOutcome",
+        "elapsedSeconds"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "kind",
+    "generatorVersion",
+    "modelHash",
+    "stagePackHash",
+    "internalOnly",
+    "trace",
+    "resolution"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:GeneratedDelivery:1",
+  "title": "GeneratedDelivery"
+}

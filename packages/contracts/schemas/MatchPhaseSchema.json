@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "SETUP",
+    "TOSS",
+    "AWAITING_INNINGS",
+    "READY",
+    "AWAITING_BATTER",
+    "AWAITING_BOWLER",
+    "INTERVAL",
+    "WEATHER_DELAY",
+    "COMPLETE"
+  ],
+  "$id": "urn:lcxxvi:MatchPhase:1",
+  "title": "MatchPhase"
+}

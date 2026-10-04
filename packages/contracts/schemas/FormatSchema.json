@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "T20",
+    "ODI",
+    "RED_BALL"
+  ],
+  "$id": "urn:lcxxvi:Format:1",
+  "title": "Format"
+}

@@ -1,0 +1,79 @@
+{
+  "verifiedAt": "2026-09-24T12:20:59.741Z",
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "platform": "linux",
+  "architecture": "x64",
+  "lockfileSha256": "f7c8c7cb1552c96d013eeed769ad01b420922c09b9d8305ef5a1bd1e6082597d",
+  "schemaVersion": "1.0.0",
+  "scoringImplemented": true,
+  "scoringEngine": "LC_SCORING_V1",
+  "matchEngineImplemented": false,
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Deterministic Random Service",
+  "gates": [
+    {
+      "gate": "installation",
+      "command": "npm ci",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3027
+    },
+    {
+      "gate": "schemas",
+      "command": "npm run schemas:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 663
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2240
+    },
+    {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3459
+    },
+    {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2410
+    },
+    {
+      "gate": "fixtures",
+      "command": "npm run fixtures:audit",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 848
+    },
+    {
+      "gate": "scorer",
+      "command": "npm run fixtures:engine",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 816
+    },
+    {
+      "gate": "unit",
+      "command": "npm test",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 4714
+    },
+    {
+      "gate": "smoke",
+      "command": "npm run smoke",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 7768
+    }
+  ]
+}

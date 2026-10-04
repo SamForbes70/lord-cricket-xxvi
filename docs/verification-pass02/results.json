@@ -1,0 +1,70 @@
+{
+  "verifiedAt": "2026-09-24T10:54:24.137Z",
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "platform": "linux",
+  "architecture": "x64",
+  "lockfileSha256": "3b1f98a47db3f7074efd4f35afef5969185272bc83ea6dbb4cfec35a8119e256",
+  "schemaVersion": "1.0.0",
+  "engineImplemented": false,
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Scoring Kernel and Reducers",
+  "gates": [
+    {
+      "gate": "installation",
+      "command": "npm ci",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2132
+    },
+    {
+      "gate": "schemas",
+      "command": "npm run schemas:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 447
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2976
+    },
+    {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2190
+    },
+    {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 1534
+    },
+    {
+      "gate": "fixtures",
+      "command": "npm run fixtures:audit",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 517
+    },
+    {
+      "gate": "unit",
+      "command": "npm test",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 1772
+    },
+    {
+      "gate": "smoke",
+      "command": "npm run smoke",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3206
+    }
+  ]
+}

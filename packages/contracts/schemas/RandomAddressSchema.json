@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "seed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "MATCH_DELIVERY",
+        "TOSS",
+        "WEATHER",
+        "AI_TIE_BREAK",
+        "CAREER_TRAINING",
+        "WORLD_GENERATION",
+        "PREDICTION"
+      ]
+    },
+    "entityId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "eventOrdinal": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "stageName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "drawIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "seed",
+    "domain",
+    "entityId",
+    "eventOrdinal",
+    "stageName",
+    "drawIndex"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:RandomAddress:1",
+  "title": "RandomAddress"
+}

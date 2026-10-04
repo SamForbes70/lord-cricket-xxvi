@@ -1,0 +1,46 @@
+{
+  "manifestVersion": "PASS_05_1_INITIAL_BASELINE_V1",
+  "source": "supplied Pass 05 archive",
+  "packagedSourceCommit": "7804d87ab4b8b244a836effe5badd16359bfdc97",
+  "gitMetadataPresent": false,
+  "workingTreeComparedToArchive": "EXTRACTED_ARCHIVE_IS_WORKING_BASELINE",
+  "packageVersion": "0.1.0",
+  "lockfileVersion": 3,
+  "schemaCount": 84,
+  "fixtureCounts": {
+    "scoringValidDeliveries": 45,
+    "scoringInvalidResolutions": 29,
+    "terminalReferenceOnly": 4,
+    "clockReferenceOnly": 5,
+    "deferredPersistenceNrrReferenceOnly": 4,
+    "scoringCorpusTotal": 87,
+    "randomAddresses": 24,
+    "stateHashes": 8,
+    "probabilityCases": 15,
+    "probabilityBoundaries": 4
+  },
+  "versions": {
+    "scoringEngine": "LC_SCORING_V1",
+    "randomVersion": "SHA256_COUNTER_V1",
+    "stateHashVersion": "LC_CANONICAL_JSON_V1_SHA256",
+    "probabilityVersion": "LC_INTEGER_PROBABILITY_V1",
+    "lutVersion": "LC_EXP_LUT_V1",
+    "modelId": "synthetic-alpha-01",
+    "modelStatus": "SYNTHETIC_ALPHA"
+  },
+  "hashes": {
+    "packageLockSha256": "345dcb447876aa6f94df9e01d650af7c7153aed3063e28fabf3522e153d7af6e",
+    "scoringCorpusSha256": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+    "scoringIndexSha256": "0ca2b7885349d506ca0313884c1c1572a269c9c6ebb647f61b308410bc57a19e",
+    "randomVectorsSha256": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+    "probabilityVectorsSha256": "976e1f4c5b5b8401c743e5b22b4db430e54fb6640424b5813634d77e90118f4d",
+    "modelPackPinnedSha256": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+    "expLutPinnedSha256": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825"
+  },
+  "priorVerificationStatus": "BLOCKED",
+  "notes": [
+    "Archive excludes .git, so current git status/latest commit cannot be independently queried.",
+    "No separate working repository was supplied; the extracted Pass 05 archive is the working baseline.",
+    "Pinned model/LUT hashes will be independently revalidated during Pass 05.1."
+  ]
+}

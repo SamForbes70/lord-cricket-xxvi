@@ -1,0 +1,117 @@
+import type { Player, TeamTactics, DeliveryRecorded } from "@lcxxvi/contracts";
+export const hash = "a".repeat(64);
+const skills = {
+  defence: 50,
+  timing: 50,
+  power: 50,
+  rotation: 50,
+  vsPace: 50,
+  vsSpin: 50,
+  control: 50,
+  movement: 50,
+  variation: 50,
+  stamina: 50,
+  catching: 50,
+  groundFielding: 50,
+  throwing: 50,
+  keeping: 50,
+};
+/** Minimal test record, not a generated world or playable roster. */
+export const player: Player = {
+  playerId: "test-player",
+  name: "Contract fixture",
+  birthDate: "2000-02-29",
+  batHand: "R",
+  bowlHand: "R",
+  bowlingStyle: null,
+  role: "BATTER",
+  skills: { T20: skills, ODI: skills, RED_BALL: skills },
+  variations: ["stock"],
+  shotSectorWeights: [1, 1, 1, 1, 1, 1, 1, 1],
+  exposureBalls: { T20: 0, ODI: 0, RED_BALL: 0 },
+  provenance: {
+    kind: "USER_SUPPLIED",
+    sourceId: "test-fixture",
+    sourceHash: hash,
+    confidenceBp: 0,
+  },
+};
+export const battingPlan = {
+  playerId: "p017",
+  aggression: 3,
+  intent: "ROTATE",
+} as const;
+export const command = {
+  commandId: "cmd-0091",
+  aggregateId: "match-0001",
+  expectedRevision: 82,
+  actorId: "USER:team-01",
+  kind: "SET_BATTING_PLAN",
+  payload: battingPlan,
+};
+export const versions = {
+  schema: "1.0.0",
+  engine: "contract-foundation-01",
+  random: "SHA256_COUNTER_V1",
+  rules: "LC_T20_01",
+  rulesHash: hash,
+  model: "test-model",
+  modelHash: hash,
+  worldHash: hash,
+} as const;
+export const tactics: TeamTactics = {
+  battingPlans: {
+    p1: { playerId: "p1", aggression: 2, intent: "NORMAL" },
+    p2: { playerId: "p2", aggression: 2, intent: "NORMAL" },
+  },
+  bowlingPlan: {
+    bowlerId: "b1",
+    line: "OFF",
+    length: "GOOD",
+    variationId: "stock",
+    effort: "NORMAL",
+  },
+  fieldSlots: [
+    { slotId: "slip-1", playerId: "f1" },
+    { slotId: "slip-2", playerId: "f2" },
+    { slotId: "point", playerId: "f3" },
+    { slotId: "cover", playerId: "f4" },
+    { slotId: "mid-off", playerId: "f5" },
+    { slotId: "mid-on", playerId: "f6" },
+    { slotId: "midwicket", playerId: "f7" },
+    { slotId: "deep-square-leg", playerId: "f8" },
+    { slotId: "fine-leg", playerId: "f9" },
+  ],
+  nextBatterId: null,
+  delegation: {
+    battingOrder: false,
+    bowlerSelection: false,
+    battingTactics: false,
+    bowlingTactics: false,
+    declarations: false,
+    followOn: false,
+  },
+};
+export const delivery: DeliveryRecorded = {
+  type: "DELIVERY_RECORDED",
+  inningsIndex: 0,
+  deliveryIndex: 0,
+  strikerId: "p1",
+  nonStrikerId: "p2",
+  bowlerId: "b1",
+  legality: "LEGAL",
+  legalBall: true,
+  countsAsBallFaced: true,
+  batRuns: 0,
+  extras: { wides: 0, noBalls: 0, byes: 0, legByes: 0, penalties: 0 },
+  completedRuns: 0,
+  boundary: "NONE",
+  dismissal: null,
+  endsAfter: { north: "p1", south: "p2" },
+  shotSector: null,
+  trajectory: null,
+  executedLength: "GOOD",
+  fieldOutcome: "NONE",
+  elapsedSeconds: 40,
+  freeHitNext: false,
+};

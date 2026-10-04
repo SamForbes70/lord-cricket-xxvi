@@ -1,0 +1,12 @@
+installation: BLOCKED (recorded failed attempt)
+schemas: BLOCKED
+build: BLOCKED
+typecheck: BLOCKED
+lint: BLOCKED
+fixtures: BLOCKED
+scorer: BLOCKED
+vectors: PASS
+probability-vectors: PASS
+generator-vectors: PASS
+unit: BLOCKED
+smoke: BLOCKED

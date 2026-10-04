@@ -1,0 +1,8 @@
+
+> lord-cricket-xxvi@0.1.0 vectors:check
+> python3 scripts/check-determinism-vectors.py
+
+PASS: 24 random-address and 8 state-hash vectors independently verified
+
+EXIT_CODE=0
+ELAPSED_MS=1738

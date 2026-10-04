@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "limitedOversRain": {
+      "type": "boolean",
+      "const": false
+    },
+    "superOver": {
+      "type": "boolean",
+      "const": false
+    },
+    "injuries": {
+      "type": "boolean",
+      "const": false
+    },
+    "prediction": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "limitedOversRain",
+    "superOver",
+    "injuries",
+    "prediction"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:Capabilities:1",
+  "title": "Capabilities"
+}

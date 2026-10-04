@@ -1,0 +1,3273 @@
+{
+  "verification": "OFFLINE_LIMITED_WITH_IDENTITY_ZOD_AND_NODE_SHA_SHIMS",
+  "count": 1200,
+  "passed": 1200,
+  "failures": [],
+  "selected": {
+    "LEGAL:NONE:STOP": 782,
+    "LEGAL:NONE:NONE": 323,
+    "WIDE:NONE:NONE": 11,
+    "LEGAL:CAUGHT:CATCH": 57,
+    "LEGAL:BOWLED:NONE": 6,
+    "LEGAL:NONE:DROP": 15,
+    "LEGAL:RUN_OUT:RUN_OUT": 2,
+    "NO_BALL:NONE:STOP": 2,
+    "NO_BALL:NONE:NONE": 1,
+    "LEGAL:LBW:NONE": 1
+  },
+  "edgeChecks": [
+    {
+      "name": "winning-wide-truncation",
+      "seed": "pass06-independent-28",
+      "passed": true,
+      "stages": [
+        "length:0",
+        "legality:0"
+      ],
+      "outcome": "WIDE",
+      "fieldOutcome": "NONE"
+    },
+    {
+      "name": "free-hit-pre-sampling-dismissal-mask",
+      "seed": "pass06-independent-35",
+      "passed": true,
+      "stages": [
+        "length:0",
+        "legality:0",
+        "contact:0",
+        "sector:0",
+        "running:0"
+      ],
+      "outcome": "LEGAL",
+      "fieldOutcome": "STOP"
+    },
+    {
+      "name": "no-ball-continues-contact",
+      "seed": "pass06-independent-487",
+      "passed": true,
+      "stages": [
+        "length:0",
+        "legality:0",
+        "contact:0",
+        "sector:0",
+        "running:0",
+        "running:1"
+      ],
+      "outcome": "NO_BALL",
+      "fieldOutcome": "STOP"
+    },
+    {
+      "name": "target-bounded-physical-runs-13",
+      "seed": "pass06-independent-13",
+      "passed": true,
+      "stages": [
+        "length:0",
+        "legality:0",
+        "contact:0",
+        "sector:0",
+        "fielding:0",
+        "running:0",
+        "running:1"
+      ],
+      "outcome": "LEGAL",
+      "fieldOutcome": "STOP"
+    },
+    {
+      "name": "target-bounded-physical-runs-324",
+      "seed": "pass06-independent-324",
+      "passed": true,
+      "stages": [
+        "length:0",
+        "legality:0",
+        "contact:0",
+        "sector:0",
+        "running:0"
+      ],
+      "outcome": "LEGAL",
+      "fieldOutcome": "NONE"
+    },
+    {
+      "name": "full-winning-boundary",
+      "seed": "pass06-independent-26",
+      "passed": true,
+      "stages": [
+        "length:0",
+        "legality:0",
+        "contact:0",
+        "sector:0",
+        "fielding:0",
+        "running:0"
+      ],
+      "outcome": "LEGAL",
+      "fieldOutcome": "NONE"
+    },
+    {
+      "name": "wrong-stage-pack",
+      "passed": true,
+      "rejection": true
+    },
+    {
+      "name": "wrong-rules-hash",
+      "passed": true,
+      "rejection": true
+    },
+    {
+      "name": "wrong-ordinal",
+      "passed": true,
+      "rejection": true
+    },
+    {
+      "name": "incomplete-field",
+      "passed": true,
+      "rejection": true
+    },
+    {
+      "name": "unversioned-generator",
+      "passed": true,
+      "rejection": true
+    }
+  ],
+  "frozenVectorFixtures": 9,
+  "frozenVectorStageAddresses": 48,
+  "examplesByOutcome": {
+    "LEGAL:NONE:STOP": {
+      "seed": "pass06-independent-0",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 1385300019,
+          "selectedCategoryId": "GOOD",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 4019867251,
+          "selectedCategoryId": "LEGAL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 978080327,
+          "selectedCategoryId": "GROUND",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 23,
+              "mass": 457346115,
+              "cumulative": 457346115
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 18,
+              "mass": 269245061,
+              "cumulative": 726591176
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 0,
+              "mass": 2716906691,
+              "cumulative": 3443497867
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 500,
+              "lutIndex": 10,
+              "mass": 625006483,
+              "cumulative": 4068504350
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": -1375,
+              "lutIndex": 28,
+              "mass": 224481198,
+              "cumulative": 4292985548
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 15,
+              "mass": 1981748,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "sector",
+          "drawIndex": 0,
+          "draw": 2706690109,
+          "selectedCategoryId": "SECTOR_4",
+          "categories": [
+            {
+              "id": "SECTOR_0",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 480555781
+            },
+            {
+              "id": "SECTOR_1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 440509466,
+              "cumulative": 921065247
+            },
+            {
+              "id": "SECTOR_2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 1441667344
+            },
+            {
+              "id": "SECTOR_3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 700810515,
+              "cumulative": 2142477859
+            },
+            {
+              "id": "SECTOR_4",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 750868408,
+              "cumulative": 2893346267
+            },
+            {
+              "id": "SECTOR_5",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 400463151,
+              "cumulative": 3293809418
+            },
+            {
+              "id": "SECTOR_6",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 3774365199
+            },
+            {
+              "id": "SECTOR_7",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 0,
+          "draw": 884125250,
+          "selectedCategoryId": "0",
+          "categories": [
+            {
+              "id": "0",
+              "allowed": true,
+              "logitBp": 4700,
+              "lutIndex": 0,
+              "mass": 2466519073,
+              "cumulative": 2466519073
+            },
+            {
+              "id": "1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 1261292740,
+              "cumulative": 3727811813
+            },
+            {
+              "id": "2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 315323185,
+              "cumulative": 4043134998
+            },
+            {
+              "id": "3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 35035909,
+              "cumulative": 4078170907
+            },
+            {
+              "id": "4",
+              "allowed": true,
+              "logitBp": -4800,
+              "lutIndex": 95,
+              "mass": 216796389,
+              "cumulative": 4294967296
+            },
+            {
+              "id": "6",
+              "allowed": true,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 4,
+        "trajectory": "GROUND",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    "LEGAL:NONE:NONE": {
+      "seed": "pass06-independent-6",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 3998599312,
+          "selectedCategoryId": "SHORT",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 2127523279,
+          "selectedCategoryId": "LEGAL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 223253454,
+          "selectedCategoryId": "MISS",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 29,
+              "mass": 442161181,
+              "cumulative": 442161181
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 23,
+              "mass": 262921625,
+              "cumulative": 705082806
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 6,
+              "mass": 2626699198,
+              "cumulative": 3331782004
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 2000,
+              "lutIndex": 0,
+              "mass": 709099628,
+              "cumulative": 4040881632
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": 125,
+              "lutIndex": 19,
+              "mass": 252150458,
+              "cumulative": 4293032090
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 20,
+              "mass": 1935206,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "dismissal",
+          "drawIndex": 0,
+          "draw": 1320624224,
+          "selectedCategoryId": "NONE",
+          "categories": [
+            {
+              "id": "BOWLED",
+              "allowed": true,
+              "logitBp": -30880,
+              "lutIndex": 309,
+              "mass": 186923999,
+              "cumulative": 186923999
+            },
+            {
+              "id": "NONE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4108043297,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 0,
+          "draw": 1315654386,
+          "selectedCategoryId": "0",
+          "categories": [
+            {
+              "id": "0",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4166118277,
+              "cumulative": 4166118277
+            },
+            {
+              "id": "1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 107374182,
+              "cumulative": 4273492459
+            },
+            {
+              "id": "4",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 21474837,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": false,
+        "attemptedStroke": true,
+        "shotSector": null,
+        "trajectory": null,
+        "executedLength": "SHORT",
+        "fieldOutcome": "NONE",
+        "elapsedSeconds": 40
+      }
+    },
+    "WIDE:NONE:NONE": {
+      "seed": "pass06-independent-28",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 1586223616,
+          "selectedCategoryId": "GOOD",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 4226956387,
+          "selectedCategoryId": "WIDE",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 0,
+          "draw": 2567757913,
+          "selectedCategoryId": "1",
+          "categories": [
+            {
+              "id": "1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4209067950,
+              "cumulative": 4209067950
+            },
+            {
+              "id": "2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 64424509,
+              "cumulative": 4273492459
+            },
+            {
+              "id": "5",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 21474837,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "WIDE",
+        "batRuns": 0,
+        "extras": {
+          "wides": 1,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": false,
+        "attemptedStroke": false,
+        "shotSector": null,
+        "trajectory": null,
+        "executedLength": "GOOD",
+        "fieldOutcome": "NONE",
+        "elapsedSeconds": 40
+      }
+    },
+    "LEGAL:CAUGHT:CATCH": {
+      "seed": "pass06-independent-35",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 265551055,
+          "selectedCategoryId": "FULL",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 945211533,
+          "selectedCategoryId": "LEGAL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 4180378857,
+          "selectedCategoryId": "EDGE",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 23,
+              "mass": 457346115,
+              "cumulative": 457346115
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 18,
+              "mass": 269245061,
+              "cumulative": 726591176
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 0,
+              "mass": 2716906691,
+              "cumulative": 3443497867
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 500,
+              "lutIndex": 10,
+              "mass": 625006483,
+              "cumulative": 4068504350
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": -1375,
+              "lutIndex": 28,
+              "mass": 224481198,
+              "cumulative": 4292985548
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 15,
+              "mass": 1981748,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "sector",
+          "drawIndex": 0,
+          "draw": 3537772280,
+          "selectedCategoryId": "SECTOR_6",
+          "categories": [
+            {
+              "id": "SECTOR_0",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 480555781
+            },
+            {
+              "id": "SECTOR_1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 440509466,
+              "cumulative": 921065247
+            },
+            {
+              "id": "SECTOR_2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 1441667344
+            },
+            {
+              "id": "SECTOR_3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 700810515,
+              "cumulative": 2142477859
+            },
+            {
+              "id": "SECTOR_4",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 750868408,
+              "cumulative": 2893346267
+            },
+            {
+              "id": "SECTOR_5",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 400463151,
+              "cumulative": 3293809418
+            },
+            {
+              "id": "SECTOR_6",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 3774365199
+            },
+            {
+              "id": "SECTOR_7",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "fielding",
+          "drawIndex": 0,
+          "draw": 1330699031,
+          "selectedCategoryId": "CHANCE",
+          "categories": [
+            {
+              "id": "CHANCE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 1932735283,
+              "cumulative": 1932735283
+            },
+            {
+              "id": "NO_CHANCE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 2362232013,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "fielding",
+          "drawIndex": 1,
+          "draw": 2517606718,
+          "selectedCategoryId": "CATCH",
+          "categories": [
+            {
+              "id": "CATCH",
+              "allowed": true,
+              "logitBp": 16200,
+              "lutIndex": 0,
+              "mass": 3585417781,
+              "cumulative": 3585417781
+            },
+            {
+              "id": "DROP",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 162,
+              "mass": 709549515,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": {
+          "kind": "CAUGHT",
+          "playerId": "p1",
+          "fielderId": "f1",
+          "wicketEnd": "NORTH"
+        },
+        "endsAfter": {
+          "north": null,
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 6,
+        "trajectory": "EDGE",
+        "executedLength": "FULL",
+        "fieldOutcome": "CATCH",
+        "elapsedSeconds": 40
+      }
+    },
+    "LEGAL:BOWLED:NONE": {
+      "seed": "pass06-independent-121",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 3864735165,
+          "selectedCategoryId": "SHORT",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 4002405119,
+          "selectedCategoryId": "LEGAL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 108317661,
+          "selectedCategoryId": "MISS",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 29,
+              "mass": 442161181,
+              "cumulative": 442161181
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 23,
+              "mass": 262921625,
+              "cumulative": 705082806
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 6,
+              "mass": 2626699198,
+              "cumulative": 3331782004
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 2000,
+              "lutIndex": 0,
+              "mass": 709099628,
+              "cumulative": 4040881632
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": 125,
+              "lutIndex": 19,
+              "mass": 252150458,
+              "cumulative": 4293032090
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 20,
+              "mass": 1935206,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "dismissal",
+          "drawIndex": 0,
+          "draw": 91493341,
+          "selectedCategoryId": "BOWLED",
+          "categories": [
+            {
+              "id": "BOWLED",
+              "allowed": true,
+              "logitBp": -30880,
+              "lutIndex": 309,
+              "mass": 186923999,
+              "cumulative": 186923999
+            },
+            {
+              "id": "NONE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4108043297,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": {
+          "kind": "BOWLED",
+          "playerId": "p1",
+          "fielderId": null,
+          "wicketEnd": "NORTH"
+        },
+        "endsAfter": {
+          "north": null,
+          "south": "p2"
+        },
+        "batContact": false,
+        "attemptedStroke": true,
+        "shotSector": null,
+        "trajectory": null,
+        "executedLength": "SHORT",
+        "fieldOutcome": "NONE",
+        "elapsedSeconds": 40
+      }
+    },
+    "LEGAL:NONE:DROP": {
+      "seed": "pass06-independent-200",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 411601223,
+          "selectedCategoryId": "FULL",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 1955490180,
+          "selectedCategoryId": "LEGAL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 4082952779,
+          "selectedCategoryId": "EDGE",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 23,
+              "mass": 457346115,
+              "cumulative": 457346115
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 18,
+              "mass": 269245061,
+              "cumulative": 726591176
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 0,
+              "mass": 2716906691,
+              "cumulative": 3443497867
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 500,
+              "lutIndex": 10,
+              "mass": 625006483,
+              "cumulative": 4068504350
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": -1375,
+              "lutIndex": 28,
+              "mass": 224481198,
+              "cumulative": 4292985548
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 15,
+              "mass": 1981748,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "sector",
+          "drawIndex": 0,
+          "draw": 911555152,
+          "selectedCategoryId": "SECTOR_1",
+          "categories": [
+            {
+              "id": "SECTOR_0",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 480555781
+            },
+            {
+              "id": "SECTOR_1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 440509466,
+              "cumulative": 921065247
+            },
+            {
+              "id": "SECTOR_2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 1441667344
+            },
+            {
+              "id": "SECTOR_3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 700810515,
+              "cumulative": 2142477859
+            },
+            {
+              "id": "SECTOR_4",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 750868408,
+              "cumulative": 2893346267
+            },
+            {
+              "id": "SECTOR_5",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 400463151,
+              "cumulative": 3293809418
+            },
+            {
+              "id": "SECTOR_6",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 3774365199
+            },
+            {
+              "id": "SECTOR_7",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "fielding",
+          "drawIndex": 0,
+          "draw": 1858918177,
+          "selectedCategoryId": "CHANCE",
+          "categories": [
+            {
+              "id": "CHANCE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 1932735283,
+              "cumulative": 1932735283
+            },
+            {
+              "id": "NO_CHANCE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 2362232013,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "fielding",
+          "drawIndex": 1,
+          "draw": 4082375131,
+          "selectedCategoryId": "DROP",
+          "categories": [
+            {
+              "id": "CATCH",
+              "allowed": true,
+              "logitBp": 16200,
+              "lutIndex": 0,
+              "mass": 3585417781,
+              "cumulative": 3585417781
+            },
+            {
+              "id": "DROP",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 162,
+              "mass": 709549515,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 0,
+          "draw": 3504072110,
+          "selectedCategoryId": "1",
+          "categories": [
+            {
+              "id": "0",
+              "allowed": true,
+              "logitBp": 4700,
+              "lutIndex": 0,
+              "mass": 3250405137,
+              "cumulative": 3250405137
+            },
+            {
+              "id": "1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 440160626,
+              "cumulative": 3690565763
+            },
+            {
+              "id": "2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 101575529,
+              "cumulative": 3792141292
+            },
+            {
+              "id": "3",
+              "allowed": true,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 3792141292
+            },
+            {
+              "id": "4",
+              "allowed": true,
+              "logitBp": -4800,
+              "lutIndex": 95,
+              "mass": 502826004,
+              "cumulative": 4294967296
+            },
+            {
+              "id": "6",
+              "allowed": true,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 1,
+          "draw": 2494169400,
+          "selectedCategoryId": "SAFE",
+          "categories": [
+            {
+              "id": "RUN_OUT",
+              "allowed": true,
+              "logitBp": -61500,
+              "lutIndex": 615,
+              "mass": 9143726,
+              "cumulative": 9143726
+            },
+            {
+              "id": "SAFE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4285823570,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 1,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 1,
+        "attemptedRuns": 1,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p2",
+          "south": "p1"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 1,
+        "trajectory": "EDGE",
+        "executedLength": "FULL",
+        "fieldOutcome": "DROP",
+        "elapsedSeconds": 40
+      }
+    },
+    "LEGAL:RUN_OUT:RUN_OUT": {
+      "seed": "pass06-independent-224",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 1366002420,
+          "selectedCategoryId": "GOOD",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 2544542481,
+          "selectedCategoryId": "LEGAL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 1520696494,
+          "selectedCategoryId": "GROUND",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 23,
+              "mass": 457346115,
+              "cumulative": 457346115
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 18,
+              "mass": 269245061,
+              "cumulative": 726591176
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 0,
+              "mass": 2716906691,
+              "cumulative": 3443497867
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 500,
+              "lutIndex": 10,
+              "mass": 625006483,
+              "cumulative": 4068504350
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": -1375,
+              "lutIndex": 28,
+              "mass": 224481198,
+              "cumulative": 4292985548
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 15,
+              "mass": 1981748,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "sector",
+          "drawIndex": 0,
+          "draw": 4131541699,
+          "selectedCategoryId": "SECTOR_7",
+          "categories": [
+            {
+              "id": "SECTOR_0",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 480555781
+            },
+            {
+              "id": "SECTOR_1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 440509466,
+              "cumulative": 921065247
+            },
+            {
+              "id": "SECTOR_2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 1441667344
+            },
+            {
+              "id": "SECTOR_3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 700810515,
+              "cumulative": 2142477859
+            },
+            {
+              "id": "SECTOR_4",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 750868408,
+              "cumulative": 2893346267
+            },
+            {
+              "id": "SECTOR_5",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 400463151,
+              "cumulative": 3293809418
+            },
+            {
+              "id": "SECTOR_6",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 3774365199
+            },
+            {
+              "id": "SECTOR_7",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 0,
+          "draw": 2627064854,
+          "selectedCategoryId": "1",
+          "categories": [
+            {
+              "id": "0",
+              "allowed": true,
+              "logitBp": 4700,
+              "lutIndex": 0,
+              "mass": 2466519073,
+              "cumulative": 2466519073
+            },
+            {
+              "id": "1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 1261292740,
+              "cumulative": 3727811813
+            },
+            {
+              "id": "2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 315323185,
+              "cumulative": 4043134998
+            },
+            {
+              "id": "3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 35035909,
+              "cumulative": 4078170907
+            },
+            {
+              "id": "4",
+              "allowed": true,
+              "logitBp": -4800,
+              "lutIndex": 95,
+              "mass": 216796389,
+              "cumulative": 4294967296
+            },
+            {
+              "id": "6",
+              "allowed": true,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 1,
+          "draw": 2394179,
+          "selectedCategoryId": "RUN_OUT",
+          "categories": [
+            {
+              "id": "RUN_OUT",
+              "allowed": true,
+              "logitBp": -60300,
+              "lutIndex": 603,
+              "mass": 10306725,
+              "cumulative": 10306725
+            },
+            {
+              "id": "SAFE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4284660571,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 2,
+          "draw": 3012798642,
+          "selectedCategoryId": "SOUTH",
+          "categories": [
+            {
+              "id": "NORTH",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 2147483648,
+              "cumulative": 2147483648
+            },
+            {
+              "id": "SOUTH",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 2147483648,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 1,
+        "boundary": "NONE",
+        "dismissal": {
+          "kind": "RUN_OUT",
+          "playerId": "p1",
+          "fielderId": "f8",
+          "wicketEnd": "SOUTH"
+        },
+        "endsAfter": {
+          "north": "p2",
+          "south": null
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 7,
+        "trajectory": "GROUND",
+        "executedLength": "GOOD",
+        "fieldOutcome": "RUN_OUT",
+        "elapsedSeconds": 40
+      }
+    },
+    "NO_BALL:NONE:STOP": {
+      "seed": "pass06-independent-487",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 2930962078,
+          "selectedCategoryId": "GOOD",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 4286134887,
+          "selectedCategoryId": "NO_BALL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 2200384742,
+          "selectedCategoryId": "GROUND",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 23,
+              "mass": 457557237,
+              "cumulative": 457557237
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 18,
+              "mass": 269369351,
+              "cumulative": 726926588
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 0,
+              "mass": 2718160882,
+              "cumulative": 3445087470
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 500,
+              "lutIndex": 10,
+              "mass": 625295002,
+              "cumulative": 4070382472
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": -1375,
+              "lutIndex": 28,
+              "mass": 224584824,
+              "cumulative": 4294967296
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": false,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "sector",
+          "drawIndex": 0,
+          "draw": 2435083792,
+          "selectedCategoryId": "SECTOR_4",
+          "categories": [
+            {
+              "id": "SECTOR_0",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 480555781
+            },
+            {
+              "id": "SECTOR_1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 440509466,
+              "cumulative": 921065247
+            },
+            {
+              "id": "SECTOR_2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 1441667344
+            },
+            {
+              "id": "SECTOR_3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 700810515,
+              "cumulative": 2142477859
+            },
+            {
+              "id": "SECTOR_4",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 750868408,
+              "cumulative": 2893346267
+            },
+            {
+              "id": "SECTOR_5",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 400463151,
+              "cumulative": 3293809418
+            },
+            {
+              "id": "SECTOR_6",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 480555781,
+              "cumulative": 3774365199
+            },
+            {
+              "id": "SECTOR_7",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 520602097,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 0,
+          "draw": 3770873436,
+          "selectedCategoryId": "2",
+          "categories": [
+            {
+              "id": "0",
+              "allowed": true,
+              "logitBp": 4700,
+              "lutIndex": 0,
+              "mass": 2466519073,
+              "cumulative": 2466519073
+            },
+            {
+              "id": "1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 1261292740,
+              "cumulative": 3727811813
+            },
+            {
+              "id": "2",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 315323185,
+              "cumulative": 4043134998
+            },
+            {
+              "id": "3",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 47,
+              "mass": 35035909,
+              "cumulative": 4078170907
+            },
+            {
+              "id": "4",
+              "allowed": true,
+              "logitBp": -4800,
+              "lutIndex": 95,
+              "mass": 216796389,
+              "cumulative": 4294967296
+            },
+            {
+              "id": "6",
+              "allowed": true,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 1,
+          "draw": 3044054045,
+          "selectedCategoryId": "SAFE",
+          "categories": [
+            {
+              "id": "RUN_OUT",
+              "allowed": true,
+              "logitBp": -61500,
+              "lutIndex": 615,
+              "mass": 9143726,
+              "cumulative": 9143726
+            },
+            {
+              "id": "SAFE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4285823570,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "NO_BALL",
+        "batRuns": 2,
+        "extras": {
+          "wides": 0,
+          "noBalls": 1,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 2,
+        "attemptedRuns": 2,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 4,
+        "trajectory": "GROUND",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    "NO_BALL:NONE:NONE": {
+      "seed": "pass06-independent-617",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 1725843543,
+          "selectedCategoryId": "GOOD",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 4278356420,
+          "selectedCategoryId": "NO_BALL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 652161417,
+          "selectedCategoryId": "PAD",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 23,
+              "mass": 457557237,
+              "cumulative": 457557237
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 18,
+              "mass": 269369351,
+              "cumulative": 726926588
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 0,
+              "mass": 2718160882,
+              "cumulative": 3445087470
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 500,
+              "lutIndex": 10,
+              "mass": 625295002,
+              "cumulative": 4070382472
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": -1375,
+              "lutIndex": 28,
+              "mass": 224584824,
+              "cumulative": 4294967296
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": false,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "dismissal",
+          "drawIndex": 0,
+          "draw": 3440171352,
+          "selectedCategoryId": "NONE",
+          "categories": [
+            {
+              "id": "LBW",
+              "allowed": false,
+              "logitBp": null,
+              "lutIndex": null,
+              "mass": 0,
+              "cumulative": 0
+            },
+            {
+              "id": "NONE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4294967296,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "running",
+          "drawIndex": 0,
+          "draw": 223157304,
+          "selectedCategoryId": "0",
+          "categories": [
+            {
+              "id": "0",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4166118277,
+              "cumulative": 4166118277
+            },
+            {
+              "id": "1",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 107374182,
+              "cumulative": 4273492459
+            },
+            {
+              "id": "4",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 21474837,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "NO_BALL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 1,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": false,
+        "attemptedStroke": true,
+        "shotSector": null,
+        "trajectory": null,
+        "executedLength": "GOOD",
+        "fieldOutcome": "NONE",
+        "elapsedSeconds": 40
+      }
+    },
+    "LEGAL:LBW:NONE": {
+      "seed": "pass06-independent-1119",
+      "trace": [
+        {
+          "stageName": "length",
+          "drawIndex": 0,
+          "draw": 2977013716,
+          "selectedCategoryId": "GOOD",
+          "categories": [
+            {
+              "id": "FULL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 715313043,
+              "cumulative": 715313043
+            },
+            {
+              "id": "GOOD",
+              "allowed": true,
+              "logitBp": 700,
+              "lutIndex": 0,
+              "mass": 3068716365,
+              "cumulative": 3784029408
+            },
+            {
+              "id": "SHORT",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 7,
+              "mass": 510937888,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "legality",
+          "drawIndex": 0,
+          "draw": 3484484257,
+          "selectedCategoryId": "LEGAL",
+          "categories": [
+            {
+              "id": "LEGAL",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4223613484,
+              "cumulative": 4223613484
+            },
+            {
+              "id": "WIDE",
+              "allowed": true,
+              "logitBp": -900,
+              "lutIndex": 9,
+              "mass": 51101015,
+              "cumulative": 4274714499
+            },
+            {
+              "id": "NO_BALL",
+              "allowed": true,
+              "logitBp": -600,
+              "lutIndex": 6,
+              "mass": 20252797,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "contact",
+          "drawIndex": 0,
+          "draw": 690918652,
+          "selectedCategoryId": "PAD",
+          "categories": [
+            {
+              "id": "MISS",
+              "allowed": true,
+              "logitBp": -852,
+              "lutIndex": 23,
+              "mass": 457346115,
+              "cumulative": 457346115
+            },
+            {
+              "id": "PAD",
+              "allowed": true,
+              "logitBp": -330,
+              "lutIndex": 18,
+              "mass": 269245061,
+              "cumulative": 726591176
+            },
+            {
+              "id": "GROUND",
+              "allowed": true,
+              "logitBp": 1450,
+              "lutIndex": 0,
+              "mass": 2716906691,
+              "cumulative": 3443497867
+            },
+            {
+              "id": "AERIAL",
+              "allowed": true,
+              "logitBp": 500,
+              "lutIndex": 10,
+              "mass": 625006483,
+              "cumulative": 4068504350
+            },
+            {
+              "id": "EDGE",
+              "allowed": true,
+              "logitBp": -1375,
+              "lutIndex": 28,
+              "mass": 224481198,
+              "cumulative": 4292985548
+            },
+            {
+              "id": "HIT_WICKET",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 15,
+              "mass": 1981748,
+              "cumulative": 4294967296
+            }
+          ]
+        },
+        {
+          "stageName": "dismissal",
+          "drawIndex": 0,
+          "draw": 20609949,
+          "selectedCategoryId": "LBW",
+          "categories": [
+            {
+              "id": "LBW",
+              "allowed": true,
+              "logitBp": -39880,
+              "lutIndex": 399,
+              "mass": 78012459,
+              "cumulative": 78012459
+            },
+            {
+              "id": "NONE",
+              "allowed": true,
+              "logitBp": 0,
+              "lutIndex": 0,
+              "mass": 4216954837,
+              "cumulative": 4294967296
+            }
+          ]
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": {
+          "kind": "LBW",
+          "playerId": "p1",
+          "fielderId": null,
+          "wicketEnd": "NORTH"
+        },
+        "endsAfter": {
+          "north": null,
+          "south": "p2"
+        },
+        "batContact": false,
+        "attemptedStroke": true,
+        "shotSector": null,
+        "trajectory": null,
+        "executedLength": "GOOD",
+        "fieldOutcome": "NONE",
+        "elapsedSeconds": 40
+      }
+    }
+  },
+  "examplesByStageSelection": {
+    "length:GOOD": {
+      "seed": "pass06-independent-0",
+      "drawIndex": 0,
+      "draw": 1385300019
+    },
+    "legality:LEGAL": {
+      "seed": "pass06-independent-0",
+      "drawIndex": 0,
+      "draw": 4019867251
+    },
+    "contact:GROUND": {
+      "seed": "pass06-independent-0",
+      "drawIndex": 0,
+      "draw": 978080327
+    },
+    "sector:SECTOR_4": {
+      "seed": "pass06-independent-0",
+      "drawIndex": 0,
+      "draw": 2706690109
+    },
+    "running:0": {
+      "seed": "pass06-independent-0",
+      "drawIndex": 0,
+      "draw": 884125250
+    },
+    "sector:SECTOR_6": {
+      "seed": "pass06-independent-1",
+      "drawIndex": 0,
+      "draw": 3560237742
+    },
+    "contact:AERIAL": {
+      "seed": "pass06-independent-2",
+      "drawIndex": 0,
+      "draw": 3503762208
+    },
+    "sector:SECTOR_7": {
+      "seed": "pass06-independent-2",
+      "drawIndex": 0,
+      "draw": 3779101489
+    },
+    "fielding:NO_CHANCE": {
+      "seed": "pass06-independent-2",
+      "drawIndex": 0,
+      "draw": 2166249133
+    },
+    "running:1": {
+      "seed": "pass06-independent-2",
+      "drawIndex": 0,
+      "draw": 1547353153
+    },
+    "running:SAFE": {
+      "seed": "pass06-independent-2",
+      "drawIndex": 1,
+      "draw": 3400652320
+    },
+    "sector:SECTOR_1": {
+      "seed": "pass06-independent-3",
+      "drawIndex": 0,
+      "draw": 492994732
+    },
+    "sector:SECTOR_0": {
+      "seed": "pass06-independent-5",
+      "drawIndex": 0,
+      "draw": 139970793
+    },
+    "length:SHORT": {
+      "seed": "pass06-independent-6",
+      "drawIndex": 0,
+      "draw": 3998599312
+    },
+    "contact:MISS": {
+      "seed": "pass06-independent-6",
+      "drawIndex": 0,
+      "draw": 223253454
+    },
+    "dismissal:NONE": {
+      "seed": "pass06-independent-6",
+      "drawIndex": 0,
+      "draw": 1320624224
+    },
+    "length:FULL": {
+      "seed": "pass06-independent-9",
+      "drawIndex": 0,
+      "draw": 163737212
+    },
+    "sector:SECTOR_2": {
+      "seed": "pass06-independent-10",
+      "drawIndex": 0,
+      "draw": 1126229316
+    },
+    "contact:EDGE": {
+      "seed": "pass06-independent-13",
+      "drawIndex": 0,
+      "draw": 4132524647
+    },
+    "running:2": {
+      "seed": "pass06-independent-13",
+      "drawIndex": 0,
+      "draw": 3720649234
+    },
+    "sector:SECTOR_3": {
+      "seed": "pass06-independent-16",
+      "drawIndex": 0,
+      "draw": 2068930216
+    },
+    "running:4": {
+      "seed": "pass06-independent-16",
+      "drawIndex": 0,
+      "draw": 2424039875
+    },
+    "sector:SECTOR_5": {
+      "seed": "pass06-independent-21",
+      "drawIndex": 0,
+      "draw": 2942747649
+    },
+    "running:6": {
+      "seed": "pass06-independent-26",
+      "drawIndex": 0,
+      "draw": 3281223553
+    },
+    "legality:WIDE": {
+      "seed": "pass06-independent-28",
+      "drawIndex": 0,
+      "draw": 4226956387
+    },
+    "fielding:CHANCE": {
+      "seed": "pass06-independent-35",
+      "drawIndex": 0,
+      "draw": 1330699031
+    },
+    "fielding:CATCH": {
+      "seed": "pass06-independent-35",
+      "drawIndex": 1,
+      "draw": 2517606718
+    },
+    "contact:PAD": {
+      "seed": "pass06-independent-42",
+      "drawIndex": 0,
+      "draw": 461486187
+    },
+    "dismissal:BOWLED": {
+      "seed": "pass06-independent-121",
+      "drawIndex": 0,
+      "draw": 91493341
+    },
+    "fielding:DROP": {
+      "seed": "pass06-independent-200",
+      "drawIndex": 1,
+      "draw": 4082375131
+    },
+    "running:RUN_OUT": {
+      "seed": "pass06-independent-224",
+      "drawIndex": 1,
+      "draw": 2394179
+    },
+    "running:SOUTH": {
+      "seed": "pass06-independent-224",
+      "drawIndex": 2,
+      "draw": 3012798642
+    },
+    "running:3": {
+      "seed": "pass06-independent-324",
+      "drawIndex": 0,
+      "draw": 4011487750
+    },
+    "legality:NO_BALL": {
+      "seed": "pass06-independent-487",
+      "drawIndex": 0,
+      "draw": 4286134887
+    },
+    "running:NORTH": {
+      "seed": "pass06-independent-692",
+      "drawIndex": 2,
+      "draw": 416218555
+    },
+    "dismissal:LBW": {
+      "seed": "pass06-independent-1119",
+      "drawIndex": 0,
+      "draw": 20609949
+    }
+  },
+  "referenceCases": [
+    {
+      "id": 0,
+      "seed": "pass06-independent-0",
+      "legality": "LEGAL",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 1385300019,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 4019867251,
+          "selectedCategoryId": "LEGAL"
+        },
+        {
+          "stageName": "contact",
+          "draw": 978080327,
+          "selectedCategoryId": "GROUND"
+        },
+        {
+          "stageName": "sector",
+          "draw": 2706690109,
+          "selectedCategoryId": "SECTOR_4"
+        },
+        {
+          "stageName": "running",
+          "draw": 884125250,
+          "selectedCategoryId": "0"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 4,
+        "trajectory": "GROUND",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    {
+      "id": 1,
+      "seed": "pass06-independent-1",
+      "legality": "LEGAL",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 3614478179,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 2483591636,
+          "selectedCategoryId": "LEGAL"
+        },
+        {
+          "stageName": "contact",
+          "draw": 2916297117,
+          "selectedCategoryId": "GROUND"
+        },
+        {
+          "stageName": "sector",
+          "draw": 3560237742,
+          "selectedCategoryId": "SECTOR_6"
+        },
+        {
+          "stageName": "running",
+          "draw": 363090603,
+          "selectedCategoryId": "0"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 6,
+        "trajectory": "GROUND",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    {
+      "id": 2,
+      "seed": "pass06-independent-2",
+      "legality": "LEGAL",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 2130413175,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 2408938929,
+          "selectedCategoryId": "LEGAL"
+        },
+        {
+          "stageName": "contact",
+          "draw": 3503762208,
+          "selectedCategoryId": "AERIAL"
+        },
+        {
+          "stageName": "sector",
+          "draw": 3779101489,
+          "selectedCategoryId": "SECTOR_7"
+        },
+        {
+          "stageName": "fielding",
+          "draw": 2166249133,
+          "selectedCategoryId": "NO_CHANCE"
+        },
+        {
+          "stageName": "running",
+          "draw": 1547353153,
+          "selectedCategoryId": "1"
+        },
+        {
+          "stageName": "running",
+          "draw": 3400652320,
+          "selectedCategoryId": "SAFE"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 1,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 1,
+        "attemptedRuns": 1,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p2",
+          "south": "p1"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 7,
+        "trajectory": "AERIAL",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    {
+      "id": 3,
+      "seed": "pass06-independent-3",
+      "legality": "LEGAL",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 1732513455,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 3795923120,
+          "selectedCategoryId": "LEGAL"
+        },
+        {
+          "stageName": "contact",
+          "draw": 3540184523,
+          "selectedCategoryId": "AERIAL"
+        },
+        {
+          "stageName": "sector",
+          "draw": 492994732,
+          "selectedCategoryId": "SECTOR_1"
+        },
+        {
+          "stageName": "fielding",
+          "draw": 2566890193,
+          "selectedCategoryId": "NO_CHANCE"
+        },
+        {
+          "stageName": "running",
+          "draw": 1108445936,
+          "selectedCategoryId": "1"
+        },
+        {
+          "stageName": "running",
+          "draw": 3622427892,
+          "selectedCategoryId": "SAFE"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 1,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 1,
+        "attemptedRuns": 1,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p2",
+          "south": "p1"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 1,
+        "trajectory": "AERIAL",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    {
+      "id": 4,
+      "seed": "pass06-independent-4",
+      "legality": "LEGAL",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 1294723064,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 3718213245,
+          "selectedCategoryId": "LEGAL"
+        },
+        {
+          "stageName": "contact",
+          "draw": 3999172471,
+          "selectedCategoryId": "AERIAL"
+        },
+        {
+          "stageName": "sector",
+          "draw": 635979568,
+          "selectedCategoryId": "SECTOR_1"
+        },
+        {
+          "stageName": "fielding",
+          "draw": 2917341411,
+          "selectedCategoryId": "NO_CHANCE"
+        },
+        {
+          "stageName": "running",
+          "draw": 562862558,
+          "selectedCategoryId": "0"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 1,
+        "trajectory": "AERIAL",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    {
+      "id": 5,
+      "seed": "pass06-independent-5",
+      "legality": "LEGAL",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 999357430,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 1269810299,
+          "selectedCategoryId": "LEGAL"
+        },
+        {
+          "stageName": "contact",
+          "draw": 2242222038,
+          "selectedCategoryId": "GROUND"
+        },
+        {
+          "stageName": "sector",
+          "draw": 139970793,
+          "selectedCategoryId": "SECTOR_0"
+        },
+        {
+          "stageName": "running",
+          "draw": 397605881,
+          "selectedCategoryId": "0"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "LEGAL",
+        "batRuns": 0,
+        "extras": {
+          "wides": 0,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 0,
+        "trajectory": "GROUND",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    },
+    {
+      "id": 28,
+      "seed": "pass06-independent-28",
+      "legality": "WIDE",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 1586223616,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 4226956387,
+          "selectedCategoryId": "WIDE"
+        },
+        {
+          "stageName": "running",
+          "draw": 2567757913,
+          "selectedCategoryId": "1"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "WIDE",
+        "batRuns": 0,
+        "extras": {
+          "wides": 1,
+          "noBalls": 0,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 0,
+        "attemptedRuns": 0,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": false,
+        "attemptedStroke": false,
+        "shotSector": null,
+        "trajectory": null,
+        "executedLength": "GOOD",
+        "fieldOutcome": "NONE",
+        "elapsedSeconds": 40
+      }
+    },
+    {
+      "id": 487,
+      "seed": "pass06-independent-487",
+      "legality": "NO_BALL",
+      "kind": "NONE",
+      "trace": [
+        {
+          "stageName": "length",
+          "draw": 2930962078,
+          "selectedCategoryId": "GOOD"
+        },
+        {
+          "stageName": "legality",
+          "draw": 4286134887,
+          "selectedCategoryId": "NO_BALL"
+        },
+        {
+          "stageName": "contact",
+          "draw": 2200384742,
+          "selectedCategoryId": "GROUND"
+        },
+        {
+          "stageName": "sector",
+          "draw": 2435083792,
+          "selectedCategoryId": "SECTOR_4"
+        },
+        {
+          "stageName": "running",
+          "draw": 3770873436,
+          "selectedCategoryId": "2"
+        },
+        {
+          "stageName": "running",
+          "draw": 3044054045,
+          "selectedCategoryId": "SAFE"
+        }
+      ],
+      "resolution": {
+        "stage": "DELIVERY",
+        "legality": "NO_BALL",
+        "batRuns": 2,
+        "extras": {
+          "wides": 0,
+          "noBalls": 1,
+          "byes": 0,
+          "legByes": 0,
+          "penalties": 0
+        },
+        "completedRuns": 2,
+        "attemptedRuns": 2,
+        "boundary": "NONE",
+        "dismissal": null,
+        "endsAfter": {
+          "north": "p1",
+          "south": "p2"
+        },
+        "batContact": true,
+        "attemptedStroke": true,
+        "shotSector": 4,
+        "trajectory": "GROUND",
+        "executedLength": "GOOD",
+        "fieldOutcome": "STOP",
+        "elapsedSeconds": 40
+      }
+    }
+  ],
+  "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "fixtureRulesHash": "7c67aec8e3aef8be7b849775d83bad64847338e03326848ec1f1d0d99c6fa745"
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "FAST",
+    "MEDIUM",
+    "OFF_SPIN",
+    "LEG_SPIN",
+    "SLOW_LEFT_ARM",
+    "LEFT_ARM_WRIST"
+  ],
+  "$id": "urn:lcxxvi:BowlingStyle:1",
+  "title": "BowlingStyle"
+}

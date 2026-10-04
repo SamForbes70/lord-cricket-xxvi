@@ -1,0 +1,25 @@
+
+> lord-cricket-xxvi@0.1.0 fixtures:audit
+> node --import tsx scripts/audit-fixtures.ts
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "NOT_REQUESTED",
+  "matchedDeliveryCases": 0,
+  "matchedLedgerCases": 0,
+  "rejectedByScorer": 0,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Deterministic Random Service"
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

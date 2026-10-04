@@ -1,0 +1,9 @@
+independent-random PASS PASS: 24 random-address and 8 state-hash vectors independently verified
+independent-probability PASS PASS manual fraction identities, masks, empty-mass guard and category-order tie-breaking
+probability-schema-mirror PASS PASS offline structural mirror: 13 additional strict Draft 2020-12 schemas
+independent-json-schema PASS PASS 84 Draft 2020-12 schemas; 8 valid and 3 invalid probability payloads
+transpiled-algorithm-shim PASS PASS actual transpiled TypeScript algorithm with offline dependency shims: 15 independent vectors, 4 boundaries, pinned pack/LUT hashes and 4 error guards (TS 5.8.3)
+isolated-semantic-types PASS PASS offline strict semantic check: production probability.ts against contract-shaped types, generated pack.ts, TS 5.8.3
+package-boundaries PASS PASS offline package import/determinism boundaries: 23 source files (5.8.3)
+EXIT_CODE=0
+ELAPSED_MS=13851

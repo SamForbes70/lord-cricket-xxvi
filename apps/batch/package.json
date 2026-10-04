@@ -1,0 +1,11 @@
+{
+  "name": "@lcxxvi/batch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@lcxxvi/contracts": "0.1.0",
+    "@lcxxvi/domain": "0.1.0",
+    "@lcxxvi/simulation": "0.1.0"
+  }
+}

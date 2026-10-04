@@ -1,0 +1,186 @@
+{
+  "version": "LC_PASS_07A_VERIFICATION_V1",
+  "status": "PASS",
+  "timestampUTC": "2026-09-27T07:07:56.723Z",
+  "startedAtUTC": "2026-09-27T07:07:24.970Z",
+  "platform": "linux",
+  "arch": "x64",
+  "node": "v22.16.0",
+  "npm": "10.9.2",
+  "firefoxContentSandboxDisabled": false,
+  "originalVerifiedSourceZipSha256": "95e71cb5aae066885f73594d788e6df2edc54b4a1a6a49c12b365cc104af5648",
+  "inheritedGateCount": 12,
+  "allGateCount": 16,
+  "passedGateCount": 16,
+  "unitTestsExpected": 390,
+  "smokeTestsExpected": 15,
+  "negativeWorldCases": 23,
+  "negativeSetupCases": 17,
+  "independentWorldAuditExpected": {
+    "players": 160,
+    "teams": 8,
+    "grounds": 8,
+    "randomVectors": 12
+  },
+  "immutableSetupExpected": {
+    "format": "T20",
+    "xiCount": [
+      11,
+      11
+    ],
+    "setupVersion": "LC_T20_SETUP_V1"
+  },
+  "frozen": {
+    "lockfile": "44e63e6db495d897f28cda25e4338839abded362cdeaa84b6bd8a5f0ddcd17df",
+    "scoringCorpus": "6c9f256e882a37dad72c0192c965d3314177bbc9c812568c653459268b460345",
+    "scoringIndex": "0ca2b7885349d506ca0313884c1c1572a269c9c6ebb647f61b308410bc57a19e",
+    "randomVectors": "cefe36e74c45fea29ccdf4241146c06ec79e85aee71ef4170435c90a238b6da7",
+    "probabilityVectors": "976e1f4c5b5b8401c743e5b22b4db430e54fb6640424b5813634d77e90118f4d",
+    "probabilityPackSource": "f63bc07186fe0e449995520ae155020d310b335f95e4b887e8f1bd1058e77b9c",
+    "deliveryStagePackSource": "b7ed7365b98e4fe65df08f8c15a02127d7ef399a9063bbc60cab34a2ed1b8f7b",
+    "worldFile": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+    "worldManifest": "03bb21d0520237a7afed6ec99b9e4bdfc8491987e28c632114377f8ea820811a",
+    "worldNegativeFixtures": "22a7678aafbd19b32e6ab76c4c02a891c689d93ed461236377d01f577ca23d34",
+    "worldSetupFixture": "f219d2075d5acd935bdfc3bfad50d2865085c9cf3435b6d5dbc69e878cb78495"
+  },
+  "gates": [
+    {
+      "gate": "installation",
+      "command": "npm ci",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 1516,
+      "log": "installation.log"
+    },
+    {
+      "gate": "schemas",
+      "command": "npm run schemas:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 364,
+      "log": "schemas.log"
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2424,
+      "log": "build.log"
+    },
+    {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2330,
+      "log": "typecheck.log"
+    },
+    {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 1748,
+      "log": "lint.log"
+    },
+    {
+      "gate": "fixtures",
+      "command": "npm run fixtures:audit",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 342,
+      "log": "fixtures.log"
+    },
+    {
+      "gate": "scorer",
+      "command": "npm run fixtures:engine",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 419,
+      "log": "scorer.log"
+    },
+    {
+      "gate": "vectors",
+      "command": "npm run vectors:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 637,
+      "log": "vectors.log"
+    },
+    {
+      "gate": "probability-vectors",
+      "command": "npm run probability:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 687,
+      "log": "probability-vectors.log"
+    },
+    {
+      "gate": "generator-vectors",
+      "command": "npm run generator:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 642,
+      "log": "generator-vectors.log"
+    },
+    {
+      "gate": "unit",
+      "command": "npm test",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2953,
+      "log": "unit.log"
+    },
+    {
+      "gate": "smoke",
+      "command": "npm run smoke",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 9224,
+      "log": "smoke.log"
+    },
+    {
+      "gate": "world-content",
+      "command": "npm run world:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2071,
+      "log": "world-content.log",
+      "assertions": "independent complete 160/8/8 audit, twelve vectors, world/manifest hashes, strict AJV 91"
+    },
+    {
+      "gate": "world-negative",
+      "command": "npm run world:negative",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 1142,
+      "log": "world-negative.log",
+      "testCount": 28
+    },
+    {
+      "gate": "t20-setup",
+      "command": "npm run t20:setup",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 1192,
+      "log": "t20-setup.log",
+      "testCount": 20
+    },
+    {
+      "gate": "world-smoke",
+      "command": "npm run world:smoke",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3953,
+      "log": "world-smoke.log",
+      "testCount": 3
+    }
+  ],
+  "milestones": {
+    "M0": "COMPLETE",
+    "M1": "SUPPORTED_SCORING_VERIFIED_ONLY",
+    "M2": "INCOMPLETE"
+  },
+  "playable": false
+}

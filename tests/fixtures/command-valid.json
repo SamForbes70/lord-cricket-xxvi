@@ -1,0 +1,12 @@
+{
+  "commandId": "cmd-0091",
+  "aggregateId": "match-0001",
+  "expectedRevision": 82,
+  "actorId": "USER:team-01",
+  "kind": "SET_BATTING_PLAN",
+  "payload": {
+    "playerId": "p017",
+    "aggression": 3,
+    "intent": "ROTATE"
+  }
+}

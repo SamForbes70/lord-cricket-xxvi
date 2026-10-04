@@ -1,0 +1,431 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "packId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "players": {
+      "minItems": 1,
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[\\s\\S]{1,80}$"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "batHand": {
+            "type": "string",
+            "enum": [
+              "R",
+              "L"
+            ]
+          },
+          "bowlHand": {
+            "type": "string",
+            "enum": [
+              "R",
+              "L"
+            ]
+          },
+          "bowlingStyle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "FAST",
+                  "MEDIUM",
+                  "OFF_SPIN",
+                  "LEG_SPIN",
+                  "SLOW_LEFT_ARM",
+                  "LEFT_ARM_WRIST"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "BATTER",
+              "BOWLER",
+              "ALLROUNDER",
+              "KEEPER"
+            ]
+          },
+          "skills": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "T20",
+                "ODI",
+                "RED_BALL"
+              ]
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "defence": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "timing": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "power": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "rotation": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "vsPace": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "vsSpin": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "control": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "movement": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "variation": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "stamina": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "catching": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "groundFielding": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "throwing": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "keeping": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "required": [
+                "defence",
+                "timing",
+                "power",
+                "rotation",
+                "vsPace",
+                "vsSpin",
+                "control",
+                "movement",
+                "variation",
+                "stamina",
+                "catching",
+                "groundFielding",
+                "throwing",
+                "keeping"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "variations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "shotSectorWeights": {
+            "minItems": 8,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "exposureBalls": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "T20",
+                "ODI",
+                "RED_BALL"
+              ]
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "FICTIONAL",
+                  "LICENSED",
+                  "USER_SUPPLIED"
+                ]
+              },
+              "sourceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "sourceHash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "confidenceBp": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              }
+            },
+            "required": [
+              "kind",
+              "sourceId",
+              "sourceHash",
+              "confidenceBp"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "playerId",
+          "name",
+          "birthDate",
+          "batHand",
+          "bowlHand",
+          "bowlingStyle",
+          "role",
+          "skills",
+          "variations",
+          "shotSectorWeights",
+          "exposureBalls",
+          "provenance"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "teams": {
+      "minItems": 2,
+      "maxItems": 500,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[\\s\\S]{1,80}$"
+          },
+          "squadIds": {
+            "minItems": 11,
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "colours": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string",
+                "pattern": "^#[a-fA-F0-9]{6}$"
+              },
+              {
+                "type": "string",
+                "pattern": "^#[a-fA-F0-9]{6}$"
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2,
+            "items": false
+          }
+        },
+        "required": [
+          "teamId",
+          "name",
+          "squadIds",
+          "colours"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "grounds": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "groundId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[\\s\\S]{1,80}$"
+          },
+          "pitchPrior": {
+            "type": "object",
+            "properties": {
+              "seamBp": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              },
+              "turnBp": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              },
+              "variabilityBp": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              },
+              "moistureBp": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              },
+              "wearPoints": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "seamBp",
+              "turnBp",
+              "variabilityBp",
+              "moistureBp",
+              "wearPoints"
+            ],
+            "additionalProperties": false
+          },
+          "sectorRadiiCm": {
+            "minItems": 8,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "outfieldSpeedBp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          }
+        },
+        "required": [
+          "groundId",
+          "name",
+          "pitchPrior",
+          "sectorRadiiCm",
+          "outfieldSpeedBp"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "rulesIds": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    }
+  },
+  "required": [
+    "packId",
+    "schemaVersion",
+    "players",
+    "teams",
+    "grounds",
+    "rulesIds",
+    "provenance"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:WorldPack:1",
+  "title": "WorldPack"
+}

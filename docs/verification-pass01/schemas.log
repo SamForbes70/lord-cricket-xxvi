@@ -1,0 +1,6 @@
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+54 JSON Schemas verified
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

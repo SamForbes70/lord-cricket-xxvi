@@ -1,0 +1,5 @@
+
+> lord-cricket-xxvi@0.1.0 generator:check
+> python3 scripts/check-generator-vectors.py
+
+PASS: 9 independently hashed generator fixtures and exact length/legality mass oracles

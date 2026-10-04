@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[\\s\\S]{1,80}$"
+    },
+    "squadIds": {
+      "minItems": 11,
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "colours": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "string",
+          "pattern": "^#[a-fA-F0-9]{6}$"
+        },
+        {
+          "type": "string",
+          "pattern": "^#[a-fA-F0-9]{6}$"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    }
+  },
+  "required": [
+    "teamId",
+    "name",
+    "squadIds",
+    "colours"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:Team:1",
+  "title": "Team"
+}

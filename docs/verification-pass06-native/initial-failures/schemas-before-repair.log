@@ -1,0 +1,13 @@
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+/mnt/data/lcxxvi-pass06-repair/repo/scripts/generate-schemas.ts:31
+      throw new Error(`Stale schema: ${path}`);
+            ^
+
+
+Error: Stale schema: packages/contracts/schemas/GeneratedDeliverySchema.json
+    at <anonymous> (/mnt/data/lcxxvi-pass06-repair/repo/scripts/generate-schemas.ts:31:13)
+
+Node.js v22.16.0

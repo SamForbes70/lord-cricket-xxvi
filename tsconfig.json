@@ -1,0 +1,32 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "packages/contracts"
+    },
+    {
+      "path": "packages/domain"
+    },
+    {
+      "path": "packages/simulation"
+    },
+    {
+      "path": "packages/ai"
+    },
+    {
+      "path": "packages/projections"
+    },
+    {
+      "path": "packages/persistence"
+    },
+    {
+      "path": "packages/data"
+    },
+    {
+      "path": "apps/web"
+    },
+    {
+      "path": "apps/batch"
+    }
+  ]
+}

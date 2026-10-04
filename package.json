@@ -1,0 +1,62 @@
+{
+  "name": "lord-cricket-xxvi",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "vite --config apps/web/vite.config.ts",
+    "build": "tsc -b && vite build --config apps/web/vite.config.ts && vite build --config vite.runtime.config.ts",
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tools.json --noEmit",
+    "lint": "eslint . && node scripts/check-boundaries.mjs",
+    "test": "vitest run",
+    "schemas": "node --import tsx scripts/generate-schemas.ts",
+    "schemas:check": "node --import tsx scripts/generate-schemas.ts --check",
+    "smoke": "playwright test",
+    "batch": "node apps/batch/dist/index.js",
+    "verify": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm test && npm run smoke",
+    "format": "prettier --write .",
+    "fixtures:audit": "node --import tsx scripts/audit-fixtures.ts",
+    "fixtures:engine": "node --import tsx scripts/audit-fixtures.ts --require-scorer",
+    "vectors:check": "python3 scripts/check-determinism-vectors.py",
+    "probability:check": "python3 scripts/reference_probability.py",
+    "generator:check": "python3 scripts/check-generator-vectors.py",
+    "world:check": "python3 scripts/audit-fictional-world.py && node scripts/verify-world.mjs",
+    "world:negative": "vitest run tests/unit/world.test.ts",
+    "t20:setup": "vitest run tests/unit/t20-setup.test.ts",
+    "world:smoke": "playwright test tests/smoke/world.spec.ts",
+    "verify:07a": "node scripts/verify-pass07a.mjs",
+    "corpus:node": "node --import tsx scripts/t20-corpus.ts",
+    "t20:rules": "vitest run tests/unit/t20-match.test.ts",
+    "verify:07b": "node scripts/verify-pass07b.mjs",
+    "t20:inventory": "node scripts/check-pass07b-inventory.mjs",
+    "test:ui": "playwright test --config playwright.ui.config.ts"
+  },
+  "dependencies": {
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.37.0",
+    "@playwright/test": "1.56.0",
+    "@types/node": "22.18.10",
+    "@types/react": "19.1.16",
+    "@types/react-dom": "19.1.9",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "eslint": "9.37.0",
+    "prettier": "3.6.2",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.1",
+    "vite": "7.1.7",
+    "vitest": "3.2.4"
+  }
+}

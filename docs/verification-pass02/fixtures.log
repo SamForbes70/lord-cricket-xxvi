@@ -1,0 +1,19 @@
+
+> lord-cricket-xxvi@0.1.0 fixtures:audit
+> node --import tsx scripts/audit-fixtures.ts
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "NOT_RUN_NO_SCORER",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Scoring Kernel and Reducers"
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

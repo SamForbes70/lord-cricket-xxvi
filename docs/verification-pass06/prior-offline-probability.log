@@ -1,0 +1,1 @@
+PASS actual transpiled TypeScript algorithm with offline dependency shims: 15 independent vectors, 4 boundaries, pinned pack/LUT hashes and 4 error guards (TS 5.8.3)

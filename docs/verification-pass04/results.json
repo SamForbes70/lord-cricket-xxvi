@@ -1,0 +1,91 @@
+{
+  "verifiedAt": "2026-09-24T13:09:22.436Z",
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "platform": "linux",
+  "architecture": "x64",
+  "firefoxContentSandboxDisabled": true,
+  "lockfileSha256": "96df2a1421744fbbda0973cf55a2e5b000ab90ae60eeadf2949b100e9d84eed9",
+  "schemaVersion": "1.0.0",
+  "scoringImplemented": true,
+  "randomServiceImplemented": true,
+  "randomVersion": "SHA256_COUNTER_V1",
+  "stateHashVersion": "LC_CANONICAL_JSON_V1_SHA256",
+  "randomSamplerImplemented": false,
+  "scoringEngine": "LC_SCORING_V1",
+  "matchEngineImplemented": false,
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Integer Probability Model",
+  "gates": [
+    {
+      "gate": "installation",
+      "command": "npm ci",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3431
+    },
+    {
+      "gate": "schemas",
+      "command": "npm run schemas:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 802
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 7232
+    },
+    {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3451
+    },
+    {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 2347
+    },
+    {
+      "gate": "fixtures",
+      "command": "npm run fixtures:audit",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 668
+    },
+    {
+      "gate": "scorer",
+      "command": "npm run fixtures:engine",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 775
+    },
+    {
+      "gate": "vectors",
+      "command": "npm run vectors:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 365
+    },
+    {
+      "gate": "unit",
+      "command": "npm test",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3378
+    },
+    {
+      "gate": "smoke",
+      "command": "npm run smoke",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 8437
+    }
+  ]
+}

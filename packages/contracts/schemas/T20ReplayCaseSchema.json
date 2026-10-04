@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "caseId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "teamIds": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    },
+    "groundId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "modelId": {
+      "type": "string",
+      "const": "synthetic-alpha-01"
+    },
+    "rulesId": {
+      "type": "string",
+      "const": "LC_T20_01"
+    },
+    "stagePackId": {
+      "type": "string",
+      "const": "synthetic-alpha-01-delivery-v1"
+    },
+    "fixtureCaptainPolicyId": {
+      "type": "string",
+      "const": "LC_FIXTURE_CAPTAIN_V1"
+    },
+    "expectedFinalEventHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "expectedScorecardSha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "oracleStatus": {
+      "type": "string",
+      "enum": [
+        "NOT_AUTHORED_UNTIL_PASS_07B",
+        "GENERATED_FROM_PRODUCTION_NOT_INDEPENDENT"
+      ]
+    }
+  },
+  "required": [
+    "caseId",
+    "seed",
+    "teamIds",
+    "groundId",
+    "modelId",
+    "rulesId",
+    "stagePackId",
+    "fixtureCaptainPolicyId",
+    "expectedFinalEventHash",
+    "expectedScorecardSha256",
+    "oracleStatus"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:T20ReplayCase:1",
+  "title": "T20ReplayCase"
+}

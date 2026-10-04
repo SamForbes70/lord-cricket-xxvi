@@ -1,0 +1,6 @@
+
+> lord-cricket-xxvi@0.1.0 vectors:check
+> python3 scripts/check-determinism-vectors.py
+
+PASS: 24 random-address and 8 state-hash vectors independently verified
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.tsbuildinfo
+playwright-report/
+test-results/
+/*.log
+/COMMIT.txt
+# Pass 07B executable evidence is delivered separately; generated when verification runs.
+/docs/verification-pass07b/inherited/
+/docs/verification-pass07b/browser/
+/docs/verification-pass07b/*.log
+/docs/verification-pass07b/pass07b-results.json
+/docs/verification-pass07b/browser-coverage.json
+
+test-results-ui/
+/docs/verification-pass08/

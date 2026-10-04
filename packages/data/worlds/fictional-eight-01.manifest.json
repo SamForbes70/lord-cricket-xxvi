@@ -1,0 +1,56 @@
+{
+  "worldPackId": "fictional-eight-01",
+  "schemaVersion": "1.0.0",
+  "worldGeneratorVersion": "LC_FICTIONAL_WORLD_GENERATOR_V1",
+  "worldSeed": "lcxxvi-fictional-eight-v1-20260927",
+  "generatorSourceSha256": "a3aaa4b64926ad9859f84222eb51274e7881df750308c2e9ae8fd1fa66e2f4da",
+  "provenanceSourceSha256": "97c7a43de0937ce85dcc03c3cddbd2a1be67b99b8af2f0099391bb7c39562982",
+  "worldFileSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+  "worldCanonicalSha256": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+  "worldByteLength": 310033,
+  "rulesIds": [
+    "LC_T20_01",
+    "LC_ODI_01",
+    "LC_RED5_01"
+  ],
+  "modelId": "synthetic-alpha-01",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "stagePackId": "synthetic-alpha-01-delivery-v1",
+  "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+  "randomId": "SHA256_COUNTER_V1",
+  "variationIds": [
+    "stock"
+  ],
+  "provenance": "FICTIONAL",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "teamIds": [
+    "team-01",
+    "team-02",
+    "team-03",
+    "team-04",
+    "team-05",
+    "team-06",
+    "team-07",
+    "team-08"
+  ],
+  "groundIds": [
+    "ground-01",
+    "ground-02",
+    "ground-03",
+    "ground-04",
+    "ground-05",
+    "ground-06",
+    "ground-07",
+    "ground-08"
+  ],
+  "homeGroundIds": {
+    "team-01": "ground-01",
+    "team-02": "ground-02",
+    "team-03": "ground-03",
+    "team-04": "ground-04",
+    "team-05": "ground-05",
+    "team-06": "ground-06",
+    "team-07": "ground-07",
+    "team-08": "ground-08"
+  }
+}

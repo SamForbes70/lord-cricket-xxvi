@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "browser": "firefox",
+  "browserVersion": "142.0.1",
+  "vectors": 15,
+  "independentPythonReference": true,
+  "mainThreadAndWorker": true,
+  "errorRecovery": true,
+  "predictionIsolation": true
+}

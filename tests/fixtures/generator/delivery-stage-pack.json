@@ -1,0 +1,103 @@
+{
+  "stagePackId": "synthetic-alpha-01-delivery-v1",
+  "generatorVersion": "LC_CONDITIONAL_DELIVERY_V1",
+  "status": "SYNTHETIC_ALPHA",
+  "source": "Lord_Cricket_XXVI_Technical_Design_V0_1(1).docx Appendix F",
+  "length": {
+    "intended": 7000,
+    "neighboursTotal": 2500,
+    "gross": 500,
+    "intendedControlBp": 6000,
+    "intendedFatigueBp": -5000
+  },
+  "sectorLineMultiplierBp": 12500,
+  "coverage": {
+    "neighbourBp": 3500,
+    "ground": {
+      "INNER": 8000,
+      "MIDDLE": 10000,
+      "DEEP": 7000
+    },
+    "aerial": {
+      "INNER": 2000,
+      "MIDDLE": 5000,
+      "DEEP": 10000
+    },
+    "edge": {
+      "keeper": 10000,
+      "slip": 10000,
+      "gully": 6000,
+      "other": 1000
+    }
+  },
+  "catchOpportunityBp": {
+    "AERIAL": 3000,
+    "EDGE": 4500
+  },
+  "catchConversion": {
+    "interceptBp": 15000,
+    "catchingBp": 12000
+  },
+  "runs": {
+    "GROUND": [
+      4400,
+      3600,
+      900,
+      100,
+      1000,
+      0
+    ],
+    "AERIAL": [
+      1800,
+      1600,
+      900,
+      100,
+      2400,
+      3200
+    ],
+    "EDGE": [
+      6000,
+      1300,
+      300,
+      0,
+      2400,
+      0
+    ],
+    "NONE": [
+      9700,
+      250,
+      0,
+      0,
+      50,
+      0
+    ],
+    "WIDE": [
+      9800,
+      150,
+      50
+    ]
+  },
+  "running": {
+    "interceptBp": -65000,
+    "throwingBp": 5000,
+    "coverageBp": 3000,
+    "rotateBp": 2500
+  },
+  "bowled": {
+    "interceptBp": -35000,
+    "controlBp": 3000,
+    "defenceBp": -3000,
+    "stumpsBp": 4000
+  },
+  "lbw": {
+    "interceptBp": -40000,
+    "controlBp": 3000,
+    "defenceBp": -3000
+  },
+  "stumping": {
+    "numerator": 3,
+    "denominator": 1000
+  },
+  "noLiveMatchOrCalibration": true,
+  "elapsedSeconds": 40
+}

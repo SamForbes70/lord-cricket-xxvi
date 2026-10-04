@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "STALE_REVISION",
+    "ILLEGAL_ACTION",
+    "INVALID_DATA",
+    "UNSUPPORTED_VERSION",
+    "PERSISTENCE_FAILED",
+    "INTERNAL_INVARIANT"
+  ],
+  "$id": "urn:lcxxvi:ErrorCode:1",
+  "title": "ErrorCode"
+}

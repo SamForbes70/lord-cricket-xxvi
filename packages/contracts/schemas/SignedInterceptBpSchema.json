@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "integer",
+  "minimum": -200000,
+  "maximum": 200000,
+  "$id": "urn:lcxxvi:SignedInterceptBp:1",
+  "title": "SignedInterceptBp"
+}

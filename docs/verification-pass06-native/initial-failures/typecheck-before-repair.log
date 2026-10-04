@@ -1,0 +1,18 @@
+
+> lord-cricket-xxvi@0.1.0 typecheck
+> tsc -b --pretty false && tsc -p tsconfig.tools.json --noEmit
+
+packages/simulation/src/generator.ts(267,7): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"HIT_WICKET"' have no overlap.
+packages/simulation/src/generator.ts(272,7): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"MISS"' have no overlap.
+packages/simulation/src/generator.ts(272,29): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"PAD"' have no overlap.
+packages/simulation/src/generator.ts(282,7): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"GROUND"' have no overlap.
+packages/simulation/src/generator.ts(282,31): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"AERIAL"' have no overlap.
+packages/simulation/src/generator.ts(282,55): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"EDGE"' have no overlap.
+packages/simulation/src/generator.ts(308,18): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"MISS"' have no overlap.
+packages/simulation/src/generator.ts(308,40): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"PAD"' have no overlap.
+packages/simulation/src/generator.ts(311,105): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"MISS"' have no overlap.
+packages/simulation/src/generator.ts(312,53): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"MISS"' have no overlap.
+packages/simulation/src/generator.ts(334,9): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"MISS"' have no overlap.
+packages/simulation/src/generator.ts(346,8): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"MISS"' have no overlap.
+packages/simulation/src/generator.ts(377,16): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"MISS"' have no overlap.
+packages/simulation/src/generator.ts(378,16): error TS2367: This comparison appears to be unintentional because the types '"WIDE"' and '"PAD"' have no overlap.

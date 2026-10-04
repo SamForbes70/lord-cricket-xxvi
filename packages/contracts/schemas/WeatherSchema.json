@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "DRY",
+    "OVERCAST",
+    "RAIN",
+    "UNSAFE_LIGHT"
+  ],
+  "$id": "urn:lcxxvi:Weather:1",
+  "title": "Weather"
+}

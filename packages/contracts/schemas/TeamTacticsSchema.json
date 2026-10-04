@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "battingPlans": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "aggression": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "intent": {
+            "type": "string",
+            "enum": [
+              "NORMAL",
+              "ROTATE",
+              "PROTECT"
+            ]
+          }
+        },
+        "required": [
+          "playerId",
+          "aggression",
+          "intent"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "bowlingPlan": {
+      "type": "object",
+      "properties": {
+        "bowlerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "line": {
+          "type": "string",
+          "enum": [
+            "OFF",
+            "STUMPS",
+            "LEG"
+          ]
+        },
+        "length": {
+          "type": "string",
+          "enum": [
+            "YORKER",
+            "FULL",
+            "GOOD",
+            "SHORT"
+          ]
+        },
+        "variationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "effort": {
+          "type": "string",
+          "enum": [
+            "CONSERVE",
+            "NORMAL",
+            "MAXIMUM"
+          ]
+        }
+      },
+      "required": [
+        "bowlerId",
+        "line",
+        "length",
+        "variationId",
+        "effort"
+      ],
+      "additionalProperties": false
+    },
+    "fieldSlots": {
+      "minItems": 9,
+      "maxItems": 9,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "required": [
+          "slotId",
+          "playerId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "nextBatterId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "delegation": {
+      "type": "object",
+      "properties": {
+        "battingOrder": {
+          "type": "boolean"
+        },
+        "bowlerSelection": {
+          "type": "boolean"
+        },
+        "battingTactics": {
+          "type": "boolean"
+        },
+        "bowlingTactics": {
+          "type": "boolean"
+        },
+        "declarations": {
+          "type": "boolean"
+        },
+        "followOn": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "battingOrder",
+        "bowlerSelection",
+        "battingTactics",
+        "bowlingTactics",
+        "declarations",
+        "followOn"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "battingPlans",
+    "bowlingPlan",
+    "fieldSlots",
+    "nextBatterId",
+    "delegation"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:TeamTactics:1",
+  "title": "TeamTactics"
+}

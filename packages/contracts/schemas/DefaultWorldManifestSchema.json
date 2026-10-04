@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "worldPackId": {
+      "type": "string",
+      "const": "fictional-eight-01"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "worldGeneratorVersion": {
+      "type": "string",
+      "const": "LC_FICTIONAL_WORLD_GENERATOR_V1"
+    },
+    "worldSeed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "generatorSourceSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "provenanceSourceSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldFileSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldCanonicalSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldByteLength": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 25000000
+    },
+    "rulesIds": {
+      "minItems": 3,
+      "maxItems": 3,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "modelId": {
+      "type": "string",
+      "const": "synthetic-alpha-01"
+    },
+    "modelHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "stagePackId": {
+      "type": "string",
+      "const": "synthetic-alpha-01-delivery-v1"
+    },
+    "stagePackHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "randomId": {
+      "type": "string",
+      "const": "SHA256_COUNTER_V1"
+    },
+    "variationIds": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "provenance": {
+      "type": "string",
+      "const": "FICTIONAL"
+    },
+    "modelStatus": {
+      "type": "string",
+      "const": "SYNTHETIC_ALPHA"
+    },
+    "teamIds": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "groundIds": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "homeGroundIds": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    }
+  },
+  "required": [
+    "worldPackId",
+    "schemaVersion",
+    "worldGeneratorVersion",
+    "worldSeed",
+    "generatorSourceSha256",
+    "provenanceSourceSha256",
+    "worldFileSha256",
+    "worldCanonicalSha256",
+    "worldByteLength",
+    "rulesIds",
+    "modelId",
+    "modelHash",
+    "stagePackId",
+    "stagePackHash",
+    "randomId",
+    "variationIds",
+    "provenance",
+    "modelStatus",
+    "teamIds",
+    "groundIds",
+    "homeGroundIds"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:DefaultWorldManifest:1",
+  "title": "DefaultWorldManifest"
+}

@@ -1,0 +1,567 @@
+{
+  "fixtureVersion": "LC_WORLD_07A_NEGATIVE_V1",
+  "independentlyAuthored": true,
+  "cases": [
+    {
+      "id": "W05-SHARED-PLAYER",
+      "target": "world",
+      "reason": "Cross-team duplicate initial squad assignment",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/teams/1/squadIds/0",
+          "value": "p001"
+        }
+      ]
+    },
+    {
+      "id": "W02-NO-KEEPER",
+      "target": "world",
+      "reason": "Team one has no wicketkeepers",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/role",
+          "value": "BATTER"
+        },
+        {
+          "op": "replace",
+          "path": "/players/1/role",
+          "value": "BATTER"
+        }
+      ]
+    },
+    {
+      "id": "W02-ONLY-FIVE-BOWLERS",
+      "target": "world",
+      "reason": "Sixth bowler removed along with allrounders; team lacks six eligible players",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/2/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/3/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/4/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/5/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/6/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/7/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/8/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/9/bowlingStyle",
+          "value": null
+        },
+        {
+          "op": "replace",
+          "path": "/players/10/bowlingStyle",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "W03-BAD-RATING",
+      "target": "world",
+      "reason": "T20 defence outside bounded integer rating",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/skills/T20/defence",
+          "value": 101
+        }
+      ]
+    },
+    {
+      "id": "W03-NONINTEGER-RATING",
+      "target": "world",
+      "reason": "Fractional ODI skill rejected",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/skills/ODI/timing",
+          "value": 63.5
+        }
+      ]
+    },
+    {
+      "id": "W03-MISSING-FORMAT",
+      "target": "world",
+      "reason": "RED_BALL profile is mandatory",
+      "changes": [
+        {
+          "op": "remove",
+          "path": "/players/0/skills/RED_BALL"
+        }
+      ]
+    },
+    {
+      "id": "W03-UNKNOWN-VARIATION",
+      "target": "world",
+      "reason": "Stock is the only published variation",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/variations/0",
+          "value": "unsupported-spin"
+        }
+      ]
+    },
+    {
+      "id": "W03-ZERO-SHOT-WEIGHTS",
+      "target": "world",
+      "reason": "Positive eight-sector shot weight is mandatory",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/shotSectorWeights",
+          "value": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "W03-BAD-PROVENANCE",
+      "target": "world",
+      "reason": "Every world player must have approved fictional provenance",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/provenance/kind",
+          "value": "LICENSED"
+        }
+      ]
+    },
+    {
+      "id": "W03-FABRICATED-EXPOSURE",
+      "target": "world",
+      "reason": "Synthetic world players start with no real delivery exposures",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/exposureBalls/T20",
+          "value": 151
+        }
+      ]
+    },
+    {
+      "id": "W08-DUPLICATE-PLAYER-ID",
+      "target": "world",
+      "reason": "Player IDs are globally unique",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/playerId",
+          "value": "p002"
+        }
+      ]
+    },
+    {
+      "id": "W08-UNKNOWN-SQUAD-ID",
+      "target": "world",
+      "reason": "Squad member not defined in global player array",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/teams/0/squadIds/0",
+          "value": "p999"
+        }
+      ]
+    },
+    {
+      "id": "W08-UNKNOWN-RULE-ID",
+      "target": "world",
+      "reason": "World only references published frozen profiles",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/rulesIds/0",
+          "value": "LC_UNKNOWN_01"
+        }
+      ]
+    },
+    {
+      "id": "W08-DUPLICATE-GROUND-ID",
+      "target": "world",
+      "reason": "Ground IDs globally unique",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/grounds/0/groundId",
+          "value": "ground-02"
+        }
+      ]
+    },
+    {
+      "id": "W08-INVALID-GROUND-RADIUS",
+      "target": "world",
+      "reason": "Boundary radii must be positive integers",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/grounds/0/sectorRadiiCm/0",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "id": "W08-WORLD-UNKNOWN-PROP",
+      "target": "world",
+      "reason": "Unknown fields rejected",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/players/0/execute",
+          "value": "evil"
+        }
+      ]
+    },
+    {
+      "id": "W08-MANIFEST-WORLD-HASH",
+      "target": "manifest",
+      "reason": "Manifest canonical digest changed",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/worldCanonicalSha256",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "id": "W08-MANIFEST-FILE-HASH",
+      "target": "manifest",
+      "reason": "Manifest byte digest changed",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/worldFileSha256",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "id": "W08-MANIFEST-SOURCE-HASH",
+      "target": "manifest",
+      "reason": "Manifest generator digest changed",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/generatorSourceSha256",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "id": "W08-MANIFEST-UNKNOWN-HOME-GROUND",
+      "target": "manifest",
+      "reason": "Unresolved home ground reference",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/homeGroundIds/team-01",
+          "value": "ground-99"
+        }
+      ]
+    },
+    {
+      "id": "W08-MANIFEST-SHARED-HOME-GROUND",
+      "target": "manifest",
+      "reason": "Default eight-home-ground mapping must be bijective",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/homeGroundIds/team-02",
+          "value": "ground-01"
+        }
+      ]
+    },
+    {
+      "id": "W08-MANIFEST-UNAPPROVED-RULE",
+      "target": "manifest",
+      "reason": "Rule approval cannot be changed via manifest",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/rulesIds/0",
+          "value": "LC_OTHER"
+        }
+      ]
+    },
+    {
+      "id": "W08-MANIFEST-UNKNOWN-FIELD",
+      "target": "manifest",
+      "reason": "Manifest must be strict",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/arbitraryField",
+          "value": "text"
+        }
+      ]
+    },
+    {
+      "id": "W04-DUPLICATE-XI-PLAYER",
+      "target": "setup",
+      "reason": "XI cannot select same player twice",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/selectedTeams/0/playerIds/10",
+          "value": "p012"
+        }
+      ]
+    },
+    {
+      "id": "W04-FOREIGN-XI-PLAYER",
+      "target": "setup",
+      "reason": "XI player belongs to another team",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/selectedTeams/0/playerIds/10",
+          "value": "p021"
+        }
+      ]
+    },
+    {
+      "id": "W04-KEEPER-NOT-KEEPER",
+      "target": "setup",
+      "reason": "Keeper must be a keeper in selected XI",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/selectedTeams/0/keeperId",
+          "value": "p012"
+        }
+      ]
+    },
+    {
+      "id": "W04-CAPTAIN-NOT-SELECTED",
+      "target": "setup",
+      "reason": "Captain must be selected",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/selectedTeams/0/captainId",
+          "value": "p019"
+        }
+      ]
+    },
+    {
+      "id": "W04-LOW-XI-BOWLERS",
+      "target": "setup",
+      "reason": "XI must contain at least five bowling-capable players",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/selectedTeams/0/playerIds",
+          "value": [
+            "p001",
+            "p003",
+            "p004",
+            "p009",
+            "p012",
+            "p013",
+            "p014",
+            "p015",
+            "p016",
+            "p017",
+            "p018"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "W08-UNKNOWN-GROUND",
+      "target": "setup",
+      "reason": "Match ground must exist in published world",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/setup/groundId",
+          "value": "ground-99"
+        }
+      ]
+    },
+    {
+      "id": "W08-UNSUPPORTED-PREDICTION",
+      "target": "setup",
+      "reason": "Prediction has not been implemented",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/setup/capabilities/prediction",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "W08-UNSUPPORTED-RULES",
+      "target": "setup",
+      "reason": "Only LC_T20_01 bootstraps in 07A",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/setup/rulesId",
+          "value": "LC_ODI_01"
+        }
+      ]
+    },
+    {
+      "id": "W08-UNSUPPORTED-MODEL",
+      "target": "setup",
+      "reason": "Model cannot silently migrate",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/setup/modelId",
+          "value": "other-model"
+        }
+      ]
+    },
+    {
+      "id": "W08-UNSUPPORTED-FORMAT",
+      "target": "setup",
+      "reason": "Only T20 setup is supported",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/setup/format",
+          "value": "ODI"
+        }
+      ]
+    },
+    {
+      "id": "W08-WRONG-WORLD-HASH",
+      "target": "setup",
+      "reason": "Setup requires exact frozen canonical digest",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/worldCanonicalSha256",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "id": "W08-WRONG-STAGE-HASH",
+      "target": "setup",
+      "reason": "Setup requires exact frozen stage digest",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/stagePackHash",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "id": "W08-WRONG-RULE-HASH",
+      "target": "setup",
+      "reason": "Setup requires exact frozen rules digest",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/rulesHash",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "id": "W08-EXTRA-PROP",
+      "target": "setup",
+      "reason": "Unknown request property rejected",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/unexpected",
+          "value": "execute"
+        }
+      ]
+    },
+    {
+      "id": "W08-NON-DISTINCT-TEAMS",
+      "target": "setup",
+      "reason": "Match cannot have identical teams",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/setup/teamIds/1",
+          "value": "team-01"
+        },
+        {
+          "op": "replace",
+          "path": "/selectedTeams/1/teamId",
+          "value": "team-01"
+        }
+      ]
+    },
+    {
+      "id": "W08-TEAM-SELECTION-ORDER",
+      "target": "setup",
+      "reason": "Selections must align with requested team order",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/selectedTeams/1/teamId",
+          "value": "team-03"
+        }
+      ]
+    },
+    {
+      "id": "W08-MISSING-XI-PLAYER",
+      "target": "setup",
+      "reason": "Exactly 11 selected players mandatory",
+      "changes": [
+        {
+          "op": "replace",
+          "path": "/selectedTeams/0/playerIds",
+          "value": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p009",
+            "p010",
+            "p012",
+            "p013",
+            "p014"
+          ]
+        }
+      ]
+    }
+  ]
+}
