@@ -1,0 +1,5 @@
+# Pass 11 verification evidence
+
+`results.json` is the machine-readable final gate record. `fresh-core.log` is the final core pipeline. `fresh-m5b-browser.log` records the initial Chromium PASS and Firefox host launch failure; `fresh-m5b-firefox-home-root.log` is the repaired Firefox rerun using Playwright's required `HOME=/root` workaround. `fresh-m4.log` and `fresh-m5a.log` contain inherited persistence/ODI gates. `fresh-ui.log` contains all Chromium T20 UI PASS results before the command-window timeout; `fresh-ui-firefox-full.log` and `fresh-ui-firefox-rest.log` complete the Firefox matrix.
+
+The full T20 corpus cannot finish inside this environment's per-command execution ceiling. The same 100 fixed cases were therefore executed in four 25-case shards using the unchanged production setup, engine, replay and command-resimulation functions. `t20-corpus-shard-*.json` and `.log` are the shard evidence. `fresh-t20-corpus-sharded-summary.json` verifies all 100 sequential cases passed and their deterministic fields match the accepted complete oracle 100/100.

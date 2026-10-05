@@ -1,0 +1,30 @@
+
+> lord-cricket-xxvi@0.1.0 red5:fixtures
+> node --import tsx scripts/audit-red5-fixtures.ts
+
+{
+  "gate": "PASS_11_RED5_FORMAT_FIXTURES",
+  "result": "PASS",
+  "rulesId": "LC_RED5_01",
+  "terminal": {
+    "matched": 4,
+    "ids": [
+      "F10",
+      "F11",
+      "F12",
+      "T01"
+    ]
+  },
+  "clock": {
+    "matched": 5,
+    "ids": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "C05"
+    ]
+  },
+  "totalMatched": 9,
+  "note": "Independent Appendix D expected values are retained in the Pass 02 corpus; this gate executes the Pass 11 red-ball arbitration/clock implementation against them."
+}

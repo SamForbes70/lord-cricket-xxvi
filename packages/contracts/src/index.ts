@@ -11,3 +11,5 @@ export * from "./generator.js";
 export * from "./world.js";
 export * from "./t20-match.js";
 export * from "./odi-match.js";
+
+export * from "./red-ball-match.js";

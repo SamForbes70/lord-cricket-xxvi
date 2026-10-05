@@ -1,8 +1,8 @@
-# Lord Cricket XXVI | Pass 10 / M5A ODI exhibition
+# Lord Cricket XXVI | Pass 11 / M5B red-ball exhibition and match clock
 
-The browser application now supports manual fictional T20 and ODI exhibition matches on the same deterministic statistical engine architecture. ODI is a distinct 50-over profile with its own setup, event-chain, scorecard and replay contracts. One Web Worker remains the authority for match state, and the M4 IndexedDB persistence boundary now stores and restores either supported limited-overs format.
+The browser application supports manual fictional T20, ODI and five-day red-ball exhibition matches on the same deterministic statistical architecture. Red-ball is a distinct event-sourced match state machine with four-innings arbitration and a deterministic five-day clock. One Web Worker remains authoritative for active match state, and the M4 IndexedDB persistence boundary stores and restores all three supported formats.
 
-**Model status: SYNTHETIC_ALPHA.** The shipped T20 and ODI rules are custom game profiles, not claims of certified ICC competition compliance or empirical realism. The approved fictional world remains 160 players, eight squads and eight grounds. Limited-overs rain and DLS remain disabled. Red-ball, league management, training, tactical opponent AI and empirical calibration remain unavailable.
+**Model status: SYNTHETIC_ALPHA.** The shipped profiles are custom Lord Cricket XXVI game rules, not claims of certified ICC competition compliance or empirical realism. The approved fictional world remains 160 players, eight squads and eight grounds. Limited-overs rain and DLS remain disabled. Automatic stochastic red-ball weather scheduling, league management, training, tactical opponent AI and empirical calibration are not enabled in this pass.
 
 ## Run
 
@@ -14,58 +14,54 @@ npm run build
 npm run dev
 ```
 
-Open the local URL printed by Vite. `/engineering.html` retains the historical engineering shell. The packaged playable build uses `node start.mjs` and requires no npm install.
+Open the local URL printed by Vite. `/engineering.html` retains the historical engineering shell. The packaged playable build uses `node start.mjs` and requires no npm installation.
 
-## Play and save
+## Supported exhibition formats
 
-1. Choose T20 or ODI, select both XIs, captains and keepers, then confirm the teams.
-2. Call the toss, choose the first innings, select batters and bowlers, set supported tactics and advance by delivery or over.
-3. ODI uses 300 legal balls per innings, a 60-ball bowler maximum, no consecutive overs by one bowler, field limits of two outside for balls 0 to 59, four outside for balls 60 to 239 and five outside from ball 240, plus ODI early, middle and late model phases.
-4. Every accepted setup or command is durably committed before the UI acknowledges it. Reloading resumes the last committed revision.
-5. **Save copy** creates a manual local slot. **Export** creates a `.lcxxvi` archive. **Import** stages and validates an archive before it becomes visible.
-6. A second tab opens an active save read-only while the writer lease is held. Three checkpoint generations are retained; a corrupt newest checkpoint is recovered into a new slot without overwriting the damaged source.
+- **T20:** accepted 20-over vertical slice under `LC_T20_MATCH_V1`.
+- **ODI:** 50-over exhibition under `LC_ODI_MATCH_V1`, including the accepted ODI bowler quotas, model phases and field phases.
+- **Red ball:** five-day exhibition under `LC_RED5_MATCH_V1` / `LC_RED5_01`, with two innings per team, declarations, optional 200-run follow-on, new ball after 480 legal balls and time-expiry draw arbitration.
 
-`.lcxxvi` imports validate archive bounds, paths, CRCs, byte counts, SHA-256 hashes and pinned engine, event-chain, PRNG, model, rules and world identities. Stored match cores are not trusted directly: resume revalidates setup and resimulates the stored command history before accepting the restored state.
+The red-ball clock starts at 11:00. Lunch is 13:00-13:40, tea is 15:40-16:00 and scheduled close is 18:00. Meals and stumps wait for an over already in progress. The ten-minute innings interval replaces a coincident meal rather than stacking with it. Days one to four may extend to 18:30 while pursuing 90 legal overs. Day five applies the documented final-hour obligation from 17:00. Red-ball rain/lost-time consequences are available through deterministic rules/system events; no stochastic weather scheduler is enabled by this pass.
+
+## Save and recovery
+
+Every accepted setup or command is durably committed before the UI acknowledges it. Reloading resumes the last committed revision. **Save copy** creates a manual local slot. **Export** creates a `.lcxxvi` archive. **Import** stages and validates an archive before it becomes visible.
+
+A second tab opens an active save read-only while the writer lease is held. The writer identity is stored in browsing-context `sessionStorage`, so a reload keeps ownership while a genuinely separate tab receives a different identity. Three checkpoint generations are retained, and corrupted newest checkpoints recover into a separate slot without overwriting the damaged source.
+
+Portable imports validate archive bounds, paths, CRCs, byte counts, SHA-256 hashes and the explicit engine/event-chain/PRNG/model/rules/world pin set. Stored match cores are not trusted directly: resume revalidates setup and resimulates the accepted command history.
 
 ## Verification
 
-Core gates:
+Core Pass 11 gate:
 
 ```sh
-npm run schemas:check
-npm run build
-npm run typecheck
-npm run lint
-npm run fixtures:audit
-npm run fixtures:engine
-npm run vectors:check
-npm run probability:check
-npm run generator:check
-npm run odi:rules
-npm test
+npm run verify:11:core
 ```
 
-ODI browser gate:
+This includes schema drift/strict AJV, production build, typecheck, lint and package boundaries, scoring regression, deterministic vectors, probability vectors, generator vectors, the independent Appendix D red-ball fixture audit, red-ball rules and the complete unit suite.
+
+Production red-ball browser gate:
 
 ```sh
-npm run test:m5a
+npm run test:m5b
 ```
 
-Inherited M4 and M3 regressions remain available through `npm run test:m4` and `npm run test:ui`.
+Inherited persistence and format regressions remain available through `npm run test:m4`, `npm run test:m5a`, `npm run test:ui` and `npm run corpus:node`.
 
-The ODI rules suite covers the machine-readable format corpus, 300-ball termination, 60-ball bowler quota, no consecutive overs, field phase boundaries, ODI model phase boundaries, free-hit carry, complete seeded match replay and command resimulation, deterministic rehydration and portable save round-trip. The production Chromium browser test starts an ODI from the normal UI, advances play, verifies 50-over presentation, reloads and restores the same durable revision and ODI session identity.
+Pass 11 evidence covers the original Appendix D terminal cases F10-F12/T01 and clock cases C01-C05, declarations, follow-on, new ball, final-hour rain adjustment, complete seeded match, exact replay/resimulation, persistence/archive round-trip, Chromium/Firefox start/play/reload, the inherited M4 persistence suite and the full 100-match T20 replay corpus.
 
 The formal M3 human acceptance record remains separate. Automated testing is not represented as a human playthrough.
 
 ## Architecture and boundaries
 
-- `apps/web/src/match`: revisioned UI protocol, format routing, T20 controller, ODI controller and durable worker boundary.
-- `packages/persistence`: IndexedDB repository, writer leases, rolling checkpoints, canonical hashes and multi-format `.lcxxvi` archive validation.
-- `packages/simulation`: accepted `LC_T20_MATCH_V1` plus `LC_ODI_MATCH_V1`, deterministic replay and save rehydration.
-- `packages/contracts`: strict T20 and ODI setup, command, event, scorecard, replay and manifest schemas.
-- `packages/data`: frozen world/model/rules plus T20 and ODI named-field defaults.
-- `tests/fixtures/odi/edge-corpus.json`: machine-readable ODI format acceptance corpus.
-- `tests/unit/odi-match.test.ts`: ODI format rules, full seeded match and persistence tests.
-- `tests/m5/odi-ui.spec.ts`: production browser ODI start, advance and resume acceptance.
+- `apps/web/src/match`: revisioned UI protocol, T20/ODI/RED5 controllers and durable worker boundary.
+- `packages/persistence`: IndexedDB repository, writer leases, rolling checkpoints, canonical hashes and multi-format `.lcxxvi` validation.
+- `packages/simulation`: accepted limited-overs engines plus `red-ball-match.ts` and `red-ball-clock.ts`.
+- `packages/contracts`: strict setup, command, clock, event, scorecard and replay contracts for each enabled format.
+- `packages/data`: frozen fictional world, synthetic model and custom rule manifests.
+- `tests/fixtures/red5/edge-corpus.json`: Pass 11 red-ball acceptance inventory.
+- `scripts/audit-red5-fixtures.ts`: execution of the original independent Appendix D terminal and clock expectations.
 
-Pass 10 does not enable limited-overs rain/DLS, red-ball sessions, league management, training, tactical AI or empirical calibration. M5 remains partial until the separate M5B red-ball stage is complete.
+Pass 11 does not add league management, contracts, transfers, tactical opponent AI, empirical calibration or verified DLS. The next bounded stage is Pass 12 / M6, the persistent eight-team T20 management season loop.

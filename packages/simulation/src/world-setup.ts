@@ -2,6 +2,7 @@ import {
   canonicalJson,
   T20MatchSetupRequestSchema,
   ODIMatchSetupRequestSchema,
+  Red5MatchSetupRequestSchema,
   type Player,
   type Ground,
   type RuleManifest,
@@ -23,6 +24,7 @@ import { canonicalStateBytes, sha256Hex } from "./determinism.js";
 
 const VERIFIED_SETUP_INSTANCES = new WeakSet<object>();
 const VERIFIED_ODI_SETUP_INSTANCES = new WeakSet<object>();
+const VERIFIED_RED5_SETUP_INSTANCES = new WeakSet<object>();
 /** In-process authenticity marker: a JSON object with fabricated hashes is not a validated 07A setup. */
 export function isVerifiedFrozenT20Setup(
   value: unknown,
@@ -41,6 +43,9 @@ const ODI_RULE = RULE_MANIFESTS.find((rule) => rule.rulesId === "LC_ODI_01");
 if (!ODI_RULE)
   throw new Error("INVALID_SETUP: frozen ODI rule manifest missing");
 const REQUIRED_ODI_RULE = canonicalJson(ODI_RULE);
+const RED5_RULE = RULE_MANIFESTS.find((rule) => rule.rulesId === "LC_RED5_01");
+if (!RED5_RULE) throw new Error("INVALID_SETUP: frozen red-ball rule manifest missing");
+const REQUIRED_RED5_RULE = canonicalJson(RED5_RULE);
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(`INVALID_T20_SETUP: ${message}`);
@@ -451,4 +456,30 @@ export function validateODIMatchSetup(
   });
   VERIFIED_ODI_SETUP_INSTANCES.add(frozen);
   return frozen;
+}
+
+
+export type FrozenRed5Setup = Readonly<{
+  setupVersion: "LC_RED5_SETUP_V1"; gameId:string; matchId:string; seed:string; format:"RED_BALL";
+  teams: readonly [FrozenTeamSelection,FrozenTeamSelection]; ground:Readonly<Ground>; versions:Readonly<MatchVersions>;
+  stagePackHash:string; modelStatus:"SYNTHETIC_ALPHA"; worldSeed:string; fixtureOnly:true;
+}>;
+export function isVerifiedFrozenRed5Setup(value:unknown): value is FrozenRed5Setup { return !!value && typeof value === "object" && VERIFIED_RED5_SETUP_INSTANCES.has(value); }
+export function validateRed5MatchSetup(input:unknown, worldBytes:Readonly<Uint8Array>, manifestInput:unknown, ruleInput:unknown=RED5_RULE, modelInput:unknown=SYNTHETIC_ALPHA_PACK, stageInput:unknown=DELIVERY_STAGE_PACK): FrozenRed5Setup {
+  const request=Red5MatchSetupRequestSchema.parse(input); const {world,manifest}=verifyFrozenWorldBytes(worldBytes,manifestInput);
+  assert(request.setup.format === "RED_BALL", "only red-ball setup is supported");
+  assert(request.setup.worldPackId===world.packId,"wrong world ID"); assert(request.setup.randomId===manifest.randomId,"unsupported random ID"); assert(request.setup.modelId===manifest.modelId,"unsupported model ID");
+  assert(request.setup.rulesId==="LC_RED5_01" && world.rulesIds.includes(request.setup.rulesId),"unsupported red-ball rules");
+  assert(!request.setup.capabilities.limitedOversRain && !request.setup.capabilities.superOver && !request.setup.capabilities.injuries && !request.setup.capabilities.prediction,"unsupported gameplay capability enabled");
+  assert(request.worldFileSha256===manifest.worldFileSha256 && request.worldCanonicalSha256===manifest.worldCanonicalSha256,"setup world hash mismatch");
+  assert(canonicalJson(ruleInput)===REQUIRED_RED5_RULE,"non-pinned red-ball rule manifest"); assert(canonicalJson(modelInput)===REQUIRED_MODEL,"non-pinned probability pack"); assert(canonicalJson(stageInput)===REQUIRED_STAGE,"non-pinned conditional-delivery stage pack");
+  const ruleHash=sha256Hex(canonicalStateBytes(ruleInput)); assert(request.rulesHash===ruleHash,"red-ball rules hash mismatch");
+  assert(request.modelHash===MODEL_PACK_SHA256 && request.modelHash===manifest.modelHash,"probability model hash mismatch"); assert(request.stagePackHash===DELIVERY_STAGE_PACK_SHA256 && request.stagePackHash===manifest.stagePackHash,"stage pack hash mismatch");
+  const r=ruleInput as RuleManifest; assert(r.format==="RED_BALL" && r.inningsPerTeam===2 && r.allocatedBalls===null && r.bowlerMaxBalls===null && r.declarations && r.followOnLead===200 && r.newBallAfterLegalBalls===480,"red-ball setup rule mismatch");
+  assert(new Set(request.setup.teamIds).size===2,"teams must differ");
+  const byId=new Map(world.players.map(p=>[p.playerId,p]));
+  const selectedTeams=request.selectedTeams.map((selection:T20TeamSelection):FrozenTeamSelection=>{ const t=world.teams.find(x=>x.teamId===selection.teamId); assert(!!t,`unknown team ${selection.teamId}`); assert(new Set(selection.playerIds).size===11,`duplicate player in XI ${selection.teamId}`); const squad=new Set(t.squadIds); assert(selection.playerIds.every(id=>squad.has(id)&&byId.has(id)),`XI player not in own squad ${selection.teamId}`); assert(selection.playerIds.includes(selection.captainId),`captain not selected ${selection.teamId}`); assert(selection.playerIds.includes(selection.keeperId),`keeper not selected ${selection.teamId}`); const players=selection.playerIds.map(id=>byId.get(id)!); assert(players.find(p=>p.playerId===selection.keeperId)?.role==="KEEPER",`designated keeper ineligible ${selection.teamId}`); assert(players.filter(isBowlingCapable).length>=5,`XI lacks five bowling-capable players ${selection.teamId}`); return deepFreeze({teamId:t.teamId,name:t.name,playerIds:[...selection.playerIds],xi:players.map(p=>structuredClone(p)),captainId:selection.captainId,keeperId:selection.keeperId}); }) as [FrozenTeamSelection,FrozenTeamSelection];
+  assert(new Set(selectedTeams.flatMap(t=>t.playerIds)).size===22,"teams cannot share XI players"); const ground=world.grounds.find(g=>g.groundId===request.setup.groundId); assert(!!ground,"unknown match ground");
+  const versions:MatchVersions={schema:"1.0.0",engine:"LC_RED5_SETUP_V1",random:manifest.randomId,rules:request.setup.rulesId,rulesHash:ruleHash,model:manifest.modelId,modelHash:MODEL_PACK_SHA256,worldHash:manifest.worldCanonicalSha256};
+  const frozen:FrozenRed5Setup=deepFreeze({setupVersion:"LC_RED5_SETUP_V1",gameId:request.setup.gameId,matchId:request.setup.matchId,seed:request.setup.seed,format:"RED_BALL",teams:selectedTeams,ground:structuredClone(ground),versions,stagePackHash:DELIVERY_STAGE_PACK_SHA256,modelStatus:"SYNTHETIC_ALPHA",worldSeed:manifest.worldSeed,fixtureOnly:true}); VERIFIED_RED5_SETUP_INSTANCES.add(frozen); return frozen;
 }

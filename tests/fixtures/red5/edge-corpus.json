@@ -1,0 +1,76 @@
+{
+  "version": "LC_RED5_EDGE_CORPUS_V1",
+  "rulesId": "LC_RED5_01",
+  "cases": [
+    {
+      "id": "F10",
+      "source": "Appendix D terminal",
+      "behaviour": "follow-on innings victory"
+    },
+    {
+      "id": "F11",
+      "source": "Appendix D terminal",
+      "behaviour": "fourth-innings target"
+    },
+    {
+      "id": "F12",
+      "source": "Appendix D terminal",
+      "behaviour": "time-expiry draw"
+    },
+    {
+      "id": "T01",
+      "source": "Appendix D terminal",
+      "behaviour": "completed fourth-innings tie"
+    },
+    {
+      "id": "C01",
+      "source": "Appendix D clock",
+      "behaviour": "wicket at scheduled close, over finishes"
+    },
+    {
+      "id": "C02",
+      "source": "Appendix D clock",
+      "behaviour": "innings interval replaces coincident lunch"
+    },
+    {
+      "id": "C03",
+      "source": "Appendix D clock",
+      "behaviour": "final-hour rain obligation reduction"
+    },
+    {
+      "id": "C04",
+      "source": "Appendix D clock",
+      "behaviour": "new ball at 480 legal balls"
+    },
+    {
+      "id": "C05",
+      "source": "Appendix D clock",
+      "behaviour": "result precedes stumps on final scheduled ball"
+    },
+    {
+      "id": "RED5-FOLLOW-ON-COMMAND",
+      "source": "Pass 11",
+      "behaviour": "200-run follow-on decision and A-B-B-A order"
+    },
+    {
+      "id": "RED5-DECLARATION",
+      "source": "Pass 11",
+      "behaviour": "declaration between deliveries"
+    },
+    {
+      "id": "RED5-REPLAY",
+      "source": "Pass 11",
+      "behaviour": "event replay and command resimulation"
+    },
+    {
+      "id": "RED5-PERSISTENCE",
+      "source": "Pass 11",
+      "behaviour": "portable archive round-trip"
+    },
+    {
+      "id": "RED5-FULL-MATCH",
+      "source": "Pass 11",
+      "behaviour": "complete deterministic exhibition"
+    }
+  ]
+}

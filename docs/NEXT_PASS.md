@@ -1,7 +1,9 @@
-# Next pass: Pass 11 / M5B red-ball exhibition and match clock
+# Next pass: Pass 12 / M6 management season loop
 
-Entry condition: retain all accepted T20, ODI, deterministic replay and M4 durability gates. Keep the ODI custom profile and its machine-readable edge corpus frozen unless a documented defect requires a versioned correction.
+Entry condition: retain all accepted T20, ODI, red-ball, deterministic replay and M4 durability gates. Keep the three custom match profiles frozen unless a documented defect requires a versioned correction.
 
-Bounded objective: implement the `LC_RED5_01` five-day exhibition profile as a separate match state machine using the existing scorer, deterministic random service, conditional delivery generator, event-chain/replay model and persistence framework. Add two innings per team, session and day clocks, lunch, tea and stumps, declarations between deliveries, optional follow-on at a 200-run first-innings lead, new-ball availability after 480 legal balls, red-ball weather/lost-time handling and the documented final-hour rule.
+Bounded objective: implement the V0.1 eight-team fictional T20 management season as a persistent event-derived career layer. Add the 14-round / 56-match fixture schedule, team table, player availability and condition, training allocation, fixture navigation, season statistics and final season archive. A complete league must simulate or play through, save, reload and reconcile without duplicate career statistics.
 
-Build an independent red-ball clock and rules corpus before enabling the profile in the browser. Do not add league management, contracts, transfers, DLS, tactical captain AI or empirical calibration in M5B.
+The management layer must consume completed match results and event-derived projections; it must not maintain an independent score or career-stat truth. User-played and simulated fixtures must use the same accepted T20 rules/model versions. Career commands and revisions must use the existing atomic M4 persistence boundary.
+
+Keep transfers, contracts, auctions, finances, injuries beyond the already documented availability/condition scope, youth intake, multiyear progression, international calendars, DLS, tactical captain AI and empirical calibration outside this pass unless a revised requirement explicitly adds them.

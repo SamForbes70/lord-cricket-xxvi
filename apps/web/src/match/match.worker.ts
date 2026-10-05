@@ -1,7 +1,7 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
 import { canonicalJson } from "@lcxxvi/contracts";
-import type { T20Session, ODISession } from "@lcxxvi/simulation";
+import type { T20Session, ODISession, Red5Session } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
   createPortableArchive,
@@ -9,9 +9,11 @@ import {
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
 import { createODIMatchController } from "./controller-odi.js";
+import { createRed5MatchController } from "./controller-red5.js";
 import {
   ARCHIVE_PINS,
   ODI_ARCHIVE_PINS,
+  RED5_ARCHIVE_PINS,
   RequestSchema,
   UI_VERSION,
   type Request,
@@ -25,10 +27,11 @@ let activeSaveId: string | null = null;
 let readOnly = false;
 let recovered = false;
 let recoveredFromGeneration: number | null = null;
-type AnySession = T20Session | ODISession;
+type AnySession = T20Session | ODISession | Red5Session;
 type MatchController =
   | ReturnType<typeof createMatchController>
-  | ReturnType<typeof createODIMatchController>;
+  | ReturnType<typeof createODIMatchController>
+  | ReturnType<typeof createRed5MatchController>;
 let controller: MatchController = makeController();
 let initialised = false;
 
@@ -49,19 +52,14 @@ function privateIdentity() {
   const token = randomHex(12);
   return { gameId: `game-${token}`, matchId: `match-${token}` };
 }
-function makeController(format: "T20" | "ODI" = "T20"): MatchController {
-  return format === "ODI"
-    ? createODIMatchController(
-        worldBytes,
-        manifest,
-        privateSeed,
-        privateIdentity,
-      )
-    : createMatchController(worldBytes, manifest, privateSeed, privateIdentity);
+function makeController(format: "T20" | "ODI" | "RED_BALL" = "T20"): MatchController {
+  if (format === "ODI") return createODIMatchController(worldBytes, manifest, privateSeed, privateIdentity);
+  if (format === "RED_BALL") return createRed5MatchController(worldBytes, manifest, privateSeed, privateIdentity);
+  return createMatchController(worldBytes, manifest, privateSeed, privateIdentity);
 }
-function sessionFormat(raw: unknown): "T20" | "ODI" {
+function sessionFormat(raw: unknown): "T20" | "ODI" | "RED_BALL" {
   const value = raw as { setup?: { format?: unknown } };
-  return value?.setup?.format === "ODI" ? "ODI" : "T20";
+  return value?.setup?.format === "ODI" ? "ODI" : value?.setup?.format === "RED_BALL" ? "RED_BALL" : "T20";
 }
 function metadata(session: AnySession) {
   return {
@@ -394,10 +392,8 @@ async function handlePersistence(request: Request): Promise<Response | null> {
     try {
       const loaded = await repository.load(saveId);
       if (!loaded) throw new Error("Save not found.");
-      const archivePins =
-        sessionFormat(loaded.session) === "ODI"
-          ? ODI_ARCHIVE_PINS
-          : ARCHIVE_PINS;
+      const fmt = sessionFormat(loaded.session);
+      const archivePins = fmt === "ODI" ? ODI_ARCHIVE_PINS : fmt === "RED_BALL" ? RED5_ARCHIVE_PINS : ARCHIVE_PINS;
       const archive = await createPortableArchive(
         loaded.session,
         loaded.summary,
@@ -419,6 +415,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       const imported = await readPortableArchive(request.archive, [
         ARCHIVE_PINS,
         ODI_ARCHIVE_PINS,
+  RED5_ARCHIVE_PINS,
       ]);
       const validationController = makeController(
         sessionFormat(imported.session),

@@ -1,23 +1,29 @@
-# Capability matrix: Pass 10 / M5A
+# Capability matrix: Pass 11 / M5B
 
 | Capability | Status and boundary |
 | --- | --- |
-| M0 approved world | Original 160 players, 8 squads, 8 grounds; unchanged gameplay data |
-| M1 scorer | Inherited supported scoring rules; unchanged |
-| T20 engine | `LC_T20_MATCH_V1`; inherited event-chain/hash regressions unchanged |
-| ODI engine | `LC_ODI_MATCH_V1`; one 50-over innings per team, deterministic event stream and replay |
-| ODI innings allocation | 300 legal balls unless all out or chase completes first |
-| ODI bowler quota | 60 legal balls per bowler; same bowler cannot bowl consecutive overs |
-| ODI field phases | Max 2 outside balls 0-59; max 4 outside 60-239; max 5 outside 240-299 |
-| ODI model phases | `ODI_EARLY`, `ODI_MIDDLE`, `ODI_LATE` at the same legal-ball boundaries |
-| ODI named fields | ODI-only registry adds `long-off`, allowing an actual five-outfielder late-innings field without altering T20 choices |
-| ODI browser exhibition | Implemented through normal production UI; both teams manually controlled |
-| M4 persistence | Retained for T20 and ODI: atomic autosave, resume, checkpoints, leases, manual slots and `.lcxxvi` export/import |
-| Portable archive pins | Import accepts only an explicitly supported T20 or ODI engine/rules/event-chain pin set |
-| Tactical opponent AI | Unavailable; both teams are controlled manually |
+| M0 approved world | Original 160 players, 8 squads and 8 grounds; gameplay data unchanged |
+| M1 scorer | Inherited supported scoring rules; full scoring regression retained |
+| T20 engine | `LC_T20_MATCH_V1`; inherited 100-match replay/resimulation corpus passes |
+| ODI engine | `LC_ODI_MATCH_V1`; inherited 50-over browser and unit regressions pass |
+| Red-ball engine | `LC_RED5_MATCH_V1`; up to four innings with deterministic event stream and replay |
+| Red-ball rules | `LC_RED5_01`: two innings per team, no fixed innings ball allocation, no bowler quota/circle restriction, no free hit |
+| Match clock | Five days, 11:00 start, lunch 13:00-13:40, tea 15:40-16:00, scheduled close 18:00 |
+| Day 1-4 extension | May continue to 18:30 while pursuing 90 legal overs; no carry of unbowled overs |
+| Final hour | Day 5 from 17:00; scheduled time and legal-ball obligation must both be satisfied |
+| Lost time | Deterministic red-ball rain-delay rules event implemented; final-hour obligation reduction tested |
+| Declarations | Available between deliveries |
+| Follow-on | Optional at a 200-run first-innings lead; explicit `A,B,B,A` order supported |
+| New ball | Available after 480 legal balls; resets ball age without resetting innings overs |
+| Red-ball result arbitration | Innings victories, fourth-innings target, completed tie and time-expiry draw implemented |
+| Browser exhibition | T20, ODI and five-day red-ball available through normal production UI; both teams manually controlled |
+| M4 persistence | Atomic autosave, resume, checkpoints, writer leases, manual slots and `.lcxxvi` export/import retained for all three formats |
+| Portable archive pins | Explicit T20, ODI and RED5 engine/rules/event-chain allow-list |
+| Automatic stochastic weather schedule | Not enabled in M5B; rules-side lost-time handling is implemented |
 | Limited-overs rain / DLS | Disabled; no target is invented or approximated |
-| Red-ball M5B | Deferred |
-| M6 league/training | Deferred |
-| M7 tactical AI/calibration | Deferred; `SYNTHETIC_ALPHA` |
+| Tactical opponent AI | Unavailable; both teams are controlled manually |
+| M5 other formats | **Complete for the bounded V0.1 T20, ODI and five-day red-ball exhibition profiles** |
+| M6 league/training | Next stage; deferred in this pass |
+| M7 tactical AI/calibration | Deferred; model status remains `SYNTHETIC_ALPHA` |
 | Certified ICC rules / empirical realism | Unclaimed |
 | Formal M3 human acceptance | Still pending as a separate acceptance record |

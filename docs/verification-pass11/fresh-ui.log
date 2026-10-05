@@ -1,0 +1,23 @@
+
+> lord-cricket-xxvi@0.1.0 test:ui
+> playwright test --config playwright.ui.config.ts
+
+
+Running 6 tests using 1 worker
+
+chromium keyboard step [33m0[39m AWAITING_INNINGS
+chromium keyboard step [33m10[39m READY
+chromium keyboard step [33m20[39m READY
+chromium keyboard step [33m30[39m READY
+chromium keyboard step [33m40[39m READY
+chromium keyboard step [33m50[39m READY
+chromium keyboard step [33m60[39m READY
+chromium keyboard step [33m70[39m READY
+chromium keyboard step [33m80[39m AWAITING_BOWLER
+chromium keyboard step [33m90[39m AWAITING_BOWLER
+chromium keyboard step [33m100[39m AWAITING_BOWLER
+  ✓  1 [chromium] › tests/ui/match.spec.ts:56:1 › a full keyboard-only human-command match, replay identity and terminal controls (23.3s)
+  ✓  2 [chromium] › tests/ui/match.spec.ts:150:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (1.8s)
+  ✓  3 [chromium] › tests/ui/match.spec.ts:210:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (1.8s)
+firefox keyboard step [33m0[39m AWAITING_INNINGS
+firefox keyboard step [33m10[39m READY

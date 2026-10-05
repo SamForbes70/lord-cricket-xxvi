@@ -59,3 +59,12 @@ export const ODIMatchSetupRequestSchema = z.strictObject({
 });
 export type ODIMatchSetupRequest = z.infer<typeof ODIMatchSetupRequestSchema>;
 
+
+/** Pass 11 / M5B red-ball setup boundary. */
+export const Red5MatchSetupRequestSchema = z.strictObject({
+  setup: MatchSetupManifestSchema,
+  worldFileSha256: HashSchema, worldCanonicalSha256: HashSchema, rulesHash: HashSchema, modelHash: HashSchema, stagePackHash: HashSchema,
+  setupVersion: z.literal("LC_RED5_SETUP_V1"),
+  selectedTeams: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
+});
+export type Red5MatchSetupRequest = z.infer<typeof Red5MatchSetupRequestSchema>;

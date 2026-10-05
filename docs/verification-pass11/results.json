@@ -1,0 +1,36 @@
+{
+  "pass": "PASS_11_M5B",
+  "status": "PASS",
+  "baselineCommit": "0d0f184a18db9a848790a9063c60eb70db4cda76",
+  "rulesId": "LC_RED5_01",
+  "engineVersion": "LC_RED5_MATCH_V1",
+  "eventChainVersion": "LC_RED5_EVENT_CHAIN_V1",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "gates": {
+    "schemas": {"status":"PASS","count":114},
+    "build": {"status":"PASS"},
+    "typecheck": {"status":"PASS"},
+    "lintAndBoundaries": {"status":"PASS"},
+    "scoringRegression": {"status":"PASS","matchedDeliveries":45,"matchedLedgers":45,"rejections":29},
+    "determinismVectors": {"status":"PASS","randomAddress":24,"stateHash":8},
+    "probabilityVectors": {"status":"PASS","massDraw":15,"boundaries":4},
+    "generatorVectors": {"status":"PASS","count":9},
+    "redBallAppendixDFixtures": {"status":"PASS","terminal":4,"clock":5,"total":9},
+    "redBallRules": {"status":"PASS","tests":19},
+    "unitSuite": {"status":"PASS","tests":444,"files":16},
+    "m5bChromium": {"status":"PASS","tests":1},
+    "m5bFirefox": {"status":"PASS","tests":1,"note":"Fresh first launch was blocked by root/HOME ownership; rerun with HOME=/root passed."},
+    "inheritedM4Chromium": {"status":"PASS","tests":6},
+    "inheritedOdiChromium": {"status":"PASS","tests":1},
+    "inheritedT20UiChromium": {"status":"PASS","tests":3},
+    "inheritedT20UiFirefox": {"status":"PASS","tests":3},
+    "t20ReplayCorpus": {"status":"PASS","matches":100,"replayPassed":100,"resimulationPassed":100,"acceptedOracleComparison":"100/100 MATCH","deterministicRecordsSha256":"efd294a26f7b85ed04a409ee72dffb4329821b24f9c804b5a7efea67406cc813","totalAttempts":22051}
+  },
+  "scope": {
+    "m5": "COMPLETE_FOR_BOUNDED_V0_1_FORMATS",
+    "m3HumanAcceptance": "PENDING",
+    "limitedOversDls": "DISABLED",
+    "automaticStochasticRedBallWeather": "DISABLED",
+    "nextPass": "Pass 12 / M6 management season loop"
+  }
+}

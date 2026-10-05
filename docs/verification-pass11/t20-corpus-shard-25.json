@@ -1,0 +1,952 @@
+[
+  {
+    "caseId": "T20-R026",
+    "seed": "lcxxvi-p07-t20-0026",
+    "teamIds": [
+      "team-02",
+      "team-06"
+    ],
+    "groundId": "ground-04",
+    "eventCount": 332,
+    "attempts": 231,
+    "eventsSha256": "d09e48888aeb1c062e62dc7020e619549fc1582091dabf0faa202d6afe40b187",
+    "scorecardSha256": "008be9fab3caa3b336060b2f9df0fa3bd1860f61e6829412e9dc88f25a807f67",
+    "finalEventHash": "d4d3c93a9c09c44cb932834aa38d9dc6d84db887c2a9265bece53bb947f600ab",
+    "finalStateHash": "e271989ccb0d5da7dd37377d37f437d6ffad002ad4dc0654576f8a483a03a411",
+    "scores": [
+      [
+        77,
+        9,
+        120
+      ],
+      [
+        78,
+        6,
+        107
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-02",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 4,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 1078
+  },
+  {
+    "caseId": "T20-R027",
+    "seed": "lcxxvi-p07-t20-0027",
+    "teamIds": [
+      "team-03",
+      "team-07"
+    ],
+    "groundId": "ground-07",
+    "eventCount": 321,
+    "attempts": 220,
+    "eventsSha256": "450c07a0376038b56a64dca953aaeaeacb947990c63a69f577a2fd73e368abb4",
+    "scorecardSha256": "6c2634f637255677735cee1bb4a15c50e6cdc2a880e9ce8874a3abd1824d08d4",
+    "finalEventHash": "6aa5a6763edeb173d24eed37b2273a7a51e2b7177df716c380b0a59c35eec78a",
+    "finalStateHash": "98fb568176201bb8a8091d6000c46c542b062f3713228d1b6d38010d33370443",
+    "scores": [
+      [
+        73,
+        9,
+        120
+      ],
+      [
+        79,
+        8,
+        99
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-07",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 2,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 847
+  },
+  {
+    "caseId": "T20-R028",
+    "seed": "lcxxvi-p07-t20-0028",
+    "teamIds": [
+      "team-04",
+      "team-08"
+    ],
+    "groundId": "ground-02",
+    "eventCount": 300,
+    "attempts": 206,
+    "eventsSha256": "7fb794053760cb5052532158f59632c9b54763db316dfe1b0930d8d81c93045c",
+    "scorecardSha256": "aa7e5c574155d02f5ad729ddce46cbeab1db87f6f9e4705b98b20c453dc5e57f",
+    "finalEventHash": "5bcd15a3f3bd6d7edb49df216adc300309a652cc952e4955ead2e6a8b733c9f6",
+    "finalStateHash": "f8eaa0512982443e946adfdb3be9c4fa1a2d5121177555ca6fcdeeebc2b385e1",
+    "scores": [
+      [
+        63,
+        8,
+        120
+      ],
+      [
+        66,
+        6,
+        85
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-08",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 4,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 724
+  },
+  {
+    "caseId": "T20-R029",
+    "seed": "lcxxvi-p07-t20-0029",
+    "teamIds": [
+      "team-05",
+      "team-01"
+    ],
+    "groundId": "ground-05",
+    "eventCount": 328,
+    "attempts": 224,
+    "eventsSha256": "91a8217bb48176ab9b6e1be520437fbda52043aee967e1c80c53f62c5df62638",
+    "scorecardSha256": "87c01bb89d8be228a617eeeb0cfd8918008d63413a412f179db6e806dfe7fdcf",
+    "finalEventHash": "1ff4a1c1c382e09cfb51a2b7d050d82f626e21073a0c39c745b1885a504aab94",
+    "finalStateHash": "3d829b08ffc35eefbbe0d28d9df120eb54a740957ed2146246da261d54ce0d7c",
+    "scores": [
+      [
+        113,
+        9,
+        120
+      ],
+      [
+        86,
+        10,
+        103
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-05",
+      "marginType": "RUNS",
+      "marginRuns": 27,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 797
+  },
+  {
+    "caseId": "T20-R030",
+    "seed": "lcxxvi-p07-t20-0030",
+    "teamIds": [
+      "team-06",
+      "team-02"
+    ],
+    "groundId": "ground-08",
+    "eventCount": 348,
+    "attempts": 240,
+    "eventsSha256": "c36214286890e0086378334b6fc178548e6c94384381a2c536b38b4a85a7e541",
+    "scorecardSha256": "c9be539960277d348dffe90a3d9601f0be803ec1d9f5acb40daa39e9d18a36ec",
+    "finalEventHash": "fca9dc983baac16877b95e00115caeab30e6d40230faaccda404d7b85639f97e",
+    "finalStateHash": "74a8ec0b1aaa5548642622b3c1af464419e31b1dc196029baee4cd5a20d9ec1e",
+    "scores": [
+      [
+        77,
+        9,
+        120
+      ],
+      [
+        60,
+        10,
+        115
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-06",
+      "marginType": "RUNS",
+      "marginRuns": 17,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 848
+  },
+  {
+    "caseId": "T20-R031",
+    "seed": "lcxxvi-p07-t20-0031",
+    "teamIds": [
+      "team-07",
+      "team-03"
+    ],
+    "groundId": "ground-03",
+    "eventCount": 269,
+    "attempts": 184,
+    "eventsSha256": "02a3521374445d597d2d2c6e8bf5166b45a760b9c35fa51807abfcf8932b5acf",
+    "scorecardSha256": "f7f677c710dc38008ba839ee5393923cf656c8de7d38593cc68bc0b9b7d1fdb8",
+    "finalEventHash": "2b4877fd317474933d886ec8c6a813d5d538a8c499c6c862904a43e1912b3782",
+    "finalStateHash": "2d926c9399ed7e3bee1c9c263d800068baf8c349c412b98bab76ad782724058c",
+    "scores": [
+      [
+        61,
+        10,
+        96
+      ],
+      [
+        62,
+        5,
+        84
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-03",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 5,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 643
+  },
+  {
+    "caseId": "T20-R032",
+    "seed": "lcxxvi-p07-t20-0032",
+    "teamIds": [
+      "team-08",
+      "team-04"
+    ],
+    "groundId": "ground-06",
+    "eventCount": 343,
+    "attempts": 237,
+    "eventsSha256": "aac38a4ebc1d5207f28c38ba0def6b0291f2277ca94723bd632fd9255773a005",
+    "scorecardSha256": "366bd190cf4887bbdd72ebc92cc0a59726ab050ed07f8716552cad09d3ce666f",
+    "finalEventHash": "0a4a6b7b803c930f5a0cfd0eaf06eb3742da6197e5668f557f1b6f55dc6c1882",
+    "finalStateHash": "59a2b2b1418457c07143b6eeaa220d0afe29081decde3e4de3866a75c0f25121",
+    "scores": [
+      [
+        74,
+        9,
+        120
+      ],
+      [
+        75,
+        8,
+        114
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-08",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 2,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 825
+  },
+  {
+    "caseId": "T20-R033",
+    "seed": "lcxxvi-p07-t20-0033",
+    "teamIds": [
+      "team-01",
+      "team-06"
+    ],
+    "groundId": "ground-01",
+    "eventCount": 341,
+    "attempts": 238,
+    "eventsSha256": "5db5a1cff62a8626c2e60991616c7562b24465494bf243062451c6938621fa2a",
+    "scorecardSha256": "970bf3cdcc747c26479044c903c6e8520f806fbb31d1a62b73a95e7ffeccb743",
+    "finalEventHash": "ac90a079a1d840b8a3d09812613f64f1d2cfc64d30758a2b41ce6169084f5790",
+    "finalStateHash": "9b81113f40a0b8bc42a434b4c52c78dbc78cda83be697e9d9d8aa0d60717c4d0",
+    "scores": [
+      [
+        101,
+        10,
+        114
+      ],
+      [
+        62,
+        5,
+        120
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-06",
+      "marginType": "RUNS",
+      "marginRuns": 39,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 799
+  },
+  {
+    "caseId": "T20-R034",
+    "seed": "lcxxvi-p07-t20-0034",
+    "teamIds": [
+      "team-02",
+      "team-07"
+    ],
+    "groundId": "ground-04",
+    "eventCount": 315,
+    "attempts": 219,
+    "eventsSha256": "b2063b5f9be19285eafbb843ed28facd6deb9b492367abc3bf9b59a97dbaa552",
+    "scorecardSha256": "41b55c78ab08d1a9a5d8fc0d848a0a88054312daf59f448b8244b961ee2bbfca",
+    "finalEventHash": "ca09789b97b69331ba798728e7e0fd86afbd520c0e5441fd03cba5cf6955080f",
+    "finalStateHash": "9654b0a772be7a10988084c39610ecd7982319e4d4256baa7e42bf701d761e74",
+    "scores": [
+      [
+        83,
+        9,
+        120
+      ],
+      [
+        84,
+        3,
+        97
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-02",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 7,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 728
+  },
+  {
+    "caseId": "T20-R035",
+    "seed": "lcxxvi-p07-t20-0035",
+    "teamIds": [
+      "team-03",
+      "team-08"
+    ],
+    "groundId": "ground-07",
+    "eventCount": 309,
+    "attempts": 211,
+    "eventsSha256": "5cb6697b0eede79793e6ecd4b64826a8265129b31363b1b285e83ebaf48ef791",
+    "scorecardSha256": "502f54f0a4b5117bb839e5942a25b3ea1ae341a8abf9d1edbc748bed31c8a441",
+    "finalEventHash": "941e3c2020770af53d29f8be218ef8c82af7ca35e787b0bf1262b829afc5c1f6",
+    "finalStateHash": "a784dd1a7704831f92512f74643d715cd7c7bf01c8f55ef550ddf1235759c45d",
+    "scores": [
+      [
+        77,
+        10,
+        94
+      ],
+      [
+        51,
+        10,
+        114
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-03",
+      "marginType": "RUNS",
+      "marginRuns": 26,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 795
+  },
+  {
+    "caseId": "T20-R036",
+    "seed": "lcxxvi-p07-t20-0036",
+    "teamIds": [
+      "team-04",
+      "team-01"
+    ],
+    "groundId": "ground-02",
+    "eventCount": 317,
+    "attempts": 220,
+    "eventsSha256": "0b7c236337cb123021abfbddcd97f6204ba5321f4d3f6b35526868baa9727315",
+    "scorecardSha256": "9f8c68ced83a27f6f32e5409468fd852a59073da4e8821f30f4f77c5dfd8aa08",
+    "finalEventHash": "ca20404d7c1fff5e882821e1a3feb97030c331f97447d2ece29493451706f0d6",
+    "finalStateHash": "f793fb0f736d42145b50c3401f50fd86b0aafb99983f4f9957a0b2cccc8743ac",
+    "scores": [
+      [
+        95,
+        10,
+        106
+      ],
+      [
+        96,
+        7,
+        106
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-01",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 3,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 803
+  },
+  {
+    "caseId": "T20-R037",
+    "seed": "lcxxvi-p07-t20-0037",
+    "teamIds": [
+      "team-05",
+      "team-02"
+    ],
+    "groundId": "ground-05",
+    "eventCount": 324,
+    "attempts": 223,
+    "eventsSha256": "3ec2068d3c1e6e0ffd5644a1aaf1e59eb2973300481c1c33426cf1de57d0facd",
+    "scorecardSha256": "6b1b51f62e541dcc97a959534cdc7d4224a534341290c8bbae666d9c5069684a",
+    "finalEventHash": "a9fe00ed3d2e366dc4e369a71d956dd506a3977e6812d01f77b8eef80e73ed09",
+    "finalStateHash": "d6cea3c00c6e20837f8a526f66beed0fac9124fc3cdccc4d91b5d84ff77c4a90",
+    "scores": [
+      [
+        89,
+        10,
+        119
+      ],
+      [
+        75,
+        10,
+        101
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-02",
+      "marginType": "RUNS",
+      "marginRuns": 14,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 776
+  },
+  {
+    "caseId": "T20-R038",
+    "seed": "lcxxvi-p07-t20-0038",
+    "teamIds": [
+      "team-06",
+      "team-03"
+    ],
+    "groundId": "ground-08",
+    "eventCount": 297,
+    "attempts": 209,
+    "eventsSha256": "c747808d8d7366810ff2b7e77a90bd8c485b59b7d6ff24255ca82ef18d8ac7c8",
+    "scorecardSha256": "804e8ccf726302f3bd949439ce5fb03e6b0e800c0c23c83fb66934fb9fde421c",
+    "finalEventHash": "43fc5fa1cbebed7c431a13ae05591ec8545ae99b84f77e8b1662056add3d63c7",
+    "finalStateHash": "1cdbc376b94cd8c83ebb71c12ec15cdd3073dcd5baf5ce24c391aa2f09665eeb",
+    "scores": [
+      [
+        75,
+        5,
+        120
+      ],
+      [
+        76,
+        3,
+        87
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-06",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 7,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 748
+  },
+  {
+    "caseId": "T20-R039",
+    "seed": "lcxxvi-p07-t20-0039",
+    "teamIds": [
+      "team-07",
+      "team-04"
+    ],
+    "groundId": "ground-03",
+    "eventCount": 306,
+    "attempts": 211,
+    "eventsSha256": "36507f4c1ab02c6735630b38359d905de6e592446b1c91a3c2730c994a7fd95b",
+    "scorecardSha256": "17c72a203d862384e55e9de32428e75c9af78391b23da0d89fe86361619df340",
+    "finalEventHash": "cc6a0616687e96a89f8966c2bdfb167e5eb79fcbcc87feae1f54fccf2b580a46",
+    "finalStateHash": "ddd25863461f73d018d586648a95f65d66710e4cda214d295c2631868568b5b8",
+    "scores": [
+      [
+        74,
+        10,
+        103
+      ],
+      [
+        76,
+        6,
+        102
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-04",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 4,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 783
+  },
+  {
+    "caseId": "T20-R040",
+    "seed": "lcxxvi-p07-t20-0040",
+    "teamIds": [
+      "team-08",
+      "team-05"
+    ],
+    "groundId": "ground-06",
+    "eventCount": 331,
+    "attempts": 231,
+    "eventsSha256": "d54678fe2c1c27cd3e4fd2ae4a6da586c6ca6020106f5606d35357c84fe08b86",
+    "scorecardSha256": "dc8df2a742f7fd0a06aa8dde035fde4bb9b7c8b02808dea3f03f6f4223b0fcae",
+    "finalEventHash": "b86da77f081edb66234feabc85fc3e14d6eaa9b5b8b1f51ec2bf187e727070e8",
+    "finalStateHash": "bd912c483f9775087cc9b81ec6edcbd091f17f563c3433f46f6b23464edb3e58",
+    "scores": [
+      [
+        90,
+        7,
+        120
+      ],
+      [
+        93,
+        7,
+        107
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-05",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 3,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 812
+  },
+  {
+    "caseId": "T20-R041",
+    "seed": "lcxxvi-p07-t20-0041",
+    "teamIds": [
+      "team-01",
+      "team-07"
+    ],
+    "groundId": "ground-01",
+    "eventCount": 320,
+    "attempts": 218,
+    "eventsSha256": "db2d96d0db5969f88d5369864a9c520038822b691c2e561142b10ee0f5aa505a",
+    "scorecardSha256": "abb2da6efb3ea7b04869fbdb548585af9f561ba62f09fb0b80b4ce12f98bccdc",
+    "finalEventHash": "05695994da8b39dc3061a07609b7d407c48c4f13174c1f6be633124ce06dd053",
+    "finalStateHash": "a1bd27fb607d90921a6af8dd1f6794fa20913e1edeed4d361102f0f731e649db",
+    "scores": [
+      [
+        69,
+        10,
+        120
+      ],
+      [
+        54,
+        10,
+        97
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-07",
+      "marginType": "RUNS",
+      "marginRuns": 15,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 762
+  },
+  {
+    "caseId": "T20-R042",
+    "seed": "lcxxvi-p07-t20-0042",
+    "teamIds": [
+      "team-02",
+      "team-08"
+    ],
+    "groundId": "ground-04",
+    "eventCount": 315,
+    "attempts": 222,
+    "eventsSha256": "ea06b26fd4a7136f2d942f1635930b59a3d920619135b3e3bce4064fd7aaf173",
+    "scorecardSha256": "18ed3668638338ce966b93b737c336cb0fc8572938b2b3c97050d544473421ea",
+    "finalEventHash": "83611f64b45ae3e6a061bf242596cfaa000592d20c3b1eeb4bc6dc855d336fd6",
+    "finalStateHash": "84258d709cd5dbe5ebea2e73526090a1dc22e8c4068424d6e21a84b25afdc028",
+    "scores": [
+      [
+        72,
+        8,
+        120
+      ],
+      [
+        73,
+        3,
+        95
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-02",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 7,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 742
+  },
+  {
+    "caseId": "T20-R043",
+    "seed": "lcxxvi-p07-t20-0043",
+    "teamIds": [
+      "team-03",
+      "team-01"
+    ],
+    "groundId": "ground-07",
+    "eventCount": 241,
+    "attempts": 161,
+    "eventsSha256": "1b2cff77cb6261e2d33eca0bf5df115a5fe3239a4820d01d3fe58d2e9b76258b",
+    "scorecardSha256": "02549198be1a4715fe4b136fe48d136c2846756885b4e91db0e33ff38b197c15",
+    "finalEventHash": "efb450db9b11c1e6a92c6ec19d8b431b9ea6cdedb114a6961f51fdf24df7f355",
+    "finalStateHash": "b065eb7660d2938edef36e38eb32a66f8080d464873ca228c068bb4a31396060",
+    "scores": [
+      [
+        58,
+        10,
+        71
+      ],
+      [
+        59,
+        8,
+        88
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-03",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 2,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 586
+  },
+  {
+    "caseId": "T20-R044",
+    "seed": "lcxxvi-p07-t20-0044",
+    "teamIds": [
+      "team-04",
+      "team-02"
+    ],
+    "groundId": "ground-02",
+    "eventCount": 283,
+    "attempts": 192,
+    "eventsSha256": "6f2324cfec534a06cf17f65b3fecac457185e7b89b08e8237df3a2a255f9befa",
+    "scorecardSha256": "800e631a6874b915388628726a4152eadf74ab1dbcdef55a2c6aa4f2ead82178",
+    "finalEventHash": "3c618fb40fc0b7e46ba17169ae760c1327291fa93c289aa330e124210e0852b9",
+    "finalStateHash": "20f4cdd2953d3f74f85834da8eb49576b3444a3bafebf8a44341f0a0165d2705",
+    "scores": [
+      [
+        92,
+        8,
+        120
+      ],
+      [
+        61,
+        10,
+        68
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-02",
+      "marginType": "RUNS",
+      "marginRuns": 31,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 680
+  },
+  {
+    "caseId": "T20-R045",
+    "seed": "lcxxvi-p07-t20-0045",
+    "teamIds": [
+      "team-05",
+      "team-03"
+    ],
+    "groundId": "ground-05",
+    "eventCount": 267,
+    "attempts": 178,
+    "eventsSha256": "eeb84faa0cb8a7f918b4cd72d2dcfdd301d2a7e8a40ddc699d5f73e41ed4aa70",
+    "scorecardSha256": "2e35658b27b7a22a41642d3d2681b6543fceb4dfb7b4e8e69c3de01e32b93976",
+    "finalEventHash": "97fa29480177c57906c64e139f74b026a51af8c6c684b12f2ee6f0eb68d8e99d",
+    "finalStateHash": "f5a77ae32c1523fc8637847be1220885e7a9cf2f9d1a473fe09a8e04e42b66df",
+    "scores": [
+      [
+        77,
+        10,
+        109
+      ],
+      [
+        48,
+        10,
+        68
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-03",
+      "marginType": "RUNS",
+      "marginRuns": 29,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 653
+  },
+  {
+    "caseId": "T20-R046",
+    "seed": "lcxxvi-p07-t20-0046",
+    "teamIds": [
+      "team-06",
+      "team-04"
+    ],
+    "groundId": "ground-08",
+    "eventCount": 308,
+    "attempts": 210,
+    "eventsSha256": "e2df74aac6ea85a2950edd3687be84a4559da18cf6f14fcb6105029a4330258a",
+    "scorecardSha256": "e60d6cfae2d8d5f29bc1c2246b647794f66dfc3b9547b5986349977b55cddc06",
+    "finalEventHash": "26885a20d1c80baaf50f3c908b52477917c63ed8a8279c931bd4a1c448059899",
+    "finalStateHash": "8d6f1a8ff8b66ac01ad776d211ee524bcd829787e653291c62c49cfc19d66cbe",
+    "scores": [
+      [
+        62,
+        9,
+        120
+      ],
+      [
+        58,
+        10,
+        88
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-04",
+      "marginType": "RUNS",
+      "marginRuns": 4,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 748
+  },
+  {
+    "caseId": "T20-R047",
+    "seed": "lcxxvi-p07-t20-0047",
+    "teamIds": [
+      "team-07",
+      "team-05"
+    ],
+    "groundId": "ground-03",
+    "eventCount": 356,
+    "attempts": 248,
+    "eventsSha256": "e2c34d8652a39d92b3314f89c03f2c53ce4081be0c3cbd74ac5d70586c77804d",
+    "scorecardSha256": "2c3f95c691fcc908802e9c18aa41523b4763a97ced6c99dfae737b805fdf2ebe",
+    "finalEventHash": "90d7ee81a7ff0d2d61f78e3b0e552c0fa6d91d0b7697edd09888ec6a0db9c315",
+    "finalStateHash": "ed24c8f2fbb9567933927d56322b06fce2857e4f1311d2a436aca2cf8eee0e33",
+    "scores": [
+      [
+        88,
+        9,
+        120
+      ],
+      [
+        92,
+        8,
+        120
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-07",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 2,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 852
+  },
+  {
+    "caseId": "T20-R048",
+    "seed": "lcxxvi-p07-t20-0048",
+    "teamIds": [
+      "team-08",
+      "team-06"
+    ],
+    "groundId": "ground-06",
+    "eventCount": 348,
+    "attempts": 244,
+    "eventsSha256": "64aeab214d767203602a4aee4ae4787c9175d8c7e068798063db7f31c48edacd",
+    "scorecardSha256": "b71fdb6b47f268bf1e6754b2069dbdd4f37d4fb324e91038b6d583e6269ac137",
+    "finalEventHash": "595b077b0983fa85d524a905afa0f583fc89d399bd4e9183eb227be9219ad670",
+    "finalStateHash": "8deb163f83761fe3bc2e6814ede9b327e8d5b43d470301859914c6584dc0411a",
+    "scores": [
+      [
+        93,
+        7,
+        120
+      ],
+      [
+        85,
+        6,
+        120
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-06",
+      "marginType": "RUNS",
+      "marginRuns": 8,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 835
+  },
+  {
+    "caseId": "T20-R049",
+    "seed": "lcxxvi-p07-t20-0049",
+    "teamIds": [
+      "team-01",
+      "team-08"
+    ],
+    "groundId": "ground-01",
+    "eventCount": 302,
+    "attempts": 211,
+    "eventsSha256": "ec8203074cdf6b780136378f3a8d59ce22c7dbe135034a210faa4e28b19ac4b4",
+    "scorecardSha256": "eeabb83267da9b4d1aa9f2ebe4ff69a1bcc207d840467a5fc551de36c92b9712",
+    "finalEventHash": "8dd714d2db0cab5644d113b0894cb8f01732c7206c79f76416dd0711642095de",
+    "finalStateHash": "c30512cae9132a7516a27d810ab4264f9bff9b3ded4df95127ac38e1cd630dd7",
+    "scores": [
+      [
+        101,
+        2,
+        120
+      ],
+      [
+        66,
+        10,
+        87
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-08",
+      "marginType": "RUNS",
+      "marginRuns": 35,
+      "marginWickets": null,
+      "completionReason": "CHASE_COMPLETE_SHORT"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 687
+  },
+  {
+    "caseId": "T20-R050",
+    "seed": "lcxxvi-p07-t20-0050",
+    "teamIds": [
+      "team-02",
+      "team-01"
+    ],
+    "groundId": "ground-04",
+    "eventCount": 316,
+    "attempts": 221,
+    "eventsSha256": "6810548ceb371446becb4b1435588aaeb4dce9ba08453b80390881f205aa33ff",
+    "scorecardSha256": "ef6680e2253dd84abf4fb2468f88f7eb30cfdc905d310b97f7d12d6faf91e9fe",
+    "finalEventHash": "3cf74f574db8ba3bc5a7d3c5285d68cd0eb2c350e5618d1f45f1cd263792f7e4",
+    "finalStateHash": "dfdfb464652d9de1993537a221772be8dd0a8f54bae8364668be51b02efe84c2",
+    "scores": [
+      [
+        57,
+        6,
+        120
+      ],
+      [
+        58,
+        5,
+        97
+      ]
+    ],
+    "result": {
+      "kind": "WIN",
+      "winnerTeamId": "team-01",
+      "marginType": "WICKETS",
+      "marginRuns": null,
+      "marginWickets": 5,
+      "completionReason": "TARGET_REACHED"
+    },
+    "replay": true,
+    "resimulation": true,
+    "elapsedMs": 726
+  }
+]

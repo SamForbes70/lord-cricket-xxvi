@@ -2,10 +2,13 @@ import { z } from "zod";
 import type { SaveSummary } from "@lcxxvi/persistence";
 import {
   T20CommandSchema,
+  Red5CommandSchema,
   T20TeamSelectionSchema,
   type T20Command,
   type T20Scorecard,
   type ODIScorecard,
+  type Red5Scorecard,
+  type Red5Command,
   type InningsLedger,
   type BowlingPlan,
 } from "@lcxxvi/contracts";
@@ -29,6 +32,19 @@ export const ODI_PINS = Object.freeze({
   rulesHash: "81f8ec39a793e3761dac2d477a7fc7d4981df2e69b262e88160cb93141c28ee5",
   modelHash: PINS.modelHash,
   stagePackHash: PINS.stagePackHash,
+});
+
+
+export const RED5_PINS = Object.freeze({
+  engine: "LC_RED5_MATCH_V1",
+  eventChain: "LC_RED5_EVENT_CHAIN_V1",
+  worldHash: PINS.worldHash,
+  rulesHash: "819b388b1947f71c6228b21680687472760bfcf4a872f0f41cc9508e65928800",
+  modelHash: PINS.modelHash,
+  stagePackHash: PINS.stagePackHash,
+});
+export const RED5_ARCHIVE_PINS = Object.freeze({
+  engine: RED5_PINS.engine,eventChain:RED5_PINS.eventChain,random:"SHA256_COUNTER_V1",model:"synthetic-alpha-01",modelHash:RED5_PINS.modelHash,rules:"LC_RED5_01",rulesHash:RED5_PINS.rulesHash,worldHash:RED5_PINS.worldHash,
 });
 
 export const ARCHIVE_PINS = Object.freeze({
@@ -61,7 +77,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({
     ...base,
     type: z.literal("START"),
-    format: z.enum(["T20", "ODI"]).default("T20"),
+    format: z.enum(["T20", "ODI", "RED_BALL"]).default("T20"),
     selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
     groundId: z.string().min(1),
   }),
@@ -69,7 +85,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
     ...base,
     type: z.literal("COMMAND"),
     origin: z.literal("HUMAN"),
-    command: T20CommandSchema,
+    command: z.union([T20CommandSchema, Red5CommandSchema]),
   }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
   z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
@@ -101,8 +117,8 @@ export const RequestSchema = z.discriminatedUnion("type", [
 ]);
 export type Request = z.infer<typeof RequestSchema>;
 export type Selection = z.infer<typeof T20TeamSelectionSchema>;
-export type Action = T20Command extends infer C
-  ? C extends T20Command
+export type Action = (T20Command | Red5Command) extends infer C
+  ? C extends T20Command | Red5Command
     ? Pick<C, "kind" | "payload">
     : never
   : never;
@@ -124,7 +140,7 @@ export type Catalog = {
 };
 export type Candidate = { id: string; name: string; reason: string };
 export type View = {
-  format: "T20" | "ODI";
+  format: "T20" | "ODI" | "RED_BALL";
   revision: number;
   phase: string;
   nextDecision: string;
@@ -150,10 +166,11 @@ export type View = {
   positions: string[];
   advanceReason: string;
   commentary: { sequence: number; text: string; short: string }[];
-  scorecard: T20Scorecard | ODIScorecard | null;
+  scorecard: T20Scorecard | ODIScorecard | Red5Scorecard | null;
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;
+  redBall?: { day:number; localSeconds:number; finalHourActive:boolean; finalHourBallsRemaining:number; followOnEnforced:boolean; newBallAvailable:boolean; declared:boolean[] } | null;
 };
 export type Verification = {
   revision: number;

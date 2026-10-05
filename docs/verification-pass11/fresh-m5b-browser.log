@@ -1,0 +1,42 @@
+
+> lord-cricket-xxvi@0.1.0 test:m5b
+> playwright test --config playwright.m5b.config.ts
+
+
+Running 2 tests using 1 worker
+
+  ✓  1 [chromium-m5b] › tests/m5/red5-ui.spec.ts:21:1 › red-ball exhibition exposes the five-day clock, declarations and durable resume (2.6s)
+  ✘  2 [firefox-m5b] › tests/m5/red5-ui.spec.ts:21:1 › red-ball exhibition exposes the five-day clock, declarations and durable resume (3ms)
+
+
+  1) [firefox-m5b] › tests/m5/red5-ui.spec.ts:21:1 › red-ball exhibition exposes the five-day clock, declarations and durable resume 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    ╔══════════════════════════════════════════════════════════════════════════════════╗
+    ║ Firefox is unable to launch if the $HOME folder isn't owned by the current user. ║
+    ║ Workaround: Set the HOME=/root environment variable when running Playwright.     ║
+    ╚══════════════════════════════════════════════════════════════════════════════════╝
+    Call log:
+    [2m  - <launching> /mnt/data/lcxxvi-pass11/pw-browsers/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-OGSkX2 -juggler-pipe -silent[22m
+    [2m  - <launched> pid=14442[22m
+    [2m  - [pid=14442][err] Running Nightly as root in a regular user's session is not supported.  ($HOME is /home/oai which is owned by oai.)[22m
+    [2m  - [pid=14442] <process did exit: exitCode=1, signal=null>[22m
+    [2m  - [pid=14442] starting temporary directories cleanup[22m
+    [2m  - [pid=14442] <gracefully close start>[22m
+    [2m  - [pid=14442] finished temporary directories cleanup[22m
+    [2m  - [pid=14442] <gracefully close end>[22m
+
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m5b/red5-ui-red-ball-exhibitio-3304a-arations-and-durable-resume-firefox-m5b/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m5b/red5-ui-red-ball-exhibitio-3304a-arations-and-durable-resume-firefox-m5b/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [firefox-m5b] › tests/m5/red5-ui.spec.ts:21:1 › red-ball exhibition exposes the five-day clock, declarations and durable resume 
+  1 passed (4.8s)

@@ -41,7 +41,11 @@
     "verify:09:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm test",
     "odi:rules": "vitest run tests/unit/odi-match.test.ts",
     "test:m5a": "playwright test --config playwright.m5a.config.ts",
-    "verify:10:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run odi:rules && npm test"
+    "verify:10:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run odi:rules && npm test",
+    "red5:rules": "vitest run tests/unit/red5-match.test.ts tests/unit/red5-clock.test.ts",
+    "verify:11:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run red5:fixtures && npm run red5:rules && npm test",
+    "test:m5b": "playwright test --config playwright.m5b.config.ts",
+    "red5:fixtures": "node --import tsx scripts/audit-red5-fixtures.ts"
   },
   "dependencies": {
     "react": "19.1.1",

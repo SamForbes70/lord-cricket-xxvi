@@ -1,0 +1,56 @@
+
+> lord-cricket-xxvi@0.1.0 verify:11:core
+> npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run red5:fixtures && npm run red5:rules && npm test
+
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+114 JSON Schemas verified
+
+> lord-cricket-xxvi@0.1.0 build
+> tsc -b && vite build --config apps/web/vite.config.ts && vite build --config vite.runtime.config.ts
+
+[36mvite v7.1.7 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 117 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                         [39m[1m[2m  0.71 kB[22m[1m[22m[2m │ gzip:  0.41 kB[22m
+[2mdist/[22m[32mengineering.html                   [39m[1m[2m  0.72 kB[22m[1m[22m[2m │ gzip:  0.41 kB[22m
+[2mdist/[22m[2massets/[22m[32mmatch.worker-xBYZCfgE.js    [39m[1m[2m577.44 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[35mengineering-BrDsDFp9.css    [39m[1m[2m  1.37 kB[22m[1m[22m[2m │ gzip:  0.63 kB[22m
+[2mdist/[22m[2massets/[22m[35mmain-B7L_4DI5.css           [39m[1m[2m  7.27 kB[22m[1m[22m[2m │ gzip:  2.35 kB[22m
+[2mdist/[22m[2massets/[22m[36mengineering-em9Hjknt.js     [39m[1m[2m  3.22 kB[22m[1m[22m[2m │ gzip:  1.49 kB[22m
+[2mdist/[22m[2massets/[22m[36mmain-DGjrAb_x.js            [39m[1m[2m 24.61 kB[22m[1m[22m[2m │ gzip:  8.01 kB[22m
+[2mdist/[22m[2massets/[22m[36mred-ball-match-UHfxV3OG.js  [39m[1m[2m270.67 kB[22m[1m[22m[2m │ gzip: 81.42 kB[22m
+[32m✓ built in 1.73s[39m
+[36mvite v7.1.7 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 119 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                             [39m[1m[2m  0.36 kB[22m[1m[22m[2m │ gzip:  0.24 kB[22m
+[2mdist/[22m[2massets/[22m[32mdeterminism.worker-RkeOuiZt.js  [39m[1m[2m136.80 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[32mt20.worker-BDmMn79d.js          [39m[1m[2m523.23 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[36mindex-BVSIeJH0.js               [39m[1m[33m524.87 kB[39m[22m[2m │ gzip: 88.48 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 1.39s[39m
+
+> lord-cricket-xxvi@0.1.0 typecheck
+> tsc -b --pretty false && tsc -p tsconfig.tools.json --noEmit
+
+
+> lord-cricket-xxvi@0.1.0 lint
+> eslint . && node scripts/check-boundaries.mjs
+
+
+/mnt/data/lcxxvi-pass11/repo/scripts/audit-red5-fixtures.ts
+  11:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 1 problem (1 error, 0 warnings)
+

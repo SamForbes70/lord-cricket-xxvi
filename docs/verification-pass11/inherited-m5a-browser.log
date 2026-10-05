@@ -1,0 +1,11 @@
+
+> lord-cricket-xxvi@0.1.0 test:m5a
+> playwright test --config playwright.m5a.config.ts
+
+
+Running 2 tests using 1 worker
+
+  ✓  1 [chromium-m5a] › tests/m5/odi-ui.spec.ts:21:1 › ODI exhibition starts, advances and resumes durably (3.3s)
+  ✓  2 [chromium-m5a] › tests/m5/red5-ui.spec.ts:18:1 › red-ball exhibition exposes the five-day clock, declarations and durable resume (1.9s)
+
+  2 passed (6.3s)

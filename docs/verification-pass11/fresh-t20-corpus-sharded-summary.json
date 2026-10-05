@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "count": 100,
+  "replayPassed": 100,
+  "resimulationPassed": 100,
+  "caseIdsSequential": true,
+  "acceptedOracleComparison": "100/100 MATCH",
+  "deterministicRecordsSha256": "efd294a26f7b85ed04a409ee72dffb4329821b24f9c804b5a7efea67406cc813",
+  "totalAttempts": 22051
+}

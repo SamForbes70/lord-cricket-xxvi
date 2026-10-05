@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "setup": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "gameId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "matchId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "T20",
+            "ODI",
+            "RED_BALL"
+          ]
+        },
+        "worldPackId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "rulesId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "randomId": {
+          "type": "string",
+          "const": "SHA256_COUNTER_V1"
+        },
+        "seed": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "teamIds": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "items": false
+        },
+        "groundId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "limitedOversRain": {
+              "type": "boolean",
+              "const": false
+            },
+            "superOver": {
+              "type": "boolean",
+              "const": false
+            },
+            "injuries": {
+              "type": "boolean",
+              "const": false
+            },
+            "prediction": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "limitedOversRain",
+            "superOver",
+            "injuries",
+            "prediction"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "gameId",
+        "matchId",
+        "format",
+        "worldPackId",
+        "rulesId",
+        "modelId",
+        "randomId",
+        "seed",
+        "teamIds",
+        "groundId",
+        "capabilities"
+      ],
+      "additionalProperties": false
+    },
+    "worldFileSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldCanonicalSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "rulesHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "modelHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "stagePackHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "setupVersion": {
+      "type": "string",
+      "const": "LC_RED5_SETUP_V1"
+    },
+    "selectedTeams": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "playerIds": {
+              "minItems": 11,
+              "maxItems": 11,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              }
+            },
+            "captainId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "keeperId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "required": [
+            "teamId",
+            "playerIds",
+            "captainId",
+            "keeperId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "playerIds": {
+              "minItems": 11,
+              "maxItems": 11,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              }
+            },
+            "captainId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "keeperId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "required": [
+            "teamId",
+            "playerIds",
+            "captainId",
+            "keeperId"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    }
+  },
+  "required": [
+    "setup",
+    "worldFileSha256",
+    "worldCanonicalSha256",
+    "rulesHash",
+    "modelHash",
+    "stagePackHash",
+    "setupVersion",
+    "selectedTeams"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:Red5MatchSetupRequest:1",
+  "title": "Red5MatchSetupRequest"
+}

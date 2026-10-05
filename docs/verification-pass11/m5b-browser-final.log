@@ -1,0 +1,11 @@
+
+> lord-cricket-xxvi@0.1.0 test:m5b
+> playwright test --config playwright.m5b.config.ts
+
+
+Running 2 tests using 1 worker
+
+  ✓  1 [chromium-m5b] › tests/m5/red5-ui.spec.ts:21:1 › red-ball exhibition exposes the five-day clock, declarations and durable resume (2.2s)
+  ✓  2 [firefox-m5b] › tests/m5/red5-ui.spec.ts:21:1 › red-ball exhibition exposes the five-day clock, declarations and durable resume (3.6s)
+
+  2 passed (8.8s)

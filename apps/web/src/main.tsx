@@ -53,11 +53,11 @@ function App() {
   }
   useEffect(() => {
     const ownerKey = "lcxxvi-writer-owner";
-    const navigation = performance.getEntriesByType("navigation")[0] as
-      | PerformanceNavigationTiming
-      | undefined;
-    let owner =
-      navigation?.type === "reload" ? sessionStorage.getItem(ownerKey) : null;
+    // sessionStorage is scoped to the browsing context and survives reloads.
+    // Reading it unconditionally avoids Firefox reporting a reload as a normal
+    // navigation and accidentally rotating the writer identity. A separate tab
+    // gets its own sessionStorage and therefore its own lease owner.
+    let owner = sessionStorage.getItem(ownerKey);
     if (!owner) {
       owner = `tab-${crypto.randomUUID()}`;
       sessionStorage.setItem(ownerKey, owner);
@@ -189,7 +189,7 @@ function App() {
       </a>
       <header className="masthead">
         <div>
-          <p className="eyebrow">THE FICTIONAL TWENTY20 EXHIBITION</p>
+          <p className="eyebrow">THE FICTIONAL CRICKET EXHIBITION</p>
           <h1>
             Lord Cricket <span>XXVI</span>
           </h1>
@@ -296,8 +296,9 @@ function App() {
               </strong>
               {i && (
                 <span className="over">
-                  {overs(i.legalBalls)} / {view.format === "ODI" ? 50 : 20}{" "}
-                  overs
+                  {view.format === "RED_BALL"
+                    ? `${overs(i.legalBalls)} overs`
+                    : `${overs(i.legalBalls)} / ${view.format === "ODI" ? 50 : 20} overs`}
                 </span>
               )}
             </div>
@@ -307,11 +308,9 @@ function App() {
               {i?.targetToWin != null && (
                 <p>
                   {Math.max(0, i.targetToWin - i.runs)} needed ·{" "}
-                  {Math.max(
-                    0,
-                    (view.format === "ODI" ? 300 : 120) - i.legalBalls,
-                  )}{" "}
-                  balls left
+                  {view.format === "RED_BALL"
+                    ? "time remaining"
+                    : `${Math.max(0, (view.format === "ODI" ? 300 : 120) - i.legalBalls)} balls left`}
                 </p>
               )}
               {view.activeIndex === 1 && (
@@ -370,11 +369,13 @@ function App() {
               <span>Match status</span>
               <p>
                 {view.resultText ??
-                  (i?.freeHitPending
-                    ? "Free hit pending"
-                    : i && i.legalBalls < 36
-                      ? "Powerplay: at most 2 outside the circle"
-                      : "Manual control of both teams")}
+                  (view.format === "RED_BALL" && view.redBall
+                    ? `Day ${view.redBall.day} · ${String(Math.floor(view.redBall.localSeconds / 3600)).padStart(2, "0")}:${String(Math.floor((view.redBall.localSeconds % 3600) / 60)).padStart(2, "0")}${view.redBall.finalHourActive ? ` · final hour ${view.redBall.finalHourBallsRemaining} balls` : ""}`
+                    : i?.freeHitPending
+                      ? "Free hit pending"
+                      : i && i.legalBalls < 36
+                        ? "Powerplay: at most 2 outside the circle"
+                        : "Manual control of both teams")}
               </p>
             </div>
           </section>
@@ -458,6 +459,36 @@ function App() {
                   </button>
                 </div>
               )}
+              {view.phase === "AWAITING_FOLLOW_ON" && (
+                <div className="actions">
+                  <button
+                    onClick={() =>
+                      act({
+                        kind: "CHOOSE_FOLLOW_ON",
+                        payload: {
+                          teamId: view.decisionTeamId!,
+                          enforce: true,
+                        },
+                      })
+                    }
+                  >
+                    Enforce follow-on
+                  </button>
+                  <button
+                    onClick={() =>
+                      act({
+                        kind: "CHOOSE_FOLLOW_ON",
+                        payload: {
+                          teamId: view.decisionTeamId!,
+                          enforce: false,
+                        },
+                      })
+                    }
+                  >
+                    Bat again
+                  </button>
+                </div>
+              )}
               {(view.phase === "AWAITING_BATTER" ||
                 view.phase === "AWAITING_BOWLER") && (
                 <div className="candidates">
@@ -496,6 +527,31 @@ function App() {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+              {view.phase === "READY" && view.format === "RED_BALL" && i && (
+                <div className="actions redball-actions">
+                  <button
+                    onClick={() =>
+                      act({
+                        kind: "DECLARE",
+                        payload: { teamId: i.battingTeamId },
+                      })
+                    }
+                  >
+                    Declare innings
+                  </button>
+                  <button
+                    disabled={!view.redBall?.newBallAvailable}
+                    onClick={() =>
+                      act({
+                        kind: "TAKE_NEW_BALL",
+                        payload: { teamId: i.bowlingTeamId },
+                      })
+                    }
+                  >
+                    Take new ball
+                  </button>
                 </div>
               )}
               <div className="advance">
@@ -537,7 +593,11 @@ function App() {
             <section className="result">
               <h2>{view.resultText}</h2>
               <p>
-                One complete fictional {view.format}. Review both innings below.
+                One complete fictional{" "}
+                {view.format === "RED_BALL"
+                  ? "five-day red-ball match"
+                  : view.format}
+                . Review the innings below.
               </p>
               <button
                 disabled={busy || fatal}
@@ -763,9 +823,9 @@ function App() {
           pinned engine/model/rules identity required for validated resume.
         </p>
         <p>
-          Original world: 160 fictional players, 8 squads. T20 and ODI
-          exhibition use custom game rules; no certified ICC compliance or
-          empirical realism. DLS, red-ball, careers and tactical AI are
+          Original world: 160 fictional players, 8 squads. T20, ODI and five-day
+          red-ball exhibitions use custom game rules; no certified ICC
+          compliance or empirical realism. DLS, careers and tactical AI are
           unavailable.
         </p>
       </footer>
@@ -780,7 +840,7 @@ function Setup({
   catalog: Catalog;
   busy: boolean;
   start: (
-    format: "T20" | "ODI",
+    format: "T20" | "ODI" | "RED_BALL",
     teams: [Selection, Selection],
     ground: string,
   ) => void;
@@ -790,7 +850,7 @@ function Setup({
     structuredClone(catalog.teams[1]!.suggested),
   ]);
   const [ground, setGround] = useState(catalog.grounds[0]!.id);
-  const [format, setFormat] = useState<"T20" | "ODI">("T20");
+  const [format, setFormat] = useState<"T20" | "ODI" | "RED_BALL">("T20");
   const reasons = teams
     .map((s, index) => {
       const t = catalog.teams.find((t) => t.id === s.teamId)!;
@@ -929,10 +989,13 @@ function Setup({
           <select
             aria-label="Format"
             value={format}
-            onChange={(e) => setFormat(e.target.value as "T20" | "ODI")}
+            onChange={(e) =>
+              setFormat(e.target.value as "T20" | "ODI" | "RED_BALL")
+            }
           >
             <option value="T20">T20 · 20 overs</option>
             <option value="ODI">ODI · 50 overs</option>
+            <option value="RED_BALL">Red ball · five days</option>
           </select>
         </label>
         <label>
