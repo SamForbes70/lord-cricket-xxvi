@@ -1,0 +1,5 @@
+
+> lord-cricket-xxvi@0.1.0 training:fixtures
+> node --import tsx scripts/audit-career-training.ts --write
+
+{"beforeAdvanceSha256":"903dbc3acc9711a141efff18266dd23c826f63c2a6352da2d12dc2a649d768bc","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V2","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001BattingReadiness":1,"p001FatigueBp":2100,"p002BowlingReadiness":1,"p003FieldingReadiness":1,"p004FatigueBp":1500,"practicePlayers":3,"restPlayers":157},"day2StateSha256":"228c1d1f0e8cb27264dc9f9b724c8bca361a97a6f07e9ee32e3cea013024e7d7","day3":{"date":"2027-01-05","p001BattingReadiness":0,"p001FatigueBp":100},"day3StateSha256":"3f2c85d37f8e608e512bc670361c0552868adbe3c8665e38d304d9c194c46efd","noPermanentAttributeGrowth":true,"practiceRecoveryPerDayBp":1400,"readinessRange":[-3,3],"restRecoveryPerDayBp":2000,"status":"PASS","trainingPolicyVersion":"LC_T20_CAREER_TRAINING_V1"}

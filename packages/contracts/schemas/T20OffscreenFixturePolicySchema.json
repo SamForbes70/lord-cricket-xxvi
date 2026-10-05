@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "policyVersion": {
+      "type": "string",
+      "const": "LC_T20_OFFSCREEN_POLICY_V1"
+    },
+    "executionVersion": {
+      "type": "string",
+      "const": "LC_T20_OFFSCREEN_FIXTURE_V1"
+    },
+    "selectionPolicyId": {
+      "type": "string",
+      "const": "LC_SEASON_XI_BASELINE_V1"
+    },
+    "captainPolicyId": {
+      "type": "string",
+      "const": "LC_FIXTURE_CAPTAIN_V1"
+    },
+    "conditionDeltaPolicyId": {
+      "type": "string",
+      "const": "LC_ENGINE_FINAL_FATIGUE_DELTA_V1"
+    },
+    "matchEngineVersion": {
+      "type": "string",
+      "const": "LC_T20_MATCH_V1"
+    },
+    "selectionScorePolicy": {
+      "type": "string",
+      "const": "SUM_SUPPORTED_T20_SKILLS_PLUS_AREA_READINESS_V1"
+    },
+    "unavailablePlayersExcluded": {
+      "type": "boolean",
+      "const": true
+    },
+    "fatigueSelectionEffect": {
+      "type": "string",
+      "const": "LOWER_FATIGUE_STABLE_TIEBREAK_ONLY"
+    },
+    "minimumNonKeeperBowlingCapable": {
+      "type": "number",
+      "const": 5
+    },
+    "requiresKeeper": {
+      "type": "boolean",
+      "const": true
+    },
+    "noFutureRandomAccess": {
+      "type": "boolean",
+      "const": true
+    },
+    "noAlternateMatchSimulator": {
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "policyVersion",
+    "executionVersion",
+    "selectionPolicyId",
+    "captainPolicyId",
+    "conditionDeltaPolicyId",
+    "matchEngineVersion",
+    "selectionScorePolicy",
+    "unavailablePlayersExcluded",
+    "fatigueSelectionEffect",
+    "minimumNonKeeperBowlingCapable",
+    "requiresKeeper",
+    "noFutureRandomAccess",
+    "noAlternateMatchSimulator"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:T20OffscreenFixturePolicy:1",
+  "title": "T20OffscreenFixturePolicy"
+}

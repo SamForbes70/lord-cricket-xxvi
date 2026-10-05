@@ -1,0 +1,29 @@
+
+Running 3 tests using 1 worker
+
+  ✘  1 [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play (191ms)
+  ✓  2 [chromium] › tests/smoke/app.spec.ts:43:1 › compiled batch app reports accurate capabilities and rejects unsupported commands (675ms)
+  ✓  3 [chromium] › tests/smoke/app.spec.ts:84:1 › compiled scoring CLI exercises production scorer and rejects malformed requests (346ms)
+
+
+  1) [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4173/engineering.html
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4173/engineering.html", waiting until "load"[22m
+
+
+       7 |   const errors: string[] = [];
+       8 |   page.on("pageerror", (e) => errors.push(e.message));
+    >  9 |   await page.goto("/engineering.html");
+         |              ^
+      10 |   await expect(
+      11 |     page.getByRole("heading", { name: "Lord Cricket XXVI" }),
+      12 |   ).toBeVisible();
+        at /mnt/data/lcxxvi-pass12d/repo/tests/smoke/app.spec.ts:9:14
+
+    Error Context: test-results/app-production-React-shell-b41db--without-pretending-to-play-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play 
+  2 passed (3.8s)

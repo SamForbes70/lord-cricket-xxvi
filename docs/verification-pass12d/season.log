@@ -1,0 +1,5 @@
+
+> lord-cricket-xxvi@0.1.0 season:fixtures
+> node --import tsx scripts/audit-season-schedule.ts --write
+
+{"eighthRound":[["team-08","team-01"],["team-07","team-02"],["team-06","team-03"],["team-05","team-04"]],"finalDate":"2027-02-11","firstDate":"2027-01-03","firstRound":[["team-01","team-08"],["team-02","team-07"],["team-03","team-06"],["team-04","team-05"]],"fixtures":56,"orderedPairs":56,"rounds":14,"scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","schedulerAlgorithm":"CIRCLE_REVERSE_VENUES_V1","schedulerVersion":"LC_T20_SEASON_SCHEDULE_V1","seasonSeedHash":"9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402","status":"PASS","teamCounts":{"team-01":{"away":7,"home":7,"matches":14},"team-02":{"away":7,"home":7,"matches":14},"team-03":{"away":7,"home":7,"matches":14},"team-04":{"away":7,"home":7,"matches":14},"team-05":{"away":7,"home":7,"matches":14},"team-06":{"away":7,"home":7,"matches":14},"team-07":{"away":7,"home":7,"matches":14},"team-08":{"away":7,"home":7,"matches":14}},"uniqueFixtureIds":56,"uniqueMatchIds":56,"uniqueMatchSeeds":56}

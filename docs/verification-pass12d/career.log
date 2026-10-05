@@ -1,0 +1,5 @@
+
+> lord-cricket-xxvi@0.1.0 career:fixtures
+> node --import tsx scripts/audit-career-condition.ts --write
+
+{"appliedCompletionKeys":["completion-m-b383e5ed09f44b7a-r01-m01"],"availabilityPackId":"fictional-eight-01-availability-test-v1","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V1","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001Availability":"UNAVAILABLE","p001FatigueBp":1500,"p002FatigueBp":0},"day2StateSha256":"8d465b1bbaca446d453f8e5a81dfc8e61f6ab840691e1e1fc89e22e92e9eb6ff","day3":{"date":"2027-01-05","p001Availability":"UNAVAILABLE","p001FatigueBp":0},"day3StateSha256":"1a48066d5ba50daafd4b609d06ebe2ee234a49708b8ebd4574f17085cfd32263","fatiguedStateSha256":"cb188e98814aee570d8c2e7081fff4115c54ff3bf326079ebcc1dc9842c96df2","finalScheduledDate":"2027-02-11","initialDate":"2027-01-03","initialStateSha256":"8ccc8adf4718e1c93a4e6873ccadc27a75599df8510235afe186c3bd0585564d","playerConditions":160,"playersPerTeam":[20,20,20,20,20,20,20,20],"status":"PASS","teamCount":8,"worldPackId":"fictional-eight-01"}

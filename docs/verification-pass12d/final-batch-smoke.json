@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "roundNumber": 1,
+  "outcomes": 3,
+  "skippedUserFixtureId": "fx-b383e5ed09f44b7a-r01-m01",
+  "careerRevision": 3,
+  "careerDate": "2027-01-03",
+  "executionSha256": "0edb1ea0aaa00de4d980e99c69aed2575e6e3d84cee5793f6fc2149fba0df4b8"
+}

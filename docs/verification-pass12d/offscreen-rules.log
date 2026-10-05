@@ -1,0 +1,21 @@
+
+> lord-cricket-xxvi@0.1.0 offscreen:rules
+> vitest run tests/unit/offscreen-fixture.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12d/repo[39m
+
+ [32m✓[39m tests/unit/offscreen-fixture.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 5723[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mruns a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once [33m 541[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mreplay and command resimulation remain exact for an off-screen fixture [33m 945[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22muses manual availability when selecting the XI and falls back to the second keeper [33m 376[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mround execution sorts fixture IDs and is batch-order independent by construction [33m 1862[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mcan pause before the user's fixture while simulating the other three matches [33m 1114[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mrejects duplicate fixture execution, wrong career date and insufficient availability [33m 463[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mdetects outcome tampering through the canonical outcome hash [33m 418[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 04:24:16
+[2m   Duration [22m 6.34s[2m (transform 185ms, setup 0ms, collect 421ms, tests 5.72s, environment 0ms, prepare 63ms)[22m
+

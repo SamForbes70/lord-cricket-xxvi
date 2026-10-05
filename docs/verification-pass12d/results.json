@@ -1,0 +1,221 @@
+{
+  "pass": "12D",
+  "milestone": "M6D_DETERMINISTIC_OFFSCREEN_FIXTURE_EXECUTION",
+  "status": "PASS_CORE_WITH_BROWSER_RERUN_BLOCKED_BY_HOST_POLICY",
+  "baselineCommit": "4b00c38afdd0b5cb02e3d52744b2656ba5a3974e",
+  "verifiedAtUtc": "2026-10-05T04:33:04.573773+00:00",
+  "environment": {
+    "node": "v22.16.0",
+    "npm": "10.9.2",
+    "chromium": "Chromium 144.0.7559.96 built on Debian GNU/Linux 13 (trixie)",
+    "platform": "linux-x64"
+  },
+  "dependencyInstall": {
+    "status": "PASS",
+    "mode": "npm ci --offline from pinned cache",
+    "packageLockSha256": "1aa457c6023ae96090da9ba9501972ad9a992f3b1c6aa186000da927cdc0551e",
+    "packagesAdded": 208
+  },
+  "gates": {
+    "schemas": {
+      "status": "PASS",
+      "count": 147
+    },
+    "build": {
+      "status": "PASS"
+    },
+    "typecheck": {
+      "status": "PASS"
+    },
+    "lint": {
+      "status": "PASS",
+      "packageBoundaries": 7
+    },
+    "scoringRegression": {
+      "status": "PASS",
+      "delivery": 45,
+      "ledger": 45,
+      "invalidRejected": 29
+    },
+    "determinismVectors": {
+      "status": "PASS",
+      "randomAddress": 24,
+      "stateHash": 8
+    },
+    "probability": {
+      "status": "PASS",
+      "lutEntries": 1601,
+      "massDrawVectors": 15,
+      "boundaries": 4
+    },
+    "generator": {
+      "status": "PASS",
+      "fixtures": 9
+    },
+    "season12A": {
+      "status": "PASS",
+      "tests": 8,
+      "fixtures": 56
+    },
+    "career12B": {
+      "status": "PASS",
+      "tests": 9
+    },
+    "training12C": {
+      "status": "PASS",
+      "tests": 10
+    },
+    "offscreen12D": {
+      "status": "PASS",
+      "tests": 8,
+      "fixtures": 56,
+      "totalEvents": 17720,
+      "totalCommands": 5856,
+      "results": {
+        "WIN": 55,
+        "TIE": 1
+      }
+    },
+    "fullUnit": {
+      "status": "PASS",
+      "tests": 479,
+      "files": 20
+    },
+    "batchRoundSmoke": {
+      "status": "PASS",
+      "roundNumber": 1,
+      "outcomes": 3,
+      "skippedUserFixtureId": "fx-b383e5ed09f44b7a-r01-m01",
+      "careerRevision": 3,
+      "careerDate": "2027-01-03",
+      "executionSha256": "0edb1ea0aaa00de4d980e99c69aed2575e6e3d84cee5793f6fc2149fba0df4b8"
+    },
+    "browserFresh": {
+      "status": "BLOCKED",
+      "reason": "Chromium navigation to local 127.0.0.1 test server returned ERR_BLOCKED_BY_ADMINISTRATOR before application code loaded",
+      "compiledCliCasesPassed": 2,
+      "pageCasesStarted": 1,
+      "applicationCodeReached": false
+    }
+  },
+  "offscreenCorpus": {
+    "auditVersion": "LC_T20_OFFSCREEN_AUDIT_V1",
+    "policyVersion": "LC_T20_OFFSCREEN_POLICY_V1",
+    "executionVersion": "LC_T20_OFFSCREEN_FIXTURE_V1",
+    "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+    "fixtures": 56,
+    "uniqueFixtureIds": 56,
+    "uniqueMatchIds": 56,
+    "outcomeCorpusSha256": "9444a122f63ae80d8cfdd91b2977e6024e05e7f86fb1b672a4f751edbe38a8ae",
+    "scorecardCorpusSha256": "8831c826346d7553b0d2aea2da5a8f661a74943f78946c1b0a1a642ad4a9e832",
+    "eventLogCorpusSha256": "8331bfe0ebe4fd401e2529f79e3903bb3b2732a5ec1498c3fb30fcd6b5d14932",
+    "commandLogCorpusSha256": "11174373ad9dcb9214fb01a42c85f1ad6de57bfff0979095cc782f40efcd53cb",
+    "firstFixtureId": "fx-b383e5ed09f44b7a-r01-m01",
+    "firstOutcomeSha256": "16bb57dd5a04c40535ef951c2268cc0642df7ac9be7d93d66bf0dfb23ea4e8a7",
+    "lastFixtureId": "fx-b383e5ed09f44b7a-r14-m04",
+    "lastOutcomeSha256": "36937972d96d6285890201308d54acb02ac0181758c5e1d122bef319e46f9d8f",
+    "totalEvents": 17720,
+    "totalCommands": 5856,
+    "resultCounts": {
+      "WIN": 55,
+      "TIE": 1
+    },
+    "appliedMatchConditions": 56,
+    "finalCareerRevision": 95,
+    "finalCareerDate": "2027-02-11",
+    "finalCareerStateSha256": "7a9cd180e4a108dd1ab29822ef95371dfc868548f9b7c55ac1cd6b8a768e7985",
+    "summarySha256": "e5adb07f9c50153ffe6349fa66c1be32314d76da249cc2961a26daba1ec9e7f9"
+  },
+  "sourceCompatibility": {
+    "pass12cCommit": "4b00c38afdd0b5cb02e3d52744b2656ba5a3974e",
+    "criticalFiles": [
+      {
+        "path": "packages/simulation/src/t20-match.ts",
+        "sha256": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/simulation/src/odi-match.ts",
+        "sha256": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/simulation/src/red-ball-match.ts",
+        "sha256": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/simulation/src/red-ball-clock.ts",
+        "sha256": "fb3527069307600f6d43db1ede92e255cfc4c65c0a69d211e4c0447ccff61626",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/simulation/src/generator.ts",
+        "sha256": "1dfb921fe5fa49021f2b37cea945a06b69de351a5e3955e53bf2a96fbc77f43a",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/simulation/src/probability.ts",
+        "sha256": "38221d20341b0e92773a22de21c3eebca043fc5a2a2ae399d9d396b144e9421d",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/simulation/src/determinism.ts",
+        "sha256": "276eeb1d0d7fe9af744522140ab7dadfbc292a50b0b30969aebb21db135121c9",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/persistence/src/index.ts",
+        "sha256": "c2c2b54a0a1b5c78372d63fed0fcb215382b0755c53d44d5b1ac5f0366265682",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/domain/src/scoring-kernel.ts",
+        "sha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/data/src/probability-pack.ts",
+        "sha256": "f63bc07186fe0e449995520ae155020d310b335f95e4b887e8f1bd1058e77b9c",
+        "matchesPass12C": true
+      },
+      {
+        "path": "packages/data/src/delivery-pack.ts",
+        "sha256": "b7ed7365b98e4fe65df08f8c15a02127d7ef399a9063bbc60cab34a2ed1b8f7b",
+        "matchesPass12C": true
+      },
+      {
+        "path": "apps/web/src/main.tsx",
+        "sha256": "b19854c5f61143af266a9166f58c69e39dc12c019dd939da26ebadccb43e3596",
+        "matchesPass12C": true
+      },
+      {
+        "path": "apps/web/src/match/controller.ts",
+        "sha256": "f7592866eb0e51110b049e029f355be76f77aefa1675c81f179257110a840704",
+        "matchesPass12C": true
+      },
+      {
+        "path": "apps/web/src/match/protocol.ts",
+        "sha256": "c66cae2f1b0b8752d515b68bfd3577e693aa4beeb22e8d9058397527e32d1560",
+        "matchesPass12C": true
+      }
+    ],
+    "criticalFilesAllMatch": true,
+    "inheritedSchemaCount": 142,
+    "inheritedSchemaMismatches": [],
+    "currentSchemaCount": 147,
+    "newSchemaCount": 5,
+    "packageLockMatches": true
+  },
+  "scope": {
+    "sameT20Engine": true,
+    "alternateMatchSimulator": false,
+    "tacticalAiImplemented": false,
+    "leagueTableImplemented": false,
+    "nrrImplemented": false,
+    "seasonStatisticsImplemented": false,
+    "seasonPersistenceImplemented": false,
+    "managementUiImplemented": false,
+    "modelStatus": "SYNTHETIC_ALPHA"
+  }
+}
