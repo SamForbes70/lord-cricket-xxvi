@@ -1,29 +1,28 @@
-# Capability matrix: Pass 11 / M5B
+# Capability matrix: Pass 12A / M6A
 
 | Capability | Status and boundary |
 | --- | --- |
-| M0 approved world | Original 160 players, 8 squads and 8 grounds; gameplay data unchanged |
-| M1 scorer | Inherited supported scoring rules; full scoring regression retained |
-| T20 engine | `LC_T20_MATCH_V1`; inherited 100-match replay/resimulation corpus passes |
-| ODI engine | `LC_ODI_MATCH_V1`; inherited 50-over browser and unit regressions pass |
-| Red-ball engine | `LC_RED5_MATCH_V1`; up to four innings with deterministic event stream and replay |
-| Red-ball rules | `LC_RED5_01`: two innings per team, no fixed innings ball allocation, no bowler quota/circle restriction, no free hit |
-| Match clock | Five days, 11:00 start, lunch 13:00-13:40, tea 15:40-16:00, scheduled close 18:00 |
-| Day 1-4 extension | May continue to 18:30 while pursuing 90 legal overs; no carry of unbowled overs |
-| Final hour | Day 5 from 17:00; scheduled time and legal-ball obligation must both be satisfied |
-| Lost time | Deterministic red-ball rain-delay rules event implemented; final-hour obligation reduction tested |
-| Declarations | Available between deliveries |
-| Follow-on | Optional at a 200-run first-innings lead; explicit `A,B,B,A` order supported |
-| New ball | Available after 480 legal balls; resets ball age without resetting innings overs |
-| Red-ball result arbitration | Innings victories, fourth-innings target, completed tie and time-expiry draw implemented |
-| Browser exhibition | T20, ODI and five-day red-ball available through normal production UI; both teams manually controlled |
-| M4 persistence | Atomic autosave, resume, checkpoints, writer leases, manual slots and `.lcxxvi` export/import retained for all three formats |
-| Portable archive pins | Explicit T20, ODI and RED5 engine/rules/event-chain allow-list |
-| Automatic stochastic weather schedule | Not enabled in M5B; rules-side lost-time handling is implemented |
-| Limited-overs rain / DLS | Disabled; no target is invented or approximated |
-| Tactical opponent AI | Unavailable; both teams are controlled manually |
-| M5 other formats | **Complete for the bounded V0.1 T20, ODI and five-day red-ball exhibition profiles** |
-| M6 league/training | Next stage; deferred in this pass |
-| M7 tactical AI/calibration | Deferred; model status remains `SYNTHETIC_ALPHA` |
-| Certified ICC rules / empirical realism | Unclaimed |
-| Formal M3 human acceptance | Still pending as a separate acceptance record |
+| T20/ODI/red-ball match engines | Inherited unchanged from Pass 11 |
+| M4 persistence | Inherited unchanged; season persistence not yet implemented |
+| Fictional world | Frozen `fictional-eight-01`, 160 players / 8 teams / 8 grounds |
+| T20 competition contract | `LC_T20_LEAGUE_01` implemented |
+| Season schedule contract | `LC_T20_SEASON_SCHEDULE_V1` implemented |
+| Fixture scheduler | Deterministic circle algorithm, 14 rounds, 56 fixtures |
+| Venue reversal | Rounds 8-14 reverse corresponding first-half venues |
+| Match-day spacing | Three calendar days using pure deterministic date arithmetic |
+| Team frequency | Exactly once per round; 14 fixtures per team |
+| Venue balance | Exactly 7 home and 7 away per team |
+| Fixture identity | Stable fixture and match IDs plus canonical schedule SHA-256 |
+| Fixture randomness boundary | 56 independent canonical match seeds; no shared mutable RNG |
+| World/ground trust | Frozen world hash and all home-ground references validated |
+| League points/table policy | Contract pinned; reducer/table calculation not implemented yet |
+| Career day commands | Deferred to Pass 12B/12C |
+| Player condition/availability | Deferred to Pass 12B |
+| Training/recovery | Deferred to Pass 12C |
+| AI/off-screen fixture execution | Deferred to Pass 12D |
+| NRR/table reducer | Deferred to Pass 12E |
+| Season persistence/archive | Deferred to Pass 12F |
+| Full 56-match season acceptance | Deferred to Pass 12G |
+| Tactical opponent AI | Deferred to M7; not disguised as fixture autopilot |
+| Limited-overs DLS | Disabled |
+| Model status | `SYNTHETIC_ALPHA` |

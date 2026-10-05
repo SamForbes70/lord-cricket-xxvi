@@ -1,0 +1,22 @@
+{
+  "scheduleVersion": "LC_T20_SEASON_SCHEDULE_V1",
+  "seasonId": "season-01",
+  "gameId": "career-01",
+  "competitionId": "LC_T20_LEAGUE_01",
+  "worldPackId": "fictional-eight-01",
+  "worldCanonicalSha256": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+  "seasonSeed": "season-seed-01",
+  "startDate": "2027-01-03",
+  "teamIds": ["team-01", "team-02", "team-03", "team-04", "team-05", "team-06", "team-07", "team-08"],
+  "groundIds": ["ground-01", "ground-02", "ground-03", "ground-04", "ground-05", "ground-06", "ground-07", "ground-08"],
+  "homeGroundIds": {
+    "team-01": "ground-01",
+    "team-02": "ground-02",
+    "team-03": "ground-03",
+    "team-04": "ground-04",
+    "team-05": "ground-05",
+    "team-06": "ground-06",
+    "team-07": "ground-07",
+    "team-08": "ground-08"
+  }
+}

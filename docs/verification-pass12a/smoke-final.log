@@ -1,0 +1,255 @@
+
+> lord-cricket-xxvi@0.1.0 smoke
+> playwright test
+
+
+Running 23 tests using 2 workers
+
+  ✘   1 [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play (3ms)
+  ✘   2 [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (3ms)
+  ✓   3 [chromium] › tests/smoke/app.spec.ts:43:1 › compiled batch app reports accurate capabilities and rejects unsupported commands (762ms)
+  ✓   4 [chromium] › tests/smoke/determinism.spec.ts:115:1 › compiled batch random/hash commands match frozen outputs and reject bad requests (595ms)
+  ✘   6 [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors (1ms)
+  ✓   5 [chromium] › tests/smoke/app.spec.ts:84:1 › compiled scoring CLI exercises production scorer and rejects malformed requests (345ms)
+  ✘   7 [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors (1ms)
+  ✓   8 [chromium] › tests/smoke/generator.spec.ts:44:1 › compiled batch generator command hands validated resolution to scoring adapter (371ms)
+  ✘  10 [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 (1ms)
+  ✓   9 [chromium] › tests/smoke/probability.spec.ts:64:1 › compiled batch probability command matches independent vector and rejects a wrong request (519ms)
+  ✘  11 [chromium] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (1ms)
+  ✘  12 [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 (4ms)
+  ✘  14 [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 (3ms)
+  ✘  15 [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 (3ms)
+  ✓  13 [chromium] › tests/smoke/world.spec.ts:25:1 › compiled batch validates frozen world, immutable setup and rejects tampered input (848ms)
+  ✘  16 [firefox-determinism] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (3ms)
+  ✘  17 [firefox-determinism] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors (3ms)
+  ✘  18 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 (3ms)
+  ✘  19 [firefox-determinism] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors (3ms)
+  ✘  20 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 (3ms)
+  ✘  21 [firefox-determinism] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (3ms)
+  ✘  22 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 (3ms)
+  ✘  23 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 (4ms)
+
+
+  1) [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  2) [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  3) [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  4) [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  5) [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  6) [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  7) [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  8) [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  9) [chromium] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  10) [firefox-determinism] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  11) [firefox-determinism] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  12) [firefox-determinism] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  13) [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  14) [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  15) [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  16) [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  17) [firefox-determinism] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses 
+
+    Error: browserType.launch: Executable doesn't exist at /home/oai/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  17 failed
+    [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play 
+    [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+    [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+    [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+    [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 
+    [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 
+    [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 
+    [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 
+    [chromium] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses 
+    [firefox-determinism] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+    [firefox-determinism] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+    [firefox-determinism] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+    [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 
+    [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 
+    [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 
+    [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 
+    [firefox-determinism] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses 
+  6 passed (10.2s)

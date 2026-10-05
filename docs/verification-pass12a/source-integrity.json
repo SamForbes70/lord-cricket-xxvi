@@ -1,0 +1,72 @@
+{
+  "baselineCommit": "e51d5245a7a47c046aea1bc0293f4a7516c41a32",
+  "criticalGameplayFiles": [
+    {
+      "path": "packages/simulation/src/t20-match.ts",
+      "baselineSha256": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db",
+      "currentSha256": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/odi-match.ts",
+      "baselineSha256": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8",
+      "currentSha256": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/red-ball-match.ts",
+      "baselineSha256": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500",
+      "currentSha256": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/red-ball-clock.ts",
+      "baselineSha256": "fb3527069307600f6d43db1ede92e255cfc4c65c0a69d211e4c0447ccff61626",
+      "currentSha256": "fb3527069307600f6d43db1ede92e255cfc4c65c0a69d211e4c0447ccff61626",
+      "unchanged": true
+    },
+    {
+      "path": "packages/domain/src/scoring-kernel.ts",
+      "baselineSha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+      "currentSha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+      "unchanged": true
+    },
+    {
+      "path": "packages/domain/src/innings-ledger.ts",
+      "baselineSha256": "ecf8012915821b01b2c71b6b107ca329017a68123d600a50656b97434bbcdddb",
+      "currentSha256": "ecf8012915821b01b2c71b6b107ca329017a68123d600a50656b97434bbcdddb",
+      "unchanged": true
+    },
+    {
+      "path": "packages/persistence/src/index.ts",
+      "baselineSha256": "c2c2b54a0a1b5c78372d63fed0fcb215382b0755c53d44d5b1ac5f0366265682",
+      "currentSha256": "c2c2b54a0a1b5c78372d63fed0fcb215382b0755c53d44d5b1ac5f0366265682",
+      "unchanged": true
+    },
+    {
+      "path": "packages/data/src/probability-pack.ts",
+      "baselineSha256": "f63bc07186fe0e449995520ae155020d310b335f95e4b887e8f1bd1058e77b9c",
+      "currentSha256": "f63bc07186fe0e449995520ae155020d310b335f95e4b887e8f1bd1058e77b9c",
+      "unchanged": true
+    },
+    {
+      "path": "packages/data/src/delivery-pack.ts",
+      "baselineSha256": "b7ed7365b98e4fe65df08f8c15a02127d7ef399a9063bbc60cab34a2ed1b8f7b",
+      "currentSha256": "b7ed7365b98e4fe65df08f8c15a02127d7ef399a9063bbc60cab34a2ed1b8f7b",
+      "unchanged": true
+    }
+  ],
+  "criticalGameplayAllUnchanged": true,
+  "inheritedSchemaCount": 114,
+  "inheritedSchemasByteIdentical": true,
+  "inheritedSchemaDifferences": [],
+  "currentSchemaCount": 120,
+  "newSchemas": [
+    "packages/contracts/schemas/SeasonFixtureSchema.json",
+    "packages/contracts/schemas/SeasonRoundSchema.json",
+    "packages/contracts/schemas/SeasonScheduleCoreSchema.json",
+    "packages/contracts/schemas/SeasonScheduleRequestSchema.json",
+    "packages/contracts/schemas/SeasonScheduleSchema.json",
+    "packages/contracts/schemas/T20LeagueCompetitionManifestSchema.json"
+  ]
+}

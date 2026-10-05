@@ -1,0 +1,32 @@
+{
+  "pass": "12A",
+  "milestone": "M6A_COMPETITION_CONTRACTS_AND_FIXTURE_SCHEDULER",
+  "result": "PASS",
+  "baselineCommit": "e51d5245a7a47c046aea1bc0293f4a7516c41a32",
+  "gates": {
+    "cleanOfflineInstall": {"status": "PASS", "packages": 208, "log": "npm-ci-offline.log"},
+    "schemas": {"status": "PASS", "count": 120},
+    "build": {"status": "PASS"},
+    "typecheck": {"status": "PASS"},
+    "lintAndBoundaries": {"status": "PASS", "packageBoundaries": 7},
+    "scoringRegression": {"status": "PASS", "deliveries": 45, "ledgers": 45, "rejections": 29},
+    "determinismVectors": {"status": "PASS", "random": 24, "stateHashes": 8},
+    "probabilityVectors": {"status": "PASS", "massAndDraw": 15, "boundaries": 4},
+    "generatorVectors": {"status": "PASS", "cases": 9},
+    "seasonFixtureAudit": {"status": "PASS", "rounds": 14, "fixtures": 56, "orderedPairs": 56, "uniqueMatchSeeds": 56, "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545"},
+    "seasonUnit": {"status": "PASS", "tests": 8},
+    "allUnit": {"status": "PASS", "tests": 452},
+    "browserNonCorpus": {"status": "PASS", "tests": 15, "browsers": ["Chromium", "Firefox"]},
+    "chromiumT20Corpus": {"status": "PASS", "cases": 100, "shards": 4},
+    "firefoxT20CorpusFresh": {"status": "BLOCKED_BY_EXECUTION_WINDOW", "reason": "Existing 25-case inherited shard exceeds the environment's per-command execution ceiling. Pass 11 Firefox corpus remains inherited evidence; critical match-engine files are byte-identical to Pass 11."}
+  },
+  "scopeExclusions": [
+    "career day reducer",
+    "condition and availability",
+    "training and recovery",
+    "AI fixture execution",
+    "league table and NRR reducer",
+    "season persistence/archive",
+    "management UI"
+  ]
+}

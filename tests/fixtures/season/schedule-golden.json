@@ -1,0 +1,22 @@
+{
+  "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+  "seasonSeedHash": "9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402",
+  "firstFixture": {
+    "fixtureId": "fx-b383e5ed09f44b7a-r01-m01",
+    "matchId": "m-b383e5ed09f44b7a-r01-m01",
+    "matchSeed": "bdd032f9cf2050cf5034a828d9d459a82c5a8a0048b492653cbc0e3a1913dcb8",
+    "homeTeamId": "team-01",
+    "awayTeamId": "team-08",
+    "groundId": "ground-01",
+    "matchDayDate": "2027-01-03"
+  },
+  "lastFixture": {
+    "fixtureId": "fx-b383e5ed09f44b7a-r14-m04",
+    "matchId": "m-b383e5ed09f44b7a-r14-m04",
+    "matchSeed": "d91c93ad04f55f4c088cb5677dbafd86e83f144c067c59bf19a2688cbb5ebfcc",
+    "homeTeamId": "team-06",
+    "awayTeamId": "team-05",
+    "groundId": "ground-06",
+    "matchDayDate": "2027-02-11"
+  }
+}

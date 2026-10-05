@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › tests/smoke/t20-corpus.spec.ts:12:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 (22.1s)
+
+  1 passed (23.4s)

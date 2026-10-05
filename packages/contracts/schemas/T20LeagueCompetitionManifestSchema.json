@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "competitionVersion": {
+      "type": "string",
+      "const": "LC_T20_LEAGUE_COMPETITION_V1"
+    },
+    "competitionId": {
+      "type": "string",
+      "const": "LC_T20_LEAGUE_01"
+    },
+    "format": {
+      "type": "string",
+      "const": "T20"
+    },
+    "worldPackId": {
+      "type": "string",
+      "const": "fictional-eight-01"
+    },
+    "worldCanonicalSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "teamIds": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "groundIds": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "homeGroundIds": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "teamCount": {
+      "type": "number",
+      "const": 8
+    },
+    "rounds": {
+      "type": "number",
+      "const": 14
+    },
+    "matchesPerRound": {
+      "type": "number",
+      "const": 4
+    },
+    "totalFixtures": {
+      "type": "number",
+      "const": 56
+    },
+    "roundSpacingDays": {
+      "type": "number",
+      "const": 3
+    },
+    "playoffs": {
+      "type": "boolean",
+      "const": false
+    },
+    "points": {
+      "type": "object",
+      "properties": {
+        "win": {
+          "type": "number",
+          "const": 2
+        },
+        "tie": {
+          "type": "number",
+          "const": 1
+        },
+        "noResult": {
+          "type": "number",
+          "const": 1
+        },
+        "loss": {
+          "type": "number",
+          "const": 0
+        }
+      },
+      "required": [
+        "win",
+        "tie",
+        "noResult",
+        "loss"
+      ],
+      "additionalProperties": false
+    },
+    "tableOrder": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "string",
+          "const": "POINTS"
+        },
+        {
+          "type": "string",
+          "const": "WINS"
+        },
+        {
+          "type": "string",
+          "const": "NET_RUN_RATE"
+        },
+        {
+          "type": "string",
+          "const": "HEAD_TO_HEAD_POINTS"
+        },
+        {
+          "type": "string",
+          "const": "TEAM_ID"
+        }
+      ],
+      "minItems": 5,
+      "maxItems": 5,
+      "items": false
+    },
+    "rainAdjustedNrr": {
+      "type": "boolean",
+      "const": false
+    },
+    "schedulerAlgorithm": {
+      "type": "string",
+      "const": "CIRCLE_REVERSE_VENUES_V1"
+    }
+  },
+  "required": [
+    "competitionVersion",
+    "competitionId",
+    "format",
+    "worldPackId",
+    "worldCanonicalSha256",
+    "teamIds",
+    "groundIds",
+    "homeGroundIds",
+    "teamCount",
+    "rounds",
+    "matchesPerRound",
+    "totalFixtures",
+    "roundSpacingDays",
+    "playoffs",
+    "points",
+    "tableOrder",
+    "rainAdjustedNrr",
+    "schedulerAlgorithm"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:T20LeagueCompetitionManifest:1",
+  "title": "T20LeagueCompetitionManifest"
+}
