@@ -1,0 +1,25 @@
+
+> lord-cricket-xxvi@0.1.0 offscreen:fixtures
+> node --import tsx scripts/audit-offscreen-fixtures.ts
+
+{"status":"PASS","auditVersion":"LC_T20_OFFSCREEN_AUDIT_V1","policyVersion":"LC_T20_OFFSCREEN_POLICY_V1","executionVersion":"LC_T20_OFFSCREEN_FIXTURE_V1","scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","fixtures":56,"uniqueFixtureIds":56,"uniqueMatchIds":56,"outcomeCorpusSha256":"9444a122f63ae80d8cfdd91b2977e6024e05e7f86fb1b672a4f751edbe38a8ae","scorecardCorpusSha256":"8831c826346d7553b0d2aea2da5a8f661a74943f78946c1b0a1a642ad4a9e832","eventLogCorpusSha256":"8331bfe0ebe4fd401e2529f79e3903bb3b2732a5ec1498c3fb30fcd6b5d14932","commandLogCorpusSha256":"11174373ad9dcb9214fb01a42c85f1ad6de57bfff0979095cc782f40efcd53cb","firstFixtureId":"fx-b383e5ed09f44b7a-r01-m01","firstOutcomeSha256":"16bb57dd5a04c40535ef951c2268cc0642df7ac9be7d93d66bf0dfb23ea4e8a7","lastFixtureId":"fx-b383e5ed09f44b7a-r14-m04","lastOutcomeSha256":"36937972d96d6285890201308d54acb02ac0181758c5e1d122bef319e46f9d8f","totalEvents":17720,"totalCommands":5856,"resultCounts":{"WIN":55,"TIE":1},"appliedMatchConditions":56,"finalCareerRevision":95,"finalCareerDate":"2027-02-11","finalCareerStateSha256":"7a9cd180e4a108dd1ab29822ef95371dfc868548f9b7c55ac1cd6b8a768e7985","summarySha256":"e5adb07f9c50153ffe6349fa66c1be32314d76da249cc2961a26daba1ec9e7f9"}
+
+> lord-cricket-xxvi@0.1.0 offscreen:rules
+> vitest run tests/unit/offscreen-fixture.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12e/repo[39m
+
+ [32m✓[39m tests/unit/offscreen-fixture.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 6101[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mruns a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once [33m 607[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mreplay and command resimulation remain exact for an off-screen fixture [33m 1126[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22muses manual availability when selecting the XI and falls back to the second keeper [33m 397[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mround execution sorts fixture IDs and is batch-order independent by construction [33m 1948[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mcan pause before the user's fixture while simulating the other three matches [33m 1146[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mrejects duplicate fixture execution, wrong career date and insufficient availability [33m 466[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mdetects outcome tampering through the canonical outcome hash [33m 406[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 07:09:36
+[2m   Duration [22m 6.72s[2m (transform 177ms, setup 0ms, collect 426ms, tests 6.10s, environment 0ms, prepare 52ms)[22m

@@ -58,7 +58,11 @@
     "offscreen:fixtures": "node --import tsx scripts/audit-offscreen-fixtures.ts",
     "offscreen:fixtures:write": "node --import tsx scripts/audit-offscreen-fixtures.ts --write",
     "offscreen:rules": "vitest run tests/unit/offscreen-fixture.test.ts",
-    "verify:12d:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm run career:fixtures && npm run career:rules && npm run training:fixtures && npm run training:rules && npm run offscreen:fixtures && npm run offscreen:rules && npm test"
+    "verify:12d:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm run career:fixtures && npm run career:rules && npm run training:fixtures && npm run training:rules && npm run offscreen:fixtures && npm run offscreen:rules && npm test",
+    "projection:fixtures": "node --import tsx scripts/audit-season-projections.ts",
+    "projection:fixtures:write": "node --import tsx scripts/audit-season-projections.ts --write",
+    "projection:rules": "vitest run tests/unit/season-projections.test.ts",
+    "verify:12e:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm run career:fixtures && npm run career:rules && npm run training:fixtures && npm run training:rules && npm run offscreen:fixtures && npm run offscreen:rules && npm run projection:fixtures && npm run projection:rules && npm test"
   },
   "dependencies": {
     "react": "19.1.1",

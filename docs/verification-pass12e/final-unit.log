@@ -1,0 +1,40 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12e/repo[39m
+
+ [32m✓[39m tests/unit/scoring-kernel.test.ts [2m([22m[2m134 tests[22m[2m)[22m[32m 164[2mms[22m[39m
+ [32m✓[39m tests/unit/generator.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+ [32m✓[39m tests/unit/t20-match.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 3263[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mrejects hash-tampered event, state, chain, wrong version and invalid stage pack [33m 1187[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mpins first complete seeded match scorecard as regression observation distinct from independent rule goldens [33m 388[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mfully seeded match reconciles scorecard/events and event-prefix interrupted replay at every event [33m 1093[2mms[22m[39m
+ [32m✓[39m tests/unit/odi-match.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 4936[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mends the first innings on exactly 300 legal balls with no phantom 301st ball [33m 332[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mruns, replays, resimulates and rehydrates a complete seeded ODI [33m 2965[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mround-trips a complete ODI through the portable save archive [33m 1479[2mms[22m[39m
+ [32m✓[39m tests/unit/red5-match.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 4574[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 11 / M5B red-ball profile[2m > [22mmakes the new ball available after 480 legal balls and resets only ball age [33m 374[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 11 / M5B red-ball profile[2m > [22mcompletes a deterministic five-day exhibition and reproduces its final chain [33m 3809[2mms[22m[39m
+ [32m✓[39m tests/unit/season-projections.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 677[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12E league table, NRR and season statistical projections[2m > [22madapts a validated Pass 12D outcome into the shared season projection path [33m 629[2mms[22m[39m
+ [32m✓[39m tests/unit/career-condition.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 182[2mms[22m[39m
+ [32m✓[39m tests/unit/career-training.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 463[2mms[22m[39m
+ [32m✓[39m tests/unit/probability.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 143[2mms[22m[39m
+ [32m✓[39m tests/unit/match-ui.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1444[2mms[22m[39m
+   [33m[2m✓[22m[39m M3 production worker controller[2m > [22mcompletes a manual match, stops at decisions, blocks ineligible bowlers, proves replay, keeps seed private and prevents terminal deliveries [33m 1194[2mms[22m[39m
+ [32m✓[39m tests/unit/offscreen-fixture.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 5728[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mruns a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once [33m 554[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mreplay and command resimulation remain exact for an off-screen fixture [33m 939[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22muses manual availability when selecting the XI and falls back to the second keeper [33m 410[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mround execution sorts fixture IDs and is batch-order independent by construction [33m 1965[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mcan pause before the user's fixture while simulating the other three matches [33m 1051[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mrejects duplicate fixture execution, wrong career date and insufficient availability [33m 419[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mdetects outcome tampering through the canonical outcome hash [33m 384[2mms[22m[39m
+ [32m✓[39m tests/unit/random-service.test.ts [2m([22m[2m44 tests[22m[2m)[22m[32m 42[2mms[22m[39m
+ [32m✓[39m tests/unit/season-scheduler.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m tests/unit/contracts.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 1058[2mms[22m[39m
+   [33m[2m✓[22m[39m every generated schema compiles with strict AJV 2020-12 [33m 903[2mms[22m[39m
+ [32m✓[39m tests/unit/red5-clock.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 4[2mms[22m[39m

@@ -1,0 +1,28 @@
+
+Running 2 tests using 1 worker
+
+  ✘  1 [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (873ms)
+  ✓  2 [chromium] › tests/smoke/determinism.spec.ts:115:1 › compiled batch random/hash commands match frozen outputs and reject bad requests (497ms)
+
+
+  1) [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4174/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4174/", waiting until "load"[22m
+
+
+      12 |   const errors: string[] = [];
+      13 |   page.on("pageerror", (e) => errors.push(e.message));
+    > 14 |   await page.goto("http://127.0.0.1:4174");
+         |              ^
+      15 |   await page.waitForFunction(() => Boolean(window.determinism));
+      16 |   for (const v of vectors.addresses) {
+      17 |     const request = {
+        at /mnt/data/lcxxvi-pass12e/repo/tests/smoke/determinism.spec.ts:14:14
+
+    Error Context: test-results/determinism-Node-browser-a-4f913-en-address-and-state-vector-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector
+  1 passed (4.3s)

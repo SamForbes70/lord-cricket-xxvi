@@ -1,4 +1,6 @@
-import { executeDeterminismRequest, executeProbabilityRequest, generateDelivery, validateT20MatchSetup, verifyFrozenWorldBytes, runFixtureT20, textT20Scorecard, projectT20Scorecard, eventChainManifest, replayT20Events, resimulateT20Commands, generateSeasonSchedule, simulateOffscreenRound } from "@lcxxvi/simulation";
+import { executeDeterminismRequest, executeProbabilityRequest, generateDelivery, validateT20MatchSetup, verifyFrozenWorldBytes, runFixtureT20, textT20Scorecard, projectT20Scorecard, eventChainManifest, replayT20Events, resimulateT20Commands, generateSeasonSchedule, simulateOffscreenRound, validateOffscreenFixtureOutcome } from "@lcxxvi/simulation";
+import { T20_LEAGUE_COMPETITION } from "@lcxxvi/data";
+import { createT20SeasonProjection, completionFromOffscreenOutcome, applyT20SeasonMatchCompletion, validateT20SeasonProjection } from "@lcxxvi/projections";
 import { evaluateScoringDelivery } from "@lcxxvi/domain";
 import { readFile,writeFile } from "node:fs/promises";
 import {
@@ -89,6 +91,17 @@ try {
     const manifest = JSON.parse(await readFile("packages/data/worlds/fictional-eight-01.manifest.json", "utf8"));
     const simulated = simulateOffscreenRound({schedule, careerState, roundNumber, userTeamId: args[4] ?? null, worldBytes: world, worldManifest: manifest});
     console.log(canonicalJson({result: simulated.result, careerState: simulated.careerState}));
+  } else if (args[0] === "new-t20-season-projection" && args.length === 2 && args[1]) {
+    const schedule = JSON.parse(await readFile(args[1], "utf8"));
+    console.log(canonicalJson(createT20SeasonProjection({ competition: T20_LEAGUE_COMPETITION, schedule })));
+  } else if (args[0] === "apply-t20-offscreen-outcome" && args.length === 4 && args[1] && args[2] && args[3]) {
+    const schedule = JSON.parse(await readFile(args[1], "utf8"));
+    const state = JSON.parse(await readFile(args[2], "utf8"));
+    const outcome = validateOffscreenFixtureOutcome(JSON.parse(await readFile(args[3], "utf8")));
+    const completion = completionFromOffscreenOutcome(schedule, outcome);
+    const next = applyT20SeasonMatchCompletion({ state, competition: T20_LEAGUE_COMPETITION, schedule, completion });
+    validateT20SeasonProjection({ state: next, competition: T20_LEAGUE_COMPETITION, schedule });
+    console.log(canonicalJson(next));
   } else if (args[0] === "validate-world" && args.length <= 3) {
     const world = await readFile(args[1] ?? "packages/data/worlds/fictional-eight-01.json");
     const manifest = JSON.parse(await readFile(args[2] ?? "packages/data/worlds/fictional-eight-01.manifest.json", "utf8"));
@@ -107,7 +120,7 @@ try {
     console.log(canonicalJson(snapshot));
   } else {
     console.error(
-      "Usage: npm run batch -- status | validate-command <file.json> | score-delivery <request.json> | random <request.json> | hash-state <request.json> | probability <request.json> | sample-category <request.json> | generate-delivery <request.json> | schedule-t20-season <request.json> | simulate-t20-round <schedule.json> <career-state.json> <round-number> [user-team-id] | validate-world [world.json manifest.json] | setup-t20 <request.json> [world.json manifest.json] | match-t20 [request.json] [output-prefix] | replay-t20 <output-prefix.manifest.json>",
+      "Usage: npm run batch -- status | validate-command <file.json> | score-delivery <request.json> | random <request.json> | hash-state <request.json> | probability <request.json> | sample-category <request.json> | generate-delivery <request.json> | schedule-t20-season <request.json> | simulate-t20-round <schedule.json> <career-state.json> <round-number> [user-team-id] | new-t20-season-projection <schedule.json> | apply-t20-offscreen-outcome <schedule.json> <projection.json> <outcome.json> | validate-world [world.json manifest.json] | setup-t20 <request.json> [world.json manifest.json] | match-t20 [request.json] [output-prefix] | replay-t20 <output-prefix.manifest.json>",
     );
     process.exitCode = 2;
   }

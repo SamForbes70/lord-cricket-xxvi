@@ -19,3 +19,5 @@ export * from "./competition.js";
 export * from "./career.js";
 
 export * from "./season-execution.js";
+
+export * from "./season-projections.js";

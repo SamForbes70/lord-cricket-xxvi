@@ -1,0 +1,256 @@
+{
+  "pass": "12E",
+  "milestone": "M6E_LEAGUE_TABLE_NRR_SEASON_PROJECTIONS",
+  "status": "PASS_CORE_WITH_BROWSER_RERUN_BLOCKED_BY_HOST_POLICY",
+  "baselineCommit": "d1aed30c758af206204f930417b54241b93dce80",
+  "verifiedAtUtc": "2026-10-05T07:11:53Z",
+  "environment": {
+    "node": "v22.16.0",
+    "npm": "10.9.2",
+    "chromium": "Chromium 144.0.7559.96 built on Debian GNU/Linux 13 (trixie)",
+    "platform": "linux-x64"
+  },
+  "dependencyInstall": {
+    "status": "PASS",
+    "mode": "npm ci --offline from pinned cache",
+    "packageLockSha256": "abc3c860fa130c9cc18e0c3d1cb4c86e58206d105d68ed951d40048f8fe34df9",
+    "packagesAdded": 208
+  },
+  "gates": {
+    "schemas": {
+      "status": "PASS",
+      "count": 155
+    },
+    "build": {
+      "status": "PASS"
+    },
+    "typecheck": {
+      "status": "PASS"
+    },
+    "lint": {
+      "status": "PASS",
+      "packageBoundaries": 7
+    },
+    "scoringRegression": {
+      "status": "PASS",
+      "delivery": 45,
+      "ledger": 45,
+      "invalidRejected": 29
+    },
+    "determinismVectors": {
+      "status": "PASS",
+      "randomAddress": 24,
+      "stateHash": 8
+    },
+    "probability": {
+      "status": "PASS",
+      "lutEntries": 1601,
+      "massDrawVectors": 15,
+      "boundaries": 4
+    },
+    "generator": {
+      "status": "PASS",
+      "fixtures": 9
+    },
+    "season12A": {
+      "status": "PASS",
+      "tests": 8,
+      "fixtures": 56
+    },
+    "career12B": {
+      "status": "PASS",
+      "tests": 9
+    },
+    "training12C": {
+      "status": "PASS",
+      "tests": 10
+    },
+    "offscreen12D": {
+      "status": "PASS",
+      "tests": 8,
+      "fixtures": 56,
+      "totalEvents": 17720,
+      "totalCommands": 5856
+    },
+    "projection12E": {
+      "status": "PASS",
+      "tests": 8,
+      "fixturesApplied": 56,
+      "projectionSha256": "f04bdc754dfa3ac8fbcb2b14ad09843a084e8faf209915fbced8ce0e68619cff",
+      "tableSha256": "7265c41b2704070d4cad3d644c9e6b4dec8afce7a09cb13cc02c609f9543cd41",
+      "playerStatsSha256": "599976509740d7ece7d4509d84e49b6e5d8f301327bd675ddecf3bc7620b0d2c"
+    },
+    "fullUnit": {
+      "status": "PASS",
+      "tests": 487,
+      "files": 21
+    },
+    "batchProjectionSmoke": {
+      "status": "PASS",
+      "revision": 1,
+      "appliedCount": 1,
+      "teamAppearances": 2
+    },
+    "browserFresh": {
+      "status": "BLOCKED",
+      "reason": "Chromium navigation to local 127.0.0.1 test server returned ERR_BLOCKED_BY_ADMINISTRATOR before application code loaded",
+      "compiledCliCasesPassed": 1,
+      "pageCasesStarted": 1,
+      "applicationCodeReached": false
+    }
+  },
+  "projectionCorpus": {
+    "auditVersion": "LC_T20_SEASON_PROJECTION_AUDIT_V1",
+    "projectionVersion": "LC_T20_SEASON_PROJECTION_V1",
+    "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+    "fixturesApplied": 56,
+    "totalEvents": 17720,
+    "outcomeCorpusSha256": "c6bf86c083e69a45d39854ccd08c74aca7ff7e17d349c7e6b6f0e9400a26e13f",
+    "projectionSha256": "f04bdc754dfa3ac8fbcb2b14ad09843a084e8faf209915fbced8ce0e68619cff",
+    "tableSha256": "7265c41b2704070d4cad3d644c9e6b4dec8afce7a09cb13cc02c609f9543cd41",
+    "playerStatsSha256": "599976509740d7ece7d4509d84e49b6e5d8f301327bd675ddecf3bc7620b0d2c",
+    "appliedMatchesSha256": "896886d80537161612ef7fcd0a046389d1028729526e835103b3022ba0697ebe",
+    "champion": {
+      "teamId": "team-04",
+      "points": 19,
+      "wins": 9,
+      "nrrNumerator": 788562,
+      "nrrDenominator": 2318796,
+      "nrrX1000": 340
+    },
+    "tableOrder": [
+      "team-04",
+      "team-07",
+      "team-03",
+      "team-02",
+      "team-05",
+      "team-08",
+      "team-01",
+      "team-06"
+    ],
+    "playerStatRecords": 88,
+    "playerAppearances": 1232,
+    "battingRuns": 9194,
+    "creditedBowlingWickets": 765,
+    "runsLeader": {
+      "playerId": "p111",
+      "teamId": "team-06",
+      "value": 270
+    },
+    "wicketsLeader": {
+      "playerId": "p004",
+      "teamId": "team-01",
+      "value": 22
+    },
+    "cursor": {
+      "appliedCount": 56,
+      "highestAppliedFixtureOrdinal": 55,
+      "missingFixtureOrdinals": []
+    },
+    "summarySha256": "5e592ba24439f523354428cedf55293495f00fe223edef72a95dbf1fdced0dd2"
+  },
+  "sourceCompatibility": {
+    "pass12dCommit": "d1aed30c758af206204f930417b54241b93dce80",
+    "criticalFiles": [
+      {
+        "path": "packages/simulation/src/t20-match.ts",
+        "sha256": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/simulation/src/odi-match.ts",
+        "sha256": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/simulation/src/red-ball-match.ts",
+        "sha256": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/simulation/src/red-ball-clock.ts",
+        "sha256": "fb3527069307600f6d43db1ede92e255cfc4c65c0a69d211e4c0447ccff61626",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/simulation/src/generator.ts",
+        "sha256": "1dfb921fe5fa49021f2b37cea945a06b69de351a5e3955e53bf2a96fbc77f43a",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/simulation/src/probability.ts",
+        "sha256": "38221d20341b0e92773a22de21c3eebca043fc5a2a2ae399d9d396b144e9421d",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/simulation/src/determinism.ts",
+        "sha256": "276eeb1d0d7fe9af744522140ab7dadfbc292a50b0b30969aebb21db135121c9",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/simulation/src/offscreen-fixture.ts",
+        "sha256": "59df4303562ae8609fad0961928d952cc2d4c9e8ea47593a961c320f74452867",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/persistence/src/index.ts",
+        "sha256": "c2c2b54a0a1b5c78372d63fed0fcb215382b0755c53d44d5b1ac5f0366265682",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/domain/src/scoring-kernel.ts",
+        "sha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/data/src/probability-pack.ts",
+        "sha256": "f63bc07186fe0e449995520ae155020d310b335f95e4b887e8f1bd1058e77b9c",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/data/src/delivery-pack.ts",
+        "sha256": "b7ed7365b98e4fe65df08f8c15a02127d7ef399a9063bbc60cab34a2ed1b8f7b",
+        "matchesPass12D": true
+      },
+      {
+        "path": "packages/contracts/src/season-execution.ts",
+        "sha256": "15aceee42e7b329e9dadeae5dd0dd35b7d64acb70fe7a2b04236c71bedc77ffa",
+        "matchesPass12D": true
+      },
+      {
+        "path": "apps/web/src/main.tsx",
+        "sha256": "b19854c5f61143af266a9166f58c69e39dc12c019dd939da26ebadccb43e3596",
+        "matchesPass12D": true
+      },
+      {
+        "path": "apps/web/src/match/controller.ts",
+        "sha256": "f7592866eb0e51110b049e029f355be76f77aefa1675c81f179257110a840704",
+        "matchesPass12D": true
+      },
+      {
+        "path": "apps/web/src/match/protocol.ts",
+        "sha256": "c66cae2f1b0b8752d515b68bfd3577e693aa4beeb22e8d9058397527e32d1560",
+        "matchesPass12D": true
+      }
+    ],
+    "criticalFilesAllMatch": true,
+    "inheritedSchemaCount": 147,
+    "inheritedSchemaMismatches": [],
+    "currentSchemaCount": 155,
+    "newSchemaCount": 8
+  },
+  "scope": {
+    "sameT20Engine": true,
+    "alternateMatchSimulator": false,
+    "leagueTableImplemented": true,
+    "nrrImplemented": true,
+    "seasonStatisticsImplemented": true,
+    "exactNrrRanking": true,
+    "seasonPersistenceImplemented": false,
+    "managementUiImplemented": false,
+    "userMatchSeasonAdapterContractImplemented": true,
+    "userMatchControllerWired": false,
+    "tacticalAiImplemented": false,
+    "modelStatus": "SYNTHETIC_ALPHA"
+  }
+}

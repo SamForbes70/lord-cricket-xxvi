@@ -11,3 +11,5 @@ export interface Projection<T> {
 export interface Projector<T> {
   apply(previous: Projection<T>, event: Readonly<EventEnvelope>): Projection<T>;
 }
+
+export * from "./season.js";

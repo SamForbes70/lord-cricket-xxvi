@@ -1,0 +1,50 @@
+{
+  "auditVersion": "LC_T20_SEASON_PROJECTION_AUDIT_V1",
+  "projectionVersion": "LC_T20_SEASON_PROJECTION_V1",
+  "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+  "fixturesApplied": 56,
+  "totalEvents": 17720,
+  "outcomeCorpusSha256": "c6bf86c083e69a45d39854ccd08c74aca7ff7e17d349c7e6b6f0e9400a26e13f",
+  "projectionSha256": "f04bdc754dfa3ac8fbcb2b14ad09843a084e8faf209915fbced8ce0e68619cff",
+  "tableSha256": "7265c41b2704070d4cad3d644c9e6b4dec8afce7a09cb13cc02c609f9543cd41",
+  "playerStatsSha256": "599976509740d7ece7d4509d84e49b6e5d8f301327bd675ddecf3bc7620b0d2c",
+  "appliedMatchesSha256": "896886d80537161612ef7fcd0a046389d1028729526e835103b3022ba0697ebe",
+  "champion": {
+    "teamId": "team-04",
+    "points": 19,
+    "wins": 9,
+    "nrrNumerator": 788562,
+    "nrrDenominator": 2318796,
+    "nrrX1000": 340
+  },
+  "tableOrder": [
+    "team-04",
+    "team-07",
+    "team-03",
+    "team-02",
+    "team-05",
+    "team-08",
+    "team-01",
+    "team-06"
+  ],
+  "playerStatRecords": 88,
+  "playerAppearances": 1232,
+  "battingRuns": 9194,
+  "creditedBowlingWickets": 765,
+  "runsLeader": {
+    "playerId": "p111",
+    "teamId": "team-06",
+    "value": 270
+  },
+  "wicketsLeader": {
+    "playerId": "p004",
+    "teamId": "team-01",
+    "value": 22
+  },
+  "cursor": {
+    "appliedCount": 56,
+    "highestAppliedFixtureOrdinal": 55,
+    "missingFixtureOrdinals": []
+  },
+  "summarySha256": "5e592ba24439f523354428cedf55293495f00fe223edef72a95dbf1fdced0dd2"
+}

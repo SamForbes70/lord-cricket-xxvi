@@ -1,0 +1,104 @@
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+155 JSON Schemas verified
+
+> lord-cricket-xxvi@0.1.0 fixtures:audit
+> node --import tsx scripts/audit-fixtures.ts
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "NOT_REQUESTED",
+  "matchedDeliveryCases": 0,
+  "matchedLedgerCases": 0,
+  "rejectedByScorer": 0,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Pass 07: bounded seeded T20 orchestration"
+}
+
+> lord-cricket-xxvi@0.1.0 fixtures:engine
+> node --import tsx scripts/audit-fixtures.ts --require-scorer
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "PASS",
+  "matchedDeliveryCases": 45,
+  "matchedLedgerCases": 45,
+  "rejectedByScorer": 29,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Pass 07: bounded seeded T20 orchestration"
+}
+
+> lord-cricket-xxvi@0.1.0 vectors:check
+> python3 scripts/check-determinism-vectors.py
+
+PASS: 24 random-address and 8 state-hash vectors independently verified
+
+> lord-cricket-xxvi@0.1.0 probability:check
+> python3 scripts/reference_probability.py
+
+PASS Python independent Decimal LUT: 1601 entries; checksum d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825
+PASS model: d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab; 15 mass/draw vectors; 4 boundaries
+PASS manual fraction identities, masks, empty-mass guard and category-order tie-breaking
+
+> lord-cricket-xxvi@0.1.0 generator:check
+> python3 scripts/check-generator-vectors.py
+
+PASS: 9 independently hashed generator fixtures and exact length/legality mass oracles
+
+> lord-cricket-xxvi@0.1.0 season:fixtures
+> node --import tsx scripts/audit-season-schedule.ts --write
+
+{"eighthRound":[["team-08","team-01"],["team-07","team-02"],["team-06","team-03"],["team-05","team-04"]],"finalDate":"2027-02-11","firstDate":"2027-01-03","firstRound":[["team-01","team-08"],["team-02","team-07"],["team-03","team-06"],["team-04","team-05"]],"fixtures":56,"orderedPairs":56,"rounds":14,"scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","schedulerAlgorithm":"CIRCLE_REVERSE_VENUES_V1","schedulerVersion":"LC_T20_SEASON_SCHEDULE_V1","seasonSeedHash":"9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402","status":"PASS","teamCounts":{"team-01":{"away":7,"home":7,"matches":14},"team-02":{"away":7,"home":7,"matches":14},"team-03":{"away":7,"home":7,"matches":14},"team-04":{"away":7,"home":7,"matches":14},"team-05":{"away":7,"home":7,"matches":14},"team-06":{"away":7,"home":7,"matches":14},"team-07":{"away":7,"home":7,"matches":14},"team-08":{"away":7,"home":7,"matches":14}},"uniqueFixtureIds":56,"uniqueMatchIds":56,"uniqueMatchSeeds":56}
+
+> lord-cricket-xxvi@0.1.0 career:fixtures
+> node --import tsx scripts/audit-career-condition.ts --write
+
+{"appliedCompletionKeys":["completion-m-b383e5ed09f44b7a-r01-m01"],"availabilityPackId":"fictional-eight-01-availability-test-v1","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V1","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001Availability":"UNAVAILABLE","p001FatigueBp":1500,"p002FatigueBp":0},"day2StateSha256":"8d465b1bbaca446d453f8e5a81dfc8e61f6ab840691e1e1fc89e22e92e9eb6ff","day3":{"date":"2027-01-05","p001Availability":"UNAVAILABLE","p001FatigueBp":0},"day3StateSha256":"1a48066d5ba50daafd4b609d06ebe2ee234a49708b8ebd4574f17085cfd32263","fatiguedStateSha256":"cb188e98814aee570d8c2e7081fff4115c54ff3bf326079ebcc1dc9842c96df2","finalScheduledDate":"2027-02-11","initialDate":"2027-01-03","initialStateSha256":"8ccc8adf4718e1c93a4e6873ccadc27a75599df8510235afe186c3bd0585564d","playerConditions":160,"playersPerTeam":[20,20,20,20,20,20,20,20],"status":"PASS","teamCount":8,"worldPackId":"fictional-eight-01"}
+
+> lord-cricket-xxvi@0.1.0 training:fixtures
+> node --import tsx scripts/audit-career-training.ts --write
+
+{"beforeAdvanceSha256":"903dbc3acc9711a141efff18266dd23c826f63c2a6352da2d12dc2a649d768bc","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V2","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001BattingReadiness":1,"p001FatigueBp":2100,"p002BowlingReadiness":1,"p003FieldingReadiness":1,"p004FatigueBp":1500,"practicePlayers":3,"restPlayers":157},"day2StateSha256":"228c1d1f0e8cb27264dc9f9b724c8bca361a97a6f07e9ee32e3cea013024e7d7","day3":{"date":"2027-01-05","p001BattingReadiness":0,"p001FatigueBp":100},"day3StateSha256":"3f2c85d37f8e608e512bc670361c0552868adbe3c8665e38d304d9c194c46efd","noPermanentAttributeGrowth":true,"practiceRecoveryPerDayBp":1400,"readinessRange":[-3,3],"restRecoveryPerDayBp":2000,"status":"PASS","trainingPolicyVersion":"LC_T20_CAREER_TRAINING_V1"}
+
+> lord-cricket-xxvi@0.1.0 projection:fixtures
+> node --import tsx scripts/audit-season-projections.ts
+
+{"status":"PASS","auditVersion":"LC_T20_SEASON_PROJECTION_AUDIT_V1","projectionVersion":"LC_T20_SEASON_PROJECTION_V1","scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","fixturesApplied":56,"totalEvents":17720,"outcomeCorpusSha256":"c6bf86c083e69a45d39854ccd08c74aca7ff7e17d349c7e6b6f0e9400a26e13f","projectionSha256":"f04bdc754dfa3ac8fbcb2b14ad09843a084e8faf209915fbced8ce0e68619cff","tableSha256":"7265c41b2704070d4cad3d644c9e6b4dec8afce7a09cb13cc02c609f9543cd41","playerStatsSha256":"599976509740d7ece7d4509d84e49b6e5d8f301327bd675ddecf3bc7620b0d2c","appliedMatchesSha256":"896886d80537161612ef7fcd0a046389d1028729526e835103b3022ba0697ebe","champion":{"teamId":"team-04","points":19,"wins":9,"nrrNumerator":788562,"nrrDenominator":2318796,"nrrX1000":340},"tableOrder":["team-04","team-07","team-03","team-02","team-05","team-08","team-01","team-06"],"playerStatRecords":88,"playerAppearances":1232,"battingRuns":9194,"creditedBowlingWickets":765,"runsLeader":{"playerId":"p111","teamId":"team-06","value":270},"wicketsLeader":{"playerId":"p004","teamId":"team-01","value":22},"cursor":{"appliedCount":56,"highestAppliedFixtureOrdinal":55,"missingFixtureOrdinals":[]},"summarySha256":"5e592ba24439f523354428cedf55293495f00fe223edef72a95dbf1fdced0dd2"}
+
+> lord-cricket-xxvi@0.1.0 projection:rules
+> vitest run tests/unit/season-projections.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12e/repo[39m
+
+ [32m✓[39m tests/unit/season-projections.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 569[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12E league table, NRR and season statistical projections[2m > [22madapts a validated Pass 12D outcome into the shared season projection path [33m 527[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 07:04:59
+[2m   Duration [22m 1.33s[2m (transform 375ms, setup 0ms, collect 549ms, tests 569ms, environment 0ms, prepare 79ms)[22m

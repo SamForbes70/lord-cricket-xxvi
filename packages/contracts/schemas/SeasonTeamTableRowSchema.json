@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "rank": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8
+    },
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "played": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 14
+    },
+    "wins": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 14
+    },
+    "losses": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 14
+    },
+    "ties": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 14
+    },
+    "noResults": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 14
+    },
+    "points": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 28
+    },
+    "runsFor": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "ballsFor": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "runsAgainst": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "ballsAgainst": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "nrrNumerator": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "nrrDenominator": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nrrX1000": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "headToHeadPoints": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 28
+    }
+  },
+  "required": [
+    "rank",
+    "teamId",
+    "played",
+    "wins",
+    "losses",
+    "ties",
+    "noResults",
+    "points",
+    "runsFor",
+    "ballsFor",
+    "runsAgainst",
+    "ballsAgainst",
+    "nrrNumerator",
+    "nrrDenominator",
+    "nrrX1000",
+    "headToHeadPoints"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SeasonTeamTableRow:1",
+  "title": "SeasonTeamTableRow"
+}

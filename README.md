@@ -1,46 +1,43 @@
-# Lord Cricket XXVI | Pass 12D / M6D deterministic off-screen fixture execution
+# Lord Cricket XXVI | Pass 12E / M6E league table, NRR and season statistical projections
 
-Pass 12D connects the management-season foundation to the accepted T20 match engine. Scheduled league fixtures can now be executed headlessly without introducing a second or simplified cricket simulator.
+Pass 12E turns the deterministic Pass 12D fixture outcomes into an authoritative competition projection. It does not change any cricket match engine.
 
-**Model status remains SYNTHETIC_ALPHA.** Tactical opponent AI is not claimed here. The off-screen runner deliberately uses the existing deterministic `LC_FIXTURE_CAPTAIN_V1` baseline to complete matches. M7 remains responsible for deeper tactical captaincy.
+**Model status remains SYNTHETIC_ALPHA.** The frozen 56-match season result is regression evidence, not evidence of empirical cricket realism.
 
-## Pass 12D deliverable
+## Implemented
 
-`LC_T20_OFFSCREEN_POLICY_V1` pins one execution path:
+`LC_T20_SEASON_PROJECTION_V1` consumes `LC_T20_SEASON_MATCH_COMPLETION_V1` records. Pass 12D off-screen outcomes have an adapter today; future user-played T20 matches must feed the same completion boundary.
 
-- match engine: `LC_T20_MATCH_V1`;
-- XI selection: `LC_SEASON_XI_BASELINE_V1`;
-- captain policy: `LC_FIXTURE_CAPTAIN_V1`;
-- condition feedback: `LC_ENGINE_FINAL_FATIGUE_DELTA_V1`.
+The table implements the custom `LC_T20_LEAGUE_01` rules:
 
-Every fixture remains bound to the Pass 12A schedule's immutable fixture ID, match ID, match seed, home/away teams, date and home ground. Setup is still validated against the frozen fictional world and pinned rules/model/stage hashes.
+- win 2 points;
+- tie or no-result 1 point each;
+- loss 0;
+- order by points, wins, exact NRR, head-to-head mini-table points, then ascending stable team ID;
+- all-out innings use the allocated 120 balls for NRR;
+- successful chases use actual legal balls;
+- no-result matches are excluded from NRR.
 
-The deterministic XI selector:
+NRR ranking uses exact integer rational comparison. The rounded `nrrX1000` value is display data only.
 
-- excludes manually unavailable players;
-- requires an available keeper;
-- requires at least five available non-keeper bowling-capable players;
-- applies temporary Pass 12C readiness as rating points to its matching batting/bowling/fielding skill group;
-- uses lower career fatigue only as a stable tie-break because no calibrated fatigue-to-selection-rating conversion exists yet;
-- never permanently alters frozen player attributes.
+Player projections include matches, runs, dismissals, balls faced, fours, sixes, bowling runs, legal balls, wickets and maidens. Batting average, strike rate, bowling average, economy and bowling strike rate are deterministic fixed-point hundredths. Zero denominators are null. Raw runs and wickets leaderboards use stable player-ID tie-breaking.
 
-A completed off-screen fixture returns a hash-validated outcome containing the selected XIs, canonical event-chain manifest, event and command log hashes, complete scorecard and the exactly-once match-condition delta applied to career state.
+Exactly-once behaviour is explicit: repeating the same completion is idempotent, a conflicting completion is rejected, and the projection cursor exposes gaps when fixtures arrive out of ordinal order.
 
-Round execution sorts fixtures by fixture ID, as required by the V0.1 design. If a managed team is supplied, its fixture is skipped and the other three fixtures complete headlessly, allowing the future career controller to pause before the user's match.
-
-## Full 56-fixture audit
-
-The frozen Pass 12D audit executes all 14 rounds and all 56 scheduled matches through the same T20 engine. The golden audit pins the outcome, scorecard, event-log and command-log corpora plus the final career-state hash.
+## Full 56-fixture projection audit
 
 ```sh
-npm run offscreen:fixtures
-npm run offscreen:rules
+npm run projection:fixtures
+npm run projection:rules
 ```
 
-A compiled batch entry point is also available:
+The frozen audit applies all 56 deterministic Pass 12D outcomes and pins final table, player-stat, applied-match and complete-projection hashes.
+
+Compiled batch entry points:
 
 ```sh
-npm run batch -- simulate-t20-round <schedule.json> <career-state.json> <round-number> [user-team-id]
+npm run batch -- new-t20-season-projection <schedule.json>
+npm run batch -- apply-t20-offscreen-outcome <schedule.json> <projection.json> <outcome.json>
 ```
 
 ## Verify
@@ -49,31 +46,9 @@ With Node 22.12 or later:
 
 ```sh
 npm ci
-npm run verify:12d:core
+npm run verify:12e:core
 ```
 
-Focused management gates remain available:
+Pass 12E deliberately does **not** implement season IndexedDB persistence/archive, management UI/navigation, user-match season wiring or M7 tactical captain AI.
 
-```sh
-npm run season:fixtures
-npm run season:rules
-npm run career:fixtures
-npm run career:rules
-npm run training:fixtures
-npm run training:rules
-npm run offscreen:fixtures
-npm run offscreen:rules
-```
-
-## Architecture boundary
-
-- `packages/contracts/src/season-execution.ts`: strict off-screen policy, fixture outcome and round-result contracts.
-- `packages/data/src/season-execution.ts`: frozen Pass 12D policy declaration.
-- `packages/simulation/src/offscreen-fixture.ts`: deterministic XI selection, match execution, result hashing, user-fixture pause and exactly-once career-condition feedback.
-- `scripts/audit-offscreen-fixtures.ts`: full 56-match golden audit.
-- `tests/unit/offscreen-fixture.test.ts`: focused off-screen invariants, replay/resimulation, availability and duplicate protection.
-- `docs/decisions/024-pass12d-offscreen-fixture-execution.md`: versioning and scope decision.
-
-Pass 12D deliberately does **not** implement league-table/NRR calculation, season statistical projections, career IndexedDB persistence/archive, management UI/navigation or M7 tactical opponent AI.
-
-The next bounded stage is **Pass 12E / M6E: League Table, NRR and Season Statistical Projections**.
+The next bounded stage is **Pass 12F / M6F: Durable Season State, Recovery and Archive**.
