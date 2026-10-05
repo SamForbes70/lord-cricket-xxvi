@@ -230,7 +230,7 @@ it("every generated schema compiles with strict AJV 2020-12", () => {
   const files = readdirSync("packages/contracts/schemas").filter((f) =>
     f.endsWith("Schema.json"),
   );
-  expect(files.length).toBe(120); // 114 inherited schemas plus six additive Pass 12A competition/schedule schemas
+  expect(files.length).toBe(131); // 120 inherited schemas plus eleven additive Pass 12B career/condition schemas
   for (const f of files)
     expect(schema(f.replace("Schema.json", ""))).toBeTypeOf("function");
 });

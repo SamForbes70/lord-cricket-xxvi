@@ -1,0 +1,7 @@
+{
+  "status": "BLOCKED",
+  "scope": "fresh inherited Chromium M4 browser rerun",
+  "reason": "Host Chromium returned net::ERR_BLOCKED_BY_ADMINISTRATOR for http://127.0.0.1:4190/ before application code loaded.",
+  "applicationAssertionsExecuted": false,
+  "compatibilityEvidence": "Pass 12A baseline browser evidence remains applicable because accepted match, persistence, worker and UI implementation files are byte-identical to baseline commit 769e91333c3df17703cbd384b5abde03d1ae174f; see source-integrity.json."
+}

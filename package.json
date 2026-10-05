@@ -48,7 +48,10 @@
     "red5:fixtures": "node --import tsx scripts/audit-red5-fixtures.ts",
     "season:fixtures": "node --import tsx scripts/audit-season-schedule.ts --write",
     "season:rules": "vitest run tests/unit/season-scheduler.test.ts",
-    "verify:12a:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm test"
+    "verify:12a:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm test",
+    "career:fixtures": "node --import tsx scripts/audit-career-condition.ts --write",
+    "career:rules": "vitest run tests/unit/career-condition.test.ts",
+    "verify:12b:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm run career:fixtures && npm run career:rules && npm test"
   },
   "dependencies": {
     "react": "19.1.1",

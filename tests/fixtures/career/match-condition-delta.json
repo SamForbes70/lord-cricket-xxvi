@@ -1,0 +1,11 @@
+{
+  "deltaVersion": "LC_T20_MATCH_CONDITION_DELTA_V1",
+  "matchCompletionKey": "completion-m-b383e5ed09f44b7a-r01-m01",
+  "matchId": "m-b383e5ed09f44b7a-r01-m01",
+  "matchDayDate": "2027-01-03",
+  "playerFatigueDeltaBp": {
+    "p001": 3500,
+    "p002": 1000,
+    "p141": 600
+  }
+}

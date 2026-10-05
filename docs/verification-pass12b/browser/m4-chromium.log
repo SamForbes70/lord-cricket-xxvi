@@ -1,0 +1,188 @@
+
+> lord-cricket-xxvi@0.1.0 test:m4
+> playwright test --config playwright.m4.config.ts
+
+
+Running 6 tests using 1 worker
+
+  ✘  1 [chromium-m4] › tests/m4/persistence.spec.ts:110:1 › autosave resumes exact durable match state after reload and continues (869ms)
+  ✘  2 [chromium-m4] › tests/m4/persistence.spec.ts:138:1 › a second tab is read-only while the first tab holds the writer lease (201ms)
+  ✘  3 [chromium-m4] › tests/m4/persistence.spec.ts:169:1 › manual copy, export and staged import preserve a rehydratable match (217ms)
+  ✘  4 [chromium-m4] › tests/m4/persistence.spec.ts:210:1 › corrupt newest checkpoint recovers an older generation without overwriting the damaged save (193ms)
+  ✘  5 [chromium-m4] › tests/m4/persistence.spec.ts:269:1 › durable command failure rolls provisional engine state back to the last committed revision (209ms)
+  ✘  6 [chromium-m4] › tests/m4/persistence.spec.ts:303:1 › repository abort injection proves command-batch atomicity and duplicate command rejection (187ms)
+
+
+  1) [chromium-m4] › tests/m4/persistence.spec.ts:110:1 › autosave resumes exact durable match state after reload and continues 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4190/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4190/", waiting until "load"[22m
+
+
+      3 |
+      4 | async function ready(page: Page) {
+    > 5 |   await page.goto("/");
+        |              ^
+      6 |   await expect(
+      7 |     page.getByRole("button", { name: "Confirm XIs and start" }),
+      8 |   ).toBeEnabled();
+        at ready (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:5:14)
+        at start (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:14:9)
+        at /mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:113:9
+
+    Error Context: test-results-m4/persistence-autosave-resum-4fb9c--after-reload-and-continues-chromium-m4/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m4/persistence-autosave-resum-4fb9c--after-reload-and-continues-chromium-m4/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m4/persistence-autosave-resum-4fb9c--after-reload-and-continues-chromium-m4/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-m4] › tests/m4/persistence.spec.ts:138:1 › a second tab is read-only while the first tab holds the writer lease 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4190/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4190/", waiting until "load"[22m
+
+
+      3 |
+      4 | async function ready(page: Page) {
+    > 5 |   await page.goto("/");
+        |              ^
+      6 |   await expect(
+      7 |     page.getByRole("button", { name: "Confirm XIs and start" }),
+      8 |   ).toBeEnabled();
+        at ready (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:5:14)
+        at start (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:14:9)
+        at /mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:142:9
+
+    Error Context: test-results-m4/persistence-a-second-tab-i-3a175--tab-holds-the-writer-lease-chromium-m4/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m4/persistence-a-second-tab-i-3a175--tab-holds-the-writer-lease-chromium-m4/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m4/persistence-a-second-tab-i-3a175--tab-holds-the-writer-lease-chromium-m4/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-m4] › tests/m4/persistence.spec.ts:169:1 › manual copy, export and staged import preserve a rehydratable match 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4190/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4190/", waiting until "load"[22m
+
+
+      3 |
+      4 | async function ready(page: Page) {
+    > 5 |   await page.goto("/");
+        |              ^
+      6 |   await expect(
+      7 |     page.getByRole("button", { name: "Confirm XIs and start" }),
+      8 |   ).toBeEnabled();
+        at ready (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:5:14)
+        at start (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:14:9)
+        at /mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:172:9
+
+    Error Context: test-results-m4/persistence-manual-copy-ex-415db-eserve-a-rehydratable-match-chromium-m4/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m4/persistence-manual-copy-ex-415db-eserve-a-rehydratable-match-chromium-m4/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m4/persistence-manual-copy-ex-415db-eserve-a-rehydratable-match-chromium-m4/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-m4] › tests/m4/persistence.spec.ts:210:1 › corrupt newest checkpoint recovers an older generation without overwriting the damaged save 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4190/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4190/", waiting until "load"[22m
+
+
+      3 |
+      4 | async function ready(page: Page) {
+    > 5 |   await page.goto("/");
+        |              ^
+      6 |   await expect(
+      7 |     page.getByRole("button", { name: "Confirm XIs and start" }),
+      8 |   ).toBeEnabled();
+        at ready (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:5:14)
+        at start (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:14:9)
+        at /mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:213:9
+
+    Error Context: test-results-m4/persistence-corrupt-newest-c3091-verwriting-the-damaged-save-chromium-m4/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m4/persistence-corrupt-newest-c3091-verwriting-the-damaged-save-chromium-m4/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m4/persistence-corrupt-newest-c3091-verwriting-the-damaged-save-chromium-m4/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-m4] › tests/m4/persistence.spec.ts:269:1 › durable command failure rolls provisional engine state back to the last committed revision 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4190/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4190/", waiting until "load"[22m
+
+
+      3 |
+      4 | async function ready(page: Page) {
+    > 5 |   await page.goto("/");
+        |              ^
+      6 |   await expect(
+      7 |     page.getByRole("button", { name: "Confirm XIs and start" }),
+      8 |   ).toBeEnabled();
+        at ready (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:5:14)
+        at start (/mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:14:9)
+        at /mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:272:9
+
+    Error Context: test-results-m4/persistence-durable-comman-71303-the-last-committed-revision-chromium-m4/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m4/persistence-durable-comman-71303-the-last-committed-revision-chromium-m4/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m4/persistence-durable-comman-71303-the-last-committed-revision-chromium-m4/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium-m4] › tests/m4/persistence.spec.ts:303:1 › repository abort injection proves command-batch atomicity and duplicate command rejection 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4190/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4190/", waiting until "load"[22m
+
+
+      304 |   page,
+      305 | }) => {
+    > 306 |   await page.goto("/");
+          |              ^
+      307 |   const moduleUrl = `/@fs/${path.resolve("packages/persistence/src/index.ts")}`;
+      308 |   const result = await page.evaluate(async (url) => {
+      309 |     const persistence = (await import(
+        at /mnt/data/lcxxvi-pass12b/repo/tests/m4/persistence.spec.ts:306:14
+
+    Error Context: test-results-m4/persistence-repository-abo-d44a8-duplicate-command-rejection-chromium-m4/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m4/persistence-repository-abo-d44a8-duplicate-command-rejection-chromium-m4/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m4/persistence-repository-abo-d44a8-duplicate-command-rejection-chromium-m4/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [chromium-m4] › tests/m4/persistence.spec.ts:110:1 › autosave resumes exact durable match state after reload and continues 
+    [chromium-m4] › tests/m4/persistence.spec.ts:138:1 › a second tab is read-only while the first tab holds the writer lease 
+    [chromium-m4] › tests/m4/persistence.spec.ts:169:1 › manual copy, export and staged import preserve a rehydratable match 
+    [chromium-m4] › tests/m4/persistence.spec.ts:210:1 › corrupt newest checkpoint recovers an older generation without overwriting the damaged save 
+    [chromium-m4] › tests/m4/persistence.spec.ts:269:1 › durable command failure rolls provisional engine state back to the last committed revision 
+    [chromium-m4] › tests/m4/persistence.spec.ts:303:1 › repository abort injection proves command-batch atomicity and duplicate command rejection 

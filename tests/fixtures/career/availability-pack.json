@@ -1,0 +1,22 @@
+{
+  "availabilityVersion": "LC_T20_AVAILABILITY_PACK_V1",
+  "packId": "fictional-eight-01-availability-test-v1",
+  "worldPackId": "fictional-eight-01",
+  "worldCanonicalSha256": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+  "entries": [
+    {
+      "playerId": "p001",
+      "startDate": "2027-01-04",
+      "endDate": "2027-01-06",
+      "reason": "Pre-declared fixture-pack absence",
+      "source": "MANUAL_FIXTURE_PACK"
+    },
+    {
+      "playerId": "p021",
+      "startDate": "2027-01-10",
+      "endDate": "2027-01-12",
+      "reason": "Pre-declared fixture-pack absence",
+      "source": "MANUAL_FIXTURE_PACK"
+    }
+  ]
+}

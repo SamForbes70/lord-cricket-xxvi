@@ -1,29 +1,23 @@
-# Lord Cricket XXVI | Pass 12A / M6A competition contracts and fixture scheduler
+# Lord Cricket XXVI | Pass 12B / M6B squad condition, availability and career-day state
 
-Pass 12A begins the management layer without changing any accepted match engine. The repository now contains a strict T20 league competition contract and deterministic season scheduler for the V0.1 eight-team fictional competition.
+Pass 12B adds the deterministic player-condition layer needed by the management season without changing any accepted match engine. The Pass 12A 14-round / 56-fixture schedule remains the authoritative season graph.
 
-**Model status remains SYNTHETIC_ALPHA.** T20, ODI and five-day red-ball exhibition play remain as delivered in Pass 11. Limited-overs rain/DLS, tactical opponent AI, injuries, contracts, transfers and empirical calibration remain outside this pass.
+**Model status remains SYNTHETIC_ALPHA.** T20, ODI and five-day red-ball exhibition play are unchanged. Limited-overs rain/DLS, tactical opponent AI, injuries, contracts, transfers and empirical calibration remain outside this pass.
 
-## Pass 12A deliverable
+## Pass 12B deliverable
 
-`LC_T20_LEAGUE_01` defines the bounded V0.1 competition:
+`LC_T20_CAREER_DAY_STATE_V1` binds a career to the frozen world, the exact Pass 12A schedule hash and a versioned availability pack. It tracks all 160 fictional players with:
 
-- eight fictional teams;
-- 14 rounds;
-- four fixtures per round;
-- 56 total fixtures;
-- double round robin;
-- circle scheduling;
-- reverse venues in rounds 8-14;
-- default round spacing of three days;
-- no playoffs;
-- points policy of 2 win, 1 tie/no-result, 0 loss;
-- future table order pinned as points, wins, NRR, head-to-head points, stable team ID;
-- rain-adjusted NRR disabled.
+- fatigue from 0 to 10,000 basis points;
+- last career-day update date;
+- manual availability, independently projected from fatigue;
+- an exactly-once ledger of applied match-condition completions.
 
-`LC_T20_SEASON_SCHEDULE_V1` accepts the frozen world identity, a season identity/seed, start date, eight team IDs and eight home grounds. It produces a canonical 56-fixture schedule with stable fixture IDs, match IDs, match-day dates, home grounds, independent fixture seeds and a SHA-256 schedule identity.
+`LC_T20_CAREER_CONDITION_V1` pins the V0.1 between-match recovery policy. A normal rest day removes 2,000 fatigue basis points, clamped at zero. The future practice recovery constant of 1,400 is recorded but training choices and readiness effects are deferred to Pass 12C.
 
-The scheduler contains no ambient clock. Calendar advancement uses deterministic Gregorian arithmetic. Caller ordering of team IDs cannot change the schedule.
+Career dates advance with pure Gregorian arithmetic and never depend on the system clock, timezone or opening the application. The default frozen availability pack contains no forced absences; the strict pack format supports pre-declared manual unavailable date ranges and random injuries remain disabled.
+
+A match-condition delta is accepted only when it references a match in the exact bound season schedule, uses the fixture's date and contains players from the two scheduled squads. Repeating the identical match completion is idempotent. Conflicting completion keys, duplicate match IDs and unscheduled condition updates are rejected.
 
 ## Run and verify
 
@@ -31,33 +25,29 @@ With Node 22.12 or later:
 
 ```sh
 npm ci
-npm run verify:12a:core
-npm run smoke
+npm run verify:12b:core
 ```
 
-Generate the frozen acceptance schedule directly:
-
-```sh
-npm run batch -- schedule-t20-season tests/fixtures/season/schedule-request.json
-```
-
-Focused Pass 12A gates:
+Focused management gates:
 
 ```sh
 npm run season:fixtures
 npm run season:rules
+npm run career:fixtures
+npm run career:rules
 ```
 
-The pinned acceptance schedule is 14 rounds / 56 fixtures, with every ordered team pair occurring once, each team playing once per round and finishing with seven home and seven away fixtures.
+The frozen Pass 12B career audit verifies the actual 8×20 world rosters, a scheduled match-condition application, duplicate idempotency, daily recovery and manual unavailability against pinned state hashes.
 
 ## Architecture boundary
 
-- `packages/contracts/src/competition.ts`: strict competition, schedule request, round and fixture contracts.
-- `packages/data/src/competition.ts`: frozen `LC_T20_LEAGUE_01` manifest.
-- `packages/simulation/src/season-scheduler.ts`: pure circle scheduler and schedule validator.
-- `tests/fixtures/season`: request and frozen golden identity.
-- `scripts/audit-season-schedule.ts`: machine-readable Pass 12A fixture audit.
+- `packages/contracts/src/career.ts`: strict career, availability, player-condition and match-delta contracts.
+- `packages/data/src/career-condition.ts`: frozen policy, default availability pack and 8×20 squad map.
+- `packages/simulation/src/career-condition.ts`: pure career-day reducer, exactly-once match-condition boundary and squad-condition projection.
+- `tests/fixtures/career`: frozen availability, match delta and state-hash goldens.
+- `scripts/audit-career-condition.ts`: machine-readable Pass 12B audit.
+- `docs/decisions/022-pass12b-career-condition-state.md`: architectural rationale and boundary.
 
-Pass 12A deliberately does **not** implement a playable management season yet. No league table, training, condition, availability, AI fixture execution, match-completion reducer, season persistence or management UI is claimed.
+Pass 12B deliberately does **not** implement training choices/readiness, league table/NRR, AI round execution, season statistics, career IndexedDB persistence or management UI.
 
-The next bounded stage is **Pass 12B: Squad Condition, Availability and Career-Day State**.
+The next bounded stage is **Pass 12C: Training and Recovery Directives**.

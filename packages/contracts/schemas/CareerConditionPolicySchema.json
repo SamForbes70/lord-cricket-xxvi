@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "conditionPolicyVersion": {
+      "type": "string",
+      "const": "LC_T20_CAREER_CONDITION_V1"
+    },
+    "maxFatigueBp": {
+      "type": "number",
+      "const": 10000
+    },
+    "restRecoveryPerDayBp": {
+      "type": "number",
+      "const": 2000
+    },
+    "practiceRecoveryPerDayBp": {
+      "type": "number",
+      "const": 1400
+    },
+    "noRandomInjuries": {
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "conditionPolicyVersion",
+    "maxFatigueBp",
+    "restRecoveryPerDayBp",
+    "practiceRecoveryPerDayBp",
+    "noRandomInjuries"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:CareerConditionPolicy:1",
+  "title": "CareerConditionPolicy"
+}

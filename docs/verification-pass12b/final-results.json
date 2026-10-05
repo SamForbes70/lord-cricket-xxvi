@@ -1,0 +1,238 @@
+{
+  "pass": "12B",
+  "milestone": "M6B",
+  "result": "PASS",
+  "baselineCommit": "769e91333c3df17703cbd384b5abde03d1ae174f",
+  "installation": {
+    "status": "PASS",
+    "command": "npm ci --offline --cache <pinned-cache> --no-audit --no-fund",
+    "lockfileSha256": "1aa457c6023ae96090da9ba9501972ad9a992f3b1c6aa186000da927cdc0551e"
+  },
+  "core": {
+    "status": "PASS",
+    "command": "npm run verify:12b:core",
+    "schemaCount": 131,
+    "unitTests": 461,
+    "unitTestFiles": 18,
+    "careerTests": 9,
+    "seasonTests": 8
+  },
+  "careerAudit": {
+    "status": "PASS",
+    "careerStateVersion": "LC_T20_CAREER_DAY_STATE_V1",
+    "conditionPolicyVersion": "LC_T20_CAREER_CONDITION_V1",
+    "worldPackId": "fictional-eight-01",
+    "playerConditions": 160,
+    "teamCount": 8,
+    "playersPerTeam": [
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20
+    ],
+    "initialDate": "2027-01-03",
+    "finalScheduledDate": "2027-02-11",
+    "initialStateSha256": "8ccc8adf4718e1c93a4e6873ccadc27a75599df8510235afe186c3bd0585564d",
+    "fatiguedStateSha256": "cb188e98814aee570d8c2e7081fff4115c54ff3bf326079ebcc1dc9842c96df2",
+    "day2StateSha256": "8d465b1bbaca446d453f8e5a81dfc8e61f6ab840691e1e1fc89e22e92e9eb6ff",
+    "day3StateSha256": "1a48066d5ba50daafd4b609d06ebe2ee234a49708b8ebd4574f17085cfd32263",
+    "availabilityPackId": "fictional-eight-01-availability-test-v1",
+    "appliedCompletionKeys": [
+      "completion-m-b383e5ed09f44b7a-r01-m01"
+    ],
+    "day2": {
+      "date": "2027-01-04",
+      "p001FatigueBp": 1500,
+      "p001Availability": "UNAVAILABLE",
+      "p002FatigueBp": 0
+    },
+    "day3": {
+      "date": "2027-01-05",
+      "p001FatigueBp": 0,
+      "p001Availability": "UNAVAILABLE"
+    }
+  },
+  "seasonAudit": {
+    "status": "PASS",
+    "schedulerVersion": "LC_T20_SEASON_SCHEDULE_V1",
+    "schedulerAlgorithm": "CIRCLE_REVERSE_VENUES_V1",
+    "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+    "seasonSeedHash": "9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402",
+    "rounds": 14,
+    "fixtures": 56,
+    "orderedPairs": 56,
+    "uniqueFixtureIds": 56,
+    "uniqueMatchIds": 56,
+    "uniqueMatchSeeds": 56,
+    "firstRound": [
+      [
+        "team-01",
+        "team-08"
+      ],
+      [
+        "team-02",
+        "team-07"
+      ],
+      [
+        "team-03",
+        "team-06"
+      ],
+      [
+        "team-04",
+        "team-05"
+      ]
+    ],
+    "eighthRound": [
+      [
+        "team-08",
+        "team-01"
+      ],
+      [
+        "team-07",
+        "team-02"
+      ],
+      [
+        "team-06",
+        "team-03"
+      ],
+      [
+        "team-05",
+        "team-04"
+      ]
+    ],
+    "firstDate": "2027-01-03",
+    "finalDate": "2027-02-11",
+    "teamCounts": {
+      "team-01": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      },
+      "team-02": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      },
+      "team-03": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      },
+      "team-04": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      },
+      "team-05": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      },
+      "team-06": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      },
+      "team-07": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      },
+      "team-08": {
+        "home": 7,
+        "away": 7,
+        "matches": 14
+      }
+    }
+  },
+  "sourceIntegrity": {
+    "status": "PASS",
+    "baselineCommit": "769e91333c3df17703cbd384b5abde03d1ae174f",
+    "criticalFiles": [
+      {
+        "path": "packages/simulation/src/determinism.ts",
+        "unchanged": true,
+        "sha256": "276eeb1d0d7fe9af744522140ab7dadfbc292a50b0b30969aebb21db135121c9"
+      },
+      {
+        "path": "packages/simulation/src/generator.ts",
+        "unchanged": true,
+        "sha256": "1dfb921fe5fa49021f2b37cea945a06b69de351a5e3955e53bf2a96fbc77f43a"
+      },
+      {
+        "path": "packages/simulation/src/probability.ts",
+        "unchanged": true,
+        "sha256": "38221d20341b0e92773a22de21c3eebca043fc5a2a2ae399d9d396b144e9421d"
+      },
+      {
+        "path": "packages/simulation/src/t20-match.ts",
+        "unchanged": true,
+        "sha256": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db"
+      },
+      {
+        "path": "packages/simulation/src/odi-match.ts",
+        "unchanged": true,
+        "sha256": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8"
+      },
+      {
+        "path": "packages/simulation/src/red-ball-match.ts",
+        "unchanged": true,
+        "sha256": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500"
+      },
+      {
+        "path": "packages/simulation/src/red-ball-clock.ts",
+        "unchanged": true,
+        "sha256": "fb3527069307600f6d43db1ede92e255cfc4c65c0a69d211e4c0447ccff61626"
+      },
+      {
+        "path": "packages/persistence/src/index.ts",
+        "unchanged": true,
+        "sha256": "c2c2b54a0a1b5c78372d63fed0fcb215382b0755c53d44d5b1ac5f0366265682"
+      },
+      {
+        "path": "packages/persistence/src/archive.ts",
+        "unchanged": true,
+        "sha256": "96a0a235b58e0644339df0004a40eeae52f34df8ffecfec53a49617fb1f031de"
+      },
+      {
+        "path": "apps/web/src/match/match.worker.ts",
+        "unchanged": true,
+        "sha256": "9b1b265ad7acccebfbb1c195d3f92649aae9d7eab0766f24027f81eb78c8c985"
+      },
+      {
+        "path": "apps/web/src/match/controller.ts",
+        "unchanged": true,
+        "sha256": "f7592866eb0e51110b049e029f355be76f77aefa1675c81f179257110a840704"
+      },
+      {
+        "path": "apps/web/src/match/controller-odi.ts",
+        "unchanged": true,
+        "sha256": "9ce37fa2a44b2da30dca2894ce30b6a81f154da392084dc9471853499566b7d0"
+      },
+      {
+        "path": "apps/web/src/match/controller-red5.ts",
+        "unchanged": true,
+        "sha256": "5dee2e107b189c0388047ebee2a38a2d881fb80bbbf6a628a8c887fd178e23e2"
+      }
+    ],
+    "criticalUnchanged": 13,
+    "criticalTotal": 13,
+    "inheritedSchemas": 120,
+    "inheritedSchemasUnchanged": 120
+  },
+  "browser": {
+    "status": "BLOCKED",
+    "scope": "fresh inherited Chromium M4 browser rerun",
+    "reason": "Host Chromium returned net::ERR_BLOCKED_BY_ADMINISTRATOR for http://127.0.0.1:4190/ before application code loaded.",
+    "applicationAssertionsExecuted": false,
+    "compatibilityEvidence": "Pass 12A baseline browser evidence remains applicable because accepted match, persistence, worker and UI implementation files are byte-identical to baseline commit 769e91333c3df17703cbd384b5abde03d1ae174f; see source-integrity.json."
+  },
+  "limitations": [
+    "Training directives/readiness deferred to Pass 12C",
+    "AI round simulation/table/statistics/season persistence/management UI not implemented in Pass 12B"
+  ]
+}

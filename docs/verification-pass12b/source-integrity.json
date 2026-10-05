@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "baselineCommit": "769e91333c3df17703cbd384b5abde03d1ae174f",
+  "criticalFiles": [
+    {
+      "path": "packages/simulation/src/determinism.ts",
+      "unchanged": true,
+      "sha256": "276eeb1d0d7fe9af744522140ab7dadfbc292a50b0b30969aebb21db135121c9"
+    },
+    {
+      "path": "packages/simulation/src/generator.ts",
+      "unchanged": true,
+      "sha256": "1dfb921fe5fa49021f2b37cea945a06b69de351a5e3955e53bf2a96fbc77f43a"
+    },
+    {
+      "path": "packages/simulation/src/probability.ts",
+      "unchanged": true,
+      "sha256": "38221d20341b0e92773a22de21c3eebca043fc5a2a2ae399d9d396b144e9421d"
+    },
+    {
+      "path": "packages/simulation/src/t20-match.ts",
+      "unchanged": true,
+      "sha256": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db"
+    },
+    {
+      "path": "packages/simulation/src/odi-match.ts",
+      "unchanged": true,
+      "sha256": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8"
+    },
+    {
+      "path": "packages/simulation/src/red-ball-match.ts",
+      "unchanged": true,
+      "sha256": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500"
+    },
+    {
+      "path": "packages/simulation/src/red-ball-clock.ts",
+      "unchanged": true,
+      "sha256": "fb3527069307600f6d43db1ede92e255cfc4c65c0a69d211e4c0447ccff61626"
+    },
+    {
+      "path": "packages/persistence/src/index.ts",
+      "unchanged": true,
+      "sha256": "c2c2b54a0a1b5c78372d63fed0fcb215382b0755c53d44d5b1ac5f0366265682"
+    },
+    {
+      "path": "packages/persistence/src/archive.ts",
+      "unchanged": true,
+      "sha256": "96a0a235b58e0644339df0004a40eeae52f34df8ffecfec53a49617fb1f031de"
+    },
+    {
+      "path": "apps/web/src/match/match.worker.ts",
+      "unchanged": true,
+      "sha256": "9b1b265ad7acccebfbb1c195d3f92649aae9d7eab0766f24027f81eb78c8c985"
+    },
+    {
+      "path": "apps/web/src/match/controller.ts",
+      "unchanged": true,
+      "sha256": "f7592866eb0e51110b049e029f355be76f77aefa1675c81f179257110a840704"
+    },
+    {
+      "path": "apps/web/src/match/controller-odi.ts",
+      "unchanged": true,
+      "sha256": "9ce37fa2a44b2da30dca2894ce30b6a81f154da392084dc9471853499566b7d0"
+    },
+    {
+      "path": "apps/web/src/match/controller-red5.ts",
+      "unchanged": true,
+      "sha256": "5dee2e107b189c0388047ebee2a38a2d881fb80bbbf6a628a8c887fd178e23e2"
+    }
+  ],
+  "criticalUnchanged": 13,
+  "criticalTotal": 13,
+  "inheritedSchemas": 120,
+  "inheritedSchemasUnchanged": 120
+}
