@@ -1,54 +1,40 @@
-# Lord Cricket XXVI | Pass 12E / M6E league table, NRR and season statistical projections
+# Lord Cricket XXVI | Pass 12F / M6F durable season state, recovery and archive
 
-Pass 12E turns the deterministic Pass 12D fixture outcomes into an authoritative competition projection. It does not change any cricket match engine.
+Pass 12F binds the existing management subsystems into one durable season aggregate without changing cricket match outcomes.
 
-**Model status remains SYNTHETIC_ALPHA.** The frozen 56-match season result is regression evidence, not evidence of empirical cricket realism.
+**Model status remains SYNTHETIC_ALPHA.** The frozen season remains deterministic regression evidence, not empirical calibration.
 
-## Implemented
+## Durable season state
 
-`LC_T20_SEASON_PROJECTION_V1` consumes `LC_T20_SEASON_MATCH_COMPLETION_V1` records. Pass 12D off-screen outcomes have an adapter today; future user-played T20 matches must feed the same completion boundary.
+`LC_T20_SEASON_STATE_V1` contains:
 
-The table implements the custom `LC_T20_LEAGUE_01` rules:
+- the frozen 56-fixture schedule;
+- V2 career condition, availability, training and readiness;
+- `LC_T20_SEASON_PROJECTION_V1` table/player statistics;
+- canonical match-completion records for every finished fixture;
+- controlled team, aggregate revision and ACTIVE/COMPLETE phase;
+- canonical SHA-256.
 
-- win 2 points;
-- tie or no-result 1 point each;
-- loss 0;
-- order by points, wins, exact NRR, head-to-head mini-table points, then ascending stable team ID;
-- all-out innings use the allocated 120 balls for NRR;
-- successful chases use actual legal balls;
-- no-result matches are excluded from NRR.
+Validation rechecks the embedded schedule and career hashes and reconciles completed fixtures across career condition and projection ledgers. A season becomes COMPLETE only when all 56 fixtures reconcile and the projection cursor has no gaps.
 
-NRR ranking uses exact integer rational comparison. The rounded `nrrX1000` value is display data only.
+## Persistence and recovery
 
-Player projections include matches, runs, dismissals, balls faced, fours, sixes, bowling runs, legal balls, wickets and maidens. Batting average, strike rate, bowling average, economy and bowling strike rate are deterministic fixed-point hundredths. Zero denominators are null. Raw runs and wickets leaderboards use stable player-ID tie-breaking.
+`IndexedDbSeasonRepository` reuses the M4 database and stores. Season rows are additive `SEASON` records; inherited match saves remain readable and are excluded from season listings.
 
-Exactly-once behaviour is explicit: repeating the same completion is idempotent, a conflicting completion is rejected, and the projection cursor exposes gaps when fixtures arrive out of ordinal order.
+A commit requires the writer lease and durable revision, then writes the checkpoint, optional command receipt and season projection in one IndexedDB transaction. Three checkpoint generations rotate. Recovery selects the newest valid generation and leaves the corrupt generation untouched for diagnostics.
 
-## Full 56-fixture projection audit
+The current host blocks all browser navigation with `ERR_BLOCKED_BY_ADMINISTRATOR`, so the new real-IndexedDB Playwright gate is retained but must be recorded BLOCKED here. Its production browser bundle builds successfully. Pure checkpoint/recovery and archive behaviour are independently executable in Node.
 
-```sh
-npm run projection:fixtures
-npm run projection:rules
-```
+## Portable saves and final archive
 
-The frozen audit applies all 56 deterministic Pass 12D outcomes and pins final table, player-stat, applied-match and complete-projection hashes.
+A season `.lcxxvi` contains `manifest.json`, `game.json`, `events.ndjson` (canonical match completions) and `projection.json`. Complete seasons additionally carry `season-archive.json`.
 
-Compiled batch entry points:
+`LC_T20_SEASON_ARCHIVE_V1` freezes champion, final table, leaders, all 56 completion keys and the final state hash. It cannot be produced from an incomplete season.
 
 ```sh
-npm run batch -- new-t20-season-projection <schedule.json>
-npm run batch -- apply-t20-offscreen-outcome <schedule.json> <projection.json> <outcome.json>
+npm run season:persistence:fixtures
+npm run season:persistence:rules
+npm run verify:12f:core
 ```
 
-## Verify
-
-With Node 22.12 or later:
-
-```sh
-npm ci
-npm run verify:12e:core
-```
-
-Pass 12E deliberately does **not** implement season IndexedDB persistence/archive, management UI/navigation, user-match season wiring or M7 tactical captain AI.
-
-The next bounded stage is **Pass 12F / M6F: Durable Season State, Recovery and Archive**.
+Pass 12F deliberately does not add management screens or a second career year. The next bounded build is **Pass 12G / M6G: Management UI and Full-Season Acceptance**.

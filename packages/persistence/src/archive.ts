@@ -1,5 +1,6 @@
-import { canonicalJson } from "@lcxxvi/contracts";
+import { canonicalJson, SeasonPortableManifestSchema, SeasonSaveSummarySchema, SeasonArchiveSchema, type SeasonPortableManifest, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState } from "@lcxxvi/contracts";
 import { SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
+import { SEASON_SAVE_SCHEMA_VERSION, validateT20SeasonArchive, validateT20SeasonState } from "./season.js";
 
 export const ARCHIVE_EXTENSION = ".lcxxvi";
 export const ARCHIVE_VERSION = "LC_ARCHIVE_V1" as const;
@@ -418,4 +419,88 @@ export async function readPortableArchive(
   )
     throw new Error("ARCHIVE_EVENT_STREAM_MISMATCH");
   return { session, summary: manifest.summary, manifest };
+}
+
+
+export const SEASON_PORTABLE_ARCHIVE_VERSION = "LC_T20_SEASON_PORTABLE_V1" as const;
+
+export async function createSeasonPortableArchive(
+  stateRaw: unknown,
+  summaryRaw: unknown,
+  exportedAt: string,
+  completedArchiveRaw: unknown | null = null,
+): Promise<Uint8Array> {
+  const state = await validateT20SeasonState(stateRaw);
+  const summary = SeasonSaveSummarySchema.parse(summaryRaw);
+  if (summary.seasonId !== state.seasonId || summary.stateSha256 !== state.stateSha256 || summary.revision !== state.revision)
+    throw new Error("SEASON_ARCHIVE_SUMMARY_STATE_MISMATCH");
+  const completedArchive = completedArchiveRaw === null ? null : await validateT20SeasonArchive(completedArchiveRaw);
+  if ((state.phase === "COMPLETE") !== Boolean(completedArchive))
+    throw new Error("SEASON_ARCHIVE_COMPLETION_PAYLOAD_MISMATCH");
+  if (completedArchive && completedArchive.stateSha256 !== state.stateSha256)
+    throw new Error("SEASON_ARCHIVE_FINAL_STATE_MISMATCH");
+  const payloads: Entry[] = [
+    { name: "game.json", data: encoder.encode(canonicalJson(state)) },
+    { name: "events.ndjson", data: encoder.encode(state.completedMatches.map((m) => canonicalJson(m)).join("\n") + (state.completedMatches.length ? "\n" : "")) },
+    { name: "projection.json", data: encoder.encode(canonicalJson(state.projection)) },
+  ];
+  if (completedArchive) payloads.push({ name: "season-archive.json", data: encoder.encode(canonicalJson(completedArchive)) });
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
+  for (const payload of payloads) fileMeta[payload.name] = { bytes: payload.data.length, sha256: await sha256Bytes(payload.data) };
+  const manifest = SeasonPortableManifestSchema.parse({
+    archiveVersion: SEASON_PORTABLE_ARCHIVE_VERSION,
+    saveSchema: SEASON_SAVE_SCHEMA_VERSION,
+    exportedAt,
+    summary,
+    files: fileMeta,
+  });
+  return makeZip([{ name: "manifest.json", data: encoder.encode(canonicalJson(manifest)) }, ...payloads]);
+}
+
+export async function readSeasonPortableArchive(bytes: Uint8Array): Promise<{
+  state: T20SeasonState;
+  summary: SeasonSaveSummary;
+  manifest: SeasonPortableManifest;
+  seasonArchive: SeasonArchive | null;
+}> {
+  const files = parseZip(bytes);
+  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "projection.json", "season-archive.json"]);
+  for (const name of files.keys()) if (!allowed.has(name)) throw new Error("SEASON_ARCHIVE_FILE_NOT_ALLOWED");
+  for (const required of ["manifest.json", "game.json", "events.ndjson", "projection.json"])
+    if (!files.has(required)) throw new Error(`SEASON_ARCHIVE_MISSING_${required}`);
+  let manifestRaw: unknown;
+  try { manifestRaw = JSON.parse(decoder.decode(files.get("manifest.json")!)); } catch { throw new Error("SEASON_ARCHIVE_MANIFEST_JSON_INVALID"); }
+  const manifest = SeasonPortableManifestSchema.parse(manifestRaw);
+  const actualPayloadNames = [...files.keys()].filter((name) => name !== "manifest.json").sort();
+  const declaredNames = Object.keys(manifest.files).sort();
+  if (canonicalJson(actualPayloadNames) !== canonicalJson(declaredNames)) throw new Error("SEASON_ARCHIVE_FILE_SET_MISMATCH");
+  for (const name of declaredNames) {
+    const data = files.get(name);
+    if (!data) throw new Error(`SEASON_ARCHIVE_MISSING_${name}`);
+    const meta = manifest.files[name]!;
+    if (data.length !== meta.bytes || await sha256Bytes(data) !== meta.sha256) throw new Error(`SEASON_ARCHIVE_HASH_MISMATCH_${name}`);
+  }
+  let stateRaw: unknown;
+  try { stateRaw = JSON.parse(decoder.decode(files.get("game.json")!)); } catch { throw new Error("SEASON_ARCHIVE_GAME_JSON_INVALID"); }
+  const state = await validateT20SeasonState(stateRaw);
+  const summary = SeasonSaveSummarySchema.parse(manifest.summary);
+  if (summary.seasonId !== state.seasonId || summary.stateSha256 !== state.stateSha256 || summary.revision !== state.revision) throw new Error("SEASON_ARCHIVE_SUMMARY_STATE_MISMATCH");
+  const eventText = decoder.decode(files.get("events.ndjson")!);
+  const eventLines = eventText.length ? eventText.split("\n").filter(Boolean) : [];
+  if (eventLines.length !== state.completedMatches.length) throw new Error("SEASON_ARCHIVE_EVENT_COUNT_MISMATCH");
+  for (let index = 0; index < eventLines.length; index += 1) {
+    let parsed: unknown; try { parsed = JSON.parse(eventLines[index]!); } catch { throw new Error("SEASON_ARCHIVE_EVENT_JSON_INVALID"); }
+    if (canonicalJson(parsed) !== canonicalJson(state.completedMatches[index])) throw new Error(`SEASON_ARCHIVE_EVENT_MISMATCH_${index}`);
+  }
+  let projectionRaw: unknown;
+  try { projectionRaw = JSON.parse(decoder.decode(files.get("projection.json")!)); } catch { throw new Error("SEASON_ARCHIVE_PROJECTION_JSON_INVALID"); }
+  if (canonicalJson(projectionRaw) !== canonicalJson(state.projection)) throw new Error("SEASON_ARCHIVE_PROJECTION_MISMATCH");
+  let seasonArchive: SeasonArchive | null = null;
+  if (files.has("season-archive.json")) {
+    let raw: unknown; try { raw = JSON.parse(decoder.decode(files.get("season-archive.json")!)); } catch { throw new Error("SEASON_ARCHIVE_FINAL_JSON_INVALID"); }
+    seasonArchive = await validateT20SeasonArchive(SeasonArchiveSchema.parse(raw));
+    if (seasonArchive.stateSha256 !== state.stateSha256) throw new Error("SEASON_ARCHIVE_FINAL_STATE_MISMATCH");
+  }
+  if ((state.phase === "COMPLETE") !== Boolean(seasonArchive)) throw new Error("SEASON_ARCHIVE_COMPLETION_PAYLOAD_MISMATCH");
+  return { state, summary, manifest, seasonArchive };
 }

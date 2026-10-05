@@ -1,0 +1,7458 @@
+{
+  "seasonStateVersion": "LC_T20_SEASON_STATE_V1",
+  "seasonId": "season-01",
+  "gameId": "career-01",
+  "careerId": "career-persistence-audit-01",
+  "controlledTeamId": "team-01",
+  "schedule": {
+    "scheduleVersion": "LC_T20_SEASON_SCHEDULE_V1",
+    "schedulerAlgorithm": "CIRCLE_REVERSE_VENUES_V1",
+    "seasonId": "season-01",
+    "gameId": "career-01",
+    "competitionId": "LC_T20_LEAGUE_01",
+    "worldPackId": "fictional-eight-01",
+    "worldCanonicalSha256": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+    "seasonSeedHash": "9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402",
+    "startDate": "2027-01-03",
+    "teamIds": [
+      "team-01",
+      "team-02",
+      "team-03",
+      "team-04",
+      "team-05",
+      "team-06",
+      "team-07",
+      "team-08"
+    ],
+    "groundIds": [
+      "ground-01",
+      "ground-02",
+      "ground-03",
+      "ground-04",
+      "ground-05",
+      "ground-06",
+      "ground-07",
+      "ground-08"
+    ],
+    "homeGroundIds": {
+      "team-01": "ground-01",
+      "team-02": "ground-02",
+      "team-03": "ground-03",
+      "team-04": "ground-04",
+      "team-05": "ground-05",
+      "team-06": "ground-06",
+      "team-07": "ground-07",
+      "team-08": "ground-08"
+    },
+    "rounds": [
+      {
+        "roundNumber": 1,
+        "matchDayDate": "2027-01-03",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r01-m01",
+          "fx-b383e5ed09f44b7a-r01-m02",
+          "fx-b383e5ed09f44b7a-r01-m03",
+          "fx-b383e5ed09f44b7a-r01-m04"
+        ]
+      },
+      {
+        "roundNumber": 2,
+        "matchDayDate": "2027-01-06",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r02-m01",
+          "fx-b383e5ed09f44b7a-r02-m02",
+          "fx-b383e5ed09f44b7a-r02-m03",
+          "fx-b383e5ed09f44b7a-r02-m04"
+        ]
+      },
+      {
+        "roundNumber": 3,
+        "matchDayDate": "2027-01-09",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r03-m01",
+          "fx-b383e5ed09f44b7a-r03-m02",
+          "fx-b383e5ed09f44b7a-r03-m03",
+          "fx-b383e5ed09f44b7a-r03-m04"
+        ]
+      },
+      {
+        "roundNumber": 4,
+        "matchDayDate": "2027-01-12",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r04-m01",
+          "fx-b383e5ed09f44b7a-r04-m02",
+          "fx-b383e5ed09f44b7a-r04-m03",
+          "fx-b383e5ed09f44b7a-r04-m04"
+        ]
+      },
+      {
+        "roundNumber": 5,
+        "matchDayDate": "2027-01-15",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r05-m01",
+          "fx-b383e5ed09f44b7a-r05-m02",
+          "fx-b383e5ed09f44b7a-r05-m03",
+          "fx-b383e5ed09f44b7a-r05-m04"
+        ]
+      },
+      {
+        "roundNumber": 6,
+        "matchDayDate": "2027-01-18",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r06-m01",
+          "fx-b383e5ed09f44b7a-r06-m02",
+          "fx-b383e5ed09f44b7a-r06-m03",
+          "fx-b383e5ed09f44b7a-r06-m04"
+        ]
+      },
+      {
+        "roundNumber": 7,
+        "matchDayDate": "2027-01-21",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r07-m01",
+          "fx-b383e5ed09f44b7a-r07-m02",
+          "fx-b383e5ed09f44b7a-r07-m03",
+          "fx-b383e5ed09f44b7a-r07-m04"
+        ]
+      },
+      {
+        "roundNumber": 8,
+        "matchDayDate": "2027-01-24",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r08-m01",
+          "fx-b383e5ed09f44b7a-r08-m02",
+          "fx-b383e5ed09f44b7a-r08-m03",
+          "fx-b383e5ed09f44b7a-r08-m04"
+        ]
+      },
+      {
+        "roundNumber": 9,
+        "matchDayDate": "2027-01-27",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r09-m01",
+          "fx-b383e5ed09f44b7a-r09-m02",
+          "fx-b383e5ed09f44b7a-r09-m03",
+          "fx-b383e5ed09f44b7a-r09-m04"
+        ]
+      },
+      {
+        "roundNumber": 10,
+        "matchDayDate": "2027-01-30",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r10-m01",
+          "fx-b383e5ed09f44b7a-r10-m02",
+          "fx-b383e5ed09f44b7a-r10-m03",
+          "fx-b383e5ed09f44b7a-r10-m04"
+        ]
+      },
+      {
+        "roundNumber": 11,
+        "matchDayDate": "2027-02-02",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r11-m01",
+          "fx-b383e5ed09f44b7a-r11-m02",
+          "fx-b383e5ed09f44b7a-r11-m03",
+          "fx-b383e5ed09f44b7a-r11-m04"
+        ]
+      },
+      {
+        "roundNumber": 12,
+        "matchDayDate": "2027-02-05",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r12-m01",
+          "fx-b383e5ed09f44b7a-r12-m02",
+          "fx-b383e5ed09f44b7a-r12-m03",
+          "fx-b383e5ed09f44b7a-r12-m04"
+        ]
+      },
+      {
+        "roundNumber": 13,
+        "matchDayDate": "2027-02-08",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r13-m01",
+          "fx-b383e5ed09f44b7a-r13-m02",
+          "fx-b383e5ed09f44b7a-r13-m03",
+          "fx-b383e5ed09f44b7a-r13-m04"
+        ]
+      },
+      {
+        "roundNumber": 14,
+        "matchDayDate": "2027-02-11",
+        "fixtureIds": [
+          "fx-b383e5ed09f44b7a-r14-m01",
+          "fx-b383e5ed09f44b7a-r14-m02",
+          "fx-b383e5ed09f44b7a-r14-m03",
+          "fx-b383e5ed09f44b7a-r14-m04"
+        ]
+      }
+    ],
+    "fixtures": [
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m01",
+        "matchId": "m-b383e5ed09f44b7a-r01-m01",
+        "ordinal": 0,
+        "roundNumber": 1,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-03",
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-08",
+        "groundId": "ground-01",
+        "matchSeed": "bdd032f9cf2050cf5034a828d9d459a82c5a8a0048b492653cbc0e3a1913dcb8",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m02",
+        "matchId": "m-b383e5ed09f44b7a-r01-m02",
+        "ordinal": 1,
+        "roundNumber": 1,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-03",
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-07",
+        "groundId": "ground-02",
+        "matchSeed": "6f68cc3a615eaf63d4ea09dc885f97f0fb36af4d795ce513b465cbc3b5caf5ee",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m03",
+        "matchId": "m-b383e5ed09f44b7a-r01-m03",
+        "ordinal": 2,
+        "roundNumber": 1,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-03",
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-06",
+        "groundId": "ground-03",
+        "matchSeed": "21f3dc5d7b0d4569db67b76c637e92712b7e9d2243d04e3329e73871d01e4f28",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m04",
+        "matchId": "m-b383e5ed09f44b7a-r01-m04",
+        "ordinal": 3,
+        "roundNumber": 1,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-03",
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-05",
+        "groundId": "ground-04",
+        "matchSeed": "c6489c407149acf359eeb4fbef605a05dc2cb3dd2d1df1c6d335a954e35a8fc0",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r02-m01",
+        "matchId": "m-b383e5ed09f44b7a-r02-m01",
+        "ordinal": 4,
+        "roundNumber": 2,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-06",
+        "homeTeamId": "team-07",
+        "awayTeamId": "team-01",
+        "groundId": "ground-07",
+        "matchSeed": "8be686b3bd04918cfede9d24f87e2827d0d19be7190bf435b879011a35bfe61d",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r02-m02",
+        "matchId": "m-b383e5ed09f44b7a-r02-m02",
+        "ordinal": 5,
+        "roundNumber": 2,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-06",
+        "homeTeamId": "team-06",
+        "awayTeamId": "team-08",
+        "groundId": "ground-06",
+        "matchSeed": "ec1ce6c427d2af1bdcbd0926b31d7c6cfd4dab52a4f03bd1026677023e21f63a",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r02-m03",
+        "matchId": "m-b383e5ed09f44b7a-r02-m03",
+        "ordinal": 6,
+        "roundNumber": 2,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-06",
+        "homeTeamId": "team-05",
+        "awayTeamId": "team-02",
+        "groundId": "ground-05",
+        "matchSeed": "951683af1146e96302c42aef22374570f8eff92c7f33cb24945a2e3bccc94a47",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r02-m04",
+        "matchId": "m-b383e5ed09f44b7a-r02-m04",
+        "ordinal": 7,
+        "roundNumber": 2,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-06",
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-03",
+        "groundId": "ground-04",
+        "matchSeed": "36e42ed10f2f6ca61ac445e286f34faef8c0919ddc1895d884fc2f80a955cbb2",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r03-m01",
+        "matchId": "m-b383e5ed09f44b7a-r03-m01",
+        "ordinal": 8,
+        "roundNumber": 3,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-09",
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-06",
+        "groundId": "ground-01",
+        "matchSeed": "fe19ab71308a0c7baeeda43e3ebab3a32deaa52b33ac51a4d825c53e64e7dc5e",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r03-m02",
+        "matchId": "m-b383e5ed09f44b7a-r03-m02",
+        "ordinal": 9,
+        "roundNumber": 3,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-09",
+        "homeTeamId": "team-07",
+        "awayTeamId": "team-05",
+        "groundId": "ground-07",
+        "matchSeed": "506eee3a1a6153b146bd1f94aa26ecf265510d401c5f03cb08c2323b0968d9be",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r03-m03",
+        "matchId": "m-b383e5ed09f44b7a-r03-m03",
+        "ordinal": 10,
+        "roundNumber": 3,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-09",
+        "homeTeamId": "team-08",
+        "awayTeamId": "team-04",
+        "groundId": "ground-08",
+        "matchSeed": "3ec58beac73299f8da837e61a7c7b3bf22e1aa308d8c003e5de5e8650a20268b",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r03-m04",
+        "matchId": "m-b383e5ed09f44b7a-r03-m04",
+        "ordinal": 11,
+        "roundNumber": 3,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-09",
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-03",
+        "groundId": "ground-02",
+        "matchSeed": "2eb69ec8b481cbb8fbf99dfbacdca778dc2ea320e01abca3731f9c272fcd96da",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r04-m01",
+        "matchId": "m-b383e5ed09f44b7a-r04-m01",
+        "ordinal": 12,
+        "roundNumber": 4,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-12",
+        "homeTeamId": "team-05",
+        "awayTeamId": "team-01",
+        "groundId": "ground-05",
+        "matchSeed": "12a04ae035fc580a96ccf281922c52919d813728a88c07de6ac88f125d96a3fc",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r04-m02",
+        "matchId": "m-b383e5ed09f44b7a-r04-m02",
+        "ordinal": 13,
+        "roundNumber": 4,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-12",
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-06",
+        "groundId": "ground-04",
+        "matchSeed": "e94ef82e84495c95cd576b003930fabf3f7e4a355e6269c297a4bb7e2b0f5e7f",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r04-m03",
+        "matchId": "m-b383e5ed09f44b7a-r04-m03",
+        "ordinal": 14,
+        "roundNumber": 4,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-12",
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-07",
+        "groundId": "ground-03",
+        "matchSeed": "ecf8ead2365745b9bfc4171c1968f43c63d063dc040f584755eca87894c1666c",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r04-m04",
+        "matchId": "m-b383e5ed09f44b7a-r04-m04",
+        "ordinal": 15,
+        "roundNumber": 4,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-12",
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-08",
+        "groundId": "ground-02",
+        "matchSeed": "7dad9a338b1aaa1dd103d73fc56b5b49a159c6423c90acb2dcacc5ea1f33822a",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r05-m01",
+        "matchId": "m-b383e5ed09f44b7a-r05-m01",
+        "ordinal": 16,
+        "roundNumber": 5,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-15",
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-04",
+        "groundId": "ground-01",
+        "matchSeed": "e399687418c3c9c253527f861f27d47daaef08ba050b990d2a36c6762478a226",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r05-m02",
+        "matchId": "m-b383e5ed09f44b7a-r05-m02",
+        "ordinal": 17,
+        "roundNumber": 5,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-15",
+        "homeTeamId": "team-05",
+        "awayTeamId": "team-03",
+        "groundId": "ground-05",
+        "matchSeed": "f85828ba188be067541bccc7e8c63eb37e2cb4e886fe69961d5d930d42dc6d35",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r05-m03",
+        "matchId": "m-b383e5ed09f44b7a-r05-m03",
+        "ordinal": 18,
+        "roundNumber": 5,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-15",
+        "homeTeamId": "team-06",
+        "awayTeamId": "team-02",
+        "groundId": "ground-06",
+        "matchSeed": "0681bdbdc37b8da41f650d2262ed06b1a63f66be97c151f289424db2464a1c45",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r05-m04",
+        "matchId": "m-b383e5ed09f44b7a-r05-m04",
+        "ordinal": 19,
+        "roundNumber": 5,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-15",
+        "homeTeamId": "team-07",
+        "awayTeamId": "team-08",
+        "groundId": "ground-07",
+        "matchSeed": "d61191ccc9849af823416a599a9ca0da63a164a311efc903c030c883024e5728",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r06-m01",
+        "matchId": "m-b383e5ed09f44b7a-r06-m01",
+        "ordinal": 20,
+        "roundNumber": 6,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-18",
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-01",
+        "groundId": "ground-03",
+        "matchSeed": "c3b3b8fad63e2058d96b64458e1618aa1d8185841b181eb79524592e695f4e80",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r06-m02",
+        "matchId": "m-b383e5ed09f44b7a-r06-m02",
+        "ordinal": 21,
+        "roundNumber": 6,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-18",
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-04",
+        "groundId": "ground-02",
+        "matchSeed": "35c592259f91651e75534011fdc1d6472db42a89c2501928e0567729d1b1194a",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r06-m03",
+        "matchId": "m-b383e5ed09f44b7a-r06-m03",
+        "ordinal": 22,
+        "roundNumber": 6,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-18",
+        "homeTeamId": "team-08",
+        "awayTeamId": "team-05",
+        "groundId": "ground-08",
+        "matchSeed": "171f57933ea7b082616e200748d0d5b81dc0bf75daca57e28e265e600ae0ecbe",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r06-m04",
+        "matchId": "m-b383e5ed09f44b7a-r06-m04",
+        "ordinal": 23,
+        "roundNumber": 6,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-18",
+        "homeTeamId": "team-07",
+        "awayTeamId": "team-06",
+        "groundId": "ground-07",
+        "matchSeed": "dfb4fe24c7f0dddc17ee11673d023bc9334dbe639d9e3326c75f120aaf3ef88a",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r07-m01",
+        "matchId": "m-b383e5ed09f44b7a-r07-m01",
+        "ordinal": 24,
+        "roundNumber": 7,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-21",
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-02",
+        "groundId": "ground-01",
+        "matchSeed": "0822cc7c10990eb93ffe8421b4b8886df72f42f5f8039fb44de7152d4a147a55",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r07-m02",
+        "matchId": "m-b383e5ed09f44b7a-r07-m02",
+        "ordinal": 25,
+        "roundNumber": 7,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-21",
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-08",
+        "groundId": "ground-03",
+        "matchSeed": "8771e470089f4b44d493b68482f4289cd47f0bee75a92816ccb89ce87ac27c6f",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r07-m03",
+        "matchId": "m-b383e5ed09f44b7a-r07-m03",
+        "ordinal": 26,
+        "roundNumber": 7,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-21",
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-07",
+        "groundId": "ground-04",
+        "matchSeed": "8605e0f25c9efae1604b8bf51a3aa4e23e10016f832f0f88d1d2261fb901a45d",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r07-m04",
+        "matchId": "m-b383e5ed09f44b7a-r07-m04",
+        "ordinal": 27,
+        "roundNumber": 7,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-21",
+        "homeTeamId": "team-05",
+        "awayTeamId": "team-06",
+        "groundId": "ground-05",
+        "matchSeed": "8185b766dff5142d816aa79435692ae8442fe812e1b43d06ec034485b65b6aa3",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r08-m01",
+        "matchId": "m-b383e5ed09f44b7a-r08-m01",
+        "ordinal": 28,
+        "roundNumber": 8,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-24",
+        "homeTeamId": "team-08",
+        "awayTeamId": "team-01",
+        "groundId": "ground-08",
+        "matchSeed": "cace9d9679ddd3921f89f9663cd59572a59633ee594d602972481ad4250f174f",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r08-m02",
+        "matchId": "m-b383e5ed09f44b7a-r08-m02",
+        "ordinal": 29,
+        "roundNumber": 8,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-24",
+        "homeTeamId": "team-07",
+        "awayTeamId": "team-02",
+        "groundId": "ground-07",
+        "matchSeed": "12a426f28c9e043c9774e541ecc1ba3b965d5fdf243c8a5b68c834620ac261fb",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r08-m03",
+        "matchId": "m-b383e5ed09f44b7a-r08-m03",
+        "ordinal": 30,
+        "roundNumber": 8,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-24",
+        "homeTeamId": "team-06",
+        "awayTeamId": "team-03",
+        "groundId": "ground-06",
+        "matchSeed": "e61425d44e962e505c0064aa5beff5580ad6b5f8164c61d833ad5d18cd91d0d2",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r08-m04",
+        "matchId": "m-b383e5ed09f44b7a-r08-m04",
+        "ordinal": 31,
+        "roundNumber": 8,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-24",
+        "homeTeamId": "team-05",
+        "awayTeamId": "team-04",
+        "groundId": "ground-05",
+        "matchSeed": "27821a6fec81b7d32128078bd7ed68a1923a44301262d9c08ca8d09e6b3df764",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r09-m01",
+        "matchId": "m-b383e5ed09f44b7a-r09-m01",
+        "ordinal": 32,
+        "roundNumber": 9,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-27",
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-07",
+        "groundId": "ground-01",
+        "matchSeed": "533883c01ca42fcd8140b62af05070bc419aa8217cb45c187ef30e2fd8f6b22f",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r09-m02",
+        "matchId": "m-b383e5ed09f44b7a-r09-m02",
+        "ordinal": 33,
+        "roundNumber": 9,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-27",
+        "homeTeamId": "team-08",
+        "awayTeamId": "team-06",
+        "groundId": "ground-08",
+        "matchSeed": "3742af64eea2726aebc30a01f592195f428d986f5b258754011c00409149c73f",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r09-m03",
+        "matchId": "m-b383e5ed09f44b7a-r09-m03",
+        "ordinal": 34,
+        "roundNumber": 9,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-27",
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-05",
+        "groundId": "ground-02",
+        "matchSeed": "dea2878089ce35b4f717f7b7352ab8b02df309c1d844cfa9eff82973a5121926",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r09-m04",
+        "matchId": "m-b383e5ed09f44b7a-r09-m04",
+        "ordinal": 35,
+        "roundNumber": 9,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-27",
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-04",
+        "groundId": "ground-03",
+        "matchSeed": "81a5e4bd3753beb3871182675a6aca40cd64c829e15ea5dd8e76955a6a41f81b",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r10-m01",
+        "matchId": "m-b383e5ed09f44b7a-r10-m01",
+        "ordinal": 36,
+        "roundNumber": 10,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-01-30",
+        "homeTeamId": "team-06",
+        "awayTeamId": "team-01",
+        "groundId": "ground-06",
+        "matchSeed": "6feba3f9d805f3539788b75c870daf2cc3cd9dbddad63d3cd6d6cac0dabe1913",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r10-m02",
+        "matchId": "m-b383e5ed09f44b7a-r10-m02",
+        "ordinal": 37,
+        "roundNumber": 10,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-01-30",
+        "homeTeamId": "team-05",
+        "awayTeamId": "team-07",
+        "groundId": "ground-05",
+        "matchSeed": "a04d3bd29df97929728a15e0d9b4933a937efa0147785b23695ad7e725735ed7",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r10-m03",
+        "matchId": "m-b383e5ed09f44b7a-r10-m03",
+        "ordinal": 38,
+        "roundNumber": 10,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-01-30",
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-08",
+        "groundId": "ground-04",
+        "matchSeed": "1ff5e223cd39e7a75eac6670039a2eaca9ba1ded665d9f23e1f431571b3c7c93",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r10-m04",
+        "matchId": "m-b383e5ed09f44b7a-r10-m04",
+        "ordinal": 39,
+        "roundNumber": 10,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-01-30",
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-02",
+        "groundId": "ground-03",
+        "matchSeed": "0a3b6419858a6893e4a55af02f2e6bd3113927bab1c6b1583d7127fab2289c38",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r11-m01",
+        "matchId": "m-b383e5ed09f44b7a-r11-m01",
+        "ordinal": 40,
+        "roundNumber": 11,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-02-02",
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-05",
+        "groundId": "ground-01",
+        "matchSeed": "d18b988ec53cee70cebcd97ed4da46c0d204cf6e3c2d5526b201c68c6bdf77f1",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r11-m02",
+        "matchId": "m-b383e5ed09f44b7a-r11-m02",
+        "ordinal": 41,
+        "roundNumber": 11,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-02-02",
+        "homeTeamId": "team-06",
+        "awayTeamId": "team-04",
+        "groundId": "ground-06",
+        "matchSeed": "f62e0b8f9f0af8157c3b751b5055cdf97758f0fa41989a891ff6f4e2c049b658",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r11-m03",
+        "matchId": "m-b383e5ed09f44b7a-r11-m03",
+        "ordinal": 42,
+        "roundNumber": 11,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-02-02",
+        "homeTeamId": "team-07",
+        "awayTeamId": "team-03",
+        "groundId": "ground-07",
+        "matchSeed": "fe2aeaef36d6160f87cb7095d271baefe04e5801cfeffce4c55543d14b4d256f",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r11-m04",
+        "matchId": "m-b383e5ed09f44b7a-r11-m04",
+        "ordinal": 43,
+        "roundNumber": 11,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-02-02",
+        "homeTeamId": "team-08",
+        "awayTeamId": "team-02",
+        "groundId": "ground-08",
+        "matchSeed": "15609bda858dde8847b2b18642dc0c5a280788382f75a32b2bd14726b8346eeb",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r12-m01",
+        "matchId": "m-b383e5ed09f44b7a-r12-m01",
+        "ordinal": 44,
+        "roundNumber": 12,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-02-05",
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-01",
+        "groundId": "ground-04",
+        "matchSeed": "81776c3a681441bf8bde55c02cf85642d2e30cd7a302499f45266b4ab4c0770f",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r12-m02",
+        "matchId": "m-b383e5ed09f44b7a-r12-m02",
+        "ordinal": 45,
+        "roundNumber": 12,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-02-05",
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-05",
+        "groundId": "ground-03",
+        "matchSeed": "edb969a9b15ab63d15345f32042f9106ed8d92bb2d7ca3e74480450fc5070aa0",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r12-m03",
+        "matchId": "m-b383e5ed09f44b7a-r12-m03",
+        "ordinal": 46,
+        "roundNumber": 12,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-02-05",
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-06",
+        "groundId": "ground-02",
+        "matchSeed": "17c741ff8ec4e67b67393716a30e99a935b7cb4adbe559c77c4ca9bba91a253e",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r12-m04",
+        "matchId": "m-b383e5ed09f44b7a-r12-m04",
+        "ordinal": 47,
+        "roundNumber": 12,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-02-05",
+        "homeTeamId": "team-08",
+        "awayTeamId": "team-07",
+        "groundId": "ground-08",
+        "matchSeed": "c3f2b772af38ada9b56267d9d2ef00e1fd8ca578c40258f8c5326ff18d06c4ae",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r13-m01",
+        "matchId": "m-b383e5ed09f44b7a-r13-m01",
+        "ordinal": 48,
+        "roundNumber": 13,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-02-08",
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-03",
+        "groundId": "ground-01",
+        "matchSeed": "3533767fb0c9a3dd861233f2e0d391cb3e6c3d194d3e363478fc9d76e2f4ce6d",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r13-m02",
+        "matchId": "m-b383e5ed09f44b7a-r13-m02",
+        "ordinal": 49,
+        "roundNumber": 13,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-02-08",
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-02",
+        "groundId": "ground-04",
+        "matchSeed": "0ddc179f49856359ee42d20a4d58edb529d25c1c4f6b9f9192a83dcdaa50953d",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r13-m03",
+        "matchId": "m-b383e5ed09f44b7a-r13-m03",
+        "ordinal": 50,
+        "roundNumber": 13,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-02-08",
+        "homeTeamId": "team-05",
+        "awayTeamId": "team-08",
+        "groundId": "ground-05",
+        "matchSeed": "f1a2c0322ea6878548a2f8813614a611df0618e8003f31b608571a09f057a864",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r13-m04",
+        "matchId": "m-b383e5ed09f44b7a-r13-m04",
+        "ordinal": 51,
+        "roundNumber": 13,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-02-08",
+        "homeTeamId": "team-06",
+        "awayTeamId": "team-07",
+        "groundId": "ground-06",
+        "matchSeed": "b88cffbf6f547d56c71d898235bab37f6462ef7cb741d5265a249fc9a40db166",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r14-m01",
+        "matchId": "m-b383e5ed09f44b7a-r14-m01",
+        "ordinal": 52,
+        "roundNumber": 14,
+        "roundFixtureIndex": 1,
+        "matchDayDate": "2027-02-11",
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-01",
+        "groundId": "ground-02",
+        "matchSeed": "53744f2131c19f37622e6aa5536209c2f66f55bb126e36821171f2e254c929a9",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r14-m02",
+        "matchId": "m-b383e5ed09f44b7a-r14-m02",
+        "ordinal": 53,
+        "roundNumber": 14,
+        "roundFixtureIndex": 2,
+        "matchDayDate": "2027-02-11",
+        "homeTeamId": "team-08",
+        "awayTeamId": "team-03",
+        "groundId": "ground-08",
+        "matchSeed": "002ce15f54f9694d9dd81c400ec84b5a8b8d3f93e6570bbe5d822290575b4f81",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r14-m03",
+        "matchId": "m-b383e5ed09f44b7a-r14-m03",
+        "ordinal": 54,
+        "roundNumber": 14,
+        "roundFixtureIndex": 3,
+        "matchDayDate": "2027-02-11",
+        "homeTeamId": "team-07",
+        "awayTeamId": "team-04",
+        "groundId": "ground-07",
+        "matchSeed": "8ce58f5c508199176841a5ccbe2fc2bdbd719055be6434d44d596a6dc6a23f08",
+        "status": "SCHEDULED"
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r14-m04",
+        "matchId": "m-b383e5ed09f44b7a-r14-m04",
+        "ordinal": 55,
+        "roundNumber": 14,
+        "roundFixtureIndex": 4,
+        "matchDayDate": "2027-02-11",
+        "homeTeamId": "team-06",
+        "awayTeamId": "team-05",
+        "groundId": "ground-06",
+        "matchSeed": "d91c93ad04f55f4c088cb5677dbafd86e83f144c067c59bf19a2688cbb5ebfcc",
+        "status": "SCHEDULED"
+      }
+    ],
+    "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545"
+  },
+  "careerState": {
+    "careerStateVersion": "LC_T20_CAREER_DAY_STATE_V2",
+    "conditionPolicyVersion": "LC_T20_CAREER_CONDITION_V1",
+    "trainingPolicyVersion": "LC_T20_CAREER_TRAINING_V1",
+    "careerId": "career-persistence-audit-01",
+    "gameId": "career-01",
+    "seasonId": "season-01",
+    "competitionId": "LC_T20_LEAGUE_01",
+    "scheduleVersion": "LC_T20_SEASON_SCHEDULE_V1",
+    "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+    "worldPackId": "fictional-eight-01",
+    "worldCanonicalSha256": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+    "availabilityPackId": "fictional-eight-01-availability-v1",
+    "availabilityPackSha256": "6696e2b5bafebac3518495e20bf35bc4e203cb2d9ebcfb40acc15b0bfe0bcb36",
+    "startDate": "2027-01-03",
+    "finalScheduledDate": "2027-02-11",
+    "currentDate": "2027-01-03",
+    "revision": 4,
+    "playerConditions": [
+      {
+        "playerId": "p001",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p002",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p003",
+        "fatigueBp": 105,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p004",
+        "fatigueBp": 120,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p005",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p006",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p007",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p008",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p009",
+        "fatigueBp": 12,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p010",
+        "fatigueBp": 39,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p011",
+        "fatigueBp": 42,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p012",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p013",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p014",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p015",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p016",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p017",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p018",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p019",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p020",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p021",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p022",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p023",
+        "fatigueBp": 125,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p024",
+        "fatigueBp": 120,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p025",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p026",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p027",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p028",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p029",
+        "fatigueBp": 12,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p030",
+        "fatigueBp": 27,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p031",
+        "fatigueBp": 42,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p032",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p033",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p034",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p035",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p036",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p037",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p038",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p039",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p040",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p041",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p042",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p043",
+        "fatigueBp": 125,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p044",
+        "fatigueBp": 120,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p045",
+        "fatigueBp": 57,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p046",
+        "fatigueBp": 84,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p047",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p048",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p049",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p050",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p051",
+        "fatigueBp": 75,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p052",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p053",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p054",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p055",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p056",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p057",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p058",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p059",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p060",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p061",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p062",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p063",
+        "fatigueBp": 150,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p064",
+        "fatigueBp": 90,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p065",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p066",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p067",
+        "fatigueBp": 12,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p068",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p069",
+        "fatigueBp": 27,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p070",
+        "fatigueBp": 105,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p071",
+        "fatigueBp": 140,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p072",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p073",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p074",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p075",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p076",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p077",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p078",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p079",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p080",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p081",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p082",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p083",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p084",
+        "fatigueBp": 150,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p085",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p086",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p087",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p088",
+        "fatigueBp": 12,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p089",
+        "fatigueBp": 130,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p090",
+        "fatigueBp": 105,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p091",
+        "fatigueBp": 57,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p092",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p093",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p094",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p095",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p096",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p097",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p098",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p099",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p100",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p101",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p102",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p103",
+        "fatigueBp": 40,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p104",
+        "fatigueBp": 15,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p105",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p106",
+        "fatigueBp": 21,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p107",
+        "fatigueBp": 12,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p108",
+        "fatigueBp": 27,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p109",
+        "fatigueBp": 90,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p110",
+        "fatigueBp": 57,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p111",
+        "fatigueBp": 72,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p112",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p113",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p114",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p115",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p116",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p117",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p118",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p119",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p120",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p121",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p122",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p123",
+        "fatigueBp": 105,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p124",
+        "fatigueBp": 120,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p125",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p126",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p127",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p128",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p129",
+        "fatigueBp": 12,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p130",
+        "fatigueBp": 27,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p131",
+        "fatigueBp": 42,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p132",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p133",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p134",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p135",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p136",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p137",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p138",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p139",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p140",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p141",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p142",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p143",
+        "fatigueBp": 100,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p144",
+        "fatigueBp": 15,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p145",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p146",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p147",
+        "fatigueBp": 12,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p148",
+        "fatigueBp": 27,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p149",
+        "fatigueBp": 42,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p150",
+        "fatigueBp": 57,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p151",
+        "fatigueBp": 72,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p152",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p153",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p154",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p155",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p156",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p157",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p158",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p159",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p160",
+        "fatigueBp": 0,
+        "lastUpdatedDate": "2027-01-03"
+      }
+    ],
+    "playerReadiness": [
+      {
+        "playerId": "p001",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p002",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p003",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p004",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p005",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p006",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p007",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p008",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p009",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p010",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p011",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p012",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p013",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p014",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p015",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p016",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p017",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p018",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p019",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p020",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p021",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p022",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p023",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p024",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p025",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p026",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p027",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p028",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p029",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p030",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p031",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p032",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p033",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p034",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p035",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p036",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p037",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p038",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p039",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p040",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p041",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p042",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p043",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p044",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p045",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p046",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p047",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p048",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p049",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p050",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p051",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p052",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p053",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p054",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p055",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p056",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p057",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p058",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p059",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p060",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p061",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p062",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p063",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p064",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p065",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p066",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p067",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p068",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p069",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p070",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p071",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p072",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p073",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p074",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p075",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p076",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p077",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p078",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p079",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p080",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p081",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p082",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p083",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p084",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p085",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p086",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p087",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p088",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p089",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p090",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p091",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p092",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p093",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p094",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p095",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p096",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p097",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p098",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p099",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p100",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p101",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p102",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p103",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p104",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p105",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p106",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p107",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p108",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p109",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p110",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p111",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p112",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p113",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p114",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p115",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p116",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p117",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p118",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p119",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p120",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p121",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p122",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p123",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p124",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p125",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p126",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p127",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p128",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p129",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p130",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p131",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p132",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p133",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p134",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p135",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p136",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p137",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p138",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p139",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p140",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p141",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p142",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p143",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p144",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p145",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p146",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p147",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p148",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p149",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p150",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p151",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p152",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p153",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p154",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p155",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p156",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p157",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p158",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p159",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      },
+      {
+        "playerId": "p160",
+        "batting": 0,
+        "bowling": 0,
+        "fielding": 0,
+        "lastUpdatedDate": "2027-01-03"
+      }
+    ],
+    "trainingAssignments": [
+      {
+        "playerId": "p001",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p002",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p003",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p004",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p005",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p006",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p007",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p008",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p009",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p010",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p011",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p012",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p013",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p014",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p015",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p016",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p017",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p018",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p019",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p020",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p021",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p022",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p023",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p024",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p025",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p026",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p027",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p028",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p029",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p030",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p031",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p032",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p033",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p034",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p035",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p036",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p037",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p038",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p039",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p040",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p041",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p042",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p043",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p044",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p045",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p046",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p047",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p048",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p049",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p050",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p051",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p052",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p053",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p054",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p055",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p056",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p057",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p058",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p059",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p060",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p061",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p062",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p063",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p064",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p065",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p066",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p067",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p068",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p069",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p070",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p071",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p072",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p073",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p074",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p075",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p076",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p077",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p078",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p079",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p080",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p081",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p082",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p083",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p084",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p085",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p086",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p087",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p088",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p089",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p090",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p091",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p092",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p093",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p094",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p095",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p096",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p097",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p098",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p099",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p100",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p101",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p102",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p103",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p104",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p105",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p106",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p107",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p108",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p109",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p110",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p111",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p112",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p113",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p114",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p115",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p116",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p117",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p118",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p119",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p120",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p121",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p122",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p123",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p124",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p125",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p126",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p127",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p128",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p129",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p130",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p131",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p132",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p133",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p134",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p135",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p136",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p137",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p138",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p139",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p140",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p141",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p142",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p143",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p144",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p145",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p146",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p147",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p148",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p149",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p150",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p151",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p152",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p153",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p154",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p155",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p156",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p157",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p158",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p159",
+        "directive": "REST"
+      },
+      {
+        "playerId": "p160",
+        "directive": "REST"
+      }
+    ],
+    "appliedMatchConditions": [
+      {
+        "matchCompletionKey": "complete-season-01-fx-b383e5ed09f44b7a-r01-m01",
+        "matchId": "m-b383e5ed09f44b7a-r01-m01",
+        "matchDayDate": "2027-01-03",
+        "payloadSha256": "430b9d52f339ac1ba425ad205a344c91012551f84f11f19dcff7110039bf227e"
+      },
+      {
+        "matchCompletionKey": "complete-season-01-fx-b383e5ed09f44b7a-r01-m02",
+        "matchId": "m-b383e5ed09f44b7a-r01-m02",
+        "matchDayDate": "2027-01-03",
+        "payloadSha256": "be5d7e37a9c19b2295cec0e138a5ccbecc34d697383e0893d73fd036434c462b"
+      },
+      {
+        "matchCompletionKey": "complete-season-01-fx-b383e5ed09f44b7a-r01-m03",
+        "matchId": "m-b383e5ed09f44b7a-r01-m03",
+        "matchDayDate": "2027-01-03",
+        "payloadSha256": "99dda9251badbeca0ceb8e98d06f9d732ad815d051bfe38949627edda4bb909a"
+      },
+      {
+        "matchCompletionKey": "complete-season-01-fx-b383e5ed09f44b7a-r01-m04",
+        "matchId": "m-b383e5ed09f44b7a-r01-m04",
+        "matchDayDate": "2027-01-03",
+        "payloadSha256": "4ef38ed50987a20bc6a4126665a7c4c02b549d86591c7cd23a25fb6d3b80f460"
+      }
+    ],
+    "stateSha256": "52d1826b7ad0705db57f794fd2ecf95c0d92f834526c53e1347c68080227b1cf"
+  },
+  "projection": {
+    "projectionVersion": "LC_T20_SEASON_PROJECTION_V1",
+    "seasonId": "season-01",
+    "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+    "competitionId": "LC_T20_LEAGUE_01",
+    "revision": 4,
+    "cursor": {
+      "appliedCount": 4,
+      "highestAppliedFixtureOrdinal": 3,
+      "missingFixtureOrdinals": []
+    },
+    "appliedMatches": [
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m01",
+        "matchId": "m-b383e5ed09f44b7a-r01-m01",
+        "fixtureOrdinal": 0,
+        "roundNumber": 1,
+        "homeTeamId": "team-01",
+        "awayTeamId": "team-08",
+        "sourceCompletionSha256": "e5dcbb2d88b884d48452ecfe745d39dd3a8dc02b4232abbb71e093dd3f4c2214",
+        "resultKind": "WIN",
+        "winnerTeamId": "team-01",
+        "homePoints": 2,
+        "awayPoints": 0,
+        "nrrEligible": true,
+        "homeRuns": 82,
+        "homeBalls": 113,
+        "awayRuns": 80,
+        "awayBalls": 120
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m02",
+        "matchId": "m-b383e5ed09f44b7a-r01-m02",
+        "fixtureOrdinal": 1,
+        "roundNumber": 1,
+        "homeTeamId": "team-02",
+        "awayTeamId": "team-07",
+        "sourceCompletionSha256": "b73cdd4ef2fa9e8bd1810146a00119ea2a915b9f0b91cad81417d0f173e613a2",
+        "resultKind": "WIN",
+        "winnerTeamId": "team-07",
+        "homePoints": 0,
+        "awayPoints": 2,
+        "nrrEligible": true,
+        "homeRuns": 87,
+        "homeBalls": 120,
+        "awayRuns": 88,
+        "awayBalls": 120
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m03",
+        "matchId": "m-b383e5ed09f44b7a-r01-m03",
+        "fixtureOrdinal": 2,
+        "roundNumber": 1,
+        "homeTeamId": "team-03",
+        "awayTeamId": "team-06",
+        "sourceCompletionSha256": "4b30339c00f9e8f3caf7106c940c272a68d400f8e075f58de05e4731314d2315",
+        "resultKind": "WIN",
+        "winnerTeamId": "team-03",
+        "homePoints": 2,
+        "awayPoints": 0,
+        "nrrEligible": true,
+        "homeRuns": 104,
+        "homeBalls": 110,
+        "awayRuns": 102,
+        "awayBalls": 120
+      },
+      {
+        "fixtureId": "fx-b383e5ed09f44b7a-r01-m04",
+        "matchId": "m-b383e5ed09f44b7a-r01-m04",
+        "fixtureOrdinal": 3,
+        "roundNumber": 1,
+        "homeTeamId": "team-04",
+        "awayTeamId": "team-05",
+        "sourceCompletionSha256": "6530d01fc701600339d774227109b6dc8f2bde3e5bf67ddf2fabba4c6e66342e",
+        "resultKind": "WIN",
+        "winnerTeamId": "team-04",
+        "homePoints": 2,
+        "awayPoints": 0,
+        "nrrEligible": true,
+        "homeRuns": 79,
+        "homeBalls": 102,
+        "awayRuns": 73,
+        "awayBalls": 120
+      }
+    ],
+    "table": [
+      {
+        "rank": 1,
+        "teamId": "team-04",
+        "played": 1,
+        "wins": 1,
+        "losses": 0,
+        "ties": 0,
+        "noResults": 0,
+        "points": 2,
+        "runsFor": 79,
+        "ballsFor": 102,
+        "runsAgainst": 73,
+        "ballsAgainst": 120,
+        "nrrNumerator": 12204,
+        "nrrDenominator": 12240,
+        "nrrX1000": 997,
+        "headToHeadPoints": 0
+      },
+      {
+        "rank": 2,
+        "teamId": "team-03",
+        "played": 1,
+        "wins": 1,
+        "losses": 0,
+        "ties": 0,
+        "noResults": 0,
+        "points": 2,
+        "runsFor": 104,
+        "ballsFor": 110,
+        "runsAgainst": 102,
+        "ballsAgainst": 120,
+        "nrrNumerator": 7560,
+        "nrrDenominator": 13200,
+        "nrrX1000": 573,
+        "headToHeadPoints": 0
+      },
+      {
+        "rank": 3,
+        "teamId": "team-01",
+        "played": 1,
+        "wins": 1,
+        "losses": 0,
+        "ties": 0,
+        "noResults": 0,
+        "points": 2,
+        "runsFor": 82,
+        "ballsFor": 113,
+        "runsAgainst": 80,
+        "ballsAgainst": 120,
+        "nrrNumerator": 4800,
+        "nrrDenominator": 13560,
+        "nrrX1000": 354,
+        "headToHeadPoints": 0
+      },
+      {
+        "rank": 4,
+        "teamId": "team-07",
+        "played": 1,
+        "wins": 1,
+        "losses": 0,
+        "ties": 0,
+        "noResults": 0,
+        "points": 2,
+        "runsFor": 88,
+        "ballsFor": 120,
+        "runsAgainst": 87,
+        "ballsAgainst": 120,
+        "nrrNumerator": 720,
+        "nrrDenominator": 14400,
+        "nrrX1000": 50,
+        "headToHeadPoints": 0
+      },
+      {
+        "rank": 5,
+        "teamId": "team-02",
+        "played": 1,
+        "wins": 0,
+        "losses": 1,
+        "ties": 0,
+        "noResults": 0,
+        "points": 0,
+        "runsFor": 87,
+        "ballsFor": 120,
+        "runsAgainst": 88,
+        "ballsAgainst": 120,
+        "nrrNumerator": -720,
+        "nrrDenominator": 14400,
+        "nrrX1000": -50,
+        "headToHeadPoints": 0
+      },
+      {
+        "rank": 6,
+        "teamId": "team-08",
+        "played": 1,
+        "wins": 0,
+        "losses": 1,
+        "ties": 0,
+        "noResults": 0,
+        "points": 0,
+        "runsFor": 80,
+        "ballsFor": 120,
+        "runsAgainst": 82,
+        "ballsAgainst": 113,
+        "nrrNumerator": -4800,
+        "nrrDenominator": 13560,
+        "nrrX1000": -354,
+        "headToHeadPoints": 0
+      },
+      {
+        "rank": 7,
+        "teamId": "team-06",
+        "played": 1,
+        "wins": 0,
+        "losses": 1,
+        "ties": 0,
+        "noResults": 0,
+        "points": 0,
+        "runsFor": 102,
+        "ballsFor": 120,
+        "runsAgainst": 104,
+        "ballsAgainst": 110,
+        "nrrNumerator": -7560,
+        "nrrDenominator": 13200,
+        "nrrX1000": -573,
+        "headToHeadPoints": 0
+      },
+      {
+        "rank": 8,
+        "teamId": "team-05",
+        "played": 1,
+        "wins": 0,
+        "losses": 1,
+        "ties": 0,
+        "noResults": 0,
+        "points": 0,
+        "runsFor": 73,
+        "ballsFor": 120,
+        "runsAgainst": 79,
+        "ballsAgainst": 102,
+        "nrrNumerator": -12204,
+        "nrrDenominator": 12240,
+        "nrrX1000": -997,
+        "headToHeadPoints": 0
+      }
+    ],
+    "players": [
+      {
+        "playerId": "p001",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p003",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 13,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 1,
+        "maidens": 1,
+        "bowlingAverageX100": 1300,
+        "economyX100": 433,
+        "bowlingStrikeRateX100": 1800
+      },
+      {
+        "playerId": "p004",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 2,
+        "dismissals": 1,
+        "ballsFaced": 8,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 200,
+        "strikeRateX100": 2500,
+        "bowlingRunsConceded": 3,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 3,
+        "maidens": 0,
+        "bowlingAverageX100": 100,
+        "economyX100": 100,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p005",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 7,
+        "dismissals": 0,
+        "ballsFaced": 4,
+        "fours": 0,
+        "sixes": 1,
+        "battingAverageX100": null,
+        "strikeRateX100": 17500,
+        "bowlingRunsConceded": 16,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 800,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p006",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 23,
+        "dismissals": 0,
+        "ballsFaced": 29,
+        "fours": 2,
+        "sixes": 1,
+        "battingAverageX100": null,
+        "strikeRateX100": 7931,
+        "bowlingRunsConceded": 5,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 500,
+        "economyX100": 250,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p007",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 18,
+        "dismissals": 1,
+        "ballsFaced": 13,
+        "fours": 4,
+        "sixes": 0,
+        "battingAverageX100": 1800,
+        "strikeRateX100": 13846,
+        "bowlingRunsConceded": 6,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 1,
+        "bowlingAverageX100": 300,
+        "economyX100": 300,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p008",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 6,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 300,
+        "economyX100": 300,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p009",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 1,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 16,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 800,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p010",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 10,
+        "dismissals": 1,
+        "ballsFaced": 10,
+        "fours": 1,
+        "sixes": 1,
+        "battingAverageX100": 1000,
+        "strikeRateX100": 10000,
+        "bowlingRunsConceded": 11,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 550,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p011",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 18,
+        "dismissals": 1,
+        "ballsFaced": 48,
+        "fours": 2,
+        "sixes": 0,
+        "battingAverageX100": 1800,
+        "strikeRateX100": 3750,
+        "bowlingRunsConceded": 4,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 1,
+        "bowlingAverageX100": null,
+        "economyX100": 200,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p020",
+        "teamId": "team-01",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p021",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p023",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 10,
+        "dismissals": 1,
+        "ballsFaced": 9,
+        "fours": 0,
+        "sixes": 1,
+        "battingAverageX100": 1000,
+        "strikeRateX100": 11111,
+        "bowlingRunsConceded": 25,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 1250,
+        "economyX100": 833,
+        "bowlingStrikeRateX100": 900
+      },
+      {
+        "playerId": "p024",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 3,
+        "dismissals": 1,
+        "ballsFaced": 12,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 300,
+        "strikeRateX100": 2500,
+        "bowlingRunsConceded": 16,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 3,
+        "maidens": 0,
+        "bowlingAverageX100": 533,
+        "economyX100": 533,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p025",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 2,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 100,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p026",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 32,
+        "dismissals": 0,
+        "ballsFaced": 19,
+        "fours": 3,
+        "sixes": 2,
+        "battingAverageX100": null,
+        "strikeRateX100": 16842,
+        "bowlingRunsConceded": 7,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 350,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p027",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 11,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 3,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 1,
+        "bowlingAverageX100": 300,
+        "economyX100": 150,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p028",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 11,
+        "dismissals": 0,
+        "ballsFaced": 24,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": 4583,
+        "bowlingRunsConceded": 8,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 400,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p029",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 6,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 7,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 350,
+        "economyX100": 350,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p030",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 14,
+        "dismissals": 1,
+        "ballsFaced": 18,
+        "fours": 1,
+        "sixes": 1,
+        "battingAverageX100": 1400,
+        "strikeRateX100": 7778,
+        "bowlingRunsConceded": 13,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 650,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p031",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 12,
+        "dismissals": 1,
+        "ballsFaced": 21,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": 1200,
+        "strikeRateX100": 5714,
+        "bowlingRunsConceded": 6,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 300,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p033",
+        "teamId": "team-02",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p042",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p043",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 14,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1400,
+        "economyX100": 467,
+        "bowlingStrikeRateX100": 1800
+      },
+      {
+        "playerId": "p044",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 15,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1500,
+        "economyX100": 500,
+        "bowlingStrikeRateX100": 1800
+      },
+      {
+        "playerId": "p045",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 8,
+        "dismissals": 1,
+        "ballsFaced": 30,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 800,
+        "strikeRateX100": 2667,
+        "bowlingRunsConceded": 17,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 850,
+        "economyX100": 567,
+        "bowlingStrikeRateX100": 900
+      },
+      {
+        "playerId": "p046",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 21,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 2100,
+        "economyX100": 700,
+        "bowlingStrikeRateX100": 1800
+      },
+      {
+        "playerId": "p047",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 9,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 450,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p049",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 68,
+        "dismissals": 0,
+        "ballsFaced": 60,
+        "fours": 6,
+        "sixes": 4,
+        "battingAverageX100": null,
+        "strikeRateX100": 11333,
+        "bowlingRunsConceded": 15,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 750,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p050",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 2,
+        "dismissals": 1,
+        "ballsFaced": 4,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 200,
+        "strikeRateX100": 5000,
+        "bowlingRunsConceded": 3,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 1,
+        "bowlingAverageX100": null,
+        "economyX100": 150,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p051",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 23,
+        "dismissals": 0,
+        "ballsFaced": 17,
+        "fours": 3,
+        "sixes": 1,
+        "battingAverageX100": null,
+        "strikeRateX100": 13529,
+        "bowlingRunsConceded": 8,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 800,
+        "economyX100": 400,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p052",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p053",
+        "teamId": "team-03",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p061",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 6,
+        "dismissals": 0,
+        "ballsFaced": 1,
+        "fours": 0,
+        "sixes": 1,
+        "battingAverageX100": null,
+        "strikeRateX100": 60000,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p063",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 1,
+        "dismissals": 1,
+        "ballsFaced": 4,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 100,
+        "strikeRateX100": 2500,
+        "bowlingRunsConceded": 13,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 650,
+        "economyX100": 433,
+        "bowlingStrikeRateX100": 900
+      },
+      {
+        "playerId": "p064",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 1,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 16,
+        "bowlingLegalBalls": 15,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1600,
+        "economyX100": 640,
+        "bowlingStrikeRateX100": 1500
+      },
+      {
+        "playerId": "p065",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 11,
+        "dismissals": 1,
+        "ballsFaced": 9,
+        "fours": 1,
+        "sixes": 1,
+        "battingAverageX100": 1100,
+        "strikeRateX100": 12222,
+        "bowlingRunsConceded": 5,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 250,
+        "economyX100": 250,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p066",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 9,
+        "dismissals": 1,
+        "ballsFaced": 20,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 900,
+        "strikeRateX100": 4500,
+        "bowlingRunsConceded": 5,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 1,
+        "bowlingAverageX100": null,
+        "economyX100": 250,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p067",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 1,
+        "dismissals": 1,
+        "ballsFaced": 7,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 100,
+        "strikeRateX100": 1429,
+        "bowlingRunsConceded": 16,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 800,
+        "economyX100": 800,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p069",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 7,
+        "dismissals": 1,
+        "ballsFaced": 8,
+        "fours": 0,
+        "sixes": 1,
+        "battingAverageX100": 700,
+        "strikeRateX100": 8750,
+        "bowlingRunsConceded": 6,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 1,
+        "bowlingAverageX100": 600,
+        "economyX100": 300,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p070",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 3,
+        "dismissals": 1,
+        "ballsFaced": 11,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 300,
+        "strikeRateX100": 2727,
+        "bowlingRunsConceded": 5,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 1,
+        "bowlingAverageX100": 250,
+        "economyX100": 250,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p071",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 25,
+        "dismissals": 1,
+        "ballsFaced": 29,
+        "fours": 1,
+        "sixes": 2,
+        "battingAverageX100": 2500,
+        "strikeRateX100": 8621,
+        "bowlingRunsConceded": 7,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 350,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p073",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p080",
+        "teamId": "team-04",
+        "matches": 1,
+        "runs": 13,
+        "dismissals": 0,
+        "ballsFaced": 12,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": 10833,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p082",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 7,
+        "dismissals": 1,
+        "ballsFaced": 9,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": 700,
+        "strikeRateX100": 7778,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p084",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 6,
+        "dismissals": 1,
+        "ballsFaced": 8,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": 600,
+        "strikeRateX100": 7500,
+        "bowlingRunsConceded": 32,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 3200,
+        "economyX100": 1067,
+        "bowlingStrikeRateX100": 1800
+      },
+      {
+        "playerId": "p085",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 3,
+        "dismissals": 1,
+        "ballsFaced": 18,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 300,
+        "strikeRateX100": 1667,
+        "bowlingRunsConceded": 3,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 1,
+        "bowlingAverageX100": null,
+        "economyX100": 150,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p086",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 5,
+        "dismissals": 1,
+        "ballsFaced": 6,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": 500,
+        "strikeRateX100": 8333,
+        "bowlingRunsConceded": 3,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 300,
+        "economyX100": 150,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p087",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 3,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 14,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 3,
+        "maidens": 0,
+        "bowlingAverageX100": 467,
+        "economyX100": 700,
+        "bowlingStrikeRateX100": 400
+      },
+      {
+        "playerId": "p088",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 17,
+        "dismissals": 1,
+        "ballsFaced": 11,
+        "fours": 1,
+        "sixes": 2,
+        "battingAverageX100": 1700,
+        "strikeRateX100": 15455,
+        "bowlingRunsConceded": 3,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 1,
+        "bowlingAverageX100": 300,
+        "economyX100": 150,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p089",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 9,
+        "dismissals": 1,
+        "ballsFaced": 24,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 900,
+        "strikeRateX100": 3750,
+        "bowlingRunsConceded": 9,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 450,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p090",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 1,
+        "dismissals": 1,
+        "ballsFaced": 2,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 100,
+        "strikeRateX100": 5000,
+        "bowlingRunsConceded": 10,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 500,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p091",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 5,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 4,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 200,
+        "economyX100": 200,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p096",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 23,
+        "dismissals": 0,
+        "ballsFaced": 16,
+        "fours": 1,
+        "sixes": 2,
+        "battingAverageX100": null,
+        "strikeRateX100": 14375,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p097",
+        "teamId": "team-05",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 4,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p101",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p103",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 8,
+        "dismissals": 1,
+        "ballsFaced": 10,
+        "fours": 0,
+        "sixes": 1,
+        "battingAverageX100": 800,
+        "strikeRateX100": 8000,
+        "bowlingRunsConceded": 10,
+        "bowlingLegalBalls": 14,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 429,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p104",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 12,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1200,
+        "economyX100": 600,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p105",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 23,
+        "dismissals": 1,
+        "ballsFaced": 28,
+        "fours": 2,
+        "sixes": 0,
+        "battingAverageX100": 2300,
+        "strikeRateX100": 8214,
+        "bowlingRunsConceded": 10,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1000,
+        "economyX100": 500,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p106",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 10,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 500,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p107",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 18,
+        "dismissals": 1,
+        "ballsFaced": 15,
+        "fours": 1,
+        "sixes": 2,
+        "battingAverageX100": 1800,
+        "strikeRateX100": 12000,
+        "bowlingRunsConceded": 10,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 500,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p108",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 2,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 17,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 850,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p109",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 14,
+        "dismissals": 1,
+        "ballsFaced": 18,
+        "fours": 2,
+        "sixes": 0,
+        "battingAverageX100": 1400,
+        "strikeRateX100": 7778,
+        "bowlingRunsConceded": 14,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 700,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p110",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 4,
+        "dismissals": 1,
+        "ballsFaced": 8,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": 400,
+        "strikeRateX100": 5000,
+        "bowlingRunsConceded": 9,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 450,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p111",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 31,
+        "dismissals": 1,
+        "ballsFaced": 41,
+        "fours": 2,
+        "sixes": 1,
+        "battingAverageX100": 3100,
+        "strikeRateX100": 7561,
+        "bowlingRunsConceded": 11,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 550,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p114",
+        "teamId": "team-06",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p121",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 0,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": null,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p123",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 1,
+        "dismissals": 1,
+        "ballsFaced": 11,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 100,
+        "strikeRateX100": 909,
+        "bowlingRunsConceded": 7,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 1,
+        "maidens": 1,
+        "bowlingAverageX100": 700,
+        "economyX100": 233,
+        "bowlingStrikeRateX100": 1800
+      },
+      {
+        "playerId": "p124",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 28,
+        "dismissals": 0,
+        "ballsFaced": 25,
+        "fours": 2,
+        "sixes": 2,
+        "battingAverageX100": null,
+        "strikeRateX100": 11200,
+        "bowlingRunsConceded": 8,
+        "bowlingLegalBalls": 18,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 267,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p125",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 8,
+        "dismissals": 1,
+        "ballsFaced": 11,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": 800,
+        "strikeRateX100": 7273,
+        "bowlingRunsConceded": 11,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1100,
+        "economyX100": 550,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p126",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 10,
+        "dismissals": 1,
+        "ballsFaced": 3,
+        "fours": 1,
+        "sixes": 1,
+        "battingAverageX100": 1000,
+        "strikeRateX100": 33333,
+        "bowlingRunsConceded": 4,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 200,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p127",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 1,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 10,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 500,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p128",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 2,
+        "dismissals": 1,
+        "ballsFaced": 4,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 200,
+        "strikeRateX100": 5000,
+        "bowlingRunsConceded": 4,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 200,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p129",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 27,
+        "dismissals": 1,
+        "ballsFaced": 38,
+        "fours": 1,
+        "sixes": 2,
+        "battingAverageX100": 2700,
+        "strikeRateX100": 7105,
+        "bowlingRunsConceded": 13,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 0,
+        "bowlingAverageX100": 650,
+        "economyX100": 650,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p130",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 4,
+        "dismissals": 1,
+        "ballsFaced": 15,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 400,
+        "strikeRateX100": 2667,
+        "bowlingRunsConceded": 19,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1900,
+        "economyX100": 950,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p131",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 3,
+        "dismissals": 1,
+        "ballsFaced": 8,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 300,
+        "strikeRateX100": 3750,
+        "bowlingRunsConceded": 6,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 300,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p140",
+        "teamId": "team-07",
+        "matches": 1,
+        "runs": 1,
+        "dismissals": 0,
+        "ballsFaced": 4,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": 2500,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p142",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 0,
+        "ballsFaced": 1,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": null,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p143",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 1,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 19,
+        "bowlingLegalBalls": 17,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1900,
+        "economyX100": 671,
+        "bowlingStrikeRateX100": 1700
+      },
+      {
+        "playerId": "p144",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 1,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 4,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 200,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p145",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 4,
+        "dismissals": 1,
+        "ballsFaced": 15,
+        "fours": 1,
+        "sixes": 0,
+        "battingAverageX100": 400,
+        "strikeRateX100": 2667,
+        "bowlingRunsConceded": 6,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 300,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p146",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 12,
+        "dismissals": 0,
+        "ballsFaced": 21,
+        "fours": 0,
+        "sixes": 1,
+        "battingAverageX100": null,
+        "strikeRateX100": 5714,
+        "bowlingRunsConceded": 4,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 1,
+        "bowlingAverageX100": null,
+        "economyX100": 200,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p147",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 4,
+        "dismissals": 1,
+        "ballsFaced": 11,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 400,
+        "strikeRateX100": 3636,
+        "bowlingRunsConceded": 13,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 1300,
+        "economyX100": 650,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p148",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 2,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 6,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 300,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p149",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 0,
+        "dismissals": 1,
+        "ballsFaced": 3,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 0,
+        "strikeRateX100": 0,
+        "bowlingRunsConceded": 2,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 1,
+        "maidens": 0,
+        "bowlingAverageX100": 200,
+        "economyX100": 100,
+        "bowlingStrikeRateX100": 1200
+      },
+      {
+        "playerId": "p150",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 36,
+        "dismissals": 1,
+        "ballsFaced": 38,
+        "fours": 4,
+        "sixes": 1,
+        "battingAverageX100": 3600,
+        "strikeRateX100": 9474,
+        "bowlingRunsConceded": 16,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": 800,
+        "bowlingStrikeRateX100": null
+      },
+      {
+        "playerId": "p151",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 5,
+        "dismissals": 1,
+        "ballsFaced": 13,
+        "fours": 0,
+        "sixes": 0,
+        "battingAverageX100": 500,
+        "strikeRateX100": 3846,
+        "bowlingRunsConceded": 11,
+        "bowlingLegalBalls": 12,
+        "bowlingWickets": 2,
+        "maidens": 1,
+        "bowlingAverageX100": 550,
+        "economyX100": 550,
+        "bowlingStrikeRateX100": 600
+      },
+      {
+        "playerId": "p158",
+        "teamId": "team-08",
+        "matches": 1,
+        "runs": 17,
+        "dismissals": 1,
+        "ballsFaced": 14,
+        "fours": 1,
+        "sixes": 1,
+        "battingAverageX100": 1700,
+        "strikeRateX100": 12143,
+        "bowlingRunsConceded": 0,
+        "bowlingLegalBalls": 0,
+        "bowlingWickets": 0,
+        "maidens": 0,
+        "bowlingAverageX100": null,
+        "economyX100": null,
+        "bowlingStrikeRateX100": null
+      }
+    ],
+    "leaders": {
+      "runs": [
+        {
+          "playerId": "p049",
+          "teamId": "team-03",
+          "value": 68
+        },
+        {
+          "playerId": "p150",
+          "teamId": "team-08",
+          "value": 36
+        },
+        {
+          "playerId": "p026",
+          "teamId": "team-02",
+          "value": 32
+        },
+        {
+          "playerId": "p111",
+          "teamId": "team-06",
+          "value": 31
+        },
+        {
+          "playerId": "p124",
+          "teamId": "team-07",
+          "value": 28
+        },
+        {
+          "playerId": "p129",
+          "teamId": "team-07",
+          "value": 27
+        },
+        {
+          "playerId": "p071",
+          "teamId": "team-04",
+          "value": 25
+        },
+        {
+          "playerId": "p006",
+          "teamId": "team-01",
+          "value": 23
+        },
+        {
+          "playerId": "p051",
+          "teamId": "team-03",
+          "value": 23
+        },
+        {
+          "playerId": "p096",
+          "teamId": "team-05",
+          "value": 23
+        }
+      ],
+      "wickets": [
+        {
+          "playerId": "p004",
+          "teamId": "team-01",
+          "value": 3
+        },
+        {
+          "playerId": "p024",
+          "teamId": "team-02",
+          "value": 3
+        },
+        {
+          "playerId": "p087",
+          "teamId": "team-05",
+          "value": 3
+        },
+        {
+          "playerId": "p007",
+          "teamId": "team-01",
+          "value": 2
+        },
+        {
+          "playerId": "p008",
+          "teamId": "team-01",
+          "value": 2
+        },
+        {
+          "playerId": "p023",
+          "teamId": "team-02",
+          "value": 2
+        },
+        {
+          "playerId": "p029",
+          "teamId": "team-02",
+          "value": 2
+        },
+        {
+          "playerId": "p045",
+          "teamId": "team-03",
+          "value": 2
+        },
+        {
+          "playerId": "p063",
+          "teamId": "team-04",
+          "value": 2
+        },
+        {
+          "playerId": "p065",
+          "teamId": "team-04",
+          "value": 2
+        }
+      ]
+    }
+  },
+  "completedMatches": [
+    {
+      "completionVersion": "LC_T20_SEASON_MATCH_COMPLETION_V1",
+      "seasonId": "season-01",
+      "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+      "fixtureId": "fx-b383e5ed09f44b7a-r01-m01",
+      "matchId": "m-b383e5ed09f44b7a-r01-m01",
+      "fixtureOrdinal": 0,
+      "roundNumber": 1,
+      "matchDayDate": "2027-01-03",
+      "homeTeamId": "team-01",
+      "awayTeamId": "team-08",
+      "source": "OFFSCREEN",
+      "sourceCompletionSha256": "e5dcbb2d88b884d48452ecfe745d39dd3a8dc02b4232abbb71e093dd3f4c2214",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p009",
+            "p010",
+            "p011",
+            "p007",
+            "p006",
+            "p004",
+            "p005",
+            "p003",
+            "p008",
+            "p020",
+            "p001"
+          ],
+          "captainId": "p009",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p149",
+            "p151",
+            "p150",
+            "p148",
+            "p145",
+            "p144",
+            "p147",
+            "p143",
+            "p146",
+            "p158",
+            "p142"
+          ],
+          "captainId": "p149",
+          "keeperId": "p142"
+        }
+      ],
+      "scorecard": {
+        "matchId": "m-b383e5ed09f44b7a-r01-m01",
+        "innings": [
+          {
+            "battingTeamId": "team-08",
+            "bowlingTeamId": "team-01",
+            "runs": 80,
+            "wickets": 9,
+            "legalBalls": 120,
+            "overs": "20.0",
+            "extras": {
+              "wides": 2,
+              "noBalls": 0,
+              "byes": 0,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "batting": {
+              "p149": {
+                "runs": 0,
+                "ballsFaced": 3,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p151": {
+                "runs": 5,
+                "ballsFaced": 13,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p150": {
+                "runs": 36,
+                "ballsFaced": 38,
+                "fours": 4,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p148": {
+                "runs": 0,
+                "ballsFaced": 2,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p145": {
+                "runs": 4,
+                "ballsFaced": 15,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p144": {
+                "runs": 0,
+                "ballsFaced": 1,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p147": {
+                "runs": 4,
+                "ballsFaced": 11,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p143": {
+                "runs": 0,
+                "ballsFaced": 1,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p146": {
+                "runs": 12,
+                "ballsFaced": 21,
+                "fours": 0,
+                "sixes": 1,
+                "dismissed": false
+              },
+              "p158": {
+                "runs": 17,
+                "ballsFaced": 14,
+                "fours": 1,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p142": {
+                "runs": 0,
+                "ballsFaced": 1,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              }
+            },
+            "bowling": {
+              "p009": {
+                "runsConceded": 16,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p010": {
+                "runsConceded": 11,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p011": {
+                "runsConceded": 4,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 1
+              },
+              "p007": {
+                "runsConceded": 6,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 1
+              },
+              "p006": {
+                "runsConceded": 5,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p004": {
+                "runsConceded": 3,
+                "legalBalls": 18,
+                "wickets": 3,
+                "maidens": 0
+              },
+              "p005": {
+                "runsConceded": 16,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p003": {
+                "runsConceded": 13,
+                "legalBalls": 18,
+                "wickets": 1,
+                "maidens": 1
+              },
+              "p008": {
+                "runsConceded": 6,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p020": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p001": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p149",
+                "runs": 0,
+                "legalBalls": 3,
+                "sequence": 9
+              },
+              {
+                "playerId": "p151",
+                "runs": 15,
+                "legalBalls": 23,
+                "sequence": 37
+              },
+              {
+                "playerId": "p148",
+                "runs": 21,
+                "legalBalls": 31,
+                "sequence": 50
+              },
+              {
+                "playerId": "p145",
+                "runs": 42,
+                "legalBalls": 62,
+                "sequence": 92
+              },
+              {
+                "playerId": "p144",
+                "runs": 42,
+                "legalBalls": 63,
+                "sequence": 94
+              },
+              {
+                "playerId": "p150",
+                "runs": 50,
+                "legalBalls": 79,
+                "sequence": 117
+              },
+              {
+                "playerId": "p143",
+                "runs": 50,
+                "legalBalls": 80,
+                "sequence": 119
+              },
+              {
+                "playerId": "p147",
+                "runs": 50,
+                "legalBalls": 88,
+                "sequence": 130
+              },
+              {
+                "playerId": "p158",
+                "runs": 80,
+                "legalBalls": 119,
+                "sequence": 173
+              }
+            ],
+            "targetToWin": null
+          },
+          {
+            "battingTeamId": "team-01",
+            "bowlingTeamId": "team-08",
+            "runs": 82,
+            "wickets": 5,
+            "legalBalls": 113,
+            "overs": "18.5",
+            "extras": {
+              "wides": 3,
+              "noBalls": 0,
+              "byes": 1,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "batting": {
+              "p009": {
+                "runs": 0,
+                "ballsFaced": 1,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p010": {
+                "runs": 10,
+                "ballsFaced": 10,
+                "fours": 1,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p011": {
+                "runs": 18,
+                "ballsFaced": 48,
+                "fours": 2,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p007": {
+                "runs": 18,
+                "ballsFaced": 13,
+                "fours": 4,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p006": {
+                "runs": 23,
+                "ballsFaced": 29,
+                "fours": 2,
+                "sixes": 1,
+                "dismissed": false
+              },
+              "p004": {
+                "runs": 2,
+                "ballsFaced": 8,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p005": {
+                "runs": 7,
+                "ballsFaced": 4,
+                "fours": 0,
+                "sixes": 1,
+                "dismissed": false
+              },
+              "p003": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p008": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p020": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p001": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              }
+            },
+            "bowling": {
+              "p149": {
+                "runsConceded": 2,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p151": {
+                "runsConceded": 11,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 1
+              },
+              "p150": {
+                "runsConceded": 16,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p148": {
+                "runsConceded": 6,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p145": {
+                "runsConceded": 6,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p144": {
+                "runsConceded": 4,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p147": {
+                "runsConceded": 13,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p143": {
+                "runsConceded": 19,
+                "legalBalls": 17,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p146": {
+                "runsConceded": 4,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 1
+              },
+              "p158": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p142": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p009",
+                "runs": 0,
+                "legalBalls": 1,
+                "sequence": 182
+              },
+              {
+                "playerId": "p010",
+                "runs": 19,
+                "legalBalls": 26,
+                "sequence": 216
+              },
+              {
+                "playerId": "p007",
+                "runs": 46,
+                "legalBalls": 51,
+                "sequence": 253
+              },
+              {
+                "playerId": "p011",
+                "runs": 64,
+                "legalBalls": 96,
+                "sequence": 313
+              },
+              {
+                "playerId": "p004",
+                "runs": 68,
+                "legalBalls": 106,
+                "sequence": 328
+              }
+            ],
+            "targetToWin": 81
+          }
+        ],
+        "result": {
+          "kind": "WIN",
+          "winnerTeamId": "team-01",
+          "marginType": "WICKETS",
+          "marginRuns": null,
+          "marginWickets": 5,
+          "completionReason": "TARGET_REACHED"
+        }
+      },
+      "scorecardSha256": "866cbdaf032b5c4a6d6e733e76f10d6692e6942eb8a0ce12bfda2b1bd7a78ce6"
+    },
+    {
+      "completionVersion": "LC_T20_SEASON_MATCH_COMPLETION_V1",
+      "seasonId": "season-01",
+      "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+      "fixtureId": "fx-b383e5ed09f44b7a-r01-m02",
+      "matchId": "m-b383e5ed09f44b7a-r01-m02",
+      "fixtureOrdinal": 1,
+      "roundNumber": 1,
+      "matchDayDate": "2027-01-03",
+      "homeTeamId": "team-02",
+      "awayTeamId": "team-07",
+      "source": "OFFSCREEN",
+      "sourceCompletionSha256": "b73cdd4ef2fa9e8bd1810146a00119ea2a915b9f0b91cad81417d0f173e613a2",
+      "selectedTeams": [
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p029",
+            "p031",
+            "p030",
+            "p023",
+            "p027",
+            "p028",
+            "p024",
+            "p026",
+            "p033",
+            "p025",
+            "p021"
+          ],
+          "captainId": "p029",
+          "keeperId": "p021"
+        },
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p129",
+            "p130",
+            "p131",
+            "p126",
+            "p124",
+            "p127",
+            "p123",
+            "p125",
+            "p128",
+            "p140",
+            "p121"
+          ],
+          "captainId": "p129",
+          "keeperId": "p121"
+        }
+      ],
+      "scorecard": {
+        "matchId": "m-b383e5ed09f44b7a-r01-m02",
+        "innings": [
+          {
+            "battingTeamId": "team-07",
+            "bowlingTeamId": "team-02",
+            "runs": 88,
+            "wickets": 8,
+            "legalBalls": 120,
+            "overs": "20.0",
+            "extras": {
+              "wides": 3,
+              "noBalls": 0,
+              "byes": 1,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "batting": {
+              "p129": {
+                "runs": 27,
+                "ballsFaced": 38,
+                "fours": 1,
+                "sixes": 2,
+                "dismissed": true
+              },
+              "p130": {
+                "runs": 4,
+                "ballsFaced": 15,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p131": {
+                "runs": 3,
+                "ballsFaced": 8,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p126": {
+                "runs": 10,
+                "ballsFaced": 3,
+                "fours": 1,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p124": {
+                "runs": 28,
+                "ballsFaced": 25,
+                "fours": 2,
+                "sixes": 2,
+                "dismissed": false
+              },
+              "p127": {
+                "runs": 0,
+                "ballsFaced": 1,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p123": {
+                "runs": 1,
+                "ballsFaced": 11,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p125": {
+                "runs": 8,
+                "ballsFaced": 11,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p128": {
+                "runs": 2,
+                "ballsFaced": 4,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p140": {
+                "runs": 1,
+                "ballsFaced": 4,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p121": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              }
+            },
+            "bowling": {
+              "p029": {
+                "runsConceded": 7,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p031": {
+                "runsConceded": 6,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p030": {
+                "runsConceded": 13,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p023": {
+                "runsConceded": 25,
+                "legalBalls": 18,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p027": {
+                "runsConceded": 3,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 1
+              },
+              "p028": {
+                "runsConceded": 8,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p024": {
+                "runsConceded": 16,
+                "legalBalls": 18,
+                "wickets": 3,
+                "maidens": 0
+              },
+              "p026": {
+                "runsConceded": 7,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p033": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p025": {
+                "runsConceded": 2,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p021": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p130",
+                "runs": 18,
+                "legalBalls": 37,
+                "sequence": 56
+              },
+              {
+                "playerId": "p131",
+                "runs": 32,
+                "legalBalls": 56,
+                "sequence": 83
+              },
+              {
+                "playerId": "p126",
+                "runs": 42,
+                "legalBalls": 59,
+                "sequence": 87
+              },
+              {
+                "playerId": "p129",
+                "runs": 46,
+                "legalBalls": 65,
+                "sequence": 96
+              },
+              {
+                "playerId": "p127",
+                "runs": 46,
+                "legalBalls": 66,
+                "sequence": 98
+              },
+              {
+                "playerId": "p123",
+                "runs": 49,
+                "legalBalls": 81,
+                "sequence": 120
+              },
+              {
+                "playerId": "p125",
+                "runs": 63,
+                "legalBalls": 96,
+                "sequence": 140
+              },
+              {
+                "playerId": "p128",
+                "runs": 86,
+                "legalBalls": 115,
+                "sequence": 169
+              }
+            ],
+            "targetToWin": null
+          },
+          {
+            "battingTeamId": "team-02",
+            "bowlingTeamId": "team-07",
+            "runs": 87,
+            "wickets": 6,
+            "legalBalls": 120,
+            "overs": "20.0",
+            "extras": {
+              "wides": 0,
+              "noBalls": 0,
+              "byes": 0,
+              "legByes": 5,
+              "penalties": 0
+            },
+            "batting": {
+              "p029": {
+                "runs": 0,
+                "ballsFaced": 6,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p031": {
+                "runs": 12,
+                "ballsFaced": 21,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p030": {
+                "runs": 14,
+                "ballsFaced": 18,
+                "fours": 1,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p023": {
+                "runs": 10,
+                "ballsFaced": 9,
+                "fours": 0,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p027": {
+                "runs": 0,
+                "ballsFaced": 11,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p028": {
+                "runs": 11,
+                "ballsFaced": 24,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p024": {
+                "runs": 3,
+                "ballsFaced": 12,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p026": {
+                "runs": 32,
+                "ballsFaced": 19,
+                "fours": 3,
+                "sixes": 2,
+                "dismissed": false
+              },
+              "p033": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p025": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p021": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              }
+            },
+            "bowling": {
+              "p129": {
+                "runsConceded": 13,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p130": {
+                "runsConceded": 19,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p131": {
+                "runsConceded": 6,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p126": {
+                "runsConceded": 4,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p124": {
+                "runsConceded": 8,
+                "legalBalls": 18,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p127": {
+                "runsConceded": 10,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p123": {
+                "runsConceded": 7,
+                "legalBalls": 18,
+                "wickets": 1,
+                "maidens": 1
+              },
+              "p125": {
+                "runsConceded": 11,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p128": {
+                "runsConceded": 4,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p140": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p121": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p029",
+                "runs": 0,
+                "legalBalls": 6,
+                "sequence": 187
+              },
+              {
+                "playerId": "p030",
+                "runs": 26,
+                "legalBalls": 42,
+                "sequence": 236
+              },
+              {
+                "playerId": "p031",
+                "runs": 28,
+                "legalBalls": 46,
+                "sequence": 243
+              },
+              {
+                "playerId": "p027",
+                "runs": 30,
+                "legalBalls": 59,
+                "sequence": 261
+              },
+              {
+                "playerId": "p023",
+                "runs": 40,
+                "legalBalls": 70,
+                "sequence": 277
+              },
+              {
+                "playerId": "p024",
+                "runs": 46,
+                "legalBalls": 91,
+                "sequence": 307
+              }
+            ],
+            "targetToWin": 89
+          }
+        ],
+        "result": {
+          "kind": "WIN",
+          "winnerTeamId": "team-07",
+          "marginType": "RUNS",
+          "marginRuns": 1,
+          "marginWickets": null,
+          "completionReason": "CHASE_COMPLETE_SHORT"
+        }
+      },
+      "scorecardSha256": "a1680a095b349cc3f113b83597545062ea6ea4070bb035c15089444dc05bbe03"
+    },
+    {
+      "completionVersion": "LC_T20_SEASON_MATCH_COMPLETION_V1",
+      "seasonId": "season-01",
+      "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+      "fixtureId": "fx-b383e5ed09f44b7a-r01-m03",
+      "matchId": "m-b383e5ed09f44b7a-r01-m03",
+      "fixtureOrdinal": 2,
+      "roundNumber": 1,
+      "matchDayDate": "2027-01-03",
+      "homeTeamId": "team-03",
+      "awayTeamId": "team-06",
+      "source": "OFFSCREEN",
+      "sourceCompletionSha256": "4b30339c00f9e8f3caf7106c940c272a68d400f8e075f58de05e4731314d2315",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p050",
+            "p049",
+            "p045",
+            "p051",
+            "p043",
+            "p046",
+            "p047",
+            "p052",
+            "p053",
+            "p044",
+            "p042"
+          ],
+          "captainId": "p050",
+          "keeperId": "p042"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p109",
+            "p110",
+            "p111",
+            "p107",
+            "p105",
+            "p103",
+            "p106",
+            "p108",
+            "p104",
+            "p114",
+            "p101"
+          ],
+          "captainId": "p109",
+          "keeperId": "p101"
+        }
+      ],
+      "scorecard": {
+        "matchId": "m-b383e5ed09f44b7a-r01-m03",
+        "innings": [
+          {
+            "battingTeamId": "team-06",
+            "bowlingTeamId": "team-03",
+            "runs": 102,
+            "wickets": 6,
+            "legalBalls": 120,
+            "overs": "20.0",
+            "extras": {
+              "wides": 2,
+              "noBalls": 2,
+              "byes": 0,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "batting": {
+              "p109": {
+                "runs": 14,
+                "ballsFaced": 18,
+                "fours": 2,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p110": {
+                "runs": 4,
+                "ballsFaced": 8,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p111": {
+                "runs": 31,
+                "ballsFaced": 41,
+                "fours": 2,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p107": {
+                "runs": 18,
+                "ballsFaced": 15,
+                "fours": 1,
+                "sixes": 2,
+                "dismissed": true
+              },
+              "p105": {
+                "runs": 23,
+                "ballsFaced": 28,
+                "fours": 2,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p103": {
+                "runs": 8,
+                "ballsFaced": 10,
+                "fours": 0,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p106": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p108": {
+                "runs": 0,
+                "ballsFaced": 2,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p104": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p114": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p101": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              }
+            },
+            "bowling": {
+              "p050": {
+                "runsConceded": 3,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 1
+              },
+              "p049": {
+                "runsConceded": 15,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p045": {
+                "runsConceded": 17,
+                "legalBalls": 18,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p051": {
+                "runsConceded": 8,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p043": {
+                "runsConceded": 14,
+                "legalBalls": 18,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p046": {
+                "runsConceded": 21,
+                "legalBalls": 18,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p047": {
+                "runsConceded": 9,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p052": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p053": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p044": {
+                "runsConceded": 15,
+                "legalBalls": 18,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p042": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p110",
+                "runs": 6,
+                "legalBalls": 10,
+                "sequence": 18
+              },
+              {
+                "playerId": "p109",
+                "runs": 35,
+                "legalBalls": 44,
+                "sequence": 67
+              },
+              {
+                "playerId": "p107",
+                "runs": 63,
+                "legalBalls": 65,
+                "sequence": 96
+              },
+              {
+                "playerId": "p111",
+                "runs": 84,
+                "legalBalls": 101,
+                "sequence": 145
+              },
+              {
+                "playerId": "p105",
+                "runs": 93,
+                "legalBalls": 114,
+                "sequence": 163
+              },
+              {
+                "playerId": "p103",
+                "runs": 102,
+                "legalBalls": 118,
+                "sequence": 171
+              }
+            ],
+            "targetToWin": null
+          },
+          {
+            "battingTeamId": "team-03",
+            "bowlingTeamId": "team-06",
+            "runs": 104,
+            "wickets": 2,
+            "legalBalls": 110,
+            "overs": "18.2",
+            "extras": {
+              "wides": 1,
+              "noBalls": 1,
+              "byes": 1,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "batting": {
+              "p050": {
+                "runs": 2,
+                "ballsFaced": 4,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p049": {
+                "runs": 68,
+                "ballsFaced": 60,
+                "fours": 6,
+                "sixes": 4,
+                "dismissed": false
+              },
+              "p045": {
+                "runs": 8,
+                "ballsFaced": 30,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p051": {
+                "runs": 23,
+                "ballsFaced": 17,
+                "fours": 3,
+                "sixes": 1,
+                "dismissed": false
+              },
+              "p043": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p046": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p047": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p052": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p053": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p044": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p042": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              }
+            },
+            "bowling": {
+              "p109": {
+                "runsConceded": 14,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p110": {
+                "runsConceded": 9,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p111": {
+                "runsConceded": 11,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p107": {
+                "runsConceded": 10,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p105": {
+                "runsConceded": 10,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p103": {
+                "runsConceded": 10,
+                "legalBalls": 14,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p106": {
+                "runsConceded": 10,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p108": {
+                "runsConceded": 17,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p104": {
+                "runsConceded": 12,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p114": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p101": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p050",
+                "runs": 3,
+                "legalBalls": 7,
+                "sequence": 189
+              },
+              {
+                "playerId": "p045",
+                "runs": 53,
+                "legalBalls": 68,
+                "sequence": 271
+              }
+            ],
+            "targetToWin": 103
+          }
+        ],
+        "result": {
+          "kind": "WIN",
+          "winnerTeamId": "team-03",
+          "marginType": "WICKETS",
+          "marginRuns": null,
+          "marginWickets": 8,
+          "completionReason": "TARGET_REACHED"
+        }
+      },
+      "scorecardSha256": "907a213dfb78ac82c4cb3131e938eefda0f4f9505d9d6ec078f3d960b20b1f63"
+    },
+    {
+      "completionVersion": "LC_T20_SEASON_MATCH_COMPLETION_V1",
+      "seasonId": "season-01",
+      "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+      "fixtureId": "fx-b383e5ed09f44b7a-r01-m04",
+      "matchId": "m-b383e5ed09f44b7a-r01-m04",
+      "fixtureOrdinal": 3,
+      "roundNumber": 1,
+      "matchDayDate": "2027-01-03",
+      "homeTeamId": "team-04",
+      "awayTeamId": "team-05",
+      "source": "OFFSCREEN",
+      "sourceCompletionSha256": "6530d01fc701600339d774227109b6dc8f2bde3e5bf67ddf2fabba4c6e66342e",
+      "selectedTeams": [
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p070",
+            "p071",
+            "p063",
+            "p069",
+            "p067",
+            "p064",
+            "p065",
+            "p066",
+            "p080",
+            "p061",
+            "p073"
+          ],
+          "captainId": "p070",
+          "keeperId": "p061"
+        },
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p090",
+            "p089",
+            "p088",
+            "p084",
+            "p086",
+            "p085",
+            "p091",
+            "p087",
+            "p096",
+            "p097",
+            "p082"
+          ],
+          "captainId": "p090",
+          "keeperId": "p082"
+        }
+      ],
+      "scorecard": {
+        "matchId": "m-b383e5ed09f44b7a-r01-m04",
+        "innings": [
+          {
+            "battingTeamId": "team-05",
+            "bowlingTeamId": "team-04",
+            "runs": 73,
+            "wickets": 10,
+            "legalBalls": 105,
+            "overs": "17.3",
+            "extras": {
+              "wides": 1,
+              "noBalls": 1,
+              "byes": 0,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "batting": {
+              "p090": {
+                "runs": 1,
+                "ballsFaced": 2,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p089": {
+                "runs": 9,
+                "ballsFaced": 24,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p088": {
+                "runs": 17,
+                "ballsFaced": 11,
+                "fours": 1,
+                "sixes": 2,
+                "dismissed": true
+              },
+              "p084": {
+                "runs": 6,
+                "ballsFaced": 8,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p086": {
+                "runs": 5,
+                "ballsFaced": 6,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p085": {
+                "runs": 3,
+                "ballsFaced": 18,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p091": {
+                "runs": 0,
+                "ballsFaced": 5,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p087": {
+                "runs": 0,
+                "ballsFaced": 3,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p096": {
+                "runs": 23,
+                "ballsFaced": 16,
+                "fours": 1,
+                "sixes": 2,
+                "dismissed": false
+              },
+              "p097": {
+                "runs": 0,
+                "ballsFaced": 4,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p082": {
+                "runs": 7,
+                "ballsFaced": 9,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": true
+              }
+            },
+            "bowling": {
+              "p070": {
+                "runsConceded": 5,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 1
+              },
+              "p071": {
+                "runsConceded": 7,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p063": {
+                "runsConceded": 13,
+                "legalBalls": 18,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p069": {
+                "runsConceded": 6,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 1
+              },
+              "p067": {
+                "runsConceded": 16,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p064": {
+                "runsConceded": 16,
+                "legalBalls": 15,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p065": {
+                "runsConceded": 5,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p066": {
+                "runsConceded": 5,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 1
+              },
+              "p080": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p061": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p073": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p090",
+                "runs": 2,
+                "legalBalls": 3,
+                "sequence": 9
+              },
+              {
+                "playerId": "p088",
+                "runs": 20,
+                "legalBalls": 16,
+                "sequence": 27
+              },
+              {
+                "playerId": "p084",
+                "runs": 31,
+                "legalBalls": 30,
+                "sequence": 47
+              },
+              {
+                "playerId": "p086",
+                "runs": 37,
+                "legalBalls": 40,
+                "sequence": 62
+              },
+              {
+                "playerId": "p089",
+                "runs": 41,
+                "legalBalls": 53,
+                "sequence": 81
+              },
+              {
+                "playerId": "p091",
+                "runs": 43,
+                "legalBalls": 64,
+                "sequence": 97
+              },
+              {
+                "playerId": "p087",
+                "runs": 43,
+                "legalBalls": 73,
+                "sequence": 111
+              },
+              {
+                "playerId": "p085",
+                "runs": 57,
+                "legalBalls": 81,
+                "sequence": 122
+              },
+              {
+                "playerId": "p097",
+                "runs": 62,
+                "legalBalls": 90,
+                "sequence": 134
+              },
+              {
+                "playerId": "p082",
+                "runs": 73,
+                "legalBalls": 105,
+                "sequence": 156
+              }
+            ],
+            "targetToWin": null
+          },
+          {
+            "battingTeamId": "team-04",
+            "bowlingTeamId": "team-05",
+            "runs": 79,
+            "wickets": 8,
+            "legalBalls": 102,
+            "overs": "17.0",
+            "extras": {
+              "wides": 2,
+              "noBalls": 0,
+              "byes": 0,
+              "legByes": 1,
+              "penalties": 0
+            },
+            "batting": {
+              "p070": {
+                "runs": 3,
+                "ballsFaced": 11,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p071": {
+                "runs": 25,
+                "ballsFaced": 29,
+                "fours": 1,
+                "sixes": 2,
+                "dismissed": true
+              },
+              "p063": {
+                "runs": 1,
+                "ballsFaced": 4,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p069": {
+                "runs": 7,
+                "ballsFaced": 8,
+                "fours": 0,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p067": {
+                "runs": 1,
+                "ballsFaced": 7,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p064": {
+                "runs": 0,
+                "ballsFaced": 1,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p065": {
+                "runs": 11,
+                "ballsFaced": 9,
+                "fours": 1,
+                "sixes": 1,
+                "dismissed": true
+              },
+              "p066": {
+                "runs": 9,
+                "ballsFaced": 20,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": true
+              },
+              "p080": {
+                "runs": 13,
+                "ballsFaced": 12,
+                "fours": 1,
+                "sixes": 0,
+                "dismissed": false
+              },
+              "p061": {
+                "runs": 6,
+                "ballsFaced": 1,
+                "fours": 0,
+                "sixes": 1,
+                "dismissed": false
+              },
+              "p073": {
+                "runs": 0,
+                "ballsFaced": 0,
+                "fours": 0,
+                "sixes": 0,
+                "dismissed": false
+              }
+            },
+            "bowling": {
+              "p090": {
+                "runsConceded": 10,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p089": {
+                "runsConceded": 9,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p088": {
+                "runsConceded": 3,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 1
+              },
+              "p084": {
+                "runsConceded": 32,
+                "legalBalls": 18,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p086": {
+                "runsConceded": 3,
+                "legalBalls": 12,
+                "wickets": 1,
+                "maidens": 0
+              },
+              "p085": {
+                "runsConceded": 3,
+                "legalBalls": 12,
+                "wickets": 0,
+                "maidens": 1
+              },
+              "p091": {
+                "runsConceded": 4,
+                "legalBalls": 12,
+                "wickets": 2,
+                "maidens": 0
+              },
+              "p087": {
+                "runsConceded": 14,
+                "legalBalls": 12,
+                "wickets": 3,
+                "maidens": 0
+              },
+              "p096": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p097": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              },
+              "p082": {
+                "runsConceded": 0,
+                "legalBalls": 0,
+                "wickets": 0,
+                "maidens": 0
+              }
+            },
+            "fallOfWickets": [
+              {
+                "playerId": "p070",
+                "runs": 14,
+                "legalBalls": 15,
+                "sequence": 180
+              },
+              {
+                "playerId": "p063",
+                "runs": 15,
+                "legalBalls": 20,
+                "sequence": 188
+              },
+              {
+                "playerId": "p069",
+                "runs": 22,
+                "legalBalls": 30,
+                "sequence": 201
+              },
+              {
+                "playerId": "p067",
+                "runs": 36,
+                "legalBalls": 46,
+                "sequence": 225
+              },
+              {
+                "playerId": "p064",
+                "runs": 36,
+                "legalBalls": 47,
+                "sequence": 227
+              },
+              {
+                "playerId": "p071",
+                "runs": 49,
+                "legalBalls": 67,
+                "sequence": 256
+              },
+              {
+                "playerId": "p065",
+                "runs": 50,
+                "legalBalls": 70,
+                "sequence": 260
+              },
+              {
+                "playerId": "p066",
+                "runs": 73,
+                "legalBalls": 101,
+                "sequence": 303
+              }
+            ],
+            "targetToWin": 74
+          }
+        ],
+        "result": {
+          "kind": "WIN",
+          "winnerTeamId": "team-04",
+          "marginType": "WICKETS",
+          "marginRuns": null,
+          "marginWickets": 2,
+          "completionReason": "TARGET_REACHED"
+        }
+      },
+      "scorecardSha256": "5ec7a8afdd2902384593365b8e4569774ce80e73ed58bf48b9a4d06552af34e5"
+    }
+  ],
+  "revision": 4,
+  "phase": "ACTIVE",
+  "stateSha256": "44efc247477a7f06f5fb026d99f2af410ded8dc200de243d72542443433c16d1"
+}

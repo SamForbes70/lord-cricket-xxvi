@@ -1,0 +1,61 @@
+{
+  "pass": "12F",
+  "milestone": "M6F",
+  "status": "IMPLEMENTATION_COMPLETE_ACCEPTANCE_BLOCKED_BROWSER_INDEXEDDB",
+  "baselineCommit": "8483d1328b7f346cfb7a068cc506a1b42c0c1808",
+  "environment": {
+    "os": "Debian GNU/Linux 13",
+    "node": "v22.16.0",
+    "npm": "10.9.2",
+    "python": "3.13.5",
+    "chromium": "144.0.7559.96"
+  },
+  "gates": {
+    "offlineInstall": "PASS",
+    "schemas": {"status":"PASS","count":163},
+    "build": "PASS",
+    "typecheck": "PASS",
+    "lintAndBoundaries": "PASS",
+    "scoring": {"status":"PASS","deliveries":45,"ledgers":45,"invalid":29},
+    "randomVectors": {"status":"PASS","random":24,"stateHash":8},
+    "probability": {"status":"PASS","lutEntries":1601,"vectors":15,"boundaries":4},
+    "generator": {"status":"PASS","vectors":9},
+    "season12A": {"status":"PASS","fixtures":56,"tests":8},
+    "career12B": {"status":"PASS","tests":9},
+    "training12C": {"status":"PASS","tests":10},
+    "offscreen12D": {"status":"PASS","fixtures":56,"tests":8},
+    "projection12E": {"status":"PASS","fixtures":56,"tests":8},
+    "seasonPersistence12F": {"status":"PASS","tests":10},
+    "unitRegression": {
+      "status":"PASS_SHARDED",
+      "tests":497,
+      "files":22,
+      "detail":"477 inherited tests excluding red-ball and 12F persistence passed; 10 red-ball tests passed standalone; 10 new 12F persistence tests passed. A combined inherited run recorded 486/487 because the long red-ball completion case crossed its 5s harness timeout under contention; it passed standalone in 3.597s."
+    },
+    "m6fBrowserBundle": "PASS",
+    "m6fIndexedDbChromium": {
+      "status":"BLOCKED",
+      "reason":"Chromium navigation is denied by host policy with ERR_BLOCKED_BY_ADMINISTRATOR before Lord Cricket code executes. about:blank cannot open IndexedDB in this host."
+    },
+    "sourceIntegrity": {
+      "status":"PASS",
+      "criticalFilesByteIdentical":19,
+      "inheritedSchemasByteIdentical":155,
+      "newSchemas":8,
+      "lockfileChanged":false
+    }
+  },
+  "seasonPersistenceGolden": {
+    "scheduleSha256": "8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545",
+    "activeStateSha256": "44efc247477a7f06f5fb026d99f2af410ded8dc200de243d72542443433c16d1",
+    "activeCompletedFixtures": 4,
+    "completeStateSha256": "a18b5dfbd70a10bf0a99ad7723b4c12e238880f5dde9b1bd83236f9e8079fc61",
+    "completeStateCanonicalSha256": "6a88028e215446b1a2fab9a3aed555bfd008ebd8be86705ee125f63c5e428028",
+    "completedFixtures": 56,
+    "championTeamId": "team-04",
+    "seasonArchiveSha256": "1be8733d2f857ffdba5b7c8b356a769f0aff0fa178c6b75935e821811f24d5a4",
+    "portableArchiveSha256": "178188084816bf1f2eea0e5336e4747ffe7f9de06a37c463a811727b3d5fceaa",
+    "portableArchiveBytes": 788011,
+    "summarySha256": "099f9208aba9fad15c627441282237e63813a48bfc02fa0ed5dc439e4d0802a7"
+  }
+}

@@ -1,0 +1,47 @@
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+163 JSON Schemas verified
+
+> lord-cricket-xxvi@0.1.0 build
+> tsc -b && vite build --config apps/web/vite.config.ts && vite build --config vite.runtime.config.ts
+
+[36mvite v7.1.7 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 122 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                             [39m[1m[2m  0.71 kB[22m[1m[22m[2m │ gzip:  0.41 kB[22m
+[2mdist/[22m[32mengineering.html                       [39m[1m[2m  0.72 kB[22m[1m[22m[2m │ gzip:  0.41 kB[22m
+[2mdist/[22m[2massets/[22m[32mmatch.worker-DxipHN2r.js        [39m[1m[2m590.04 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[35mengineering-BrDsDFp9.css        [39m[1m[2m  1.37 kB[22m[1m[22m[2m │ gzip:  0.63 kB[22m
+[2mdist/[22m[2massets/[22m[35mmain-B7L_4DI5.css               [39m[1m[2m  7.27 kB[22m[1m[22m[2m │ gzip:  2.35 kB[22m
+[2mdist/[22m[2massets/[22m[36mengineering-BIx7u-gA.js         [39m[1m[2m  3.22 kB[22m[1m[22m[2m │ gzip:  1.49 kB[22m
+[2mdist/[22m[2massets/[22m[36mmain-v6o8Pd6v.js                [39m[1m[2m 24.61 kB[22m[1m[22m[2m │ gzip:  8.01 kB[22m
+[2mdist/[22m[2massets/[22m[36mseason-persistence-BU0XWgYX.js  [39m[1m[2m280.86 kB[22m[1m[22m[2m │ gzip: 83.77 kB[22m
+[32m✓ built in 1.61s[39m
+[36mvite v7.1.7 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 130 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                             [39m[1m[2m  0.36 kB[22m[1m[22m[2m │ gzip:  0.24 kB[22m
+[2mdist/[22m[2massets/[22m[32mdeterminism.worker-D3V9ukrk.js  [39m[1m[2m149.87 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[32mt20.worker-COxBWk0V.js          [39m[1m[2m535.76 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[36mindex-Ch9BfyuA.js               [39m[1m[33m537.41 kB[39m[22m[2m │ gzip: 92.06 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 1.58s[39m
+
+> lord-cricket-xxvi@0.1.0 typecheck
+> tsc -b --pretty false && tsc -p tsconfig.tools.json --noEmit
+
+
+> lord-cricket-xxvi@0.1.0 lint
+> eslint . && node scripts/check-boundaries.mjs
+
+All seven package dependency and ambient API boundaries passed

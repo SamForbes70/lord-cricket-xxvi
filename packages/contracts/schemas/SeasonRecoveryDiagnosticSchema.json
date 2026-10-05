@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "saveId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "requestedGeneration": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "recoveredGeneration": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "recoveredCheckpointSerial": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "recoveredRevision": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "corruptedGenerations": {
+      "maxItems": 3,
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2
+      }
+    }
+  },
+  "required": [
+    "saveId",
+    "requestedGeneration",
+    "recoveredGeneration",
+    "recoveredCheckpointSerial",
+    "recoveredRevision",
+    "corruptedGenerations"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SeasonRecoveryDiagnostic:1",
+  "title": "SeasonRecoveryDiagnostic"
+}

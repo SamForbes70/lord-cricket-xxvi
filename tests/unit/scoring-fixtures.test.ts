@@ -180,5 +180,5 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(155); // inherited 147 plus eight additive Pass 12E projection schemas
+  expect(names).toHaveLength(163); // inherited 155 plus eight additive Pass 12F season-persistence schemas
 });

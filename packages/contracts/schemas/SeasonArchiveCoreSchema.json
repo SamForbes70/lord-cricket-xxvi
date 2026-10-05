@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "archiveVersion": {
+      "type": "string",
+      "const": "LC_T20_SEASON_ARCHIVE_V1"
+    },
+    "seasonId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "careerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "scheduleSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "stateSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "projectionRevision": {
+      "type": "number",
+      "const": 56
+    },
+    "fixtureCount": {
+      "type": "number",
+      "const": 56
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "championTeamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "finalTable": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "played": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 14
+          },
+          "wins": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 14
+          },
+          "losses": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 14
+          },
+          "ties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 14
+          },
+          "noResults": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 14
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 28
+          },
+          "runsFor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ballsFor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "runsAgainst": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ballsAgainst": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "nrrNumerator": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "nrrDenominator": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nrrX1000": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "headToHeadPoints": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 28
+          }
+        },
+        "required": [
+          "rank",
+          "teamId",
+          "played",
+          "wins",
+          "losses",
+          "ties",
+          "noResults",
+          "points",
+          "runsFor",
+          "ballsFor",
+          "runsAgainst",
+          "ballsAgainst",
+          "nrrNumerator",
+          "nrrDenominator",
+          "nrrX1000",
+          "headToHeadPoints"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "leaders": {
+      "type": "object",
+      "properties": {
+        "runs": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "playerId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "teamId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "playerId",
+              "teamId",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "wickets": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "playerId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "teamId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "playerId",
+              "teamId",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "runs",
+        "wickets"
+      ],
+      "additionalProperties": false
+    },
+    "completionKeys": {
+      "minItems": 56,
+      "maxItems": 56,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    }
+  },
+  "required": [
+    "archiveVersion",
+    "seasonId",
+    "careerId",
+    "scheduleSha256",
+    "stateSha256",
+    "projectionRevision",
+    "fixtureCount",
+    "completedAt",
+    "championTeamId",
+    "finalTable",
+    "leaders",
+    "completionKeys"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SeasonArchiveCore:1",
+  "title": "SeasonArchiveCore"
+}

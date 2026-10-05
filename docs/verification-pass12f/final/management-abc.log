@@ -1,0 +1,57 @@
+
+> lord-cricket-xxvi@0.1.0 season:fixtures
+> node --import tsx scripts/audit-season-schedule.ts --write
+
+{"eighthRound":[["team-08","team-01"],["team-07","team-02"],["team-06","team-03"],["team-05","team-04"]],"finalDate":"2027-02-11","firstDate":"2027-01-03","firstRound":[["team-01","team-08"],["team-02","team-07"],["team-03","team-06"],["team-04","team-05"]],"fixtures":56,"orderedPairs":56,"rounds":14,"scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","schedulerAlgorithm":"CIRCLE_REVERSE_VENUES_V1","schedulerVersion":"LC_T20_SEASON_SCHEDULE_V1","seasonSeedHash":"9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402","status":"PASS","teamCounts":{"team-01":{"away":7,"home":7,"matches":14},"team-02":{"away":7,"home":7,"matches":14},"team-03":{"away":7,"home":7,"matches":14},"team-04":{"away":7,"home":7,"matches":14},"team-05":{"away":7,"home":7,"matches":14},"team-06":{"away":7,"home":7,"matches":14},"team-07":{"away":7,"home":7,"matches":14},"team-08":{"away":7,"home":7,"matches":14}},"uniqueFixtureIds":56,"uniqueMatchIds":56,"uniqueMatchSeeds":56}
+
+> lord-cricket-xxvi@0.1.0 season:rules
+> vitest run tests/unit/season-scheduler.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12f/repo[39m
+
+ [32m✓[39m tests/unit/season-scheduler.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 10:27:32
+[2m   Duration [22m 719ms[2m (transform 204ms, setup 0ms, collect 442ms, tests 59ms, environment 0ms, prepare 58ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 career:fixtures
+> node --import tsx scripts/audit-career-condition.ts --write
+
+{"appliedCompletionKeys":["completion-m-b383e5ed09f44b7a-r01-m01"],"availabilityPackId":"fictional-eight-01-availability-test-v1","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V1","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001Availability":"UNAVAILABLE","p001FatigueBp":1500,"p002FatigueBp":0},"day2StateSha256":"8d465b1bbaca446d453f8e5a81dfc8e61f6ab840691e1e1fc89e22e92e9eb6ff","day3":{"date":"2027-01-05","p001Availability":"UNAVAILABLE","p001FatigueBp":0},"day3StateSha256":"1a48066d5ba50daafd4b609d06ebe2ee234a49708b8ebd4574f17085cfd32263","fatiguedStateSha256":"cb188e98814aee570d8c2e7081fff4115c54ff3bf326079ebcc1dc9842c96df2","finalScheduledDate":"2027-02-11","initialDate":"2027-01-03","initialStateSha256":"8ccc8adf4718e1c93a4e6873ccadc27a75599df8510235afe186c3bd0585564d","playerConditions":160,"playersPerTeam":[20,20,20,20,20,20,20,20],"status":"PASS","teamCount":8,"worldPackId":"fictional-eight-01"}
+
+> lord-cricket-xxvi@0.1.0 career:rules
+> vitest run tests/unit/career-condition.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12f/repo[39m
+
+ [32m✓[39m tests/unit/career-condition.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 230[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 10:27:33
+[2m   Duration [22m 929ms[2m (transform 239ms, setup 0ms, collect 482ms, tests 230ms, environment 0ms, prepare 70ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 training:fixtures
+> node --import tsx scripts/audit-career-training.ts --write
+
+{"beforeAdvanceSha256":"903dbc3acc9711a141efff18266dd23c826f63c2a6352da2d12dc2a649d768bc","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V2","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001BattingReadiness":1,"p001FatigueBp":2100,"p002BowlingReadiness":1,"p003FieldingReadiness":1,"p004FatigueBp":1500,"practicePlayers":3,"restPlayers":157},"day2StateSha256":"228c1d1f0e8cb27264dc9f9b724c8bca361a97a6f07e9ee32e3cea013024e7d7","day3":{"date":"2027-01-05","p001BattingReadiness":0,"p001FatigueBp":100},"day3StateSha256":"3f2c85d37f8e608e512bc670361c0552868adbe3c8665e38d304d9c194c46efd","noPermanentAttributeGrowth":true,"practiceRecoveryPerDayBp":1400,"readinessRange":[-3,3],"restRecoveryPerDayBp":2000,"status":"PASS","trainingPolicyVersion":"LC_T20_CAREER_TRAINING_V1"}
+
+> lord-cricket-xxvi@0.1.0 training:rules
+> vitest run tests/unit/career-training.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12f/repo[39m
+
+ [32m✓[39m tests/unit/career-training.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 471[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 10:27:35
+[2m   Duration [22m 1.17s[2m (transform 203ms, setup 0ms, collect 454ms, tests 471ms, environment 0ms, prepare 61ms)[22m
+

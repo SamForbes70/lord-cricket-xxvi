@@ -254,6 +254,7 @@ export class IndexedDbSaveRepository {
     const rows = (await req(tx.objectStore("games").getAll())) as GameRecord[];
     await txDone(tx);
     return rows
+      .filter((row) => (row as GameRecord & { recordType?: string }).recordType !== "SEASON")
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .map(summaryFromGame);
   }
@@ -715,3 +716,4 @@ export class IndexedDbSaveRepository {
 }
 
 export * from "./archive.js";
+export * from "./season.js";
