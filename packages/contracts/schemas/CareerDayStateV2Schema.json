@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "careerStateVersion": {
+      "type": "string",
+      "const": "LC_T20_CAREER_DAY_STATE_V2"
+    },
+    "conditionPolicyVersion": {
+      "type": "string",
+      "const": "LC_T20_CAREER_CONDITION_V1"
+    },
+    "trainingPolicyVersion": {
+      "type": "string",
+      "const": "LC_T20_CAREER_TRAINING_V1"
+    },
+    "careerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "gameId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seasonId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "competitionId": {
+      "type": "string",
+      "const": "LC_T20_LEAGUE_01"
+    },
+    "scheduleVersion": {
+      "type": "string",
+      "const": "LC_T20_SEASON_SCHEDULE_V1"
+    },
+    "scheduleSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldPackId": {
+      "type": "string",
+      "const": "fictional-eight-01"
+    },
+    "worldCanonicalSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "availabilityPackId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "availabilityPackSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "finalScheduledDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "currentDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "playerConditions": {
+      "minItems": 160,
+      "maxItems": 160,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "fatigueBp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "lastUpdatedDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "playerId",
+          "fatigueBp",
+          "lastUpdatedDate"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "playerReadiness": {
+      "minItems": 160,
+      "maxItems": 160,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "batting": {
+            "type": "integer",
+            "minimum": -3,
+            "maximum": 3
+          },
+          "bowling": {
+            "type": "integer",
+            "minimum": -3,
+            "maximum": 3
+          },
+          "fielding": {
+            "type": "integer",
+            "minimum": -3,
+            "maximum": 3
+          },
+          "lastUpdatedDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "playerId",
+          "batting",
+          "bowling",
+          "fielding",
+          "lastUpdatedDate"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "trainingAssignments": {
+      "minItems": 160,
+      "maxItems": 160,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "directive": {
+            "type": "string",
+            "enum": [
+              "REST",
+              "BATTING_PRACTICE",
+              "BOWLING_PRACTICE",
+              "FIELDING_PRACTICE"
+            ]
+          }
+        },
+        "required": [
+          "playerId",
+          "directive"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "appliedMatchConditions": {
+      "maxItems": 56,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "matchCompletionKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "matchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "matchDayDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "payloadSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "matchCompletionKey",
+          "matchId",
+          "matchDayDate",
+          "payloadSha256"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "stateSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "careerStateVersion",
+    "conditionPolicyVersion",
+    "trainingPolicyVersion",
+    "careerId",
+    "gameId",
+    "seasonId",
+    "competitionId",
+    "scheduleVersion",
+    "scheduleSha256",
+    "worldPackId",
+    "worldCanonicalSha256",
+    "availabilityPackId",
+    "availabilityPackSha256",
+    "startDate",
+    "finalScheduledDate",
+    "currentDate",
+    "revision",
+    "playerConditions",
+    "playerReadiness",
+    "trainingAssignments",
+    "appliedMatchConditions",
+    "stateSha256"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:CareerDayStateV2:1",
+  "title": "CareerDayStateV2"
+}

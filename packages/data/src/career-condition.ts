@@ -1,6 +1,7 @@
 import {
   CareerAvailabilityPackSchema,
   CareerConditionPolicySchema,
+  CareerTrainingPolicySchema,
 } from "@lcxxvi/contracts";
 import { FROZEN_WORLD_PINS } from "./world-pins.js";
 
@@ -40,3 +41,14 @@ export const FICTIONAL_EIGHT_TEAM_ROSTERS = Object.freeze(
 export const FICTIONAL_EIGHT_PLAYER_IDS = Object.freeze(
   Array.from({ length: 160 }, (_, index) => `p${String(index + 1).padStart(3, "0")}`),
 );
+
+export const T20_CAREER_TRAINING_POLICY = CareerTrainingPolicySchema.parse({
+  trainingPolicyVersion: "LC_T20_CAREER_TRAINING_V1",
+  readinessMinRatingDelta: -3,
+  readinessMaxRatingDelta: 3,
+  readinessPracticeGainPerDay: 1,
+  readinessDecayPerDay: 1,
+  restRecoveryPerDayBp: 2000,
+  practiceRecoveryPerDayBp: 1400,
+  noPermanentAttributeGrowth: true,
+});

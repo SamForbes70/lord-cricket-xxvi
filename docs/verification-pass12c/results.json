@@ -1,0 +1,41 @@
+{
+  "pass": "12C",
+  "milestone": "M6C",
+  "scope": "Training and Recovery Directives",
+  "status": "PASS",
+  "baselineCommit": "1213d96cc8bf716198f4887d9973560134032962",
+  "gates": {
+    "offlineCleanInstall": { "status": "PASS", "packagesAdded": 208 },
+    "schemas": { "status": "PASS", "count": 142, "additiveSchemas": 11 },
+    "build": { "status": "PASS" },
+    "typecheck": { "status": "PASS" },
+    "lintAndBoundaries": { "status": "PASS", "packageBoundaries": 7 },
+    "scoringFixtureAudit": { "status": "PASS", "deliveryCases": 45, "ledgerCases": 45, "rejections": 29 },
+    "determinismVectors": { "status": "PASS", "randomAddresses": 24, "stateHashes": 8 },
+    "probabilityVectors": { "status": "PASS", "vectors": 15, "boundaries": 4 },
+    "generatorVectors": { "status": "PASS", "fixtures": 9 },
+    "seasonSchedule": { "status": "PASS", "fixtures": 56, "rulesTests": 8 },
+    "careerCondition": { "status": "PASS", "rulesTests": 9 },
+    "careerTraining": { "status": "PASS", "rulesTests": 10 },
+    "unitSuite": { "status": "PASS", "tests": 471, "files": 19 },
+    "sourceIntegrity": { "status": "PASS", "criticalFilesUnchanged": 13, "inheritedSchemasUnchanged": 131 },
+    "freshChromiumNavigation": {
+      "status": "BLOCKED",
+      "reason": "Host policy returned ERR_BLOCKED_BY_ADMINISTRATOR for localhost before application code executed; compiled CLI cases passed and browser-sensitive source is byte-identical to Pass 12B."
+    }
+  },
+  "trainingPolicy": {
+    "policyVersion": "LC_T20_CAREER_TRAINING_V1",
+    "restRecoveryPerDayBp": 2000,
+    "practiceRecoveryPerDayBp": 1400,
+    "readinessRange": [-3, 3],
+    "practiceGainPerDay": 1,
+    "nonPracticedDecayTowardZeroPerDay": 1,
+    "permanentAttributeGrowth": false
+  },
+  "careerState": {
+    "legacyVersion": "LC_T20_CAREER_DAY_STATE_V1",
+    "currentTrainingVersion": "LC_T20_CAREER_DAY_STATE_V2",
+    "migration": "DETERMINISTIC_V1_TO_V2"
+  }
+}

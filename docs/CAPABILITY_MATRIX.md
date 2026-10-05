@@ -1,28 +1,29 @@
-# Capability matrix: Pass 12A / M6A
+# Capability matrix: Pass 12C / M6C
 
 | Capability | Status and boundary |
 | --- | --- |
 | T20/ODI/red-ball match engines | Inherited unchanged from Pass 11 |
-| M4 persistence | Inherited unchanged; season persistence not yet implemented |
+| M4 match persistence | Inherited unchanged; career/season persistence not yet implemented |
 | Fictional world | Frozen `fictional-eight-01`, 160 players / 8 teams / 8 grounds |
 | T20 competition contract | `LC_T20_LEAGUE_01` implemented |
-| Season schedule contract | `LC_T20_SEASON_SCHEDULE_V1` implemented |
-| Fixture scheduler | Deterministic circle algorithm, 14 rounds, 56 fixtures |
-| Venue reversal | Rounds 8-14 reverse corresponding first-half venues |
-| Match-day spacing | Three calendar days using pure deterministic date arithmetic |
-| Team frequency | Exactly once per round; 14 fixtures per team |
-| Venue balance | Exactly 7 home and 7 away per team |
-| Fixture identity | Stable fixture and match IDs plus canonical schedule SHA-256 |
-| Fixture randomness boundary | 56 independent canonical match seeds; no shared mutable RNG |
-| World/ground trust | Frozen world hash and all home-ground references validated |
-| League points/table policy | Contract pinned; reducer/table calculation not implemented yet |
-| Career day commands | Deferred to Pass 12B/12C |
-| Player condition/availability | Deferred to Pass 12B |
-| Training/recovery | Deferred to Pass 12C |
+| Season schedule | `LC_T20_SEASON_SCHEDULE_V1`, deterministic 14 rounds / 56 fixtures |
+| Career condition V1 | Implemented and retained unchanged from Pass 12B |
+| Career state V2 | Implemented with training policy/readiness and deterministic V1→V2 migration |
+| Career-day progression | Explicit pure Gregorian `ADVANCE_DAY`; no ambient clock |
+| Availability | Manual fixture-pack unavailable dates; no random injuries |
+| Match fatigue input | Exactly-once, schedule/date/squad-bound V1 and V2 application paths |
+| Training directives | `REST`, `BATTING_PRACTICE`, `BOWLING_PRACTICE`, `FIELDING_PRACTICE` |
+| Rest recovery | 2,000 fatigue bp per elapsed career day |
+| Practice recovery | 1,400 fatigue bp per elapsed career day |
+| Temporary readiness | Batting/bowling/fielding signed range -3..+3; relevant practice +1/day, otherwise decay 1 toward zero |
+| Permanent attribute growth | Disabled; training never mutates frozen base player skills |
+| Training persistence | Directive persists until explicitly changed |
+| Player form | Deferred and separate from readiness |
 | AI/off-screen fixture execution | Deferred to Pass 12D |
-| NRR/table reducer | Deferred to Pass 12E |
+| League table / NRR | Policy contract pinned; reducer deferred to Pass 12E |
+| Season statistics | Deferred to Pass 12E |
 | Season persistence/archive | Deferred to Pass 12F |
 | Full 56-match season acceptance | Deferred to Pass 12G |
-| Tactical opponent AI | Deferred to M7; not disguised as fixture autopilot |
+| Tactical opponent AI | Deferred to M7; fixture autopilot must not be presented as tactical AI |
 | Limited-overs DLS | Disabled |
 | Model status | `SYNTHETIC_ALPHA` |

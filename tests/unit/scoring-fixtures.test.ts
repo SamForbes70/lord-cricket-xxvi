@@ -180,5 +180,5 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(131); // inherited 120 plus eleven additive Pass 12B career/condition schemas
+  expect(names).toHaveLength(142); // inherited 131 plus eleven additive Pass 12C training/readiness schemas
 });

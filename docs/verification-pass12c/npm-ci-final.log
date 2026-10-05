@@ -1,0 +1,7 @@
+npm warn deprecated eslint@9.37.0: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 208 packages in 1s
+
+real	0m1.482s
+user	0m1.496s
+sys	0m1.446s

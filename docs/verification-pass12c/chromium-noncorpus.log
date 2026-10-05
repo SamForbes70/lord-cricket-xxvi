@@ -1,0 +1,113 @@
+
+Running 11 tests using 2 workers
+
+  ✘   2 [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector (213ms)
+  ✘   1 [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play (1.2s)
+  ✓   3 [chromium] › tests/smoke/determinism.spec.ts:115:1 › compiled batch random/hash commands match frozen outputs and reject bad requests (565ms)
+  ✓   5 [chromium] › tests/smoke/app.spec.ts:43:1 › compiled batch app reports accurate capabilities and rejects unsupported commands (723ms)
+  ✓   6 [chromium] › tests/smoke/app.spec.ts:84:1 › compiled scoring CLI exercises production scorer and rejects malformed requests (338ms)
+  ✘   4 [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors (1.2s)
+  ✓   8 [chromium] › tests/smoke/generator.spec.ts:44:1 › compiled batch generator command hands validated resolution to scoring adapter (373ms)
+  ✘   7 [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors (1.2s)
+  ✘   9 [chromium] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (1.2s)
+  ✓  10 [chromium] › tests/smoke/probability.spec.ts:64:1 › compiled batch probability command matches independent vector and rejects a wrong request (583ms)
+  ✓  11 [chromium] › tests/smoke/world.spec.ts:25:1 › compiled batch validates frozen world, immutable setup and rejects tampered input (799ms)
+
+
+  1) [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4173/engineering.html
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4173/engineering.html", waiting until "load"[22m
+
+
+       7 |   const errors: string[] = [];
+       8 |   page.on("pageerror", (e) => errors.push(e.message));
+    >  9 |   await page.goto("/engineering.html");
+         |              ^
+      10 |   await expect(
+      11 |     page.getByRole("heading", { name: "Lord Cricket XXVI" }),
+      12 |   ).toBeVisible();
+        at /mnt/data/lcxxvi-pass12b/repo/tests/smoke/app.spec.ts:9:14
+
+    Error Context: test-results/app-production-React-shell-b41db--without-pretending-to-play-chromium/error-context.md
+
+  2) [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4174/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4174/", waiting until "load"[22m
+
+
+      12 |   const errors: string[] = [];
+      13 |   page.on("pageerror", (e) => errors.push(e.message));
+    > 14 |   await page.goto("http://127.0.0.1:4174");
+         |              ^
+      15 |   await page.waitForFunction(() => Boolean(window.determinism));
+      16 |   for (const v of vectors.addresses) {
+      17 |     const request = {
+        at /mnt/data/lcxxvi-pass12b/repo/tests/smoke/determinism.spec.ts:14:14
+
+    Error Context: test-results/determinism-Node-browser-a-4f913-en-address-and-state-vector-chromium/error-context.md
+
+  3) [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4174/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4174/", waiting until "load"[22m
+
+
+       9 |   const errors:string[]=[];
+      10 |   page.on('pageerror',error=>errors.push(error.message));
+    > 11 |   await page.goto('http://127.0.0.1:4174');
+         |              ^
+      12 |   await page.waitForFunction(()=>Boolean(window.determinism?.generator));
+      13 |   for(const v of vectors.fixtures) {
+      14 |     const input={...request,seed:v.seed};
+        at /mnt/data/lcxxvi-pass12b/repo/tests/smoke/generator.spec.ts:11:14
+
+    Error Context: test-results/generator-Node-browser-and-6b337-he-frozen-generator-vectors-chromium/error-context.md
+
+  4) [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4174/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4174/", waiting until "load"[22m
+
+
+      16 |   const errors: string[] = [];
+      17 |   page.on("pageerror", error => errors.push(error.message));
+    > 18 |   await page.goto("http://127.0.0.1:4174");
+         |              ^
+      19 |   await page.waitForFunction(() => Boolean(window.determinism));
+      20 |   for (const v of vectors.cases) {
+      21 |     const base = { ...version, categories: v.categories };
+        at /mnt/data/lcxxvi-pass12b/repo/tests/smoke/probability.spec.ts:18:14
+
+    Error Context: test-results/probability-Node-browser-a-ff0ae-pendent-probability-vectors-chromium/error-context.md
+
+  5) [chromium] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:4174/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4174/", waiting until "load"[22m
+
+
+       9 |
+      10 | test("Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses", async ({ page, browser }) => {
+    > 11 |   await page.goto("http://127.0.0.1:4174");
+         |              ^
+      12 |   await page.waitForFunction(() => Boolean(window.determinism?.execute));
+      13 |   for (const {address,expectedUint32} of vectors.vectors) {
+      14 |     const output = await page.evaluate(async address => {
+        at /mnt/data/lcxxvi-pass12b/repo/tests/smoke/world.spec.ts:11:14
+
+    Error Context: test-results/world-Node-browser-and-wor-ae680--WORLD-GENERATION-addresses-chromium/error-context.md
+
+  5 failed
+    [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play 
+    [chromium] › tests/smoke/determinism.spec.ts:8:1 › Node, browser and worker agree on every frozen address and state vector 
+    [chromium] › tests/smoke/generator.spec.ts:8:1 › Node, browser and worker agree on the frozen generator vectors 
+    [chromium] › tests/smoke/probability.spec.ts:15:1 › Node, browser and worker agree on independent probability vectors 
+    [chromium] › tests/smoke/world.spec.ts:10:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses 
+  6 passed (9.2s)

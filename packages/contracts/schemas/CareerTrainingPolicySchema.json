@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "trainingPolicyVersion": {
+      "type": "string",
+      "const": "LC_T20_CAREER_TRAINING_V1"
+    },
+    "readinessMinRatingDelta": {
+      "type": "number",
+      "const": -3
+    },
+    "readinessMaxRatingDelta": {
+      "type": "number",
+      "const": 3
+    },
+    "readinessPracticeGainPerDay": {
+      "type": "number",
+      "const": 1
+    },
+    "readinessDecayPerDay": {
+      "type": "number",
+      "const": 1
+    },
+    "restRecoveryPerDayBp": {
+      "type": "number",
+      "const": 2000
+    },
+    "practiceRecoveryPerDayBp": {
+      "type": "number",
+      "const": 1400
+    },
+    "noPermanentAttributeGrowth": {
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "trainingPolicyVersion",
+    "readinessMinRatingDelta",
+    "readinessMaxRatingDelta",
+    "readinessPracticeGainPerDay",
+    "readinessDecayPerDay",
+    "restRecoveryPerDayBp",
+    "practiceRecoveryPerDayBp",
+    "noPermanentAttributeGrowth"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:CareerTrainingPolicy:1",
+  "title": "CareerTrainingPolicy"
+}

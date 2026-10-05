@@ -108,3 +108,126 @@ export type CareerDayState = z.infer<typeof CareerDayStateSchema>;
 export type SquadPlayerConditionView = z.infer<typeof SquadPlayerConditionViewSchema>;
 export type SquadConditionView = z.infer<typeof SquadConditionViewSchema>;
 export type CareerAdvanceDayReceipt = z.infer<typeof CareerAdvanceDayReceiptSchema>;
+
+export const CareerTrainingPolicySchema = z.strictObject({
+  trainingPolicyVersion: z.literal("LC_T20_CAREER_TRAINING_V1"),
+  readinessMinRatingDelta: z.literal(-3),
+  readinessMaxRatingDelta: z.literal(3),
+  readinessPracticeGainPerDay: z.literal(1),
+  readinessDecayPerDay: z.literal(1),
+  restRecoveryPerDayBp: z.literal(2000),
+  practiceRecoveryPerDayBp: z.literal(1400),
+  noPermanentAttributeGrowth: z.literal(true),
+});
+
+export const TrainingDirectiveSchema = z.enum([
+  "REST",
+  "BATTING_PRACTICE",
+  "BOWLING_PRACTICE",
+  "FIELDING_PRACTICE",
+]);
+
+export const PlayerReadinessSchema = z.strictObject({
+  playerId: IDSchema,
+  batting: z.number().int().min(-3).max(3),
+  bowling: z.number().int().min(-3).max(3),
+  fielding: z.number().int().min(-3).max(3),
+  lastUpdatedDate: z.iso.date(),
+});
+
+export const PlayerTrainingAssignmentSchema = z.strictObject({
+  playerId: IDSchema,
+  directive: TrainingDirectiveSchema,
+});
+
+const CareerDayStateV2CoreShape = {
+  careerStateVersion: z.literal("LC_T20_CAREER_DAY_STATE_V2"),
+  conditionPolicyVersion: z.literal("LC_T20_CAREER_CONDITION_V1"),
+  trainingPolicyVersion: z.literal("LC_T20_CAREER_TRAINING_V1"),
+  careerId: IDSchema,
+  gameId: IDSchema,
+  seasonId: IDSchema,
+  competitionId: z.literal("LC_T20_LEAGUE_01"),
+  scheduleVersion: z.literal("LC_T20_SEASON_SCHEDULE_V1"),
+  scheduleSha256: HashSchema,
+  worldPackId: z.literal("fictional-eight-01"),
+  worldCanonicalSha256: HashSchema,
+  availabilityPackId: IDSchema,
+  availabilityPackSha256: HashSchema,
+  startDate: z.iso.date(),
+  finalScheduledDate: z.iso.date(),
+  currentDate: z.iso.date(),
+  revision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+  playerConditions: z.array(PlayerCareerConditionSchema).length(160),
+  playerReadiness: z.array(PlayerReadinessSchema).length(160),
+  trainingAssignments: z.array(PlayerTrainingAssignmentSchema).length(160),
+  appliedMatchConditions: z.array(AppliedMatchConditionSchema).max(56),
+} as const;
+
+export const CareerDayStateV2CoreSchema = z.strictObject(CareerDayStateV2CoreShape);
+export const CareerDayStateV2Schema = z.strictObject({
+  ...CareerDayStateV2CoreShape,
+  stateSha256: HashSchema,
+});
+
+export const SetTrainingDirectiveRequestSchema = z.strictObject({
+  command: z.literal("SET_TRAINING_DIRECTIVE"),
+  playerId: IDSchema,
+  directive: TrainingDirectiveSchema,
+  effectiveDate: z.iso.date(),
+  expectedRevision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+});
+
+export const SetTrainingDirectiveReceiptSchema = z.strictObject({
+  command: z.literal("SET_TRAINING_DIRECTIVE"),
+  playerId: IDSchema,
+  previousDirective: TrainingDirectiveSchema,
+  directive: TrainingDirectiveSchema,
+  changed: z.boolean(),
+  revision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+  stateSha256: HashSchema,
+});
+
+export const CareerAdvanceDayV2ReceiptSchema = z.strictObject({
+  command: z.literal("ADVANCE_DAY"),
+  previousDate: z.iso.date(),
+  currentDate: z.iso.date(),
+  restPlayers: CounterSchema,
+  practicePlayers: CounterSchema,
+  recoveredPlayers: CounterSchema,
+  readinessChangedPlayers: CounterSchema,
+  restRecoveryPerPlayerBp: z.literal(2000),
+  practiceRecoveryPerPlayerBp: z.literal(1400),
+  revision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+  stateSha256: HashSchema,
+});
+
+export const SquadPlayerTrainingConditionViewSchema = z.strictObject({
+  playerId: IDSchema,
+  fatigueBp: BasisPointsSchema,
+  availability: z.enum(["AVAILABLE", "UNAVAILABLE"]),
+  availabilityReason: z.string().min(1).max(240).nullable(),
+  unavailableThrough: z.iso.date().nullable(),
+  directive: TrainingDirectiveSchema,
+  battingReadiness: z.number().int().min(-3).max(3),
+  bowlingReadiness: z.number().int().min(-3).max(3),
+  fieldingReadiness: z.number().int().min(-3).max(3),
+});
+
+export const SquadTrainingConditionViewSchema = z.strictObject({
+  teamId: IDSchema,
+  date: z.iso.date(),
+  players: z.array(SquadPlayerTrainingConditionViewSchema).length(20),
+});
+
+export type CareerTrainingPolicy = z.infer<typeof CareerTrainingPolicySchema>;
+export type TrainingDirective = z.infer<typeof TrainingDirectiveSchema>;
+export type PlayerReadiness = z.infer<typeof PlayerReadinessSchema>;
+export type PlayerTrainingAssignment = z.infer<typeof PlayerTrainingAssignmentSchema>;
+export type CareerDayStateV2Core = z.infer<typeof CareerDayStateV2CoreSchema>;
+export type CareerDayStateV2 = z.infer<typeof CareerDayStateV2Schema>;
+export type SetTrainingDirectiveRequest = z.infer<typeof SetTrainingDirectiveRequestSchema>;
+export type SetTrainingDirectiveReceipt = z.infer<typeof SetTrainingDirectiveReceiptSchema>;
+export type CareerAdvanceDayV2Receipt = z.infer<typeof CareerAdvanceDayV2ReceiptSchema>;
+export type SquadPlayerTrainingConditionView = z.infer<typeof SquadPlayerTrainingConditionViewSchema>;
+export type SquadTrainingConditionView = z.infer<typeof SquadTrainingConditionViewSchema>;

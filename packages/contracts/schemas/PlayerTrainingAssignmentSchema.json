@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "directive": {
+      "type": "string",
+      "enum": [
+        "REST",
+        "BATTING_PRACTICE",
+        "BOWLING_PRACTICE",
+        "FIELDING_PRACTICE"
+      ]
+    }
+  },
+  "required": [
+    "playerId",
+    "directive"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PlayerTrainingAssignment:1",
+  "title": "PlayerTrainingAssignment"
+}

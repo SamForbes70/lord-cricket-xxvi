@@ -1,0 +1,217 @@
+
+> lord-cricket-xxvi@0.1.0 verify:12c:core
+> npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm run career:fixtures && npm run career:rules && npm run training:fixtures && npm run training:rules && npm test
+
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+142 JSON Schemas verified
+
+> lord-cricket-xxvi@0.1.0 build
+> tsc -b && vite build --config apps/web/vite.config.ts && vite build --config vite.runtime.config.ts
+
+[36mvite v7.1.7 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 119 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                       [39m[1m[2m  0.70 kB[22m[1m[22m[2m │ gzip:  0.40 kB[22m
+[2mdist/[22m[32mengineering.html                 [39m[1m[2m  0.71 kB[22m[1m[22m[2m │ gzip:  0.41 kB[22m
+[2mdist/[22m[2massets/[22m[32mmatch.worker-UE1Ti5kB.js  [39m[1m[2m584.66 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[35mengineering-BrDsDFp9.css  [39m[1m[2m  1.37 kB[22m[1m[22m[2m │ gzip:  0.63 kB[22m
+[2mdist/[22m[2massets/[22m[35mmain-B7L_4DI5.css         [39m[1m[2m  7.27 kB[22m[1m[22m[2m │ gzip:  2.35 kB[22m
+[2mdist/[22m[2massets/[22m[36mengineering-D-3qIN-e.js   [39m[1m[2m  3.21 kB[22m[1m[22m[2m │ gzip:  1.48 kB[22m
+[2mdist/[22m[2massets/[22m[36mmain-C6xzEpf_.js          [39m[1m[2m 24.60 kB[22m[1m[22m[2m │ gzip:  8.01 kB[22m
+[2mdist/[22m[2massets/[22m[36mcareer-DjK1ZkzM.js        [39m[1m[2m276.03 kB[22m[1m[22m[2m │ gzip: 82.52 kB[22m
+[32m✓ built in 1.73s[39m
+[36mvite v7.1.7 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 125 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                             [39m[1m[2m  0.36 kB[22m[1m[22m[2m │ gzip:  0.24 kB[22m
+[2mdist/[22m[2massets/[22m[32mdeterminism.worker-v-S4sQRv.js  [39m[1m[2m144.52 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[32mt20.worker-DD9zIqnf.js          [39m[1m[2m530.42 kB[22m[1m[22m
+[2mdist/[22m[2massets/[22m[36mindex-DXTlesuW.js               [39m[1m[33m532.07 kB[39m[22m[2m │ gzip: 90.29 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 1.52s[39m
+
+> lord-cricket-xxvi@0.1.0 typecheck
+> tsc -b --pretty false && tsc -p tsconfig.tools.json --noEmit
+
+
+> lord-cricket-xxvi@0.1.0 lint
+> eslint . && node scripts/check-boundaries.mjs
+
+All seven package dependency and ambient API boundaries passed
+
+> lord-cricket-xxvi@0.1.0 fixtures:audit
+> node --import tsx scripts/audit-fixtures.ts
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "NOT_REQUESTED",
+  "matchedDeliveryCases": 0,
+  "matchedLedgerCases": 0,
+  "rejectedByScorer": 0,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Pass 07: bounded seeded T20 orchestration"
+}
+
+> lord-cricket-xxvi@0.1.0 fixtures:engine
+> node --import tsx scripts/audit-fixtures.ts --require-scorer
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "PASS",
+  "matchedDeliveryCases": 45,
+  "matchedLedgerCases": 45,
+  "rejectedByScorer": 29,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Pass 07: bounded seeded T20 orchestration"
+}
+
+> lord-cricket-xxvi@0.1.0 vectors:check
+> python3 scripts/check-determinism-vectors.py
+
+PASS: 24 random-address and 8 state-hash vectors independently verified
+
+> lord-cricket-xxvi@0.1.0 probability:check
+> python3 scripts/reference_probability.py
+
+PASS Python independent Decimal LUT: 1601 entries; checksum d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825
+PASS model: d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab; 15 mass/draw vectors; 4 boundaries
+PASS manual fraction identities, masks, empty-mass guard and category-order tie-breaking
+
+> lord-cricket-xxvi@0.1.0 generator:check
+> python3 scripts/check-generator-vectors.py
+
+PASS: 9 independently hashed generator fixtures and exact length/legality mass oracles
+
+> lord-cricket-xxvi@0.1.0 season:fixtures
+> node --import tsx scripts/audit-season-schedule.ts --write
+
+{"eighthRound":[["team-08","team-01"],["team-07","team-02"],["team-06","team-03"],["team-05","team-04"]],"finalDate":"2027-02-11","firstDate":"2027-01-03","firstRound":[["team-01","team-08"],["team-02","team-07"],["team-03","team-06"],["team-04","team-05"]],"fixtures":56,"orderedPairs":56,"rounds":14,"scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","schedulerAlgorithm":"CIRCLE_REVERSE_VENUES_V1","schedulerVersion":"LC_T20_SEASON_SCHEDULE_V1","seasonSeedHash":"9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402","status":"PASS","teamCounts":{"team-01":{"away":7,"home":7,"matches":14},"team-02":{"away":7,"home":7,"matches":14},"team-03":{"away":7,"home":7,"matches":14},"team-04":{"away":7,"home":7,"matches":14},"team-05":{"away":7,"home":7,"matches":14},"team-06":{"away":7,"home":7,"matches":14},"team-07":{"away":7,"home":7,"matches":14},"team-08":{"away":7,"home":7,"matches":14}},"uniqueFixtureIds":56,"uniqueMatchIds":56,"uniqueMatchSeeds":56}
+
+> lord-cricket-xxvi@0.1.0 season:rules
+> vitest run tests/unit/season-scheduler.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12b/repo[39m
+
+ [32m✓[39m tests/unit/season-scheduler.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 56[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 03:52:11
+[2m   Duration [22m 638ms[2m (transform 177ms, setup 0ms, collect 381ms, tests 56ms, environment 0ms, prepare 69ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 career:fixtures
+> node --import tsx scripts/audit-career-condition.ts --write
+
+{"appliedCompletionKeys":["completion-m-b383e5ed09f44b7a-r01-m01"],"availabilityPackId":"fictional-eight-01-availability-test-v1","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V1","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001Availability":"UNAVAILABLE","p001FatigueBp":1500,"p002FatigueBp":0},"day2StateSha256":"8d465b1bbaca446d453f8e5a81dfc8e61f6ab840691e1e1fc89e22e92e9eb6ff","day3":{"date":"2027-01-05","p001Availability":"UNAVAILABLE","p001FatigueBp":0},"day3StateSha256":"1a48066d5ba50daafd4b609d06ebe2ee234a49708b8ebd4574f17085cfd32263","fatiguedStateSha256":"cb188e98814aee570d8c2e7081fff4115c54ff3bf326079ebcc1dc9842c96df2","finalScheduledDate":"2027-02-11","initialDate":"2027-01-03","initialStateSha256":"8ccc8adf4718e1c93a4e6873ccadc27a75599df8510235afe186c3bd0585564d","playerConditions":160,"playersPerTeam":[20,20,20,20,20,20,20,20],"status":"PASS","teamCount":8,"worldPackId":"fictional-eight-01"}
+
+> lord-cricket-xxvi@0.1.0 career:rules
+> vitest run tests/unit/career-condition.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12b/repo[39m
+
+ [32m✓[39m tests/unit/career-condition.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 181[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 03:52:13
+[2m   Duration [22m 741ms[2m (transform 175ms, setup 0ms, collect 383ms, tests 181ms, environment 0ms, prepare 55ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 training:fixtures
+> node --import tsx scripts/audit-career-training.ts --write
+
+{"beforeAdvanceSha256":"903dbc3acc9711a141efff18266dd23c826f63c2a6352da2d12dc2a649d768bc","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V2","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001BattingReadiness":1,"p001FatigueBp":2100,"p002BowlingReadiness":1,"p003FieldingReadiness":1,"p004FatigueBp":1500,"practicePlayers":3,"restPlayers":157},"day2StateSha256":"228c1d1f0e8cb27264dc9f9b724c8bca361a97a6f07e9ee32e3cea013024e7d7","day3":{"date":"2027-01-05","p001BattingReadiness":0,"p001FatigueBp":100},"day3StateSha256":"3f2c85d37f8e608e512bc670361c0552868adbe3c8665e38d304d9c194c46efd","noPermanentAttributeGrowth":true,"practiceRecoveryPerDayBp":1400,"readinessRange":[-3,3],"restRecoveryPerDayBp":2000,"status":"PASS","trainingPolicyVersion":"LC_T20_CAREER_TRAINING_V1"}
+
+> lord-cricket-xxvi@0.1.0 training:rules
+> vitest run tests/unit/career-training.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12b/repo[39m
+
+ [32m✓[39m tests/unit/career-training.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 477[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 03:52:14
+[2m   Duration [22m 1.03s[2m (transform 162ms, setup 0ms, collect 364ms, tests 477ms, environment 0ms, prepare 64ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12b/repo[39m
+
+ [32m✓[39m tests/unit/scoring-kernel.test.ts [2m([22m[2m134 tests[22m[2m)[22m[32m 161[2mms[22m[39m
+ [32m✓[39m tests/unit/generator.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 83[2mms[22m[39m
+ [32m✓[39m tests/unit/career-training.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 523[2mms[22m[39m
+ [32m✓[39m tests/unit/career-condition.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 194[2mms[22m[39m
+ [32m✓[39m tests/unit/t20-match.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 3134[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mrejects hash-tampered event, state, chain, wrong version and invalid stage pack [33m 1132[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mpins first complete seeded match scorecard as regression observation distinct from independent rule goldens [33m 366[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mfully seeded match reconciles scorecard/events and event-prefix interrupted replay at every event [33m 1022[2mms[22m[39m
+ [32m✓[39m tests/unit/odi-match.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 4725[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mends the first innings on exactly 300 legal balls with no phantom 301st ball [33m 304[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mruns, replays, resimulates and rehydrates a complete seeded ODI [33m 2673[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mround-trips a complete ODI through the portable save archive [33m 1595[2mms[22m[39m
+ [32m✓[39m tests/unit/probability.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+ [32m✓[39m tests/unit/red5-match.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 4295[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 11 / M5B red-ball profile[2m > [22mmakes the new ball available after 480 legal balls and resets only ball age [33m 360[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 11 / M5B red-ball profile[2m > [22mcompletes a deterministic five-day exhibition and reproduces its final chain [33m 3629[2mms[22m[39m
+ [32m✓[39m tests/unit/match-ui.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1615[2mms[22m[39m
+   [33m[2m✓[22m[39m M3 production worker controller[2m > [22mcompletes a manual match, stops at decisions, blocks ineligible bowlers, proves replay, keeps seed private and prevents terminal deliveries [33m 1310[2mms[22m[39m
+ [32m✓[39m tests/unit/random-service.test.ts [2m([22m[2m44 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m tests/unit/season-scheduler.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 55[2mms[22m[39m
+ [32m✓[39m tests/unit/contracts.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 1163[2mms[22m[39m
+   [33m[2m✓[22m[39m every generated schema compiles with strict AJV 2020-12 [33m 996[2mms[22m[39m
+ [32m✓[39m tests/unit/persistence-m4.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 5118[2mms[22m[39m
+   [33m[2m✓[22m[39m M4 deterministic persistence and portable archive[2m > [22mproduces byte-identical final state across repeated save/rehydrate cycles [33m 4866[2mms[22m[39m
+ [32m✓[39m tests/unit/red5-clock.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/unit/scoring-fixtures.test.ts [2m([22m[2m84 tests[22m[2m)[22m[33m 672[2mms[22m[39m
+   [33m[2m✓[22m[39m runs a real scorer comparison gate against the retained corpus [33m 460[2mms[22m[39m
+ [32m✓[39m tests/unit/world.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 314[2mms[22m[39m
+ [32m✓[39m tests/unit/t20-setup.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 368[2mms[22m[39m
+ [32m✓[39m tests/unit/determinism.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/defaults.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m19 passed[39m[22m[90m (19)[39m
+[2m      Tests [22m [1m[32m471 passed[39m[22m[90m (471)[39m
+[2m   Start at [22m 03:52:16
+[2m   Duration [22m 10.65s[2m (transform 610ms, setup 0ms, collect 5.30s, tests 22.59s, environment 3ms, prepare 1.30s)[22m
+

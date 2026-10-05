@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "REST",
+    "BATTING_PRACTICE",
+    "BOWLING_PRACTICE",
+    "FIELDING_PRACTICE"
+  ],
+  "$id": "urn:lcxxvi:TrainingDirective:1",
+  "title": "TrainingDirective"
+}
