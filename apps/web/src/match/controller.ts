@@ -12,6 +12,7 @@ import {
   sha256Hex,
   validateT20Field,
   rehydrateT20Session,
+  conditionDeltaFromCompletedT20Session,
 } from "@lcxxvi/simulation";
 import {
   FIELD_REGISTRY,
@@ -30,6 +31,7 @@ import {
   type View,
   type Verification,
   type Request,
+  type CareerMatchResult,
 } from "./protocol.js";
 
 /** Owned by one production worker. Seed injection exists for Node tests only; it is never a wire message. */
@@ -78,6 +80,7 @@ export function createMatchController(
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name })),
   };
   let session: T20Session | null = null;
+  let careerFixture: Extract<Request, { type: "START" }>["careerFixture"] | null = null;
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
     requestId: string;
@@ -222,6 +225,45 @@ export function createMatchController(
       lastEventHash: s.lastEventHash,
     };
   }
+  function careerResult(): CareerMatchResult | null {
+    if (!careerFixture || !session || session.core.phase !== "COMPLETE") return null;
+    const scorecard = projectT20Scorecard(session);
+    const scorecardSha256 = hash(scorecard);
+    const conditionDelta = conditionDeltaFromCompletedT20Session({
+      seasonId: careerFixture.seasonId,
+      fixtureId: careerFixture.fixtureId,
+      matchId: careerFixture.matchId,
+      matchDayDate: careerFixture.matchDayDate,
+      session,
+    });
+    const sourceCompletionSha256 = hash({
+      source: "USER_MATCH",
+      seasonId: careerFixture.seasonId,
+      fixtureId: careerFixture.fixtureId,
+      matchId: careerFixture.matchId,
+      scorecardSha256,
+      finalEventHash: session.lastEventHash,
+    });
+    return {
+      resultVersion: "LC_CAREER_USER_MATCH_RESULT_V1",
+      seasonId: careerFixture.seasonId,
+      scheduleSha256: careerFixture.scheduleSha256,
+      fixtureId: careerFixture.fixtureId,
+      matchId: careerFixture.matchId,
+      fixtureOrdinal: careerFixture.fixtureOrdinal,
+      roundNumber: careerFixture.roundNumber,
+      matchDayDate: careerFixture.matchDayDate,
+      homeTeamId: careerFixture.homeTeamId,
+      awayTeamId: careerFixture.awayTeamId,
+      selectedTeams: [structuredClone(careerFixture.selections[0]), structuredClone(careerFixture.selections[1])],
+      scorecard,
+      scorecardSha256,
+      finalEventHash: session.lastEventHash,
+      sourceCompletionSha256,
+      conditionDelta,
+    };
+  }
+
   function verify(): Verification {
     if (!session || session.core.phase !== "COMPLETE")
       throw new Error(
@@ -281,6 +323,7 @@ export function createMatchController(
   }
   function restore(raw: unknown): void {
     session = rehydrateT20Session(raw, worldBytes, manifest);
+    careerFixture = null;
     seen.clear();
     audit.splice(
       0,
@@ -309,6 +352,7 @@ export function createMatchController(
       view: view(),
       error,
       verification: null,
+      careerResult: careerResult(),
     };
   }
   return {
@@ -329,6 +373,11 @@ export function createMatchController(
             throw new Error("Request ID already used with different content.");
           return structuredClone(prior.response);
         }
+        if (request.type === "BOOT" && request.careerFixture) {
+          if (session && (session.setup.gameId !== request.careerFixture.matchGameId || session.setup.matchId !== request.careerFixture.matchId))
+            throw new Error("Recovered match does not match the scheduled career fixture.");
+          careerFixture = request.careerFixture;
+        }
         if (
           request.type !== "BOOT" &&
           request.expectedRevision !== (session?.revision ?? 0)
@@ -340,18 +389,30 @@ export function createMatchController(
           if (request.format !== "T20")
             throw new Error("T20 controller received a non-T20 start.");
           if (session) throw new Error("A match is already in progress.");
+          careerFixture = request.careerFixture ?? null;
+          if (careerFixture) {
+            if (careerFixture.matchId !== request.careerFixture?.matchId || careerFixture.groundId !== request.groundId)
+              throw new Error("Career fixture binding mismatch.");
+            if (careerFixture.homeTeamId !== request.selections[0].teamId || careerFixture.awayTeamId !== request.selections[1].teamId)
+              throw new Error("Career fixture team order mismatch.");
+            if (JSON.stringify(careerFixture.selections) !== JSON.stringify(request.selections))
+              throw new Error("Career fixture XI snapshot mismatch.");
+          }
+          const identity = careerFixture
+            ? { gameId: careerFixture.matchGameId, matchId: careerFixture.matchId }
+            : privateIdentity();
           const setup = validateT20MatchSetup(
             {
               setupVersion: "LC_T20_SETUP_V1",
               setup: {
                 schemaVersion: "1.0.0",
-                ...privateIdentity(),
+                ...identity,
                 format: "T20",
                 worldPackId: FROZEN_WORLD_PINS.worldPackId,
                 rulesId: "LC_T20_01",
                 modelId: "synthetic-alpha-01",
                 randomId: "SHA256_COUNTER_V1",
-                seed: privateSeed(),
+                seed: careerFixture ? careerFixture.matchSeed : privateSeed(),
                 teamIds: request.selections.map((t) => t.teamId),
                 groundId: request.groundId,
                 capabilities: {
@@ -411,6 +472,7 @@ export function createMatchController(
         view: view(),
         error,
         verification,
+        careerResult: careerResult(),
       };
       if (request && !error)
         seen.set(id, {

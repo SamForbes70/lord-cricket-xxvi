@@ -11,10 +11,12 @@ import {
   T20_OFFSCREEN_FIXTURE_POLICY,
 } from "@lcxxvi/data";
 import {
+  conditionDeltaFromCompletedT20Session,
   createCareerDayStateV2,
   generateSeasonSchedule,
   resimulateT20Commands,
   replayT20Events,
+  selectOffscreenFixtureTeams,
   simulateOffscreenFixture,
   simulateOffscreenRound,
   validateOffscreenFixtureOutcome,
@@ -78,6 +80,27 @@ describe("Pass 12D deterministic off-screen T20 fixture execution", () => {
     expect(simulated.careerState.appliedMatchConditions).toHaveLength(1);
     expect(simulated.careerState.appliedMatchConditions[0]!.matchId).toBe(fixture.matchId);
     expect(Object.values(simulated.outcome.conditionDelta.playerFatigueDeltaBp).every((value) => value > 0)).toBe(true);
+  });
+
+  test("shared XI and condition helpers reproduce the accepted off-screen fixture outcome", () => {
+    const { seasonSchedule, careerState } = baseline();
+    const fixture = seasonSchedule.fixtures[0]!;
+    const selected = selectOffscreenFixtureTeams({
+      schedule: seasonSchedule,
+      careerState,
+      fixtureId: fixture.fixtureId,
+      worldBytes,
+      worldManifest,
+    });
+    const simulated = simulateOffscreenFixture({ schedule: seasonSchedule, careerState, fixtureId: fixture.fixtureId, worldBytes, worldManifest });
+    expect(selected).toEqual(simulated.outcome.selectedTeams);
+    expect(conditionDeltaFromCompletedT20Session({
+      seasonId: seasonSchedule.seasonId,
+      fixtureId: fixture.fixtureId,
+      matchId: fixture.matchId,
+      matchDayDate: fixture.matchDayDate,
+      session: simulated.session,
+    })).toEqual(simulated.outcome.conditionDelta);
   });
 
   test("replay and command resimulation remain exact for an off-screen fixture", () => {

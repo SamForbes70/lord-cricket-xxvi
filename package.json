@@ -68,7 +68,9 @@
     "season:persistence:rules": "vitest run tests/unit/season-persistence.test.ts",
     "season:persistence:bundle": "vite build --config vite.m6f.config.ts",
     "test:m6f": "playwright test --config playwright.m6f.config.ts",
-    "verify:12f:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm run career:fixtures && npm run career:rules && npm run training:fixtures && npm run training:rules && npm run offscreen:fixtures && npm run offscreen:rules && npm run projection:fixtures && npm run projection:rules && npm run season:persistence:fixtures && npm run season:persistence:rules && npm test"
+    "verify:12f:core": "npm run schemas:check && npm run build && npm run typecheck && npm run lint && npm run fixtures:audit && npm run fixtures:engine && npm run vectors:check && npm run probability:check && npm run generator:check && npm run season:fixtures && npm run season:rules && npm run career:fixtures && npm run career:rules && npm run training:fixtures && npm run training:rules && npm run offscreen:fixtures && npm run offscreen:rules && npm run projection:fixtures && npm run projection:rules && npm run season:persistence:fixtures && npm run season:persistence:rules && npm test",
+    "management:acceptance": "node --import tsx scripts/audit-management-season.ts",
+    "test:m6g": "playwright test --config playwright.m6g.config.ts"
   },
   "dependencies": {
     "react": "19.1.1",

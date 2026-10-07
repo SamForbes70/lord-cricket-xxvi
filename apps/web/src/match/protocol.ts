@@ -11,6 +11,7 @@ import {
   type Red5Command,
   type InningsLedger,
   type BowlingPlan,
+  type MatchConditionDelta,
 } from "@lcxxvi/contracts";
 
 export const UI_VERSION = "LC_T20_UI_V2" as const;
@@ -72,14 +73,34 @@ const base = {
   requestId: z.string().regex(/^ui-[0-9]+$/),
   expectedRevision: z.number().int().nonnegative(),
 };
+export const CareerFixtureLaunchSchema = z.strictObject({
+  launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V1"),
+  saveId: z.string().min(1).max(160),
+  seasonId: z.string().min(1).max(128),
+  scheduleSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  fixtureId: z.string().min(1).max(128),
+  fixtureOrdinal: z.number().int().min(0).max(55),
+  roundNumber: z.number().int().min(1).max(14),
+  matchDayDate: z.iso.date(),
+  homeTeamId: z.string().min(1).max(128),
+  awayTeamId: z.string().min(1).max(128),
+  groundId: z.string().min(1).max(128),
+  matchId: z.string().min(1).max(128),
+  matchGameId: z.string().min(1).max(128),
+  matchSeed: z.string().min(1).max(256),
+  selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
+  careerStateSha256: z.string().regex(/^[a-f0-9]{64}$/),
+});
+
 export const RequestSchema = z.discriminatedUnion("type", [
-  z.strictObject({ ...base, type: z.literal("BOOT") }),
+  z.strictObject({ ...base, type: z.literal("BOOT"), fresh: z.boolean().optional(), careerFixture: CareerFixtureLaunchSchema.nullable().optional() }),
   z.strictObject({
     ...base,
     type: z.literal("START"),
     format: z.enum(["T20", "ODI", "RED_BALL"]).default("T20"),
     selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
     groundId: z.string().min(1),
+    careerFixture: CareerFixtureLaunchSchema.nullable().optional(),
   }),
   z.strictObject({
     ...base,
@@ -191,6 +212,25 @@ export type PersistenceView = {
   recoveredFromGeneration: number | null;
   saves: SaveSummary[];
 };
+export type CareerMatchResult = {
+  resultVersion: "LC_CAREER_USER_MATCH_RESULT_V1";
+  seasonId: string;
+  scheduleSha256: string;
+  fixtureId: string;
+  matchId: string;
+  fixtureOrdinal: number;
+  roundNumber: number;
+  matchDayDate: string;
+  homeTeamId: string;
+  awayTeamId: string;
+  selectedTeams: [Selection, Selection];
+  scorecard: T20Scorecard;
+  scorecardSha256: string;
+  finalEventHash: string;
+  sourceCompletionSha256: string;
+  conditionDelta: MatchConditionDelta;
+};
+
 export type Response = {
   version: typeof UI_VERSION;
   requestId: string;
@@ -202,4 +242,5 @@ export type Response = {
   verification: Verification | null;
   persistence?: PersistenceView;
   archive?: Uint8Array | null;
+  careerResult?: CareerMatchResult | null;
 };

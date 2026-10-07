@@ -462,10 +462,40 @@ async function handlePersistence(request: Request): Promise<Response | null> {
 }
 
 async function handle(raw: unknown): Promise<Response> {
-  await initialise();
   const parsed = RequestSchema.safeParse(raw);
-  if (!parsed.success) return decorate(controller.handle(raw));
+  if (!parsed.success) {
+    await initialise();
+    return decorate(controller.handle(raw));
+  }
   const request = parsed.data;
+  await initialise();
+  if (request.type === "BOOT" && request.careerFixture) {
+    const current = controller.snapshot();
+    const matchesCareerFixture =
+      current?.setup.gameId === request.careerFixture.matchGameId &&
+      current?.setup.matchId === request.careerFixture.matchId;
+    if (!matchesCareerFixture) {
+      if (activeSaveId && !readOnly) {
+        try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
+      }
+      activeSaveId = null;
+      readOnly = false;
+      recovered = false;
+      recoveredFromGeneration = null;
+      controller = makeController("T20");
+      await repository.setActiveSaveId(null);
+    }
+  } else if (request.type === "BOOT" && request.fresh) {
+    if (activeSaveId && !readOnly) {
+      try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
+    }
+    activeSaveId = null;
+    readOnly = false;
+    recovered = false;
+    recoveredFromGeneration = null;
+    controller = makeController();
+    await repository.setActiveSaveId(null);
+  }
   const persistenceResponse = await handlePersistence(request);
   if (persistenceResponse) return persistenceResponse;
   if (request.type === "BOOT") return decorate(controller.handle(request));

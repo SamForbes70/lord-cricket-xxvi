@@ -1,0 +1,20 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12gr/bundle-repo[39m
+
+ [32m✓[39m tests/unit/career-application-service.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 2078[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12G-R career application service[2m > [22mcreates a durable career, persists training, stops at the user fixture and completes it exactly once [33m 2058[2mms[22m[39m
+ [32m✓[39m tests/unit/offscreen-fixture.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 6745[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mruns a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once [33m 585[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mshared XI and condition helpers reproduce the accepted off-screen fixture outcome [33m 526[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mreplay and command resimulation remain exact for an off-screen fixture [33m 1132[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22muses manual availability when selecting the XI and falls back to the second keeper [33m 367[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mround execution sorts fixture IDs and is batch-order independent by construction [33m 1943[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mcan pause before the user's fixture while simulating the other three matches [33m 1197[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mrejects duplicate fixture execution, wrong career date and insufficient availability [33m 528[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mdetects outcome tampering through the canonical outcome hash [33m 463[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 00:04:00
+[2m   Duration [22m 7.43s[2m (transform 367ms, setup 0ms, collect 1.07s, tests 8.82s, environment 0ms, prepare 112ms)[22m
+

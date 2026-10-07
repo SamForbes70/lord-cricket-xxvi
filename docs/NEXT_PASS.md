@@ -1,9 +1,16 @@
-# Next pass: Pass 12G / M6G management UI and full-season acceptance
+# Next pass: M7 model quality, tactical captain AI, analytics and performance
 
-Entry condition: retain the frozen Pass 12A schedule, Pass 12B/12C career state, Pass 12D shared-engine fixture execution, Pass 12E season projection and Pass 12F durable `LC_T20_SEASON_STATE_V1` persistence/archive.
+Entry condition: Pass 12G-R management implementation is frozen and reproducible. The M6 browser acceptance remains blocked until an execution environment can navigate the production application and IndexedDB test origins. Do not mislabel that host-blocked gate as passed.
 
-Bounded objective: expose the first complete management-season loop to a user. Add Home/Career/Squad/Fixtures/Statistics navigation for the single fictional T20 season; choose the controlled team; inspect condition/readiness and training; advance days/rounds; stop before the user's match; launch that match through the existing T20 UI; commit its shared `USER_MATCH` completion; simulate remaining fixtures; show table/leaders; autosave after each accepted management action; resume after reload; and finish on the immutable season archive screen.
+Once the browser gate can execute, rerun `npm run test:m6g` and the inherited M6F IndexedDB test. Complete formal M3 human playthrough separately.
 
-Required gates: one complete 14-round / 56-match career from new game to archive; save/reload at round boundaries and immediately before/after the managed fixture; no duplicated fixture, fatigue, projection or stat after reload; keyboard navigation and 150% scale for management routes; export/delete/import of an active and completed season; final table/archive identical to a deterministic headless oracle; and a human acceptance checklist.
+The next feature milestone is M7. Keep it bounded to quality rather than expanding the career world:
 
-Do not add second-year careers, transfers, contracts, youth, injuries, DLS, real players or M7 tactical AI in the same pass.
+1. build a real tactical captain policy over public match state, replacing the explicit baseline fixture captain where enabled;
+2. calibrate and quality-check format distributions, while preserving deterministic/versioned model contracts;
+3. implement the V0.1 analytics still missing from the player experience, particularly partnerships, worm, Manhattan and wagon-wheel views where supported by canonical events;
+4. close the V0.1 editing gap for names/colours/new-game roster import, or formally revise that product requirement;
+5. measure and optimise the declared performance budgets on a reference machine;
+6. run scenario grids for tactical dominance/exploits and model-quality acceptance.
+
+Do not add multiyear careers, global competitions, transfers, contracts or finances until the V0.1 vertical slice has cleared M7 and M8.

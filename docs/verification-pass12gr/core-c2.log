@@ -1,0 +1,61 @@
+
+> lord-cricket-xxvi@0.1.0 season:persistence:rules
+> vitest run tests/unit/season-persistence.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12gr/bundle-repo[39m
+
+ [32m✓[39m tests/unit/season-persistence.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 25351[2mms[22m[39m
+   [33m[2m✓[22m[39m M6F durable season state and archive[2m > [22mreloads an active portable save and can advance into the next scheduled round [33m 1053[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 23:59:31
+[2m   Duration [22m 26.01s[2m (transform 209ms, setup 0ms, collect 456ms, tests 25.35s, environment 0ms, prepare 65ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 odi:rules
+> vitest run tests/unit/odi-match.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12gr/bundle-repo[39m
+
+ [32m✓[39m tests/unit/odi-match.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 4767[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mruns, replays, resimulates and rehydrates a complete seeded ODI [33m 2794[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mround-trips a complete ODI through the portable save archive [33m 1513[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 23:59:58
+[2m   Duration [22m 5.47s[2m (transform 216ms, setup 0ms, collect 509ms, tests 4.77s, environment 0ms, prepare 61ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 red5:fixtures
+> node --import tsx scripts/audit-red5-fixtures.ts
+
+{
+  "gate": "PASS_11_RED5_FORMAT_FIXTURES",
+  "result": "PASS",
+  "rulesId": "LC_RED5_01",
+  "terminal": {
+    "matched": 4,
+    "ids": [
+      "F10",
+      "F11",
+      "F12",
+      "T01"
+    ]
+  },
+  "clock": {
+    "matched": 5,
+    "ids": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "C05"
+    ]
+  },
+  "totalMatched": 9,
+  "note": "Independent Appendix D expected values are retained in the Pass 02 corpus; this gate executes the Pass 11 red-ball arbitration/clock implementation against them."
+}

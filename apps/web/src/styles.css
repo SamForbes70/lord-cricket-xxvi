@@ -596,3 +596,5 @@ code {
     flex-direction: column;
   }
 }
+.career-match-banner { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; border:1px solid #8c7e52; background:#fff6d8; border-radius:6px; padding:10px 12px; margin:10px 0 14px; }
+.career-match-banner span { flex:1 1 420px; }

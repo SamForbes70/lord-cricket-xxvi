@@ -234,7 +234,16 @@ function buildFixtureSetup(
   return validateT20MatchSetup(request, worldBytes, verified.manifest);
 }
 
-function conditionDeltaFromSession(schedule: SeasonSchedule, fixture: SeasonFixture, session: T20Session) {
+export function conditionDeltaFromCompletedT20Session(input: {
+  seasonId: string;
+  fixtureId: string;
+  matchId: string;
+  matchDayDate: string;
+  session: T20Session;
+}) {
+  const { seasonId, fixtureId, matchId, matchDayDate, session } = input;
+  assertOffscreen(session.core.phase === "COMPLETE", "CONDITION_DELTA_REQUIRES_COMPLETE_MATCH");
+  assertOffscreen(session.setup.matchId === matchId, "CONDITION_DELTA_MATCH_ID_MISMATCH");
   const selectedIds = session.setup.teams.flatMap((team) => [...team.playerIds]).sort();
   const playerFatigueDeltaBp = Object.fromEntries(
     selectedIds
@@ -243,9 +252,9 @@ function conditionDeltaFromSession(schedule: SeasonSchedule, fixture: SeasonFixt
   );
   return MatchConditionDeltaSchema.parse({
     deltaVersion: "LC_T20_MATCH_CONDITION_DELTA_V1",
-    matchCompletionKey: `complete-${schedule.seasonId}-${fixture.fixtureId}`,
-    matchId: fixture.matchId,
-    matchDayDate: fixture.matchDayDate,
+    matchCompletionKey: `complete-${seasonId}-${fixtureId}`,
+    matchId,
+    matchDayDate,
     playerFatigueDeltaBp,
   });
 }
@@ -273,7 +282,10 @@ function simulateOne(context: SimulationContext, fixture: SeasonFixture): {
   const setup = buildFixtureSetup(verified, schedule, fixture, selectedTeams, worldBytes);
   const session = runFixtureT20(setup);
   const scorecard = projectT20Scorecard(session);
-  const conditionDelta = conditionDeltaFromSession(schedule, fixture, session);
+  const conditionDelta = conditionDeltaFromCompletedT20Session({
+    seasonId: schedule.seasonId, fixtureId: fixture.fixtureId, matchId: fixture.matchId,
+    matchDayDate: fixture.matchDayDate, session,
+  });
   const after = applyMatchConditionDeltaV2(before, conditionDelta, schedule);
   const core = OffscreenFixtureOutcomeCoreSchema.parse({
     executionVersion: T20_OFFSCREEN_FIXTURE_POLICY.executionVersion,
@@ -324,6 +336,24 @@ function prepareContext(input: {
   assertOffscreen(state.availabilityPackId === availabilityPack.packId, "AVAILABILITY_PACK_ID_MISMATCH");
   assertOffscreen(hasher.hash(availabilityPack) === state.availabilityPackSha256, "AVAILABILITY_PACK_HASH_MISMATCH");
   return { schedule, state, availabilityPack, verified, worldBytes: input.worldBytes };
+}
+
+export function selectOffscreenFixtureTeams(input: {
+  schedule: unknown;
+  careerState: unknown;
+  availabilityPack?: unknown;
+  fixtureId: string;
+  worldBytes: Readonly<Uint8Array>;
+  worldManifest: unknown;
+}): readonly [T20TeamSelection, T20TeamSelection] {
+  const context = prepareContext(input);
+  const fixture = context.schedule.fixtures.find((entry) => entry.fixtureId === input.fixtureId);
+  assertOffscreen(Boolean(fixture), `UNKNOWN_FIXTURE:${input.fixtureId}`);
+  assertFixtureBinding(context.schedule, context.state, fixture!);
+  return [
+    selectBaselineXI(context.verified, context.state, context.availabilityPack, fixture!.homeTeamId),
+    selectBaselineXI(context.verified, context.state, context.availabilityPack, fixture!.awayTeamId),
+  ];
 }
 
 export function simulateOffscreenFixture(input: {

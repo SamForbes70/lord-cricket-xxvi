@@ -13,6 +13,8 @@ import {
   type PersistenceView,
 } from "./match/protocol.js";
 import "./styles.css";
+import { CareerApp } from "./career/CareerApp.js";
+import type { CareerUserMatchLaunch } from "./career/service.js";
 
 type Body = Request extends infer R
   ? R extends Request
@@ -20,11 +22,20 @@ type Body = Request extends infer R
     : never
   : never;
 const overs = (balls: number) => `${Math.floor(balls / 6)}.${balls % 6}`;
-function App() {
+export function MatchApp() {
   const worker = useRef<Worker | null>(null),
     serial = useRef(0),
     inflight = useRef<string | null>(null),
     currentRevision = useRef(0);
+  const careerLaunch = useRef<CareerUserMatchLaunch | null>((() => {
+    try {
+      const raw = sessionStorage.getItem("lcxxvi-career-match-launch");
+      return raw ? (JSON.parse(raw) as CareerUserMatchLaunch) : null;
+    } catch {
+      return null;
+    }
+  })());
+  const careerStartIssued = useRef(false);
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [view, setView] = useState<View | null>(null);
   const [busy, setBusy] = useState(true),
@@ -90,6 +101,25 @@ function App() {
       setView(r.view);
       setVerification(r.verification);
       if (r.persistence) setPersistence(r.persistence);
+      if (r.careerResult) {
+        sessionStorage.setItem("lcxxvi-career-match-result", JSON.stringify(r.careerResult));
+      }
+      if (r.catalog && !r.view && careerLaunch.current && !careerStartIssued.current) {
+        careerStartIssued.current = true;
+        const requestId = `ui-${++serial.current}`;
+        inflight.current = requestId;
+        setBusy(true);
+        w.postMessage({
+          version: UI_VERSION,
+          requestId,
+          expectedRevision: r.revision,
+          type: "START",
+          format: "T20",
+          selections: careerLaunch.current.selections,
+          groundId: careerLaunch.current.groundId,
+          careerFixture: careerLaunch.current,
+        });
+      }
       if (r.archive) {
         const archiveBytes = new Uint8Array(r.archive.byteLength);
         archiveBytes.set(r.archive);
@@ -120,6 +150,7 @@ function App() {
       requestId: id,
       expectedRevision: 0,
       type: "BOOT",
+      careerFixture: careerLaunch.current,
     });
     return () => w.terminate();
   }, []);
@@ -240,6 +271,15 @@ function App() {
               : "Local autosave ready"}
         </span>
       </div>
+      {careerLaunch.current && (
+        <div className="career-match-banner">
+          <strong>Scheduled career match</strong>
+          <span>Round {careerLaunch.current.roundNumber} · this result will return to the management career only after the match is complete.</span>
+          {view?.phase === "COMPLETE" && (
+            <button className="primary" onClick={() => { window.location.hash = "#career"; }}>Return result to career</button>
+          )}
+        </div>
+      )}
       {error && (
         <p className="error" role="alert" tabIndex={-1}>
           {error}
@@ -1200,6 +1240,16 @@ function Tactics({
     </section>
   );
 }
+function RootApp() {
+  const [hash, setHash] = useState(window.location.hash || "#career");
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash || "#career");
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  return hash === "#exhibition" ? <MatchApp /> : <CareerApp />;
+}
+
 const root = document.getElementById("root");
 if (!root) throw new Error("Root missing");
-createRoot(root).render(<App />);
+createRoot(root).render(<RootApp />);

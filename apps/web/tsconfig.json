@@ -22,6 +22,12 @@
     },
     {
       "path": "../../packages/persistence"
+    },
+    {
+      "path": "../../packages/data"
+    },
+    {
+      "path": "../../packages/projections"
     }
   ]
 }

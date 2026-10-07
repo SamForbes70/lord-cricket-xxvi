@@ -1,0 +1,84 @@
+
+> lord-cricket-xxvi@0.1.0 season:fixtures
+> node --import tsx scripts/audit-season-schedule.ts --write
+
+{"eighthRound":[["team-08","team-01"],["team-07","team-02"],["team-06","team-03"],["team-05","team-04"]],"finalDate":"2027-02-11","firstDate":"2027-01-03","firstRound":[["team-01","team-08"],["team-02","team-07"],["team-03","team-06"],["team-04","team-05"]],"fixtures":56,"orderedPairs":56,"rounds":14,"scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","schedulerAlgorithm":"CIRCLE_REVERSE_VENUES_V1","schedulerVersion":"LC_T20_SEASON_SCHEDULE_V1","seasonSeedHash":"9af5e7b63cf847398867a1fbf48469a6c40b72e000017d1caf54b99219aa1402","status":"PASS","teamCounts":{"team-01":{"away":7,"home":7,"matches":14},"team-02":{"away":7,"home":7,"matches":14},"team-03":{"away":7,"home":7,"matches":14},"team-04":{"away":7,"home":7,"matches":14},"team-05":{"away":7,"home":7,"matches":14},"team-06":{"away":7,"home":7,"matches":14},"team-07":{"away":7,"home":7,"matches":14},"team-08":{"away":7,"home":7,"matches":14}},"uniqueFixtureIds":56,"uniqueMatchIds":56,"uniqueMatchSeeds":56}
+
+> lord-cricket-xxvi@0.1.0 season:rules
+> vitest run tests/unit/season-scheduler.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12gr/bundle-repo[39m
+
+ [32m✓[39m tests/unit/season-scheduler.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 54[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 23:57:48
+[2m   Duration [22m 644ms[2m (transform 181ms, setup 0ms, collect 402ms, tests 54ms, environment 0ms, prepare 61ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 career:fixtures
+> node --import tsx scripts/audit-career-condition.ts --write
+
+{"appliedCompletionKeys":["completion-m-b383e5ed09f44b7a-r01-m01"],"availabilityPackId":"fictional-eight-01-availability-test-v1","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V1","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001Availability":"UNAVAILABLE","p001FatigueBp":1500,"p002FatigueBp":0},"day2StateSha256":"8d465b1bbaca446d453f8e5a81dfc8e61f6ab840691e1e1fc89e22e92e9eb6ff","day3":{"date":"2027-01-05","p001Availability":"UNAVAILABLE","p001FatigueBp":0},"day3StateSha256":"1a48066d5ba50daafd4b609d06ebe2ee234a49708b8ebd4574f17085cfd32263","fatiguedStateSha256":"cb188e98814aee570d8c2e7081fff4115c54ff3bf326079ebcc1dc9842c96df2","finalScheduledDate":"2027-02-11","initialDate":"2027-01-03","initialStateSha256":"8ccc8adf4718e1c93a4e6873ccadc27a75599df8510235afe186c3bd0585564d","playerConditions":160,"playersPerTeam":[20,20,20,20,20,20,20,20],"status":"PASS","teamCount":8,"worldPackId":"fictional-eight-01"}
+
+> lord-cricket-xxvi@0.1.0 career:rules
+> vitest run tests/unit/career-condition.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12gr/bundle-repo[39m
+
+ [32m✓[39m tests/unit/career-condition.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 179[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 23:57:50
+[2m   Duration [22m 809ms[2m (transform 194ms, setup 0ms, collect 432ms, tests 179ms, environment 0ms, prepare 63ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 training:fixtures
+> node --import tsx scripts/audit-career-training.ts --write
+
+{"beforeAdvanceSha256":"903dbc3acc9711a141efff18266dd23c826f63c2a6352da2d12dc2a649d768bc","careerStateVersion":"LC_T20_CAREER_DAY_STATE_V2","conditionPolicyVersion":"LC_T20_CAREER_CONDITION_V1","day2":{"date":"2027-01-04","p001BattingReadiness":1,"p001FatigueBp":2100,"p002BowlingReadiness":1,"p003FieldingReadiness":1,"p004FatigueBp":1500,"practicePlayers":3,"restPlayers":157},"day2StateSha256":"228c1d1f0e8cb27264dc9f9b724c8bca361a97a6f07e9ee32e3cea013024e7d7","day3":{"date":"2027-01-05","p001BattingReadiness":0,"p001FatigueBp":100},"day3StateSha256":"3f2c85d37f8e608e512bc670361c0552868adbe3c8665e38d304d9c194c46efd","noPermanentAttributeGrowth":true,"practiceRecoveryPerDayBp":1400,"readinessRange":[-3,3],"restRecoveryPerDayBp":2000,"status":"PASS","trainingPolicyVersion":"LC_T20_CAREER_TRAINING_V1"}
+
+> lord-cricket-xxvi@0.1.0 training:rules
+> vitest run tests/unit/career-training.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12gr/bundle-repo[39m
+
+ [32m✓[39m tests/unit/career-training.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 475[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 23:57:51
+[2m   Duration [22m 1.09s[2m (transform 196ms, setup 0ms, collect 429ms, tests 475ms, environment 0ms, prepare 60ms)[22m
+
+
+> lord-cricket-xxvi@0.1.0 offscreen:fixtures
+> node --import tsx scripts/audit-offscreen-fixtures.ts
+
+{"status":"PASS","auditVersion":"LC_T20_OFFSCREEN_AUDIT_V1","policyVersion":"LC_T20_OFFSCREEN_POLICY_V1","executionVersion":"LC_T20_OFFSCREEN_FIXTURE_V1","scheduleSha256":"8b20a83491ea9f5c40eadb42de459690fe889ffdd733453a3b0d89db16406545","fixtures":56,"uniqueFixtureIds":56,"uniqueMatchIds":56,"outcomeCorpusSha256":"9444a122f63ae80d8cfdd91b2977e6024e05e7f86fb1b672a4f751edbe38a8ae","scorecardCorpusSha256":"8831c826346d7553b0d2aea2da5a8f661a74943f78946c1b0a1a642ad4a9e832","eventLogCorpusSha256":"8331bfe0ebe4fd401e2529f79e3903bb3b2732a5ec1498c3fb30fcd6b5d14932","commandLogCorpusSha256":"11174373ad9dcb9214fb01a42c85f1ad6de57bfff0979095cc782f40efcd53cb","firstFixtureId":"fx-b383e5ed09f44b7a-r01-m01","firstOutcomeSha256":"16bb57dd5a04c40535ef951c2268cc0642df7ac9be7d93d66bf0dfb23ea4e8a7","lastFixtureId":"fx-b383e5ed09f44b7a-r14-m04","lastOutcomeSha256":"36937972d96d6285890201308d54acb02ac0181758c5e1d122bef319e46f9d8f","totalEvents":17720,"totalCommands":5856,"resultCounts":{"WIN":55,"TIE":1},"appliedMatchConditions":56,"finalCareerRevision":95,"finalCareerDate":"2027-02-11","finalCareerStateSha256":"7a9cd180e4a108dd1ab29822ef95371dfc868548f9b7c55ac1cd6b8a768e7985","summarySha256":"e5adb07f9c50153ffe6349fa66c1be32314d76da249cc2961a26daba1ec9e7f9"}
+
+> lord-cricket-xxvi@0.1.0 offscreen:rules
+> vitest run tests/unit/offscreen-fixture.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/mnt/data/lcxxvi-pass12gr/bundle-repo[39m
+
+ [32m✓[39m tests/unit/offscreen-fixture.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 6263[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mruns a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once [33m 602[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mshared XI and condition helpers reproduce the accepted off-screen fixture outcome [33m 526[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mreplay and command resimulation remain exact for an off-screen fixture [33m 906[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22muses manual availability when selecting the XI and falls back to the second keeper [33m 381[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mround execution sorts fixture IDs and is batch-order independent by construction [33m 1920[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mcan pause before the user's fixture while simulating the other three matches [33m 1114[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mrejects duplicate fixture execution, wrong career date and insufficient availability [33m 430[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mdetects outcome tampering through the canonical outcome hash [33m 378[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 23:58:14
+[2m   Duration [22m 6.89s[2m (transform 190ms, setup 0ms, collect 418ms, tests 6.26s, environment 0ms, prepare 57ms)[22m
+

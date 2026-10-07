@@ -1,0 +1,46 @@
+.career-shell { max-width: 1440px; margin: 0 auto; padding: 20px 32px 48px; }
+.career-masthead { display:flex; gap:20px; align-items:center; justify-content:space-between; border-bottom:1px solid #d2d5c9; padding-bottom:14px; }
+.career-masthead h1 { margin-bottom: .15em; }
+.career-nav { display:flex; flex-wrap:wrap; gap:7px; margin:14px 0; align-items:center; }
+.career-nav button, .career-nav a, .button-link { min-height:40px; border:1px solid #6b8276; border-radius:5px; padding:.55em .8em; background:#fff; color:#143c2d; font-weight:650; text-decoration:none; display:inline-flex; align-items:center; }
+.career-nav button[aria-current="page"] { background:#194b38; color:#fff; }
+.career-nav a { margin-left:auto; }
+.career-disclosure { border:1px solid #a99d74; background:#fff9df; padding:12px 14px; margin:15px 0 24px; line-height:1.45; }
+.career-disclosure.compact { font-size:.82em; margin:8px 0 18px; }
+.career-error { border-left:4px solid #a33b23; background:#fff0eb; padding:12px; }
+.career-warning { border-left:4px solid #946d12; background:#fff7dc; padding:12px; }
+.career-panel { background:#fffdf6; border:1px solid #d3d8c9; border-radius:8px; padding:16px; min-width:0; }
+.career-panel.emphasis { border-color:#6d8f7d; }
+.dashboard-grid, .career-summary-grid, .stats-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.big-stat { font-family:Georgia,serif; font-size:1.9em; margin:.15em 0 .35em; }
+.save-badge { border:1px solid #8a9a8f; border-radius:6px; padding:8px 12px; min-width:145px; text-align:right; background:#fff; }
+.save-badge small { margin-top:3px; }
+.save-badge[data-status="saving"] { background:#fff7dc; }
+.save-badge[data-status="read-only"], .save-badge[data-status="error"] { background:#fff0eb; }
+.action-row { display:flex; flex-wrap:wrap; gap:8px; }
+.team-picker { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:18px 0 26px; }
+.team-card { min-height:96px; text-align:left; display:flex; flex-direction:column; justify-content:space-between; }
+.team-card strong { font-size:1.05em; }
+.team-card span { color:#5c6c63; font-size:.85em; }
+.save-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.save-list button { text-align:left; }
+.import-panel { margin-top:24px; max-width:700px; }
+.import-panel input, .settings-actions input { display:block; margin-top:8px; }
+.table-wrap { overflow-x:auto; width:100%; margin:10px 0 24px; }
+table { border-collapse:collapse; width:100%; min-width:760px; background:#fffdf8; }
+th, td { text-align:left; border-bottom:1px solid #dedfd7; padding:9px 10px; vertical-align:top; }
+th { background:#eef0e8; white-space:nowrap; }
+.managed-fixture { background:#f0f6ed; }
+.round-block { margin-top:22px; }
+.stats-grid ol { list-style-position:inside; padding:0; margin:0; }
+.stats-grid li { display:flex; justify-content:space-between; gap:15px; padding:7px 0; border-bottom:1px solid #e1e2db; }
+.settings-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; max-width:850px; }
+.check-label { display:flex; gap:9px; align-items:center; }
+.settings-actions { margin-top:22px; max-width:700px; }
+.settings-actions button { margin-right:12px; }
+.sr-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.density-compact .career-panel { padding:11px; }
+.density-compact th, .density-compact td { padding:6px 8px; }
+.reduced-motion *, .reduced-motion *::before, .reduced-motion *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+@media (max-width: 900px) { .team-picker { grid-template-columns:repeat(2,minmax(0,1fr)); } .dashboard-grid,.career-summary-grid,.stats-grid,.settings-grid { grid-template-columns:1fr; } .career-masthead { align-items:flex-start; } }
+@media (max-width: 620px) { .career-shell { padding:14px; } .team-picker,.save-list { grid-template-columns:1fr; } .career-masthead { flex-direction:column; } .career-nav a { margin-left:0; } }

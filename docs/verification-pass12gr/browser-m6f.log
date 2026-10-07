@@ -1,0 +1,28 @@
+
+> lord-cricket-xxvi@0.1.0 test:m6f
+> playwright test --config playwright.m6f.config.ts
+
+
+Running 1 test using 1 worker
+F
+
+  1) [chromium] › tests/m6f/season-persistence.spec.ts:7:1 › M6F IndexedDB season commits are atomic and recover from previous generation 
+
+    Error: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at https://lcxxvi.test/
+    Call log:
+    [2m  - navigating to "https://lcxxvi.test/", waiting until "load"[22m
+
+
+      12 |     return route.fulfill({ status: 200, contentType: "text/html", body: '<!doctype html><script src="/bundle.js"></script>' });
+      13 |   });
+    > 14 |   await page.goto("https://lcxxvi.test/");
+         |              ^
+      15 |   await page.waitForFunction(() => typeof window.runSeasonPersistenceBrowser === "function");
+      16 |   const result = await page.evaluate(async () => {
+      17 |     const state = await fetch("/state.json").then((response) => response.json());
+        at /mnt/data/lcxxvi-pass12gr/bundle-repo/tests/m6f/season-persistence.spec.ts:14:14
+
+    Error Context: test-results/season-persistence-M6F-Ind-0d545-er-from-previous-generation-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/m6f/season-persistence.spec.ts:7:1 › M6F IndexedDB season commits are atomic and recover from previous generation 

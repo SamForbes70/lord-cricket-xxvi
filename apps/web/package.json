@@ -8,6 +8,8 @@
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "@lcxxvi/simulation": "0.1.0",
-    "@lcxxvi/persistence": "0.1.0"
+    "@lcxxvi/persistence": "0.1.0",
+    "@lcxxvi/data": "0.1.0",
+    "@lcxxvi/projections": "0.1.0"
   }
 }

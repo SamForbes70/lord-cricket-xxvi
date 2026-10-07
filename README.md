@@ -1,40 +1,50 @@
-# Lord Cricket XXVI | Pass 12F / M6F durable season state, recovery and archive
+# Lord Cricket XXVI | Pass 12G-R / M6G management game integration
 
-Pass 12F binds the existing management subsystems into one durable season aggregate without changing cricket match outcomes.
+Lord Cricket XXVI now contains the first coherent one-season management application over the accepted deterministic cricket engine and Pass 12A-F season systems.
 
-**Model status remains SYNTHETIC_ALPHA.** The frozen season remains deterministic regression evidence, not empirical calibration.
+**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management and tactical opponent AI are not enabled.
 
-## Durable season state
+## Player-facing management loop
 
-`LC_T20_SEASON_STATE_V1` contains:
+The default web route opens the management career. A player can:
 
-- the frozen 56-fixture schedule;
-- V2 career condition, availability, training and readiness;
-- `LC_T20_SEASON_PROJECTION_V1` table/player statistics;
-- canonical match-completion records for every finished fixture;
-- controlled team, aggregate revision and ACTIVE/COMPLETE phase;
-- canonical SHA-256.
+- choose one of the eight frozen fictional teams;
+- use Home, Career, Squad, Fixtures, Statistics and Settings screens;
+- inspect availability, fatigue and temporary readiness;
+- set REST, batting, bowling or fielding practice;
+- advance to the next managed fixture without silently passing it;
+- simulate that fixture through the accepted `LC_T20_MATCH_V1` engine, or launch the existing interactive T20 match UI;
+- follow the authoritative Pass 12E table, exact NRR and player statistics;
+- persist locally through the existing Pass 12F IndexedDB repository;
+- export/import the existing portable `.lcxxvi` season archive;
+- finish all 14 rounds / 56 fixtures and create the immutable final season archive.
 
-Validation rechecks the embedded schedule and career hashes and reconciles completed fixtures across career condition and projection ledgers. A season becomes COMPLETE only when all 56 fixtures reconcile and the projection cursor has no gaps.
+The fixture autopilot remains the transparent deterministic baseline completion policy. It is not presented as tactical captain AI.
 
-## Persistence and recovery
+## Architecture
 
-`IndexedDbSeasonRepository` reuses the M4 database and stores. Season rows are additive `SEASON` records; inherited match saves remain readable and are excluded from season listings.
+There is one cricket truth. React is a projection/controller only. `CareerApplicationService` orchestrates the accepted schedule, career condition/training, shared T20 fixture execution, season projections and Pass 12F persistence. The existing scoring, deterministic random service, probability model, delivery generator, T20 engine, ODI engine, red-ball engine and season persistence primitives remain byte-identical to the Pass 12F baseline.
 
-A commit requires the writer lease and durable revision, then writes the checkpoint, optional command receipt and season projection in one IndexedDB transaction. Three checkpoint generations rotate. Recovery selects the newest valid generation and leaves the corrupt generation untouched for diagnostics.
+Scheduled interactive matches use the existing T20 controller with the immutable fixture seed, ground and XI snapshot. A terminal interactive result is returned through the same canonical `USER_MATCH` season-completion boundary used by the management service.
 
-The current host blocks all browser navigation with `ERR_BLOCKED_BY_ADMINISTRATOR`, so the new real-IndexedDB Playwright gate is retained but must be recorded BLOCKED here. Its production browser bundle builds successfully. Pure checkpoint/recovery and archive behaviour are independently executable in Node.
+## Verification
 
-## Portable saves and final archive
-
-A season `.lcxxvi` contains `manifest.json`, `game.json`, `events.ndjson` (canonical match completions) and `projection.json`. Complete seasons additionally carry `season-archive.json`.
-
-`LC_T20_SEASON_ARCHIVE_V1` freezes champion, final table, leaders, all 56 completion keys and the final state hash. It cannot be produced from an incomplete season.
+Useful gates:
 
 ```sh
-npm run season:persistence:fixtures
-npm run season:persistence:rules
-npm run verify:12f:core
+npm run schemas:check
+npm run build
+npm run typecheck
+npm run lint
+npm test
+npm run management:acceptance
+npm run test:m6g
 ```
 
-Pass 12F deliberately does not add management screens or a second career year. The next bounded build is **Pass 12G / M6G: Management UI and Full-Season Acceptance**.
+The deterministic headless M6G acceptance completes exactly 56 fixtures with 14 `USER_MATCH` boundaries and 42 off-screen fixtures, reconciles all condition applications and projections, seals the final state/archive, and round-trips the portable season.
+
+The current execution host blocks Chromium navigation with `ERR_BLOCKED_BY_ADMINISTRATOR` before Lord Cricket code executes. The inherited Pass 12F IndexedDB browser gate and the new production M6G Playwright suite therefore remain **BLOCKED BY HOST BROWSER POLICY**, not passed. The implementation is complete, but formal M6 acceptance is not claimed while that mandatory browser gate is blocked.
+
+Formal M3 human acceptance of the interactive match UI also remains separate and pending.
+
+See `docs/CAPABILITY_MATRIX.md`, `docs/MANAGEMENT_UI.md`, `docs/verification-pass12gr/` and `docs/NEXT_PASS.md`.

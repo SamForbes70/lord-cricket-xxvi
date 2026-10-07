@@ -1,0 +1,13 @@
+BASELINE=0095c8115e4c412a11494a151400503f787a124c
+BYTE_IDENTICAL packages/domain/src/scoring-kernel.ts
+BYTE_IDENTICAL packages/simulation/src/determinism.ts
+BYTE_IDENTICAL packages/simulation/src/probability.ts
+BYTE_IDENTICAL packages/simulation/src/generator.ts
+BYTE_IDENTICAL packages/simulation/src/t20-match.ts
+BYTE_IDENTICAL packages/simulation/src/odi-match.ts
+BYTE_IDENTICAL packages/simulation/src/red-ball-match.ts
+BYTE_IDENTICAL packages/simulation/src/red-ball-clock.ts
+BYTE_IDENTICAL packages/persistence/src/season.ts
+ADDITIVE_SHARED_HELPER_CHANGE packages/simulation/src/offscreen-fixture.ts
+SCHEMA_COUNT 163
+GENERATED_SCHEMA_DIFF_COUNT 0
