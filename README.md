@@ -92,3 +92,17 @@ Historical saves continue to use `synthetic-alpha-01` unchanged.
 The offline-only candidate `LC_T20_SCORING_COMPONENTS_RESEARCH_V1` is documented in [`docs/M7G_RESEARCH_AND_PROMOTION_GATES.md`](docs/M7G_RESEARCH_AND_PROMOTION_GATES.md). It models observed T20 first-innings scoring components and five train-inferred scoring regimes, using a real Cricsheet match-level train/holdout separation. The frozen `synthetic-alpha-01` production model, save versions, random service, scoring kernel, ODI and red-ball remain unchanged. This is **not** an empirically calibrated gameplay update.
 
 To reproduce after obtaining the Cricsheet ZIP from its authorised source, run `bash scripts/m7g-run.sh /absolute/path/to/t20s_json.zip`. The original downloaded/uploaded archive is not included in the source package. Cricsheet attribution and ODC-By licence information: https://cricsheet.org/ and https://cricsheet.org/licensing/.
+
+## Pass 20 / M7H: empirical two-innings research (NOT playable model)
+
+M7H adds a **research-only** target-aware second-innings T20 scoring model and player-history predictive evaluation. Rebuild them from the user-supplied Cricsheet JSON archive (ODC-By 1.0, attribution: https://cricsheet.org/, licence details: https://cricsheet.org/licensing/):
+
+```sh
+bash scripts/m7h-run.sh /absolute/path/to/t20s_json.zip
+```
+
+The offline command regenerates M7G and M7H in `reference/m7g/` and `reference/m7h/`, audits Cricsheet player registry/exposure and runs research-only Python/TypeScript tests. It does **not** change the executable cricket probability model, player ratings, scoring engine or saves. The original ZIP is not included in source/release packages.
+
+M7H fits a 5-regime second-innings model using training-match data, wickets lost, phase and pre-delivery required scoring rate. It separately simulates 400 two-innings matches with a target, stops on a successful chase and checks scorer-compatible categories in TypeScript. It reports excluded unusual events and unseen holdout categories rather than mapping them to invented cricket outcomes. The already-reviewed Cricsheet holdout is **development validation, not a pristine final test**. Player-history binary predictors use a fixed 300-attempt prior and Cricsheet stable registry IDs. Even when predictive log-loss improves, those marginals are **not** empirically identified 0–100 skills or captain tactical effects.
+
+The existing playable game **remains SYNTHETIC_ALPHA**. Browser and human acceptance, full legal-delivery support, player/fielding/tactic identification, score-tail and independently untouched final validation remain unaccepted. See `docs/NEXT_PASS.md` and `PASS_20_M7H_REPORT.md`.

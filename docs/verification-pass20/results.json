@@ -1,0 +1,145 @@
+{
+  "auditVersion": "LC_M7H_ACCEPTANCE_RESULTS_V1",
+  "baselineCommit": "c1eea974b7d48210422ba4380a9b0cbce4b5ea04",
+  "limitations": [
+    "Current development holdout reused after previous iteration decisions.",
+    "Second innings lower score tail fails predeclared 10 percent tolerance.",
+    "Rare scorer and irregular innings exceptions remain.",
+    "Player histories are observational predictive marginals, not 0-100 ratings.",
+    "Captain tactic effect cannot be identified from supplied Cricsheet JSON."
+  ],
+  "playerPredictive": {
+    "causalTacticEffectsIdentified": false,
+    "gameplayRatingsIdentified": false,
+    "outcomes": {
+      "boundary": {
+        "bootstrap95ByMatch": [
+          -0.0019437462500526887,
+          -0.0014945015461156166
+        ],
+        "candidateMinusPhaseBaselineNLL": -0.0017028672853097004,
+        "heldOutAttemptCount": 148808,
+        "predictiveImprovementSupported": true
+      },
+      "dot": {
+        "bootstrap95ByMatch": [
+          -0.0026235630817512162,
+          -0.0021299174926867077
+        ],
+        "candidateMinusPhaseBaselineNLL": -0.0023673613514466098,
+        "heldOutAttemptCount": 148808,
+        "predictiveImprovementSupported": true
+      },
+      "wicket": {
+        "bootstrap95ByMatch": [
+          -0.00026073253125031117,
+          -0.00011176628375810794
+        ],
+        "candidateMinusPhaseBaselineNLL": -0.00018001616266133752,
+        "heldOutAttemptCount": 148808,
+        "predictiveImprovementSupported": true
+      }
+    },
+    "priorExposure": 300
+  },
+  "quality": {
+    "bootstrap95": [
+      -0.009879611337840578,
+      -0.005271323024684558
+    ],
+    "candidateMinusBaselineNll": -0.007514361481753524,
+    "excludedMatches": {
+      "INVALID_SECOND_INNINGS": 4,
+      "NON_STANDARD_TARGET": 1,
+      "PREMATURE_SECOND_INNINGS": 37
+    },
+    "gates": {
+      "browserAcceptance": false,
+      "calibratedIndividualPlayerSkills": false,
+      "chaseWinRateWithin5pp": true,
+      "empiricallyIdentifiedTactics": false,
+      "freshUntouchedFinalTestSet": false,
+      "heldoutNllBetterThanPhaseOnly": true,
+      "meanSecondRunsWithin5Percent": true,
+      "meanSecondWicketsWithinHalf": true,
+      "secondP10Within10Percent": false,
+      "secondP50Within10Percent": true,
+      "secondP90Within10Percent": true,
+      "zeroObservedExclusions": false,
+      "zeroUnseenHeldoutCategories": false
+    },
+    "reference": {
+      "chaseWinRate": 0.5077399380804953,
+      "count": 646,
+      "dotAttemptProportion": null,
+      "meanLegalBalls": 100.12383900928792,
+      "meanRuns": 122.78018575851394,
+      "meanWickets": 6.041795665634675,
+      "p10": 71,
+      "p50": 124,
+      "p90": 175
+    },
+    "simulation": {
+      "chaseWinRate": 0.515,
+      "count": 400,
+      "dotAttemptProportion": 0.40193370165745856,
+      "meanLegalBalls": 100.44,
+      "meanRuns": 124.56,
+      "meanWickets": 5.6675,
+      "p10": 80,
+      "p50": 124,
+      "p90": 172
+    },
+    "unseenHeldout": {
+      "NO_BALL|5|0|1|0|0|0|NONE|NONE": 1
+    },
+    "unsupported": {
+      "BOUNDARY_DISMISSAL_OR_ALLOWANCE": 1,
+      "FREE_HIT_MASK": 3,
+      "INVALID_LEGALITY_CHANNEL": 12,
+      "MULTI_WICKET_UNSUPPORTED": 1,
+      "UNSUPPORTED_EXTRA_TYPE": 6,
+      "UNSUPPORTED_WICKET_TYPE": 10
+    }
+  },
+  "researchCandidate": {
+    "candidateFileSha256": "e44568f03535f08c95e22c0e904ef2d17a662aa7753526d8e600d24e175ec269",
+    "candidateSha256": "580e0908756a8792d7296ea6f5e816e6c0358975484a5493b398d24f82342824",
+    "developmentHoldoutMatches": 646,
+    "gameplayIntegrationPermitted": false,
+    "reproducedByteIdentically": true,
+    "secondInningsCategories": 63,
+    "simulatedTwoInningsMatches": 400,
+    "trainingDeliveryCount": 280405,
+    "trainingMatches": 2569,
+    "version": "LC_T20_CHASE_COMPONENTS_RESEARCH_V1"
+  },
+  "sourceData": {
+    "declaredSource": "Cricsheet T20 JSON user upload",
+    "licence": "ODC-By 1.0, https://cricsheet.org/licensing/",
+    "originalArchiveRedistributed": false,
+    "sourceSha256": "d89ef1b3df83f520bf6bbfe2a439e3246cc6e6bc82fdc40ab97313b82c33ac9e"
+  },
+  "verification": {
+    "browserAcceptance": "BLOCKED_BEFORE_APP_LOAD_BY_ADMINISTRATOR",
+    "build": "PASS",
+    "determinismVectors": "PASS",
+    "empiricalGameplayPromotion": "NOT_APPROVED",
+    "generatorVectors": "PASS",
+    "lint": "PASS",
+    "probabilityVectors": "PASS",
+    "pythonTests": {
+      "pass": 55,
+      "total": 55
+    },
+    "schemasVerified": 163,
+    "seasonAcceptance": "PASS",
+    "seasonFixtures": 56,
+    "typecheck": "PASS",
+    "typescriptTests": {
+      "pass": 526,
+      "total": 526
+    },
+    "untouchedFinalHoldout": "NOT_AVAILABLE"
+  }
+}

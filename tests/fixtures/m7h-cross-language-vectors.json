@@ -1,0 +1,54 @@
+{
+  "version": "LC_T20_CHASE_COMPONENTS_RESEARCH_V1",
+  "packHash": "580e0908756a8792d7296ea6f5e816e6c0358975484a5493b398d24f82342824",
+  "vectors": [
+    {
+      "regime": 0,
+      "legalBalls": 0,
+      "wickets": 0,
+      "target": 160,
+      "runs": 0,
+      "seed": "m7h-alpha",
+      "ordinal": 0,
+      "freeHit": false,
+      "context": "POWERPLAY/0-2|MEDIUM",
+      "category": "LEGAL|1|0|0|0|0|0|NONE|NONE"
+    },
+    {
+      "regime": 2,
+      "legalBalls": 40,
+      "wickets": 3,
+      "target": 130,
+      "runs": 38,
+      "seed": "m7h-beta",
+      "ordinal": 4,
+      "freeHit": true,
+      "context": "MIDDLE/3-5|MEDIUM",
+      "category": "LEGAL|4|0|0|0|0|4|NONE|NONE"
+    },
+    {
+      "regime": 4,
+      "legalBalls": 110,
+      "wickets": 8,
+      "target": 170,
+      "runs": 140,
+      "seed": "m7h-gamma",
+      "ordinal": 29,
+      "freeHit": false,
+      "context": "DEATH/6-9|HIGH",
+      "category": "LEGAL|1|0|0|0|0|0|NONE|NONE"
+    },
+    {
+      "regime": 1,
+      "legalBalls": 95,
+      "wickets": 7,
+      "target": 150,
+      "runs": 100,
+      "seed": "m7h-delta",
+      "ordinal": 77,
+      "freeHit": true,
+      "context": "DEATH/6-9|HIGH",
+      "category": "LEGAL|2|0|0|0|0|0|NONE|NONE"
+    }
+  ]
+}
