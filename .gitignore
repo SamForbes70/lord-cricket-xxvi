@@ -19,3 +19,6 @@ test-results-ui/
 
 /docs/verification-pass07b/corpus/
 /docs/verification-pass09/final/node-corpus*/
+
+__pycache__/
+*.pyc

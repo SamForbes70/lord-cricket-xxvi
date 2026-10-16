@@ -59,3 +59,13 @@ node --import tsx scripts/audit-m7b-quality.ts --matches=16 > paired-quality.jso
 ```
 
 Cricsheet JSON data licensing: https://cricsheet.org/licensing/ (Open Data Commons Attribution). Preserve attribution and dataset notices if publishing/reference redistributing. The model remains `SYNTHETIC_ALPHA`; no real data were acquired or fitted in this build, and browser gates remain blocked on the current host.
+
+## Pass 15 / M7C offline T20 calibration gate
+
+Run `node --import tsx scripts/m7c-synthetic.ts --matches=96 > m7c-synthetic.json`
+to produce an immutable-model first-innings/phase diagnostic; use
+`python3 scripts/m7c-calibration.py extract|compare` with a separately
+acquired reference archive on an authorised host. Details, limitations and
+mandatory holdout checks are in `docs/M7C_CALIBRATION_RUNBOOK.md` and
+`docs/decisions/ADR-027-M7C-CALIBRATION-GATE.md`. M7C has not fitted or enabled
+new coefficients, and the game remains `SYNTHETIC_ALPHA`.
