@@ -1,0 +1,90 @@
+{
+  "version": "LC_T20_JOINT_ENVELOPE_RESEARCH_V1",
+  "packHash": "923218fdc32c466f62f1becdbb071edee4c9dc787d0a6226dc9cc0b7edec8711",
+  "vectors": [
+    {
+      "phase": "POWERPLAY",
+      "wickets": 0,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 0,
+      "expected": "LEGAL|1|0|NONE"
+    },
+    {
+      "phase": "MIDDLE",
+      "wickets": 3,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 1,
+      "expected": "LEGAL|1|0|NONE"
+    },
+    {
+      "phase": "DEATH",
+      "wickets": 6,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 2,
+      "expected": "LEGAL|0|0|NONE"
+    },
+    {
+      "phase": "POWERPLAY",
+      "wickets": 9,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 3,
+      "expected": "LEGAL|4|1|NONE"
+    },
+    {
+      "phase": "MIDDLE",
+      "wickets": 2,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 4,
+      "expected": "LEGAL|0|0|NONE"
+    },
+    {
+      "phase": "DEATH",
+      "wickets": 5,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 5,
+      "expected": "WIDE|1|0|NONE"
+    },
+    {
+      "phase": "POWERPLAY",
+      "wickets": 8,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 6,
+      "expected": "LEGAL|1|0|NONE"
+    },
+    {
+      "phase": "MIDDLE",
+      "wickets": 1,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 7,
+      "expected": "LEGAL|0|0|BOWLER"
+    },
+    {
+      "phase": "DEATH",
+      "wickets": 4,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 8,
+      "expected": "LEGAL|1|0|NONE"
+    },
+    {
+      "phase": "POWERPLAY",
+      "wickets": 7,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 9,
+      "expected": "LEGAL|0|0|NONE"
+    },
+    {
+      "phase": "MIDDLE",
+      "wickets": 0,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 10,
+      "expected": "LEGAL|1|0|NONE"
+    },
+    {
+      "phase": "DEATH",
+      "wickets": 3,
+      "seed": "m7f-vector-20261016",
+      "ordinal": 11,
+      "expected": "LEGAL|1|0|NONE"
+    }
+  ]
+}

@@ -69,3 +69,20 @@ acquired reference archive on an authorised host. Details, limitations and
 mandatory holdout checks are in `docs/M7C_CALIBRATION_RUNBOOK.md` and
 `docs/decisions/ADR-027-M7C-CALIBRATION-GATE.md`. M7C has not fitted or enabled
 new coefficients, and the game remains `SYNTHETIC_ALPHA`.
+
+## Pass 18 / M7F joint empirical envelope (offline research only)
+
+Cricsheet training deliveries are fitted into an immutable integer-normalised
+joint category model (`LC_T20_JOINT_ENVELOPE_RESEARCH_V1`) conditioned on T20
+phase and wickets lost. Python fitting and TypeScript research sampling agree
+on deterministic vectors; the pack is held separately from the accepted game
+model. M7F reference: Cricsheet, https://cricsheet.org/ , ODC-By 1.0,
+https://cricsheet.org/licensing/ . The dataset was user uploaded, not
+independently authenticated or redistributed in this source package.
+
+To reproduce offline, use `bash scripts/m7f-run.sh /path/to/t20s_json.zip`.
+The derived candidate and deterministic vectors are in `tests/fixtures/`,
+with full limitations in `docs/decisions/ADR-028-M7F-JOINT-RESEARCH.md`.
+This research sampler does **not** produce the scorer's full delivery format,
+and no model has been promoted to gameplay or to `EMPIRICALLY_VALIDATED`.
+Historical saves continue to use `synthetic-alpha-01` unchanged.

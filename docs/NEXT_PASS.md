@@ -1,21 +1,32 @@
-# Next Pass: M7F empirical joint-model investigation
+# Next Pass: M7G complete conditional gameplay model, model-quality gate and browser acceptance
 
-M7E completed genuine uploaded Cricsheet offline analysis and phase-marginal
-research fitting. Baseline T20 run-scoring fails reference targets. No gameplay
-model has been promoted, and the inherited browser gates remain blocked.
+Pass 18 / M7F constructed and evaluated the versioned integer-normalised
+`LC_T20_JOINT_ENVELOPE_RESEARCH_V1` on genuine uploaded Cricsheet observations:
+2,605 chronological training matches, 652 held-out matches, no overlapping
+match dates or IDs. The holdout categorical log-loss is improved over the
+pooled baseline. Mean runs, mean wickets, dot rate, boundary rate and median
+score fall within proposed tolerances for the *offline first-innings envelope*
+but **P10 and P90 still fail**. This candidate is not a scorer-compatible
+delivery implementation. Production `synthetic-alpha-01` and saves unchanged.
 
-1. Obtain independent review of archive provenance/licensing, T20 rules/strength
-   cohorts and extraction exclusions. Compare within competition/era/skill bands.
-2. Build a **normalised joint conditional T20 delivery-outcome candidate** using
-   training data only, with legality, wickets, batter runs, extras, innings phase,
-   pitch and skill uncertainty. Do not infer inaccessible attributes as facts.
-3. Evaluate with untouched 652-match time holdout or a separately frozen cohort,
-   uncertainty bands and independent cricket-rule vectors; hold out match IDs/dates.
-4. Ensure tactical changes are coherent, legal command masks and state are obeyed,
-   and no tactic dominates. Preserve original `synthetic-alpha-01` for old saves.
-5. Issue NEW versioned model pack/hash only after real regression evidence, including
-   golden replay, cross-version loading, and synthetic statistical release gates.
-6. Close browser/IndexedDB/human acceptance on an authorised host, not by bypass.
+**M7G priorities (gated, not approval by assertion):**
 
-Current research marginal model is NOT a ball simulator and must not be installed
-as gameplay probability weights.
+1. Independent rules/data provenance review and competition/era/strength-cohort
+   analysis. Explain score-tail failures and varying match quality.
+2. Fit *fully resolved* legal delivery fields, including extras attribution,
+   player identity/skill shrinkage, wicket-credit/end semantics, and fielding
+   where observed. Never infer unobserved tactical settings as facts.
+3. Model and independently test tactical response surfaces against supported
+   game commands. Hold all sampler changes behind a new model ID and hash.
+4. Compare full seeded match distributions against untouched heldout matches,
+   including P10/P50/P90, wicket and dismissal distributions, chase censoring,
+   controlled skill/field/fatigue sensitivity and dominance/exploit grids.
+5. Preserve old model loads and event chains. New-version compatibility must
+   be explicit; no automatic save migration based solely on changed weights.
+6. Perform authorised Chromium/Firefox IndexedDB, keyboard/zoom and human
+   acceptance; the current host returns ERR_BLOCKED_BY_ADMINISTRATOR.
+7. Benchmark on a recorded reference four-core/8GB laptop. Node diagnostics
+   alone cannot be claimed as reference-platform performance acceptance.
+
+**No game model was promoted during Pass 18.** Do not describe the joint
+research pack as EMPIRICALLY_VALIDATED gameplay.

@@ -32,3 +32,6 @@
 | M7 quality diagnostic | 64 seeded matches (M7A) and 16 paired-policy fixtures (M7B). Cricsheet offline reference extractor constructed-fixture tested; actual reference dataset NOT acquired, calibration NOT performed |
 | Performance diagnostic | Node match p95 479.93 ms, environment-specific; reference browser/56-match/save/load budgets not accepted |
 | Model status | `SYNTHETIC_ALPHA`, no empirical-realism claim |
+| M7F joint research model | Research-only versioned legality/team-runs/bat-boundary/wicket-category distribution; exactly 2^32 integer mass, phase × wickets-lost contexts. 2,605 train/652 holdout. Improves heldout categorical logloss; score P10/P90 fail |
+| M7F player/tactical calibration | NOT ACCEPTED: data do not directly identify game ratings and commanded tactics |
+| M7F gameplay model promotion | DISABLED; existing `synthetic-alpha-01` and `.lcxxvi` save format remain unchanged |
