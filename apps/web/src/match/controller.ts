@@ -85,7 +85,7 @@ export function createMatchController(
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
     requestId: string;
-    origin: "HUMAN";
+    origin: "HUMAN" | "AI";
     commandKind: string;
     engineActorId: string;
   }[] = [];
@@ -287,8 +287,8 @@ export function createMatchController(
       eventCount: session.events.length,
       replay: true,
       resimulation: true,
-      humanRequests: audit.length,
-      systemAutopilotRequests: 0,
+      humanRequests: audit.filter(a => a.origin === "HUMAN").length,
+      systemAutopilotRequests: audit.filter(a => a.origin === "AI").length,
     };
   }
   function execute(request: Extract<Request, { type: "COMMAND" }>) {
@@ -311,14 +311,14 @@ export function createMatchController(
           ? l?.innings.battingTeamId
           : l?.innings.bowlingTeamId;
     const expectedActor = cmd.kind === "ADVANCE" ? "SYSTEM" : `USER:${teamId}`;
-    if (cmd.actorId !== expectedActor)
+    if (cmd.actorId !== (request.origin === "AI" ? (cmd.kind === "ADVANCE" ? "SYSTEM" : `AI:${teamId}`) : expectedActor))
       throw new Error(
-        "Only human commands are accepted by this match interface.",
+        "Only human-owned or explicitly delegated AI-owned commands may change the team decision.",
       );
     session = executeT20Command(session, cmd).session;
     audit.push({
       requestId: request.requestId,
-      origin: "HUMAN",
+      origin: request.origin,
       commandKind: cmd.kind,
       engineActorId: cmd.actorId,
     });
@@ -332,7 +332,7 @@ export function createMatchController(
       audit.length,
       ...session.commands.map((cmd) => ({
         requestId: cmd.commandId,
-        origin: "HUMAN" as const,
+        origin: cmd.actorId.startsWith("AI:") ? "AI" as const : "HUMAN" as const,
         commandKind: cmd.kind,
         engineActorId: cmd.actorId,
       })),

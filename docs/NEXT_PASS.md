@@ -1,16 +1,9 @@
-# Next pass: M7B quality-gate closure and browser acceptance
+# Next pass: M7C empirical calibration and browser acceptance
 
-M7A is implemented as an additive, non-release-complete slice over Pass 12G-R. The M6F IndexedDB and M6G Chromium tests were reattempted on 16 October 2026, and again rejected before app code executed with `ERR_BLOCKED_BY_ADMINISTRATOR`. This is an environmental BLOCKED gate, not PASS. To close it, run approved Playwright test commands on an authorised host with a working Chromium/Firefox origin and IndexedDB. Formal M3 human acceptance remains separate.
+Pass 14 M7B added the optional in-app T20 tactical captain and an offline Cricsheet JSON match reference reader. Node tests and build gates passed, but the restricted Chromium host returns ERR_BLOCKED_BY_ADMINISTRATOR on localhost. M3 human acceptance remains pending; M6/M7 browser acceptance is not PASS.
 
-Highest-priority model finding: 64 deterministic fictional T20 matches averaged 84.875 runs per innings. Do not silently adjust pinned `synthetic-alpha-01` or accepted save versions. Acquire permitted ball-by-ball reference data and review terms; split by match/time into disjoint fit/validation/test cohorts; produce parameter pack `model-v2` with holdout comparisons and migration policy before enabling it.
+Next: obtain an actual Cricsheet JSON ZIP under ODC-By terms, record SHA-256 and attribution, run the reference reader with at least 200 date-held-out T20 matches; compare matched innings/wicket/phase distributions against existing `SYNTHETIC_ALPHA` output. Then fit a NEW versioned parameter pack with independent validation. Do not mutate `synthetic-alpha-01`, historical event hashes or existing save/replay semantics.
 
-Next technical sequence:
+Run M6F/M6G/M7B Playwright cases under a permitted Chromium and Firefox host, profile response times/IndexedDB/memory on a stated four-core 8GB reference machine. Add opponent end-to-end persistence, save/reload and accessibility evidence. Undertake human M3 match acceptance. Then tackle ODI/red-ball tactical and analytics coverage as independent explicitly gated scopes.
 
-1. Integrate the tested public-only tactical T20 captain into a genuinely playable opposing-team mode, with recorded delegation commands and tests for selected-side control, bowler legality, opponent information isolation, deterministic replay and save/resume.
-2. Extend format-specific tactical policies and paired-seed monotonicity grids; reject dominance/exploit patterns. Current policy is heuristic, not calibrated.
-3. Complete reproducible format-specific calibration corpus and uncertainty/bootstrapped reference validation, including censored chases and all-outs.
-4. Add independent replay and export reconciliation for analytics, plus league statistics and any promised V0.1 editing scope that is still missing.
-5. Measure p95 T20/ODI/red-ball match, full 56-game season, command latency, IndexedDB save/load and memory on the documented four-core 8GB target browser machine; profile and fix breaches.
-6. Rerun all frozen deterministic engine corpora and acceptance suite in shards, then release only with M3/M6/M7 mandatory gates green.
-
-Do not expand into international calendars, transfers, contracts or multi-year career management yet.
+Do not claim M7 acceptance from the current synthetic samples or expand contracts, finance, multiyear or international careers.

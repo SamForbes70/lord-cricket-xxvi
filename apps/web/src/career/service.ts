@@ -70,6 +70,7 @@ export type CareerUserMatchLaunch = {
   matchSeed: string;
   selections: [T20TeamSelection, T20TeamSelection];
   careerStateSha256: string;
+  managedTeamId?: string;
 };
 
 export type CareerUserMatchResult = {
@@ -472,6 +473,7 @@ export class CareerApplicationService {
       matchSeed: fixture.matchSeed,
       selections: [selections[0], selections[1]],
       careerStateSha256: state.careerState.stateSha256,
+      ...(state.controlledTeamId ? { managedTeamId: state.controlledTeamId } : {}),
     };
   }
 

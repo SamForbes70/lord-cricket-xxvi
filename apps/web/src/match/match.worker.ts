@@ -8,6 +8,7 @@ import {
   readPortableArchive,
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
+import { proposeOpponentT20Command } from "./ai-opponent.js";
 import { createODIMatchController } from "./controller-odi.js";
 import { createRed5MatchController } from "./controller-red5.js";
 import {
@@ -101,7 +102,7 @@ function durableHistoryFromSession(session: AnySession) {
             requestId: command.commandId,
             expectedRevision: command.expectedRevision,
             type: "COMMAND" as const,
-            origin: "HUMAN" as const,
+            origin: command.actorId.startsWith("AI:") ? "AI" as const : "HUMAN" as const,
             command,
           };
     return {
@@ -498,6 +499,31 @@ async function handle(raw: unknown): Promise<Response> {
   }
   const persistenceResponse = await handlePersistence(request);
   if (persistenceResponse) return persistenceResponse;
+  if (request.type === "AI_STEP") {
+    const session = controller.snapshot();
+    if (!session || session.setup.format !== "T20")
+      return decorate(controller.currentResponse(request.requestId, "AI decisions require an active T20 match."));
+    if (request.expectedRevision !== session.revision)
+      return decorate(controller.currentResponse(request.requestId, "Stale AI decision revision."));
+    if (readOnly || !activeSaveId)
+      return decorate(controller.currentResponse(request.requestId, "AI decision requires a writable durable save."));
+    const command = proposeOpponentT20Command(session as T20Session, request.teamId);
+    if (!command) return decorate(controller.currentResponse(request.requestId));
+    // AI chooses a legal *engine* command through a public view. It receives no seed/future draws.
+    // Every AI command is individually committed through the same atomic path as a human command.
+    const aiRequest: Extract<Request, { type: "COMMAND" }> = {
+      version: UI_VERSION, type: "COMMAND", origin: "AI", requestId: request.requestId,
+      expectedRevision: request.expectedRevision,
+      command: { ...command, commandId: request.requestId, expectedRevision: request.expectedRevision },
+    };
+    const prior = await repository.command(activeSaveId, request.requestId);
+    if (prior) return decorate(controller.currentResponse(request.requestId));
+    const response = controller.handle(aiRequest);
+    return commitCandidate(aiRequest, response);
+  }
+  // UI-originated COMMANDs cannot masquerade as the AI decision authority.
+  if (request.type === "COMMAND" && request.origin !== "HUMAN")
+    return decorate(controller.currentResponse(request.requestId, "AI commands must be generated inside the worker."));
   if (request.type === "BOOT") return decorate(controller.handle(request));
   if (request.type === "START" && !controller.snapshot())
     controller = makeController(request.format);

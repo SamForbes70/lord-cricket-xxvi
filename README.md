@@ -2,7 +2,7 @@
 
 Lord Cricket XXVI now contains the first coherent one-season management application over the accepted deterministic cricket engine and Pass 12A-F season systems.
 
-**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management and tactical opponent AI are not enabled.
+**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management are not enabled. Optional T20 tactical opponent AI is available in the match view, but remains SYNTHETIC_ALPHA and not browser-accepted.
 
 ## Player-facing management loop
 
@@ -19,7 +19,7 @@ The default web route opens the management career. A player can:
 - export/import the existing portable `.lcxxvi` season archive;
 - finish all 14 rounds / 56 fixtures and create the immutable final season archive.
 
-The fixture autopilot remains the transparent deterministic baseline completion policy. It is not presented as tactical captain AI.
+The fixture autopilot remains the transparent deterministic baseline completion policy. It is not presented as tactical captain AI. In interactive T20 matches, the captain dropdown optionally delegates one team to public-information-only, deterministic AI decisions. The user still advances balls; AI commands are persisted in the original match event/command stream.
 
 ## Architecture
 
@@ -48,3 +48,14 @@ The current execution host blocks Chromium navigation with `ERR_BLOCKED_BY_ADMIN
 Formal M3 human acceptance of the interactive match UI also remains separate and pending.
 
 See `docs/CAPABILITY_MATRIX.md`, `docs/MANAGEMENT_UI.md`, `docs/verification-pass12gr/` and `docs/NEXT_PASS.md`.
+
+## M7B bounded development
+
+A public-data reference ingestion script is included at `scripts/m7b-reference.py`. Run against a locally downloaded Cricsheet JSON ZIP (not bundled):
+
+```sh
+python3 scripts/m7b-reference.py --input /path/to/ipl_json.zip --out reference.json
+node --import tsx scripts/audit-m7b-quality.ts --matches=16 > paired-quality.json
+```
+
+Cricsheet JSON data licensing: https://cricsheet.org/licensing/ (Open Data Commons Attribution). Preserve attribution and dataset notices if publishing/reference redistributing. The model remains `SYNTHETIC_ALPHA`; no real data were acquired or fitted in this build, and browser gates remain blocked on the current host.

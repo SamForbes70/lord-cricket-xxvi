@@ -37,6 +37,12 @@ export function MatchApp() {
     }
   })());
   const careerStartIssued = useRef(false);
+  const [aiTeamId, setAiTeamId] = useState<string | null>(() => {
+    const c = careerLaunch.current;
+    if (c?.managedTeamId) return c.homeTeamId === c.managedTeamId ? c.awayTeamId : c.homeTeamId;
+    return sessionStorage.getItem("lcxxvi-optional-ai-team");
+  });
+  const lastAiChecked = useRef<string>("");
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [view, setView] = useState<View | null>(null);
   const [busy, setBusy] = useState(true),
@@ -162,6 +168,25 @@ export function MatchApp() {
     }
   }, [view]);
 
+  // One durable AI action per worker request. Poll again only when the engine revision advances;
+  // a no-op never spins. The user remains responsible for advancing the match clock.
+  useEffect(() => {
+    if (!view || view.format !== "T20" || !aiTeamId || busy || fatal || error || persistence?.readOnly) return;
+    if (!view.teams.some(t => t.id === aiTeamId)) return;
+    if (view.phase === "COMPLETE") return;
+    const stamp = `${aiTeamId}:${view.revision}`;
+    if (lastAiChecked.current === stamp) return;
+    lastAiChecked.current = stamp;
+    send({ type: "AI_STEP", teamId: aiTeamId });
+  }, [view, aiTeamId, busy, fatal, error, persistence?.readOnly]);
+  function changeAiOpponent(id: string) {
+    const next = id || null;
+    setAiTeamId(next);
+    lastAiChecked.current = "";
+    if (careerLaunch.current) return;
+    if (next) sessionStorage.setItem("lcxxvi-optional-ai-team", next);
+    else sessionStorage.removeItem("lcxxvi-optional-ai-team");
+  }
   function saveCopy() {
     if (!view) return;
     const title = `${view.teams[0]?.name ?? "Team 1"} v ${view.teams[1]?.name ?? "Team 2"} · ${new Date().toLocaleString()}`;
@@ -298,8 +323,8 @@ export function MatchApp() {
             <h2>Take the captain’s chair.</h2>
             <p>
               Select your side and an opponent. You make decisions for{" "}
-              <strong>both teams</strong> in this manual exhibition. There is no
-              opponent captain AI.
+              <strong>both teams</strong> initially. After starting a T20, you can optionally
+              delegate either team to the deterministic tactical captain.
             </p>
           </section>
           {catalog ? (
@@ -314,6 +339,17 @@ export function MatchApp() {
             <p role="status">Loading the approved fictional world…</p>
           )}
         </>
+      )}
+      {view && view.format === "T20" && (
+        <section className="career-match-banner" aria-label="Opponent captain control">
+          <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
+          <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
+            onChange={e => changeAiOpponent(e.target.value)}>
+            <option value="">Manual decisions for both teams</option>
+            {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
+          </select>
+          <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
+        </section>
       )}
       {view && (
         <>

@@ -72,7 +72,11 @@
     "management:acceptance": "node --import tsx scripts/audit-management-season.ts",
     "test:m6g": "playwright test --config playwright.m6g.config.ts",
     "m7:quality": "node --import tsx scripts/audit-m7-quality.ts --matches=64",
-    "m7:rules": "vitest run tests/unit/m7-ai-analytics.test.ts"
+    "m7:rules": "vitest run tests/unit/m7-ai-analytics.test.ts",
+    "m7b:reference": "python3 scripts/m7b-reference.py",
+    "m7b:opponent": "vitest run tests/unit/m7b-opponent.test.ts",
+    "test:m7b": "playwright test --config playwright.m7b.config.ts",
+    "m7b:quality": "node --import tsx scripts/audit-m7b-quality.ts --matches=16"
   },
   "dependencies": {
     "react": "19.1.1",

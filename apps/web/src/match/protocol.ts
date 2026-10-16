@@ -91,6 +91,7 @@ export const CareerFixtureLaunchSchema = z.strictObject({
   matchSeed: z.string().min(1).max(256),
   selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
   careerStateSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  managedTeamId: z.string().min(1).max(128).optional(),
 });
 
 export const RequestSchema = z.discriminatedUnion("type", [
@@ -106,9 +107,10 @@ export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({
     ...base,
     type: z.literal("COMMAND"),
-    origin: z.literal("HUMAN"),
+    origin: z.enum(["HUMAN", "AI"]),
     command: z.union([T20CommandSchema, Red5CommandSchema]),
   }),
+  z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128) }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
   z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
   z.strictObject({
@@ -203,7 +205,7 @@ export type Verification = {
   replay: true;
   resimulation: true;
   humanRequests: number;
-  systemAutopilotRequests: 0;
+  systemAutopilotRequests: number;
 };
 export type PersistenceView = {
   saveId: string | null;

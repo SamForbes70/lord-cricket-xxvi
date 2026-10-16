@@ -1,0 +1,59 @@
+{
+  "version": "LC_M7B_CRICSHEET_REFERENCE_V1",
+  "status": "REFERENCE_PREPARED_NOT_MODEL_VALIDATED",
+  "source": "Cricsheet",
+  "sourceUrl": "https://cricsheet.org/",
+  "licenseUrl": "https://cricsheet.org/licensing/",
+  "license": "Open Data Commons Attribution License (ODC-By 1.0)",
+  "licenseNoticePresent": true,
+  "sourceZipSha256": "2497f6ae9eb84785fcafaf9008d72f38cf7c154b407ecb7779c059dd914620ef",
+  "split": "chronological_by_match_date_with_no_same_date_overlap",
+  "excludedFiles": 0,
+  "training": {
+    "matches": 9,
+    "innings": 18,
+    "allFirstInnings": {
+      "count": 9,
+      "meanRuns": 180.0,
+      "p10": 180,
+      "p50": 180,
+      "p90": 180,
+      "meanWickets": 0.0
+    },
+    "uncensoredFirstInnings": {
+      "count": 9,
+      "meanRuns": 180.0
+    },
+    "attempts": 2160,
+    "dotAttemptProportion": 0.25,
+    "boundaryAttemptProportion": 0.0
+  },
+  "heldOut": {
+    "matches": 3,
+    "innings": 6,
+    "allFirstInnings": {
+      "count": 3,
+      "meanRuns": 180.0,
+      "p10": 180,
+      "p50": 180,
+      "p90": 180,
+      "meanWickets": 0.0
+    },
+    "uncensoredFirstInnings": {
+      "count": 3,
+      "meanRuns": 180.0
+    },
+    "attempts": 720,
+    "dotAttemptProportion": 0.25,
+    "boundaryAttemptProportion": 0.0
+  },
+  "holdoutMinMet": true,
+  "empiricalModelFitted": false,
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "notes": [
+    "Male 20-over T20 two-innings matches only; no rain reductions or declared no-result.",
+    "First innings analysed separately to avoid chase censoring; all-out innings included in all-first cohort.",
+    "This describes real matches; it does not fit a new model or establish transfer to fictional skill profiles.",
+    "Do not distribute the source without maintaining required ODC-By attribution and notices."
+  ]
+}
