@@ -22,3 +22,4 @@ export interface CaptainPolicy {
   readonly policyId: ID;
   choose(view: CaptainPublicView, legalCommands: readonly Command[]): Command;
 }
+export * from "./t20-captain.js";

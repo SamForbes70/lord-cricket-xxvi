@@ -8,6 +8,7 @@
     "@lcxxvi/domain": "0.1.0",
     "@lcxxvi/simulation": "0.1.0",
     "@lcxxvi/data": "0.1.0",
-    "@lcxxvi/projections": "0.1.0"
+    "@lcxxvi/projections": "0.1.0",
+    "@lcxxvi/ai": "0.1.0"
   }
 }

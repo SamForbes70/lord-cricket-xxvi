@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { MatchAnalytics } from "@lcxxvi/projections";
 import type { SaveSummary } from "@lcxxvi/persistence";
 import {
   T20CommandSchema,
@@ -188,6 +189,7 @@ export type View = {
   advanceReason: string;
   commentary: { sequence: number; text: string; short: string }[];
   scorecard: T20Scorecard | ODIScorecard | Red5Scorecard | null;
+  analytics?: MatchAnalytics | null;
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;

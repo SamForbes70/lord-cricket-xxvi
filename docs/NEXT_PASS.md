@@ -1,16 +1,16 @@
-# Next pass: M7 model quality, tactical captain AI, analytics and performance
+# Next pass: M7B quality-gate closure and browser acceptance
 
-Entry condition: Pass 12G-R management implementation is frozen and reproducible. The M6 browser acceptance remains blocked until an execution environment can navigate the production application and IndexedDB test origins. Do not mislabel that host-blocked gate as passed.
+M7A is implemented as an additive, non-release-complete slice over Pass 12G-R. The M6F IndexedDB and M6G Chromium tests were reattempted on 16 October 2026, and again rejected before app code executed with `ERR_BLOCKED_BY_ADMINISTRATOR`. This is an environmental BLOCKED gate, not PASS. To close it, run approved Playwright test commands on an authorised host with a working Chromium/Firefox origin and IndexedDB. Formal M3 human acceptance remains separate.
 
-Once the browser gate can execute, rerun `npm run test:m6g` and the inherited M6F IndexedDB test. Complete formal M3 human playthrough separately.
+Highest-priority model finding: 64 deterministic fictional T20 matches averaged 84.875 runs per innings. Do not silently adjust pinned `synthetic-alpha-01` or accepted save versions. Acquire permitted ball-by-ball reference data and review terms; split by match/time into disjoint fit/validation/test cohorts; produce parameter pack `model-v2` with holdout comparisons and migration policy before enabling it.
 
-The next feature milestone is M7. Keep it bounded to quality rather than expanding the career world:
+Next technical sequence:
 
-1. build a real tactical captain policy over public match state, replacing the explicit baseline fixture captain where enabled;
-2. calibrate and quality-check format distributions, while preserving deterministic/versioned model contracts;
-3. implement the V0.1 analytics still missing from the player experience, particularly partnerships, worm, Manhattan and wagon-wheel views where supported by canonical events;
-4. close the V0.1 editing gap for names/colours/new-game roster import, or formally revise that product requirement;
-5. measure and optimise the declared performance budgets on a reference machine;
-6. run scenario grids for tactical dominance/exploits and model-quality acceptance.
+1. Integrate the tested public-only tactical T20 captain into a genuinely playable opposing-team mode, with recorded delegation commands and tests for selected-side control, bowler legality, opponent information isolation, deterministic replay and save/resume.
+2. Extend format-specific tactical policies and paired-seed monotonicity grids; reject dominance/exploit patterns. Current policy is heuristic, not calibrated.
+3. Complete reproducible format-specific calibration corpus and uncertainty/bootstrapped reference validation, including censored chases and all-outs.
+4. Add independent replay and export reconciliation for analytics, plus league statistics and any promised V0.1 editing scope that is still missing.
+5. Measure p95 T20/ODI/red-ball match, full 56-game season, command latency, IndexedDB save/load and memory on the documented four-core 8GB target browser machine; profile and fix breaches.
+6. Rerun all frozen deterministic engine corpora and acceptance suite in shards, then release only with M3/M6/M7 mandatory gates green.
 
-Do not add multiyear careers, global competitions, transfers, contracts or finances until the V0.1 vertical slice has cleared M7 and M8.
+Do not expand into international calendars, transfers, contracts or multi-year career management yet.

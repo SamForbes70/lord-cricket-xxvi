@@ -1,3 +1,4 @@
+import { projectT20MatchAnalytics } from "@lcxxvi/projections";
 import {
   type T20Session,
   verifyFrozenWorldBytes,
@@ -220,6 +221,7 @@ export function createMatchController(
       advanceReason,
       commentary,
       scorecard: c.phase === "COMPLETE" ? projectT20Scorecard(s) : null,
+      analytics: c.phase === "COMPLETE" ? projectT20MatchAnalytics(s.events, projectT20Scorecard(s)) : null,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,
