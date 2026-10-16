@@ -1,0 +1,54 @@
+{
+  "version": "LC_T20_SCORING_COMPONENTS_RESEARCH_V1",
+  "packHash": "1213fe063ee87adf6389b4b6b0c9104a1335dee3de8d6d5a41f00825bcae17b1",
+  "vectors": [
+    {
+      "regime": 0,
+      "phase": "POWERPLAY",
+      "wickets": 0,
+      "seed": "m7g-ts-py-vector",
+      "ordinal": 0,
+      "expected": "LEGAL|0|0|0|0|0|0|NONE|NONE"
+    },
+    {
+      "regime": 1,
+      "phase": "MIDDLE",
+      "wickets": 4,
+      "seed": "m7g-ts-py-vector",
+      "ordinal": 1,
+      "expected": "LEGAL|1|0|0|0|0|0|NONE|NONE"
+    },
+    {
+      "regime": 2,
+      "phase": "DEATH",
+      "wickets": 8,
+      "seed": "m7g-ts-py-vector",
+      "ordinal": 2,
+      "expected": "LEGAL|1|0|0|0|0|0|NONE|NONE"
+    },
+    {
+      "regime": 3,
+      "phase": "POWERPLAY",
+      "wickets": 9,
+      "seed": "m7g-ts-py-vector",
+      "ordinal": 3,
+      "expected": "LEGAL|0|0|0|0|0|0|NONE|NONE"
+    },
+    {
+      "regime": 4,
+      "phase": "DEATH",
+      "wickets": 3,
+      "seed": "m7g-ts-py-vector",
+      "ordinal": 4,
+      "expected": "WIDE|0|1|0|0|0|0|NONE|NONE"
+    },
+    {
+      "regime": 0,
+      "phase": "MIDDLE",
+      "wickets": 1,
+      "seed": "m7g-ts-py-vector",
+      "ordinal": 5,
+      "expected": "LEGAL|0|0|0|0|0|0|NONE|NONE"
+    }
+  ]
+}

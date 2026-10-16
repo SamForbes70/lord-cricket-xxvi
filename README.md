@@ -86,3 +86,9 @@ with full limitations in `docs/decisions/ADR-028-M7F-JOINT-RESEARCH.md`.
 This research sampler does **not** produce the scorer's full delivery format,
 and no model has been promoted to gameplay or to `EMPIRICALLY_VALIDATED`.
 Historical saves continue to use `synthetic-alpha-01` unchanged.
+
+## Pass 19 / M7G: empirical joint scoring research (not gameplay)
+
+The offline-only candidate `LC_T20_SCORING_COMPONENTS_RESEARCH_V1` is documented in [`docs/M7G_RESEARCH_AND_PROMOTION_GATES.md`](docs/M7G_RESEARCH_AND_PROMOTION_GATES.md). It models observed T20 first-innings scoring components and five train-inferred scoring regimes, using a real Cricsheet match-level train/holdout separation. The frozen `synthetic-alpha-01` production model, save versions, random service, scoring kernel, ODI and red-ball remain unchanged. This is **not** an empirically calibrated gameplay update.
+
+To reproduce after obtaining the Cricsheet ZIP from its authorised source, run `bash scripts/m7g-run.sh /absolute/path/to/t20s_json.zip`. The original downloaded/uploaded archive is not included in the source package. Cricsheet attribution and ODC-By licence information: https://cricsheet.org/ and https://cricsheet.org/licensing/.
