@@ -1,19 +1,21 @@
-# Next pass: M7I outcome completeness, model promotion prerequisites and browser gate
+# Next pass: M7J scorer contract extension + independent acceptance
 
-**Current authoritative source:** Pass 20 / M7H. **Research status only.** Original `synthetic-alpha-01` gameplay, RNG, scoring rules and all prior save formats remain unchanged.
+Authoritative baseline: Pass 21 / M7I; all research outputs still **NOT FOR GAMEPLAY**. Existing `synthetic-alpha-01`, scoring engine, RNG, match model, ODI/red-ball, fixture autopilot and save schema are frozen.
 
-M7H added deterministic two-innings/chase research. It learned a second-innings latent scoring-component model from 2,569 eligible training matches, tested it on 646 already-inspected development-holdout matches and simulated 400 complete research match pairs. Mean second-innings scoring, mean wickets, chase-win fraction, median and P90 pass the exploratory target bands; the P10 tail fails. Read the machine-readable M7H evaluation for the exact excluded innings and rare categories; do not collapse those into legal events. M7H also measured 300-attempt-shrunk player-history predictive associations with Cricsheet registry IDs, which improve three heldout marginal losses but **do not identify player skill, 0–100 ratings or tactical causal effects**. This is research-only and does not authorise gameplay promotion.
+M7I produced a source-auditable register of 69 uncommon event rows across the frozen eligible two-innings cohort (36 first-innings, 33 second-innings). Do not map rejected cases into normal events. Diagnose handling by cricket law and source notation: retired out, combined wickets, penalty awards, no-ball run counts, overthrows/boundary allowances, and free-hit metadata anomalies. Preserve fielding and wicket-end unknowns.
 
-**Priorities in order:**
+The low-score chase tail remains unstable across deterministic sample and target strata. 600 simulated research chases have P10 77, while the already-inspected development reference has P10 71 and training has P10 82. That is **diagnostic**, not validation or grounds for tweaking to P10 71. The M7H heldout was inspected during prior model design and is not a final untouched test set.
 
-1. Independently adjudicate the named rare/unsupported legality, extras and multi-wicket source events. Expand predeclared legal support using cricket rules and training-only evidence, without retrospectively making the inspected holdout support complete by construction.
-2. Resolve accurate wicket-end, completed-run, striker-change, fielding and penalty-event semantics in the joint scorer adapter; stop using physical/fielding placeholders where an identified outcome is required. Do not fabricate Cricsheet ball-tracking or captain instructions.
-3. Stratify empirical cohorts (competition, era, relative strength, innings/chase context) and reserve a **new untouched forward-time test set**. M7C–M7H repeatedly inspected the current holdout, which is development validation only.
-4. Improve low-scoring second-innings tails, with holdout-free parameter tuning and complete chase/scorecard validation, including extras, no balls, free hits, all-out, ties and last-ball targets.
-5. Use Cricsheet registry IDs for explicit partially pooled player-history experiments. Validate leave-team/leave-player-out and subsequent seasons, account for confounding and rating uncertainty. Never present marginal predictions as causally identified captain tactics or calibrated 0–100 gameplay ratings.
-6. Build controlled tactic-effect tests and anti-exploit scenario grids. Any empirical causal claims require independent observed tactical inputs, which the currently supplied Cricsheet JSON deliveries do not include.
-7. Only after all scorer, tail, player, tactic, replay, rules-version and save compatibility gates pass, define an opt-in, separately versioned candidate gameplay pack. Keep `synthetic-alpha-01` available indefinitely for existing saves.
-8. Obtain genuine Chromium/Firefox/IndexedDB + worker/keyboard/150%-scale acceptance in an authorised host. Here system Chromium still returns `ERR_BLOCKED_BY_ADMINISTRATOR` before app code executes. M3 human playthrough remains pending.
-9. Benchmark the production game against specified targets on a recorded 4-core/8GB reference machine; the Python 400-pair research run is not a browser performance benchmark.
+Player generalisation is predictive only. Same-context training exposure above 300 attempts is uncommon for batter and bowler jointly. No tactical captain choice is identified in Cricsheet JSON, so do not fit causal tactic coefficients.
 
-**M7 remains OPEN.** Never claim `EMPIRICALLY_VALIDATED` before these independent gates pass.
+**Priorities:**
+
+1. Cricket-law adjudication and independent hand-authored event fixtures, then strictly versioned administrative scoring extensions if supported. A new multi-dismissal event contract would be a compatibility change.
+2. Fit a complete legal joint scorer model only if 100% explicit required outcome classes reconcile. No inferred fielder identity or ball tracking presented as observed data.
+3. New forward-time match data gathered *after* the currently inspected Cricsheet archive, with independent test-set manifest frozen before candidate evaluation. Avoid post-hoc lookups or reporting current holdout as untouched.
+4. Separate training-only opponent, competition and era effects. Stabilise chase target/termination subcohorts and lower-score tail with uncertainty intervals, without baking known holdout statistics into the fit.
+5. Evaluate tactical advantage through controlled paired-seed engine experiments; causal realism requires observed tactical decisions from a suitable data source.
+6. Only upon scorer, replay, skill, tactics, tail, new independent test, and browser gates passing consider a new opt-in versioned gameplay model. Keep old saves pinned to `synthetic-alpha-01`.
+7. Run browser/IndexedDB/worker/keyboard/150%-scale tests on an authorised Chromium/Firefox host; this container fails before page JavaScript with `ERR_BLOCKED_BY_ADMINISTRATOR`. Do formal human M3 and reference-hardware benchmarks separately.
+
+M7 remains OPEN. Do not claim EMPIRICALLY_VALIDATED gameplay.

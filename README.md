@@ -106,3 +106,13 @@ The offline command regenerates M7G and M7H in `reference/m7g/` and `reference/m
 M7H fits a 5-regime second-innings model using training-match data, wickets lost, phase and pre-delivery required scoring rate. It separately simulates 400 two-innings matches with a target, stops on a successful chase and checks scorer-compatible categories in TypeScript. It reports excluded unusual events and unseen holdout categories rather than mapping them to invented cricket outcomes. The already-reviewed Cricsheet holdout is **development validation, not a pristine final test**. Player-history binary predictors use a fixed 300-attempt prior and Cricsheet stable registry IDs. Even when predictive log-loss improves, those marginals are **not** empirically identified 0–100 skills or captain tactical effects.
 
 The existing playable game **remains SYNTHETIC_ALPHA**. Browser and human acceptance, full legal-delivery support, player/fielding/tactic identification, score-tail and independently untouched final validation remain unaccepted. See `docs/NEXT_PASS.md` and `PASS_20_M7H_REPORT.md`.
+
+### Pass 21 / M7I research audit (not gameplay)
+
+M7I adds source-faithful rare-delivery exception registration, target-conditioned chase lower-tail diagnostics, and predictive player-history generalisation tests. None changes the accepted scorer, match generator or saved careers. To reproduce from the separately supplied Cricsheet `t20s_json.zip` archive:
+
+```bash
+bash scripts/m7i-run.sh /absolute/path/to/t20s_json.zip
+```
+
+It rebuilds M7H research inputs if missing, validates the source archive hash, and writes `reference/m7i/*.json`. Licensed archive remains outside the source package. See ADR-031 and `docs/NEXT_PASS.md`. Browser acceptance and gameplay promotion remain open.
