@@ -18,6 +18,7 @@ from pathlib import Path, PurePosixPath
 import random
 import statistics
 import zipfile
+import stat
 
 VERSION="LC_M7C_CALIBRATION_PROTOCOL_V1"
 PHASES=("POWERPLAY","MIDDLE","DEATH")
@@ -93,10 +94,21 @@ def extract(source,dest,holdout,min_holdout):
     with zipfile.ZipFile(source) as z:
         entries=z.infolist()
         if len(entries)>50_000:raise ValueError('too many ZIP members')
+        total_expanded=0
+        member_names=set()
         for file in entries:
             q=PurePosixPath(file.filename)
-            if q.is_absolute() or '..' in q.parts or file.file_size>3_000_000:
+            mode=file.external_attr >> 16
+            total_expanded+=file.file_size
+            if (q.is_absolute() or '..' in q.parts or '\\' in file.filename or
+                file.filename in member_names or file.file_size>3_000_000 or
+                (stat.S_IFMT(mode)==stat.S_IFLNK) or
+                (file.compress_size>0 and file.file_size/file.compress_size>500) or
+                total_expanded>1_500_000_000):
                 raise ValueError('unsafe ZIP entry')
+            member_names.add(file.filename)
+        licence_present = any(PurePosixPath(x.filename).name.upper() == 'LICENSE.TXT'
+                              for x in entries)
         for file in entries:
             if file.is_dir() or not file.filename.endswith('.json') or file.filename.startswith('__MACOSX/'):
                 continue
@@ -121,6 +133,7 @@ def extract(source,dest,holdout,min_holdout):
             'declaredSource':'Cricsheet','sourceURL':'https://cricsheet.org/',
             'licence':'ODC-By-1.0','licenceURL':'https://cricsheet.org/licensing/',
             'sourceZipSha256':source_hash,
+            'licenseNoticePresent':licence_present,
             'cohort':'Male full-length/uninterrupted T20, innings one, all-out retained',
             'split':'chronological_by_match_no_date_overlap',
             'excluded':excluded,'totalEligible':len(matches),

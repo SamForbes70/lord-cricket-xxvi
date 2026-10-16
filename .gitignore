@@ -22,3 +22,8 @@ test-results-ui/
 
 __pycache__/
 *.pyc
+
+# M7D offline licensed source files (never check in)
+reference/
+*.partial
+node_modules
