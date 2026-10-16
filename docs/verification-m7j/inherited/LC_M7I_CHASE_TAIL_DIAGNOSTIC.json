@@ -1,0 +1,272 @@
+{
+  "developmentMatches": 646,
+  "firstModelSha256": "1213fe063ee87adf6389b4b6b0c9104a1335dee3de8d6d5a41f00825bcae17b1",
+  "gameplayIntegrationPermitted": false,
+  "inspectedDevelopmentReference": {
+    "ALL": {
+      "allOutRate": 0.21517027863777088,
+      "chaseRate": 0.5077399380804953,
+      "innings": 646,
+      "meanRuns": 122.78018575851394,
+      "meanWickets": 6.041795665634675,
+      "median": 124,
+      "oversExpiryRate": 0.28637770897832815,
+      "p10": 71,
+      "p90": 175
+    },
+    "HIGH_TARGET": {
+      "allOutRate": 0.354978354978355,
+      "chaseRate": 0.18181818181818182,
+      "innings": 231,
+      "meanRuns": 142.47186147186147,
+      "meanWickets": 7.532467532467533,
+      "median": 148,
+      "oversExpiryRate": 0.4805194805194805,
+      "p10": 82,
+      "p90": 192
+    },
+    "LOW_TARGET": {
+      "allOutRate": 0.046413502109704644,
+      "chaseRate": 0.869198312236287,
+      "innings": 237,
+      "meanRuns": 97.54008438818565,
+      "meanWickets": 3.831223628691983,
+      "median": 101,
+      "oversExpiryRate": 0.08438818565400844,
+      "p10": 61,
+      "p90": 127
+    },
+    "MID_TARGET": {
+      "allOutRate": 0.25842696629213485,
+      "chaseRate": 0.449438202247191,
+      "innings": 178,
+      "meanRuns": 130.8314606741573,
+      "meanWickets": 7.050561797752809,
+      "median": 141,
+      "oversExpiryRate": 0.30337078651685395,
+      "p10": 86,
+      "p90": 160
+    },
+    "TERMINATION_ALL_OUT": {
+      "allOutRate": 1.0,
+      "chaseRate": 0.0,
+      "innings": 139,
+      "meanRuns": 109.60431654676259,
+      "meanWickets": 10.0,
+      "median": 110,
+      "oversExpiryRate": 0.04316546762589928,
+      "p10": 60,
+      "p90": 158
+    },
+    "TERMINATION_CHASE": {
+      "allOutRate": 0.0,
+      "chaseRate": 1.0,
+      "innings": 328,
+      "meanRuns": 121.9939024390244,
+      "meanWickets": 3.625,
+      "median": 123,
+      "oversExpiryRate": 0.0,
+      "p10": 70,
+      "p90": 175
+    },
+    "TERMINATION_OVERS_OR_IRREGULAR": {
+      "allOutRate": 0.0,
+      "chaseRate": 0.0,
+      "innings": 179,
+      "meanRuns": 134.45251396648044,
+      "meanWickets": 7.396648044692737,
+      "median": 133,
+      "oversExpiryRate": 1.0,
+      "p10": 88,
+      "p90": 181
+    }
+  },
+  "limitations": [
+    "Previously inspected development data cannot supply an untouched final release gate.",
+    "Model-generated first-innings target distribution can differ from the real cohort.",
+    "This analysis diagnoses low-score tails but does not calibrate tactical or player effects."
+  ],
+  "modelChanged": false,
+  "modelSha256": "580e0908756a8792d7296ea6f5e816e6c0358975484a5493b398d24f82342824",
+  "referenceExclusions": {
+    "INVALID_SECOND_INNINGS": 4,
+    "NON_STANDARD_TARGET": 1,
+    "PREMATURE_SECOND_INNINGS": 37
+  },
+  "samples": 600,
+  "simulation": {
+    "ALL": {
+      "allOutRate": 0.22833333333333333,
+      "chaseRate": 0.49333333333333335,
+      "innings": 600,
+      "meanRuns": 124.28,
+      "meanWickets": 5.878333333333333,
+      "median": 125,
+      "oversExpiryRate": 0.285,
+      "p10": 77,
+      "p90": 173
+    },
+    "HIGH_TARGET": {
+      "allOutRate": 0.315,
+      "chaseRate": 0.16,
+      "innings": 200,
+      "meanRuns": 144.575,
+      "meanWickets": 7.44,
+      "median": 152,
+      "oversExpiryRate": 0.535,
+      "p10": 85,
+      "p90": 193
+    },
+    "LOW_TARGET": {
+      "allOutRate": 0.09545454545454546,
+      "chaseRate": 0.8590909090909091,
+      "innings": 220,
+      "meanRuns": 100.97272727272727,
+      "meanWickets": 3.8636363636363638,
+      "median": 103,
+      "oversExpiryRate": 0.045454545454545456,
+      "p10": 74,
+      "p90": 130
+    },
+    "MID_TARGET": {
+      "allOutRate": 0.29444444444444445,
+      "chaseRate": 0.4166666666666667,
+      "innings": 180,
+      "meanRuns": 130.21666666666667,
+      "meanWickets": 6.605555555555555,
+      "median": 140,
+      "oversExpiryRate": 0.3,
+      "p10": 79,
+      "p90": 158
+    },
+    "TERMINATION_ALL_OUT": {
+      "allOutRate": 1.0,
+      "chaseRate": 0.0,
+      "innings": 137,
+      "meanRuns": 101.03649635036497,
+      "meanWickets": 10.0,
+      "median": 99,
+      "oversExpiryRate": 0.029197080291970802,
+      "p10": 65,
+      "p90": 143
+    },
+    "TERMINATION_CHASE": {
+      "allOutRate": 0.0,
+      "chaseRate": 1.0,
+      "innings": 296,
+      "meanRuns": 123.58445945945945,
+      "meanWickets": 3.324324324324324,
+      "median": 122,
+      "oversExpiryRate": 0.0,
+      "p10": 79,
+      "p90": 174
+    },
+    "TERMINATION_OVERS_OR_IRREGULAR": {
+      "allOutRate": 0.0,
+      "chaseRate": 0.0,
+      "innings": 167,
+      "meanRuns": 144.5808383233533,
+      "meanWickets": 7.023952095808383,
+      "median": 147,
+      "oversExpiryRate": 1.0,
+      "p10": 98,
+      "p90": 186
+    }
+  },
+  "sourceZipSha256": "d89ef1b3df83f520bf6bbfe2a439e3246cc6e6bc82fdc40ab97313b82c33ac9e",
+  "status": "DIAGNOSTIC_ONLY_NO_MODEL_CHANGES",
+  "trainingMatches": 2569,
+  "trainingOnlyTargetTertileCuts": [
+    135,
+    169
+  ],
+  "trainingReference": {
+    "ALL": {
+      "allOutRate": 0.2133125729855975,
+      "chaseRate": 0.5165434021019852,
+      "innings": 2569,
+      "meanRuns": 129.38380692876606,
+      "meanWickets": 6.043596730245231,
+      "median": 132,
+      "oversExpiryRate": 0.28376800311405215,
+      "p10": 82,
+      "p90": 175
+    },
+    "HIGH_TARGET": {
+      "allOutRate": 0.3341288782816229,
+      "chaseRate": 0.21479713603818615,
+      "innings": 838,
+      "meanRuns": 148.7183770883055,
+      "meanWickets": 7.620525059665871,
+      "median": 156,
+      "oversExpiryRate": 0.4701670644391408,
+      "p10": 90,
+      "p90": 197
+    },
+    "LOW_TARGET": {
+      "allOutRate": 0.09670079635949944,
+      "chaseRate": 0.8225255972696246,
+      "innings": 879,
+      "meanRuns": 103.35608646188851,
+      "meanWickets": 4.2184300341296925,
+      "median": 108,
+      "oversExpiryRate": 0.09101251422070535,
+      "p10": 71,
+      "p90": 131
+    },
+    "MID_TARGET": {
+      "allOutRate": 0.2147887323943662,
+      "chaseRate": 0.49765258215962443,
+      "innings": 852,
+      "meanRuns": 137.2194835680751,
+      "meanWickets": 6.375586854460094,
+      "median": 143,
+      "oversExpiryRate": 0.2992957746478873,
+      "p10": 100,
+      "p90": 163
+    },
+    "TERMINATION_ALL_OUT": {
+      "allOutRate": 1.0,
+      "chaseRate": 0.0,
+      "innings": 548,
+      "meanRuns": 109.35583941605839,
+      "meanWickets": 10.0,
+      "median": 108,
+      "oversExpiryRate": 0.06386861313868614,
+      "p10": 65,
+      "p90": 152
+    },
+    "TERMINATION_CHASE": {
+      "allOutRate": 0.0,
+      "chaseRate": 1.0,
+      "innings": 1327,
+      "meanRuns": 131.32780708364731,
+      "meanWickets": 3.663149962321025,
+      "median": 133,
+      "oversExpiryRate": 0.0,
+      "p10": 82,
+      "p90": 177
+    },
+    "TERMINATION_OVERS_OR_IRREGULAR": {
+      "allOutRate": 0.0,
+      "chaseRate": 0.0,
+      "innings": 694,
+      "meanRuns": 141.4812680115274,
+      "meanWickets": 7.471181556195965,
+      "median": 142,
+      "oversExpiryRate": 1.0,
+      "p10": 101,
+      "p90": 181
+    }
+  },
+  "unsupportedAttempts": {
+    "BOUNDARY_DISMISSAL_OR_ALLOWANCE": 1,
+    "FREE_HIT_MASK": 3,
+    "INVALID_LEGALITY_CHANNEL": 12,
+    "MULTI_WICKET_UNSUPPORTED": 1,
+    "UNSUPPORTED_EXTRA_TYPE": 6,
+    "UNSUPPORTED_WICKET_TYPE": 10
+  },
+  "untouchedFinalTestSet": false,
+  "version": "LC_M7I_CHASE_TAIL_DIAGNOSTIC_V1"
+}

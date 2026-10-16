@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "PENALTY_AWARD"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "sourceEventId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "deadBallConfirmed": {
+          "type": "boolean",
+          "const": true
+        },
+        "beneficiary": {
+          "type": "string",
+          "enum": [
+            "BATTING",
+            "FIELDING"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "const": 5
+        },
+        "lawReference": {
+          "type": "string",
+          "enum": [
+            "18.6",
+            "28.3",
+            "41.17"
+          ]
+        },
+        "umpireSignalConfirmed": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "kind",
+        "commandId",
+        "sourceEventId",
+        "deadBallConfirmed",
+        "beneficiary",
+        "amount",
+        "lawReference",
+        "umpireSignalConfirmed"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "BATTER_RETIREMENT"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "sourceEventId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "deadBallConfirmed": {
+          "type": "boolean",
+          "const": true
+        },
+        "playerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "RETIRED_OUT",
+            "RETIRED_NOT_OUT"
+          ]
+        },
+        "umpireNotified": {
+          "type": "boolean",
+          "const": true
+        },
+        "finalStatusConfirmed": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "kind",
+        "commandId",
+        "sourceEventId",
+        "deadBallConfirmed",
+        "playerId",
+        "status",
+        "umpireNotified",
+        "finalStatusConfirmed"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$id": "urn:lcxxvi:M7JExceptionalCommand:1",
+  "title": "M7JExceptionalCommand"
+}

@@ -116,3 +116,28 @@ bash scripts/m7i-run.sh /absolute/path/to/t20s_json.zip
 ```
 
 It rebuilds M7H research inputs if missing, validates the source archive hash, and writes `reference/m7i/*.json`. Licensed archive remains outside the source package. See ADR-031 and `docs/NEXT_PASS.md`. Browser acceptance and gameplay promotion remain open.
+
+## Pass 22 / M7J: versioned rare-event adjudication (research only)
+
+M7J adds `LC_T20_EXCEPTION_ADJUDICATION_RESEARCH_V2` with four additive
+strict JSON schemas under research-only package subpaths and a pure administrative-event boundary. Ordinary
+balls still use the frozen `scoreDelivery` and `reduceScoringBoundary` functions.
+It can represent independently confirmed five-run penalties and dead-ball
+batting retirements without adding a legal ball or mis-crediting bowlers.
+The existing scorer already supports wide plus hit wicket. The M7I register of
+69 source exceptions is routed to explicitly documented adjudication or
+conflict queues; **zero are automatically repaired or approved**.
+
+Reproduce the new audit and focused tests:
+
+```sh
+npm run m7j:adjudication
+npm run m7j:test
+```
+
+This is **not** a new selectable gameplay model, a changed live scoring rule,
+or 69/69 event acceptance. Source JSON alone does not establish umpire signals,
+chronology or attribution of every rare event. The current playable
+`synthetic-alpha-01` and historical saves remain unchanged. See
+`docs/M7J_RUNBOOK.md` and ADR-032. Cricsheet data: https://cricsheet.org/,
+ODC-By 1.0: https://cricsheet.org/licensing/.

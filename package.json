@@ -85,7 +85,10 @@
     "m7h:research": "bash scripts/m7h-run.sh",
     "m7h:test": "vitest run tests/unit/m7h-research-chase.test.ts && python3 -m unittest discover -s tests -p test_m7h*.py -v",
     "m7i:research": "bash scripts/m7i-run.sh",
-    "m7i:test": "python3 -m unittest discover -s tests -p test_m7i_quality.py -v"
+    "m7i:test": "python3 -m unittest discover -s tests -p test_m7i_quality.py -v",
+    "m7j:adjudication": "python3 scripts/m7j-exception-audit.py",
+    "m7j:restore-fixtures": "python3 scripts/m7j-restore-fixtures.py",
+    "m7j:test": "vitest run tests/unit/m7j-adjudication.test.ts && python3 -m unittest discover -s tests -p test_m7j_exception_audit.py -v"
   },
   "dependencies": {
     "react": "19.1.1",

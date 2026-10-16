@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile, readdir } from "node:fs/promises";
 import { z } from "zod";
-import * as contracts from "../packages/contracts/src/index.js";
+import * as coreContracts from "../packages/contracts/src/index.js";
+import * as m7jResearchContracts from "../packages/contracts/src/m7j-adjudication.js";
+const contracts = {...coreContracts, ...m7jResearchContracts};
 const dir = "packages/contracts/schemas";
 await mkdir(dir, { recursive: true });
 const names: string[] = [];

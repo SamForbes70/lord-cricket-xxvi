@@ -1,21 +1,15 @@
-# Next pass: M7J scorer contract extension + independent acceptance
+# Lord Cricket XXVI - NEXT PASS after M7J
 
-Authoritative baseline: Pass 21 / M7I; all research outputs still **NOT FOR GAMEPLAY**. Existing `synthetic-alpha-01`, scoring engine, RNG, match model, ODI/red-ball, fixture autopilot and save schema are frozen.
+**M7K proposed:** Laws-adjudicated v2 scorer ledger integration and empirical gameplay promotion feasibility.
 
-M7I produced a source-auditable register of 69 uncommon event rows across the frozen eligible two-innings cohort (36 first-innings, 33 second-innings). Do not map rejected cases into normal events. Diagnose handling by cricket law and source notation: retired out, combined wickets, penalty awards, no-ball run counts, overthrows/boundary allowances, and free-hit metadata anomalies. Preserve fielding and wicket-end unknowns.
+Baseline: M7J committed source (record exact hash in PASS_22_M7J_REPORT.md).
 
-The low-score chase tail remains unstable across deterministic sample and target strata. 600 simulated research chases have P10 77, while the already-inspected development reference has P10 71 and training has P10 82. That is **diagnostic**, not validation or grounds for tweaking to P10 71. The M7H heldout was inspected during prior model design and is not a final untouched test set.
+Priorities:
 
-Player generalisation is predictive only. Same-context training exposure above 300 attempts is uncommon for batter and bowler jointly. No tactical captain choice is identified in Cricsheet JSON, so do not fit causal tactic coefficients.
+1. Obtain independently adjudicated representative cases from the 69-row M7I register, including full umpire chronology, match playing conditions, award beneficiary, ground-end metadata and reliable extras credit. Preserve original source hashes and decisions.
+2. Version a new *production-capable* delivery/administration event stream and innings ledger only when every required invariant, interrupted save/replay path and old-schema version negotiation has fixtures. Do not write v2 events into v1 saved matches.
+3. Resolve remaining anomalies: repeated No-ball extras, free-hit inconsistency, boundary + run-out ordering, multiple dismissals in one source row, true retired-out timing. Never silently coerce invalid source evidence into legal events.
+4. Assemble a research candidate with full traceable scorer integration and test two-innings match cohorts, strength variation, fatigue, captain tactical ablations and unbiased opponent/competition comparison. Model evaluation must use a *new untouched* forward-time cohort, not the repeatedly inspected M7E-H development holdout.
+5. Keep `synthetic-alpha-01` intact for historical save replay. Authorised Chromium/Firefox and formal M3 human playthrough remain independent acceptance blockers. Run performance budgets on reference hardware before M8.
 
-**Priorities:**
-
-1. Cricket-law adjudication and independent hand-authored event fixtures, then strictly versioned administrative scoring extensions if supported. A new multi-dismissal event contract would be a compatibility change.
-2. Fit a complete legal joint scorer model only if 100% explicit required outcome classes reconcile. No inferred fielder identity or ball tracking presented as observed data.
-3. New forward-time match data gathered *after* the currently inspected Cricsheet archive, with independent test-set manifest frozen before candidate evaluation. Avoid post-hoc lookups or reporting current holdout as untouched.
-4. Separate training-only opponent, competition and era effects. Stabilise chase target/termination subcohorts and lower-score tail with uncertainty intervals, without baking known holdout statistics into the fit.
-5. Evaluate tactical advantage through controlled paired-seed engine experiments; causal realism requires observed tactical decisions from a suitable data source.
-6. Only upon scorer, replay, skill, tactics, tail, new independent test, and browser gates passing consider a new opt-in versioned gameplay model. Keep old saves pinned to `synthetic-alpha-01`.
-7. Run browser/IndexedDB/worker/keyboard/150%-scale tests on an authorised Chromium/Firefox host; this container fails before page JavaScript with `ERR_BLOCKED_BY_ADMINISTRATOR`. Do formal human M3 and reference-hardware benchmarks separately.
-
-M7 remains OPEN. Do not claim EMPIRICALLY_VALIDATED gameplay.
+M7J is a safe research-rule prerequisite, NOT gameplay-ready completion of those tasks. Details and fixture evidence: ADR-032 and `docs/M7J_RUNBOOK.md`.

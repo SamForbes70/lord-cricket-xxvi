@@ -1,0 +1,54 @@
+{
+  "calibratedSkill0To100": false,
+  "context": [
+    "innings index",
+    "phase by pre-delivery legal balls"
+  ],
+  "gameplayIntegrationPermitted": false,
+  "heldOutMatches": 652,
+  "identityResolution": "Cricsheet per-match registry.people stable person IDs",
+  "limitations": [
+    "Historical associations, not causal or format-independent player skill.",
+    "Missing opponent/ground/quality interactions can confound associations.",
+    "No observed captain choices in delivery records; no tactic-effect calibration.",
+    "Previous M7 work has already used this development holdout.",
+    "Separate marginal outcome predictions cannot replace a joint legal delivery sampler."
+  ],
+  "mixture": "0.5*smoothed_batter+0.5*smoothed_bowler",
+  "priorExposure": 300,
+  "results": {
+    "boundary": {
+      "bootstrap95ByMatch": [
+        -0.0019437462500526887,
+        -0.0014945015461156166
+      ],
+      "candidateMinusPhaseBaselineNLL": -0.0017028672853097004,
+      "heldOutAttemptCount": 148808,
+      "predictiveImprovementSupported": true
+    },
+    "dot": {
+      "bootstrap95ByMatch": [
+        -0.0026235630817512162,
+        -0.0021299174926867077
+      ],
+      "candidateMinusPhaseBaselineNLL": -0.0023673613514466098,
+      "heldOutAttemptCount": 148808,
+      "predictiveImprovementSupported": true
+    },
+    "wicket": {
+      "bootstrap95ByMatch": [
+        -0.00026073253125031117,
+        -0.00011176628375810794
+      ],
+      "candidateMinusPhaseBaselineNLL": -0.00018001616266133752,
+      "heldOutAttemptCount": 148808,
+      "predictiveImprovementSupported": true
+    }
+  },
+  "sourceZipSha256": "d89ef1b3df83f520bf6bbfe2a439e3246cc6e6bc82fdc40ab97313b82c33ac9e",
+  "status": "EXPLORATORY_PREDICTIVE_NOT_SKILL_RATINGS",
+  "tacticalEffectsIdentified": false,
+  "trainMatches": 2605,
+  "untouchedFinalTestSet": false,
+  "version": "LC_M7H_PLAYER_MARGINAL_PREDICTIVE_V1"
+}

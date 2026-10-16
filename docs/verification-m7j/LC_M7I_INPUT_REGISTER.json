@@ -1,0 +1,2018 @@
+{
+  "auditedMatchCount": 3257,
+  "exceptionCount": 69,
+  "exceptions": [
+    {
+      "attempt": 0,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1502749",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 108,
+      "preWickets": 3,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "cf74428a25222f20a8d8e301b98e62f343978b4db17de9521b6ce16b034db2da"
+    },
+    {
+      "attempt": 1,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1503464",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 114,
+      "preWickets": 3,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "f4ce6d262c1e40704627845979a9f28058390b0b1ddf3176dde5e22a7d8b7c76"
+    },
+    {
+      "attempt": 5,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1512744",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 4,
+          "extras": 0,
+          "total": 4
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 107,
+      "preWickets": 4,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "8f907f78bbc432970173242a1d50835d6c48b580a98bc301a4b6650bea511170"
+    },
+    {
+      "attempt": 5,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1526845",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 107,
+      "preWickets": 4,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "c97d8b85b27d126de7fdce9e0d1be7b659a5eb47a44ba52baa735891cd1c55f5"
+    },
+    {
+      "attempt": 5,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1534043",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 16,
+      "preFreeHit": false,
+      "preLegalBalls": 101,
+      "preWickets": 2,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "2a7becedbd7117bbe1bf667f6e90a1d6163c3fc4c0ccdffa2787c48e87a9d344"
+    },
+    {
+      "attempt": 5,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1534047",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 107,
+      "preWickets": 3,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "6a292a21589867a27777dd996984cea4e855e61ba86641f9e58fb0d141757426"
+    },
+    {
+      "attempt": 5,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1534051",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 3,
+      "preFreeHit": false,
+      "preLegalBalls": 22,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "449db828f88fa9239f8cac2d2f5922168802b98a0411d27370881f68b6f05207"
+    },
+    {
+      "attempt": 2,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1534054",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 110,
+      "preWickets": 6,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "cbe4aaf94b8faf9f6aafc0c4b640c9016c12eb6d3ccc9e19104eeb5a36efd562"
+    },
+    {
+      "attempt": 1,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1534056",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          },
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "stumped"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 103,
+      "preWickets": 0,
+      "reason": "MULTI_WICKET_UNSUPPORTED",
+      "sourceEventSha256": "7860c36a9411608a6babf3b8ce8def78e29176eeecc953e4d1878a5cbaff026a"
+    },
+    {
+      "attempt": 1,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1535418",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "bowled"
+          },
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "run out"
+          }
+        ]
+      },
+      "over": 2,
+      "preFreeHit": false,
+      "preLegalBalls": 13,
+      "preWickets": 1,
+      "reason": "MULTI_WICKET_UNSUPPORTED",
+      "sourceEventSha256": "7bb3d2c276e7ee928c99c3f5f190ba2a8302734e80b93e35d2f41b53f73cccde"
+    },
+    {
+      "attempt": 3,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1538440",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5,
+          "wides": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 7,
+          "total": 7
+        },
+        "wickets": []
+      },
+      "over": 9,
+      "preFreeHit": false,
+      "preLegalBalls": 57,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "c5f827d09d30e6a612c2410c3c896c73b55d08e49aa4787dea0da702931093e1"
+    },
+    {
+      "attempt": 5,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1540312",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 15,
+      "preFreeHit": false,
+      "preLegalBalls": 95,
+      "preWickets": 2,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "527f4ec2a380521547be254951fd8e86bcdf50bf94df98006bc17fe9ca19bdf1"
+    },
+    {
+      "attempt": 2,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1542989",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": []
+      },
+      "over": 11,
+      "preFreeHit": false,
+      "preLegalBalls": 67,
+      "preWickets": 1,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "b92f03da53a4255262887f97b5f96cb86d72ed22d6f28ce65f7da1d552fe0a4c"
+    },
+    {
+      "attempt": 0,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1546388",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": []
+      },
+      "over": 10,
+      "preFreeHit": false,
+      "preLegalBalls": 60,
+      "preWickets": 4,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "4c7703d5bee058d422b1473c6ff4d9a84571a01d0a00712010e18e91655afa2f"
+    },
+    {
+      "attempt": 1,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1554537",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "caught"
+          },
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 108,
+      "preWickets": 3,
+      "reason": "MULTI_WICKET_UNSUPPORTED",
+      "sourceEventSha256": "99d93f757f05eac1bdbbee97b0a0c0ad542438931dd3a640e381512f104b2b26"
+    },
+    {
+      "attempt": 0,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1554553",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 6,
+          "extras": 0,
+          "total": 6
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 102,
+      "preWickets": 7,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "e77b4198a0aa6ef149877ba2168c2bb1c87cf4631d2abf7bd379d1d139556638"
+    },
+    {
+      "attempt": 3,
+      "cohort": "heldOut",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1554576",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 111,
+      "preWickets": 6,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "0fbeff0aa36fb50946f9475d0c64455ed2cc3f27cdd9ab795d297e41e1347cbe"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1050219",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 114,
+      "preWickets": 8,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "3680aae9bb727f688fbfa295ae7afe72709e0771764aa9f87baccd5fcf45730a"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "UNRESOLVED_MUST_NOT_CONVERT",
+      "innings": 1,
+      "matchId": "1142915",
+      "observedComponents": {
+        "extras": {
+          "wides": 1
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 1,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "hit wicket"
+          }
+        ]
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 118,
+      "preWickets": 1,
+      "reason": "WIDE_WICKET_MASK",
+      "sourceEventSha256": "3c3e3016aaf8877acb76fd06f6de479e07dc1fd6cce840b7c1a6725bc6135a71"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1199508",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 4,
+          "extras": 0,
+          "total": 4
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "run out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 113,
+      "preWickets": 6,
+      "reason": "BOUNDARY_DISMISSAL_OR_ALLOWANCE",
+      "sourceEventSha256": "2bcd33f93c15b6039ec49865fc56eed2927c3ff7eb8f4b7f55a8042a207a82f7"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1208612",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 4,
+          "extras": 0,
+          "total": 4
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 113,
+      "preWickets": 5,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "c7f3a4303a0b27b1f4f38cc0f3743e1a9a251d5c73c09c3f92d063bab23aef7d"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1275051",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired not out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 108,
+      "preWickets": 6,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "51e739c36ac698573c10cdd555c4600040f26df1b7f1e2a0ab0d1f29744b280a"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1275277",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 2,
+          "extras": 0,
+          "total": 2
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired not out"
+          }
+        ]
+      },
+      "over": 14,
+      "preFreeHit": false,
+      "preLegalBalls": 89,
+      "preWickets": 4,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "b49e85b9ad8816462eb14d3c9cb9f82caf2ce987c6cedb5c27550a2b4f2338c5"
+    },
+    {
+      "attempt": 1,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1282742",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired not out"
+          }
+        ]
+      },
+      "over": 7,
+      "preFreeHit": false,
+      "preLegalBalls": 43,
+      "preWickets": 2,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "86c6a0c330bb841c67211c3d43a1cb86371e597ed5afb976840bb85f53f865bb"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1283034",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired not out"
+          }
+        ]
+      },
+      "over": 8,
+      "preFreeHit": false,
+      "preLegalBalls": 48,
+      "preWickets": 2,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "4d1929becd1a04a5265991a0882d51eb0c4fefeefcbfe93914790dd7e18865bc"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1283040",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 4,
+          "extras": 0,
+          "total": 4
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "run out"
+          }
+        ]
+      },
+      "over": 1,
+      "preFreeHit": false,
+      "preLegalBalls": 6,
+      "preWickets": 0,
+      "reason": "BOUNDARY_DISMISSAL_OR_ALLOWANCE",
+      "sourceEventSha256": "46f8010f796fcf551914580d4c5ecbf675f842778f4277b01224948132ad8a19"
+    },
+    {
+      "attempt": 3,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1286673",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 5,
+          "total": 6
+        },
+        "wickets": []
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 105,
+      "preWickets": 6,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "47455aaa447c21204c6bbe7835d5a15a56046ccabf16c455ca88612b8c363d6d"
+    },
+    {
+      "attempt": 6,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1298156",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 5,
+          "total": 6
+        },
+        "wickets": []
+      },
+      "over": 10,
+      "preFreeHit": true,
+      "preLegalBalls": 65,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "fb26e5eff0391a38025e411ac0324e6e5408d9f4b9d0aea42424b1fce11ab364"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1321284",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 2,
+          "extras": 0,
+          "total": 2
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 14,
+      "preFreeHit": false,
+      "preLegalBalls": 89,
+      "preWickets": 0,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "224e3b86cc899b94918a7aee5414f58131b664ddff30df604f60bdedb58d7d2f"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1321477",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 102,
+      "preWickets": 7,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "780f678b8f1a558a41982de4eb3b4f12bc23f344773b988a370d4ddff4eed3f4"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1367728",
+      "observedComponents": {
+        "extras": {
+          "noballs": 1,
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 6,
+          "total": 6
+        },
+        "wickets": []
+      },
+      "over": 9,
+      "preFreeHit": false,
+      "preLegalBalls": 59,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "5a594a03652f64813428f0a3bbc6bb32d37135cf11740051c057ec1d4188b2f8"
+    },
+    {
+      "attempt": 2,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1381453",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 13,
+      "preFreeHit": false,
+      "preLegalBalls": 80,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "88c97bef4017d1f7d0620ba4e2244a16b2d8478339e413fa8b2094ad2907fb4c"
+    },
+    {
+      "attempt": 4,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1383082",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired not out"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 106,
+      "preWickets": 4,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "7e98c8b2649f1b7c1bf1317b2571f4815a98bb3019f1122b00182cdee0e48e6b"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1391336",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "hit the ball twice"
+          }
+        ]
+      },
+      "over": 6,
+      "preFreeHit": false,
+      "preLegalBalls": 41,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "be6013642c73e7b83958fd9f169566bcd7ad7f837f70d80b6318b594a21a9afd"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1415725",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 5,
+          "total": 6
+        },
+        "wickets": []
+      },
+      "over": 14,
+      "preFreeHit": false,
+      "preLegalBalls": 89,
+      "preWickets": 3,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "3e79d6b10a89f9742de788500a6f9ccb0b669e2226ea24a8072af0254f4911b5"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1438075",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 9,
+      "preFreeHit": false,
+      "preLegalBalls": 54,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "c89569e1a1bf0e870e38ec46d199d38919910f72c18e7be20a372b624509a583"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1440129",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 5,
+          "total": 6
+        },
+        "wickets": []
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 108,
+      "preWickets": 5,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "663c0d73077c2c7cfdc841d393a1c3c005daa25b66dc14a237ee8ef24050ac41"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1443776",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 13,
+      "preFreeHit": false,
+      "preLegalBalls": 83,
+      "preWickets": 5,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "6397f72200e929fdf617c55a4e288eab9ebecf090fce0a6e8484960268f97a38"
+    },
+    {
+      "attempt": 1,
+      "cohort": "training",
+      "disposition": "UNRESOLVED_MUST_NOT_CONVERT",
+      "innings": 1,
+      "matchId": "1453929",
+      "observedComponents": {
+        "extras": {
+          "wides": 1
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 1,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "hit wicket"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 109,
+      "preWickets": 6,
+      "reason": "WIDE_WICKET_MASK",
+      "sourceEventSha256": "ec5ea4004c4ef163751c6262c425cc8b5b16e8034414c6d6e5a821da3dd0034a"
+    },
+    {
+      "attempt": 6,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1457222",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 107,
+      "preWickets": 3,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "7b6c1f4f8de64a101fc3aa0d955e0be86c9cd1bc7697742f0bed2f20db817f28"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1459374",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 2,
+          "extras": 0,
+          "total": 2
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 107,
+      "preWickets": 1,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "9f40094e643ad2a2264c7c7505a482e6a582e25bc5cc27aa9fa7c84f5e50db7e"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1459387",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "run out"
+          },
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 13,
+      "preFreeHit": false,
+      "preLegalBalls": 83,
+      "preWickets": 1,
+      "reason": "MULTI_WICKET_UNSUPPORTED",
+      "sourceEventSha256": "959e95a8d8f3922920a66d401387ec2fa2c67c2669020e667bdd27752cefcd13"
+    },
+    {
+      "attempt": 6,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1472527",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 0,
+          "total": 1
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 16,
+      "preFreeHit": false,
+      "preLegalBalls": 101,
+      "preWickets": 3,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "2eacc74bb466f9969aad53a41a5ba5aab0dc2483a25a31eee9fef4116c2b6ecc"
+    },
+    {
+      "attempt": 6,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "1487633",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "retired out"
+          }
+        ]
+      },
+      "over": 18,
+      "preFreeHit": false,
+      "preLegalBalls": 113,
+      "preWickets": 7,
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "1393e7380d430fe960709f36ba7094e77c155e31628ea57f31143db5f627b963"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "1494767",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5,
+          "wides": 1
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 6,
+          "total": 6
+        },
+        "wickets": []
+      },
+      "over": 15,
+      "preFreeHit": false,
+      "preLegalBalls": 90,
+      "preWickets": 6,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "aa72b1b91f71e38ed5804438f19c97deadd0b85d22487dfe5cf37998fb3f3f9c"
+    },
+    {
+      "attempt": 4,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "222678",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": []
+      },
+      "over": 1,
+      "preFreeHit": false,
+      "preLegalBalls": 10,
+      "preWickets": 0,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "802b2539db522bd5e4b879cadde738b70c7c886d297d629de8f74510394fd4ac"
+    },
+    {
+      "attempt": 4,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "222678",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": [
+          {
+            "dismissedRole": "NON_STRIKER",
+            "kind": "run out"
+          }
+        ]
+      },
+      "over": 16,
+      "preFreeHit": false,
+      "preLegalBalls": 100,
+      "preWickets": 6,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "b8aff75d423c94b972c829111f9c44262fdc545a08266f3a0a83bee465c16382"
+    },
+    {
+      "attempt": 1,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "222678",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 1,
+          "extras": 2,
+          "total": 3
+        },
+        "wickets": []
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 103,
+      "preWickets": 5,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "9b27494fa570d744df2d8d2fa2e620e3c601a56ebd262c0d1ebd0474eae56069"
+    },
+    {
+      "attempt": 6,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "222678",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 6,
+          "extras": 2,
+          "total": 8
+        },
+        "wickets": []
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 107,
+      "preWickets": 5,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "2d4dc1503cf11e031d02eb15ea7c6792e3357c18deda3d4f3a3983ee16336e8f"
+    },
+    {
+      "attempt": 1,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "237242",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 4,
+          "extras": 2,
+          "total": 6
+        },
+        "wickets": []
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 115,
+      "preWickets": 6,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "103535d833a0282d0dee2904a6837ef3421fe011792525a9d344baf0805b2172"
+    },
+    {
+      "attempt": 1,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "287857",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": []
+      },
+      "over": 11,
+      "preFreeHit": false,
+      "preLegalBalls": 67,
+      "preWickets": 2,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "d18a4dec7b97083e8376dd4be9459456b077c28b50fe3b59aef80cb859449757"
+    },
+    {
+      "attempt": 7,
+      "cohort": "training",
+      "disposition": "REQUIRES_SOURCE_AND_FREE_HIT_ADJUDICATION",
+      "innings": 1,
+      "matchId": "306991",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "caught"
+          }
+        ]
+      },
+      "over": 2,
+      "preFreeHit": true,
+      "preLegalBalls": 17,
+      "preWickets": 1,
+      "reason": "FREE_HIT_MASK",
+      "sourceEventSha256": "ef50eda853d643c4865067e0e610ca65cbb91377a1a5409c56fbea77b49e436e"
+    },
+    {
+      "attempt": 3,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "355995",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": []
+      },
+      "over": 15,
+      "preFreeHit": false,
+      "preLegalBalls": 92,
+      "preWickets": 3,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "5153a607bdb59726e0facc241e52bc9f7d9d60783fab4ea11ccbaf38a7230f45"
+    },
+    {
+      "attempt": 4,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "401076",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 118,
+      "preWickets": 9,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "60912ffef6024dd66bde3670cbc3c6ecdd676f8f2ebbe72c0a5191e3682bea51"
+    },
+    {
+      "attempt": 1,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "412694",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": []
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 115,
+      "preWickets": 6,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "2850f5532053dca3d58552f9979965bd1ba0a8e0216f670a6065bd449ca7c369"
+    },
+    {
+      "attempt": 6,
+      "cohort": "training",
+      "disposition": "REQUIRES_SOURCE_AND_FREE_HIT_ADJUDICATION",
+      "innings": 1,
+      "matchId": "412698",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "bowled"
+          }
+        ]
+      },
+      "over": 17,
+      "preFreeHit": true,
+      "preLegalBalls": 107,
+      "preWickets": 4,
+      "reason": "FREE_HIT_MASK",
+      "sourceEventSha256": "00c91b521a4e0afa546d30fac3d280ebfaa7c8e6b89c20d331c1e78dcac573a7"
+    },
+    {
+      "attempt": 2,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "439146",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 0,
+      "preFreeHit": false,
+      "preLegalBalls": 2,
+      "preWickets": 0,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "9c2b8a9264cd3f42b4ab03dd2e52a26dc83517b3fc747c3e8660786a28e811de"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_SOURCE_AND_FREE_HIT_ADJUDICATION",
+      "innings": 2,
+      "matchId": "489212",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "caught"
+          }
+        ]
+      },
+      "over": 15,
+      "preFreeHit": true,
+      "preLegalBalls": 93,
+      "preWickets": 6,
+      "reason": "FREE_HIT_MASK",
+      "sourceEventSha256": "dd5b26139a6575bb4ff9211174f9094e3c8b9c1f5f67cd5044e41a9c87881dc4"
+    },
+    {
+      "attempt": 2,
+      "cohort": "training",
+      "disposition": "REQUIRES_SOURCE_AND_FREE_HIT_ADJUDICATION",
+      "innings": 2,
+      "matchId": "533293",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "bowled"
+          }
+        ]
+      },
+      "over": 19,
+      "preFreeHit": true,
+      "preLegalBalls": 115,
+      "preWickets": 8,
+      "reason": "FREE_HIT_MASK",
+      "sourceEventSha256": "503d215eabf21a19b7cfa89304cf9d6193e6641a993f2fc93488d00b415bedec"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "534208",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 16,
+      "preFreeHit": false,
+      "preLegalBalls": 96,
+      "preWickets": 1,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "b8bab6a8f8ae18ef75f31d4366e86c6ef74f8ab55b0609bc2ec64a390f413b5d"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "569237",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 119,
+      "preWickets": 9,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "092115e5c47d0f70131d32ec0dab0825dc7f95f20820f2ef7d7ffca6528c29ec"
+    },
+    {
+      "attempt": 4,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "636164",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 17,
+      "preFreeHit": false,
+      "preLegalBalls": 106,
+      "preWickets": 3,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "4e8882ce8b629c8633dec4f8009ff00389c02dbaaa50eab6341a4b738bf9c2dc"
+    },
+    {
+      "attempt": 3,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "660185",
+      "observedComponents": {
+        "extras": {
+          "penalty": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 2,
+          "extras": 5,
+          "total": 7
+        },
+        "wickets": []
+      },
+      "over": 10,
+      "preFreeHit": false,
+      "preLegalBalls": 62,
+      "preWickets": 7,
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "2a1f4c0d74e3ed4cbb9d498bb8429e4709b116b3190d737a3ab26365aca96db3"
+    },
+    {
+      "attempt": 2,
+      "cohort": "training",
+      "disposition": "REQUIRES_SOURCE_AND_FREE_HIT_ADJUDICATION",
+      "innings": 2,
+      "matchId": "660185",
+      "observedComponents": {
+        "extras": {},
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 0,
+          "total": 0
+        },
+        "wickets": [
+          {
+            "dismissedRole": "STRIKER",
+            "kind": "caught"
+          }
+        ]
+      },
+      "over": 15,
+      "preFreeHit": true,
+      "preLegalBalls": 91,
+      "preWickets": 8,
+      "reason": "FREE_HIT_MASK",
+      "sourceEventSha256": "9cf35b7603783eb084c5d51a08f531b733caa09474dcb158a997a830cb769e65"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "682927",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 7,
+      "preFreeHit": false,
+      "preLegalBalls": 47,
+      "preWickets": 2,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "8d38a0afd246dd3c27b53a8a29895a631b8583f53b0561b1961d76c343c42233"
+    },
+    {
+      "attempt": 3,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 1,
+      "matchId": "682941",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 14,
+      "preFreeHit": false,
+      "preLegalBalls": 87,
+      "preWickets": 5,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "141abc7a82eb0fa19e413eecf2a2b52e8e8794ae72e182a88ed1841c07e9a38b"
+    },
+    {
+      "attempt": 4,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "915785",
+      "observedComponents": {
+        "extras": {
+          "noballs": 2
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 2,
+          "total": 2
+        },
+        "wickets": []
+      },
+      "over": 15,
+      "preFreeHit": false,
+      "preLegalBalls": 94,
+      "preWickets": 5,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "1f5d6f10ba926a980495db90b62a61b6e463a1f07e2ade7597ec6b133552f391"
+    },
+    {
+      "attempt": 5,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "951311",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 118,
+      "preWickets": 8,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "c9b35402c42a513f6441489b4ae54fd1e69dd2e50b3a2f89a9da80fa6fb07337"
+    },
+    {
+      "attempt": 0,
+      "cohort": "training",
+      "disposition": "REQUIRES_RULES_AND_SCORER_ADJUDICATION",
+      "innings": 2,
+      "matchId": "966747",
+      "observedComponents": {
+        "extras": {
+          "noballs": 5
+        },
+        "nonBoundary": false,
+        "runs": {
+          "batter": 0,
+          "extras": 5,
+          "total": 5
+        },
+        "wickets": []
+      },
+      "over": 19,
+      "preFreeHit": false,
+      "preLegalBalls": 114,
+      "preWickets": 9,
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "71277e461554903b25d67632dca81a4044b8824cdf87620bea21651951090f81"
+    }
+  ],
+  "fullySupportedCoverage": false,
+  "gameplayIntegrationPermitted": false,
+  "limitations": [
+    "Original records may contain multiple adjudications, overthrows, unusual penalties and retirements.",
+    "Source examples are diagnostic only, never automatically rewritten.",
+    "A complete match scorer needs separately adjudicated rules and attribution."
+  ],
+  "sourceZipSha256": "d89ef1b3df83f520bf6bbfe2a439e3246cc6e6bc82fdc40ab97313b82c33ac9e",
+  "status": "SOURCE_EXCEPTION_REGISTER_NOT_RESOLVED_DELIVERIES",
+  "supportedAttemptCounts": [
+    {
+      "cohort": "heldOut",
+      "count": 80348,
+      "innings": 1
+    },
+    {
+      "cohort": "heldOut",
+      "count": 68443,
+      "innings": 2
+    },
+    {
+      "cohort": "training",
+      "count": 321480,
+      "innings": 1
+    },
+    {
+      "cohort": "training",
+      "count": 284314,
+      "innings": 2
+    }
+  ],
+  "unobservedPhysicalFields": [
+    "wicket end",
+    "fielder identity",
+    "trajectory",
+    "shot sector"
+  ],
+  "unsupportedCounts": [
+    {
+      "cohort": "heldOut",
+      "count": 2,
+      "innings": 1,
+      "reason": "MULTI_WICKET_UNSUPPORTED"
+    },
+    {
+      "cohort": "heldOut",
+      "count": 1,
+      "innings": 1,
+      "reason": "UNSUPPORTED_EXTRA_TYPE"
+    },
+    {
+      "cohort": "heldOut",
+      "count": 5,
+      "innings": 1,
+      "reason": "UNSUPPORTED_WICKET_TYPE"
+    },
+    {
+      "cohort": "heldOut",
+      "count": 2,
+      "innings": 2,
+      "reason": "INVALID_LEGALITY_CHANNEL"
+    },
+    {
+      "cohort": "heldOut",
+      "count": 1,
+      "innings": 2,
+      "reason": "MULTI_WICKET_UNSUPPORTED"
+    },
+    {
+      "cohort": "heldOut",
+      "count": 6,
+      "innings": 2,
+      "reason": "UNSUPPORTED_WICKET_TYPE"
+    },
+    {
+      "cohort": "training",
+      "count": 1,
+      "innings": 1,
+      "reason": "BOUNDARY_DISMISSAL_OR_ALLOWANCE"
+    },
+    {
+      "cohort": "training",
+      "count": 2,
+      "innings": 1,
+      "reason": "FREE_HIT_MASK"
+    },
+    {
+      "cohort": "training",
+      "count": 9,
+      "innings": 1,
+      "reason": "INVALID_LEGALITY_CHANNEL"
+    },
+    {
+      "cohort": "training",
+      "count": 1,
+      "innings": 1,
+      "reason": "MULTI_WICKET_UNSUPPORTED"
+    },
+    {
+      "cohort": "training",
+      "count": 4,
+      "innings": 1,
+      "reason": "UNSUPPORTED_EXTRA_TYPE"
+    },
+    {
+      "cohort": "training",
+      "count": 9,
+      "innings": 1,
+      "reason": "UNSUPPORTED_WICKET_TYPE"
+    },
+    {
+      "cohort": "training",
+      "count": 2,
+      "innings": 1,
+      "reason": "WIDE_WICKET_MASK"
+    },
+    {
+      "cohort": "training",
+      "count": 1,
+      "innings": 2,
+      "reason": "BOUNDARY_DISMISSAL_OR_ALLOWANCE"
+    },
+    {
+      "cohort": "training",
+      "count": 3,
+      "innings": 2,
+      "reason": "FREE_HIT_MASK"
+    },
+    {
+      "cohort": "training",
+      "count": 10,
+      "innings": 2,
+      "reason": "INVALID_LEGALITY_CHANNEL"
+    },
+    {
+      "cohort": "training",
+      "count": 6,
+      "innings": 2,
+      "reason": "UNSUPPORTED_EXTRA_TYPE"
+    },
+    {
+      "cohort": "training",
+      "count": 4,
+      "innings": 2,
+      "reason": "UNSUPPORTED_WICKET_TYPE"
+    }
+  ],
+  "version": "LC_M7I_RARE_DELIVERY_REGISTER_V1"
+}

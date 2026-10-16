@@ -7,6 +7,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./m7j": {
+      "types": "./dist/m7j-adjudication.d.ts",
+      "default": "./dist/m7j-adjudication.js"
     }
   },
   "dependencies": {

@@ -1,0 +1,286 @@
+{
+  "calibratedGameplaySkillRatings": false,
+  "causalTacticalEffects": false,
+  "cautions": [
+    "Competition and time strata reuse inspected development holdout; not release evidence.",
+    "Cold-start gains may be inherited from another known participant.",
+    "Cricsheet team/competition composition confounds player histories.",
+    "Marginal predictions are not a legal joint cricket-outcome sampler."
+  ],
+  "earlyLateDevelopmentSplitAt": "2026-05-01",
+  "exposureGroupDefinitions": ">=300 training attempts in same innings/phase context",
+  "gameplayIntegrationPermitted": false,
+  "matchCounts": {
+    "developmentHoldout": 652,
+    "training": 2605
+  },
+  "method": "Fixed M7H prior=300 per innings/phase; marginal dot, bat-boundary and wicket predictions; match bootstrap",
+  "results": {
+    "ALL": {
+      "boundary": {
+        "attempts": 148808,
+        "candidateMinusBaselineNLL": -0.0017028672853097004,
+        "matchBootstrap95": [
+          -0.0019154890910055907,
+          -0.0014993717990018113
+        ],
+        "matches": 652,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 148808,
+        "candidateMinusBaselineNLL": -0.0023673613514466098,
+        "matchBootstrap95": [
+          -0.002611532596245253,
+          -0.0021046179683035966
+        ],
+        "matches": 652,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 148808,
+        "candidateMinusBaselineNLL": -0.00018001616266133752,
+        "matchBootstrap95": [
+          -0.00025954657854055665,
+          -0.00010978081927857541
+        ],
+        "matches": 652,
+        "upper95BelowZero": true
+      }
+    },
+    "BATTER_ONLY_300_PLUS": {
+      "boundary": {
+        "attempts": 7592,
+        "candidateMinusBaselineNLL": -0.0038183978850872863,
+        "matchBootstrap95": [
+          -0.005120152704243231,
+          -0.002482207483290633
+        ],
+        "matches": 279,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 7592,
+        "candidateMinusBaselineNLL": -0.004811402009549678,
+        "matchBootstrap95": [
+          -0.0061551354508437095,
+          -0.003547027363141593
+        ],
+        "matches": 279,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 7592,
+        "candidateMinusBaselineNLL": -0.0003707600230468619,
+        "matchBootstrap95": [
+          -0.000847852016265671,
+          9.653011850189485e-05
+        ],
+        "matches": 279,
+        "upper95BelowZero": false
+      }
+    },
+    "BOTH_300_PLUS": {
+      "boundary": {
+        "attempts": 1858,
+        "candidateMinusBaselineNLL": -0.002959906005578949,
+        "matchBootstrap95": [
+          -0.005424637032819652,
+          -0.0006366110148413219
+        ],
+        "matches": 154,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 1858,
+        "candidateMinusBaselineNLL": -0.002874975380380389,
+        "matchBootstrap95": [
+          -0.005113044652635079,
+          -9.948084040060264e-05
+        ],
+        "matches": 154,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 1858,
+        "candidateMinusBaselineNLL": -0.00018946302748408685,
+        "matchBootstrap95": [
+          -0.0010422543659053074,
+          0.0007844685527676762
+        ],
+        "matches": 154,
+        "upper95BelowZero": false
+      }
+    },
+    "BOWLER_ONLY_300_PLUS": {
+      "boundary": {
+        "attempts": 11675,
+        "candidateMinusBaselineNLL": -0.0023704455195320915,
+        "matchBootstrap95": [
+          -0.0032596819755393684,
+          -0.0017189531498564296
+        ],
+        "matches": 371,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 11675,
+        "candidateMinusBaselineNLL": -0.005548543908198198,
+        "matchBootstrap95": [
+          -0.006742424332051586,
+          -0.004172904184091229
+        ],
+        "matches": 371,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 11675,
+        "candidateMinusBaselineNLL": -0.0005053264950774465,
+        "matchBootstrap95": [
+          -0.0008100206970622143,
+          -0.00020308377243105223
+        ],
+        "matches": 371,
+        "upper95BelowZero": true
+      }
+    },
+    "COMP:ICC Men's T20 World Cup": {
+      "boundary": {
+        "attempts": 11555,
+        "candidateMinusBaselineNLL": -0.003097531496916946,
+        "matchBootstrap95": [
+          -0.004056057004313241,
+          -0.001996804671020984
+        ],
+        "matches": 49,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 11555,
+        "candidateMinusBaselineNLL": -0.002194875197427525,
+        "matchBootstrap95": [
+          -0.003031170115487707,
+          -0.001490577593571708
+        ],
+        "matches": 49,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 11555,
+        "candidateMinusBaselineNLL": 0.00020057196592856665,
+        "matchBootstrap95": [
+          -4.3649349702043034e-05,
+          0.00048165657711856627
+        ],
+        "matches": 49,
+        "upper95BelowZero": false
+      }
+    },
+    "EARLY_DEV": {
+      "boundary": {
+        "attempts": 75427,
+        "candidateMinusBaselineNLL": -0.0018561827254198848,
+        "matchBootstrap95": [
+          -0.00216942209679098,
+          -0.0015172885286105057
+        ],
+        "matches": 326,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 75427,
+        "candidateMinusBaselineNLL": -0.0021378897286239967,
+        "matchBootstrap95": [
+          -0.002462314699368552,
+          -0.0017483015066039748
+        ],
+        "matches": 326,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 75427,
+        "candidateMinusBaselineNLL": -0.00014886525782083736,
+        "matchBootstrap95": [
+          -0.00026427853017928823,
+          -4.309613790497483e-05
+        ],
+        "matches": 326,
+        "upper95BelowZero": true
+      }
+    },
+    "LATE_DEV": {
+      "boundary": {
+        "attempts": 73381,
+        "candidateMinusBaselineNLL": -0.0015452771229898777,
+        "matchBootstrap95": [
+          -0.0018424763866469469,
+          -0.0011716188647890203
+        ],
+        "matches": 326,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 73381,
+        "candidateMinusBaselineNLL": -0.002603231073781291,
+        "matchBootstrap95": [
+          -0.0030004646957437838,
+          -0.002210688826621722
+        ],
+        "matches": 326,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 73381,
+        "candidateMinusBaselineNLL": -0.0002120356131921889,
+        "matchBootstrap95": [
+          -0.0003161361213934916,
+          -0.00010304892719606013
+        ],
+        "matches": 326,
+        "upper95BelowZero": true
+      }
+    },
+    "NEITHER_300_PLUS": {
+      "boundary": {
+        "attempts": 127683,
+        "candidateMinusBaselineNLL": -0.00149774473853124,
+        "matchBootstrap95": [
+          -0.0017487290641053416,
+          -0.0012939593731235684
+        ],
+        "matches": 652,
+        "upper95BelowZero": true
+      },
+      "dot": {
+        "attempts": 127683,
+        "candidateMinusBaselineNLL": -0.001923773638969167,
+        "matchBootstrap95": [
+          -0.00213890491937079,
+          -0.0016524310507624758
+        ],
+        "matches": 652,
+        "upper95BelowZero": true
+      },
+      "wicket": {
+        "attempts": 127683,
+        "candidateMinusBaselineNLL": -0.0001387915846528155,
+        "matchBootstrap95": [
+          -0.0002273919947892512,
+          -6.186415198530688e-05
+        ],
+        "matches": 652,
+        "upper95BelowZero": true
+      }
+    }
+  },
+  "sourceZipSha256": "d89ef1b3df83f520bf6bbfe2a439e3246cc6e6bc82fdc40ab97313b82c33ac9e",
+  "status": "DEVELOPMENT_HOLDOUT_PREDICTIVE_ASSOCIATION_ONLY",
+  "untouchedFinalTestSet": false,
+  "version": "LC_M7I_PLAYER_GENERALISATION_AUDIT_V1",
+  "warmthCountsByAttempt": {
+    "BATTER_ONLY_300_PLUS": 7592,
+    "BOTH_300_PLUS": 1858,
+    "BOWLER_ONLY_300_PLUS": 11675,
+    "NEITHER_300_PLUS": 127683
+  }
+}

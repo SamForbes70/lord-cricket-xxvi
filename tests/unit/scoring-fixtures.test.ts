@@ -180,5 +180,6 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(163); // inherited 155 plus eight additive Pass 12F season-persistence schemas
+  expect(names).toHaveLength(163); // 163 frozen contracts remain in the production import path
+  expect(names.filter((n) => n.startsWith("M7J"))).toHaveLength(0);
 });

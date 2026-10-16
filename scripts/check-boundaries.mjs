@@ -45,6 +45,7 @@ for (const name of names) {
               ["@noble/hashes/sha2", "@noble/hashes/utils"].includes(mod)
             ) &&
             !(name !== "contracts" && mod === "@lcxxvi/contracts") &&
+            !(name === "domain" && mod === "@lcxxvi/contracts/m7j") &&
             !(name === "simulation" && ["@lcxxvi/data", "@lcxxvi/domain"].includes(mod))
           )
             throw new Error(`Forbidden dependency ${file}: ${mod}`);
