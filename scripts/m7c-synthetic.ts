@@ -10,7 +10,9 @@ import { validateT20MatchSetup, runFixtureT20, projectT20Scorecard } from "@lcxx
 
 const rawCount=process.argv.find(a=>a.startsWith("--matches="))?.split("=")[1] ?? "96";
 const n=Number(rawCount);
+const seedOffset=Number(process.argv.find(a=>a.startsWith("--seed-offset="))?.split("=")[1] ?? "0");
 if (!Number.isSafeInteger(n) || n<1 || n>2000) throw new Error("LC_M7C_MATCH_COUNT_OUT_OF_RANGE");
+if (!Number.isSafeInteger(seedOffset) || seedOffset<0 || seedOffset+n>2000) throw new Error("LC_M7C_SEED_OFFSET_OUT_OF_RANGE");
 const raw=JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json","utf8"));
 const world=readFileSync("packages/data/worlds/fictional-eight-01.json");
 const manifest=JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.manifest.json","utf8"));
@@ -19,7 +21,7 @@ const rows: {seed:string; first:InningRow; second:InningRow; elapsedMs:number; e
 const phase=(legalBallsBefore:number)=> legalBallsBefore<36?"POWERPLAY":legalBallsBefore<90?"MIDDLE":"DEATH";
 const empty=():InningRow=>({runs:0,wickets:0,legalBalls:0,attempts:0,dots:0,boundaries:0,illegals:0,phases:{POWERPLAY:{runs:0,wickets:0,legalBalls:0,attempts:0,dots:0,boundaries:0},MIDDLE:{runs:0,wickets:0,legalBalls:0,attempts:0,dots:0,boundaries:0},DEATH:{runs:0,wickets:0,legalBalls:0,attempts:0,dots:0,boundaries:0}}});
 for(let k=0;k<n;k++) {
- const req=structuredClone(raw);req.setup.seed=`m7c-profiling-${String(k).padStart(6,"0")}`;
+ const req=structuredClone(raw);req.setup.seed=`m7c-profiling-${String(seedOffset+k).padStart(6,"0")}`;
  const setup=validateT20MatchSetup(req,world,manifest);
  const t0=performance.now();const session=runFixtureT20(setup);const elapsedMs=performance.now()-t0;
  const card=projectT20Scorecard(session);

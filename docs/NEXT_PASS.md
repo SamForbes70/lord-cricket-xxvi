@@ -1,28 +1,21 @@
-# Next pass: M7D external dataset ingestion and model candidate, then M8
+# Next Pass: M7F empirical joint-model investigation
 
-Pass 15 M7C preserves the frozen engine, adds a fixed-seed 96-match
-first-innings phase diagnostic, and implements a defensively checked external
-reference extraction/comparison protocol. It has **not** ingested genuine
-Cricsheet delivery records: this execution host cannot resolve the data host.
-Therefore no fitted parameter pack is approved and model status remains
-SYNTHETIC_ALPHA.
+M7E completed genuine uploaded Cricsheet offline analysis and phase-marginal
+research fitting. Baseline T20 run-scoring fails reference targets. No gameplay
+model has been promoted, and the inherited browser gates remain blocked.
 
-Next action in an authorised, network-enabled environment:
+1. Obtain independent review of archive provenance/licensing, T20 rules/strength
+   cohorts and extraction exclusions. Compare within competition/era/skill bands.
+2. Build a **normalised joint conditional T20 delivery-outcome candidate** using
+   training data only, with legality, wickets, batter runs, extras, innings phase,
+   pitch and skill uncertainty. Do not infer inaccessible attributes as facts.
+3. Evaluate with untouched 652-match time holdout or a separately frozen cohort,
+   uncertainty bands and independent cricket-rule vectors; hold out match IDs/dates.
+4. Ensure tactical changes are coherent, legal command masks and state are obeyed,
+   and no tactic dominates. Preserve original `synthetic-alpha-01` for old saves.
+5. Issue NEW versioned model pack/hash only after real regression evidence, including
+   golden replay, cross-version loading, and synthetic statistical release gates.
+6. Close browser/IndexedDB/human acceptance on an authorised host, not by bypass.
 
-1. Acquire, record provenance and licensing for a full actual Cricsheet JSON
-   T20 ZIP; retain exact source bytes outside the code repository.
-2. Run the M7C extractor and enforce >=200 date-held-out real matches plus
-   substantial separate training matches. Examine exclusions and league mix.
-3. Run simulations on representative fixed population contexts, inspect
-   phase-level deltas and run independent ablation, then fit a NEW versioned
-   parameter pack. Do not edit `synthetic-alpha-01` or replay hashes.
-4. Validate on an untouched held-out real cohort with bootstrap uncertainty,
-   cohort-wise scoring/wickets/extras/dots/boundaries/tails, and no dominating
-   tactic exploit; do not approve weak or nonrepresentative evidence.
-5. Run M6F/M6G/M7B browser+IndexedDB tests in *permitted* Chromium and Firefox,
-   record 1366x768, keyboard and 150% rendering; perform human M3 acceptance.
-6. Benchmark browser/worker run times, memory, save/load on recorded reference
-   four-core, 8GB host. Fix performance issues with unchanged event hashes.
-
-Do not label the complete M7 milestone PASS until these outstanding gates are
-really executed and accepted. M8 release remains a separate milestone.
+Current research marginal model is NOT a ball simulator and must not be installed
+as gameplay probability weights.
