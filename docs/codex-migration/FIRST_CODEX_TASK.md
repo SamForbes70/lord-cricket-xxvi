@@ -1,0 +1,14 @@
+# First Codex execution task: baseline acceptance and build readiness
+
+Act as the lead engineering owner for Lord Cricket XXVI. This is an implementation environment and acceptance task, not a request to rewrite the architecture.
+
+1. Inspect this repository, `AGENTS.md`, `docs/CAPABILITY_MATRIX.md`, `docs/NEXT_PASS.md`, `docs/M3_HUMAN_ACCEPTANCE.md`, `docs/BROWSER_ACCEPTANCE_ON_AUTHORISED_HOST.md`, `docs/decisions/`, and this migration's recovery audit.
+2. Confirm the historical 16 October 2026 commit `5b8b9da990d657197fb56bbfd33152f87b875f5c` exists and is an ancestor of HEAD. Confirm the migration changed documentation only and the repository is clean.
+3. On this authorised Windows development machine install/check Node >=22.12, npm, Git and Python, then `npm ci`. Document version and registry errors; do not mask failures.
+4. Independently run `npm run schemas:check`, `npm run build`, `npm run typecheck`, `npm run lint`, deterministic fixture/vector scripts, all unit tests (shard expensive red-ball and persistence tests if necessary), 72 Python M7 tests after fixture restoration and `npm run management:acceptance`. Do not report inherited historical test counts as newly executed results.
+5. Run actual Chromium and Firefox Playwright UI/career acceptance on this machine using existing `playwright.*.config.ts`. Check complete interactive T20 progression, keyboard/150% layout, home/squad/fixtures/stats, season save/restore, fixture progression, `.lcxxvi` export and import, 14-round 56-match season completion and end-of-season archives. Do not invent completed human or visual acceptance; ask the owner for hands-on confirmation where required.
+6. Run prebuilt game from the preserved owner release, verify http://127.0.0.1:4180/, then compare with locally rebuilt assets and APIs. Record any differences and failures. Do not clear existing browser 127.0.0.1:4180 IndexedDB without backing up/exporting the user's careers.
+7. Review prior calibration results. Existing `SYNTHETIC_ALPHA` T20 runs were materially low against sampled real cricket; M7G/H/I/J are explicitly research-only. Produce precise acceptance requirements before any promoted gameplay model.
+8. Output `docs/codex-migration/CODEX_ENVIRONMENT_ACCEPTANCE.md` with a PASS/FAIL/BLOCKED/NOT RUN matrix, versions, commands, results, browser screenshots or Playwright traces, hashes and issues. Create narrowly scoped fixes only when failures are demonstrated, adding regression tests. Report the next bounded development pass but do not begin it automatically.
+
+Non-negotiable: preserve deterministic event accounting and save compatibility; no speculative claims, no untested PASS declarations, no automatic migration of Cricsheet abnormalities and no assumptions that historical browser acceptance is complete.

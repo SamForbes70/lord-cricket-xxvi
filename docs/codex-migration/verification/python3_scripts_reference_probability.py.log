@@ -1,0 +1,3 @@
+PASS Python independent Decimal LUT: 1601 entries; checksum d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825
+PASS model: d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab; 15 mass/draw vectors; 4 boundaries
+PASS manual fraction identities, masks, empty-mass guard and category-order tie-breaking

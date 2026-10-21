@@ -1,0 +1,57 @@
+{
+  "baselineCommit": "bc5588831f2e9300c9063a047209544013c6e62b",
+  "criticalFileIdentity": [
+    {
+      "path": "packages/domain/src/scoring-kernel.ts",
+      "sha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+      "unchanged": true
+    },
+    {
+      "path": "packages/domain/src/validate-resolution.ts",
+      "sha256": "9e3754d85f90ae3370a9067408e459dd2c721a38ea855a38c700d49616abe393",
+      "unchanged": true
+    },
+    {
+      "path": "packages/contracts/src/scoring.ts",
+      "sha256": "050e6112d8e48b324730dce553016317a636392efcbe717ee1da93bc29c1409d",
+      "unchanged": true
+    },
+    {
+      "path": "packages/contracts/src/core.ts",
+      "sha256": "610608ba3f0fbf4c3a37c442e6d4d99e272b34fe46ef163f5e935496cf675367",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/generator.ts",
+      "sha256": "1dfb921fe5fa49021f2b37cea945a06b69de351a5e3955e53bf2a96fbc77f43a",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/probability.ts",
+      "sha256": "38221d20341b0e92773a22de21c3eebca043fc5a2a2ae399d9d396b144e9421d",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/determinism.ts",
+      "sha256": "276eeb1d0d7fe9af744522140ab7dadfbc292a50b0b30969aebb21db135121c9",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/t20-match.ts",
+      "sha256": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/odi-match.ts",
+      "sha256": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8",
+      "unchanged": true
+    },
+    {
+      "path": "packages/simulation/src/red-ball-match.ts",
+      "sha256": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500",
+      "unchanged": true
+    }
+  ],
+  "finalCommit": "5b8b9da990d657197fb56bbfd33152f87b875f5c",
+  "sourceTreeClean": true
+}
