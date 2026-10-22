@@ -1,0 +1,49 @@
+[2m[WebServer] [22m(node:12554) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:12567) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:12585) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12585) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/m6g/management.spec.ts:79:1 › M6G primary career controls are keyboard reachable at 1366x768 (15.1s)
+
+
+  1) [chromium] › tests/m6g/management.spec.ts:79:1 › M6G primary career controls are keyboard reachable at 1366x768 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: locator.evaluate: Test timeout of 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator(':focus')[22m
+
+
+      45 |   await page.goto("/");
+      46 |   await page.keyboard.press("Tab");
+    > 47 |   const focused = await page.locator(":focus").evaluate((node) => ({ tag: node.tagName, text: node.textContent }));
+         |                                                ^
+      48 |   expect(["A", "BUTTON", "INPUT", "SELECT"]).toContain(focused.tag);
+      49 |   await expect(page.locator("main")).toBeVisible();
+      50 | });
+        at /workspace/lord-cricket-xxvi/tests/m6g/management.spec.ts:47:48
+
+    Error Context: ../../tmp/lcxxvi-keyboard-baseline/management-M6G-primary-car-d20c8-board-reachable-at-1366x768-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/lcxxvi-keyboard-baseline/management-M6G-primary-car-d20c8-board-reachable-at-1366x768-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../tmp/lcxxvi-keyboard-baseline/management-M6G-primary-car-d20c8-board-reachable-at-1366x768-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/m6g/management.spec.ts:79:1 › M6G primary career controls are keyboard reachable at 1366x768 
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

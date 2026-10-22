@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "probability:check"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:10:44.051600+00:00",
+  "durationSeconds": 0.788,
+  "exitCode": 0,
+  "log": "probability.log",
+  "sha256": "1cbd56a455937dc9a8462479070f2fd87d2ed6730ea34ebb0d420de3458f45f7"
+}

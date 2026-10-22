@@ -1,0 +1,22 @@
+
+> lord-cricket-xxvi@0.1.0 red5:rules
+> vitest run tests/unit/red5-match.test.ts tests/unit/red5-clock.test.ts --maxWorkers=1
+
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ✓ tests/unit/red5-match.test.ts (10 tests) 6711ms
+   ✓ Pass 11 / M5B red-ball profile > makes the new ball available after 480 legal balls and resets only ball age  574ms
+   ✓ Pass 11 / M5B red-ball profile > completes a deterministic five-day exhibition and reproduces its final chain  5505ms
+ ✓ tests/unit/red5-clock.test.ts (9 tests) 7ms
+
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+   Start at  08:15:34
+   Duration  8.85s (transform 718ms, setup 0ms, collect 1.50s, tests 6.72s, environment 0ms, prepare 235ms)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

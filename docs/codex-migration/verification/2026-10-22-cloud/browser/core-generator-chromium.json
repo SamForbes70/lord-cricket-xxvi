@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "browser": "chromium",
+  "version": "154.0.8037.57",
+  "vectors": 9,
+  "mainThreadAndWorker": true,
+  "predictionIsolation": true,
+  "errorRecovery": true
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "lint"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:10:11.065503+00:00",
+  "durationSeconds": 7.524,
+  "exitCode": 0,
+  "log": "lint.log",
+  "sha256": "5b7b32975d6c99b9560a9178f518dbd2bce30f4473fc046d404b0c805de75a1d"
+}

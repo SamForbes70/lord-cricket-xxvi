@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "browser": "chromium",
+  "browserVersion": "154.0.8037.57",
+  "vectors": 15,
+  "independentPythonReference": true,
+  "mainThreadAndWorker": true,
+  "errorRecovery": true,
+  "predictionIsolation": true
+}

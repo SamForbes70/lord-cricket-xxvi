@@ -1,0 +1,29 @@
+
+> lord-cricket-xxvi@0.1.0 fixtures:audit
+> node --import tsx scripts/audit-fixtures.ts
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "NOT_REQUESTED",
+  "matchedDeliveryCases": 0,
+  "matchedLedgerCases": 0,
+  "rejectedByScorer": 0,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Pass 07: bounded seeded T20 orchestration"
+}
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

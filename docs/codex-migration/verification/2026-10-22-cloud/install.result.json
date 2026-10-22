@@ -1,0 +1,14 @@
+{
+  "command": [
+    "npm",
+    "ci",
+    "--cache",
+    "/workspace/.npm"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:09:44.227609+00:00",
+  "durationSeconds": 5.987,
+  "exitCode": 0,
+  "log": "install.log",
+  "sha256": "6d0d130af41de836ac1eec7a0f55e95d196251e6dc3cdc7d4f78e26ef8052772"
+}

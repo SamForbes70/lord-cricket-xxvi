@@ -2,7 +2,7 @@ import { test, expect, type Page, type Locator } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 const dir = "docs/verification-pass08";
 async function ready(page: Page) {
-  await page.goto("/");
+  await page.goto("/#exhibition");
   await expect(
     page.getByRole("button", { name: "Confirm XIs and start" }),
   ).toBeEnabled();

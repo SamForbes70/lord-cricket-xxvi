@@ -1,0 +1,22 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m5a.config.ts",
+    "tests/m5/odi-ui.spec.ts",
+    "--reporter",
+    "list",
+    "--output",
+    "/tmp/lcxxvi-odi-acceptance",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:15:46.935633+00:00",
+  "durationSeconds": 14.309,
+  "exitCode": 0,
+  "log": "browser-odi.log",
+  "sha256": "66a8a64459bc6feaa6cb3469d2a16e3ad07fa99cbbbb82b3ad3990e0bf91c740"
+}

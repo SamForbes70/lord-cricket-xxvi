@@ -1,0 +1,33 @@
+[2m[WebServer] [22m(node:15742) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:15759) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:15778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:15791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 11 tests using 1 worker
+
+(node:15809) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15809) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play (2.0s)
+  ✓   2 [chromium] › tests/smoke/app.spec.ts:52:1 › compiled batch app reports accurate capabilities and rejects unsupported commands (3.0s)
+  ✓   3 [chromium] › tests/smoke/app.spec.ts:78:1 › compiled scoring CLI exercises production scorer and rejects malformed requests (1.7s)
+  ✓   4 [chromium] › tests/smoke/determinism.spec.ts:7:1 › Node, browser and worker agree on every frozen address and state vector (2.6s)
+  ✓   5 [chromium] › tests/smoke/determinism.spec.ts:118:1 › compiled batch random/hash commands match frozen outputs and reject bad requests (949ms)
+  ✓   6 [chromium] › tests/smoke/generator.spec.ts:7:1 › Node, browser and worker agree on the frozen generator vectors (4.4s)
+  ✓   7 [chromium] › tests/smoke/generator.spec.ts:92:1 › compiled batch generator command hands validated resolution to scoring adapter (2.9s)
+  ✓   8 [chromium] › tests/smoke/probability.spec.ts:13:1 › Node, browser and worker agree on independent probability vectors (4.2s)
+  ✓   9 [chromium] › tests/smoke/probability.spec.ts:125:1 › compiled batch probability command matches independent vector and rejects a wrong request (1.3s)
+  ✓  10 [chromium] › tests/smoke/world.spec.ts:7:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (1.7s)
+  ✓  11 [chromium] › tests/smoke/world.spec.ts:44:1 › compiled batch validates frozen world, immutable setup and rejects tampered input (1.4s)
+
+  11 passed (33.6s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

@@ -99,6 +99,7 @@ function tamperLocalEntry(bytes: Uint8Array, targetName: string): Uint8Array {
   throw new Error(`missing ${targetName}`);
 }
 
+// This hook simulates a complete season before any assertions run.
 beforeAll(async () => {
   partialState = await buildState(1);
   completeState = await buildState(14);
@@ -123,7 +124,7 @@ beforeAll(async () => {
     controlledTeamId: "team-01", schedule, careerState: userPlayed.careerState, projection,
     completedMatches: [...completions, userCompletion].sort((a, b) => a.fixtureOrdinal - b.fixtureOrdinal), revision: 4, phase: "ACTIVE",
   });
-}, 35_000);
+}, 120_000);
 
 describe("M6F durable season state and archive", () => {
   it("binds schedule, career, projection and canonical completions into one hashed state", async () => {

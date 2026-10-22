@@ -1,0 +1,8 @@
+
+> lord-cricket-xxvi@0.1.0 m7j:restore-fixtures
+> python3 scripts/m7j-restore-fixtures.py
+
+reference/m7i/LC_M7I_RARE_DELIVERY_REGISTER.json
+reference/m7i/LC_M7I_CHASE_TAIL_DIAGNOSTIC.json
+reference/m7i/LC_M7I_PLAYER_GENERALISATION.json
+reference/m7h/LC_M7H_PLAYER_PREDICTIVE_EVALUATION.json

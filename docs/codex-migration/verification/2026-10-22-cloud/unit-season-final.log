@@ -1,0 +1,21 @@
+
+> lord-cricket-xxvi@0.1.0 season:persistence:rules
+> vitest run tests/unit/season-persistence.test.ts --maxWorkers=1
+
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ✓ tests/unit/season-persistence.test.ts (10 tests) 80488ms
+   ✓ M6F durable season state and archive > reloads an active portable save and can advance into the next scheduled round  2707ms
+   ✓ M6F durable season state and archive > round-trips a complete season with its immutable archive and rejects payload tampering  644ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  08:15:44
+   Duration  82.29s (transform 730ms, setup 0ms, collect 1.26s, tests 80.49s, environment 0ms, prepare 121ms)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

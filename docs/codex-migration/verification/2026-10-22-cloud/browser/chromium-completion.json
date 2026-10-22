@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "input": "keyboard-only until match completion and first replay",
+  "steps": 108,
+  "revision": "109",
+  "eventBytesHash": "6df9a4c0c4bd8b4f6f6f7097b4bb146fe59eba95a962ced11499b0cd2d3519af",
+  "scorecardHash": "705b171087ce86dfc147626b1ffa4ea2a2d30c045572d778bdfd075d5f968366",
+  "renderModes": [
+    "full/comfortable/100",
+    "off/compact/150"
+  ],
+  "humanBrowserTester": false,
+  "automation": "Playwright keyboard navigation; production UI human-command route",
+  "disabledBowlerSeen": true
+}

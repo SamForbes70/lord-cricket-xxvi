@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import path from "node:path";
 
 async function ready(page: Page) {
-  await page.goto("/");
+  await page.goto("/#exhibition");
   await expect(
     page.getByRole("button", { name: "Confirm XIs and start" }),
   ).toBeEnabled();
@@ -145,7 +145,7 @@ test("a second tab is read-only while the first tab holds the writer lease", asy
     .locator("#decision")
     .getAttribute("data-revision");
   const second = await context.newPage();
-  await second.goto("/");
+  await second.goto("/#exhibition");
   await expect(second.getByTestId("save-status")).toContainText("Read only");
   await expect(second.locator("#decision fieldset")).toHaveAttribute(
     "disabled",
@@ -303,7 +303,7 @@ test("durable command failure rolls provisional engine state back to the last co
 test("repository abort injection proves command-batch atomicity and duplicate command rejection", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/#exhibition");
   const moduleUrl = `/@fs/${path.resolve("packages/persistence/src/index.ts")}`;
   const result = await page.evaluate(async (url) => {
     const persistence = (await import(

@@ -1,0 +1,67 @@
+[2m[WebServer] [22m(node:13563) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:13601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:13621) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13621) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+chromium keyboard step [33m0[39m AWAITING_INNINGS
+chromium keyboard step [33m10[39m READY
+chromium keyboard step [33m20[39m AWAITING_BATTER
+chromium keyboard step [33m30[39m READY
+chromium keyboard step [33m40[39m READY
+chromium keyboard step [33m50[39m READY
+chromium keyboard step [33m60[39m AWAITING_BATTER
+chromium keyboard step [33m70[39m READY
+chromium keyboard step [33m80[39m READY
+chromium keyboard step [33m90[39m READY
+chromium keyboard step [33m100[39m READY
+  ✓  1 [chromium] › tests/ui/match.spec.ts:54:1 › a full keyboard-only human-command match, replay identity and terminal controls (42.8s)
+  ✘  2 [chromium] › tests/ui/match.spec.ts:125:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (2.8s)
+(node:14017) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14017) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [chromium] › tests/ui/match.spec.ts:170:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (4.2s)
+
+
+  1) [chromium] › tests/ui/match.spec.ts:125:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names 
+
+    Error: decision-top ends in viewport at 150%
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m768[39m
+    Received:    [31m780.296875[39m
+
+      168 |         box!.y + box!.height,
+      169 |         `${name} ends in viewport at ${scale}%`,
+    > 170 |       ).toBeLessThanOrEqual(768);
+          |         ^
+      171 |     }
+      172 |     await shot(page, browserName, `desktop-${scale}`);
+      173 |   }
+        at /workspace/lord-cricket-xxvi/tests/ui/match.spec.ts:170:9
+
+    Error Context: ../../tmp/lcxxvi-ui-acceptance/match-desktop-essential-st-56cd9--narrow-view-and-long-names-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/lcxxvi-ui-acceptance/match-desktop-essential-st-56cd9--narrow-view-and-long-names-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../tmp/lcxxvi-ui-acceptance/match-desktop-essential-st-56cd9--narrow-view-and-long-names-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/ui/match.spec.ts:125:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names 
+  2 passed (56.4s)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "gh",
+    "api",
+    "repos/SamForbes70/lord-cricket-xxvi/issues/1"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:13:26.404834+00:00",
+  "durationSeconds": 0.24,
+  "exitCode": 1,
+  "log": "github-issue.log",
+  "sha256": "4d539a824754ecf977826b3cef67686a69acf1ed73ded0d2157c7ca3858790cc"
+}

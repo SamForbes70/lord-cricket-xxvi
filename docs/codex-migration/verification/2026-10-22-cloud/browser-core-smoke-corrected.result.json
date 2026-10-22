@@ -1,0 +1,27 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "tests/smoke/app.spec.ts",
+    "tests/smoke/determinism.spec.ts",
+    "tests/smoke/probability.spec.ts",
+    "tests/smoke/generator.spec.ts",
+    "tests/smoke/world.spec.ts",
+    "--config",
+    "playwright.config.ts",
+    "--project=chromium",
+    "--workers",
+    "1",
+    "--output",
+    "/tmp/lcxxvi-core-smoke",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:17:05.449496+00:00",
+  "durationSeconds": 36.66,
+  "exitCode": 0,
+  "log": "browser-core-smoke-corrected.log",
+  "sha256": "354646f922f245018c1e3d6661ed60efa77a26b4feae255ed6275eece7da1429"
+}

@@ -1,0 +1,130 @@
+{
+  "sourceHEAD": "b8e38e9614fc4340218033b8c42b5a0162e2cf3b",
+  "branch": "codex/baseline-recovery-acceptance",
+  "historicalCommit": "5b8b9da990d657197fb56bbfd33152f87b875f5c",
+  "ancestor": true,
+  "applicationMigrationDiff": "",
+  "migrationPaths": [
+    "AGENTS.md",
+    "CODEX_START_HERE.md",
+    "PUBLISH_TO_GITHUB_AND_OPEN_CODEX.md",
+    "docs/codex-migration/FIRST_CODEX_TASK.md",
+    "docs/codex-migration/PASS_22_M7J_BASELINE_MANIFEST.json",
+    "docs/codex-migration/PASS_22_M7J_REPORT.md",
+    "docs/codex-migration/RECOVERY_AUDIT.md",
+    "docs/codex-migration/VERIFICATION_AND_GATES.md",
+    "docs/codex-migration/original-design/Lord_Cricket_XXVI_Technical_Design_V0_1.docx",
+    "docs/codex-migration/verification/prebuilt_http_smoke.json",
+    "docs/codex-migration/verification/python3_scripts_check-determinism-vectors.py.log",
+    "docs/codex-migration/verification/python3_scripts_check-generator-vectors.py.log",
+    "docs/codex-migration/verification/python3_scripts_reference_probability.py.log",
+    "docs/codex-migration/verification/python_initial_run_before_fixture_restore.log",
+    "docs/codex-migration/verification/python_research_72.log",
+    "tools/windows/publish-private-github.ps1"
+  ],
+  "criticalFileHashes": [
+    {
+      "path": "packages/domain/src/scoring-kernel.ts",
+      "expected": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+      "actual": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+      "matches": true
+    },
+    {
+      "path": "packages/domain/src/validate-resolution.ts",
+      "expected": "9e3754d85f90ae3370a9067408e459dd2c721a38ea855a38c700d49616abe393",
+      "actual": "9e3754d85f90ae3370a9067408e459dd2c721a38ea855a38c700d49616abe393",
+      "matches": true
+    },
+    {
+      "path": "packages/contracts/src/scoring.ts",
+      "expected": "050e6112d8e48b324730dce553016317a636392efcbe717ee1da93bc29c1409d",
+      "actual": "050e6112d8e48b324730dce553016317a636392efcbe717ee1da93bc29c1409d",
+      "matches": true
+    },
+    {
+      "path": "packages/contracts/src/core.ts",
+      "expected": "610608ba3f0fbf4c3a37c442e6d4d99e272b34fe46ef163f5e935496cf675367",
+      "actual": "610608ba3f0fbf4c3a37c442e6d4d99e272b34fe46ef163f5e935496cf675367",
+      "matches": true
+    },
+    {
+      "path": "packages/simulation/src/generator.ts",
+      "expected": "1dfb921fe5fa49021f2b37cea945a06b69de351a5e3955e53bf2a96fbc77f43a",
+      "actual": "1dfb921fe5fa49021f2b37cea945a06b69de351a5e3955e53bf2a96fbc77f43a",
+      "matches": true
+    },
+    {
+      "path": "packages/simulation/src/probability.ts",
+      "expected": "38221d20341b0e92773a22de21c3eebca043fc5a2a2ae399d9d396b144e9421d",
+      "actual": "38221d20341b0e92773a22de21c3eebca043fc5a2a2ae399d9d396b144e9421d",
+      "matches": true
+    },
+    {
+      "path": "packages/simulation/src/determinism.ts",
+      "expected": "276eeb1d0d7fe9af744522140ab7dadfbc292a50b0b30969aebb21db135121c9",
+      "actual": "276eeb1d0d7fe9af744522140ab7dadfbc292a50b0b30969aebb21db135121c9",
+      "matches": true
+    },
+    {
+      "path": "packages/simulation/src/t20-match.ts",
+      "expected": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db",
+      "actual": "4ff57a3850c7dd44c9a16af2898465bb1ec0a88c6fd7beb9b996967d222658db",
+      "matches": true
+    },
+    {
+      "path": "packages/simulation/src/odi-match.ts",
+      "expected": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8",
+      "actual": "4a63aec8135698e9e8f8547c93042d80b9b3a19de6e61eb68ec0c465b3a1f5b8",
+      "matches": true
+    },
+    {
+      "path": "packages/simulation/src/red-ball-match.ts",
+      "expected": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500",
+      "actual": "286e07b9b2e079019256d39d73635aa0a4b91a2637922d16518beff2c3bbc500",
+      "matches": true
+    }
+  ],
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "builtAssets": [
+    {
+      "path": "apps/web/dist/assets/engineering-BrDsDFp9.css",
+      "size": 1368,
+      "sha256": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85"
+    },
+    {
+      "path": "apps/web/dist/assets/engineering-DjJLFLCG.js",
+      "size": 3219,
+      "sha256": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942"
+    },
+    {
+      "path": "apps/web/dist/assets/main-BbIwlpMX.css",
+      "size": 11862,
+      "sha256": "b9b52ecf2dbd768b5c1ffb5fc1795b41905b4e9e72e0c484a7925206c42fa1b7"
+    },
+    {
+      "path": "apps/web/dist/assets/main-UAgcvAPq.js",
+      "size": 510846,
+      "sha256": "0567122667cb7b1cef1fd71a938972f718e10b18c78198bb9dea9cdf1d809cd1"
+    },
+    {
+      "path": "apps/web/dist/assets/match.worker-CvFgBjcU.js",
+      "size": 601438,
+      "sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4"
+    },
+    {
+      "path": "apps/web/dist/assets/season-persistence-BwG5leb3.js",
+      "size": 282911,
+      "sha256": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59"
+    },
+    {
+      "path": "apps/web/dist/engineering.html",
+      "size": 723,
+      "sha256": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d"
+    },
+    {
+      "path": "apps/web/dist/index.html",
+      "size": 719,
+      "sha256": "f79bcea164850601abae111ecb853cce74bb42733bb6e02cb1dad601676c5de5"
+    }
+  ]
+}
