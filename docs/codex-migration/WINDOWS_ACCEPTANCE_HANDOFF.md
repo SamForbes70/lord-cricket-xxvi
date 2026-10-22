@@ -6,6 +6,8 @@ The workflow in `.github/workflows/verify.yml` provides automated Windows-runner
 
 Use a clean checkout of PR #2's `codex/baseline-recovery-acceptance` branch, Node >=22.12, npm, Git and Python 3. Preserve any local changes; do not reset a working checkout to prepare acceptance. Keep an existing `LCXXVI_CHROMIUM_EXECUTABLE` override unset unless it intentionally names a supported Windows Chromium executable.
 
+Use a fresh clean clone if an existing checkout already converted frozen JSON files to CRLF. The branch's `.gitattributes` preserves LF on new checkouts; pulling that rule alone may leave previously checked-out files untouched. Do not force-overwrite files to repair this. The frozen-world validation below must pass before browser acceptance.
+
 From the repository root in PowerShell, capture the commit, versions, full command output and each command's `$LASTEXITCODE`. Stop if installation or build fails; do not report later browser commands as executed. The following commands use Playwright-managed Windows browsers and fresh test contexts:
 
 ```powershell
@@ -20,6 +22,7 @@ npm run schemas:check
 npm run build
 npm run typecheck
 npm run lint
+node scripts/verify-world.mjs
 
 $evidence = Join-Path (Get-Location) 'test-results\windows-acceptance'
 New-Item -ItemType Directory -Force $evidence

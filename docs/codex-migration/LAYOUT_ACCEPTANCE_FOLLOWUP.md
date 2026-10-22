@@ -44,6 +44,14 @@ The unit gate now caps Vitest at two workers and permits 300 seconds, matching t
 
 The Linux workflow now executes the two browser layout regressions after the existing verifier, and uploads their measurements/screenshots on failure or success. A new **Windows** job installs Playwright-managed Chromium/Firefox, builds the app, runs all six match UI tests and all four portable career tests, and uploads screenshots/traces. It has read-only repository permissions and a 20-minute limit. A failed UI test does not suppress an independent career run after a successful build.
 
+### Windows checkout integrity defect discovered by the new job
+
+The first Windows job at revision `e9437b0` executed on `win32` and passed installation/build, but recorded **six UI failures** (worker could not initialise) and **two career failures / two keyboard passes**. Career error snapshots reported `INVALID_T20_SETUP: world file bytes are not the frozen published world`. It did not reach the UI layout assertions; these were not new layout verdicts.
+
+Reproducing Git's `core.autocrlf=true` checkout filter converted the frozen world JSON to 13,712 CRLF line endings. Its SHA-256 became `cade8ad2b59caf77faf2a7582028f9e8b3058de6246bee4daa0bb513bf093f63`, while the accepted LF file is `0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257`. Parsed JSON was identical, but the unchanged production verifier correctly rejected the modified bytes.
+
+The repository now declares `*.json text eol=lf` in `.gitattributes`. With `core.autocrlf=true` still enabled, the same checkout-filter check produces the exact accepted hash, zero CRLFs and a successful `verifyFrozenWorldBytes` result. No data file, expected checksum, validator or model was changed. Windows CI additionally checks schema drift and executes `node scripts/verify-world.mjs` before browser acceptance. Evidence: `windows-line-endings.json` and the first job's log/error snapshots in this follow-up's evidence directory. The actual rerun verdict remains tied to its exact commit in Actions.
+
 CI results are tied to the exact tested revision in [PR #2 checks](https://github.com/SamForbes70/lord-cricket-xxvi/pull/2/checks); Actions logs/artifacts and the PR description record the rerun verdict. The historical failure above is preserved, not relabelled as passed.
 
 ## Preserved boundaries and outstanding work

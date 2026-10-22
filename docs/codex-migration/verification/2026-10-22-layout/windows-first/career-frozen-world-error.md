@@ -1,0 +1,50 @@
+# Page snapshot
+
+```yaml
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: LORD CRICKET XXVI · MANAGEMENT
+      - heading "Aster Harbour" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Round 1 · 2027-01-03
+    - generic [ref=e9]:
+      - strong [ref=e10]: Error
+      - generic [ref=e11]: 0/56 fixtures · rev 1
+  - navigation "Career navigation" [ref=e12]:
+    - button "Home" [ref=e13] [cursor=pointer]
+    - button "Career" [ref=e14] [cursor=pointer]
+    - button "Squad" [ref=e15] [cursor=pointer]
+    - button "Fixtures" [ref=e16] [cursor=pointer]
+    - button "Statistics" [ref=e17] [cursor=pointer]
+    - button "Settings" [ref=e18] [cursor=pointer]
+    - link "Exhibition" [ref=e19] [cursor=pointer]:
+      - /url: "#exhibition"
+  - region "Model disclosure" [ref=e20]: Fictional data · SYNTHETIC_ALPHA · one-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.
+  - alert [ref=e21]: "INVALID_T20_SETUP: world file bytes are not the frozen published world"
+  - region "Home" [ref=e22]:
+    - heading "Home" [level=2] [ref=e23]
+    - generic [ref=e24]:
+      - article [ref=e25]:
+        - heading "Next required action" [level=3] [ref=e26]
+        - paragraph [ref=e27]: Round 1
+        - paragraph [ref=e28]:
+          - strong [ref=e29]: Aster Harbour
+          - text: v
+          - strong [ref=e30]: Moonstone Bay
+        - paragraph [ref=e31]: 2027-01-03 · Aster Quay
+        - generic [ref=e32]:
+          - button "Simulate match" [ref=e33] [cursor=pointer]
+          - button "Play match" [ref=e34] [cursor=pointer]
+      - article [ref=e35]:
+        - heading "League position" [level=3] [ref=e36]
+        - paragraph [ref=e37]: "#1"
+        - paragraph [ref=e38]: 0W · 0L · 0T · 0NR · 0 pts · NRR –
+      - article [ref=e39]:
+        - heading "Condition" [level=3] [ref=e40]
+        - paragraph [ref=e41]: 0.0% fatigue
+        - paragraph [ref=e42]: 0 unavailable · 1 in practice
+      - article [ref=e43]:
+        - heading "Progress" [level=3] [ref=e44]
+        - paragraph [ref=e45]: 0/56
+        - paragraph [ref=e46]: 0/14 managed-team fixtures complete.
+```

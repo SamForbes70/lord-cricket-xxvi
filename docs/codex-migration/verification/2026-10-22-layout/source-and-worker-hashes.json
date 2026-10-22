@@ -25,7 +25,7 @@
   },
   {
     "path": ".github/workflows/verify.yml",
-    "sha256": "6d026ec3304d0e75020415aa6636aac2c0372e57188c08f0329acc70e2d46762"
+    "sha256": "29415d8252290aa62afbf1dd72411a9eb65014e287af8aaa69e842a27c5236d9"
   },
   {
     "path": "package-lock.json",
@@ -34,5 +34,9 @@
   {
     "path": "apps/web/dist/assets/match.worker-CvFgBjcU.js",
     "sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4"
+  },
+  {
+    "path": ".gitattributes",
+    "sha256": "85c87354bdcb7307e08b230c8e3945bf4443586cdec30a9d0a15007650bf635a"
   }
 ]
