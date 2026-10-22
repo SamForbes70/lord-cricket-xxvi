@@ -3,9 +3,10 @@ import { mkdirSync, writeFileSync } from "node:fs";
 const dir = process.env.LCXXVI_UI_EVIDENCE_DIR ?? "docs/verification-pass08";
 async function ready(page: Page) {
   await page.goto("/#exhibition");
+  // Fresh Windows Firefox profiles can initialise the match worker slowly.
   await expect(
     page.getByRole("button", { name: "Confirm XIs and start" }),
-  ).toBeEnabled();
+  ).toBeEnabled({ timeout: 30_000 });
 }
 async function settle(page: Page) {
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");

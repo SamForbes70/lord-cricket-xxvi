@@ -21,7 +21,7 @@
   },
   {
     "path": "tests/ui/match.spec.ts",
-    "sha256": "eb79b8c0eaf3e560a7e6365b36c0ca2978f6db92003ce4bee815c1f1a15afe30"
+    "sha256": "69ed0bec7aa04e5541344075ef70c2f617564385c37a4bcc64287022364cb5f2"
   },
   {
     "path": ".github/workflows/verify.yml",
