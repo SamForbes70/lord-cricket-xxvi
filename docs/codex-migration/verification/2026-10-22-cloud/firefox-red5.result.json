@@ -1,0 +1,23 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m5b.config.ts",
+    "--project",
+    "firefox-m5b",
+    "--reporter",
+    "list",
+    "--output",
+    "/tmp/lcxxvi-firefox-red5",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:32:25.640394+00:00",
+  "durationSeconds": 12.573,
+  "exitCode": 0,
+  "log": "firefox-red5.log",
+  "sha256": "a8c839efefc8b0c3b07b158b0fd7ca36355fb793b38d64426b4587fee3d08788"
+}

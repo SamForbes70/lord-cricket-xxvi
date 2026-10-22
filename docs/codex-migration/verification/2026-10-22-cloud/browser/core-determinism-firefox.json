@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "browser": "firefox",
+  "browserVersion": "142.0.1",
+  "node": "v24.19.0",
+  "addressVectors": 24,
+  "stateVectors": 8,
+  "mainThreadAndWorker": true,
+  "invalidRequestRecovery": true,
+  "predictionIsolation": true
+}

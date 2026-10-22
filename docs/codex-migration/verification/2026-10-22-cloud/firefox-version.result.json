@@ -1,0 +1,16 @@
+{
+  "command": [
+    "env",
+    "PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright",
+    "node",
+    "--input-type=module",
+    "-e",
+    "import { firefox } from \"playwright\"; const browser = await firefox.launch(); console.log(await browser.version()); await browser.close();"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:26:22.876063+00:00",
+  "durationSeconds": 94.091,
+  "exitCode": 1,
+  "log": "firefox-version.log",
+  "sha256": "77445ab1de64723ceec6eae4fa89cf95b115bdc29f50003ef64fe4dcadb0eab6"
+}

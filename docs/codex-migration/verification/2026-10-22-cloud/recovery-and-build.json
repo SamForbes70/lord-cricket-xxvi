@@ -126,5 +126,10 @@
       "size": 719,
       "sha256": "f79bcea164850601abae111ecb853cce74bb42733bb6e02cb1dad601676c5de5"
     }
-  ]
+  ],
+  "packageLock": {
+    "sourceSha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884",
+    "workingSha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884",
+    "unchanged": true
+  }
 }

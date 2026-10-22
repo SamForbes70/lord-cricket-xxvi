@@ -60,9 +60,59 @@
     "durationSeconds": 8.496
   },
   {
+    "name": "firefox-ai",
+    "exitCode": 0,
+    "durationSeconds": 11.633
+  },
+  {
+    "name": "firefox-career-permitted",
+    "exitCode": 0,
+    "durationSeconds": 102.881
+  },
+  {
+    "name": "firefox-career",
+    "exitCode": 130,
+    "durationSeconds": 155.506
+  },
+  {
+    "name": "firefox-core",
+    "exitCode": 0,
+    "durationSeconds": 11.863
+  },
+  {
+    "name": "firefox-install-retry",
+    "exitCode": 0,
+    "durationSeconds": 8.242
+  },
+  {
     "name": "firefox-install",
     "exitCode": 1,
     "durationSeconds": 1.916
+  },
+  {
+    "name": "firefox-launch-diagnostic",
+    "exitCode": 1,
+    "durationSeconds": 15.54
+  },
+  {
+    "name": "firefox-launch-permission-check",
+    "exitCode": 0,
+    "durationSeconds": 1.596
+  },
+  {
+    "name": "firefox-red5",
+    "exitCode": 0,
+    "durationSeconds": 12.573
+  },
+  {
+    "name": "firefox-ui",
+    "exitCode": 1,
+    "durationSeconds": 56.277
+  },
+  {
+    "name": "firefox-version",
+    "exitCode": 1,
+    "durationSeconds": 94.091
   },
   {
     "name": "fixtures-audit",
@@ -78,6 +128,11 @@
     "name": "generator",
     "exitCode": 0,
     "durationSeconds": 1.093
+  },
+  {
+    "name": "github-issue-resolved",
+    "exitCode": 0,
+    "durationSeconds": 0.457
   },
   {
     "name": "github-issue",

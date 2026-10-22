@@ -1,0 +1,26 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "tests/smoke/determinism.spec.ts",
+    "tests/smoke/probability.spec.ts",
+    "tests/smoke/generator.spec.ts",
+    "tests/smoke/world.spec.ts",
+    "--config",
+    "playwright.config.ts",
+    "--project=firefox-determinism",
+    "--workers",
+    "1",
+    "--output",
+    "/tmp/lcxxvi-firefox-core",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:32:02.035678+00:00",
+  "durationSeconds": 11.863,
+  "exitCode": 0,
+  "log": "firefox-core.log",
+  "sha256": "341667666d3cc9d2c1283259de4a65cc2694982b426a8b89dbebe15a1d3cf1c6"
+}

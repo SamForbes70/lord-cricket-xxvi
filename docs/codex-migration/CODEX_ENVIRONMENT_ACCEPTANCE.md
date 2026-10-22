@@ -2,7 +2,7 @@
 
 22 October 2026 (Australia/Brisbane). This run was performed on a Linux cloud host, not the owner's Windows PC.
 
-**Verdict: the recovered engineering baseline builds and runs; full product acceptance remains FAIL/BLOCKED.** All 538 TypeScript unit tests, 72 Python tests and the headless 56-fixture season passed. The selected Chromium suites finished with 25 tests passed and one layout assertion failed. Firefox, Windows, original-owner-archive and human acceptance remain outstanding. This report does not authorise M7K or research-model promotion.
+**Verdict: the recovered engineering baseline builds and runs; full product acceptance remains FAIL/BLOCKED.** All 538 TypeScript unit tests, 72 Python tests and the headless 56-fixture season passed. Selected Linux browser suites finished with **35 passed / 2 layout failures**: Chromium 25/1 and Firefox 10/1. Windows, original-owner-archive and human acceptance remain outstanding. This report does not authorise M7K or research-model promotion.
 
 ## Scope and provenance
 
@@ -11,11 +11,11 @@
 - Historical M7J commit `5b8b9da990d657197fb56bbfd33152f87b875f5c` exists, is an ancestor of the source HEAD, and has 22 commits in its reachable history. Its recorded author date is 16 October 2026.
 - `git diff 5b8b9da HEAD -- apps packages scripts tests` was empty before this branch's changes. All **10/10** critical file SHA-256 values match `PASS_22_M7J_BASELINE_MANIFEST.json`.
 - The migration is application-code-preserving. Strictly calling it “documentation only” is imprecise: it also introduced `tools/windows/publish-private-github.ps1`. The complete migration path list and critical hashes are recorded in [recovery-and-build.json](verification/2026-10-22-cloud/recovery-and-build.json).
-- Git HTTPS read access worked (`git ls-remote origin HEAD` returned the source HEAD). Issue #1 could not be read: both `gh issue view`/GraphQL and `gh api repos/SamForbes70/lord-cricket-xxvi/issues/1` returned `Forbidden`; direct API connectivity returned HTTP 403 at the CONNECT proxy. The report implements the user's explicit instructions and checked-in first task. Reconciliation with any additional issue text remains **BLOCKED**, rather than assumed complete.
+- Git HTTPS read access worked (`git ls-remote origin HEAD` returned the source HEAD). GitHub API requests initially returned `Forbidden`/HTTP 403 at the CONNECT proxy. Access later succeeded after the network draft update: [issue #1](https://github.com/SamForbes70/lord-cricket-xxvi/issues/1) was read and reconciled against this report (`github-issue-resolved`). It confirms the source commits, required gates, separate branch/PR, and explicit separation of **local Windows** from cloud results. The original failure log is retained.
 
 ## Runtime and evidence
 
-Node **24.19.0**, npm **11.9.0**, Python **3.12.14**, Git **2.52.0**, Playwright **1.56.0**, system Chromium **154.0.8037.57**; Linux x86_64, five reported CPUs and approximately 34 GB reported memory. Node satisfies `>=22.12.0`. This is not a reference-hardware performance result.
+Node **24.19.0**, npm **11.9.0**, Python **3.12.14**, Git **2.52.0**, Playwright **1.56.0**, system Chromium **154.0.8037.57** and Playwright Firefox **142.0.1**; Linux x86_64, five reported CPUs and approximately 34 GB reported memory. Node satisfies `>=22.12.0`. This is not a reference-hardware performance result. The lockfile's source/working SHA-256 values and byte identity are recorded in `recovery-and-build.json`.
 
 Fresh results are under [verification/2026-10-22-cloud](verification/2026-10-22-cloud). Each `*.result.json` records the actual command argv, working directory, UTC start time, duration, exit code and log SHA-256. [SHA256SUMS](verification/2026-10-22-cloud/SHA256SUMS) covers the retained evidence. Historical release results are labelled separately below; previous chat/onboarding results are not counted as fresh runs.
 
@@ -65,11 +65,33 @@ Runs used system Chromium. The JSON result files contain full command arguments,
 | PASS | `npm run season:persistence:bundle` then `npx playwright test --config playwright.m6f.config.ts` | **1/1** real browser IndexedDB commit/abort/recovery/lease checks. `persistence-bundle`, `browser-season-idb` |
 | PASS | `npx playwright test --config playwright.m6g.config.ts` | **2/2** career and keyboard tests. Career creates, navigates Home/Career/Squad/Fixtures/Statistics/Settings, saves training through reload, selects 150% scale, completes all 14 managed fixtures/56-fixture season, exports, imports in an empty context, compares final league table, then reloads imported state. `browser-career` |
 | PASS | `npx playwright test --config playwright.m7b.host.config.ts` | **1/1** optional tactical captain submits durable decisions and retains selection/state through reload. `browser-ai` |
-| BLOCKED | `PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright npx playwright install firefox` | Firefox download failed with HTTP 403 `Domain forbidden` on `cdn.playwright.dev` and `playwright.download.prss.microsoft.com`. Firefox test assertions did not execute. `firefox-install` |
+| PASS after network correction | `PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright npx playwright install firefox` | Initial download failed with HTTP 403 `Domain forbidden`; a retry after GitHub API access demonstrated a runtime change downloaded Firefox 142.0.1/build 1495 successfully. `firefox-install`, `firefox-install-retry` |
 | NOT RUN | Full `t20-corpus.spec.ts` browser corpus and aggregate historical verification orchestrators | Representative frozen-vector/browser/worker/batch gates ran as listed; these broader suites are not included in the counts. |
 | NOT RUN | Owner's hands-on M3 checklist and Windows/browser acceptance | Automation is not human acceptance. No Windows desktop is attached. |
 
 Selected final Chromium total: **25 passed / 1 failed**, across 26 tests. Baseline diagnostic runs are additional failures, not added to that total. An initial core-smoke command accidentally supplied positional test files after Playwright's variadic `--project` option: it failed before running tests. The corrected invocation ran all 11 selected tests; both logs are retained.
+
+### Linux Firefox follow-up after access was restored
+
+Firefox installed successfully, but its first launch in the restricted command sandbox stalled before test assertions. Diagnostic output included `Sandbox: writing /proc/self/uid_map: EROFS`, unwritable default caches and a compositor error. The career attempt was stopped: the runner recorded **one interrupted / one not run**, not a game-test failure (`firefox-career`, exit 130). A separate initial version probe was also stopped; neither is included in passed counts.
+
+A bounded launch with the supported `require_escalated` execution-permission flow succeeded, returning **142.0.1**. It retained Firefox's sandbox and used writable cache/config paths; no browser protections were disabled. See `firefox-launch-diagnostic` and `firefox-launch-permission-check`. The subsequent suites used that same approved execution context with:
+
+```sh
+export PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright
+export XDG_CACHE_HOME=/workspace/.cache
+export XDG_CONFIG_HOME=/workspace/.config
+```
+
+| Status | Command | Executed result |
+| --- | --- | --- |
+| PASS | `npx playwright test --config playwright.m6g.portable.config.ts --project firefox` | **2/2**: complete career/save/export/import/reload and keyboard focus. `firefox-career-permitted` |
+| FAIL | `npx playwright test --config playwright.ui.config.ts --project firefox --reporter list` | **2 passed / 1 failed**: full keyboard T20/replay and selection/tactics checks passed. Desktop 100%/150% and reduced-motion delivery checks passed, then the 390px narrow-view horizontal-overflow assertion failed. Long-name checks after that assertion did not execute. `firefox-ui` |
+| PASS | `npx playwright test tests/smoke/determinism.spec.ts tests/smoke/probability.spec.ts tests/smoke/generator.spec.ts tests/smoke/world.spec.ts --config playwright.config.ts --project=firefox-determinism --workers 1` | **4/4** browser/worker/Node frozen-vector agreement. `firefox-core` |
+| PASS | `npx playwright test --config playwright.m7b.config.ts --project firefox` | **1/1** tactical captain durable decisions and reload. `firefox-ai` |
+| PASS | `npx playwright test --config playwright.m5b.config.ts --project firefox-m5b --reporter list` | **1/1** red-ball clock/declaration/durable resume. `firefox-red5` |
+
+Selected final Firefox total: **10 passed / 1 failed**, across 11 tests. These are Linux browser results, not local Windows or human acceptance. M4's separate six-case repository suite, M6F's isolated atomicity suite and the ODI browser suite were run in Chromium only; their Firefox equivalents were not run.
 
 ### Demonstrated test fixes
 
@@ -79,7 +101,7 @@ The untouched career keyboard test pressed Tab immediately after navigation, bef
 
 The existing career test additionally verifies the exported file in a **fresh browser context with empty IndexedDB**, compares the final league table and reloads it. This closes a browser export/import coverage gap without changing the archive format or game logic.
 
-### Open product failure: exhibition layout at 150%
+### Open product failures: exhibition desktop and narrow layouts at 150%
 
 At **1366×768, 150% text scale**, the `.decision-top` bottom is **780.296875px**, exceeding the required viewport height by approximately **12.30px**. The score/active/target checks reached that point; the subsequent reduced-motion, narrow-view and long-name checks in the same test did **not execute**. Do not count them as passed. The full keyboard match separately verified presentation changes do not alter replay hashes.
 
@@ -88,6 +110,8 @@ Retained evidence: [clipped viewport](verification/2026-10-22-cloud/browser/exhi
 The automated match completed in 108 keyboard steps, revision 109, with disabled-bowler reasons observed. Its event hash is `6df9a4c0c4bd8b4f6f6f7097b4bb146fe59eba95a962ced11499b0cd2d3519af`; scorecard hash is `705b171087ce86dfc147626b1ffa4ea2a2d30c045572d778bdfd075d5f968366`. These are observations of this new worker-seeded match, not regenerated deterministic goldens.
 
 Career evidence: [150% home](verification/2026-10-22-cloud/browser/career-home-150.png) and [completed season](verification/2026-10-22-cloud/browser/completed-season.png). These establish captured rendering, not independent human visual acceptance.
+
+Firefox reached the later **390×844, 150%** narrow-view assertion, where `document.documentElement.scrollWidth <= innerWidth` returned **false**. The test did not record the numeric scroll width, so no exact overflow distance is claimed. Its [narrow viewport](verification/2026-10-22-cloud/browser/firefox-narrow-150-clipped.jpeg) and [failure trace](verification/2026-10-22-cloud/browser/firefox-narrow-layout-failure.trace.zip) show the clipped decision controls. [Desktop 150%](verification/2026-10-22-cloud/browser/firefox-desktop-150.png), [completed match/replay record](verification/2026-10-22-cloud/browser/firefox-completion.json) and [completed career](verification/2026-10-22-cloud/browser/firefox-completed-season.png) are retained separately. This is a second evidenced layout failure, not the Chromium desktop assertion repeated under a different name.
 
 ## Owner release and rebuilt application
 
@@ -123,15 +147,15 @@ Before any explicit proposal to promote a new model, require:
 2. An immutable, separately versioned candidate fitted only to training data. Predeclare cohort, target-band, termination and phase analyses; do not tune on the final cohort. Report match-bootstrap uncertainty and unsupported-event rates.
 3. Evaluate ADR-027's proposed descriptive bands: mean runs within 5%, mean wickets within 0.5, dot/boundary fractions within two percentage points, and score P10/P50/P90 within 10%. Meeting pooled bands alone is insufficient; conditional chase-tail, player-strength and identifiable tactical-effect acceptance must be agreed and independently demonstrated.
 4. Independently adjudicated representative exceptional cases with chronology, playing conditions, beneficiary/end/attribution evidence. Any production rules-v2 integration requires versioned ledger/event contracts and complete invariant/replay/save fixtures; never coerce the 69 source rows by default.
-5. New-game model/rules pins and explicit migration/rejection behaviour, retaining exact historical `synthetic-alpha-01` replay. Browser/IndexedDB tests, the open 150% layout gate, Chromium/Firefox/Windows coverage, reference-hardware budgets and the owner's M3 human checklist must be resolved.
+5. New-game model/rules pins and explicit migration/rejection behaviour, retaining exact historical `synthetic-alpha-01` replay. Browser/IndexedDB tests, both open 150% layout failures, remaining cross-browser/Windows coverage, reference-hardware budgets and the owner's M3 human checklist must be resolved.
 6. **Explicit owner approval** before exposing a research model in gameplay. No approval is inferred from these tests.
 
 ## Changes, remaining actions and next bounded pass
 
 This branch changes only acceptance tests, two expensive test time budgets, this report and fresh evidence. Production source, dependency declarations, lockfile, schemas, scoring fixtures and deterministic goldens remain unchanged. Generated historical `docs/evidence` files overwritten by smoke tests were preserved into this run's evidence directory and restored to their original tracked bytes.
 
-Environment draft additions saved: `api.github.com`, `cdn.playwright.dev`, `playwright.download.prss.microsoft.com`, preserving the existing package-manager presets. Saving the draft is not runtime application or publication. Review/apply them in environment settings to unblock issue/PR API access and Firefox downloads. A network allowance alone does not prove GitHub API authentication or write permission.
+Environment draft additions saved: `api.github.com`, `cdn.playwright.dev`, `playwright.download.prss.microsoft.com`, preserving the existing package-manager presets. Subsequent API reads, PR creation and Firefox download succeeded in this instance. Complete `install_script` and `start_skill` contents were refreshed to reproduce Firefox installation and document startup/permission requirements. These observed runtime successes do not establish environment publication or fresh-task restoration: review/save the draft and publish through environment settings when ready.
 
-Required outside actions are to supply/read issue #1's additional text, enable GitHub API access for the PR, run Firefox after its verified browser install, provide the preserved owner release for direct comparison, and complete the Windows/M3 hands-on checklist with tester/date/browser/build and observed results. No secret values are needed in chat.
+Issue #1 has been read and [draft PR #2](https://github.com/SamForbes70/lord-cricket-xxvi/pull/2) is open against `main`. It remains unmerged; issue #1 remains open. Required outside actions include providing the preserved owner release for direct comparison and completing the Windows/M3 hands-on checklist with tester/date/browser/build and observed results. No secret values are needed in chat.
 
-The next bounded development task is to repair and independently validate the exhibition's 150% desktop layout, then finish the skipped layout checks, cross-browser/Windows and human acceptance. **Do not start M7K, change the scorer/model or promote research during that task without a new explicit instruction.** No merge is authorised or performed.
+The next bounded development task is to repair and independently validate the exhibition's 150% desktop and narrow layouts, then finish the skipped long-name/layout checks, remaining cross-browser/Windows and human acceptance. **Do not start M7K, change the scorer/model or promote research during that task without a new explicit instruction.** No merge is authorised or performed.

@@ -1,0 +1,21 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m6g.portable.config.ts",
+    "--project",
+    "firefox",
+    "--output",
+    "/tmp/lcxxvi-firefox-career-permitted",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:29:22.680504+00:00",
+  "durationSeconds": 102.881,
+  "exitCode": 0,
+  "log": "firefox-career-permitted.log",
+  "sha256": "b04f3ff4c3d09179a79c474385ce46a9bf4f3a956a54097c1a5cdebf27a5f91b"
+}
