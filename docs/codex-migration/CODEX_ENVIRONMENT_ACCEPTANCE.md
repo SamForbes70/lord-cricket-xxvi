@@ -1,5 +1,7 @@
 # Codex baseline recovery and environment acceptance
 
+> This is the original baseline snapshot before the layout fix. The current [layout and CI follow-up](LAYOUT_ACCEPTANCE_FOLLOWUP.md) records the repaired failures, stronger regression tests and subsequent evidence. Original failed results below remain historical observations.
+
 22 October 2026 (Australia/Brisbane). This run was performed on a Linux cloud host, not the owner's Windows PC.
 
 **Verdict: the recovered engineering baseline builds and runs; full product acceptance remains FAIL/BLOCKED.** All 538 TypeScript unit tests, 72 Python tests and the headless 56-fixture season passed. Selected Linux browser suites finished with **35 passed / 2 layout failures**: Chromium 25/1 and Firefox 10/1. Windows, original-owner-archive and human acceptance remain outstanding. This report does not authorise M7K or research-model promotion.

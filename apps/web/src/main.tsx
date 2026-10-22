@@ -239,7 +239,7 @@ export function MatchApp() {
   return (
     <main
       style={{ fontSize: `${Number(scale) / 100}rem` }}
-      className={`density-${density}`}
+      className={`match-shell density-${density}`}
     >
       <a className="skip" href="#decision">
         Skip to next decision
@@ -341,7 +341,7 @@ export function MatchApp() {
         </>
       )}
       {view && view.format === "T20" && (
-        <section className="career-match-banner" aria-label="Opponent captain control">
+        <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
           <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
           <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
             onChange={e => changeAiOpponent(e.target.value)}>

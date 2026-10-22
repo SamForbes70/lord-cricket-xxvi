@@ -27,9 +27,9 @@
 .import-panel { margin-top:24px; max-width:700px; }
 .import-panel input, .settings-actions input { display:block; margin-top:8px; }
 .table-wrap { overflow-x:auto; width:100%; margin:10px 0 24px; }
-table { border-collapse:collapse; width:100%; min-width:760px; background:#fffdf8; }
-th, td { text-align:left; border-bottom:1px solid #dedfd7; padding:9px 10px; vertical-align:top; }
-th { background:#eef0e8; white-space:nowrap; }
+.career-shell table { border-collapse:collapse; width:100%; min-width:760px; background:#fffdf8; }
+.career-shell th, .career-shell td { text-align:left; border-bottom:1px solid #dedfd7; padding:9px 10px; vertical-align:top; }
+.career-shell th { background:#eef0e8; white-space:nowrap; }
 .managed-fixture { background:#f0f6ed; }
 .round-block { margin-top:22px; }
 .stats-grid ol { list-style-position:inside; padding:0; margin:0; }

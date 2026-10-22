@@ -1,0 +1,38 @@
+[
+  {
+    "path": "apps/web/src/main.tsx",
+    "sha256": "b8790ddf15e1e6dba457af17ec67dc018f95a44ed6a571319ffabf051eb12c73"
+  },
+  {
+    "path": "apps/web/src/styles.css",
+    "sha256": "ea61181c3e45e57cc858c0d1dbb62281d92b538ec6bccb7acf569395df306f14"
+  },
+  {
+    "path": "apps/web/src/career/career.css",
+    "sha256": "1fbbad45f8e0556c9d31e93a2fc72d044418657094e6b545ab0a58ec7ef4189d"
+  },
+  {
+    "path": "scripts/verify.mjs",
+    "sha256": "ccfaf5ebe45232395824cee6d832397242e4e19743e80604a31f84464894431b"
+  },
+  {
+    "path": "scripts/verify-pass07a.mjs",
+    "sha256": "0de28dc520f3e4f4ad739bf08be9d996e0ccbb17099bdd199b1f6d09a785784c"
+  },
+  {
+    "path": "tests/ui/match.spec.ts",
+    "sha256": "eb79b8c0eaf3e560a7e6365b36c0ca2978f6db92003ce4bee815c1f1a15afe30"
+  },
+  {
+    "path": ".github/workflows/verify.yml",
+    "sha256": "6d026ec3304d0e75020415aa6636aac2c0372e57188c08f0329acc70e2d46762"
+  },
+  {
+    "path": "package-lock.json",
+    "sha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884"
+  },
+  {
+    "path": "apps/web/dist/assets/match.worker-CvFgBjcU.js",
+    "sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4"
+  }
+]
