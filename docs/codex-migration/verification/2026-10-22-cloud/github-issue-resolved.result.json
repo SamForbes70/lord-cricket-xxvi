@@ -1,0 +1,18 @@
+{
+  "command": [
+    "gh",
+    "issue",
+    "view",
+    "1",
+    "--repo",
+    "SamForbes70/lord-cricket-xxvi",
+    "--json",
+    "title,body,url,state"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:24:38.654461+00:00",
+  "durationSeconds": 0.457,
+  "exitCode": 0,
+  "log": "github-issue-resolved.log",
+  "sha256": "aa6ec6a4b9811a6b5d4af69c56ed3459540fb279b682585abfe8583e956b9013"
+}

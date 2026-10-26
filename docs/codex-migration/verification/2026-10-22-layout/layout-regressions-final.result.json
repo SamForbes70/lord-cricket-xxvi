@@ -1,0 +1,23 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.ui.config.ts",
+    "--grep",
+    "desktop essential",
+    "--reporter",
+    "list",
+    "--output",
+    "/tmp/lcxxvi-layout-final",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T12:21:54.834126+00:00",
+  "durationSeconds": 9.623,
+  "exitCode": 0,
+  "log": "layout-regressions-final.log",
+  "sha256": "a5315bb4971a7d29b072f9b3ed25ad6514622f42bd87412ae2a730f93d7919f1"
+}

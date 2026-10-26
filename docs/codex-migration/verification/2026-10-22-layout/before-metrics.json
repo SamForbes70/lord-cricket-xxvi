@@ -1,0 +1,644 @@
+{
+  "chromium": {
+    "version": "154.0.8037.57",
+    "desktop": {
+      ".masthead": {
+        "top": 22,
+        "bottom": 136.96875,
+        "height": 114.96875
+      },
+      ".preferences": {
+        "top": 144.96875,
+        "bottom": 201.96875,
+        "height": 57
+      },
+      ".career-match-banner": {
+        "top": 211.96875,
+        "bottom": 332.96875,
+        "height": 121
+      },
+      ".scorestrip": {
+        "top": 346.96875,
+        "bottom": 530.890625,
+        "height": 183.921875
+      },
+      ".active": {
+        "top": 530.890625,
+        "bottom": 666.890625,
+        "height": 136
+      },
+      ".decision-top": {
+        "top": 691.890625,
+        "bottom": 780.296875,
+        "height": 88.40625
+      }
+    },
+    "narrow": {
+      "viewport": 390,
+      "scrollWidth": 795,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "CAPTION",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "THEAD",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.796875,
+          "width": 364.796875
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 399.796875,
+          "right": 498.59375,
+          "width": 98.796875
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 498.59375,
+          "right": 597.390625,
+          "width": 98.796875
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 597.390625,
+          "right": 696.1875,
+          "width": 98.796875
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 696.1875,
+          "right": 795,
+          "width": 98.8125
+        },
+        {
+          "tag": "TBODY",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.796875,
+          "width": 364.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.796875,
+          "right": 498.59375,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.59375,
+          "right": 597.390625,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.390625,
+          "right": 696.1875,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.1875,
+          "right": 795,
+          "width": 98.8125
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.796875,
+          "width": 364.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.796875,
+          "right": 498.59375,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.59375,
+          "right": 597.390625,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.390625,
+          "right": 696.1875,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.1875,
+          "right": 795,
+          "width": 98.8125
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.796875,
+          "width": 364.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.796875,
+          "right": 498.59375,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.59375,
+          "right": 597.390625,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.390625,
+          "right": 696.1875,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.1875,
+          "right": 795,
+          "width": 98.8125
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.796875,
+          "width": 364.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.796875,
+          "right": 498.59375,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.59375,
+          "right": 597.390625,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.390625,
+          "right": 696.1875,
+          "width": 98.796875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.1875,
+          "right": 795,
+          "width": 98.8125
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        }
+      ]
+    }
+  },
+  "firefox": {
+    "version": "142.0.1",
+    "desktop": {
+      ".masthead": {
+        "top": 22,
+        "bottom": 149,
+        "height": 127
+      },
+      ".preferences": {
+        "top": 157,
+        "bottom": 209,
+        "height": 52
+      },
+      ".career-match-banner": {
+        "top": 219,
+        "bottom": 299,
+        "height": 80
+      },
+      ".scorestrip": {
+        "top": 313,
+        "bottom": 492.96665954589844,
+        "height": 179.96665954589844
+      },
+      ".active": {
+        "top": 492.9666748046875,
+        "bottom": 626.0000152587891,
+        "height": 133.03334045410156
+      },
+      ".decision-top": {
+        "top": 651,
+        "bottom": 734.4333343505859,
+        "height": 83.43333435058594
+      }
+    },
+    "narrow": {
+      "viewport": 390,
+      "scrollWidth": 795,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "CAPTION",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "THEAD",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.79998779296875,
+          "width": 364.79998779296875
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 399.79998779296875,
+          "right": 498.59999084472656,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 498.6000061035156,
+          "right": 597.3999938964844,
+          "width": 98.79998779296875
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 597.4000244140625,
+          "right": 696.2000274658203,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 696.2000122070312,
+          "right": 795.0000152587891,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TBODY",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.79998779296875,
+          "width": 364.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.79998779296875,
+          "right": 498.59999084472656,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.6000061035156,
+          "right": 597.3999938964844,
+          "width": 98.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.4000244140625,
+          "right": 696.2000274658203,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.2000122070312,
+          "right": 795.0000152587891,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.79998779296875,
+          "width": 364.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.79998779296875,
+          "right": 498.59999084472656,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.6000061035156,
+          "right": 597.3999938964844,
+          "width": 98.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.4000244140625,
+          "right": 696.2000274658203,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.2000122070312,
+          "right": 795.0000152587891,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.79998779296875,
+          "width": 364.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.79998779296875,
+          "right": 498.59999084472656,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.6000061035156,
+          "right": 597.3999938964844,
+          "width": 98.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.4000244140625,
+          "right": 696.2000274658203,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.2000122070312,
+          "right": 795.0000152587891,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 399.79998779296875,
+          "width": 364.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 399.79998779296875,
+          "right": 498.59999084472656,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 498.6000061035156,
+          "right": 597.3999938964844,
+          "width": 98.79998779296875
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 597.4000244140625,
+          "right": 696.2000274658203,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TD",
+          "className": "",
+          "id": "",
+          "left": 696.2000122070312,
+          "right": 795.0000152587891,
+          "width": 98.80000305175781
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "id": "",
+          "left": 35,
+          "right": 795,
+          "width": 760
+        }
+      ]
+    }
+  }
+}

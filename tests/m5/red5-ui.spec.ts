@@ -21,7 +21,7 @@ async function advanceDecision(page: Page) {
 test("red-ball exhibition exposes the five-day clock, declarations and durable resume", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/#exhibition");
   await page.getByLabel("Format").selectOption("RED_BALL");
   await page.getByRole("button", { name: "Confirm XIs and start" }).click();
   await settle(page);

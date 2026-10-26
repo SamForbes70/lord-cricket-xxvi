@@ -1,0 +1,116 @@
+{
+  "verifiedAt": "2026-10-22T08:44:09.326Z",
+  "node": "v22.23.3",
+  "npm": "10.9.9",
+  "offlineEvidenceMode": false,
+  "platform": "linux",
+  "architecture": "x64",
+  "firefoxContentSandboxDisabled": false,
+  "lockfileSha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884",
+  "schemaVersion": "1.0.0",
+  "scoringImplemented": true,
+  "randomServiceImplemented": true,
+  "randomVersion": "SHA256_COUNTER_V1",
+  "stateHashVersion": "LC_CANONICAL_JSON_V1_SHA256",
+  "randomSamplerImplemented": true,
+  "samplerScope": "VERSIONED_CATEGORICAL_ONLY",
+  "conditionalDeliveryGeneratorImplemented": true,
+  "conditionalDeliveryGeneratorVerified": false,
+  "generatorVersion": "LC_CONDITIONAL_DELIVERY_V1",
+  "generatorStagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "probabilityVersion": "LC_INTEGER_PROBABILITY_V1",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "lutHash": "d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825",
+  "scoringEngine": "LC_SCORING_V1",
+  "matchEngineImplemented": false,
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Complete seeded T20 orchestration, only after all Pass 06 mandatory gates pass",
+  "gates": [
+    {
+      "gate": "installation",
+      "command": "npm ci",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 3104
+    },
+    {
+      "gate": "schemas",
+      "command": "npm run schemas:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 890
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 18396
+    },
+    {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 8740
+    },
+    {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 7003
+    },
+    {
+      "gate": "fixtures",
+      "command": "npm run fixtures:audit",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 656
+    },
+    {
+      "gate": "scorer",
+      "command": "npm run fixtures:engine",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 756
+    },
+    {
+      "gate": "vectors",
+      "command": "npm run vectors:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 147
+    },
+    {
+      "gate": "probability-vectors",
+      "command": "npm run probability:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 199
+    },
+    {
+      "gate": "generator-vectors",
+      "command": "npm run generator:check",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 150
+    },
+    {
+      "gate": "unit",
+      "command": "npm test",
+      "exitCode": null,
+      "status": "FAIL",
+      "error": "spawnSync npm ETIMEDOUT",
+      "elapsedMs": 90018
+    },
+    {
+      "gate": "smoke",
+      "command": "npm run smoke",
+      "exitCode": 0,
+      "status": "PASS",
+      "elapsedMs": 332082
+    }
+  ]
+}

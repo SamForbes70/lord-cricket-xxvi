@@ -1,0 +1,20 @@
+{
+  "command": [
+    "npm",
+    "test",
+    "--",
+    "--maxWorkers=2",
+    "--exclude",
+    "tests/unit/red5-match.test.ts",
+    "--exclude",
+    "tests/unit/red5-clock.test.ts",
+    "--exclude",
+    "tests/unit/season-persistence.test.ts"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:10:40.141961+00:00",
+  "durationSeconds": 49.761,
+  "exitCode": 0,
+  "log": "unit-main.log",
+  "sha256": "3fdb6fb7c6fea8dc91743a63d4adb105867c0844b2235b1c8ecf3fe902e04a58"
+}

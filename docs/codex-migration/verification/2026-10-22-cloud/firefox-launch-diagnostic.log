@@ -1,0 +1,45 @@
+2026-10-22T08:27:57.486Z pw:browser <launching> /workspace/.cache/ms-playwright/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-wgwlxI -juggler-pipe -silent
+2026-10-22T08:27:57.494Z pw:browser <launched> pid=18330
+2026-10-22T08:27:57.550Z pw:browser [pid=18330][err] *** You are running in headless mode.
+2026-10-22T08:27:57.697Z pw:browser [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) [GFX1-]: glxtest: libpci missing
+2026-10-22T08:27:57.698Z pw:browser [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.208797) [GFX1-]: glxtest: Unable to open a connection to the X server
+2026-10-22T08:27:57.698Z pw:browser [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.208797) |[2][GFX1-]: No GPUs detected via PCI
+2026-10-22T08:27:57.698Z pw:browser [pid=18330][out]  (t=0.208797) [GFX1-]: No GPUs detected via PCI
+2026-10-22T08:27:57.698Z pw:browser [pid=18330][out] 
+2026-10-22T08:27:57.707Z pw:browser [pid=18330][err] Fontconfig error: No writable cache directories
+2026-10-22T08:27:57.712Z pw:browser [pid=18330][err] Fontconfig error: No writable cache directories
+2026-10-22T08:27:57.750Z pw:browser [pid=18330][err] [18367] Sandbox: writing /proc/self/uid_map: EROFS
+2026-10-22T08:27:57.854Z pw:browser [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.208797) |[2][GFX1-]: No GPUs detected via PCI
+2026-10-22T08:27:57.854Z pw:browser [pid=18330][out]  (t=0.208797) |[3][GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt (t=0.36479) [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+2026-10-22T08:28:12.475Z pw:browser [pid=18330] <gracefully close start>
+2026-10-22T08:28:12.476Z pw:browser [pid=18330] <kill>
+2026-10-22T08:28:12.476Z pw:browser [pid=18330] <will force kill>
+2026-10-22T08:28:12.489Z pw:browser [pid=18330] <process did exit: exitCode=null, signal=SIGKILL>
+2026-10-22T08:28:12.490Z pw:browser [pid=18330] starting temporary directories cleanup
+2026-10-22T08:28:12.493Z pw:browser [pid=18330] finished temporary directories cleanup
+2026-10-22T08:28:12.493Z pw:browser [pid=18330] <gracefully close end>
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+browserType.launch: Timeout 15000ms exceeded.
+Call log:
+[2m  - <launching> /workspace/.cache/ms-playwright/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-wgwlxI -juggler-pipe -silent[22m
+[2m  - <launched> pid=18330[22m
+[2m  - [pid=18330][err] *** You are running in headless mode.[22m
+[2m  - [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) [GFX1-]: glxtest: libpci missing[22m
+[2m  - [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.208797) [GFX1-]: glxtest: Unable to open a connection to the X server[22m
+[2m  - [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.208797) |[2][GFX1-]: No GPUs detected via PCI[22m
+[2m  - [pid=18330][out]  (t=0.208797) [GFX1-]: No GPUs detected via PCI[22m
+[2m  - [pid=18330][out][22m
+[2m  2 × [pid=18330][err] Fontconfig error: No writable cache directories[22m
+[2m  - [pid=18330][err] [18367] Sandbox: writing /proc/self/uid_map: EROFS[22m
+[2m  - [pid=18330][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.208797) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.208797) |[2][GFX1-]: No GPUs detected via PCI[22m
+[2m  - [pid=18330][out]  (t=0.208797) |[3][GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt (t=0.36479) [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt[22m
+
+    at /workspace/lord-cricket-xxvi/[eval1]:1:69
+    at async node:internal/modules/esm/loader:224:26 {
+  name: 'TimeoutError'
+}
+
+Node.js v24.19.0

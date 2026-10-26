@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "scripts/smoke-prebuilt.mjs"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:16:25.117669+00:00",
+  "durationSeconds": 0.682,
+  "exitCode": 0,
+  "log": "prebuilt-server.log",
+  "sha256": "982cd447092f977fb6d35eab8d2210f1e518e996074571dd616ff7b6102973da"
+}

@@ -1,0 +1,1 @@
+PASS: dependency-free prebuilt server serves index and all production assets with correct script MIME types.

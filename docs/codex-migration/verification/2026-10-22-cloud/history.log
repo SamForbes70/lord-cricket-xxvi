@@ -1,0 +1,20 @@
+## codex/baseline-recovery-acceptance
+ M docs/evidence/determinism-chromium.json
+ M docs/evidence/generator-chromium.json
+ M docs/evidence/probability-chromium.json
+ M docs/evidence/shell.png
+ M tests/m4/persistence.spec.ts
+ M tests/m5/odi-ui.spec.ts
+ M tests/m5/red5-ui.spec.ts
+ M tests/m6g/management.spec.ts
+ M tests/ui/match.spec.ts
+ M tests/unit/red5-match.test.ts
+ M tests/unit/season-persistence.test.ts
+?? docs/codex-migration/verification/2026-10-22-cloud/
+b8e38e9 docs: add verified private GitHub and Windows Codex setup
+30541e1 docs: recover Lord Cricket XXVI and prepare Codex handover
+5b8b9da Pass 22 M7J: versioned dead-ball exception adjudication and law-evidence register
+bc55888 Document M7I acceptance and unresolved promotion gates
+c8c8480 Pass 21 M7I: exceptional deliveries and chase/player research audits
+commit
+22

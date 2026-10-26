@@ -1,0 +1,46 @@
+# Page snapshot
+
+```yaml
+- main [ref=e3]:
+  - link "Skip to next decision" [ref=e4] [cursor=pointer]:
+    - /url: "#decision"
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - paragraph [ref=e7]: THE FICTIONAL CRICKET EXHIBITION
+      - heading "Lord Cricket XXVI" [level=1] [ref=e8]
+    - generic [ref=e9]: SYNTHETIC_ALPHA
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - text: Text scale
+      - combobox "Text scale" [ref=e12]:
+        - option "100%" [selected]
+        - option "125%"
+        - option "150%"
+    - generic [ref=e13]:
+      - text: Commentary
+      - combobox "Commentary" [ref=e14]:
+        - option "Full" [selected]
+        - option "Brief"
+        - option "Off"
+    - generic [ref=e15]:
+      - text: Layout
+      - combobox "Layout" [ref=e16]:
+        - option "Comfortable" [selected]
+        - option "Compact"
+    - generic [ref=e17]: Local autosave ready
+  - alert [active] [ref=e18]: The match worker stopped. Reload to recover the last durable checkpoint.
+  - generic [ref=e19]:
+    - heading "Take the captain’s chair." [level=2] [ref=e20]
+    - paragraph [ref=e21]:
+      - text: Select your side and an opponent. You make decisions for
+      - strong [ref=e22]: both teams
+      - text: initially. After starting a T20, you can optionally delegate either team to the deterministic tactical captain.
+  - status [ref=e23]: Loading the approved fictional world…
+  - region "Save files" [ref=e24]:
+    - generic [ref=e26]:
+      - text: Import .lcxxvi
+      - button "Import saved game" [disabled] [ref=e27]
+  - generic [ref=e28]:
+    - paragraph [ref=e29]: Autosaves and manual copies are stored locally in this browser. Portable .lcxxvi exports include the deterministic match history and pinned engine/model/rules identity required for validated resume.
+    - paragraph [ref=e30]: "Original world: 160 fictional players, 8 squads. T20, ODI and five-day red-ball exhibitions use custom game rules; no certified ICC compliance or empirical realism. DLS, careers and tactical AI are unavailable."
+```

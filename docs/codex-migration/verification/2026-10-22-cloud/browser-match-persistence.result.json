@@ -1,0 +1,21 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m4.config.ts",
+    "--reporter",
+    "list",
+    "--output",
+    "/tmp/lcxxvi-m4-acceptance",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:14:12.337604+00:00",
+  "durationSeconds": 29.145,
+  "exitCode": 0,
+  "log": "browser-match-persistence.log",
+  "sha256": "f37be328b8ab713d55646311290cb2946dc1f6f337db0abbd3d7c9cb457fce20"
+}

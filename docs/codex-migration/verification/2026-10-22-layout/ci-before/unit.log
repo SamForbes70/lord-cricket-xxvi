@@ -1,0 +1,58 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90m/home/runner/work/lord-cricket-xxvi/lord-cricket-xxvi[39m
+
+ [32m✓[39m tests/unit/season-projections.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 834[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12E league table, NRR and season statistical projections[2m > [22madapts a validated Pass 12D outcome into the shared season projection path [33m 767[2mms[22m[39m
+ [32m✓[39m tests/unit/t20-match.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 4039[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mrejects hash-tampered event, state, chain, wrong version and invalid stage pack [33m 1506[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mpins first complete seeded match scorecard as regression observation distinct from independent rule goldens [33m 489[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 07B independently authored match fixtures[2m > [22mfully seeded match reconciles scorecard/events and event-prefix interrupted replay at every event [33m 1326[2mms[22m[39m
+ [32m✓[39m tests/unit/season-persistence.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 31829[2mms[22m[39m
+   [33m[2m✓[22m[39m M6F durable season state and archive[2m > [22mreloads an active portable save and can advance into the next scheduled round [33m 1249[2mms[22m[39m
+ [32m✓[39m tests/unit/scoring-kernel.test.ts [2m([22m[2m134 tests[22m[2m)[22m[32m 211[2mms[22m[39m
+ [32m✓[39m tests/unit/odi-match.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 5814[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mends the first innings on exactly 300 legal balls with no phantom 301st ball [33m 406[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mruns, replays, resimulates and rehydrates a complete seeded ODI [33m 3404[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 10 / M5A ODI format[2m > [22mround-trips a complete ODI through the portable save archive [33m 1819[2mms[22m[39m
+ [32m✓[39m tests/unit/generator.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 120[2mms[22m[39m
+ [32m✓[39m tests/unit/career-condition.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 257[2mms[22m[39m
+ [32m✓[39m tests/unit/offscreen-fixture.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 8114[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mruns a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once [33m 823[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mshared XI and condition helpers reproduce the accepted off-screen fixture outcome [33m 666[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mreplay and command resimulation remain exact for an off-screen fixture [33m 1217[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22muses manual availability when selecting the XI and falls back to the second keeper [33m 520[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mround execution sorts fixture IDs and is batch-order independent by construction [33m 2391[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mcan pause before the user's fixture while simulating the other three matches [33m 1416[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mrejects duplicate fixture execution, wrong career date and insufficient availability [33m 582[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12D deterministic off-screen T20 fixture execution[2m > [22mdetects outcome tampering through the canonical outcome hash [33m 493[2mms[22m[39m
+ [32m✓[39m tests/unit/red5-match.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 5427[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 11 / M5B red-ball profile[2m > [22mmakes the new ball available after 480 legal balls and resets only ball age [33m 492[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 11 / M5B red-ball profile[2m > [22mcompletes a deterministic five-day exhibition and reproduces its final chain [33m 4480[2mms[22m[39m
+ [32m✓[39m tests/unit/career-training.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 626[2mms[22m[39m
+ [32m✓[39m tests/unit/persistence-m4.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 5862[2mms[22m[39m
+   [33m[2m✓[22m[39m M4 deterministic persistence and portable archive[2m > [22mproduces byte-identical final state across repeated save/rehydrate cycles [33m 5595[2mms[22m[39m
+ [32m✓[39m tests/unit/probability.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 177[2mms[22m[39m
+ [32m✓[39m tests/unit/contracts.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 1735[2mms[22m[39m
+   [33m[2m✓[22m[39m every generated schema compiles with strict AJV 2020-12 [33m 1523[2mms[22m[39m
+ [32m✓[39m tests/unit/match-ui.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 2021[2mms[22m[39m
+   [33m[2m✓[22m[39m M3 production worker controller[2m > [22mcompletes a manual match, stops at decisions, blocks ineligible bowlers, proves replay, keeps seed private and prevents terminal deliveries [33m 1679[2mms[22m[39m
+ [32m✓[39m tests/unit/m7j-adjudication.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m tests/unit/random-service.test.ts [2m([22m[2m44 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+ [32m✓[39m tests/unit/season-scheduler.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+ [32m✓[39m tests/unit/scoring-fixtures.test.ts [2m([22m[2m84 tests[22m[2m)[22m[33m 991[2mms[22m[39m
+   [33m[2m✓[22m[39m runs a real scorer comparison gate against the retained corpus [33m 656[2mms[22m[39m
+ [32m✓[39m tests/unit/red5-clock.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/world.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 475[2mms[22m[39m
+ [32m✓[39m tests/unit/m7-ai-analytics.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1939[2mms[22m[39m
+   [33m[2m✓[22m[39m M7 canonical T20 match analytics[2m > [22mreconciles every summary against one complete accepted T20 event chain [33m 763[2mms[22m[39m
+   [33m[2m✓[22m[39m M7 tactical captain engine integration[2m > [22mboth captains use legal accepted engine commands and remain deterministic under replay [33m 1170[2mms[22m[39m
+ [32m✓[39m tests/unit/m7g-research-scoring.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 422[2mms[22m[39m
+ [32m✓[39m tests/unit/career-application-service.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 2437[2mms[22m[39m
+   [33m[2m✓[22m[39m Pass 12G-R career application service[2m > [22mcreates a durable career, persists training, stops at the user fixture and completes it exactly once [33m 2413[2mms[22m[39m
+ [32m✓[39m tests/unit/t20-setup.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 475[2mms[22m[39m
+ [32m✓[39m tests/unit/m7h-research-chase.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 197[2mms[22m[39m
+spawnSync npm ETIMEDOUT

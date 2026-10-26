@@ -21,7 +21,7 @@ async function advance(page: Page) {
 test("ODI exhibition starts, advances and resumes durably", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/#exhibition");
   await expect(
     page.getByRole("button", { name: "Confirm XIs and start" }),
   ).toBeEnabled();

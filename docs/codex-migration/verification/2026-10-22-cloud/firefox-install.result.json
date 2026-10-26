@@ -1,0 +1,16 @@
+{
+  "command": [
+    "env",
+    "PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright",
+    "npx",
+    "playwright",
+    "install",
+    "firefox"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:12:16.141100+00:00",
+  "durationSeconds": 1.916,
+  "exitCode": 1,
+  "log": "firefox-install.log",
+  "sha256": "b716a9a0d35b8141073f843317f366cd25058f87f395a8fe8ae1cc7f8dbc0993"
+}

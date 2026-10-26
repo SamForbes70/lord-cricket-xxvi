@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "checkoutConfiguration": "core.autocrlf=true",
+  "attribute": "*.json text eol=lf",
+  "expectedFrozenHash": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+  "filteredHash": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+  "crlfCount": 0,
+  "beforeCRLFHash": "cade8ad2b59caf77faf2a7582028f9e8b3058de6246bee4daa0bb513bf093f63",
+  "validatorUnchanged": true
+}

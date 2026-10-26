@@ -1,0 +1,364 @@
+{
+  "archive_sha256": "ef5dbcb59b01d65b410526a166fef45153755af99dc683797f075481bcfca63f",
+  "archive_bytes": 3101092,
+  "source_commit": "3ac8a0bce7ae1de7f4be62f7aef827140122029c",
+  "manifest": [
+    {
+      "path": "01_GAME/M7J_PLAYABLE_NOTICE.md",
+      "expected": "941bf40ef557ff3a847750b4e099779172aa93400daf246c05360f7580903b88",
+      "actual": "941bf40ef557ff3a847750b4e099779172aa93400daf246c05360f7580903b88",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/Start-Lord-Cricket-Windows.cmd",
+      "expected": "c4952e78ad5abf34c7c6ec9a9f6109914692ab7a839eb5c0179d247879313c2c",
+      "actual": "c4952e78ad5abf34c7c6ec9a9f6109914692ab7a839eb5c0179d247879313c2c",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/assets/engineering-BrDsDFp9.css",
+      "expected": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85",
+      "actual": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/assets/engineering-DjJLFLCG.js",
+      "expected": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942",
+      "actual": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/assets/main-BbIwlpMX.css",
+      "expected": "b9b52ecf2dbd768b5c1ffb5fc1795b41905b4e9e72e0c484a7925206c42fa1b7",
+      "actual": "b9b52ecf2dbd768b5c1ffb5fc1795b41905b4e9e72e0c484a7925206c42fa1b7",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/assets/main-UAgcvAPq.js",
+      "expected": "0567122667cb7b1cef1fd71a938972f718e10b18c78198bb9dea9cdf1d809cd1",
+      "actual": "0567122667cb7b1cef1fd71a938972f718e10b18c78198bb9dea9cdf1d809cd1",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/assets/match.worker-CvFgBjcU.js",
+      "expected": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+      "actual": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/assets/season-persistence-BwG5leb3.js",
+      "expected": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59",
+      "actual": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/engineering.html",
+      "expected": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d",
+      "actual": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/apps/web/dist/index.html",
+      "expected": "f79bcea164850601abae111ecb853cce74bb42733bb6e02cb1dad601676c5de5",
+      "actual": "f79bcea164850601abae111ecb853cce74bb42733bb6e02cb1dad601676c5de5",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/start-lord-cricket.sh",
+      "expected": "434ddc33a5ecc899cf8642aea7cb1c022b83b9c14a5601f917ac8a5e2a8a6f76",
+      "actual": "434ddc33a5ecc899cf8642aea7cb1c022b83b9c14a5601f917ac8a5e2a8a6f76",
+      "pass": true
+    },
+    {
+      "path": "01_GAME/start.mjs",
+      "expected": "b7eba76b741d6edfa8fc741d096920928283fd1343371b69c78c03bfb99c417c",
+      "actual": "b7eba76b741d6edfa8fc741d096920928283fd1343371b69c78c03bfb99c417c",
+      "pass": true
+    },
+    {
+      "path": "02_MY_CAREER_BACKUPS/PUT_YOUR_EXPORTED_SAVES_HERE.txt",
+      "expected": "01f8dfb4a8542c37dc78391ea73e010a321ec56b960cc087ef271b42ecce2f6a",
+      "actual": "01f8dfb4a8542c37dc78391ea73e010a321ec56b960cc087ef271b42ecce2f6a",
+      "pass": true
+    },
+    {
+      "path": "03_DEVELOPER_ARCHIVE/Lord_Cricket_XXVI_PASS_22_M7J_Evidence.zip",
+      "expected": "1c14321a2ba68fd40c098326d6666731774d183ff27d85307406f3487e845f94",
+      "actual": "1c14321a2ba68fd40c098326d6666731774d183ff27d85307406f3487e845f94",
+      "pass": true
+    },
+    {
+      "path": "03_DEVELOPER_ARCHIVE/Lord_Cricket_XXVI_PASS_22_M7J_Source.bundle",
+      "expected": "7b5d5fa25394e6f27941917bce82e21bab9ccf6897e7f8e384d159175a4f65db",
+      "actual": "7b5d5fa25394e6f27941917bce82e21bab9ccf6897e7f8e384d159175a4f65db",
+      "pass": true
+    },
+    {
+      "path": "03_DEVELOPER_ARCHIVE/Lord_Cricket_XXVI_PASS_22_M7J_Source.zip",
+      "expected": "a62607006cf22993c894e64638fc9239d21e1a472b07aa76135e61c6faa75ffa",
+      "actual": "a62607006cf22993c894e64638fc9239d21e1a472b07aa76135e61c6faa75ffa",
+      "pass": true
+    },
+    {
+      "path": "03_DEVELOPER_ARCHIVE/PASS_22_M7J_BASELINE_MANIFEST.json",
+      "expected": "bfafdea169d6d5fffbf1c7da0213d908d376419302b864734b44df5a898841a3",
+      "actual": "bfafdea169d6d5fffbf1c7da0213d908d376419302b864734b44df5a898841a3",
+      "pass": true
+    },
+    {
+      "path": "03_DEVELOPER_ARCHIVE/PASS_22_M7J_REPORT.md",
+      "expected": "9c2bf25840f3d942f6a3472a33e5d0bf17587fa89c9ce24ab0502ca3b639eb50",
+      "actual": "9c2bf25840f3d942f6a3472a33e5d0bf17587fa89c9ce24ab0502ca3b639eb50",
+      "pass": true
+    },
+    {
+      "path": "04_NOTES/RELEASE_PROVENANCE.json",
+      "expected": "b7ad46826d594ebfcef44377947777899d7fa2d3f19b70b9e237d482491a7c18",
+      "actual": "b7ad46826d594ebfcef44377947777899d7fa2d3f19b70b9e237d482491a7c18",
+      "pass": true
+    },
+    {
+      "path": "04_NOTES/STATUS_AND_NEXT_STEPS.txt",
+      "expected": "f01148dbc251d4d618086eb8d98aca58b9923e1853d228d8def05270c833d529",
+      "actual": "f01148dbc251d4d618086eb8d98aca58b9923e1853d228d8def05270c833d529",
+      "pass": true
+    },
+    {
+      "path": "OPEN_LORD_CRICKET.url",
+      "expected": "a8810982b9d29a301d974300566568e1c0d6f8af9ae99b059f4994c17dc128a2",
+      "actual": "a8810982b9d29a301d974300566568e1c0d6f8af9ae99b059f4994c17dc128a2",
+      "pass": true
+    },
+    {
+      "path": "PLAY_LORD_CRICKET.cmd",
+      "expected": "f3c25971a99ed433534e18437aa29e2f5bef7ae79b02f018736f75babc25cedf",
+      "actual": "f3c25971a99ed433534e18437aa29e2f5bef7ae79b02f018736f75babc25cedf",
+      "pass": true
+    },
+    {
+      "path": "START HERE FIRST.txt",
+      "expected": "4a7508105884bd76e489ea48cefbe36786eff55440a459c13f7ae21031dc20ca",
+      "actual": "4a7508105884bd76e489ea48cefbe36786eff55440a459c13f7ae21031dc20ca",
+      "pass": true
+    }
+  ],
+  "zip_crc": {
+    "Lord_Cricket_XXVI_START_HERE_2026-10-17.zip": {
+      "entries": 24,
+      "bad_entry": null
+    },
+    "Lord_Cricket_XXVI_PASS_22_M7J_Source.zip": {
+      "entries": 894,
+      "bad_entry": null
+    },
+    "Lord_Cricket_XXVI_PASS_22_M7J_Evidence.zip": {
+      "entries": 25,
+      "bad_entry": null
+    }
+  },
+  "source_mismatches": [],
+  "source_files_compared": 894,
+  "bundle_verify": {
+    "returncode": 0,
+    "stdout": "The bundle contains these 4 refs:\n5b8b9da990d657197fb56bbfd33152f87b875f5c refs/heads/pass-17-m7e\nbc5588831f2e9300c9063a047209544013c6e62b refs/remotes/origin/HEAD\nbc5588831f2e9300c9063a047209544013c6e62b refs/remotes/origin/pass-17-m7e\n5b8b9da990d657197fb56bbfd33152f87b875f5c HEAD\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha1\n",
+    "stderr": "/workspace/owner-release-comparison/original/Lord Cricket XXVI/03_DEVELOPER_ARCHIVE/Lord_Cricket_XXVI_PASS_22_M7J_Source.bundle is okay\n"
+  },
+  "assets": [
+    {
+      "path": "assets/engineering-BrDsDFp9.css",
+      "owner_sha256": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85",
+      "rebuilt_sha256": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85",
+      "identical": true
+    },
+    {
+      "path": "assets/engineering-DjJLFLCG.js",
+      "owner_sha256": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942",
+      "rebuilt_sha256": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942",
+      "identical": true
+    },
+    {
+      "path": "assets/main-BbIwlpMX.css",
+      "owner_sha256": "b9b52ecf2dbd768b5c1ffb5fc1795b41905b4e9e72e0c484a7925206c42fa1b7",
+      "rebuilt_sha256": null,
+      "identical": false
+    },
+    {
+      "path": "assets/main-UAgcvAPq.js",
+      "owner_sha256": "0567122667cb7b1cef1fd71a938972f718e10b18c78198bb9dea9cdf1d809cd1",
+      "rebuilt_sha256": null,
+      "identical": false
+    },
+    {
+      "path": "assets/match.worker-CvFgBjcU.js",
+      "owner_sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+      "rebuilt_sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+      "identical": true
+    },
+    {
+      "path": "assets/season-persistence-BwG5leb3.js",
+      "owner_sha256": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59",
+      "rebuilt_sha256": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59",
+      "identical": true
+    },
+    {
+      "path": "engineering.html",
+      "owner_sha256": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d",
+      "rebuilt_sha256": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d",
+      "identical": true
+    },
+    {
+      "path": "index.html",
+      "owner_sha256": "f79bcea164850601abae111ecb853cce74bb42733bb6e02cb1dad601676c5de5",
+      "rebuilt_sha256": "aa722497250d2da700c27122d7f9fdcb37e5013f52eed601356978b948b5d915",
+      "identical": false
+    }
+  ],
+  "rebuilt_assets": [
+    {
+      "path": "assets/engineering-BrDsDFp9.css",
+      "sha256": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85"
+    },
+    {
+      "path": "assets/engineering-DjJLFLCG.js",
+      "sha256": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942"
+    },
+    {
+      "path": "assets/main-CCReWakf.js",
+      "sha256": "edf7d5174f855b9b9cb8155f14d40582cc5557a4b12dbe24c69ae214da70983f"
+    },
+    {
+      "path": "assets/main-DU29MV68.css",
+      "sha256": "e4efff6bc638960905f697d7c255a7433826e8fa78df408a4763a029b49fcc59"
+    },
+    {
+      "path": "assets/match.worker-CvFgBjcU.js",
+      "sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4"
+    },
+    {
+      "path": "assets/season-persistence-BwG5leb3.js",
+      "sha256": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59"
+    },
+    {
+      "path": "engineering.html",
+      "sha256": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d"
+    },
+    {
+      "path": "index.html",
+      "sha256": "aa722497250d2da700c27122d7f9fdcb37e5013f52eed601356978b948b5d915"
+    }
+  ],
+  "http": [
+    {
+      "port": 4191,
+      "path": "assets/engineering-BrDsDFp9.css",
+      "status": 200,
+      "sha256": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85",
+      "matches_disk": true
+    },
+    {
+      "port": 4191,
+      "path": "assets/engineering-DjJLFLCG.js",
+      "status": 200,
+      "sha256": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942",
+      "matches_disk": true
+    },
+    {
+      "port": 4191,
+      "path": "assets/main-BbIwlpMX.css",
+      "status": 200,
+      "sha256": "b9b52ecf2dbd768b5c1ffb5fc1795b41905b4e9e72e0c484a7925206c42fa1b7",
+      "matches_disk": true
+    },
+    {
+      "port": 4191,
+      "path": "assets/main-UAgcvAPq.js",
+      "status": 200,
+      "sha256": "0567122667cb7b1cef1fd71a938972f718e10b18c78198bb9dea9cdf1d809cd1",
+      "matches_disk": true
+    },
+    {
+      "port": 4191,
+      "path": "assets/match.worker-CvFgBjcU.js",
+      "status": 200,
+      "sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+      "matches_disk": true
+    },
+    {
+      "port": 4191,
+      "path": "assets/season-persistence-BwG5leb3.js",
+      "status": 200,
+      "sha256": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59",
+      "matches_disk": true
+    },
+    {
+      "port": 4191,
+      "path": "engineering.html",
+      "status": 200,
+      "sha256": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d",
+      "matches_disk": true
+    },
+    {
+      "port": 4191,
+      "path": "index.html",
+      "status": 200,
+      "sha256": "f79bcea164850601abae111ecb853cce74bb42733bb6e02cb1dad601676c5de5",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "assets/engineering-BrDsDFp9.css",
+      "status": 200,
+      "sha256": "f991619af8dcbfa74bada0e36c84a3d18acb4f04ec2a4267a138c11d1aab8a85",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "assets/engineering-DjJLFLCG.js",
+      "status": 200,
+      "sha256": "47f8fda90e557eba9d5890503aa0965e06fefdc134cac12a919a56173c380942",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "assets/main-CCReWakf.js",
+      "status": 200,
+      "sha256": "edf7d5174f855b9b9cb8155f14d40582cc5557a4b12dbe24c69ae214da70983f",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "assets/main-DU29MV68.css",
+      "status": 200,
+      "sha256": "e4efff6bc638960905f697d7c255a7433826e8fa78df408a4763a029b49fcc59",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "assets/match.worker-CvFgBjcU.js",
+      "status": 200,
+      "sha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "assets/season-persistence-BwG5leb3.js",
+      "status": 200,
+      "sha256": "9625cfa4da8015d968a708b913cc6566e296d597473734e16bddbe6075b76a59",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "engineering.html",
+      "status": 200,
+      "sha256": "0ff8a7695df28a7cd0fddeea3c3290e655c441fc750a7744fbaa42b0f37fcc7d",
+      "matches_disk": true
+    },
+    {
+      "port": 4192,
+      "path": "index.html",
+      "status": 200,
+      "sha256": "aa722497250d2da700c27122d7f9fdcb37e5013f52eed601356978b948b5d915",
+      "matches_disk": true
+    }
+  ]
+}

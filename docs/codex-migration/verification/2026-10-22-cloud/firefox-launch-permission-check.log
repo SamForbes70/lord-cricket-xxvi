@@ -1,0 +1,19 @@
+2026-10-22T08:28:36.376Z pw:browser <launching> /workspace/.cache/ms-playwright/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-rTtYmP -juggler-pipe -silent
+2026-10-22T08:28:36.381Z pw:browser <launched> pid=18617
+2026-10-22T08:28:36.404Z pw:browser [pid=18617][err] *** You are running in headless mode.
+2026-10-22T08:28:36.459Z pw:browser [pid=18617][err] JavaScript warning: resource://services-settings/Utils.sys.mjs, line 116: unreachable code after return statement
+2026-10-22T08:28:36.462Z pw:browser [pid=18617][out] console.warn: services.settings: Ignoring preference override of remote settings server
+2026-10-22T08:28:36.462Z pw:browser [pid=18617][out] console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+2026-10-22T08:28:36.637Z pw:browser [pid=18617][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.250067) [GFX1-]: glxtest: libpci missing
+2026-10-22T08:28:36.637Z pw:browser [pid=18617][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.250067) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.250067) [GFX1-]: glxtest: Unable to open a connection to the X server
+2026-10-22T08:28:36.637Z pw:browser [pid=18617][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=0.250067) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=0.250067) |[2][GFX1-]: No GPUs detected via PCI
+2026-10-22T08:28:36.637Z pw:browser [pid=18617][out]  (t=0.250067) [GFX1-]: No GPUs detected via PCI
+2026-10-22T08:28:36.637Z pw:browser [pid=18617][out] 
+2026-10-22T08:28:36.678Z pw:browser [pid=18617][out] 
+2026-10-22T08:28:36.678Z pw:browser [pid=18617][out] Juggler listening to the pipe
+142.0.1
+2026-10-22T08:28:36.788Z pw:browser [pid=18617] <gracefully close start>
+2026-10-22T08:28:37.470Z pw:browser [pid=18617] <process did exit: exitCode=0, signal=null>
+2026-10-22T08:28:37.470Z pw:browser [pid=18617] starting temporary directories cleanup
+2026-10-22T08:28:37.476Z pw:browser [pid=18617] finished temporary directories cleanup
+2026-10-22T08:28:37.476Z pw:browser [pid=18617] <gracefully close end>

@@ -1,0 +1,252 @@
+[
+  {
+    "name": "browser-ai",
+    "exitCode": 0,
+    "durationSeconds": 5.816
+  },
+  {
+    "name": "browser-career",
+    "exitCode": 0,
+    "durationSeconds": 62.084
+  },
+  {
+    "name": "browser-core-smoke-corrected",
+    "exitCode": 0,
+    "durationSeconds": 36.66
+  },
+  {
+    "name": "browser-core-smoke",
+    "exitCode": 1,
+    "durationSeconds": 1.855
+  },
+  {
+    "name": "browser-keyboard-baseline",
+    "exitCode": 1,
+    "durationSeconds": 20.29
+  },
+  {
+    "name": "browser-match-persistence",
+    "exitCode": 0,
+    "durationSeconds": 29.145
+  },
+  {
+    "name": "browser-odi",
+    "exitCode": 0,
+    "durationSeconds": 14.309
+  },
+  {
+    "name": "browser-red5",
+    "exitCode": 0,
+    "durationSeconds": 18.456
+  },
+  {
+    "name": "browser-season-idb",
+    "exitCode": 0,
+    "durationSeconds": 5.117
+  },
+  {
+    "name": "browser-ui-baseline",
+    "exitCode": 1,
+    "durationSeconds": 21.847
+  },
+  {
+    "name": "browser-ui",
+    "exitCode": 1,
+    "durationSeconds": 57.962
+  },
+  {
+    "name": "build",
+    "exitCode": 0,
+    "durationSeconds": 8.496
+  },
+  {
+    "name": "firefox-ai",
+    "exitCode": 0,
+    "durationSeconds": 11.633
+  },
+  {
+    "name": "firefox-career-permitted",
+    "exitCode": 0,
+    "durationSeconds": 102.881
+  },
+  {
+    "name": "firefox-career",
+    "exitCode": 130,
+    "durationSeconds": 155.506
+  },
+  {
+    "name": "firefox-core",
+    "exitCode": 0,
+    "durationSeconds": 11.863
+  },
+  {
+    "name": "firefox-install-retry",
+    "exitCode": 0,
+    "durationSeconds": 8.242
+  },
+  {
+    "name": "firefox-install",
+    "exitCode": 1,
+    "durationSeconds": 1.916
+  },
+  {
+    "name": "firefox-launch-diagnostic",
+    "exitCode": 1,
+    "durationSeconds": 15.54
+  },
+  {
+    "name": "firefox-launch-permission-check",
+    "exitCode": 0,
+    "durationSeconds": 1.596
+  },
+  {
+    "name": "firefox-red5",
+    "exitCode": 0,
+    "durationSeconds": 12.573
+  },
+  {
+    "name": "firefox-ui",
+    "exitCode": 1,
+    "durationSeconds": 56.277
+  },
+  {
+    "name": "firefox-version",
+    "exitCode": 1,
+    "durationSeconds": 94.091
+  },
+  {
+    "name": "fixtures-audit",
+    "exitCode": 0,
+    "durationSeconds": 1.395
+  },
+  {
+    "name": "fixtures-engine",
+    "exitCode": 0,
+    "durationSeconds": 1.67
+  },
+  {
+    "name": "generator",
+    "exitCode": 0,
+    "durationSeconds": 1.093
+  },
+  {
+    "name": "github-issue-resolved",
+    "exitCode": 0,
+    "durationSeconds": 0.457
+  },
+  {
+    "name": "github-issue",
+    "exitCode": 1,
+    "durationSeconds": 0.24
+  },
+  {
+    "name": "history",
+    "exitCode": 0,
+    "durationSeconds": 0.036
+  },
+  {
+    "name": "install",
+    "exitCode": 0,
+    "durationSeconds": 5.987
+  },
+  {
+    "name": "lint-final",
+    "exitCode": 0,
+    "durationSeconds": 7.191
+  },
+  {
+    "name": "lint",
+    "exitCode": 0,
+    "durationSeconds": 7.524
+  },
+  {
+    "name": "management",
+    "exitCode": 0,
+    "durationSeconds": 81.826
+  },
+  {
+    "name": "persistence-bundle",
+    "exitCode": 0,
+    "durationSeconds": 1.722
+  },
+  {
+    "name": "prebuilt-server",
+    "exitCode": 0,
+    "durationSeconds": 0.682
+  },
+  {
+    "name": "probability",
+    "exitCode": 0,
+    "durationSeconds": 0.788
+  },
+  {
+    "name": "python",
+    "exitCode": 0,
+    "durationSeconds": 5.117
+  },
+  {
+    "name": "restore-fixtures",
+    "exitCode": 0,
+    "durationSeconds": 0.478
+  },
+  {
+    "name": "schemas",
+    "exitCode": 0,
+    "durationSeconds": 1.181
+  },
+  {
+    "name": "typecheck-final",
+    "exitCode": 0,
+    "durationSeconds": 9.477
+  },
+  {
+    "name": "typecheck",
+    "exitCode": 0,
+    "durationSeconds": 10.947
+  },
+  {
+    "name": "unit-main",
+    "exitCode": 0,
+    "durationSeconds": 49.761
+  },
+  {
+    "name": "unit-red5-final",
+    "exitCode": 0,
+    "durationSeconds": 9.684
+  },
+  {
+    "name": "unit-red5-retry",
+    "exitCode": 0,
+    "durationSeconds": 11.022
+  },
+  {
+    "name": "unit-red5",
+    "exitCode": 1,
+    "durationSeconds": 9.413
+  },
+  {
+    "name": "unit-season-final",
+    "exitCode": 0,
+    "durationSeconds": 83.663
+  },
+  {
+    "name": "unit-season-isolated",
+    "exitCode": 1,
+    "durationSeconds": 47.247
+  },
+  {
+    "name": "unit-season",
+    "exitCode": 1,
+    "durationSeconds": 48.841
+  },
+  {
+    "name": "vectors",
+    "exitCode": 0,
+    "durationSeconds": 0.652
+  },
+  {
+    "name": "versions",
+    "exitCode": 0,
+    "durationSeconds": 1.673
+  }
+]

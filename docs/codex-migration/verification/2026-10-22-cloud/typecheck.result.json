@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:10:00.044753+00:00",
+  "durationSeconds": 10.947,
+  "exitCode": 0,
+  "log": "typecheck.log",
+  "sha256": "19bc8e4a5d299cc96d991ef3862f9a2859a7c9975618f4df1b7c4c3b2ce09c39"
+}

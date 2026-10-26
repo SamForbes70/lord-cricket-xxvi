@@ -1,0 +1,19 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m6f.config.ts",
+    "--output",
+    "/tmp/lcxxvi-m6f-acceptance",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:13:26.721643+00:00",
+  "durationSeconds": 5.117,
+  "exitCode": 0,
+  "log": "browser-season-idb.log",
+  "sha256": "a77d34562864eb95e0ff7cf7c460d0c67f03b75e025b364bfe62fca70f25fe4f"
+}

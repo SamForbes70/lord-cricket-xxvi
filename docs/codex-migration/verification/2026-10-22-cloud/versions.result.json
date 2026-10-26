@@ -1,0 +1,13 @@
+{
+  "command": [
+    "bash",
+    "-c",
+    "node --version; npm --version; python3 --version; git --version; chromium --version; npx playwright --version; uname -srm; nproc; free -m"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:18:04.655109+00:00",
+  "durationSeconds": 1.673,
+  "exitCode": 0,
+  "log": "versions.log",
+  "sha256": "707addebc353a7feb1cfd7f94f4e990b8590e78b5f6219e53300cb21689604bf"
+}

@@ -1,11 +1,12 @@
 import { test, expect, type Page, type Locator } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
-const dir = "docs/verification-pass08";
+const dir = process.env.LCXXVI_UI_EVIDENCE_DIR ?? "docs/verification-pass08";
 async function ready(page: Page) {
-  await page.goto("/");
+  await page.goto("/#exhibition");
+  // Fresh Windows Firefox profiles can initialise the match worker slowly.
   await expect(
     page.getByRole("button", { name: "Confirm XIs and start" }),
-  ).toBeEnabled();
+  ).toBeEnabled({ timeout: 30_000 });
 }
 async function settle(page: Page) {
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
@@ -152,7 +153,10 @@ test("desktop essential strip, 150% scale, reduced motion, narrow view and long 
   browserName,
 }) => {
   await startReady(page);
+  const desktop: Record<string, Record<string, { top: number; bottom: number }>> = {};
   for (const scale of ["100", "150"]) {
+    const bounds: Record<string, { top: number; bottom: number }> = {};
+    desktop[scale] = bounds;
     await page.getByLabel("Text scale").selectOption(scale);
     await page.evaluate(() => window.scrollTo(0, 0));
     for (const [name, locator] of [
@@ -160,9 +164,12 @@ test("desktop essential strip, 150% scale, reduced motion, narrow view and long 
       ["active", page.getByTestId("active")],
       ["target", page.getByTestId("target")],
       ["decision-top", page.locator(".decision-top")],
+      ["next-delivery", page.getByRole("button", { name: "Next delivery" })],
+      ["finish-over", page.getByRole("button", { name: "Finish over" })],
     ] as const) {
       const box = await locator.boundingBox();
       expect(box, `${name} has a box`).not.toBeNull();
+      bounds[name] = { top: box!.y, bottom: box!.y + box!.height };
       expect(box!.y, `${name} starts in viewport`).toBeGreaterThanOrEqual(0);
       expect(
         box!.y + box!.height,
@@ -179,11 +186,18 @@ test("desktop essential strip, 150% scale, reduced motion, narrow view and long 
   await settle(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => window.scrollTo(0, 0));
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
+  const narrow = await page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth }));
+  expect(narrow.scrollWidth, "150% narrow document width").toBeLessThanOrEqual(narrow.width);
+  for (const control of [
+    page.getByRole("button", { name: "Next delivery" }),
+    page.getByRole("button", { name: "Finish over" }),
+    page.locator(".decision-top"),
+  ]) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(narrow.width);
+  }
   await shot(page, browserName, "narrow-150");
   // Presentation-only stress fixture: never changes the frozen world or worker session.
   await page
@@ -194,17 +208,17 @@ test("desktop essential strip, 150% scale, reduced motion, narrow view and long 
         (el.textContent =
           "Alexanderson Montgomery-Wetherington Chandrasekhar van der Westhuizen"),
     );
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
+  const longName = await page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth }));
+  expect(longName.scrollWidth, "150% long-name document width").toBeLessThanOrEqual(longName.width);
   await shot(page, browserName, "long-name-150");
   await page
     .getByRole("button", { name: "Save copy" })
     .scrollIntoViewIfNeeded();
   await expect(page.getByRole("button", { name: "Save copy" })).toBeEnabled();
   await expect(page.getByTestId("save-status")).toContainText("Saved");
+  writeFileSync(`${dir}/${browserName}-layout.json`, JSON.stringify({
+    status: "PASS", desktop, narrow, longName, humanBrowserTester: false,
+  }, null, 2) + "\n");
 });
 
 test("selection validity, tactics acceptance and explicit rejection of invalid named fields", async ({

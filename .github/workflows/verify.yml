@@ -14,10 +14,54 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium firefox
       - run: npm run verify:07a
+      - name: Exhibition layout regressions in both browsers
+        run: npx playwright test --config playwright.ui.config.ts --grep "desktop essential" --reporter list --output test-results/layout --trace retain-on-failure
+        env:
+          LCXXVI_UI_EVIDENCE_DIR: test-results/layout/images
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: pass07a-verification
-          path: docs/verification-pass07a/
+          path: |
+            docs/verification-pass07a/
+            test-results/layout/
+          if-no-files-found: warn
+          retention-days: 14
+  windows-browser-acceptance:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Record Windows runtime and source
+        run: |
+          node -e "console.log(process.platform, process.version)"
+          git rev-parse HEAD
+      - run: npm ci
+      - run: npx playwright install chromium firefox
+      - run: npm run schemas:check
+      - run: npm run build
+        id: build
+      - name: Validate frozen world bytes before browser acceptance
+        run: node scripts/verify-world.mjs
+      - name: Chromium and Firefox match UI acceptance
+        run: npx playwright test --config playwright.ui.config.ts --reporter list --output test-results/windows-ui --trace on
+        env:
+          LCXXVI_UI_EVIDENCE_DIR: test-results/windows-ui/images
+      - name: Chromium and Firefox career acceptance
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npx playwright test --config playwright.m6g.portable.config.ts --reporter list --output test-results/windows-career --trace on
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-browser-acceptance
+          path: |
+            test-results/windows-ui/
+            test-results/windows-career/
           if-no-files-found: warn
           retention-days: 14

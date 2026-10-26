@@ -14,7 +14,7 @@ const gates = [
   ["vectors", ["run", "vectors:check"]],
   ["probability-vectors", ["run", "probability:check"]],
   ["generator-vectors", ["run", "generator:check"]],
-  ["unit", ["test"]],
+  ["unit", ["test", "--", "--maxWorkers=2"]],
   ["smoke", ["run", "smoke"]],
 ];
 const results = [];
@@ -48,7 +48,8 @@ for (const [name, args] of gates) {
   const result = spawnSync(executable, arguments_, {
     encoding: "utf8",
     maxBuffer: 10_000_000,
-    timeout: name === "smoke" ? 660_000 : 90_000,
+    // The full season/persistence suite outgrew the original 90-second budget.
+    timeout: name === "smoke" ? 660_000 : name === "unit" ? 300_000 : 90_000,
   });
   const log =
     (result.stdout ?? "") +

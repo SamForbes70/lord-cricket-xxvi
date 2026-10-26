@@ -1,0 +1,23 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m6g.config.ts",
+    "--grep",
+    "keyboard",
+    "--timeout",
+    "15000",
+    "--output",
+    "/tmp/lcxxvi-keyboard-baseline",
+    "--trace",
+    "retain-on-failure"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:11:02.025885+00:00",
+  "durationSeconds": 20.29,
+  "exitCode": 1,
+  "log": "browser-keyboard-baseline.log",
+  "sha256": "be8eb4a51ced5e37bddc6340925e625e63dc5b68f9b0d6a400adf2d42c9d2147"
+}

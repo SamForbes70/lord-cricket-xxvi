@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "fixtures:engine"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T12:18:55.683158+00:00",
+  "durationSeconds": 0.966,
+  "exitCode": 0,
+  "log": "fixtures.log",
+  "sha256": "29518f19349c020bb7b2f1602b1688c45d933915ad86dd2f3b5b8b9f91dce590"
+}

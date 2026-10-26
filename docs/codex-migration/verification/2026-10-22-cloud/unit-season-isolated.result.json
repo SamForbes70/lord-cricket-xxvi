@@ -1,0 +1,15 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "season:persistence:rules",
+    "--",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:14:10.933176+00:00",
+  "durationSeconds": 47.247,
+  "exitCode": 1,
+  "log": "unit-season-isolated.log",
+  "sha256": "02f44e394e796ce3aded24d8a663799c7519603cf6086002e7898bc315b5e56b"
+}

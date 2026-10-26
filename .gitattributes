@@ -1,0 +1,2 @@
+# Frozen JSON packs, fixtures and generated schemas require identical bytes on Windows.
+*.json text eol=lf

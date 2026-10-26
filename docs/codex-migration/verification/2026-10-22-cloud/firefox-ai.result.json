@@ -1,0 +1,21 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m7b.config.ts",
+    "--project",
+    "firefox",
+    "--output",
+    "/tmp/lcxxvi-firefox-ai",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:32:13.947802+00:00",
+  "durationSeconds": 11.633,
+  "exitCode": 0,
+  "log": "firefox-ai.log",
+  "sha256": "0e8ce197913e8846a0824dc1c8e83a383308c6534f58c37035efa2545d8ddf53"
+}

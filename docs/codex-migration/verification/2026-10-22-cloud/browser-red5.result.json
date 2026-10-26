@@ -1,0 +1,23 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.m5b.config.ts",
+    "--project",
+    "chromium-m5b",
+    "--reporter",
+    "list",
+    "--output",
+    "/tmp/lcxxvi-red5-acceptance",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:16:01.286553+00:00",
+  "durationSeconds": 18.456,
+  "exitCode": 0,
+  "log": "browser-red5.log",
+  "sha256": "7e0569554cdb86d1babe97bd2f7fe30a63d4f231a64277b0e897a479d449427e"
+}

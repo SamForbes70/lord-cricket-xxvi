@@ -1,0 +1,19 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_m7*.py",
+    "-v"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:10:46.644832+00:00",
+  "durationSeconds": 5.117,
+  "exitCode": 0,
+  "log": "python.log",
+  "sha256": "e5cdfefbc66ddab31d2bd32ae5740dccecc703e99389e809a23c5690fd89b8c9"
+}

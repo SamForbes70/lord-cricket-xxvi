@@ -1,0 +1,20 @@
+{
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "40s",
+    "env",
+    "DEBUG=pw:browser",
+    "PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright",
+    "node",
+    "--input-type=module",
+    "-e",
+    "import { firefox } from \"playwright\"; const browser = await firefox.launch({timeout:15000}); console.log(await browser.version()); await browser.close();"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:27:56.975167+00:00",
+  "durationSeconds": 15.54,
+  "exitCode": 1,
+  "log": "firefox-launch-diagnostic.log",
+  "sha256": "c4cbf9ffb3b27d22b71354a9f258e6b1224e5c52ba8f86e4bcdeda89531d2fff"
+}

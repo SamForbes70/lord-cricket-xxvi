@@ -1,0 +1,46 @@
+[2m[WebServer] [22m(node:13230) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:13243) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:13296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+chromium keyboard step [33m0[39m AWAITING_INNINGS
+chromium keyboard step [33m10[39m READY
+chromium keyboard step [33m20[39m READY
+chromium keyboard step [33m30[39m READY
+chromium keyboard step [33m40[39m AWAITING_BOWLER
+chromium keyboard step [33m50[39m AWAITING_BOWLER
+chromium keyboard step [33m60[39m AWAITING_BOWLER
+chromium keyboard step [33m70[39m AWAITING_BOWLER
+chromium keyboard step [33m80[39m AWAITING_BOWLER
+chromium keyboard step [33m90[39m AWAITING_BOWLER
+chromium keyboard step [33m100[39m AWAITING_BATTER
+chromium keyboard step [33m110[39m AWAITING_BOWLER
+  ✓  1 [chromium] › tests/ui/match.spec.ts:55:1 › a full keyboard-only human-command match, replay identity and terminal controls (30.2s)
+  ✓  2 [chromium] › tests/ui/match.spec.ts:126:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (3.6s)
+  ✓  3 [chromium] › tests/ui/match.spec.ts:207:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (2.2s)
+(node:13581) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13581) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+firefox keyboard step [33m0[39m AWAITING_INNINGS
+firefox keyboard step [33m10[39m READY
+firefox keyboard step [33m20[39m READY
+firefox keyboard step [33m30[39m READY
+firefox keyboard step [33m40[39m READY
+firefox keyboard step [33m50[39m READY
+firefox keyboard step [33m60[39m READY
+firefox keyboard step [33m70[39m READY
+firefox keyboard step [33m80[39m READY
+firefox keyboard step [33m90[39m READY
+firefox keyboard step [33m100[39m READY
+  ✓  4 [firefox] › tests/ui/match.spec.ts:55:1 › a full keyboard-only human-command match, replay identity and terminal controls (30.9s)
+  ✓  5 [firefox] › tests/ui/match.spec.ts:126:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (2.1s)
+  ✓  6 [firefox] › tests/ui/match.spec.ts:207:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (2.4s)
+
+  6 passed (1.3m)

@@ -1,0 +1,45 @@
+
+> lord-cricket-xxvi@0.1.0 season:persistence:rules
+> vitest run tests/unit/season-persistence.test.ts --maxWorkers=1
+
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ❯ tests/unit/season-persistence.test.ts (10 tests | 10 skipped) 42942ms
+   ↓ M6F durable season state and archive > binds schedule, career, projection and canonical completions into one hashed state
+   ↓ M6F durable season state and archive > rejects a semantically inconsistent state even when its outer hash is recomputed
+   ↓ M6F durable season state and archive > recovers the newest valid rolling checkpoint without mutating the corrupt generation
+   ↓ M6F durable season state and archive > persists a pause before the managed fixture and accepts the same fixture through the USER_MATCH completion boundary
+   ↓ M6F durable season state and archive > rebuilds the final projection exactly from canonical completion records
+   ↓ M6F durable season state and archive > creates an immutable completed-season archive only after all 56 fixtures reconcile
+   ↓ M6F durable season state and archive > round-trips an active season portable save byte-for-byte in canonical state
+   ↓ M6F durable season state and archive > reloads an active portable save and can advance into the next scheduled round
+   ↓ M6F durable season state and archive > round-trips a complete season with its immutable archive and rejects payload tampering
+   ↓ M6F durable season state and archive > rejects summary/state substitution during import staging
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/season-persistence.test.ts [ tests/unit/season-persistence.test.ts ]
+Error: Hook timed out in 35000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+ ❯ tests/unit/season-persistence.test.ts:102:1
+    100| }
+    101| 
+    102| beforeAll(async () => {
+       | ^
+    103|   partialState = await buildState(1);
+    104|   completeState = await buildState(14);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  10 skipped (10)
+   Start at  08:14:11
+   Duration  46.32s (transform 452ms, setup 0ms, collect 950ms, tests 42.94s, environment 0ms, prepare 105ms)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

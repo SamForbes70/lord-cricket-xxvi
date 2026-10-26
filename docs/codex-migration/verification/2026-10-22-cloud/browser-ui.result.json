@@ -1,0 +1,23 @@
+{
+  "command": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.ui.config.ts",
+    "--project",
+    "chromium",
+    "--reporter",
+    "list",
+    "--output",
+    "/tmp/lcxxvi-ui-acceptance",
+    "--trace",
+    "on"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:12:30.636732+00:00",
+  "durationSeconds": 57.962,
+  "exitCode": 1,
+  "log": "browser-ui.log",
+  "sha256": "7f0d3c2b8c7cb230c074e18c81742459eafef49c8733f9ad4e7501b8f641c2e1"
+}

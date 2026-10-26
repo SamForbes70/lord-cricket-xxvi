@@ -1,0 +1,47 @@
+# Page snapshot
+
+```yaml
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: LORD CRICKET XXVI
+      - heading "Start a Career" [level=1] [ref=e7]
+    - link "Exhibition matches" [ref=e8] [cursor=pointer]:
+      - /url: "#exhibition"
+  - region "Product status" [ref=e9]:
+    - strong [ref=e10]: Playable alpha.
+    - text: Fictional eight-team dataset · SYNTHETIC_ALPHA model · one T20 season · no transfers, contracts, finances, international management or verified DLS.
+  - generic [ref=e11]:
+    - heading "New career" [level=2] [ref=e12]
+    - paragraph [ref=e13]: Choose the team you will manage for the fixed 14-round, 56-match season.
+    - generic [ref=e14]:
+      - button "Aster Harbour Aster Quay" [ref=e15] [cursor=pointer]:
+        - strong [ref=e16]: Aster Harbour
+        - generic [ref=e17]: Aster Quay
+      - button "Copper Vale Copperfield" [ref=e18] [cursor=pointer]:
+        - strong [ref=e19]: Copper Vale
+        - generic [ref=e20]: Copperfield
+      - button "Northlight Ridge Northlight Park" [ref=e21] [cursor=pointer]:
+        - strong [ref=e22]: Northlight Ridge
+        - generic [ref=e23]: Northlight Park
+      - button "Westmere Isles Westmere Oval" [ref=e24] [cursor=pointer]:
+        - strong [ref=e25]: Westmere Isles
+        - generic [ref=e26]: Westmere Oval
+      - button "Ember Plains Ember Meadow" [ref=e27] [cursor=pointer]:
+        - strong [ref=e28]: Ember Plains
+        - generic [ref=e29]: Ember Meadow
+      - button "Silver Fen Silverfen" [ref=e30] [cursor=pointer]:
+        - strong [ref=e31]: Silver Fen
+        - generic [ref=e32]: Silverfen
+      - button "Larchwood Larchwood Ground" [ref=e33] [cursor=pointer]:
+        - strong [ref=e34]: Larchwood
+        - generic [ref=e35]: Larchwood Ground
+      - button "Moonstone Bay Moonstone Fields" [ref=e36] [cursor=pointer]:
+        - strong [ref=e37]: Moonstone Bay
+        - generic [ref=e38]: Moonstone Fields
+  - generic [ref=e39]:
+    - heading "Import portable career" [level=2] [ref=e40]
+    - generic [ref=e41]:
+      - text: Choose .lcxxvi archive
+      - button "Choose .lcxxvi archive" [ref=e42]
+```

@@ -1,0 +1,59 @@
+[2m[WebServer] [22m(node:19517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:19530) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:19549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+firefox keyboard step [33m0[39m AWAITING_INNINGS
+firefox keyboard step [33m10[39m READY
+firefox keyboard step [33m20[39m READY
+firefox keyboard step [33m30[39m READY
+firefox keyboard step [33m40[39m READY
+firefox keyboard step [33m50[39m READY
+firefox keyboard step [33m60[39m READY
+firefox keyboard step [33m70[39m AWAITING_BOWLER
+firefox keyboard step [33m80[39m AWAITING_BOWLER
+firefox keyboard step [33m90[39m AWAITING_BOWLER
+  ✓  1 [firefox] › tests/ui/match.spec.ts:54:1 › a full keyboard-only human-command match, replay identity and terminal controls (37.2s)
+  ✘  2 [firefox] › tests/ui/match.spec.ts:125:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (3.7s)
+(node:19815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [firefox] › tests/ui/match.spec.ts:170:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (5.6s)
+
+
+  1) [firefox] › tests/ui/match.spec.ts:125:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      184 |       () => document.documentElement.scrollWidth <= innerWidth,
+      185 |     ),
+    > 186 |   ).toBe(true);
+          |     ^
+      187 |   await shot(page, browserName, "narrow-150");
+      188 |   // Presentation-only stress fixture: never changes the frozen world or worker session.
+      189 |   await page
+        at /workspace/lord-cricket-xxvi/tests/ui/match.spec.ts:186:5
+
+    Error Context: ../../tmp/lcxxvi-firefox-ui/match-desktop-essential-st-56cd9--narrow-view-and-long-names-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/lcxxvi-firefox-ui/match-desktop-essential-st-56cd9--narrow-view-and-long-names-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../tmp/lcxxvi-firefox-ui/match-desktop-essential-st-56cd9--narrow-view-and-long-names-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [firefox] › tests/ui/match.spec.ts:125:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names 
+  2 passed (54.4s)

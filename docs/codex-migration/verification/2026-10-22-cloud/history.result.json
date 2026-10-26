@@ -1,0 +1,13 @@
+{
+  "command": [
+    "bash",
+    "-c",
+    "git status --short --branch; git log --oneline -5; git cat-file -t 5b8b9da990d657197fb56bbfd33152f87b875f5c; git merge-base --is-ancestor 5b8b9da990d657197fb56bbfd33152f87b875f5c HEAD; git diff --exit-code 5b8b9da990d657197fb56bbfd33152f87b875f5c HEAD -- apps packages scripts tests; git rev-list --count 5b8b9da990d657197fb56bbfd33152f87b875f5c"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:18:06.369648+00:00",
+  "durationSeconds": 0.036,
+  "exitCode": 0,
+  "log": "history.log",
+  "sha256": "8ce735a3ab682c64cea12e4489874baf064393381883aeece81572880f1b4f9f"
+}

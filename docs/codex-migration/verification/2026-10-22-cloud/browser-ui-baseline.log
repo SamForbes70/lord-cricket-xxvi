@@ -1,0 +1,55 @@
+[2m[WebServer] [22m(node:12152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:12188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:12246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/ui/match.spec.ts:170:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (13.0s)
+
+
+  1) [chromium] › tests/ui/match.spec.ts:170:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeEnabled[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: 'Confirm XIs and start' })
+    Expected: enabled
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeEnabled" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: 'Confirm XIs and start' })[22m
+
+
+       6 |   await expect(
+       7 |     page.getByRole("button", { name: "Confirm XIs and start" }),
+    >  8 |   ).toBeEnabled();
+         |     ^
+       9 | }
+      10 | async function settle(page: Page) {
+      11 |   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
+        at ready (/workspace/lord-cricket-xxvi/tests/ui/match.spec.ts:8:5)
+        at /workspace/lord-cricket-xxvi/tests/ui/match.spec.ts:214:3
+
+    Error Context: ../../tmp/lcxxvi-ui-baseline/match-selection-validity-t-98223-ion-of-invalid-named-fields-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/lcxxvi-ui-baseline/match-selection-validity-t-98223-ion-of-invalid-named-fields-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../tmp/lcxxvi-ui-baseline/match-selection-validity-t-98223-ion-of-invalid-named-fields-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/ui/match.spec.ts:170:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields 
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

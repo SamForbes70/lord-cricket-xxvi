@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "m7j:restore-fixtures"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:10:46.098957+00:00",
+  "durationSeconds": 0.478,
+  "exitCode": 0,
+  "log": "restore-fixtures.log",
+  "sha256": "b956d0d60c614605ac9bb08615ff0a60a02496d13376aed606d7cb768a689ac7"
+}

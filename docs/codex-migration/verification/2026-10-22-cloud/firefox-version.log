@@ -1,0 +1,77 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+browserType.launch: Target page, context or browser has been closed
+Browser logs:
+
+<launching> /workspace/.cache/ms-playwright/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-lO3coh -juggler-pipe -silent
+<launched> pid=17941
+[pid=17941][err] *** You are running in headless mode.
+[pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) [GFX1-]: glxtest: libpci missing
+[pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=5.59285) [GFX1-]: glxtest: Unable to open a connection to the X server
+[pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=5.59285) |[2][GFX1-]: No GPUs detected via PCI
+[pid=17941][out]  (t=5.59285) [GFX1-]: No GPUs detected via PCI
+[pid=17941][out] 
+[pid=17941][err] Fontconfig error: No writable cache directories
+[pid=17941][err] Fontconfig error: No writable cache directories
+[pid=17941][err] [17997] Sandbox: writing /proc/self/uid_map: EROFS
+[pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=5.59285) |[2][GFX1-]: No GPUs detected via PCI
+[pid=17941][out]  (t=5.59285) |[3][GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt (t=5.78484) [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+[pid=17941][err] [Parent 17941, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201
+[pid=17941][err] 
+[pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.
+[pid=17941][err] [Parent 17941, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201
+[pid=17941][err] 
+[pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.
+[pid=17941][err] [Parent 17941, Unnamed thread 7f85078ccee0] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201
+[pid=17941][err] 
+[pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.
+[pid=17941][err] [Parent 17941, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201
+[pid=17941][err] 
+[pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.
+[pid=17941][err] [Parent 17941, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201
+[pid=17941][err] 
+[pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.
+[pid=17941] <gracefully close start>
+[pid=17941] <kill>
+[pid=17941] <will force kill>
+[pid=17941] <process did exit: exitCode=null, signal=SIGKILL>
+[pid=17941] starting temporary directories cleanup
+Call log:
+[2m  - <launching> /workspace/.cache/ms-playwright/firefox-1495/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-lO3coh -juggler-pipe -silent[22m
+[2m  - <launched> pid=17941[22m
+[2m  - [pid=17941][err] *** You are running in headless mode.[22m
+[2m  - [pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) [GFX1-]: glxtest: libpci missing[22m
+[2m  - [pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=5.59285) [GFX1-]: glxtest: Unable to open a connection to the X server[22m
+[2m  - [pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=5.59285) |[2][GFX1-]: No GPUs detected via PCI[22m
+[2m  - [pid=17941][out]  (t=5.59285) [GFX1-]: No GPUs detected via PCI[22m
+[2m  - [pid=17941][out][22m
+[2m  2 × [pid=17941][err] Fontconfig error: No writable cache directories[22m
+[2m  - [pid=17941][err] [17997] Sandbox: writing /proc/self/uid_map: EROFS[22m
+[2m  - [pid=17941][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: glxtest: libpci missing (t=5.59285) |[1][GFX1-]: glxtest: Unable to open a connection to the X server (t=5.59285) |[2][GFX1-]: No GPUs detected via PCI[22m
+[2m  - [pid=17941][out]  (t=5.59285) |[3][GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt (t=5.78484) [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt[22m
+[2m  2 × [pid=17941][err] [Parent 17941, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201[22m
+[2m    - [pid=17941][err][22m
+[2m    - [pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.[22m
+[2m  - [pid=17941][err] [Parent 17941, Unnamed thread 7f85078ccee0] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201[22m
+[2m  2 × [pid=17941][err][22m
+[2m    - [pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.[22m
+[2m    - [pid=17941][err] [Parent 17941, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201[22m
+[2m  - [pid=17941][err][22m
+[2m  - [pid=17941][err] (firefox-default:17941): dconf-CRITICAL **: 08:27:29.302: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.[22m
+[2m  - [pid=17941] <gracefully close start>[22m
+[2m  - [pid=17941] <kill>[22m
+[2m  - [pid=17941] <will force kill>[22m
+[2m  - [pid=17941] <process did exit: exitCode=null, signal=SIGKILL>[22m
+[2m  - [pid=17941] starting temporary directories cleanup[22m
+[2m  - [pid=17941] <forcefully close>[22m
+[2m  - [pid=17941] <kill>[22m
+[2m  - [pid=17941] <skipped force kill spawnedProcess.killed=false processClosed=true>[22m
+[2m  - [pid=17941] finished temporary directories cleanup[22m
+[2m  - [pid=17941] <gracefully close end>[22m
+
+    at /workspace/lord-cricket-xxvi/[eval1]:1:69
+    at async node:internal/modules/esm/loader:224:26
+
+Node.js v24.19.0

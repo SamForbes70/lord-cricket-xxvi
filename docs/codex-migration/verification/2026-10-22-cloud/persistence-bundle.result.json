@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "season:persistence:bundle"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:13:24.936800+00:00",
+  "durationSeconds": 1.722,
+  "exitCode": 0,
+  "log": "persistence-bundle.log",
+  "sha256": "c41ac9fddcdbe6700cef82332647fa568977246b935ee0e0e9431cd39d2ceb78"
+}

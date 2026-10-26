@@ -1,0 +1,9 @@
+Error: Project(s) "tests/smoke/app.spec.ts", "tests/smoke/determinism.spec.ts", "tests/smoke/probability.spec.ts", "tests/smoke/generator.spec.ts", "tests/smoke/world.spec.ts" not found. Available projects: "chromium", "firefox-determinism"
+    at filterProjects (/workspace/lord-cricket-xxvi/node_modules/playwright/lib/runner/projectUtils.js:80:11)
+    at runTests (/workspace/lord-cricket-xxvi/node_modules/playwright/lib/program.js:217:42)
+    at i.<anonymous> (/workspace/lord-cricket-xxvi/node_modules/playwright/lib/program.js:71:7)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

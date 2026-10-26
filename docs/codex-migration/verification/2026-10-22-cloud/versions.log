@@ -1,0 +1,16 @@
+v24.19.0
+11.9.0
+Python 3.12.14
+git version 2.52.0
+Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)
+Version 1.56.0
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+Linux 6.18.55 x86_64
+5
+               total        used        free      shared  buff/cache   available
+Mem:           34087        2215       32028          64         322       31872
+Swap:              0           0           0

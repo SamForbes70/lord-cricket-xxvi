@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "vectors:check"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:10:43.336889+00:00",
+  "durationSeconds": 0.652,
+  "exitCode": 0,
+  "log": "vectors.log",
+  "sha256": "0fed95bd9940c4a9db447da39a20b0930f12de85e904e35fc02736e70020e7a1"
+}

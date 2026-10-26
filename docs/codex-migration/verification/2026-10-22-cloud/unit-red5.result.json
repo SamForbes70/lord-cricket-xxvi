@@ -1,0 +1,15 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "red5:rules",
+    "--",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/workspace/lord-cricket-xxvi",
+  "startedAtUTC": "2026-10-22T08:11:29.973363+00:00",
+  "durationSeconds": 9.413,
+  "exitCode": 1,
+  "log": "unit-red5.log",
+  "sha256": "7a21ba4229e9a09c4b3af1de5c7e4b582986ef7c76ff510852eed969c215a5e5"
+}

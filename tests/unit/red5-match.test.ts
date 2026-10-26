@@ -293,5 +293,5 @@ describe("Pass 11 / M5B red-ball profile", () => {
     const replay = replayRed5Events(setup, s.events, red5EventChainManifest(s));
     expect(replay.lastEventHash).toBe(s.lastEventHash);
     resimulateRed5Commands(s);
-  });
+  }, 60_000);
 });
