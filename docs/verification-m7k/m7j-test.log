@@ -1,0 +1,24 @@
+
+> lord-cricket-xxvi@0.1.0 m7j:test
+> vitest run tests/unit/m7j-adjudication.test.ts && python3 -m unittest discover -s tests -p test_m7j_exception_audit.py -v
+
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ✓ tests/unit/m7j-adjudication.test.ts (12 tests) 19ms
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  09:35:13
+   Duration  424ms (transform 105ms, setup 0ms, collect 226ms, tests 19ms, environment 0ms, prepare 61ms)
+
+test_all_69_identity_and_reason_counts (test_m7j_exception_audit.M7JExceptionAudit.test_all_69_identity_and_reason_counts) ... ok
+test_duplicate_provenance_fails (test_m7j_exception_audit.M7JExceptionAudit.test_duplicate_provenance_fails) ... ok
+test_multi_wickets_not_considered_automatically_supported (test_m7j_exception_audit.M7JExceptionAudit.test_multi_wickets_not_considered_automatically_supported) ... ok
+test_no_ball_not_normalized_without_evidence (test_m7j_exception_audit.M7JExceptionAudit.test_no_ball_not_normalized_without_evidence) ... ok
+test_unknown_reason_fails (test_m7j_exception_audit.M7JExceptionAudit.test_unknown_reason_fails) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK

@@ -1,6 +1,8 @@
 # Lord Cricket XXVI - NEXT PASS after M7J
 
-**M7K proposed:** Laws-adjudicated v2 scorer ledger integration and empirical gameplay promotion feasibility.
+**M7K started:** planning and evidence preparation, authorised 26 October 2026.
+See [M7K_PLAN.md](M7K_PLAN.md) for ordered slices, acceptance gates and the 69-case evidence worksheet.
+Production integration and research-model promotion remain gated separately.
 
 Baseline: M7J committed source (record exact hash in PASS_22_M7J_REPORT.md).
 

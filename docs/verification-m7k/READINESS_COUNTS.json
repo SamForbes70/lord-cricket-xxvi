@@ -1,0 +1,19 @@
+{
+  "caseCount": 69,
+  "countByDisposition": {
+    "CONFLICT_REQUIRES_EVENT_ORDER_REVIEW": 4,
+    "CONFLICT_REQUIRES_OVERTHROW_CHRONOLOGY": 2,
+    "CONFLICT_REQUIRES_SOURCE_REVIEW": 5,
+    "NEEDS_FIELD_AND_ENDS_ADJUDICATION": 2,
+    "NEEDS_UMPIRE_AND_CHRONOLOGY_CONFIRMATION": 24,
+    "NEEDS_UMPIRE_AWARD_REASON_AND_BENEFICIARY": 11,
+    "UNRESOLVED": 21
+  },
+  "countByCohort": {
+    "heldOut": 17,
+    "training": 52
+  },
+  "independentlyAdjudicated": 0,
+  "chronologyConfirmed": 0,
+  "gameplayIntegrationPermitted": false
+}
