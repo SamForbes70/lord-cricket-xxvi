@@ -18,3 +18,13 @@ The full 538-test suite, management season and browser suites were not rerun loc
 Earlier acceptance results remain historical evidence; this directory does not count them as fresh runs.
 No new gameplay acceptance, calibration, performance acceptance or promotion is claimed.
 `SHA256SUMS` covers retained evidence except itself.
+
+
+## Representative selection follow-up
+
+`REVIEW_CHECK_RESULTS.json` records the fresh follow-up commands and their exit codes.
+Four selector tests and five inherited Python tests pass; lint and byte-identical regeneration pass.
+Linux CI now gates the selector tests and verifies reproducible output.
+The new report selects 45 observed signatures covering every original row exactly once.
+It flags match 1391336 for separate non-retirement dismissal review.
+See `../M7K_REPRESENTATIVE_REVIEW.md` for the case list and evidence limitations.

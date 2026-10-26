@@ -125,3 +125,11 @@ It records source hashes, counts and fresh M7J regression results in `verificati
 The worksheet preserves all source identities and leaves adjudication decisions to external evidence providers.
 The next implementation slice is K1; K2 production-capable integration depends on its evidence.
 No production source, dependency, schema, save format, random stream or probability coefficient changes in this pass.
+
+
+## K1 preparation update
+
+[Representative review](M7K_REPRESENTATIVE_REVIEW.md) groups all 69 cases into 45 observed signatures.
+The selector preserves full source identities and flags a non-retirement dismissal incorrectly grouped by inherited routing.
+Selection tests cover coverage, permutation stability, the routing warning and provenance rejection.
+Independent source adjudication remains pending; selected observations are not accepted scorer fixtures.
