@@ -140,3 +140,11 @@ Independent source adjudication remains pending; selected observations are not a
 [Source batch 01](verification-m7k/source-batch-01/README.md) verifies 11 source-event hashes across seven actual matches.
 It supplies match identities, dates, archive provenance and an official MCC rule reference.
 Contemporary playing conditions and independent event chronology remain unavailable; the batch approves no scorer fixtures.
+
+
+## Historical evidence follow-up
+
+[Historical evidence](verification-m7k/historical-evidence/README.md) adds independent accounts for the Finch and Mughal cases.
+It retrieves contemporary ICC standard conditions and the MCC 2022 code, replacing reliance on 2026 laws alone.
+It also documents historical free-hit scope as a limitation of the inherited research classification.
+Both cases remain partially corroborated, with zero accepted scorer fixtures and no changed adjudication flags.

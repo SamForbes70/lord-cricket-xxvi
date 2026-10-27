@@ -1,0 +1,96 @@
+{
+  "version": "LC_M7K_HISTORICAL_EVIDENCE_V1",
+  "caseCount": 2,
+  "acceptedFixtureCount": 0,
+  "cases": [
+    {
+      "matchId": "1142915",
+      "innings": 1,
+      "over": 19,
+      "attempt": 5,
+      "sourceEventSha256": "3c3e3016aaf8877acb76fd06f6de479e07dc1fd6cce840b7c1a6725bc6135a71",
+      "cohort": "training",
+      "reason": "WIDE_WICKET_MASK",
+      "status": "PARTIALLY_CORROBORATED_NOT_ADJUDICATED",
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false,
+      "gameplayIntegrationPermitted": false,
+      "reviewer": null,
+      "reviewedAt": null,
+      "sourceReferences": [
+        "ca-finch.html",
+        "bbc-finch.html",
+        "icc-2017-handbook.pdf"
+      ],
+      "corroboratedFacts": [
+        "Cricket Australia reports hit wicket while chasing a wide from Muzarabani.",
+        "BBC independently reports hit wicket and the match result.",
+        "ICC 2017-18 mens T20I conditions 22.9 allow hit wicket from a wide."
+      ],
+      "ruleLocators": {
+        "icc-2017-handbook.pdf": {
+          "pdfPage": 145,
+          "printedPages": "5.42-5.43",
+          "clauses": [
+            "22.6",
+            "22.7",
+            "22.8",
+            "22.9"
+          ]
+        },
+        "hitWicket": {
+          "pdfPage": 154,
+          "clauses": [
+            "35.1",
+            "35.2"
+          ]
+        }
+      },
+      "remainingEvidence": [
+        "Confirm match-specific amendments or their absence.",
+        "Confirm actual physical ends and field identities needed by the strict scorer context.",
+        "Independent reviewer must approve expected credits and next decision before fixture acceptance."
+      ]
+    },
+    {
+      "matchId": "1391336",
+      "innings": 1,
+      "over": 6,
+      "attempt": 5,
+      "sourceEventSha256": "be6013642c73e7b83958fd9f169566bcd7ad7f837f70d80b6318b594a21a9afd",
+      "cohort": "training",
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "status": "PARTIALLY_CORROBORATED_NOT_ADJUDICATED",
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false,
+      "gameplayIntegrationPermitted": false,
+      "reviewer": null,
+      "reviewedAt": null,
+      "sourceReferences": [
+        "wisden-mughal.html",
+        "mcc-2022.docx"
+      ],
+      "corroboratedFacts": [
+        "Wisden identifies Malta v Romania and describes a second strike, appeal and hit-the-ball-twice dismissal.",
+        "The MCC 2022 code distinguishes hit the ball twice from retirement.",
+        "MCC Law 34 excludes bowler credit for hit the ball twice."
+      ],
+      "ruleLocators": {
+        "mcc-2022.docx": {
+          "section": "LAW 34 HIT THE BALL TWICE",
+          "headings": [
+            "Out Hit the ball twice",
+            "Ball lawfully struck more than once",
+            "Bowler does not get credit"
+          ]
+        }
+      },
+      "remainingEvidence": [
+        "Confirm applicable tournament conditions and amendments.",
+        "Obtain a primary incident record or footage with reviewed timecodes.",
+        "Resolve precise contact and ground-end context before constructing the scorer fixture.",
+        "Independent reviewer must approve the complete event interpretation."
+      ]
+    }
+  ]
+}
