@@ -133,3 +133,10 @@ No production source, dependency, schema, save format, random stream or probabil
 The selector preserves full source identities and flags a non-retirement dismissal incorrectly grouped by inherited routing.
 Selection tests cover coverage, permutation stability, the routing warning and provenance rejection.
 Independent source adjudication remains pending; selected observations are not accepted scorer fixtures.
+
+
+## First source batch
+
+[Source batch 01](verification-m7k/source-batch-01/README.md) verifies 11 source-event hashes across seven actual matches.
+It supplies match identities, dates, archive provenance and an official MCC rule reference.
+Contemporary playing conditions and independent event chronology remain unavailable; the batch approves no scorer fixtures.

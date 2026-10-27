@@ -1,0 +1,5 @@
+PASS: 11 addressed event hashes across seven matches match the frozen register.
+PASS: altered expected hash rejects: Source event hash mismatch: 1391336.json, innings 1, over 6, attempt 5
+PASS: incomplete selected batch rejects: Batch does not cover every selected match
+PASS: regeneration matches VERIFIED_EVENTS.json byte for byte.
+PASS: npm run lint exits zero.
