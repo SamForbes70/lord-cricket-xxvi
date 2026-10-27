@@ -1,0 +1,135 @@
+[
+  {
+    "argv": [
+      "npm",
+      "run",
+      "schemas:check"
+    ],
+    "startedAtUtc": "2026-10-27T22:53:58.095474+00:00",
+    "seconds": 0.521,
+    "exitCode": 0,
+    "log": "schemas.log",
+    "sha256": "7b7a75d02a7b65f7e3bc1983ebd70d2124f1a1737cdd5d732b54dde8a1858065"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "startedAtUtc": "2026-10-27T22:53:58.617068+00:00",
+    "seconds": 5.682,
+    "exitCode": 0,
+    "log": "build-final.log",
+    "sha256": "fe159694c605dd44baf5f86a4541b1dfffb56c921aa0b530a1b5639708ec1bcb"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:04.298975+00:00",
+    "seconds": 3.898,
+    "exitCode": 0,
+    "log": "typecheck.log",
+    "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:08.197473+00:00",
+    "seconds": 3.678,
+    "exitCode": 0,
+    "log": "lint.log",
+    "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "fixtures:audit"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:11.877860+00:00",
+    "seconds": 0.497,
+    "exitCode": 0,
+    "log": "fixtures-audit.log",
+    "sha256": "889f1fcdd7ca5bdfab32fef6001e8eedd4989cff3a2028c6f1101262fda16deb"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "fixtures:engine"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:12.375130+00:00",
+    "seconds": 0.457,
+    "exitCode": 0,
+    "log": "fixtures-engine.log",
+    "sha256": "29518f19349c020bb7b2f1602b1688c45d933915ad86dd2f3b5b8b9f91dce590"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "vectors:check"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:12.832731+00:00",
+    "seconds": 0.132,
+    "exitCode": 0,
+    "log": "vectors.log",
+    "sha256": "0fed95bd9940c4a9db447da39a20b0930f12de85e904e35fc02736e70020e7a1"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "probability:check"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:12.964829+00:00",
+    "seconds": 0.164,
+    "exitCode": 0,
+    "log": "probability.log",
+    "sha256": "1cbd56a455937dc9a8462479070f2fd87d2ed6730ea34ebb0d420de3458f45f7"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "generator:check"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:13.128598+00:00",
+    "seconds": 0.121,
+    "exitCode": 0,
+    "log": "generator.log",
+    "sha256": "110ddf3972b8f79164c8732d45c6f77ff75a8b2d14cedc7b1d43caee545e9b9b"
+  },
+  {
+    "argv": [
+      "npm",
+      "test",
+      "--",
+      "--maxWorkers=2"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:13.250173+00:00",
+    "seconds": 37.809,
+    "exitCode": 0,
+    "log": "unit.log",
+    "sha256": "fc3583858f5472df881e0c469fa8486015000defc33b3ca7ca7ea8bf1ec658ec"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "management:acceptance"
+    ],
+    "startedAtUtc": "2026-10-27T22:54:51.059878+00:00",
+    "seconds": 31.741,
+    "exitCode": 0,
+    "log": "management.log",
+    "sha256": "0298f18b91a2914622a370f85e4365b011744d75183236a732e53749aa98f89c"
+  }
+]

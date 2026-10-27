@@ -52,4 +52,5 @@ Scorecard SHA-256:
 The owner confirmed repeat verification passed; the second hash values were not pasted separately.
 The original pasted interface showed 100% text scale and Comfortable layout.
 This record confirms the reported human checks; it does not certify unrecorded measurements or individual checklist items.
-The preserved owner release archive remains unavailable for direct comparison.
+The owner later supplied the archive; [direct comparison](codex-migration/OWNER_RELEASE_COMPARISON.md) passes.
+[Acceptance reconciliation](ACCEPTANCE_RECONCILIATION.md) records the remaining evidence gaps.

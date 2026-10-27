@@ -8,7 +8,8 @@ The management UI does not own cricket truth. It renders and commands `CareerApp
 
 The default application route is the management career. `#exhibition` opens the inherited exhibition / interactive match application.
 
-Management screens are Home, Career, Squad, Fixtures, Statistics and Settings. The UI exposes the fixed one-season product boundary and labels fictional data, `SYNTHETIC_ALPHA`, disabled DLS and the absence of tactical opponent AI.
+Management screens are Home, Career, Squad, Fixtures, Statistics and Settings. The UI exposes the fixed one-season product boundary and labels fictional data, `SYNTHETIC_ALPHA` and disabled DLS.
+Interactive T20 matches provide optional tactical captain delegation; the fixture autopilot remains a separate baseline policy.
 
 ## Managed fixture integration
 
@@ -26,4 +27,5 @@ Recovered saves are continued into a fresh recovered slot while the damaged sour
 
 ## Accessibility target
 
-The production Playwright suite is written for 1366 x 768, keyboard operation and 150% in-app text scale. Large tables are horizontally scrollable, controls are labelled and colour is not the sole status indicator. Execution of that suite is currently blocked by host browser policy before the application loads.
+The production Playwright suite is written for 1366 x 768, keyboard operation and 150% in-app text scale. Large tables are horizontally scrollable, controls are labelled and colour is not the sole status indicator. Recorded Linux and hosted Windows runs pass the portable management browser suite.
+See [current status](CURRENT_STATUS.md) for evidence and local-PC acceptance limits.

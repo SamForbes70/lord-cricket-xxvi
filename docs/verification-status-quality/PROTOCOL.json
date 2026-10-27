@@ -1,0 +1,45 @@
+{
+  "version": "LC_STATUS_QUALITY_PROTOCOL_V1",
+  "recordedAtUtc": "2026-10-27T22:49:53.268545+00:00",
+  "baseCommit": "036c21239026a36ee9eaf4aac8e766ec74e2854e",
+  "matches": 96,
+  "seedOffset": 0,
+  "seedPrefix": "m7c-profiling-",
+  "simulationCommand": [
+    "node",
+    "--import",
+    "tsx",
+    "scripts/m7c-synthetic.ts",
+    "--matches=96",
+    "--seed-offset=0"
+  ],
+  "repetitions": 2,
+  "targetBands": [
+    {
+      "name": "LOW_1_80",
+      "min": 1,
+      "max": 80
+    },
+    {
+      "name": "MIDDLE_81_100",
+      "min": 81,
+      "max": 100
+    },
+    {
+      "name": "HIGH_101_PLUS",
+      "min": 101,
+      "max": null
+    }
+  ],
+  "primaryCohort": "FIRST_INNINGS_ALL_OUT_OR_ALLOCATION_END",
+  "chaseCohorts": "Separate chase success, all-out failure and allocation-end outcomes. Do not compare censored chase totals as full innings.",
+  "statistics": "Nearest-rank P10/P50/P90. Dot/boundary fractions use delivery attempts. Phase run rate uses legal balls.",
+  "repeatCheck": "Every per-match non-runtime field and final event hash must agree across all 96 matches.",
+  "scope": "One frozen team pairing, selected XIs, ground and fixture-captain policy. Descriptive fixed-seed diagnostic, not population-matched empirical validation or tactical causal inference.",
+  "parameterChanges": false,
+  "sourceHashes": {
+    "scripts/m7c-synthetic.ts": "3ffd8368783d241815819bb2dca810a545dcf5f7d7118dbc17f2c1a4788bc014",
+    "tests/fixtures/world/t20-valid-setup.json": "f219d2075d5acd935bdfc3bfad50d2865085c9cf3435b6d5dbc69e878cb78495",
+    "packages/data/worlds/fictional-eight-01.json": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257"
+  }
+}

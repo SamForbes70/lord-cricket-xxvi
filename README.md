@@ -1,8 +1,9 @@
-# Lord Cricket XXVI | Pass 12G-R / M6G management game integration
+# Lord Cricket XXVI | Single-season management alpha
 
-Lord Cricket XXVI now contains the first coherent one-season management application over the accepted deterministic cricket engine and Pass 12A-F season systems.
+Lord Cricket XXVI provides a one-season management game over deterministic match and career systems.
+See [current status](docs/CURRENT_STATUS.md) for capabilities, acceptance evidence and remaining gates.
 
-**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management are not enabled. Optional T20 tactical opponent AI is available in the match view, but remains SYNTHETIC_ALPHA and not browser-accepted.
+**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management are not enabled. Optional T20 tactical opponent AI is available in the match view. Browser tests cover its controls; empirical tactical quality remains unaccepted.
 
 ## Player-facing management loop
 
@@ -43,11 +44,18 @@ npm run test:m6g
 
 The deterministic headless M6G acceptance completes exactly 56 fixtures with 14 `USER_MATCH` boundaries and 42 off-screen fixtures, reconciles all condition applications and projections, seals the final state/archive, and round-trips the portable season.
 
-The current execution host blocks Chromium navigation with `ERR_BLOCKED_BY_ADMINISTRATOR` before Lord Cricket code executes. The inherited Pass 12F IndexedDB browser gate and the new production M6G Playwright suite therefore remain **BLOCKED BY HOST BROWSER POLICY**, not passed. The implementation is complete, but formal M6 acceptance is not claimed while that mandatory browser gate is blocked.
+The earlier browser-policy blocker is superseded by recorded Linux and hosted Windows Chromium/Firefox results.
+These cover match UI, layouts, career reload and archive import into a fresh browser context.
+Hosted Windows results do not establish automation on the owner’s PC.
 
-Formal M3 human acceptance of the interactive match UI also remains separate and pending.
+Sam reports a successful Windows Edge match, layout check and repeat replay verification.
+[The human record](docs/M3_HUMAN_ACCEPTANCE.md) identifies the remaining unrecorded checklist details.
 
 See `docs/CAPABILITY_MATRIX.md`, `docs/MANAGEMENT_UI.md`, `docs/verification-pass12gr/` and `docs/NEXT_PASS.md`.
+
+## Historical research records
+
+The sections below describe individual passes. Later acceptance evidence is summarised in [current status](docs/CURRENT_STATUS.md).
 
 ## M7B bounded development
 
@@ -58,7 +66,7 @@ python3 scripts/m7b-reference.py --input /path/to/ipl_json.zip --out reference.j
 node --import tsx scripts/audit-m7b-quality.ts --matches=16 > paired-quality.json
 ```
 
-Cricsheet JSON data licensing: https://cricsheet.org/licensing/ (Open Data Commons Attribution). Preserve attribution and dataset notices if publishing/reference redistributing. The model remains `SYNTHETIC_ALPHA`; no real data were acquired or fitted in this build, and browser gates remain blocked on the current host.
+Cricsheet JSON data licensing: https://cricsheet.org/licensing/ (Open Data Commons Attribution). Preserve attribution and dataset notices if publishing/reference redistributing. At M7B, no real data had been fitted and browser gates were blocked. Later passes add offline research only.
 
 ## Pass 15 / M7C offline T20 calibration gate
 
@@ -105,7 +113,8 @@ The offline command regenerates M7G and M7H in `reference/m7g/` and `reference/m
 
 M7H fits a 5-regime second-innings model using training-match data, wickets lost, phase and pre-delivery required scoring rate. It separately simulates 400 two-innings matches with a target, stops on a successful chase and checks scorer-compatible categories in TypeScript. It reports excluded unusual events and unseen holdout categories rather than mapping them to invented cricket outcomes. The already-reviewed Cricsheet holdout is **development validation, not a pristine final test**. Player-history binary predictors use a fixed 300-attempt prior and Cricsheet stable registry IDs. Even when predictive log-loss improves, those marginals are **not** empirically identified 0–100 skills or captain tactical effects.
 
-The existing playable game **remains SYNTHETIC_ALPHA**. Browser and human acceptance, full legal-delivery support, player/fielding/tactic identification, score-tail and independently untouched final validation remain unaccepted. See `docs/NEXT_PASS.md` and `PASS_20_M7H_REPORT.md`.
+The existing playable game **remains SYNTHETIC_ALPHA**. The remaining research gates include full delivery support, player/fielding/tactic identification, score tails and untouched final validation.
+Later browser and human evidence is summarised in [current status](docs/CURRENT_STATUS.md). See `docs/NEXT_PASS.md` and `PASS_20_M7H_REPORT.md`.
 
 ### Pass 21 / M7I research audit (not gameplay)
 
@@ -115,7 +124,7 @@ M7I adds source-faithful rare-delivery exception registration, target-conditione
 bash scripts/m7i-run.sh /absolute/path/to/t20s_json.zip
 ```
 
-It rebuilds M7H research inputs if missing, validates the source archive hash, and writes `reference/m7i/*.json`. Licensed archive remains outside the source package. See ADR-031 and `docs/NEXT_PASS.md`. Browser acceptance and gameplay promotion remain open.
+It rebuilds M7H research inputs if missing, validates the source archive hash, and writes `reference/m7i/*.json`. Licensed archive remains outside the source package. See ADR-031 and `docs/NEXT_PASS.md`. Gameplay promotion remains open. See [current status](docs/CURRENT_STATUS.md) for later browser acceptance.
 
 ## Pass 22 / M7J: versioned rare-event adjudication (research only)
 

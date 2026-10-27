@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "python3",
+    "scripts/summarise-synthetic-quality.py",
+    "--input",
+    "docs/verification-status-quality/synthetic-run-1.json",
+    "--repeat",
+    "docs/verification-status-quality/synthetic-run-2.json",
+    "--protocol",
+    "docs/verification-status-quality/PROTOCOL.json",
+    "--out",
+    "docs/verification-status-quality/QUALITY_SUMMARY.json"
+  ],
+  "exitCode": 0,
+  "pythonTests": {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_synthetic_quality_summary.py",
+      "-v"
+    ],
+    "exitCode": 0,
+    "passed": 6
+  }
+}

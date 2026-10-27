@@ -1,0 +1,94 @@
+{
+  "setupFixture": {
+    "setup": {
+      "schemaVersion": "1.0.0",
+      "gameId": "game-07a-01",
+      "matchId": "match-07a-01",
+      "format": "T20",
+      "worldPackId": "fictional-eight-01",
+      "rulesId": "LC_T20_01",
+      "modelId": "synthetic-alpha-01",
+      "randomId": "SHA256_COUNTER_V1",
+      "seed": "pass07a-smoke-0001",
+      "teamIds": [
+        "team-01",
+        "team-02"
+      ],
+      "groundId": "ground-01",
+      "capabilities": {
+        "limitedOversRain": false,
+        "superOver": false,
+        "injuries": false,
+        "prediction": false
+      }
+    },
+    "worldFileSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+    "worldCanonicalSha256": "f4cbe33f4a2ea41385143cc03ab6d64e94a356f8af75e30483a68de87bdca252",
+    "rulesHash": "7c67aec8e3aef8be7b849775d83bad64847338e03326848ec1f1d0d99c6fa745",
+    "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+    "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+    "setupVersion": "LC_T20_SETUP_V1",
+    "selectedTeams": [
+      {
+        "teamId": "team-01",
+        "playerIds": [
+          "p001",
+          "p003",
+          "p004",
+          "p005",
+          "p006",
+          "p009",
+          "p010",
+          "p012",
+          "p013",
+          "p014",
+          "p015"
+        ],
+        "captainId": "p012",
+        "keeperId": "p001"
+      },
+      {
+        "teamId": "team-02",
+        "playerIds": [
+          "p021",
+          "p023",
+          "p024",
+          "p025",
+          "p026",
+          "p029",
+          "p030",
+          "p032",
+          "p033",
+          "p034",
+          "p035"
+        ],
+        "captainId": "p032",
+        "keeperId": "p021"
+      }
+    ]
+  },
+  "policy": "fixtureAutopilotStep / runFixtureT20, default batting/bowling plans, no optional tactical captain",
+  "runtimeRuns": [
+    {
+      "node": "v24.19.0",
+      "platform": "linux",
+      "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+      "logicalCpus": 5,
+      "totalRam": 35743760384,
+      "p50Ms": 327.3026480000008,
+      "p95Ms": 374.87612699999977,
+      "measuredInBrowser": false
+    },
+    {
+      "node": "v24.19.0",
+      "platform": "linux",
+      "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+      "logicalCpus": 5,
+      "totalRam": 35743760384,
+      "p50Ms": 316.2456579999998,
+      "p95Ms": 372.7122450000006,
+      "measuredInBrowser": false
+    }
+  ],
+  "runtimeLimits": "Linux cloud Node timings, no human decisions or persistence; not reference-browser acceptance."
+}
