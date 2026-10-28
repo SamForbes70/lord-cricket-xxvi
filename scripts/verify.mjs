@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { vitestEvidence } from "./acceptance-evidence.mjs";
 const directory = process.env.LCXXVI_VERIFY_DIR ?? "docs/verification";
 mkdirSync(directory, { recursive: true });
 const gates = [
@@ -14,7 +15,7 @@ const gates = [
   ["vectors", ["run", "vectors:check"]],
   ["probability-vectors", ["run", "probability:check"]],
   ["generator-vectors", ["run", "generator:check"]],
-  ["unit", ["test", "--", "--maxWorkers=2"]],
+  ["unit", ["test", "--", "--maxWorkers=2", "--reporter=default", "--reporter=json", `--outputFile=${directory}/unit-results.json`]],
   ["smoke", ["run", "smoke"]],
 ];
 const results = [];
@@ -45,6 +46,7 @@ for (const [name, args] of gates) {
   const arguments_ = independent
     ? [name === "vectors" ? "scripts/check-determinism-vectors.py" : name === "probability-vectors" ? "scripts/reference_probability.py" : "scripts/check-generator-vectors.py"]
     : args;
+  if (name === "unit") rmSync(`${directory}/unit-results.json`, { force: true });
   const result = spawnSync(executable, arguments_, {
     encoding: "utf8",
     maxBuffer: 10_000_000,
@@ -57,11 +59,18 @@ for (const [name, args] of gates) {
     (result.error?.message ?? "");
   writeFileSync(`${directory}/${name}.log`, log);
   if (name === "installation") installed = result.status === 0;
+  let unitEvidence = null, evidenceError = null;
+  if (name === "unit" && result.status === 0) {
+    try { unitEvidence = vitestEvidence(JSON.parse(readFileSync(`${directory}/unit-results.json`, "utf8")), started); }
+    catch (error) { evidenceError = error.message; }
+  }
   results.push({
+    ...(unitEvidence ? { unitEvidence } : {}),
+    ...(evidenceError ? { evidenceError } : {}),
     gate: name,
     command: `${executable} ${arguments_.join(" ")}`,
     exitCode: result.status,
-    status: result.status === 0 ? "PASS" : "FAIL",
+    status: result.status === 0 && !evidenceError ? "PASS" : "FAIL",
     ...(result.error ? { error: result.error.message } : {}),
     elapsedMs: Date.now() - started,
   });

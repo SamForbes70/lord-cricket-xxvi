@@ -1,0 +1,179 @@
+[
+  {
+    "argv": [
+      "npm",
+      "run",
+      "verify:09:core"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium",
+      "LCXXVI_ACCEPTANCE_DIR": "/workspace/lord-cricket-xxvi/docs/verification-acceptance-backlog/observations"
+    },
+    "startedAtUtc": "2026-10-28T11:42:28.807216+00:00",
+    "seconds": 50.897,
+    "exitCode": 0,
+    "log": "core.log",
+    "sha256": "f6441cf9894d852f21996507b22cb53bf8f351651b43f8fbcbd7175981a49323"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_m7*.py",
+      "-v"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium",
+      "LCXXVI_ACCEPTANCE_DIR": "/workspace/lord-cricket-xxvi/docs/verification-acceptance-backlog/observations"
+    },
+    "startedAtUtc": "2026-10-28T11:43:19.704717+00:00",
+    "seconds": 1.311,
+    "exitCode": 0,
+    "log": "research-python.log",
+    "sha256": "46e5bf778858aca78fc8c235699f49fd8d7c664a4aad942efc9e245aded9f699"
+  },
+  {
+    "argv": [
+      "npx",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.acceptance.config.ts",
+      "--reporter=list"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium",
+      "LCXXVI_ACCEPTANCE_DIR": "/workspace/lord-cricket-xxvi/docs/verification-acceptance-backlog/observations"
+    },
+    "startedAtUtc": "2026-10-28T11:43:21.016600+00:00",
+    "seconds": 15.666,
+    "exitCode": 0,
+    "log": "browser-observations.log",
+    "sha256": "0121bde1ca3126242036c744dbf0d01c61b0a64df46f11a05c2381b38ebe8675"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "verify:07a"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium",
+      "LCXXVI_VERIFY_DIR": "/workspace/lc-backlog-inherited-verification"
+    },
+    "startedAtUtc": "2026-10-28T11:50:47.786141+00:00",
+    "seconds": 261.777,
+    "exitCode": 0,
+    "log": "inherited-wrapper.log",
+    "sha256": "25facfb4890f06835a91e2f285cd946a2e9a65ea66e07067e9ade708019d1c13"
+  },
+  {
+    "argv": [
+      "node",
+      "scripts/owner-acceptance.mjs",
+      "--skip-install"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T11:55:09.563992+00:00",
+    "seconds": 241.353,
+    "exitCode": 0,
+    "log": "owner-collector-cloud-check.log",
+    "sha256": "a635fa3256db5ecb554a31eaf88de195c64b877a4ba66683d9dc2bf0f3852887"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "verify:09:core"
+    ],
+    "startedAtUtc": "2026-10-28T12:04:21.259524+00:00",
+    "seconds": 45.139,
+    "exitCode": 0,
+    "log": "final-core.log",
+    "sha256": "f7c95c8bfecf3c563a390bf8aee67ce1e496faec8f6b6e2e5d696830344a4e2c"
+  },
+  {
+    "argv": [
+      "npx",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.acceptance.config.ts",
+      "--reporter=list"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium",
+      "LCXXVI_ACCEPTANCE_DIR": "/workspace/lc-complete-performance-observations"
+    },
+    "startedAtUtc": "2026-10-28T12:11:58.482178+00:00",
+    "seconds": 171.579,
+    "exitCode": 0,
+    "log": "extended-browser-observations.log",
+    "sha256": "51d1fce82bc4b51342a34618763da7b259921acbb15e2ffe0a119aafe66d8727"
+  },
+  {
+    "argv": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/unit/acceptance-evidence.test.ts",
+      "tests/unit/owner-acceptance-plan.test.ts"
+    ],
+    "startedAtUtc": "2026-10-28T12:18:52.343719+00:00",
+    "seconds": 1.034,
+    "exitCode": 0,
+    "log": "final-targeted.log",
+    "sha256": "108976e1080c1f1364d2543de4f70ba2f9c4a0de79c53941a63c2f19bcbd4618"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "startedAtUtc": "2026-10-28T12:18:53.378027+00:00",
+    "seconds": 4.341,
+    "exitCode": 0,
+    "log": "final-typecheck.log",
+    "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "startedAtUtc": "2026-10-28T12:18:57.719818+00:00",
+    "seconds": 3.771,
+    "exitCode": 0,
+    "log": "final-lint.log",
+    "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+  },
+  {
+    "argv": [
+      "npx",
+      "vite",
+      "build",
+      "--config",
+      "vite.acceptance.config.ts"
+    ],
+    "startedAtUtc": "2026-10-28T12:19:01.491634+00:00",
+    "seconds": 1.619,
+    "exitCode": 0,
+    "log": "final-benchmark-build.log",
+    "sha256": "7e118e57129ee2efe0ddcd30b8b03920fda8909cd66a3127157bddde64852367"
+  }
+]

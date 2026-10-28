@@ -1,0 +1,162 @@
+{
+  "version": "LC_BROWSER_ACCEPTANCE_OBSERVATIONS_V1",
+  "browser": "chromium",
+  "browserVersion": "154.0.8037.57",
+  "observations": {
+    "commands": [
+      {
+        "label": "Call heads",
+        "ms": 21.399999998509884
+      },
+      {
+        "label": "Bat first",
+        "ms": 16.899999998509884
+      },
+      {
+        "label": "Ulen Elmcroft",
+        "ms": 15.299999997019768
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 14
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 15.899999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 24.200000002980232
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.399999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20.100000001490116
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22.5
+      },
+      {
+        "label": "Next delivery",
+        "ms": 15.599999994039536
+      },
+      {
+        "label": "Next delivery",
+        "ms": 15.299999997019768
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 17.19999999552965
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16.899999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.399999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.799999997019768
+      },
+      {
+        "label": "Next delivery",
+        "ms": 19
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.30000000447035
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.900000005960464
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 16.399999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 15.300000004470348
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18.899999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.600000001490116
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23.899999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 14.699999995529652
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 18.399999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20.299999997019768
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.399999998509884
+      },
+      {
+        "label": "Next delivery",
+        "ms": 19.30000000447035
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20.700000002980232
+      }
+    ],
+    "longTasks": [
+      142
+    ],
+    "longTaskSupported": true,
+    "jsHeapBytes": 17869578,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    }
+  },
+  "commandAcknowledgement": {
+    "samples": 30,
+    "p95Ms": 23.899999998509884,
+    "proposedBudgetMs": 100,
+    "observedWithinProposedBudget": true,
+    "scope": "Click dispatch to committed revision rendered without exhibition save; includes browser and worker scheduling."
+  },
+  "longTasks": {
+    "supported": true,
+    "maximumMs": 142,
+    "proposedMaximumMs": 50,
+    "scope": "Page lifetime, including initialisation; browser long-task entries expose tasks at least 50 ms."
+  },
+  "status": "OBSERVATIONS_ONLY_REFERENCE_HARDWARE_UNVERIFIED",
+  "remainingBudgets": [
+    "T20 engine-only match p95",
+    "Five-day match p95",
+    "56-match league",
+    "IndexedDB save p95",
+    "Active-game load p95",
+    "Total application memory including workers and native allocations"
+  ],
+  "referenceHardwareAccepted": false
+}

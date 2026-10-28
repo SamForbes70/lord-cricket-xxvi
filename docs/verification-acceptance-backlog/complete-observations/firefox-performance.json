@@ -1,0 +1,221 @@
+{
+  "version": "LC_BROWSER_ACCEPTANCE_OBSERVATIONS_V1",
+  "browser": "firefox",
+  "browserVersion": "142.0.1",
+  "observations": {
+    "commands": [
+      {
+        "label": "Call heads",
+        "ms": 14,
+        "startedAtMs": 916,
+        "completedAtMs": 930
+      },
+      {
+        "label": "Bat first",
+        "ms": 19,
+        "startedAtMs": 1083,
+        "completedAtMs": 1102
+      },
+      {
+        "label": "Walen Sableholt",
+        "ms": 18,
+        "startedAtMs": 1268,
+        "completedAtMs": 1286
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 21,
+        "startedAtMs": 1350,
+        "completedAtMs": 1371
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 18,
+        "startedAtMs": 1516,
+        "completedAtMs": 1534
+      },
+      {
+        "label": "Next delivery",
+        "ms": 28,
+        "startedAtMs": 1685,
+        "completedAtMs": 1713
+      },
+      {
+        "label": "Next delivery",
+        "ms": 24,
+        "startedAtMs": 1865,
+        "completedAtMs": 1889
+      },
+      {
+        "label": "Next delivery",
+        "ms": 32,
+        "startedAtMs": 2065,
+        "completedAtMs": 2097
+      },
+      {
+        "label": "Next delivery",
+        "ms": 21,
+        "startedAtMs": 2253,
+        "completedAtMs": 2274
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 15,
+        "startedAtMs": 2415,
+        "completedAtMs": 2430
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23,
+        "startedAtMs": 2582,
+        "completedAtMs": 2605
+      },
+      {
+        "label": "Next delivery",
+        "ms": 26,
+        "startedAtMs": 2749,
+        "completedAtMs": 2775
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 17,
+        "startedAtMs": 2917,
+        "completedAtMs": 2934
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20,
+        "startedAtMs": 3099,
+        "completedAtMs": 3119
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20,
+        "startedAtMs": 3265,
+        "completedAtMs": 3285
+      },
+      {
+        "label": "Next delivery",
+        "ms": 24,
+        "startedAtMs": 3432,
+        "completedAtMs": 3456
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18,
+        "startedAtMs": 3599,
+        "completedAtMs": 3617
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23,
+        "startedAtMs": 3765,
+        "completedAtMs": 3788
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22,
+        "startedAtMs": 3932,
+        "completedAtMs": 3954
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 12,
+        "startedAtMs": 4099,
+        "completedAtMs": 4111
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20,
+        "startedAtMs": 4182,
+        "completedAtMs": 4202
+      },
+      {
+        "label": "Zerin Wrenbrook",
+        "ms": 14,
+        "startedAtMs": 4268,
+        "completedAtMs": 4282
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23,
+        "startedAtMs": 4432,
+        "completedAtMs": 4455
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18,
+        "startedAtMs": 4599,
+        "completedAtMs": 4617
+      },
+      {
+        "label": "Next delivery",
+        "ms": 38,
+        "startedAtMs": 4768,
+        "completedAtMs": 4806
+      },
+      {
+        "label": "Next delivery",
+        "ms": 40,
+        "startedAtMs": 4967,
+        "completedAtMs": 5007
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23,
+        "startedAtMs": 5133,
+        "completedAtMs": 5156
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 35,
+        "startedAtMs": 5317,
+        "completedAtMs": 5352
+      },
+      {
+        "label": "Next delivery",
+        "ms": 27,
+        "startedAtMs": 5503,
+        "completedAtMs": 5530
+      },
+      {
+        "label": "Next delivery",
+        "ms": 24,
+        "startedAtMs": 5682,
+        "completedAtMs": 5706
+      }
+    ],
+    "longTasks": [],
+    "longTaskSupported": false,
+    "jsHeapBytes": null,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    }
+  },
+  "commandAcknowledgement": {
+    "samples": 30,
+    "p95Ms": 38,
+    "proposedBudgetMs": 100,
+    "observedWithinProposedBudget": true,
+    "scope": "Click dispatch to committed revision rendered without exhibition save; includes browser and worker scheduling."
+  },
+  "longTasks": {
+    "supported": false,
+    "maximumPageLifetimeMs": null,
+    "maximumDuringMeasuredCommandsMs": null,
+    "proposedMaximumMs": 50,
+    "scope": "Separate page-lifetime tasks from tasks overlapping measured command windows; entries expose tasks at least 50 ms."
+  },
+  "status": "OBSERVATIONS_ONLY_REFERENCE_HARDWARE_UNVERIFIED",
+  "remainingBudgets": [
+    "T20 engine-only match p95",
+    "Five-day match p95",
+    "56-match league",
+    "IndexedDB save p95",
+    "Active-game load p95",
+    "Total application memory including workers and native allocations"
+  ],
+  "referenceHardwareAccepted": false
+}

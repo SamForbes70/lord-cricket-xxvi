@@ -1,0 +1,10 @@
+
+> lord-cricket-xxvi@0.1.0 verify:07a
+> node scripts/verify-pass07a.mjs
+
+inherited-orchestrator: PASS
+world-content: PASS
+world-negative: PASS
+t20-setup: PASS
+world-smoke: PASS
+07A acceptance PASS (16/16 mandatory gates)

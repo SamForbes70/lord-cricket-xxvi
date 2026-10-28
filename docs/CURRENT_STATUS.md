@@ -6,6 +6,15 @@ PR #3 merged as `4aa71d9` after integration with `b4aceda`. Historical simulatio
 The accepted gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
 M7 quality validation and M8 release acceptance remain incomplete.
 
+## Latest acceptance tooling
+
+PR #9 merged as `0fba56c` with four passing checks and durable cross-innings research transactions.
+[Acceptance backlog audit](verification-acceptance-backlog/README.md) records the current collector and remaining external gates.
+Fresh final core verification passes 609 TypeScript tests and 87 research Python tests.
+The full acceptance wrapper now reports the observed current-run total instead of hard-coded historical counts.
+[The owner-PC collector](LOCAL_ACCEPTANCE_COLLECTOR.md) automates local browser evidence without opening existing browser profiles.
+Cloud and hosted runs remain separate from owner-PC and reference-laptop acceptance.
+
 ## Implemented product
 
 The game provides eight fictional teams and 160 players.

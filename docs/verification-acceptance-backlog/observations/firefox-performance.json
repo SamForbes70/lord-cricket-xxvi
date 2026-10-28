@@ -1,0 +1,160 @@
+{
+  "version": "LC_BROWSER_ACCEPTANCE_OBSERVATIONS_V1",
+  "browser": "firefox",
+  "browserVersion": "142.0.1",
+  "observations": {
+    "commands": [
+      {
+        "label": "Call heads",
+        "ms": 12
+      },
+      {
+        "label": "Bat first",
+        "ms": 21
+      },
+      {
+        "label": "Ulen Elmcroft",
+        "ms": 17
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 13
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 20
+      },
+      {
+        "label": "Next delivery",
+        "ms": 26
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18
+      },
+      {
+        "label": "Next delivery",
+        "ms": 29
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 25
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20
+      },
+      {
+        "label": "Next delivery",
+        "ms": 19
+      },
+      {
+        "label": "Next delivery",
+        "ms": 33
+      },
+      {
+        "label": "Next delivery",
+        "ms": 27
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 18
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22
+      },
+      {
+        "label": "Next delivery",
+        "ms": 24
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 17
+      },
+      {
+        "label": "Next delivery",
+        "ms": 25
+      },
+      {
+        "label": "Next delivery",
+        "ms": 25
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 29
+      },
+      {
+        "label": "Next delivery",
+        "ms": 29
+      },
+      {
+        "label": "Next delivery",
+        "ms": 26
+      }
+    ],
+    "longTasks": [],
+    "longTaskSupported": false,
+    "jsHeapBytes": null,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    }
+  },
+  "commandAcknowledgement": {
+    "samples": 30,
+    "p95Ms": 29,
+    "proposedBudgetMs": 100,
+    "observedWithinProposedBudget": true,
+    "scope": "Click dispatch to committed revision rendered without exhibition save; includes browser and worker scheduling."
+  },
+  "longTasks": {
+    "supported": false,
+    "maximumMs": null,
+    "proposedMaximumMs": 50,
+    "scope": "Page lifetime, including initialisation; browser long-task entries expose tasks at least 50 ms."
+  },
+  "status": "OBSERVATIONS_ONLY_REFERENCE_HARDWARE_UNVERIFIED",
+  "remainingBudgets": [
+    "T20 engine-only match p95",
+    "Five-day match p95",
+    "56-match league",
+    "IndexedDB save p95",
+    "Active-game load p95",
+    "Total application memory including workers and native allocations"
+  ],
+  "referenceHardwareAccepted": false
+}

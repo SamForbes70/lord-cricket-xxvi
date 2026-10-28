@@ -1,0 +1,26 @@
+{
+  "implemented": [
+    "Observed current-run unit counts instead of hard-coded 542",
+    "Stale/failed/skipped test evidence rejection",
+    "One-command local acceptance collector with source/host/browser metadata",
+    "Cloud/hosted classification preserves owner-PC gate",
+    "Seven performance budget areas now have browser measurements",
+    "Real failed exit code retained; later suites stop"
+  ],
+  "freshResults": {
+    "finalTypeScriptTests": 609,
+    "pythonTests": 87,
+    "initialWrapperGates": 16,
+    "initialWrapperObservedUnitTests": 608,
+    "initialCollectorBrowserTests": 16,
+    "extendedPerformanceBrowserTests": 4
+  },
+  "blocked": {
+    "historicalSourceFixtures": "Missing incident-specific structured inputs; SF statement remains recorded.",
+    "untouchedCohort": "Only 18 fresh T20 candidates before eligibility; minimum 200.",
+    "ownerPcAcceptance": "No owner-PC execution channel or returned collector result.",
+    "referenceHardwarePerformance": "Reference laptop and total native/worker memory measurements absent."
+  },
+  "modelPromotion": "NOT_AUTHORISED",
+  "gameplayAndSaves": "UNCHANGED"
+}
