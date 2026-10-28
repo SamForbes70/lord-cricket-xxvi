@@ -161,3 +161,12 @@ This integration adds the research selector checks alongside the existing summar
 It retains the 542-test TypeScript suite and all existing application behaviour.
 Source adjudication remains incomplete; merging preparation evidence does not accept a new scorer or model.
 Fresh integration commands and results are retained under `verification-m7k/integration-main/`.
+
+
+## Complete source identity audit
+
+[Source context](verification-m7k/source-context/README.md) extends verification to all 69 registered events across 65 matches.
+The audit covers every selected signature and retains preceding and following source addresses.
+It records player identities, source run sums and observed wicket kinds for review.
+Source values establish provenance, rather than umpire chronology, physical ends or accepted scorecards.
+K1 still requires independent adjudication before K2 implementation.
