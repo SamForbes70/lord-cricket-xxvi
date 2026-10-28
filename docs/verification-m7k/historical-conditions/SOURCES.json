@@ -1,0 +1,286 @@
+{
+  "rawResearchDirectory": "/workspace/m7k-source-research/third-batch",
+  "rawFilesTracked": false,
+  "sources": [
+    {
+      "sourceId": "nzc-2005.html",
+      "url": "https://archive.nzc.nz/Scorecards/83/83909.html",
+      "retrievedAt": "2026-10-28T07:40:49.890855+00:00",
+      "status": 200,
+      "finalUrl": "https://archive.nzc.nz/Scorecards/83/83909.html",
+      "bytes": 17142,
+      "sha256": "c89ca9cf5b4c012eb27643b573086e1f0e25018641d7efba842659d2ba21479c",
+      "role": "EXCLUDED",
+      "scope": "Wrong match: ODI on 23 October 2005, rather than T20 on 21 October."
+    },
+    {
+      "sourceId": "cricketweb-2005.html",
+      "url": "https://www.cricketweb.net/new-zealand-win-twenty20/",
+      "retrievedAt": "2026-10-28T07:40:49.891543+00:00",
+      "status": 200,
+      "finalUrl": "https://www.cricketweb.net/new-zealand-win-twenty20/",
+      "bytes": 49622,
+      "sha256": "456e50653ff544577d7e89845b3310b95d175395ad8d4c4b88672c97bbc0172a",
+      "role": "EVIDENCE",
+      "scope": "Independent contemporary match report; contains no no-ball penalty rule."
+    },
+    {
+      "sourceId": "foothill-handbook.pdf",
+      "url": "https://foothill.edu/clubs/pdf/icc-handbook.pdf",
+      "retrievedAt": "2026-10-28T07:41:20.436992+00:00",
+      "status": 200,
+      "finalUrl": "https://foothill.edu/clubs/pdf/icc-handbook.pdf",
+      "bytes": 10465186,
+      "sha256": "668a0a7e9c62d2470d8dd3e5b21fbec3bbeba2038b18498e9ab756cfbb58c4cc",
+      "role": "EXCLUDED",
+      "scope": "Unrelated Inter Club Council handbook, rather than International Cricket Council conditions."
+    },
+    {
+      "sourceId": "silo-handbook.html",
+      "url": "https://silo.tips/download/526958a73c839-playing-handbook",
+      "retrievedAt": "2026-10-28T07:41:20.437483+00:00",
+      "status": 200,
+      "finalUrl": "https://silo.tips/download/526958a73c839-playing-handbook",
+      "bytes": 1218094,
+      "sha256": "748aeef88c7f9a950a140888fed28d1adf53064a75c74670c211fe1970fe36a6",
+      "role": "EVIDENCE",
+      "scope": "Anonymous document mirror; publisher authentication remains incomplete."
+    },
+    {
+      "sourceId": "icc-t20-2012-saca.pdf",
+      "url": "https://saca.org.za/wp-content/uploads/2013/04/05-Standard-T20_2012_USB.pdf",
+      "retrievedAt": "2026-10-28T07:43:25.640644+00:00",
+      "status": 200,
+      "finalUrl": "https://saca.org.za/wp-content/uploads/2013/04/05-Standard-T20_2012_USB.pdf",
+      "bytes": 586369,
+      "sha256": "5b14ab01d6d9501abf7d4e06f56c914b1fc336093d870eff2fa336b5bb328e85",
+      "role": "EVIDENCE",
+      "scope": "ICC-authored standard conditions hosted by the national players association."
+    }
+  ],
+  "discoveryAndFailures": [
+    {
+      "sourceId": "two-run-2005.html",
+      "url": "https://search.brave.com/search?q=South%20Africa%20New%20Zealand%202005%20Twenty20%20two%20runs%20no%20ball%20penalty",
+      "retrievedAt": "2026-10-28T07:40:29.058991+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=South%20Africa%20New%20Zealand%202005%20Twenty20%20two%20runs%20no%20ball%20penalty",
+      "bytes": 193515,
+      "sha256": "cf6a21d121fc4c8868f467269e324acee50c8a2b7977c5ac0ea57ad824d8a0b0"
+    },
+    {
+      "sourceId": "conditions-2013.html",
+      "url": "https://search.brave.com/search?q=ICC%20World%20Twenty20%20Qualifier%202013%20playing%20conditions%20pdf%20free%20hit",
+      "retrievedAt": "2026-10-28T07:40:29.059640+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=ICC%20World%20Twenty20%20Qualifier%202013%20playing%20conditions%20pdf%20free%20hit",
+      "bytes": 213981,
+      "sha256": "22398222f40e6ae5b55c8c1568f8caf84e7c0f9a514836664f2f257751186aca"
+    },
+    {
+      "sourceId": "penalty-2013.html",
+      "url": "https://search.brave.com/search?q=Kenya%20Netherlands%20November%2023%202013%20five%20penalty%20runs",
+      "retrievedAt": "2026-10-28T07:40:29.060142+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=Kenya%20Netherlands%20November%2023%202013%20five%20penalty%20runs",
+      "bytes": 197360,
+      "sha256": "e2428765690b337201c003743567593b7500437ef7a6948b14127cd7e07a5aa0"
+    },
+    {
+      "sourceId": "icc-pdf-discovery.pdf",
+      "url": "https://images.icc-cricket.com/image/upload/prd/znuhyzqswlgae4s54cjb.pdf",
+      "retrievedAt": "2026-10-28T07:40:49.892003+00:00",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "sourceId": "search-2013-handbook.html",
+      "url": "https://search.brave.com/search?q=ICC+playing+handbook+2013+2014+pdf",
+      "retrievedAt": "2026-10-28T07:40:49.892436+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=ICC+playing+handbook+2013+2014+pdf",
+      "bytes": 204479,
+      "sha256": "1bb094877e309fc37f0e544653f9846b48af8754b15a4aa6ee1ab0585c401503"
+    },
+    {
+      "sourceId": "search-2005-rule.html",
+      "url": "https://search.brave.com/search?q=2005+twenty20+%22no-ball%22+%22two%22+penalty",
+      "retrievedAt": "2026-10-28T07:40:49.893354+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=2005+twenty20+%22no-ball%22+%22two%22+penalty",
+      "bytes": 171908,
+      "sha256": "8b1195abf3e21a8bc7b75d63a486c5279db333bceff0182fa75d47fe41cdd109"
+    },
+    {
+      "sourceId": "search-kenya-penalty.html",
+      "url": "https://search.brave.com/search?q=%22Kenya%22+%22Netherlands%22+%222013%22+%22penalty%22+helmet",
+      "retrievedAt": "2026-10-28T07:40:49.893886+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=%22Kenya%22+%22Netherlands%22+%222013%22+%22penalty%22+helmet",
+      "bytes": 169233,
+      "sha256": "811aba1447e6e3d944239067989506e3f2b0bf19fc82ca13d3951ceded9a0399"
+    },
+    {
+      "sourceId": "saca-contents-2012.pdf",
+      "url": "https://saca.org.za/wp-content/uploads/2013/04/00-Contents_Introduction_2012_USB.pdf",
+      "retrievedAt": "2026-10-28T07:41:20.436386+00:00",
+      "status": 200,
+      "finalUrl": "https://saca.org.za/wp-content/uploads/2013/04/00-Contents_Introduction_2012_USB.pdf",
+      "bytes": 580681,
+      "sha256": "eecf2572e0dfce416f12149c39aff1a71e456260e3ca2b5e06162314bbfa4e4e"
+    },
+    {
+      "sourceId": "search-nzc-2005.html",
+      "url": "https://search.brave.com/search?q=site%3Aarchive.nzc.nz+%2221st+October+2005%22",
+      "retrievedAt": "2026-10-28T07:41:20.438124+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=site%3Aarchive.nzc.nz+%2221st+October+2005%22",
+      "bytes": 164264,
+      "sha256": "4b60b7c52ea15628312449a94e84268d403dc1260fded6c510ed9e383d6bede8"
+    },
+    {
+      "sourceId": "search-2005-two.html",
+      "url": "https://search.brave.com/search?q=%22South+Africa%22+%222005%22+%22no-balls%22+%22two%22",
+      "retrievedAt": "2026-10-28T07:41:20.439074+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=%22South+Africa%22+%222005%22+%22no-balls%22+%22two%22",
+      "bytes": 141662,
+      "sha256": "d310962ab966d76272184e302224a59d89fbde9961ccac689dc56ee1c46d5ebb"
+    },
+    {
+      "sourceId": "search-2005-conditions.html",
+      "url": "https://search.brave.com/search?q=ICC+Twenty20+playing+conditions+2005+pdf+no+ball",
+      "retrievedAt": "2026-10-28T07:41:20.439533+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=ICC+Twenty20+playing+conditions+2005+pdf+no+ball",
+      "bytes": 186054,
+      "sha256": "ef4f1db77d3cdd979c88443c6b40242293f3ef1d292b72af006d254b06b2f798"
+    },
+    {
+      "sourceId": "search-saca-t20.html",
+      "url": "https://search.brave.com/search?q=site%3Asaca.org.za%2Fwp-content%2Fuploads%2F2013%2F+Twenty20",
+      "retrievedAt": "2026-10-28T07:42:04.997234+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=site%3Asaca.org.za%2Fwp-content%2Fuploads%2F2013%2F+Twenty20",
+      "bytes": 110589,
+      "sha256": "d88440b8868149c02cbd158e04754796e1e207be1377c18a818e045cf12051e2"
+    },
+    {
+      "sourceId": "search-2013-pdf.html",
+      "url": "https://search.brave.com/search?q=%22ICC%22+%222013-2014%22+%22handbook%22+filetype%3Apdf",
+      "retrievedAt": "2026-10-28T07:42:04.997956+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=%22ICC%22+%222013-2014%22+%22handbook%22+filetype%3Apdf",
+      "bytes": 101910,
+      "sha256": "11b6d84518bdfed3f50ba81e22eab3b01ccc2f58e3174aeb6ebd7f4d766d509a"
+    },
+    {
+      "sourceId": "search-2005-tworuns.html",
+      "url": "https://search.brave.com/search?q=Twenty20+%22no-ball%22+%22two-run+penalty%22",
+      "retrievedAt": "2026-10-28T07:42:04.998349+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=Twenty20+%22no-ball%22+%22two-run+penalty%22",
+      "bytes": 237127,
+      "sha256": "7bfa9d9a3ab8f0074f2ab7a87cfad0977c2426d765d1a4b8f9b952587e859eb3"
+    },
+    {
+      "sourceId": "nzc-wanderers.html",
+      "url": "https://archive.nzc.nz/Grounds/3116_itt.html",
+      "retrievedAt": "2026-10-28T07:42:04.998718+00:00",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "sourceId": "saca-t20-guess.pdf",
+      "url": "https://saca.org.za/wp-content/uploads/2013/04/05-T20_2012_USB.pdf",
+      "retrievedAt": "2026-10-28T07:42:21.680223+00:00",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "sourceId": "saca-page.html",
+      "url": "https://saca.org.za/icc-playing-handbook/",
+      "retrievedAt": "2026-10-28T07:42:21.680874+00:00",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "sourceId": "nzc-2005-correct.html",
+      "url": "https://archive.nzc.nz/Scorecards/83/83908.html",
+      "retrievedAt": "2026-10-28T07:42:21.681576+00:00",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "sourceId": "search-2013-title.html",
+      "url": "https://search.brave.com/search?q=%22ICC+PLAYING+HANDBOOK+2013%22+download",
+      "retrievedAt": "2026-10-28T07:42:21.682209+00:00",
+      "error": "HTTP Error 429: Too Many Requests"
+    },
+    {
+      "sourceId": "silo-download.pdf",
+      "url": "https://silo.tips/download/526958a73c839-playing-handbook?download=1",
+      "retrievedAt": "2026-10-28T07:42:21.683079+00:00",
+      "status": 200,
+      "finalUrl": "https://silo.tips/download/526958a73c839-playing-handbook?download=1",
+      "bytes": 1218105,
+      "sha256": "72d8bc6a436afd1a3ac3c09a80684e31f4d3749b2be78676d46cb990689640ad"
+    },
+    {
+      "sourceId": "saca-media.json",
+      "url": "https://saca.org.za/wp-json/wp/v2/media?search=2012&per_page=100",
+      "retrievedAt": "2026-10-28T07:42:42.848438+00:00",
+      "status": 200,
+      "finalUrl": "https://saca.org.za/wp-json/wp/v2/media?search=2012&per_page=100",
+      "bytes": 224462,
+      "sha256": "ed77bdc51f02b6aa05076e23b4bf2707e409d30d9251e8e18a74d9fb5578600d"
+    },
+    {
+      "sourceId": "icc-yumpu.html",
+      "url": "https://www.yumpu.com/en/document/view/31732154/playing-handbook-international-cricket-council",
+      "retrievedAt": "2026-10-28T07:42:42.849311+00:00",
+      "status": 202,
+      "finalUrl": "https://www.yumpu.com/en/document/view/31732154/playing-handbook-international-cricket-council",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "sourceId": "search-2013-file.html",
+      "url": "https://search.brave.com/search?q=%22526958a73c839%22",
+      "retrievedAt": "2026-10-28T07:42:42.850108+00:00",
+      "status": 200,
+      "finalUrl": "https://search.brave.com/search?q=%22526958a73c839%22",
+      "bytes": 125991,
+      "sha256": "a1b069340f1902344ff099ab8f3de1be2451c0a55f557f63ff956693332a2864"
+    },
+    {
+      "sourceId": "nzc-wanderers-index.html",
+      "url": "https://archive.nzc.nz/Grounds/183_tt.html",
+      "retrievedAt": "2026-10-28T07:42:42.851081+00:00",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "sourceId": "nzc-2005-series.html",
+      "url": "https://archive.nzc.nz/Seasons/Seasonal_Averages/NZ/2005-06_tt_Twenty20_Batting_by_Runs.html",
+      "retrievedAt": "2026-10-28T07:42:42.851722+00:00",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "sourceId": "icc-june-2023.pdf",
+      "url": "https://icc-static-files.s3.amazonaws.com/ICC/document/2023/05/29/f107f3dc-4c8f-44d1-936b-5180806e5354/ICC-Men-s-T20I-Playing-Conditions-June-2023-Clean.pdf",
+      "retrievedAt": "2026-10-28T07:43:14.507984+00:00",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "sourceId": "icc-may-2021.pdf",
+      "url": "https://icc-static-files.s3.amazonaws.com/ICC/document/2021/07/05/874a426e-fe06-4415-b0f5-5148a4aa0ef8/ICC-Playing-Conditions-05-Men-s-Twenty20-International-May-2021.pdf",
+      "retrievedAt": "2026-10-28T07:43:14.509153+00:00",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "sourceId": "saca-media-2013.json",
+      "url": "https://saca.org.za/wp-json/wp/v2/media?search=2013&media_type=application&per_page=100",
+      "retrievedAt": "2026-10-28T07:43:25.641471+00:00",
+      "status": 200,
+      "finalUrl": "https://saca.org.za/wp-json/wp/v2/media?search=2013&media_type=application&per_page=100",
+      "bytes": 160769,
+      "sha256": "39aed82d6c4f19dc8a6faae89f157f561b779efa241dd25e2c07d91eb20049c4"
+    }
+  ],
+  "sourceContextSha256": "d583137fea1b0aa112c98246482e95e6c2d7be4f94e929d2f469d04a265b2804"
+}

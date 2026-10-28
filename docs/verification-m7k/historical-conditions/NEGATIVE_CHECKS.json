@@ -1,0 +1,12 @@
+[
+  {
+    "check": "source-hash",
+    "status": "PASS_REJECTED",
+    "error": "Source hash mismatch: nzc-2005.html"
+  },
+  {
+    "check": "context-hash",
+    "status": "PASS_REJECTED",
+    "error": "Source context hash mismatch"
+  }
+]

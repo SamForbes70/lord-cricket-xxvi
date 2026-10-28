@@ -79,8 +79,12 @@ Production ledger acceptance, research-model promotion and release publication r
 ## M7K source coverage follow-up
 
 [Source context](verification-m7k/source-context/README.md) verifies all 69 registered event hashes across 65 matches and 45 observed signatures.
+PR #6 merged this audit as `47c37df` after four passing CI checks.
 It extends the previous 11-event batch with player identities, recorded values and neighbouring source addresses.
 Source order and recorded values remain observations for review; no source case gains independent adjudication.
+[Historical conditions](verification-m7k/historical-conditions/README.md) add the ICC 2012 standard T20I PDF and a qualified 2013 transcription.
+Both restrict initial free-hit eligibility to foot-fault no-balls.
+These sources supply rule context, rather than confirmation of match adoption or no-ball cause.
 K1 requires independent decisions and applicable conditions before K2 ledger implementation.
 
 
