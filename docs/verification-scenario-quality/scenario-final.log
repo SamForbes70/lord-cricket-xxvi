@@ -1,0 +1,4 @@
+
+> lord-cricket-xxvi@0.1.0 m7:scenarios
+> node --import tsx scripts/run-quality-scenarios.ts --seeds-per-cell=2 --out=docs/verification-scenario-quality/scenarios.json
+

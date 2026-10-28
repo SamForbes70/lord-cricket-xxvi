@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "m7:scenarios",
+    "--",
+    "--seeds-per-cell=2",
+    "--out=docs/verification-scenario-quality/scenarios.json"
+  ],
+  "startedAtUtc": "2026-10-28T01:40:24.525006+00:00",
+  "seconds": 65.39293488600015,
+  "exitCode": 0
+}

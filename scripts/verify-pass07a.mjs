@@ -7,7 +7,7 @@ import { join } from "node:path";
 const directory=process.env.LCXXVI_VERIFY_DIR ?? "docs/verification-pass07a";
 mkdirSync(directory,{recursive:true});
 const startedAt=new Date().toISOString();
-const unitTestsExpected=538;
+const unitTestsExpected=542;
 const worldFixture=JSON.parse(readFileSync("tests/fixtures/world/negative-cases.json","utf8"));
 const extra = [
   ["world-content",["run","world:check"],{assertions: "independent complete 160/8/8 audit, twelve vectors, world/manifest hashes, strict AJV >=91 (additive schemas allowed)"}],
