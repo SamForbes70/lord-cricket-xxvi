@@ -51,7 +51,7 @@ Filesystem durability depends on the host's filesystem and synchronisation guara
 The journal is a developer harness, rather than an IndexedDB gameplay repository.
 Concurrent writers, portable career import and production migrations remain outside this implementation.
 `transferAward` atomically constructs two in-memory states; separate journal writes do not form a durable cross-innings transaction.
-A match-level transaction mechanism remains necessary before production ledger acceptance.
+The [shared book follow-up](../transactions/README.md) now provides one journal for both innings in the research harness.
 Post-closure penalty records retain explicit ordering; they do not revise a production match result.
 
 ## Evaluation tooling and remaining cohort gate
@@ -115,5 +115,5 @@ After the file-handle adjustment, all 47 affected research tests, lint and typec
 `POSTFIX_COMMANDS.json` records those final checks separately.
 `BOUNDARY_CHECK.json` verifies protected source paths and the unchanged simulation-worker hash.
 Fresh gameplay smoke artefacts remain at `/workspace/m7k-ledger-gameplay-smoke-artifacts`, outside Git.
-Hosted Windows results for this change remain pending until CI completes.
+PR #8 completed four passing Linux/Windows CI checks before merging as `931da3b`.
 Real untouched-cohort evaluation is NOT RUN.

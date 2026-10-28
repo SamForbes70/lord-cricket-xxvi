@@ -1,0 +1,11 @@
+{
+  "version": "LC_M7K_FORWARD_METADATA_INVENTORY_V1",
+  "archiveSha256": "0da5dc95daad244a63ca1435a2778ce2a71199860bc8248091f35cf3688f64ba",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "priorDevelopmentLatestDate": "2026-10-14",
+  "minimumEvaluationMatches": 200,
+  "forwardMatchCount": 0,
+  "evaluationStatus": "BLOCKED_INSUFFICIENT_FORWARD_MATCHES",
+  "outcomesEvaluated": false,
+  "matches": []
+}

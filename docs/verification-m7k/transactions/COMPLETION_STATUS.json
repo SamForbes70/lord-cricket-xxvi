@@ -1,0 +1,15 @@
+{
+  "pr8": "MERGED_AFTER_4_PASSING_CI_CHECKS",
+  "durableCrossInningsTransactions": "IMPLEMENTED_SHARED_JOURNAL",
+  "realProcessExitRecovery": "PASS_BOTH_INNINGS_RECOVERED",
+  "completeHistoricalSourceFixtureCoverage": false,
+  "conditionalSourceProbes": 2,
+  "conditionalOrientationChecks": 4,
+  "sourceEventHashesVerifiedPreviously": 69,
+  "ownerReview": "SF statement preserved; no additional review approval requested.",
+  "remainingHistoricalInputs": "Incident-specific chronology, conditions, awards and physical-end records where absent.",
+  "realUntouchedCohortEvaluation": "BLOCKED_INSUFFICIENT_FORWARD_MATCHES",
+  "availableForwardMatchesBeforeEligibility": 18,
+  "requiredEvaluationMatches": 200,
+  "gameplayAndExistingSavesUnchanged": true
+}

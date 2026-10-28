@@ -1,0 +1,73 @@
+{
+  "version": "LC_M7K_CONDITIONAL_SOURCE_PROBES_V1",
+  "source": "Cricsheet, ODC-By 1.0, https://cricsheet.org/",
+  "meaning": "Conditional frozen-rule probes; missing historical context is not accepted or fabricated.",
+  "assumptions": [
+    "Frozen LC_T20_01 wide/hit-wicket provisions; match-specific amendments remain unconfirmed.",
+    "Synthetic keeper and outfield identities; no source fielder credit is asserted.",
+    "Both canonical end orientations are tested; neither represents an attested historical ground direction.",
+    "No confirmed historical free-hit signal is supplied."
+  ],
+  "probes": [
+    {
+      "matchId": "1142915",
+      "sourceEventSha256": "3c3e3016aaf8877acb76fd06f6de479e07dc1fd6cce840b7c1a6725bc6135a71",
+      "sourceFileSha256": "6ed0fac5d1aa145e11a81d0abe1ad2000a7ccb4b7ff712176eaa5c523b827efb",
+      "innings": 1,
+      "over": 19,
+      "attempt": 5,
+      "observedPlayers": {
+        "batter": "AJ Finch",
+        "nonStriker": "GJ Maxwell",
+        "bowler": "B Muzarabani"
+      },
+      "before": {
+        "runs": 227,
+        "wickets": 1,
+        "legalBalls": 118,
+        "deliveryIndex": 121
+      },
+      "expected": {
+        "runs": 228,
+        "wickets": 2,
+        "legalBalls": 118,
+        "batterRunsDelta": 0,
+        "ballsFacedDelta": 0,
+        "bowlerRunsDelta": 1,
+        "bowlerWicketsDelta": 1,
+        "nextAction": "SELECT_BATTER"
+      },
+      "completeHistoricalFixture": false
+    },
+    {
+      "matchId": "1453929",
+      "sourceEventSha256": "ec5ea4004c4ef163751c6262c425cc8b5b16e8034414c6d6e5a821da3dd0034a",
+      "sourceFileSha256": "1ff6652ccd186642c04c3a44d1dc9c8560e3d21b0003099c952a711c491f649c",
+      "innings": 1,
+      "over": 18,
+      "attempt": 1,
+      "observedPlayers": {
+        "batter": "M Akayezu",
+        "nonStriker": "E Rukiriza",
+        "bowler": "LN Oluoch"
+      },
+      "before": {
+        "runs": 89,
+        "wickets": 6,
+        "legalBalls": 109,
+        "deliveryIndex": 116
+      },
+      "expected": {
+        "runs": 90,
+        "wickets": 7,
+        "legalBalls": 109,
+        "batterRunsDelta": 0,
+        "ballsFacedDelta": 0,
+        "bowlerRunsDelta": 1,
+        "bowlerWicketsDelta": 1,
+        "nextAction": "SELECT_BATTER"
+      },
+      "completeHistoricalFixture": false
+    }
+  ]
+}
