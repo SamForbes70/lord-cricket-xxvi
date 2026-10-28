@@ -1,0 +1,50 @@
+[
+  {
+    "name": "build",
+    "argv": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "cwd": "/workspace/lord-cricket-xxvi",
+    "startedAtUtc": "2026-10-27T22:49:53.307279+00:00",
+    "seconds": 5.331,
+    "exitCode": 0,
+    "stdoutFile": "build.log",
+    "stdoutSha256": "ab741973af659092cd2138a4fbf4baba6fd9e07ad5d2e1e7538eda63e44e65dd"
+  },
+  {
+    "name": "synthetic-run-1",
+    "argv": [
+      "node",
+      "--import",
+      "tsx",
+      "scripts/m7c-synthetic.ts",
+      "--matches=96",
+      "--seed-offset=0"
+    ],
+    "cwd": "/workspace/lord-cricket-xxvi",
+    "startedAtUtc": "2026-10-27T22:49:58.638942+00:00",
+    "seconds": 32.537,
+    "exitCode": 0,
+    "stdoutFile": "synthetic-run-1.json",
+    "stdoutSha256": "6a98273ccc9d3c7f382d4433011cddacc5f1c4560b919780ee250bac91db5130"
+  },
+  {
+    "name": "synthetic-run-2",
+    "argv": [
+      "node",
+      "--import",
+      "tsx",
+      "scripts/m7c-synthetic.ts",
+      "--matches=96",
+      "--seed-offset=0"
+    ],
+    "cwd": "/workspace/lord-cricket-xxvi",
+    "startedAtUtc": "2026-10-27T22:50:31.176247+00:00",
+    "seconds": 32.041,
+    "exitCode": 0,
+    "stdoutFile": "synthetic-run-2.json",
+    "stdoutSha256": "fc7672035f0b80fd52b07b41a6be39eec7fa0b3d1878ec04507dfaf144a779cb"
+  }
+]

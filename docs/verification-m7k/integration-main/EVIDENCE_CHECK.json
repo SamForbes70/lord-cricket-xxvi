@@ -1,0 +1,135 @@
+{
+  "integrationBase": "b4aceda9182eea1f727c48bbf764042f24b1f199",
+  "verifiedHashEntries": [
+    {
+      "path": "docs/verification-m7k/CHECK_RESULTS.json",
+      "sha256": "2987860147157641be8be111ad6f724ae3f9e206b2672893abc1e7417d364067"
+    },
+    {
+      "path": "docs/verification-m7k/LC_M7K_EVIDENCE_WORKSHEET.json",
+      "sha256": "d958c65b94d60c4bada1978c85652dd42ef16df14b9efd3d61776548ecc32cdd"
+    },
+    {
+      "path": "docs/verification-m7k/LC_M7K_REPRESENTATIVE_REVIEW.json",
+      "sha256": "3d464f525348511111390d3305b46df5c5cc527b3186a3a2ce3222f12e8d1069"
+    },
+    {
+      "path": "docs/verification-m7k/READINESS_COUNTS.json",
+      "sha256": "c62735c7f4c244149117cca1b98253bf11a8096f60674985cb4af940ce7e19b9"
+    },
+    {
+      "path": "docs/verification-m7k/README.md",
+      "sha256": "2a9fd1f2245a2c8c5d97093ecbe0971218b60b7787f4f4e04d59f284f3391c65"
+    },
+    {
+      "path": "docs/verification-m7k/REVIEW_CHECK_RESULTS.json",
+      "sha256": "d6d9d8e61c59098e7a071297d2ef935af39c24df04b3f16ea9a344e17c5946f4"
+    },
+    {
+      "path": "docs/verification-m7k/build.log",
+      "sha256": "f9632255c05b31585d4e7ea2cd9970958e4a5ae95f8a12a0e7939d271eefeb4c"
+    },
+    {
+      "path": "docs/verification-m7k/fixtures-audit.log",
+      "sha256": "889f1fcdd7ca5bdfab32fef6001e8eedd4989cff3a2028c6f1101262fda16deb"
+    },
+    {
+      "path": "docs/verification-m7k/fixtures-engine.log",
+      "sha256": "29518f19349c020bb7b2f1602b1688c45d933915ad86dd2f3b5b8b9f91dce590"
+    },
+    {
+      "path": "docs/verification-m7k/generator-check.log",
+      "sha256": "110ddf3972b8f79164c8732d45c6f77ff75a8b2d14cedc7b1d43caee545e9b9b"
+    },
+    {
+      "path": "docs/verification-m7k/lint.log",
+      "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+    },
+    {
+      "path": "docs/verification-m7k/m7j-test.log",
+      "sha256": "c82d95d7ce56e310703757dd5c89907e76cbb7f9c5394e4f254db561b10742b0"
+    },
+    {
+      "path": "docs/verification-m7k/probability-check.log",
+      "sha256": "1cbd56a455937dc9a8462479070f2fd87d2ed6730ea34ebb0d420de3458f45f7"
+    },
+    {
+      "path": "docs/verification-m7k/review-inherited-python-tests.log",
+      "sha256": "42cbe224926742da239c1ad707cc794a6788acb942646a3bcc63aa439fa58148"
+    },
+    {
+      "path": "docs/verification-m7k/review-lint.log",
+      "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+    },
+    {
+      "path": "docs/verification-m7k/review-selection-tests.log",
+      "sha256": "0542ad23efd8617a7b6f8ecfee324d1ce2cdb7ec325907ef470e58499f888567"
+    },
+    {
+      "path": "docs/verification-m7k/review-selection.log",
+      "sha256": "7a283a76753a03672271f1bf339fe775bd3124d2e9028741c1cc3b3d48d6e480"
+    },
+    {
+      "path": "docs/verification-m7k/schemas-check.log",
+      "sha256": "7b7a75d02a7b65f7e3bc1983ebd70d2124f1a1737cdd5d732b54dde8a1858065"
+    },
+    {
+      "path": "docs/verification-m7k/typecheck.log",
+      "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+    },
+    {
+      "path": "docs/verification-m7k/vectors-check.log",
+      "sha256": "0fed95bd9940c4a9db447da39a20b0930f12de85e904e35fc02736e70020e7a1"
+    },
+    {
+      "path": "docs/verification-m7k/worksheet-check.log",
+      "sha256": "5ab7ffb49d44d01d2b195de9487e01afe37f9070ac23c092eba142a0244cd6db"
+    },
+    {
+      "path": "docs/verification-m7k/source-batch-01/README.md",
+      "sha256": "be29cb568fbc01fee7927582af2801ab1221ed5b10d9c4dea7d1afd2023eb2e3"
+    },
+    {
+      "path": "docs/verification-m7k/source-batch-01/SOURCES.json",
+      "sha256": "e0699b572af8f2728429617f30d339aa8b779691197191d4c93c1eb988bc60cc"
+    },
+    {
+      "path": "docs/verification-m7k/source-batch-01/VERIFIED_EVENTS.json",
+      "sha256": "12d24a4eb963f390058d9beba3edc0779ef08f0d60e749352ad18fb4e196c23a"
+    },
+    {
+      "path": "docs/verification-m7k/source-batch-01/checks.log",
+      "sha256": "e10a708b9ef20600731bb33d4e497c59614055b05330d308626a8a91b71f9c53"
+    },
+    {
+      "path": "docs/verification-m7k/source-batch-01/lint.log",
+      "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+    },
+    {
+      "path": "docs/verification-m7k/source-batch-01/verify-source-batch.py",
+      "sha256": "3dd9a09bcaee82fa8fb0a68466aef07e4cecf97455f55a26e7b4773ed2d36cd8"
+    },
+    {
+      "path": "docs/verification-m7k/historical-evidence/CASE_EVIDENCE.json",
+      "sha256": "5fe4ba1142614b619382dd87622d7b8deb6571a46c56e0d32cab3a0887e3c8b9"
+    },
+    {
+      "path": "docs/verification-m7k/historical-evidence/README.md",
+      "sha256": "f9d2495421c861d2ea4ccdf254afe56654eea58d7768d269a1d9ee3895ffd095"
+    },
+    {
+      "path": "docs/verification-m7k/historical-evidence/SOURCES.json",
+      "sha256": "53ee4d751f64cec363e5a437fe67aadb9bd91d2017b1d5a1467f7f77cbae5f33"
+    },
+    {
+      "path": "docs/verification-m7k/historical-evidence/checks.log",
+      "sha256": "d07fd48fe2a5a0b33b740e0f26f169f4a4613df696ad26a10152b81bfe65270c"
+    }
+  ],
+  "worksheetCases": 69,
+  "representativeSignatures": 45,
+  "sourceCasesRepresented": 69,
+  "acceptedFixtureCount": 0,
+  "approvalFlagsRemainFalse": true,
+  "applicationsPackagesAndLockfileMatchMain": true
+}

@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "desktop": {
+    "100": {
+      "scorestrip": {
+        "top": 229.390625,
+        "bottom": 356
+      },
+      "active": {
+        "top": 356,
+        "bottom": 454.65625
+      },
+      "target": {
+        "top": 243.390625,
+        "bottom": 342
+      },
+      "decision-top": {
+        "top": 479.65625,
+        "bottom": 529.046875
+      },
+      "next-delivery": {
+        "top": 541.046875,
+        "bottom": 583.046875
+      },
+      "finish-over": {
+        "top": 541.046875,
+        "bottom": 583.046875
+      }
+    },
+    "150": {
+      "scorestrip": {
+        "top": 277.578125,
+        "bottom": 453.5
+      },
+      "active": {
+        "top": 453.5,
+        "bottom": 581.5
+      },
+      "target": {
+        "top": 291.578125,
+        "bottom": 439.5
+      },
+      "decision-top": {
+        "top": 606.5,
+        "bottom": 679.078125
+      },
+      "next-delivery": {
+        "top": 691.078125,
+        "bottom": 750.078125
+      },
+      "finish-over": {
+        "top": 691.078125,
+        "bottom": 750.078125
+      }
+    }
+  },
+  "narrow": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "longName": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "humanBrowserTester": false
+}

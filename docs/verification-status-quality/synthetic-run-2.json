@@ -1,0 +1,7266 @@
+{
+  "version": "LC_M7C_SYNTHETIC_FIRST_INNINGS_V1",
+  "status": "DESCRIPTIVE_SYNTHETIC_ONLY",
+  "source": "SYNTHETIC_ALPHA",
+  "modelId": "synthetic-alpha-01",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "worldSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+  "matches": 96,
+  "firstInnings": {
+    "meanRuns": 89.14583333333333,
+    "meanWickets": 7.46875,
+    "p10": 68,
+    "p50": 89,
+    "p90": 109,
+    "dotAttemptProportion": 0.6377938836839314,
+    "boundaryAttemptProportion": 0.08776736786282482,
+    "meanLegalBalls": 116.05208333333333,
+    "phaseStats": {
+      "POWERPLAY": {
+        "runs": 2346,
+        "wickets": 195,
+        "legalBalls": 3456,
+        "attempts": 3503,
+        "dots": 2326,
+        "boundaries": 249,
+        "runsPerLegalOver": 4.072916666666667,
+        "dotAttemptProportion": 0.6640022837567799,
+        "boundaryAttemptProportion": 0.07108192977447902
+      },
+      "MIDDLE": {
+        "runs": 3785,
+        "wickets": 340,
+        "legalBalls": 5111,
+        "attempts": 5185,
+        "dots": 3323,
+        "boundaries": 431,
+        "runsPerLegalOver": 4.443357464292702,
+        "dotAttemptProportion": 0.6408871745419479,
+        "boundaryAttemptProportion": 0.08312439729990356
+      },
+      "DEATH": {
+        "runs": 2427,
+        "wickets": 182,
+        "legalBalls": 2574,
+        "attempts": 2626,
+        "dots": 1567,
+        "boundaries": 313,
+        "runsPerLegalOver": 5.6573426573426575,
+        "dotAttemptProportion": 0.5967250571210967,
+        "boundaryAttemptProportion": 0.1191926884996192
+      }
+    }
+  },
+  "runtime": {
+    "node": "v24.19.0",
+    "platform": "linux",
+    "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCpus": 5,
+    "totalRam": 35743760384,
+    "p50Ms": 316.2456579999998,
+    "p95Ms": 372.7122450000006,
+    "measuredInBrowser": false
+  },
+  "rows": [
+    {
+      "seed": "m7c-profiling-000000",
+      "first": {
+        "runs": 91,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 72,
+        "boundaries": 8,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 24,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 48,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 29,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 19,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 77,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 75,
+        "boundaries": 6,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 34,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 24,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 485.679241,
+      "eventHash": "d1dc8a7105322608867f0d4fb0fc7afe0f253dcc9cc793c42c8d7bc00b0c5b21"
+    },
+    {
+      "seed": "m7c-profiling-000001",
+      "first": {
+        "runs": 77,
+        "wickets": 10,
+        "legalBalls": 83,
+        "attempts": 84,
+        "dots": 54,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 44,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 6
+          },
+          "MIDDLE": {
+            "runs": 33,
+            "wickets": 6,
+            "legalBalls": 47,
+            "attempts": 48,
+            "dots": 31,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 81,
+        "wickets": 3,
+        "legalBalls": 87,
+        "attempts": 88,
+        "dots": 55,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 37,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 44,
+            "wickets": 2,
+            "legalBalls": 51,
+            "attempts": 51,
+            "dots": 32,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 283.33107300000006,
+      "eventHash": "dbc63375aab99da4d3c6bfdbf3a750fef9cd5faa3d3f28d170bd4f96d34d7a2a"
+    },
+    {
+      "seed": "m7c-profiling-000002",
+      "first": {
+        "runs": 81,
+        "wickets": 3,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 86,
+        "boundaries": 10,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 15,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 28,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 36,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 17,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 22,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 84,
+        "wickets": 6,
+        "legalBalls": 119,
+        "attempts": 120,
+        "dots": 83,
+        "boundaries": 10,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 15,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 47,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 34,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 22,
+            "wickets": 1,
+            "legalBalls": 29,
+            "attempts": 29,
+            "dots": 21,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 374.53626299999996,
+      "eventHash": "7d13f1fbf78e8b74537cba8977dd1fb89bc1b2d185cd96c93670256810e21a49"
+    },
+    {
+      "seed": "m7c-profiling-000003",
+      "first": {
+        "runs": 91,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 72,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 20,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 42,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 30,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 22,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 92,
+        "wickets": 6,
+        "legalBalls": 109,
+        "attempts": 111,
+        "dots": 68,
+        "boundaries": 11,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 34,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 50,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 8,
+            "wickets": 1,
+            "legalBalls": 19,
+            "attempts": 20,
+            "dots": 13,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 325.59313499999985,
+      "eventHash": "5d9b28a46109bf9b90875892548ee59c5ee1d3e0cece42717dc54a75b934ec70"
+    },
+    {
+      "seed": "m7c-profiling-000004",
+      "first": {
+        "runs": 116,
+        "wickets": 10,
+        "legalBalls": 110,
+        "attempts": 112,
+        "dots": 66,
+        "boundaries": 17,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 82,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 24,
+            "boundaries": 12
+          },
+          "DEATH": {
+            "runs": 4,
+            "wickets": 5,
+            "legalBalls": 20,
+            "attempts": 20,
+            "dots": 17,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 95,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 70,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 47,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 30,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 25,
+            "wickets": 4,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 18,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 343.409042,
+      "eventHash": "a17f8cacd242cf36cb843faf97938f5144097513addcaf21967ed4c574ceb5b2"
+    },
+    {
+      "seed": "m7c-profiling-000005",
+      "first": {
+        "runs": 90,
+        "wickets": 4,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 75,
+        "boundaries": 10,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 24,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 54,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 28,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 17,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 23,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 94,
+        "wickets": 7,
+        "legalBalls": 111,
+        "attempts": 112,
+        "dots": 67,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 31,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 40,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 35,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 1,
+            "legalBalls": 21,
+            "attempts": 21,
+            "dots": 10,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 309.524907,
+      "eventHash": "43b97ca517e51e33f27771b5679e59585864572681e72c2cebf23930adbfe488"
+    },
+    {
+      "seed": "m7c-profiling-000006",
+      "first": {
+        "runs": 119,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 72,
+        "boundaries": 16,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 41,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 35,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 52,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 13,
+            "boundaries": 8
+          }
+        }
+      },
+      "second": {
+        "runs": 70,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 86,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 22,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 29,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 21,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 345.1093170000004,
+      "eventHash": "980be0f2e7ecd4235e5e5dadf986160c39c7ac1db2acd9ca033282d3ce15ad21"
+    },
+    {
+      "seed": "m7c-profiling-000007",
+      "first": {
+        "runs": 84,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 75,
+        "boundaries": 8,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 28,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 38,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 32,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 18,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 86,
+        "wickets": 5,
+        "legalBalls": 116,
+        "attempts": 117,
+        "dots": 82,
+        "boundaries": 12,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 34,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 40,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 31,
+            "wickets": 1,
+            "legalBalls": 26,
+            "attempts": 26,
+            "dots": 16,
+            "boundaries": 5
+          }
+        }
+      },
+      "elapsedMs": 312.982532,
+      "eventHash": "6110574716000a206db197ff8e05fe9d8e4e424cd9f3ed4f8db6ab5e24d09c51"
+    },
+    {
+      "seed": "m7c-profiling-000008",
+      "first": {
+        "runs": 106,
+        "wickets": 10,
+        "legalBalls": 116,
+        "attempts": 117,
+        "dots": 72,
+        "boundaries": 13,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 47,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 34,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 32,
+            "wickets": 3,
+            "legalBalls": 26,
+            "attempts": 27,
+            "dots": 15,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 73,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 86,
+        "boundaries": 10,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 4,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 32,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 32,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 38,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 37,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 16,
+            "boundaries": 6
+          }
+        }
+      },
+      "elapsedMs": 342.6719589999998,
+      "eventHash": "ef8c5141abccfd6a37df7cdbddc6da4c5c43a419b8c46cdbf51c314920810ce1"
+    },
+    {
+      "seed": "m7c-profiling-000009",
+      "first": {
+        "runs": 108,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 72,
+        "boundaries": 12,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 50,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 31,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 28,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 19,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 61,
+        "wickets": 10,
+        "legalBalls": 97,
+        "attempts": 97,
+        "dots": 66,
+        "boundaries": 9,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 34,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 6
+          },
+          "MIDDLE": {
+            "runs": 25,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 40,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 2,
+            "wickets": 1,
+            "legalBalls": 7,
+            "attempts": 7,
+            "dots": 5,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 307.0852460000001,
+      "eventHash": "cb0d2a66da757e9f717fd7341a6c2a97c19a9678226e522a0d8c0b34343ca4e3"
+    },
+    {
+      "seed": "m7c-profiling-000010",
+      "first": {
+        "runs": 97,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 77,
+        "boundaries": 12,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 30,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 38,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 37,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 15,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 69,
+        "wickets": 10,
+        "legalBalls": 98,
+        "attempts": 99,
+        "dots": 62,
+        "boundaries": 7,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 29,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 20,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 35,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 1,
+            "wickets": 3,
+            "legalBalls": 8,
+            "attempts": 8,
+            "dots": 7,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 305.99680400000034,
+      "eventHash": "8fc0e566383fc9043847c2225d9c88ffd5c4dfd2d8065c9d2a9490a760c231df"
+    },
+    {
+      "seed": "m7c-profiling-000011",
+      "first": {
+        "runs": 86,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 78,
+        "boundaries": 9,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 24,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 18,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 91,
+        "wickets": 8,
+        "legalBalls": 99,
+        "attempts": 103,
+        "dots": 60,
+        "boundaries": 9,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 51,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 30,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 10,
+            "wickets": 0,
+            "legalBalls": 9,
+            "attempts": 9,
+            "dots": 6,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 308.4152119999999,
+      "eventHash": "aaad4ffe839d2f4014e9ef7a97ef903c4e4da984658c0b86ed06f3c08a1e1dce"
+    },
+    {
+      "seed": "m7c-profiling-000012",
+      "first": {
+        "runs": 90,
+        "wickets": 10,
+        "legalBalls": 115,
+        "attempts": 116,
+        "dots": 76,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 11,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 30,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 45,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 33,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 34,
+            "wickets": 3,
+            "legalBalls": 25,
+            "attempts": 25,
+            "dots": 13,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 91,
+        "wickets": 1,
+        "legalBalls": 106,
+        "attempts": 107,
+        "dots": 67,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 66,
+            "wickets": 0,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 27,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 5,
+            "wickets": 0,
+            "legalBalls": 16,
+            "attempts": 16,
+            "dots": 13,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 297.83020399999987,
+      "eventHash": "366db7005c743b23bdf9f70fb3264539f66c6bb7da78def0a2f24a88a3477ba9"
+    },
+    {
+      "seed": "m7c-profiling-000013",
+      "first": {
+        "runs": 101,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 74,
+        "boundaries": 14,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 33,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 18,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 45,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 36,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 20,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 81,
+        "wickets": 10,
+        "legalBalls": 115,
+        "attempts": 119,
+        "dots": 83,
+        "boundaries": 9,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 15,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 28,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 42,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 39,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 24,
+            "wickets": 4,
+            "legalBalls": 25,
+            "attempts": 26,
+            "dots": 16,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 331.73653399999966,
+      "eventHash": "e5edbd3d109a57932f6feab01f3145cda140387ce851ee86e555c167fd7fa366"
+    },
+    {
+      "seed": "m7c-profiling-000014",
+      "first": {
+        "runs": 83,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 79,
+        "boundaries": 7,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 24,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 34,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 20,
+            "wickets": 4,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 83,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 85,
+        "boundaries": 9,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 14,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 53,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 351.22959900000023,
+      "eventHash": "8d0d63a236e0679434d156b9fedcd7465940d999231e0fbc3dda526c159202da"
+    },
+    {
+      "seed": "m7c-profiling-000015",
+      "first": {
+        "runs": 76,
+        "wickets": 10,
+        "legalBalls": 109,
+        "attempts": 111,
+        "dots": 69,
+        "boundaries": 7,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 20,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 2,
+            "legalBalls": 19,
+            "attempts": 20,
+            "dots": 12,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 71,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 92,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 26,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 22,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 45,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 5,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 395.22841400000016,
+      "eventHash": "026741a9b427ebd5a7c8738f033e835dcacf803f016543f59dcd59ba9d6238df"
+    },
+    {
+      "seed": "m7c-profiling-000016",
+      "first": {
+        "runs": 112,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 82,
+        "boundaries": 18,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 38,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 8
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 40,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 35,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 15,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 75,
+        "wickets": 1,
+        "legalBalls": 120,
+        "attempts": 125,
+        "dots": 82,
+        "boundaries": 5,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 29,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 30,
+            "wickets": 0,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 38,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 20,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 360.18905300000006,
+      "eventHash": "4be6f90a58ab064035331df2e5cb4baa690a6797fb99e21690bfde0739abe5cd"
+    },
+    {
+      "seed": "m7c-profiling-000017",
+      "first": {
+        "runs": 75,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 88,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 30,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 45,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 76,
+        "wickets": 5,
+        "legalBalls": 102,
+        "attempts": 104,
+        "dots": 70,
+        "boundaries": 11,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 29,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 39,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 11,
+            "wickets": 0,
+            "legalBalls": 12,
+            "attempts": 12,
+            "dots": 8,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 319.7392829999999,
+      "eventHash": "1bea3344c6aefe3b3efbfcc2f45321a63dd21d072a13e91411193d7928bfeb2d"
+    },
+    {
+      "seed": "m7c-profiling-000018",
+      "first": {
+        "runs": 115,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 65,
+        "boundaries": 14,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 35,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 20,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 53,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 28,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 27,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 88,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 86,
+        "boundaries": 12,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 36,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 13,
+            "wickets": 7,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 25,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 359.3795740000005,
+      "eventHash": "1b5d6caf394b6b6415a7b2021768d137502bff3c9f970adcfc3279cd80f15873"
+    },
+    {
+      "seed": "m7c-profiling-000019",
+      "first": {
+        "runs": 77,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 89,
+        "boundaries": 11,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 28,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 23,
+            "wickets": 0,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 42,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 34,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 19,
+            "boundaries": 6
+          }
+        }
+      },
+      "second": {
+        "runs": 80,
+        "wickets": 6,
+        "legalBalls": 86,
+        "attempts": 86,
+        "dots": 58,
+        "boundaries": 12,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 53,
+            "wickets": 2,
+            "legalBalls": 50,
+            "attempts": 50,
+            "dots": 34,
+            "boundaries": 9
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 293.9961639999992,
+      "eventHash": "2b9ab27995ae58c3bb5b2ece4f02409f05d400f0109b3557ac93e253b27cf663"
+    },
+    {
+      "seed": "m7c-profiling-000020",
+      "first": {
+        "runs": 101,
+        "wickets": 10,
+        "legalBalls": 103,
+        "attempts": 105,
+        "dots": 59,
+        "boundaries": 12,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 10,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 65,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 26,
+            "boundaries": 9
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 1,
+            "legalBalls": 13,
+            "attempts": 14,
+            "dots": 5,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 106,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 71,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 28,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 47,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 30,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 31,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 16,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 325.2703759999995,
+      "eventHash": "ee4b6eb930250b53fe62378a3f40808a7520724249321fbc829798537f702fa2"
+    },
+    {
+      "seed": "m7c-profiling-000021",
+      "first": {
+        "runs": 93,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 83,
+        "boundaries": 12,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 36,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 31,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 21,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 96,
+        "wickets": 8,
+        "legalBalls": 103,
+        "attempts": 104,
+        "dots": 58,
+        "boundaries": 13,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 20,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 54,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 31,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 2,
+            "legalBalls": 13,
+            "attempts": 13,
+            "dots": 7,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 316.3440929999997,
+      "eventHash": "6bd5c804f1d542734cfc8362036785d6c9df2882af3959699eee1b0b5d7faa07"
+    },
+    {
+      "seed": "m7c-profiling-000022",
+      "first": {
+        "runs": 82,
+        "wickets": 10,
+        "legalBalls": 112,
+        "attempts": 113,
+        "dots": 78,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 38,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 17,
+            "wickets": 3,
+            "legalBalls": 22,
+            "attempts": 22,
+            "dots": 15,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 87,
+        "wickets": 6,
+        "legalBalls": 100,
+        "attempts": 101,
+        "dots": 65,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 29,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 58,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 30,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 13,
+            "wickets": 1,
+            "legalBalls": 10,
+            "attempts": 10,
+            "dots": 6,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 321.30779599999914,
+      "eventHash": "66182277be4e885578964c9c62df1f4f0646ebf2c6dfbbadaa7cde3ebdede7fa"
+    },
+    {
+      "seed": "m7c-profiling-000023",
+      "first": {
+        "runs": 79,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 81,
+        "boundaries": 9,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 35,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 18,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 22,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 80,
+        "wickets": 7,
+        "legalBalls": 110,
+        "attempts": 111,
+        "dots": 76,
+        "boundaries": 12,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 35,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 38,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 27,
+            "wickets": 0,
+            "legalBalls": 20,
+            "attempts": 20,
+            "dots": 11,
+            "boundaries": 5
+          }
+        }
+      },
+      "elapsedMs": 329.4393749999999,
+      "eventHash": "d1ee02ed7b9fe0514c6481064f626710c85bc7e36e7f3129f5beb1d40403fddd"
+    },
+    {
+      "seed": "m7c-profiling-000024",
+      "first": {
+        "runs": 102,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 73,
+        "boundaries": 11,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 33,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 35,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 15,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 67,
+        "wickets": 10,
+        "legalBalls": 88,
+        "attempts": 93,
+        "dots": 58,
+        "boundaries": 6,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 42,
+            "wickets": 10,
+            "legalBalls": 52,
+            "attempts": 57,
+            "dots": 34,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 290.0273500000003,
+      "eventHash": "39262eb3cc435f297c0c1a5e34faa8f916807978b74b4237dcf672338ab196d9"
+    },
+    {
+      "seed": "m7c-profiling-000025",
+      "first": {
+        "runs": 96,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 77,
+        "boundaries": 13,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 12,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 29,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 52,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 31,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 32,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 17,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 64,
+        "wickets": 10,
+        "legalBalls": 110,
+        "attempts": 111,
+        "dots": 75,
+        "boundaries": 7,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 32,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 9,
+            "wickets": 3,
+            "legalBalls": 20,
+            "attempts": 21,
+            "dots": 13,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 306.86899000000085,
+      "eventHash": "527b6df70d79d7a38aa88be8d215d32298fa74fd4c2f10c6485321d4ac2675c9"
+    },
+    {
+      "seed": "m7c-profiling-000026",
+      "first": {
+        "runs": 45,
+        "wickets": 10,
+        "legalBalls": 95,
+        "attempts": 96,
+        "dots": 68,
+        "boundaries": 3,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 12,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 26,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 7,
+            "wickets": 1,
+            "legalBalls": 5,
+            "attempts": 5,
+            "dots": 3,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 50,
+        "wickets": 5,
+        "legalBalls": 60,
+        "attempts": 61,
+        "dots": 39,
+        "boundaries": 6,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 34,
+            "wickets": 2,
+            "legalBalls": 24,
+            "attempts": 25,
+            "dots": 14,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 218.2705850000002,
+      "eventHash": "4886f5823e65742c4c6b147769bbfe9e888c812e67b21d73d3c7ac57f163de31"
+    },
+    {
+      "seed": "m7c-profiling-000027",
+      "first": {
+        "runs": 100,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 76,
+        "boundaries": 12,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 34,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 30,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 16,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 93,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 75,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 32,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 19,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 32,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 36,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 29,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 354.61470999999983,
+      "eventHash": "3062f670b6f6a7b06843e93ad3522b6c5efae29898362a879d43a2d5f843a816"
+    },
+    {
+      "seed": "m7c-profiling-000028",
+      "first": {
+        "runs": 103,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 70,
+        "boundaries": 12,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 44,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 16,
+            "boundaries": 6
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 20,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 33,
+            "dots": 21,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 75,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 81,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 28,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 21,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 39,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 19,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 324.79116199999953,
+      "eventHash": "3fdd2ad019d8f09df42cb30dcb906faafa01a5f7952da4c5955fd68ddf9ab648"
+    },
+    {
+      "seed": "m7c-profiling-000029",
+      "first": {
+        "runs": 109,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 74,
+        "boundaries": 13,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 29,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 41,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 35,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 39,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 13,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 55,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 84,
+        "boundaries": 4,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 15,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 23,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 35,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 17,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 22,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 329.23971399999937,
+      "eventHash": "4097426fa327d40024d745e5192c7593d0c15917a590a3e30eac814a99c22a9f"
+    },
+    {
+      "seed": "m7c-profiling-000030",
+      "first": {
+        "runs": 108,
+        "wickets": 10,
+        "legalBalls": 116,
+        "attempts": 119,
+        "dots": 76,
+        "boundaries": 16,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 53,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 37,
+            "wickets": 5,
+            "legalBalls": 26,
+            "attempts": 27,
+            "dots": 16,
+            "boundaries": 7
+          }
+        }
+      },
+      "second": {
+        "runs": 109,
+        "wickets": 7,
+        "legalBalls": 117,
+        "attempts": 118,
+        "dots": 67,
+        "boundaries": 15,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 32,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 19,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 42,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 33,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 35,
+            "wickets": 2,
+            "legalBalls": 27,
+            "attempts": 28,
+            "dots": 15,
+            "boundaries": 5
+          }
+        }
+      },
+      "elapsedMs": 372.7122450000006,
+      "eventHash": "ecbb7694681daeca225cb8eb8851de5472c8a0cc1aabe269ae83387dad2be555"
+    },
+    {
+      "seed": "m7c-profiling-000031",
+      "first": {
+        "runs": 105,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 69,
+        "boundaries": 10,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 53,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 27,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 19,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 65,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 79,
+        "boundaries": 4,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 35,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 11,
+            "wickets": 4,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 22,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 358.46307999999954,
+      "eventHash": "1faa3f5dc04e88fd92b5c3d5eb96ff07fb42f71e665ae1907eb5fe16d36313de"
+    },
+    {
+      "seed": "m7c-profiling-000032",
+      "first": {
+        "runs": 82,
+        "wickets": 10,
+        "legalBalls": 107,
+        "attempts": 111,
+        "dots": 73,
+        "boundaries": 9,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 29,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 57,
+            "dots": 34,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 22,
+            "wickets": 2,
+            "legalBalls": 17,
+            "attempts": 18,
+            "dots": 10,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 83,
+        "wickets": 7,
+        "legalBalls": 89,
+        "attempts": 89,
+        "dots": 58,
+        "boundaries": 13,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 43,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 8
+          },
+          "MIDDLE": {
+            "runs": 40,
+            "wickets": 3,
+            "legalBalls": 53,
+            "attempts": 53,
+            "dots": 34,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 296.81500199999937,
+      "eventHash": "48930c80f921d2175d32d06399d0c629475d7aeaab3fbb0fd6a2e0e68f07bf20"
+    },
+    {
+      "seed": "m7c-profiling-000033",
+      "first": {
+        "runs": 94,
+        "wickets": 4,
+        "legalBalls": 120,
+        "attempts": 125,
+        "dots": 73,
+        "boundaries": 11,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 32,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 20,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 33,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 34,
+            "dots": 20,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 67,
+        "wickets": 10,
+        "legalBalls": 106,
+        "attempts": 107,
+        "dots": 68,
+        "boundaries": 7,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 38,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 34,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 10,
+            "wickets": 2,
+            "legalBalls": 16,
+            "attempts": 16,
+            "dots": 11,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 313.54822799999965,
+      "eventHash": "ef7d58156193bea79a48c8af89761b89d52c6f5665c5d6b84552eca636c215e9"
+    },
+    {
+      "seed": "m7c-profiling-000034",
+      "first": {
+        "runs": 93,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 76,
+        "boundaries": 10,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 35,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 44,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 32,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 14,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 68,
+        "wickets": 10,
+        "legalBalls": 115,
+        "attempts": 118,
+        "dots": 83,
+        "boundaries": 9,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 26,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 27,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 41,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 3,
+            "legalBalls": 25,
+            "attempts": 25,
+            "dots": 16,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 322.84615699999995,
+      "eventHash": "6bf21e9bca499e68c569121427dfdbfa565ac70cb684bc53a3663b6756052a68"
+    },
+    {
+      "seed": "m7c-profiling-000035",
+      "first": {
+        "runs": 101,
+        "wickets": 3,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 78,
+        "boundaries": 14,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 39,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 21,
+            "boundaries": 6
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 38,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 19,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 102,
+        "wickets": 7,
+        "legalBalls": 107,
+        "attempts": 109,
+        "dots": 67,
+        "boundaries": 13,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 28,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 25,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 64,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 29,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 10,
+            "wickets": 2,
+            "legalBalls": 17,
+            "attempts": 17,
+            "dots": 13,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 299.1957540000003,
+      "eventHash": "08a4372c2548b55f8f1baf7d0287b8c4c9a1d592edc084205661280fc854da27"
+    },
+    {
+      "seed": "m7c-profiling-000036",
+      "first": {
+        "runs": 100,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 81,
+        "boundaries": 13,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 39,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 38,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 14,
+            "boundaries": 6
+          }
+        }
+      },
+      "second": {
+        "runs": 74,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 76,
+        "boundaries": 5,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 33,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 20,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 40,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 20,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 16,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 345.09328900000037,
+      "eventHash": "767db32abff3c4b4c1a2f28e12484d7657856c69819df1282f8bad06d77f8e9d"
+    },
+    {
+      "seed": "m7c-profiling-000037",
+      "first": {
+        "runs": 37,
+        "wickets": 10,
+        "legalBalls": 74,
+        "attempts": 74,
+        "dots": 51,
+        "boundaries": 3,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 19,
+            "wickets": 7,
+            "legalBalls": 38,
+            "attempts": 38,
+            "dots": 28,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 38,
+        "wickets": 5,
+        "legalBalls": 77,
+        "attempts": 79,
+        "dots": 53,
+        "boundaries": 2,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 15,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 23,
+            "wickets": 1,
+            "legalBalls": 41,
+            "attempts": 43,
+            "dots": 26,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 226.54121399999894,
+      "eventHash": "5cd72bb604768a836f076600f97a61621ad1e8e7ec6721cac862c97fe1e74ac5"
+    },
+    {
+      "seed": "m7c-profiling-000038",
+      "first": {
+        "runs": 92,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 79,
+        "boundaries": 11,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 29,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 18,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 80,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 80,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 41,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 27,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 12,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 22,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 342.001083000001,
+      "eventHash": "4c0eb1ec8824d46317b27ab07136fe3fbd4712957d787e9af4f6ffa1c75946b8"
+    },
+    {
+      "seed": "m7c-profiling-000039",
+      "first": {
+        "runs": 82,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 79,
+        "boundaries": 10,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 31,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 23,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 36,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 28,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 17,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 86,
+        "wickets": 6,
+        "legalBalls": 109,
+        "attempts": 112,
+        "dots": 73,
+        "boundaries": 11,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 25,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 35,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 0,
+            "legalBalls": 19,
+            "attempts": 19,
+            "dots": 13,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 303.2179269999997,
+      "eventHash": "a9ad0d477dcb0887f634138539c95735c5d50ebd5ab6bd905ac4f49d060c1ca7"
+    },
+    {
+      "seed": "m7c-profiling-000040",
+      "first": {
+        "runs": 68,
+        "wickets": 10,
+        "legalBalls": 83,
+        "attempts": 84,
+        "dots": 55,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 42,
+            "wickets": 6,
+            "legalBalls": 47,
+            "attempts": 48,
+            "dots": 32,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 69,
+        "wickets": 8,
+        "legalBalls": 90,
+        "attempts": 90,
+        "dots": 60,
+        "boundaries": 8,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 11,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 30,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 58,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 30,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 239.15203800000018,
+      "eventHash": "a555b40571571cb8ac5a70e92757d4a74f85ba04104ac536515ab582728c97e9"
+    },
+    {
+      "seed": "m7c-profiling-000041",
+      "first": {
+        "runs": 70,
+        "wickets": 10,
+        "legalBalls": 105,
+        "attempts": 108,
+        "dots": 70,
+        "boundaries": 7,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 35,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 35,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 12,
+            "wickets": 3,
+            "legalBalls": 15,
+            "attempts": 15,
+            "dots": 11,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 71,
+        "wickets": 5,
+        "legalBalls": 92,
+        "attempts": 92,
+        "dots": 62,
+        "boundaries": 8,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 40,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 36,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 5,
+            "wickets": 0,
+            "legalBalls": 2,
+            "attempts": 2,
+            "dots": 0,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 269.1615810000003,
+      "eventHash": "f9a256341bd6366fd1af3a16098950cfa519b96d3317b81d8cf5fc8912611756"
+    },
+    {
+      "seed": "m7c-profiling-000042",
+      "first": {
+        "runs": 97,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 82,
+        "boundaries": 13,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 57,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 36,
+            "boundaries": 9
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 23,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 87,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 79,
+        "boundaries": 7,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 29,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 36,
+            "boundaries": 0
+          },
+          "DEATH": {
+            "runs": 28,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 19,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 349.83363400000053,
+      "eventHash": "a50a4eab64045bb5f932eb35ffeb1bc9cf98267f9770600cf5e001edc4a83202"
+    },
+    {
+      "seed": "m7c-profiling-000043",
+      "first": {
+        "runs": 118,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 70,
+        "boundaries": 14,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 48,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 40,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 15,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 114,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 81,
+        "boundaries": 18,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 47,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 20,
+            "boundaries": 8
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 39,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 30,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 22,
+            "boundaries": 5
+          }
+        }
+      },
+      "elapsedMs": 334.1195820000012,
+      "eventHash": "70a7730810f865eefffc0ecf3e1c8b6ea928b9a3b5b3086fda962cf0aa04dbd7"
+    },
+    {
+      "seed": "m7c-profiling-000044",
+      "first": {
+        "runs": 106,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 81,
+        "boundaries": 14,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 34,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 6
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 38,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 33,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 17,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 83,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 86,
+        "boundaries": 10,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 36,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 42,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 21,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 324.64167799999996,
+      "eventHash": "8358023c17b11b28d51c9a28ca24801003767eb7cde63f1c807b0fd3caa12a87"
+    },
+    {
+      "seed": "m7c-profiling-000045",
+      "first": {
+        "runs": 87,
+        "wickets": 10,
+        "legalBalls": 114,
+        "attempts": 116,
+        "dots": 73,
+        "boundaries": 11,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 38,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 24,
+            "wickets": 3,
+            "legalBalls": 24,
+            "attempts": 25,
+            "dots": 11,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 67,
+        "wickets": 4,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 82,
+        "boundaries": 5,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 34,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 38,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 8,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 23,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 318.4013039999991,
+      "eventHash": "eaf934aed0a0d7e940fc2059b1c865a9c9e5c3351c710a290c4689327dd907e3"
+    },
+    {
+      "seed": "m7c-profiling-000046",
+      "first": {
+        "runs": 81,
+        "wickets": 10,
+        "legalBalls": 118,
+        "attempts": 120,
+        "dots": 73,
+        "boundaries": 6,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 32,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 32,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 33,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 17,
+            "wickets": 2,
+            "legalBalls": 28,
+            "attempts": 29,
+            "dots": 17,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 82,
+        "wickets": 7,
+        "legalBalls": 94,
+        "attempts": 94,
+        "dots": 52,
+        "boundaries": 10,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 17,
+            "wickets": 7,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 60,
+            "wickets": 0,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 25,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 5,
+            "wickets": 0,
+            "legalBalls": 4,
+            "attempts": 4,
+            "dots": 2,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 311.7333150000013,
+      "eventHash": "9745c1dfe17d18edf1dc4ff5575c0f369bda88d8c1f80775da09e748fdbf29f3"
+    },
+    {
+      "seed": "m7c-profiling-000047",
+      "first": {
+        "runs": 89,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 75,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 48,
+            "wickets": 0,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 31,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 18,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 92,
+        "wickets": 4,
+        "legalBalls": 102,
+        "attempts": 104,
+        "dots": 56,
+        "boundaries": 8,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 36,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 20,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 32,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 34,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 24,
+            "wickets": 0,
+            "legalBalls": 12,
+            "attempts": 12,
+            "dots": 2,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 291.5764359999994,
+      "eventHash": "9b2b8a3115b062727c55dc004191ffa3ccd94a635827a94de13a6b0e53aa101c"
+    },
+    {
+      "seed": "m7c-profiling-000048",
+      "first": {
+        "runs": 85,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 71,
+        "boundaries": 7,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 40,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 30,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 15,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 85,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 79,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 14,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 48,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 35,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 19,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 316.2456579999998,
+      "eventHash": "888e5ae984400bebff496a6cb5c6ca50ca30f5cbb36c7306f803942c127c4a99"
+    },
+    {
+      "seed": "m7c-profiling-000049",
+      "first": {
+        "runs": 71,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 82,
+        "boundaries": 8,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 38,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 72,
+        "wickets": 5,
+        "legalBalls": 86,
+        "attempts": 87,
+        "dots": 51,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 54,
+            "wickets": 4,
+            "legalBalls": 50,
+            "attempts": 50,
+            "dots": 26,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 274.5425529999993,
+      "eventHash": "3b85c83dc89100742f09aef0b9e88946a5c4bdc8d0618e547382dfe9a2e2c60f"
+    },
+    {
+      "seed": "m7c-profiling-000050",
+      "first": {
+        "runs": 101,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 78,
+        "boundaries": 13,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 38,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 43,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 7
+          }
+        }
+      },
+      "second": {
+        "runs": 70,
+        "wickets": 10,
+        "legalBalls": 115,
+        "attempts": 115,
+        "dots": 78,
+        "boundaries": 8,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 29,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 38,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 14,
+            "wickets": 2,
+            "legalBalls": 25,
+            "attempts": 25,
+            "dots": 17,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 319.56134799999927,
+      "eventHash": "13450d13fff9a4c3e176e418a3ed295685f71da81998dad524599ae1416c8034"
+    },
+    {
+      "seed": "m7c-profiling-000051",
+      "first": {
+        "runs": 104,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 75,
+        "boundaries": 13,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 14,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 38,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 41,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 12,
+            "boundaries": 6
+          }
+        }
+      },
+      "second": {
+        "runs": 89,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 85,
+        "boundaries": 12,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 26,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 40,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 35,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 19,
+            "boundaries": 6
+          }
+        }
+      },
+      "elapsedMs": 328.4876540000005,
+      "eventHash": "b9f42b007ccd053483a0636bb585d8b3cb882ee67ce4424019ecfa9564f9e5c5"
+    },
+    {
+      "seed": "m7c-profiling-000052",
+      "first": {
+        "runs": 85,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 75,
+        "boundaries": 7,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 13,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 30,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 33,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 42,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 14,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 82,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 81,
+        "boundaries": 10,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 15,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 38,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 29,
+            "wickets": 5,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 5
+          }
+        }
+      },
+      "elapsedMs": 320.1679940000031,
+      "eventHash": "1b23af620978f2098adf8a1fe3a4bbcf06222d9877b1f848fa333cd40a5a0ecb"
+    },
+    {
+      "seed": "m7c-profiling-000053",
+      "first": {
+        "runs": 65,
+        "wickets": 10,
+        "legalBalls": 74,
+        "attempts": 76,
+        "dots": 48,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 28,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 5,
+            "legalBalls": 38,
+            "attempts": 39,
+            "dots": 24,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 66,
+        "wickets": 6,
+        "legalBalls": 105,
+        "attempts": 105,
+        "dots": 70,
+        "boundaries": 5,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 35,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 35,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 15,
+            "wickets": 0,
+            "legalBalls": 15,
+            "attempts": 15,
+            "dots": 10,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 258.0823569999993,
+      "eventHash": "e8fd2833cda9f3360ebb983097cf6ea161e2c45208a45f994161cd78a29e20d9"
+    },
+    {
+      "seed": "m7c-profiling-000054",
+      "first": {
+        "runs": 105,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 125,
+        "dots": 77,
+        "boundaries": 10,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 56,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 57,
+            "dots": 35,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 18,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 86,
+        "wickets": 10,
+        "legalBalls": 102,
+        "attempts": 106,
+        "dots": 66,
+        "boundaries": 10,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 25,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 50,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 57,
+            "dots": 34,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 1,
+            "legalBalls": 12,
+            "attempts": 12,
+            "dots": 7,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 316.88634300000194,
+      "eventHash": "c476be2dde738a5e5a15a01558db39d8d5b7f609abb990f9e3a268a3596c9f4e"
+    },
+    {
+      "seed": "m7c-profiling-000055",
+      "first": {
+        "runs": 78,
+        "wickets": 10,
+        "legalBalls": 106,
+        "attempts": 107,
+        "dots": 63,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 22,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 48,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 29,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 8,
+            "wickets": 4,
+            "legalBalls": 16,
+            "attempts": 16,
+            "dots": 11,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 79,
+        "wickets": 8,
+        "legalBalls": 93,
+        "attempts": 97,
+        "dots": 61,
+        "boundaries": 9,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 27,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 9,
+            "wickets": 0,
+            "legalBalls": 3,
+            "attempts": 4,
+            "dots": 1,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 313.93280500000037,
+      "eventHash": "d56736f1646ec6dbfb2835c28f6c08d310f63afbd91a8c4b4aa2e2fe646c6294"
+    },
+    {
+      "seed": "m7c-profiling-000056",
+      "first": {
+        "runs": 103,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 71,
+        "boundaries": 13,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 44,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 32,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 32,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 18,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 95,
+        "wickets": 10,
+        "legalBalls": 111,
+        "attempts": 113,
+        "dots": 77,
+        "boundaries": 14,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 61,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 34,
+            "boundaries": 9
+          },
+          "DEATH": {
+            "runs": 13,
+            "wickets": 2,
+            "legalBalls": 21,
+            "attempts": 21,
+            "dots": 15,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 309.2821640000002,
+      "eventHash": "fc1ef49da63d12da0ec37575ed6e27f9a9403ebdca2499655452d80003fee1b9"
+    },
+    {
+      "seed": "m7c-profiling-000057",
+      "first": {
+        "runs": 84,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 80,
+        "boundaries": 11,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 33,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 24,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 39,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 27,
+            "wickets": 4,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 18,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 76,
+        "wickets": 10,
+        "legalBalls": 82,
+        "attempts": 86,
+        "dots": 58,
+        "boundaries": 9,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 17,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 59,
+            "wickets": 7,
+            "legalBalls": 46,
+            "attempts": 49,
+            "dots": 31,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 268.6281880000024,
+      "eventHash": "7d2de09330645d355f7d0a1099c6f82cc5153bf46d0a7fd0d55c0218930fe231"
+    },
+    {
+      "seed": "m7c-profiling-000058",
+      "first": {
+        "runs": 83,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 81,
+        "boundaries": 11,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 22,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 32,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 40,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 29,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 16,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 84,
+        "wickets": 4,
+        "legalBalls": 90,
+        "attempts": 91,
+        "dots": 53,
+        "boundaries": 10,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 36,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 48,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 31,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 271.17190800000026,
+      "eventHash": "0fe7365c4d3eee22d91e746e378eb27ae04e7fddf5718489b177853a27f67f9e"
+    },
+    {
+      "seed": "m7c-profiling-000059",
+      "first": {
+        "runs": 96,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 74,
+        "boundaries": 13,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 35,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 18,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 32,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 15,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 24,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 76,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 80,
+        "boundaries": 6,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 21,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 39,
+            "boundaries": 0
+          },
+          "DEATH": {
+            "runs": 32,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 17,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 337.0493630000019,
+      "eventHash": "acfb39ee6f605737b9d273983d91340a511d4ab0cab0622032ee56e264adbbbb"
+    },
+    {
+      "seed": "m7c-profiling-000060",
+      "first": {
+        "runs": 68,
+        "wickets": 4,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 85,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 30,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 41,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 70,
+        "wickets": 6,
+        "legalBalls": 77,
+        "attempts": 77,
+        "dots": 53,
+        "boundaries": 9,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 1,
+            "legalBalls": 41,
+            "attempts": 41,
+            "dots": 26,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 256.47424899999896,
+      "eventHash": "e780f03b991cc846e18cad5ce259e0d6e0b75a61d43c86f71a29f066fd6247df"
+    },
+    {
+      "seed": "m7c-profiling-000061",
+      "first": {
+        "runs": 88,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 83,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 39,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 31,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 21,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 90,
+        "wickets": 8,
+        "legalBalls": 109,
+        "attempts": 112,
+        "dots": 69,
+        "boundaries": 11,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 45,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 57,
+            "dots": 32,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 19,
+            "attempts": 19,
+            "dots": 11,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 321.48153100000127,
+      "eventHash": "158f3232a80e72b0b9201175a2f37c1591994da1c40d702aa4bd2d290a2f32e5"
+    },
+    {
+      "seed": "m7c-profiling-000062",
+      "first": {
+        "runs": 63,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 88,
+        "boundaries": 6,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 18,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 29,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 9,
+            "wickets": 4,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 22,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 64,
+        "wickets": 4,
+        "legalBalls": 105,
+        "attempts": 106,
+        "dots": 68,
+        "boundaries": 5,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 28,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 34,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 31,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 11,
+            "wickets": 2,
+            "legalBalls": 15,
+            "attempts": 15,
+            "dots": 9,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 303.60629400000107,
+      "eventHash": "08b6265277be8eedb63fb698a3fa5ccde811642b9cfb8f801a9f48b82ccbf2cd"
+    },
+    {
+      "seed": "m7c-profiling-000063",
+      "first": {
+        "runs": 99,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 81,
+        "boundaries": 13,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 30,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 41,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 38,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 18,
+            "boundaries": 6
+          }
+        }
+      },
+      "second": {
+        "runs": 73,
+        "wickets": 10,
+        "legalBalls": 101,
+        "attempts": 103,
+        "dots": 69,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 29,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 40,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 7,
+            "wickets": 3,
+            "legalBalls": 11,
+            "attempts": 11,
+            "dots": 7,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 307.26096099999995,
+      "eventHash": "bace5656d25cda8a4c1279ab769ebd367f30722e69c70a45795245ad6d874a4e"
+    },
+    {
+      "seed": "m7c-profiling-000064",
+      "first": {
+        "runs": 79,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 80,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 38,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 34,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 15,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 22,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 64,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 125,
+        "dots": 84,
+        "boundaries": 2,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 24,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 41,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 19,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 346.86254700000063,
+      "eventHash": "4871b0d62a18ff095515b82ffceb9c7dd1fd345d6656ba15133ae5a8f08b9706"
+    },
+    {
+      "seed": "m7c-profiling-000065",
+      "first": {
+        "runs": 65,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 80,
+        "boundaries": 3,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 14,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 26,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 29,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 31,
+            "boundaries": 0
+          },
+          "DEATH": {
+            "runs": 22,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 23,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 67,
+        "wickets": 6,
+        "legalBalls": 116,
+        "attempts": 117,
+        "dots": 87,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 44,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 21,
+            "wickets": 2,
+            "legalBalls": 26,
+            "attempts": 26,
+            "dots": 19,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 367.57709700000123,
+      "eventHash": "40ec7d14cbbce7cadfc0fbfa9c07de4a3e081bbbcf86a51930d298f858f12cba"
+    },
+    {
+      "seed": "m7c-profiling-000066",
+      "first": {
+        "runs": 91,
+        "wickets": 10,
+        "legalBalls": 115,
+        "attempts": 118,
+        "dots": 77,
+        "boundaries": 13,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 31,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 24,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 24,
+            "wickets": 8,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 39,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 36,
+            "wickets": 2,
+            "legalBalls": 25,
+            "attempts": 25,
+            "dots": 14,
+            "boundaries": 7
+          }
+        }
+      },
+      "second": {
+        "runs": 46,
+        "wickets": 10,
+        "legalBalls": 100,
+        "attempts": 102,
+        "dots": 76,
+        "boundaries": 4,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 15,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 41,
+            "boundaries": 0
+          },
+          "DEATH": {
+            "runs": 5,
+            "wickets": 2,
+            "legalBalls": 10,
+            "attempts": 10,
+            "dots": 8,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 333.54871300000013,
+      "eventHash": "6e7b52f60e456d36523846e401cf20872798101ac5e07c4297ffc834dd08ccea"
+    },
+    {
+      "seed": "m7c-profiling-000067",
+      "first": {
+        "runs": 89,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 83,
+        "boundaries": 9,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 25,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 25,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 41,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 44,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 17,
+            "boundaries": 6
+          }
+        }
+      },
+      "second": {
+        "runs": 77,
+        "wickets": 10,
+        "legalBalls": 115,
+        "attempts": 115,
+        "dots": 75,
+        "boundaries": 7,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 33,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 33,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 35,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 11,
+            "wickets": 4,
+            "legalBalls": 25,
+            "attempts": 25,
+            "dots": 18,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 343.7479929999972,
+      "eventHash": "720daabf4b6a43ebdf3bfff3ed4b8a3479e238ffe7af4dc3a947e5422bf9e198"
+    },
+    {
+      "seed": "m7c-profiling-000068",
+      "first": {
+        "runs": 94,
+        "wickets": 10,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 75,
+        "boundaries": 12,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 32,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 33,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 37,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 7
+          }
+        }
+      },
+      "second": {
+        "runs": 95,
+        "wickets": 5,
+        "legalBalls": 105,
+        "attempts": 105,
+        "dots": 64,
+        "boundaries": 11,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 29,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 35,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 17,
+            "wickets": 1,
+            "legalBalls": 15,
+            "attempts": 15,
+            "dots": 5,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 305.41943399999946,
+      "eventHash": "fc6e82455193ca596dddaabc40a346fc97e6de3a6feedc36c305e95095032888"
+    },
+    {
+      "seed": "m7c-profiling-000069",
+      "first": {
+        "runs": 122,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 76,
+        "boundaries": 18,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 33,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 60,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 31,
+            "boundaries": 8
+          },
+          "DEATH": {
+            "runs": 29,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 79,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 79,
+        "boundaries": 7,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 26,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 38,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 28,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 20,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 335.02732299999843,
+      "eventHash": "fbe7aa63e2fe57198000e0fac8567e1dd15de7e0f410a148ce8995ff44adc715"
+    },
+    {
+      "seed": "m7c-profiling-000070",
+      "first": {
+        "runs": 72,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 85,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 17,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 24,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 31,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 78,
+        "wickets": 5,
+        "legalBalls": 89,
+        "attempts": 90,
+        "dots": 55,
+        "boundaries": 10,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 33,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 45,
+            "wickets": 1,
+            "legalBalls": 53,
+            "attempts": 53,
+            "dots": 33,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 277.3265999999967,
+      "eventHash": "628e87bc94d88e04eb31a5a6b117828f76defee37f3b92f7da415636ee4e412e"
+    },
+    {
+      "seed": "m7c-profiling-000071",
+      "first": {
+        "runs": 89,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 83,
+        "boundaries": 14,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 29,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 34,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 6
+          }
+        }
+      },
+      "second": {
+        "runs": 90,
+        "wickets": 4,
+        "legalBalls": 118,
+        "attempts": 119,
+        "dots": 78,
+        "boundaries": 12,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 22,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 38,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 35,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 30,
+            "wickets": 0,
+            "legalBalls": 28,
+            "attempts": 28,
+            "dots": 17,
+            "boundaries": 4
+          }
+        }
+      },
+      "elapsedMs": 313.4886230000011,
+      "eventHash": "8e169d5f64885e66d70bb6c6ed74ebb17efb538701b9e9d5e139d98b49e95c27"
+    },
+    {
+      "seed": "m7c-profiling-000072",
+      "first": {
+        "runs": 88,
+        "wickets": 4,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 85,
+        "boundaries": 14,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 40,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 38,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 18,
+            "boundaries": 6
+          }
+        }
+      },
+      "second": {
+        "runs": 91,
+        "wickets": 6,
+        "legalBalls": 100,
+        "attempts": 103,
+        "dots": 61,
+        "boundaries": 11,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 55,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 30,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 0,
+            "legalBalls": 10,
+            "attempts": 11,
+            "dots": 5,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 295.6974169999994,
+      "eventHash": "cbbb07a9229e180b56e70b33aba0e66e8a0586a856eb66bd2c2d6e95a9d5be40"
+    },
+    {
+      "seed": "m7c-profiling-000073",
+      "first": {
+        "runs": 67,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 84,
+        "boundaries": 7,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 14,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 24,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 43,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 29,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 18,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 70,
+        "wickets": 7,
+        "legalBalls": 58,
+        "attempts": 58,
+        "dots": 34,
+        "boundaries": 9,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 48,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 19,
+            "boundaries": 6
+          },
+          "MIDDLE": {
+            "runs": 22,
+            "wickets": 3,
+            "legalBalls": 22,
+            "attempts": 22,
+            "dots": 15,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 261.10110200000054,
+      "eventHash": "f34e63b110c4b1db59e36ed870179997ed9c38c8c7f161c3f937d45193c3516a"
+    },
+    {
+      "seed": "m7c-profiling-000074",
+      "first": {
+        "runs": 81,
+        "wickets": 10,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 80,
+        "boundaries": 7,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 31,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 39,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 4,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 61,
+        "wickets": 10,
+        "legalBalls": 85,
+        "attempts": 85,
+        "dots": 61,
+        "boundaries": 8,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 26,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 34,
+            "wickets": 9,
+            "legalBalls": 49,
+            "attempts": 49,
+            "dots": 35,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 295.13741800000207,
+      "eventHash": "fd18286efddc984f754e80f05bbc114b8f57c2b78f1545435496d1ed71011939"
+    },
+    {
+      "seed": "m7c-profiling-000075",
+      "first": {
+        "runs": 87,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 81,
+        "boundaries": 11,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 22,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 33,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 40,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 32,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 18,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 42,
+        "wickets": 10,
+        "legalBalls": 85,
+        "attempts": 86,
+        "dots": 61,
+        "boundaries": 2,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 25,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 26,
+            "wickets": 5,
+            "legalBalls": 49,
+            "attempts": 50,
+            "dots": 36,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 294.45740300000034,
+      "eventHash": "dae50d320e49d4adf911e18e7dfeeb4274dc9735c717a163ed6e7aa06476b788"
+    },
+    {
+      "seed": "m7c-profiling-000076",
+      "first": {
+        "runs": 92,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 77,
+        "boundaries": 10,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 12,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 34,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 41,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 31,
+            "dots": 16,
+            "boundaries": 7
+          }
+        }
+      },
+      "second": {
+        "runs": 87,
+        "wickets": 10,
+        "legalBalls": 111,
+        "attempts": 112,
+        "dots": 73,
+        "boundaries": 12,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 31,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 36,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 20,
+            "wickets": 2,
+            "legalBalls": 21,
+            "attempts": 21,
+            "dots": 12,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 335.7490309999994,
+      "eventHash": "98c05da90a82dca7945b8c0241793cd76a0e60a620bf6e476a8f4f85e7724b36"
+    },
+    {
+      "seed": "m7c-profiling-000077",
+      "first": {
+        "runs": 83,
+        "wickets": 4,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 76,
+        "boundaries": 7,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 20,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 42,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 34,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 21,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 84,
+        "wickets": 3,
+        "legalBalls": 103,
+        "attempts": 104,
+        "dots": 69,
+        "boundaries": 11,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 36,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 7
+          },
+          "MIDDLE": {
+            "runs": 38,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 34,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 10,
+            "wickets": 0,
+            "legalBalls": 13,
+            "attempts": 13,
+            "dots": 8,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 312.66120500000034,
+      "eventHash": "c65bea02a600577beb395d83233b675002f6ff93f803f146dce60726925a5c05"
+    },
+    {
+      "seed": "m7c-profiling-000078",
+      "first": {
+        "runs": 86,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 81,
+        "boundaries": 10,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 27,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 41,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 29,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 89,
+        "wickets": 6,
+        "legalBalls": 108,
+        "attempts": 110,
+        "dots": 70,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 25,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 43,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 34,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 18,
+            "attempts": 19,
+            "dots": 11,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 335.66909900000246,
+      "eventHash": "adb2dce16077622626cc2dabc2ac2b1b707a70e7b458ddc5096ed1b350e3797e"
+    },
+    {
+      "seed": "m7c-profiling-000079",
+      "first": {
+        "runs": 95,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 73,
+        "boundaries": 10,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 24,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 53,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 31,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 17,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 18,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 85,
+        "wickets": 10,
+        "legalBalls": 93,
+        "attempts": 94,
+        "dots": 54,
+        "boundaries": 9,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 35,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 30,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 4,
+            "wickets": 2,
+            "legalBalls": 3,
+            "attempts": 3,
+            "dots": 2,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 318.1690540000018,
+      "eventHash": "fd0232d64d281bd275e98b77a2ac9b91ac73cc79315e5923653cfa9d51f2811d"
+    },
+    {
+      "seed": "m7c-profiling-000080",
+      "first": {
+        "runs": 89,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 123,
+        "dots": 80,
+        "boundaries": 10,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 48,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 15,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 22,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 43,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 22,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 90,
+        "wickets": 8,
+        "legalBalls": 113,
+        "attempts": 116,
+        "dots": 71,
+        "boundaries": 10,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 50,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 30,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 19,
+            "wickets": 1,
+            "legalBalls": 23,
+            "attempts": 24,
+            "dots": 14,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 360.6474730000009,
+      "eventHash": "0657fc3b0c14b1b8f4af0c178cf392bb73f48f3362ec79566469cfb5f75cc249"
+    },
+    {
+      "seed": "m7c-profiling-000081",
+      "first": {
+        "runs": 108,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 72,
+        "boundaries": 13,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 22,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 48,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 33,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 35,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 5
+          }
+        }
+      },
+      "second": {
+        "runs": 106,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 125,
+        "dots": 77,
+        "boundaries": 12,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 36,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 50,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 18,
+            "boundaries": 8
+          }
+        }
+      },
+      "elapsedMs": 368.0151220000007,
+      "eventHash": "b7becbc31861b539b876696c027a2b734adf75159169cef5123fb2032df2bb88"
+    },
+    {
+      "seed": "m7c-profiling-000082",
+      "first": {
+        "runs": 117,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 80,
+        "boundaries": 15,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 25,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 44,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 48,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 16,
+            "boundaries": 7
+          }
+        }
+      },
+      "second": {
+        "runs": 95,
+        "wickets": 10,
+        "legalBalls": 109,
+        "attempts": 112,
+        "dots": 71,
+        "boundaries": 11,
+        "illegals": 3,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 13,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 50,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 57,
+            "dots": 35,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 32,
+            "wickets": 1,
+            "legalBalls": 19,
+            "attempts": 19,
+            "dots": 8,
+            "boundaries": 5
+          }
+        }
+      },
+      "elapsedMs": 350.9133619999993,
+      "eventHash": "846f0f09be1de73a9abfd63f4dd3633215f3945b5d1ddc92c481a9533d87edef"
+    },
+    {
+      "seed": "m7c-profiling-000083",
+      "first": {
+        "runs": 44,
+        "wickets": 10,
+        "legalBalls": 63,
+        "attempts": 64,
+        "dots": 41,
+        "boundaries": 4,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 6,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 20,
+            "wickets": 4,
+            "legalBalls": 27,
+            "attempts": 27,
+            "dots": 18,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 48,
+        "wickets": 4,
+        "legalBalls": 62,
+        "attempts": 64,
+        "dots": 46,
+        "boundaries": 8,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 11,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 30,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 1,
+            "legalBalls": 26,
+            "attempts": 26,
+            "dots": 16,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 202.74109500000122,
+      "eventHash": "7b75d5410b054958855e0f1741aee2f1666d0534dded4948d6ebb0c44b3efcae"
+    },
+    {
+      "seed": "m7c-profiling-000084",
+      "first": {
+        "runs": 91,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 74,
+        "boundaries": 11,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 25,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 40,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 32,
+            "boundaries": 5
+          },
+          "DEATH": {
+            "runs": 27,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 17,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 74,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 84,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 23,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 26,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 41,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 25,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 392.942071999998,
+      "eventHash": "bf8e4267711aafd36522c332505d7f3c139ba28cbbc4e6df6f32c88bf2bdc0da"
+    },
+    {
+      "seed": "m7c-profiling-000085",
+      "first": {
+        "runs": 78,
+        "wickets": 9,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 77,
+        "boundaries": 7,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 27,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 40,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 33,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 11,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 79,
+        "wickets": 2,
+        "legalBalls": 113,
+        "attempts": 118,
+        "dots": 80,
+        "boundaries": 9,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 39,
+            "dots": 26,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 37,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 36,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 0,
+            "legalBalls": 23,
+            "attempts": 23,
+            "dots": 18,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 310.9599789999993,
+      "eventHash": "de11b1d0b757b1c53c9da5b2b002e66ca641bd6083d8095d45c0f9e9becd9ab1"
+    },
+    {
+      "seed": "m7c-profiling-000086",
+      "first": {
+        "runs": 84,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 75,
+        "boundaries": 9,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 20,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 31,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 37,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 27,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 18,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 79,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 82,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 9,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 29,
+            "boundaries": 0
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 34,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 24,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 19,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 303.23767000000225,
+      "eventHash": "b35a34f4b892938afc1d35d022c5d230120b55da9789a72d9f87096200e9744d"
+    },
+    {
+      "seed": "m7c-profiling-000087",
+      "first": {
+        "runs": 120,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 122,
+        "dots": 69,
+        "boundaries": 16,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 6,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 26,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 32,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 47,
+            "wickets": 0,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 11,
+            "boundaries": 7
+          }
+        }
+      },
+      "second": {
+        "runs": 68,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 125,
+        "dots": 85,
+        "boundaries": 7,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 25,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 56,
+            "dots": 40,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 22,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 23,
+            "boundaries": 3
+          }
+        }
+      },
+      "elapsedMs": 322.0400380000028,
+      "eventHash": "a7b9c67159ad2711c2dacb58c3858f725b8561d7f9b9a3622c21ca80929490d0"
+    },
+    {
+      "seed": "m7c-profiling-000088",
+      "first": {
+        "runs": 74,
+        "wickets": 6,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 82,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 21,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 35,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 35,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 18,
+            "wickets": 3,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 19,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 75,
+        "wickets": 6,
+        "legalBalls": 95,
+        "attempts": 96,
+        "dots": 62,
+        "boundaries": 9,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 22,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 26,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 49,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 34,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 4,
+            "wickets": 0,
+            "legalBalls": 5,
+            "attempts": 5,
+            "dots": 2,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 315.7668920000033,
+      "eventHash": "0d46e2eacbbaf549fa090a94dc796fc58b55b59790e01a67ca2913a979b49bde"
+    },
+    {
+      "seed": "m7c-profiling-000089",
+      "first": {
+        "runs": 113,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 72,
+        "boundaries": 12,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 33,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 58,
+            "wickets": 2,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 29,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 22,
+            "wickets": 4,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 21,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 79,
+        "wickets": 10,
+        "legalBalls": 103,
+        "attempts": 105,
+        "dots": 63,
+        "boundaries": 7,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 4,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 23,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 39,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 32,
+            "boundaries": 3
+          },
+          "DEATH": {
+            "runs": 14,
+            "wickets": 2,
+            "legalBalls": 13,
+            "attempts": 13,
+            "dots": 8,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 289.1334659999993,
+      "eventHash": "018c2ec2e6a2cecca8c266ff8c15eccf135f92d1d5b69ad8cb135d5d5c996c38"
+    },
+    {
+      "seed": "m7c-profiling-000090",
+      "first": {
+        "runs": 71,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 82,
+        "boundaries": 6,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 29,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 26,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 19,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 42,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 23,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 33,
+            "dots": 14,
+            "boundaries": 1
+          }
+        }
+      },
+      "second": {
+        "runs": 74,
+        "wickets": 5,
+        "legalBalls": 91,
+        "attempts": 93,
+        "dots": 58,
+        "boundaries": 9,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 24,
+            "wickets": 5,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 21,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 0,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 4,
+            "wickets": 0,
+            "legalBalls": 1,
+            "attempts": 1,
+            "dots": 0,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 273.8559490000007,
+      "eventHash": "cbc6c20a5f8bbaf32330a07958a38c25edae4623107cc4e19b417d532eb0383f"
+    },
+    {
+      "seed": "m7c-profiling-000091",
+      "first": {
+        "runs": 63,
+        "wickets": 10,
+        "legalBalls": 103,
+        "attempts": 105,
+        "dots": 69,
+        "boundaries": 5,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 11,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 31,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 47,
+            "wickets": 5,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 29,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 5,
+            "wickets": 2,
+            "legalBalls": 13,
+            "attempts": 13,
+            "dots": 9,
+            "boundaries": 0
+          }
+        }
+      },
+      "second": {
+        "runs": 64,
+        "wickets": 4,
+        "legalBalls": 95,
+        "attempts": 97,
+        "dots": 68,
+        "boundaries": 7,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 16,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 27,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 46,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 38,
+            "boundaries": 6
+          },
+          "DEATH": {
+            "runs": 2,
+            "wickets": 0,
+            "legalBalls": 5,
+            "attempts": 5,
+            "dots": 3,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 273.48301699999865,
+      "eventHash": "d4ee82e9b0d43ca67ffff3de70433fcf9e4327d3d897866f2b8c9452fd15768e"
+    },
+    {
+      "seed": "m7c-profiling-000092",
+      "first": {
+        "runs": 79,
+        "wickets": 8,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 80,
+        "boundaries": 6,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 22,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 25,
+            "wickets": 7,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 39,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 32,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 19,
+            "boundaries": 4
+          }
+        }
+      },
+      "second": {
+        "runs": 80,
+        "wickets": 6,
+        "legalBalls": 104,
+        "attempts": 106,
+        "dots": 63,
+        "boundaries": 7,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 42,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 19,
+            "boundaries": 5
+          },
+          "MIDDLE": {
+            "runs": 29,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 37,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 9,
+            "wickets": 1,
+            "legalBalls": 14,
+            "attempts": 14,
+            "dots": 7,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 312.68303899999955,
+      "eventHash": "64eaa1cdd1f56befbe1d33889b456314e541b919bcc72a1ad787839adb57ff6a"
+    },
+    {
+      "seed": "m7c-profiling-000093",
+      "first": {
+        "runs": 93,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 120,
+        "dots": 78,
+        "boundaries": 10,
+        "illegals": 0,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 13,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 28,
+            "boundaries": 1
+          },
+          "MIDDLE": {
+            "runs": 52,
+            "wickets": 1,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 36,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 28,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 14,
+            "boundaries": 2
+          }
+        }
+      },
+      "second": {
+        "runs": 85,
+        "wickets": 10,
+        "legalBalls": 89,
+        "attempts": 91,
+        "dots": 56,
+        "boundaries": 10,
+        "illegals": 2,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 28,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 23,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 57,
+            "wickets": 7,
+            "legalBalls": 53,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 7
+          },
+          "DEATH": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0,
+            "attempts": 0,
+            "dots": 0,
+            "boundaries": 0
+          }
+        }
+      },
+      "elapsedMs": 305.8749220000027,
+      "eventHash": "b8bace365b8bceb28d556c2b012f930554f87caa7fbecc41cef29a0dcdb63b8c"
+    },
+    {
+      "seed": "m7c-profiling-000094",
+      "first": {
+        "runs": 75,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 121,
+        "dots": 81,
+        "boundaries": 8,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 28,
+            "wickets": 1,
+            "legalBalls": 36,
+            "attempts": 37,
+            "dots": 22,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 23,
+            "wickets": 4,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 39,
+            "boundaries": 2
+          },
+          "DEATH": {
+            "runs": 24,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 20,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 77,
+        "wickets": 8,
+        "legalBalls": 96,
+        "attempts": 97,
+        "dots": 61,
+        "boundaries": 7,
+        "illegals": 1,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 35,
+            "wickets": 2,
+            "legalBalls": 36,
+            "attempts": 36,
+            "dots": 21,
+            "boundaries": 4
+          },
+          "MIDDLE": {
+            "runs": 29,
+            "wickets": 6,
+            "legalBalls": 54,
+            "attempts": 54,
+            "dots": 38,
+            "boundaries": 1
+          },
+          "DEATH": {
+            "runs": 13,
+            "wickets": 0,
+            "legalBalls": 6,
+            "attempts": 7,
+            "dots": 2,
+            "boundaries": 2
+          }
+        }
+      },
+      "elapsedMs": 292.9957460000005,
+      "eventHash": "c91ad5ef4ae841ca3612da3c8e4d6b35b283136ec5eb34c2159eeb65093fb323"
+    },
+    {
+      "seed": "m7c-profiling-000095",
+      "first": {
+        "runs": 106,
+        "wickets": 5,
+        "legalBalls": 120,
+        "attempts": 125,
+        "dots": 70,
+        "boundaries": 10,
+        "illegals": 5,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 32,
+            "wickets": 0,
+            "legalBalls": 36,
+            "attempts": 38,
+            "dots": 20,
+            "boundaries": 3
+          },
+          "MIDDLE": {
+            "runs": 43,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 33,
+            "boundaries": 4
+          },
+          "DEATH": {
+            "runs": 31,
+            "wickets": 2,
+            "legalBalls": 30,
+            "attempts": 32,
+            "dots": 17,
+            "boundaries": 3
+          }
+        }
+      },
+      "second": {
+        "runs": 52,
+        "wickets": 7,
+        "legalBalls": 120,
+        "attempts": 124,
+        "dots": 90,
+        "boundaries": 3,
+        "illegals": 4,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 26,
+            "wickets": 3,
+            "legalBalls": 36,
+            "attempts": 39,
+            "dots": 24,
+            "boundaries": 2
+          },
+          "MIDDLE": {
+            "runs": 10,
+            "wickets": 3,
+            "legalBalls": 54,
+            "attempts": 55,
+            "dots": 47,
+            "boundaries": 0
+          },
+          "DEATH": {
+            "runs": 16,
+            "wickets": 1,
+            "legalBalls": 30,
+            "attempts": 30,
+            "dots": 19,
+            "boundaries": 1
+          }
+        }
+      },
+      "elapsedMs": 321.50641499999983,
+      "eventHash": "b83e3d2bd3203054b5a0cde0f128edcf537d8638fe764004f51bf82d374d8400"
+    }
+  ]
+}

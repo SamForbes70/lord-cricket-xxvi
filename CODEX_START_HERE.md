@@ -2,11 +2,17 @@
 
 This is the **recovered complete TypeScript source repository with its full available Git history**. It was restored from the Pass 22 / M7J bundle in the original 17 October 2026 owner package. The code from historical commit `5b8b9da990d657197fb56bbfd33152f87b875f5c` was verified byte-for-byte against every source ZIP entry (894 entries).
 
+## Current acceptance
+
+PR #2 is merged. [Current status](docs/CURRENT_STATUS.md) supersedes historical browser blockers and archive-absence notes.
+[Acceptance reconciliation](docs/ACCEPTANCE_RECONCILIATION.md) separates hosted tests, owner playthrough and remaining evidence gaps.
+M7K research preparation is authorised, with work in unmerged draft PR #3. Gameplay promotion remains separately gated.
+
 ## Open this project
 1. Extract the outer ZIP to a normal Windows folder, e.g. `C:\Projects\Lord_Cricket_XXVI_Codex_Migration_2026-10-21`.
 2. In Codex desktop/app, **open the inner `Lord_Cricket_XXVI` folder**, the one with `.git`, `AGENTS.md`, `apps`, `packages`, `tests`, and `package.json`.
 3. Do not point Codex at only the `ORIGINAL_OWNER_RELEASE` ZIP or the outer migration folder.
-4. Use `docs/codex-migration/FIRST_CODEX_TASK.md` as the initial task.
+4. Read `docs/CURRENT_STATUS.md` before selecting a task.
 5. Install Node.js >=22.12, Git and Python 3 on your own Windows PC before running verification. `npm ci` requires registry access; no `node_modules` is shipped.
 
 ## Baseline checks

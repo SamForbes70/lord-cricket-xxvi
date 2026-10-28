@@ -1,0 +1,2771 @@
+{
+  "version": "LC_M7_SCENARIO_GRID_V1",
+  "seedsPerCell": 2,
+  "scenarios": 64,
+  "teamPairing": "Sorted adjacent teams; all eight teams, four pairings, all eight grounds.",
+  "selection": "Existing corpus XI selector; each keeper and six bowling-capable players retained.",
+  "policies": [
+    "BASELINE",
+    "TACTICAL"
+  ],
+  "modelId": "synthetic-alpha-01",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "rulesHash": "7c67aec8e3aef8be7b849775d83bad64847338e03326848ec1f1d0d99c6fa745",
+  "stagePackHash": "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+  "worldSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+  "scenariosList": [
+    {
+      "matchId": "m-quality-p0-ground-01-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-01-s0",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-01-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-01-s1",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-02-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-02-s0",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-02-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-02-s1",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-03-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-03-s0",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-03-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-03-s1",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-04-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-04-s0",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-04-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-04-s1",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-05-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-05-s0",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-05-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-05-s1",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-06-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-06-s0",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-06-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-06-s1",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-07-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-07-s0",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-07-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-07-s1",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-08-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-08-s0",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p0-ground-08-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p0-ground-08-s1",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-01",
+          "playerIds": [
+            "p001",
+            "p003",
+            "p004",
+            "p005",
+            "p006",
+            "p007",
+            "p008",
+            "p002",
+            "p009",
+            "p010",
+            "p011"
+          ],
+          "captainId": "p001",
+          "keeperId": "p001"
+        },
+        {
+          "teamId": "team-02",
+          "playerIds": [
+            "p021",
+            "p023",
+            "p024",
+            "p025",
+            "p026",
+            "p027",
+            "p028",
+            "p022",
+            "p029",
+            "p030",
+            "p031"
+          ],
+          "captainId": "p021",
+          "keeperId": "p021"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-01-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-01-s0",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-01-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-01-s1",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-02-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-02-s0",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-02-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-02-s1",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-03-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-03-s0",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-03-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-03-s1",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-04-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-04-s0",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-04-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-04-s1",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-05-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-05-s0",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-05-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-05-s1",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-06-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-06-s0",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-06-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-06-s1",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-07-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-07-s0",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-07-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-07-s1",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-08-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-08-s0",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p1-ground-08-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p1-ground-08-s1",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-03",
+          "playerIds": [
+            "p041",
+            "p043",
+            "p044",
+            "p045",
+            "p046",
+            "p047",
+            "p048",
+            "p042",
+            "p049",
+            "p050",
+            "p051"
+          ],
+          "captainId": "p041",
+          "keeperId": "p041"
+        },
+        {
+          "teamId": "team-04",
+          "playerIds": [
+            "p061",
+            "p063",
+            "p064",
+            "p065",
+            "p066",
+            "p067",
+            "p068",
+            "p062",
+            "p069",
+            "p070",
+            "p071"
+          ],
+          "captainId": "p061",
+          "keeperId": "p061"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-01-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-01-s0",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-01-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-01-s1",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-02-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-02-s0",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-02-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-02-s1",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-03-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-03-s0",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-03-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-03-s1",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-04-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-04-s0",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-04-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-04-s1",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-05-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-05-s0",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-05-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-05-s1",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-06-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-06-s0",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-06-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-06-s1",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-07-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-07-s0",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-07-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-07-s1",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-08-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-08-s0",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p2-ground-08-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p2-ground-08-s1",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-05",
+          "playerIds": [
+            "p081",
+            "p083",
+            "p084",
+            "p085",
+            "p086",
+            "p087",
+            "p088",
+            "p082",
+            "p089",
+            "p090",
+            "p091"
+          ],
+          "captainId": "p081",
+          "keeperId": "p081"
+        },
+        {
+          "teamId": "team-06",
+          "playerIds": [
+            "p101",
+            "p103",
+            "p104",
+            "p105",
+            "p106",
+            "p107",
+            "p108",
+            "p102",
+            "p109",
+            "p110",
+            "p111"
+          ],
+          "captainId": "p101",
+          "keeperId": "p101"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-01-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-01-s0",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-01-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-01-s1",
+      "groundId": "ground-01",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-02-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-02-s0",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-02-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-02-s1",
+      "groundId": "ground-02",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-03-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-03-s0",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-03-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-03-s1",
+      "groundId": "ground-03",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-04-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-04-s0",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-04-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-04-s1",
+      "groundId": "ground-04",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-05-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-05-s0",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-05-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-05-s1",
+      "groundId": "ground-05",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-06-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-06-s0",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-06-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-06-s1",
+      "groundId": "ground-06",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-07-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-07-s0",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-07-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-07-s1",
+      "groundId": "ground-07",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-08-s0",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-08-s0",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    },
+    {
+      "matchId": "m-quality-p3-ground-08-s1",
+      "seed": "LC_M7_QUALITY_GRID_V1_quality-p3-ground-08-s1",
+      "groundId": "ground-08",
+      "selectedTeams": [
+        {
+          "teamId": "team-07",
+          "playerIds": [
+            "p121",
+            "p123",
+            "p124",
+            "p125",
+            "p126",
+            "p127",
+            "p128",
+            "p122",
+            "p129",
+            "p130",
+            "p131"
+          ],
+          "captainId": "p121",
+          "keeperId": "p121"
+        },
+        {
+          "teamId": "team-08",
+          "playerIds": [
+            "p141",
+            "p143",
+            "p144",
+            "p145",
+            "p146",
+            "p147",
+            "p148",
+            "p142",
+            "p149",
+            "p150",
+            "p151"
+          ],
+          "captainId": "p141",
+          "keeperId": "p141"
+        }
+      ]
+    }
+  ],
+  "protocolSha256": "c640bc03c2d0d1a30651f88ee2d2414445ae31098586b15c0ce98ccad0648bcd"
+}

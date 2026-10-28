@@ -1,37 +1,34 @@
-# Capability matrix: Pass 14 M7B on Pass 13 M7A
+# Current capability matrix
 
-| Capability | Status and boundary |
+This matrix describes the implemented game after merged PR #2.
+[CURRENT_STATUS.md](CURRENT_STATUS.md) records acceptance scope and unmerged research work.
+Dated reports retain the results of their original runs.
+
+| Capability | Current boundary |
 | --- | --- |
-| T20 / ODI / five-day red-ball engines | Inherited and regression-tested; frozen core implementations unchanged |
-| Fictional world | Frozen `fictional-eight-01`, 160 players, 8 teams, 8 grounds |
-| T20 competition | 14 rounds, 56 fixtures, fixed schedule |
-| New career | Implemented, one selected managed team and one season |
-| Home / Career | Implemented |
-| Squad | Implemented with availability, fatigue, readiness and training |
-| Fixtures | Implemented for all 56 fixtures, managed fixtures identified |
-| Statistics | Authoritative Pass 12E table, NRR, player stats and leaders |
-| Settings | Text scale, density, reduced motion, season export/import |
-| Training/readiness | Pass 12C semantics, temporary only, no permanent attribute growth |
-| Off-screen matches | Pass 12D shared `LC_T20_MATCH_V1` execution |
-| Managed simulated match | Implemented through the same shared engine and canonical completion path |
-| Managed interactive match | Integrated with existing T20 UI using scheduled fixture seed/ground/XI and `USER_MATCH` completion boundary |
-| Tactical captain AI | Deterministic public-view T20 AI available as an optional team in interactive exhibition/managed match UI; commands use the existing worker and durable event stream. Browser operation remains BLOCKED on this host. Frozen Pass 12D fixture captain unchanged |
-| Career progression | Explicit commands; progression stops before the managed fixture |
-| Durable local season save | Existing Pass 12F IndexedDB repository, writer lease, revisions and rotating checkpoints |
-| Recovery | Newest-valid checkpoint design inherited; damaged generation preserved |
-| Portable season archive | Existing `.lcxxvi` format retained |
-| Final season archive | Immutable after exactly 56 reconciled fixtures |
-| Headless full-season acceptance | PASS: 14 rounds, 56 unique completions, 56 condition applications, projection rebuild and portable round-trip |
-| Application-service tests | PASS in Node with repository test double |
-| Inherited unit suite | PASS 510/510 tests across 26 files in three independent resource-controlled shards (480, 10 and 19), plus one new isolated controller test. Combined resource-contentious execution timed out, sharded acceptance is green |
-| Browser IndexedDB / management acceptance | BLOCKED by host `ERR_BLOCKED_BY_ADMINISTRATOR` before application code executes |
-| M3 human match acceptance | Pending, separate gate |
-| Limited-overs DLS | Disabled |
-| Multiyear career / transfers / contracts / finances / youth / international management | Not implemented by design |
-| Match analytics | New T20 event-derived Manhattan, worm, partnerships, eight shot sectors; completed-match display wired. Browser acceptance blocked |
-| M7 quality diagnostic | 64 seeded matches (M7A) and 16 paired-policy fixtures (M7B). Cricsheet offline reference extractor constructed-fixture tested; actual reference dataset NOT acquired, calibration NOT performed |
-| Performance diagnostic | Node match p95 479.93 ms, environment-specific; reference browser/56-match/save/load budgets not accepted |
-| Model status | `SYNTHETIC_ALPHA`, no empirical-realism claim |
-| M7F joint research model | Research-only versioned legality/team-runs/bat-boundary/wicket-category distribution; exactly 2^32 integer mass, phase × wickets-lost contexts. 2,605 train/652 holdout. Improves heldout categorical logloss; score P10/P90 fail |
-| M7F player/tactical calibration | NOT ACCEPTED: data do not directly identify game ratings and commanded tactics |
-| M7F gameplay model promotion | DISABLED; existing `synthetic-alpha-01` and `.lcxxvi` save format remain unchanged |
+| Fictional world | Eight teams, 160 players and eight grounds in the frozen world pack. |
+| Match formats | T20, ODI and five-day red-ball exhibitions under documented custom rules. |
+| Match interface | XIs, captain/keeper, toss, batting/bowling choices, field controls and complete scorecards. |
+| One-season career | Eight teams, 14 rounds and 56 fixtures, with managed interactive or simulated fixtures. |
+| Management screens | Home, Career, Squad, Fixtures, Statistics and Settings. |
+| Training and condition | Rest/practice, availability, fatigue and temporary readiness; no permanent skill growth. |
+| Tactical captain | Optional deterministic public-view T20 policy; legal controls are browser-tested. Empirical tactical quality is unaccepted. |
+| Fixture autopilot | Separate deterministic baseline completion policy; it is not the tactical captain. |
+| Local saves | IndexedDB commits, writer lease, revisions, checkpoints and validated recovery. |
+| Portable archives | `.lcxxvi` export/import, including browser tests in a fresh context. |
+| Final season | Immutable completion after exactly 56 reconciled fixtures. |
+| Statistics | League table, NRR, player statistics and accepted-event match analytics. |
+| Browser acceptance | Recorded Linux and hosted Windows Chromium/Firefox suites pass. Owner-PC automation is NOT RUN. |
+| Human match | Sam reports a successful Windows Edge match, layout check and repeat replay verification. Individual missing fields remain recorded. |
+| Replay and determinism | Frozen scoring/vector gates and the 100-case T20 browser/worker corpus pass in recorded runs. |
+| Gameplay model | `synthetic-alpha-01` / `SYNTHETIC_ALPHA`; no empirical-realism claim. |
+| Empirical research | M7F-J candidates remain offline research. No candidate is selectable in gameplay. |
+| M7K | Evidence preparation recorded in PR #3; no adjudicated source fixtures or new production ledger. |
+| Scenario quality harness | Paired baseline/tactical developer tool across all eight teams and grounds; descriptive synthetic results only. |
+| Performance | Reference-hardware browser, season, memory and save/load budgets remain unaccepted. |
+| DLS and limited-overs rain | Disabled. Red-ball delay commands do not establish a calibrated weather scheduler. |
+| Prediction, super overs and DRS | Not enabled. |
+| Multiyear management | Transfers, contracts, finances, youth and international management are not implemented. |
+
+Unit totals and commands belong to their dated evidence records, rather than this capability table.
+[Acceptance reconciliation](ACCEPTANCE_RECONCILIATION.md) maps completed and unrecorded gates without inferring missing results.

@@ -1,5 +1,6 @@
 # Owner release comparison: 26 October 2026
 
+> Dated evidence snapshot. [Current status](../CURRENT_STATUS.md) records later merges, acceptance and research authorisation.
 PASS: the supplied owner archive agrees with the recovered historical source and its release manifest.
 The rebuilt application preserves the simulation worker and save module exactly.
 Only the main presentation assets and their index references differ among the eight published web files.

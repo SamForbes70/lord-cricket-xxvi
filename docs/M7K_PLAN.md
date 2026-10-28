@@ -139,7 +139,9 @@ Independent source adjudication remains pending; selected observations are not a
 
 [Source batch 01](verification-m7k/source-batch-01/README.md) verifies 11 source-event hashes across seven actual matches.
 It supplies match identities, dates, archive provenance and an official MCC rule reference.
-Contemporary playing conditions and independent event chronology remain unavailable; the batch approves no scorer fixtures.
+The initial batch lacked contemporary conditions and independently confirmed chronology.
+The later historical evidence supplies standard rule context, while match-specific amendments and complete chronology remain unconfirmed.
+The batch approves no scorer fixtures.
 
 
 ## Historical evidence follow-up
@@ -148,3 +150,14 @@ Contemporary playing conditions and independent event chronology remain unavaila
 It retrieves contemporary ICC standard conditions and the MCC 2022 code, replacing reliance on 2026 laws alone.
 It also documents historical free-hit scope as a limitation of the inherited research classification.
 Both cases remain partially corroborated, with zero accepted scorer fixtures and no changed adjudication flags.
+
+
+## Integration with current main
+
+PR #3 integrates main `b4aceda`, including merged capability corrections and the scenario-quality harness.
+The roadmap retains the current browser/human evidence and owner-PC automation gap.
+[SCENARIO_QUALITY_HARNESS.md](SCENARIO_QUALITY_HARNESS.md) records the separately implemented ordinary model-quality tool.
+This integration adds the research selector checks alongside the existing summary checks in Linux CI.
+It retains the 542-test TypeScript suite and all existing application behaviour.
+Source adjudication remains incomplete; merging preparation evidence does not accept a new scorer or model.
+Fresh integration commands and results are retained under `verification-m7k/integration-main/`.

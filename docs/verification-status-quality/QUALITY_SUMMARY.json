@@ -1,0 +1,802 @@
+{
+  "version": "LC_BOUNDED_SYNTHETIC_QUALITY_SUMMARY_V1",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "empiricalValidation": false,
+  "coefficientChanges": false,
+  "matches": 96,
+  "modelId": "synthetic-alpha-01",
+  "modelHash": "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+  "worldSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+  "firstInnings": {
+    "count": 96,
+    "meanRuns": 89.14583333333333,
+    "meanWickets": 7.46875,
+    "scorePercentiles": {
+      "p10": 68,
+      "p50": 89,
+      "p90": 109
+    },
+    "totals": {
+      "runs": 8558,
+      "wickets": 717,
+      "legalBalls": 11141,
+      "attempts": 11314,
+      "dots": 7216,
+      "boundaries": 993,
+      "illegals": 173
+    },
+    "dotAttemptFraction": 0.6377938836839314,
+    "boundaryAttemptFraction": 0.08776736786282482,
+    "illegalAttemptFraction": 0.015290790171468976,
+    "runsPerLegalOver": 4.608921999820483,
+    "phases": {
+      "POWERPLAY": {
+        "runs": 2346,
+        "wickets": 195,
+        "legalBalls": 3456,
+        "attempts": 3503,
+        "dots": 2326,
+        "boundaries": 249,
+        "runsPerLegalOver": 4.072916666666667,
+        "dotAttemptFraction": 0.6640022837567799,
+        "boundaryAttemptFraction": 0.07108192977447902
+      },
+      "MIDDLE": {
+        "runs": 3785,
+        "wickets": 340,
+        "legalBalls": 5111,
+        "attempts": 5185,
+        "dots": 3323,
+        "boundaries": 431,
+        "runsPerLegalOver": 4.443357464292702,
+        "dotAttemptFraction": 0.6408871745419479,
+        "boundaryAttemptFraction": 0.08312439729990356
+      },
+      "DEATH": {
+        "runs": 2427,
+        "wickets": 182,
+        "legalBalls": 2574,
+        "attempts": 2626,
+        "dots": 1567,
+        "boundaries": 313,
+        "runsPerLegalOver": 5.6573426573426575,
+        "dotAttemptFraction": 0.5967250571210967,
+        "boundaryAttemptFraction": 0.1191926884996192
+      }
+    }
+  },
+  "firstByTermination": {
+    "ALL_OUT": {
+      "count": 22,
+      "meanRuns": 79.18181818181819,
+      "meanWickets": 10.0,
+      "scorePercentiles": {
+        "p10": 45,
+        "p50": 81,
+        "p90": 106
+      },
+      "totals": {
+        "runs": 1742,
+        "wickets": 220,
+        "legalBalls": 2261,
+        "attempts": 2297,
+        "dots": 1466,
+        "boundaries": 203,
+        "illegals": 36
+      },
+      "dotAttemptFraction": 0.6382237701349587,
+      "boundaryAttemptFraction": 0.08837614279494993,
+      "illegalAttemptFraction": 0.01567261645624728,
+      "runsPerLegalOver": 4.622733303847855,
+      "phases": {
+        "POWERPLAY": {
+          "runs": 510,
+          "wickets": 61,
+          "legalBalls": 792,
+          "attempts": 803,
+          "dots": 546,
+          "boundaries": 51,
+          "runsPerLegalOver": 3.8636363636363638,
+          "dotAttemptFraction": 0.6799501867995019,
+          "boundaryAttemptFraction": 0.06351183063511831
+        },
+        "MIDDLE": {
+          "runs": 876,
+          "wickets": 112,
+          "legalBalls": 1115,
+          "attempts": 1133,
+          "dots": 704,
+          "boundaries": 102,
+          "runsPerLegalOver": 4.71390134529148,
+          "dotAttemptFraction": 0.6213592233009708,
+          "boundaryAttemptFraction": 0.09002647837599294
+        },
+        "DEATH": {
+          "runs": 356,
+          "wickets": 47,
+          "legalBalls": 354,
+          "attempts": 361,
+          "dots": 216,
+          "boundaries": 50,
+          "runsPerLegalOver": 6.033898305084746,
+          "dotAttemptFraction": 0.5983379501385041,
+          "boundaryAttemptFraction": 0.13850415512465375
+        }
+      }
+    },
+    "ALLOCATION_END": {
+      "count": 74,
+      "meanRuns": 92.10810810810811,
+      "meanWickets": 6.716216216216216,
+      "scorePercentiles": {
+        "p10": 74,
+        "p50": 91,
+        "p90": 112
+      },
+      "totals": {
+        "runs": 6816,
+        "wickets": 497,
+        "legalBalls": 8880,
+        "attempts": 9017,
+        "dots": 5750,
+        "boundaries": 790,
+        "illegals": 137
+      },
+      "dotAttemptFraction": 0.6376843739602972,
+      "boundaryAttemptFraction": 0.08761228790063214,
+      "illegalAttemptFraction": 0.015193523344793168,
+      "runsPerLegalOver": 4.605405405405405,
+      "phases": {
+        "POWERPLAY": {
+          "runs": 1836,
+          "wickets": 134,
+          "legalBalls": 2664,
+          "attempts": 2700,
+          "dots": 1780,
+          "boundaries": 198,
+          "runsPerLegalOver": 4.135135135135135,
+          "dotAttemptFraction": 0.6592592592592592,
+          "boundaryAttemptFraction": 0.07333333333333333
+        },
+        "MIDDLE": {
+          "runs": 2909,
+          "wickets": 228,
+          "legalBalls": 3996,
+          "attempts": 4052,
+          "dots": 2619,
+          "boundaries": 329,
+          "runsPerLegalOver": 4.367867867867868,
+          "dotAttemptFraction": 0.6463474827245804,
+          "boundaryAttemptFraction": 0.08119447186574531
+        },
+        "DEATH": {
+          "runs": 2071,
+          "wickets": 135,
+          "legalBalls": 2220,
+          "attempts": 2265,
+          "dots": 1351,
+          "boundaries": 263,
+          "runsPerLegalOver": 5.597297297297297,
+          "dotAttemptFraction": 0.596467991169978,
+          "boundaryAttemptFraction": 0.11611479028697572
+        }
+      }
+    }
+  },
+  "secondInningsDescriptiveCensored": {
+    "count": 96,
+    "meanRuns": 78.28125,
+    "meanWickets": 6.927083333333333,
+    "scorePercentiles": {
+      "p10": 64,
+      "p50": 79,
+      "p90": 95
+    },
+    "totals": {
+      "runs": 7515,
+      "wickets": 665,
+      "legalBalls": 10146,
+      "attempts": 10309,
+      "dots": 6723,
+      "boundaries": 852,
+      "illegals": 163
+    },
+    "dotAttemptFraction": 0.6521486080124164,
+    "boundaryAttemptFraction": 0.0826462314482491,
+    "illegalAttemptFraction": 0.015811426908526532,
+    "runsPerLegalOver": 4.4441159077468955,
+    "phases": {
+      "POWERPLAY": {
+        "runs": 2378,
+        "wickets": 236,
+        "legalBalls": 3456,
+        "attempts": 3511,
+        "dots": 2340,
+        "boundaries": 259,
+        "runsPerLegalOver": 4.128472222222222,
+        "dotAttemptFraction": 0.6664767872401025,
+        "boundaryAttemptFraction": 0.07376815722016519
+      },
+      "MIDDLE": {
+        "runs": 3715,
+        "wickets": 311,
+        "legalBalls": 5034,
+        "attempts": 5108,
+        "dots": 3321,
+        "boundaries": 413,
+        "runsPerLegalOver": 4.427890345649582,
+        "dotAttemptFraction": 0.6501566170712608,
+        "boundaryAttemptFraction": 0.08085356303837118
+      },
+      "DEATH": {
+        "runs": 1422,
+        "wickets": 118,
+        "legalBalls": 1656,
+        "attempts": 1690,
+        "dots": 1062,
+        "boundaries": 180,
+        "runsPerLegalOver": 5.1521739130434785,
+        "dotAttemptFraction": 0.6284023668639053,
+        "boundaryAttemptFraction": 0.10650887573964497
+      }
+    }
+  },
+  "secondByTermination": {
+    "CHASE_WON": {
+      "count": 46,
+      "meanRuns": 80.47826086956522,
+      "meanWickets": 5.673913043478261,
+      "scorePercentiles": {
+        "p10": 64,
+        "p50": 81,
+        "p90": 95
+      },
+      "totals": {
+        "runs": 3702,
+        "wickets": 261,
+        "legalBalls": 4536,
+        "attempts": 4601,
+        "dots": 2919,
+        "boundaries": 443,
+        "illegals": 65
+      },
+      "dotAttemptFraction": 0.6344272984133884,
+      "boundaryAttemptFraction": 0.09628341664855466,
+      "illegalAttemptFraction": 0.014127363616605085,
+      "runsPerLegalOver": 4.896825396825397,
+      "phases": {
+        "POWERPLAY": {
+          "runs": 1169,
+          "wickets": 123,
+          "legalBalls": 1656,
+          "attempts": 1684,
+          "dots": 1136,
+          "boundaries": 138,
+          "runsPerLegalOver": 4.2355072463768115,
+          "dotAttemptFraction": 0.6745843230403801,
+          "boundaryAttemptFraction": 0.08194774346793349
+        },
+        "MIDDLE": {
+          "runs": 2002,
+          "wickets": 116,
+          "legalBalls": 2355,
+          "attempts": 2384,
+          "dots": 1469,
+          "boundaries": 237,
+          "runsPerLegalOver": 5.100636942675159,
+          "dotAttemptFraction": 0.6161912751677853,
+          "boundaryAttemptFraction": 0.09941275167785235
+        },
+        "DEATH": {
+          "runs": 531,
+          "wickets": 22,
+          "legalBalls": 525,
+          "attempts": 533,
+          "dots": 314,
+          "boundaries": 68,
+          "runsPerLegalOver": 6.0685714285714285,
+          "dotAttemptFraction": 0.5891181988742964,
+          "boundaryAttemptFraction": 0.1275797373358349
+        }
+      }
+    },
+    "ALL_OUT": {
+      "count": 21,
+      "meanRuns": 73.04761904761905,
+      "meanWickets": 10.0,
+      "scorePercentiles": {
+        "p10": 61,
+        "p50": 73,
+        "p90": 87
+      },
+      "totals": {
+        "runs": 1534,
+        "wickets": 210,
+        "legalBalls": 2130,
+        "attempts": 2169,
+        "dots": 1433,
+        "boundaries": 174,
+        "illegals": 39
+      },
+      "dotAttemptFraction": 0.6606731212540341,
+      "boundaryAttemptFraction": 0.08022130013831259,
+      "illegalAttemptFraction": 0.017980636237897647,
+      "runsPerLegalOver": 4.32112676056338,
+      "phases": {
+        "POWERPLAY": {
+          "runs": 512,
+          "wickets": 62,
+          "legalBalls": 756,
+          "attempts": 765,
+          "dots": 512,
+          "boundaries": 56,
+          "runsPerLegalOver": 4.063492063492063,
+          "dotAttemptFraction": 0.6692810457516339,
+          "boundaryAttemptFraction": 0.07320261437908497
+        },
+        "MIDDLE": {
+          "runs": 817,
+          "wickets": 111,
+          "legalBalls": 1113,
+          "attempts": 1141,
+          "dots": 751,
+          "boundaries": 91,
+          "runsPerLegalOver": 4.404312668463612,
+          "dotAttemptFraction": 0.6581945661700263,
+          "boundaryAttemptFraction": 0.07975460122699386
+        },
+        "DEATH": {
+          "runs": 205,
+          "wickets": 37,
+          "legalBalls": 261,
+          "attempts": 263,
+          "dots": 170,
+          "boundaries": 27,
+          "runsPerLegalOver": 4.712643678160919,
+          "dotAttemptFraction": 0.6463878326996197,
+          "boundaryAttemptFraction": 0.10266159695817491
+        }
+      }
+    },
+    "ALLOCATION_END": {
+      "count": 29,
+      "meanRuns": 78.58620689655173,
+      "meanWickets": 6.689655172413793,
+      "scorePercentiles": {
+        "p10": 64,
+        "p50": 77,
+        "p90": 95
+      },
+      "totals": {
+        "runs": 2279,
+        "wickets": 194,
+        "legalBalls": 3480,
+        "attempts": 3539,
+        "dots": 2371,
+        "boundaries": 235,
+        "illegals": 59
+      },
+      "dotAttemptFraction": 0.6699632664594518,
+      "boundaryAttemptFraction": 0.06640293868324386,
+      "illegalAttemptFraction": 0.016671376094942073,
+      "runsPerLegalOver": 3.929310344827586,
+      "phases": {
+        "POWERPLAY": {
+          "runs": 697,
+          "wickets": 51,
+          "legalBalls": 1044,
+          "attempts": 1062,
+          "dots": 692,
+          "boundaries": 65,
+          "runsPerLegalOver": 4.005747126436781,
+          "dotAttemptFraction": 0.6516007532956686,
+          "boundaryAttemptFraction": 0.06120527306967985
+        },
+        "MIDDLE": {
+          "runs": 896,
+          "wickets": 84,
+          "legalBalls": 1566,
+          "attempts": 1583,
+          "dots": 1101,
+          "boundaries": 85,
+          "runsPerLegalOver": 3.4329501915708813,
+          "dotAttemptFraction": 0.6955148452305748,
+          "boundaryAttemptFraction": 0.05369551484523057
+        },
+        "DEATH": {
+          "runs": 686,
+          "wickets": 59,
+          "legalBalls": 870,
+          "attempts": 894,
+          "dots": 578,
+          "boundaries": 85,
+          "runsPerLegalOver": 4.731034482758621,
+          "dotAttemptFraction": 0.6465324384787472,
+          "boundaryAttemptFraction": 0.09507829977628636
+        }
+      }
+    }
+  },
+  "ties": 2,
+  "targetBands": {
+    "LOW_1_80": {
+      "matches": 25,
+      "successfulChases": 23,
+      "ties": 0,
+      "first": {
+        "count": 25,
+        "meanRuns": 68.64,
+        "meanWickets": 8.24,
+        "scorePercentiles": {
+          "p10": 45,
+          "p50": 71,
+          "p90": 79
+        },
+        "totals": {
+          "runs": 1716,
+          "wickets": 206,
+          "legalBalls": 2695,
+          "attempts": 2730,
+          "dots": 1832,
+          "boundaries": 177,
+          "illegals": 35
+        },
+        "dotAttemptFraction": 0.671062271062271,
+        "boundaryAttemptFraction": 0.06483516483516484,
+        "illegalAttemptFraction": 0.01282051282051282,
+        "runsPerLegalOver": 3.820408163265306,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 551,
+            "wickets": 60,
+            "legalBalls": 900,
+            "attempts": 914,
+            "dots": 618,
+            "boundaries": 54,
+            "runsPerLegalOver": 3.6733333333333333,
+            "dotAttemptFraction": 0.6761487964989059,
+            "boundaryAttemptFraction": 0.05908096280087528
+          },
+          "MIDDLE": {
+            "runs": 782,
+            "wickets": 103,
+            "legalBalls": 1277,
+            "attempts": 1292,
+            "dots": 871,
+            "boundaries": 77,
+            "runsPerLegalOver": 3.6742364917776036,
+            "dotAttemptFraction": 0.6741486068111455,
+            "boundaryAttemptFraction": 0.05959752321981424
+          },
+          "DEATH": {
+            "runs": 383,
+            "wickets": 43,
+            "legalBalls": 518,
+            "attempts": 524,
+            "dots": 343,
+            "boundaries": 46,
+            "runsPerLegalOver": 4.436293436293436,
+            "dotAttemptFraction": 0.6545801526717557,
+            "boundaryAttemptFraction": 0.08778625954198473
+          }
+        }
+      },
+      "secondDescriptiveCensored": {
+        "count": 25,
+        "meanRuns": 69.72,
+        "meanWickets": 5.56,
+        "scorePercentiles": {
+          "p10": 50,
+          "p50": 71,
+          "p90": 80
+        },
+        "totals": {
+          "runs": 1743,
+          "wickets": 139,
+          "legalBalls": 2329,
+          "attempts": 2366,
+          "dots": 1566,
+          "boundaries": 200,
+          "illegals": 37
+        },
+        "dotAttemptFraction": 0.661876584953508,
+        "boundaryAttemptFraction": 0.08453085376162299,
+        "illegalAttemptFraction": 0.015638207945900255,
+        "runsPerLegalOver": 4.49033920137398,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 600,
+            "wickets": 62,
+            "legalBalls": 900,
+            "attempts": 920,
+            "dots": 622,
+            "boundaries": 63,
+            "runsPerLegalOver": 4.0,
+            "dotAttemptFraction": 0.6760869565217391,
+            "boundaryAttemptFraction": 0.06847826086956521
+          },
+          "MIDDLE": {
+            "runs": 951,
+            "wickets": 65,
+            "legalBalls": 1222,
+            "attempts": 1235,
+            "dots": 814,
+            "boundaries": 112,
+            "runsPerLegalOver": 4.669394435351882,
+            "dotAttemptFraction": 0.6591093117408907,
+            "boundaryAttemptFraction": 0.09068825910931175
+          },
+          "DEATH": {
+            "runs": 192,
+            "wickets": 12,
+            "legalBalls": 207,
+            "attempts": 211,
+            "dots": 130,
+            "boundaries": 25,
+            "runsPerLegalOver": 5.565217391304348,
+            "dotAttemptFraction": 0.6161137440758294,
+            "boundaryAttemptFraction": 0.11848341232227488
+          }
+        }
+      }
+    },
+    "MIDDLE_81_100": {
+      "matches": 43,
+      "successfulChases": 20,
+      "ties": 2,
+      "first": {
+        "count": 43,
+        "meanRuns": 88.67441860465117,
+        "meanWickets": 6.930232558139535,
+        "scorePercentiles": {
+          "p10": 82,
+          "p50": 89,
+          "p90": 96
+        },
+        "totals": {
+          "runs": 3813,
+          "wickets": 298,
+          "legalBalls": 5121,
+          "attempts": 5200,
+          "dots": 3334,
+          "boundaries": 438,
+          "illegals": 79
+        },
+        "dotAttemptFraction": 0.6411538461538462,
+        "boundaryAttemptFraction": 0.08423076923076923,
+        "illegalAttemptFraction": 0.015192307692307692,
+        "runsPerLegalOver": 4.467486818980668,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 1008,
+            "wickets": 80,
+            "legalBalls": 1548,
+            "attempts": 1571,
+            "dots": 1048,
+            "boundaries": 103,
+            "runsPerLegalOver": 3.9069767441860463,
+            "dotAttemptFraction": 0.6670910248249523,
+            "boundaryAttemptFraction": 0.06556333545512412
+          },
+          "MIDDLE": {
+            "runs": 1659,
+            "wickets": 141,
+            "legalBalls": 2322,
+            "attempts": 2350,
+            "dots": 1515,
+            "boundaries": 188,
+            "runsPerLegalOver": 4.286821705426356,
+            "dotAttemptFraction": 0.6446808510638298,
+            "boundaryAttemptFraction": 0.08
+          },
+          "DEATH": {
+            "runs": 1146,
+            "wickets": 77,
+            "legalBalls": 1251,
+            "attempts": 1279,
+            "dots": 771,
+            "boundaries": 147,
+            "runsPerLegalOver": 5.496402877697841,
+            "dotAttemptFraction": 0.602814698983581,
+            "boundaryAttemptFraction": 0.11493354182955434
+          }
+        }
+      },
+      "secondDescriptiveCensored": {
+        "count": 43,
+        "meanRuns": 80.62790697674419,
+        "meanWickets": 7.232558139534884,
+        "scorePercentiles": {
+          "p10": 67,
+          "p50": 84,
+          "p90": 92
+        },
+        "totals": {
+          "runs": 3467,
+          "wickets": 311,
+          "legalBalls": 4593,
+          "attempts": 4654,
+          "dots": 3002,
+          "boundaries": 392,
+          "illegals": 61
+        },
+        "dotAttemptFraction": 0.645036527718092,
+        "boundaryAttemptFraction": 0.0842286205414697,
+        "illegalAttemptFraction": 0.01310700472711646,
+        "runsPerLegalOver": 4.529065969954278,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 1066,
+            "wickets": 118,
+            "legalBalls": 1548,
+            "attempts": 1564,
+            "dots": 1049,
+            "boundaries": 118,
+            "runsPerLegalOver": 4.131782945736434,
+            "dotAttemptFraction": 0.6707161125319693,
+            "boundaryAttemptFraction": 0.07544757033248081
+          },
+          "MIDDLE": {
+            "runs": 1782,
+            "wickets": 141,
+            "legalBalls": 2302,
+            "attempts": 2336,
+            "dots": 1482,
+            "boundaries": 198,
+            "runsPerLegalOver": 4.644656820156386,
+            "dotAttemptFraction": 0.634417808219178,
+            "boundaryAttemptFraction": 0.08476027397260275
+          },
+          "DEATH": {
+            "runs": 619,
+            "wickets": 52,
+            "legalBalls": 743,
+            "attempts": 754,
+            "dots": 471,
+            "boundaries": 76,
+            "runsPerLegalOver": 4.998654104979812,
+            "dotAttemptFraction": 0.6246684350132626,
+            "boundaryAttemptFraction": 0.10079575596816977
+          }
+        }
+      }
+    },
+    "HIGH_101_PLUS": {
+      "matches": 28,
+      "successfulChases": 3,
+      "ties": 0,
+      "first": {
+        "count": 28,
+        "meanRuns": 108.17857142857143,
+        "meanWickets": 7.607142857142857,
+        "scorePercentiles": {
+          "p10": 101,
+          "p50": 106,
+          "p90": 119
+        },
+        "totals": {
+          "runs": 3029,
+          "wickets": 213,
+          "legalBalls": 3325,
+          "attempts": 3384,
+          "dots": 2050,
+          "boundaries": 378,
+          "illegals": 59
+        },
+        "dotAttemptFraction": 0.6057919621749409,
+        "boundaryAttemptFraction": 0.11170212765957446,
+        "illegalAttemptFraction": 0.01743498817966903,
+        "runsPerLegalOver": 5.465864661654136,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 787,
+            "wickets": 55,
+            "legalBalls": 1008,
+            "attempts": 1018,
+            "dots": 660,
+            "boundaries": 92,
+            "runsPerLegalOver": 4.684523809523809,
+            "dotAttemptFraction": 0.6483300589390962,
+            "boundaryAttemptFraction": 0.09037328094302555
+          },
+          "MIDDLE": {
+            "runs": 1344,
+            "wickets": 96,
+            "legalBalls": 1512,
+            "attempts": 1543,
+            "dots": 937,
+            "boundaries": 166,
+            "runsPerLegalOver": 5.333333333333333,
+            "dotAttemptFraction": 0.6072585871678549,
+            "boundaryAttemptFraction": 0.10758263123784835
+          },
+          "DEATH": {
+            "runs": 898,
+            "wickets": 62,
+            "legalBalls": 805,
+            "attempts": 823,
+            "dots": 453,
+            "boundaries": 120,
+            "runsPerLegalOver": 6.693167701863354,
+            "dotAttemptFraction": 0.5504252733900364,
+            "boundaryAttemptFraction": 0.14580801944106925
+          }
+        }
+      },
+      "secondDescriptiveCensored": {
+        "count": 28,
+        "meanRuns": 82.32142857142857,
+        "meanWickets": 7.678571428571429,
+        "scorePercentiles": {
+          "p10": 61,
+          "p50": 79,
+          "p90": 106
+        },
+        "totals": {
+          "runs": 2305,
+          "wickets": 215,
+          "legalBalls": 3224,
+          "attempts": 3289,
+          "dots": 2155,
+          "boundaries": 260,
+          "illegals": 65
+        },
+        "dotAttemptFraction": 0.6552143508665248,
+        "boundaryAttemptFraction": 0.07905138339920949,
+        "illegalAttemptFraction": 0.019762845849802372,
+        "runsPerLegalOver": 4.289702233250621,
+        "phases": {
+          "POWERPLAY": {
+            "runs": 712,
+            "wickets": 56,
+            "legalBalls": 1008,
+            "attempts": 1027,
+            "dots": 669,
+            "boundaries": 78,
+            "runsPerLegalOver": 4.238095238095238,
+            "dotAttemptFraction": 0.6514118792599806,
+            "boundaryAttemptFraction": 0.0759493670886076
+          },
+          "MIDDLE": {
+            "runs": 982,
+            "wickets": 105,
+            "legalBalls": 1510,
+            "attempts": 1537,
+            "dots": 1025,
+            "boundaries": 103,
+            "runsPerLegalOver": 3.9019867549668876,
+            "dotAttemptFraction": 0.6668835393623943,
+            "boundaryAttemptFraction": 0.06701366297983084
+          },
+          "DEATH": {
+            "runs": 611,
+            "wickets": 54,
+            "legalBalls": 706,
+            "attempts": 725,
+            "dots": 461,
+            "boundaries": 79,
+            "runsPerLegalOver": 5.192634560906516,
+            "dotAttemptFraction": 0.6358620689655172,
+            "boundaryAttemptFraction": 0.10896551724137932
+          }
+        }
+      }
+    }
+  },
+  "limits": [
+    "One pairing, ground and baseline policy; not a population-matched real-cricket cohort.",
+    "Successful chase totals are censored and reported separately.",
+    "Target bands are fixed descriptive bands, not calibrated thresholds.",
+    "Runtime measurements exclude human decisions and do not certify reference-browser budgets."
+  ],
+  "repeatability": {
+    "matchesCompared": 96,
+    "allNonRuntimeFieldsEqual": true,
+    "canonicalSha256": "696463a3124a91df78ce9ebdd5576681cd37d39d481c2a6511688aa11ffd3dd4"
+  },
+  "inputs": {
+    "input": "6a98273ccc9d3c7f382d4433011cddacc5f1c4560b919780ee250bac91db5130",
+    "repeat": "fc7672035f0b80fd52b07b41a6be39eec7fa0b3d1878ec04507dfaf144a779cb",
+    "protocol": "c801d9d05a4e971f72dce5dc31b930fac1720573771d4daadb8424946a2ff2a2"
+  }
+}

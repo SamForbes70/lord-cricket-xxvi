@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "npx",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.ui.config.ts",
+    "--reporter",
+    "list",
+    "--output",
+    "test-results/status-quality-ui",
+    "--trace",
+    "retain-on-failure"
+  ],
+  "startedAtUtc": "2026-10-27T22:54:38.782555+00:00",
+  "seconds": 79.724,
+  "exitCode": 0,
+  "sha256": "a23bc8acf09d222b5c333e1626cadcaaa8775f81569bb2bc0e252af4c5a75027",
+  "environment": {
+    "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium",
+    "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+    "XDG_CACHE_HOME": "/workspace/.cache",
+    "XDG_CONFIG_HOME": "/workspace/.config",
+    "LCXXVI_UI_EVIDENCE_DIR": "/workspace/lord-cricket-xxvi/docs/verification-status-quality/browser"
+  }
+}

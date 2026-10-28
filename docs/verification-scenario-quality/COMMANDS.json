@@ -1,0 +1,144 @@
+[
+  {
+    "argv": [
+      "npm",
+      "run",
+      "m7:scenarios",
+      "--",
+      "--seeds-per-cell=2",
+      "--out=docs/verification-scenario-quality/scenarios.json"
+    ],
+    "startedAtUtc": "2026-10-28T01:37:27.641533+00:00",
+    "seconds": 67.139,
+    "exitCode": 0,
+    "log": "scenario-run.log",
+    "sha256": "e83ff6e5d8a0609d6e4b61ac53937e9dda3b9fd1a8fd6da8b7c7753e63db3333"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "schemas:check"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:34.780981+00:00",
+    "seconds": 0.447,
+    "exitCode": 0,
+    "log": "schemas.log",
+    "sha256": "7b7a75d02a7b65f7e3bc1983ebd70d2124f1a1737cdd5d732b54dde8a1858065"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:35.228621+00:00",
+    "seconds": 4.461,
+    "exitCode": 0,
+    "log": "build.log",
+    "sha256": "af6140daa6df6ffa7426a21affc84fcfdd51362d04aaf211668a8c283308323a"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:39.689956+00:00",
+    "seconds": 5.114,
+    "exitCode": 0,
+    "log": "typecheck.log",
+    "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:44.804192+00:00",
+    "seconds": 3.683,
+    "exitCode": 0,
+    "log": "lint.log",
+    "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "fixtures:engine"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:48.487454+00:00",
+    "seconds": 0.488,
+    "exitCode": 0,
+    "log": "fixtures.log",
+    "sha256": "29518f19349c020bb7b2f1602b1688c45d933915ad86dd2f3b5b8b9f91dce590"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "vectors:check"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:48.975876+00:00",
+    "seconds": 0.124,
+    "exitCode": 0,
+    "log": "vectors.log",
+    "sha256": "0fed95bd9940c4a9db447da39a20b0930f12de85e904e35fc02736e70020e7a1"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "probability:check"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:49.100691+00:00",
+    "seconds": 0.192,
+    "exitCode": 0,
+    "log": "probability.log",
+    "sha256": "1cbd56a455937dc9a8462479070f2fd87d2ed6730ea34ebb0d420de3458f45f7"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "generator:check"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:49.292636+00:00",
+    "seconds": 0.141,
+    "exitCode": 0,
+    "log": "generator.log",
+    "sha256": "110ddf3972b8f79164c8732d45c6f77ff75a8b2d14cedc7b1d43caee545e9b9b"
+  },
+  {
+    "argv": [
+      "npm",
+      "test",
+      "--",
+      "--maxWorkers=2"
+    ],
+    "startedAtUtc": "2026-10-28T01:38:49.434133+00:00",
+    "seconds": 43.861,
+    "exitCode": 0,
+    "log": "unit.log",
+    "sha256": "d1c3e66c613b72a4c32178654c8ddaeda01f87b20e4939e97526f0a754528a5f"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_synthetic_quality_summary.py",
+      "-v"
+    ],
+    "startedAtUtc": "2026-10-28T01:39:33.295576+00:00",
+    "seconds": 0.069,
+    "exitCode": 0,
+    "log": "summary-tests.log",
+    "sha256": "6bce69d05a2be9dc89c7140f5badd8292dc3422a9c6c47ae835e0bb9a41b50f8"
+  }
+]

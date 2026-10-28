@@ -1,0 +1,166 @@
+{
+  "head": "5baea6afed9116f39dc6ee468b7846b75da2681a",
+  "ciOutput": "pass07a\tpass\t8m37s\thttps://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40583511271/job/122468858096\t\npass07a\tpass\t8m38s\thttps://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40583519694/job/122468886897\t\nwindows-browser-acceptance\tpass\t6m20s\thttps://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40583511271/job/122468857782\t\nwindows-browser-acceptance\tpass\t5m14s\thttps://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40583519694/job/122468887744\t\n",
+  "evidenceHashChecks": [
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "CHECK_RESULTS.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "LC_M7K_EVIDENCE_WORKSHEET.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "LC_M7K_REPRESENTATIVE_REVIEW.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "READINESS_COUNTS.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "README.md",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "REVIEW_CHECK_RESULTS.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "build.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "fixtures-audit.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "fixtures-engine.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "generator-check.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "lint.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "m7j-test.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "probability-check.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "review-inherited-python-tests.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "review-lint.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "review-selection-tests.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "review-selection.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "schemas-check.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "typecheck.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "vectors-check.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/SHA256SUMS",
+      "file": "worksheet-check.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/historical-evidence/SHA256SUMS",
+      "file": "CASE_EVIDENCE.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/historical-evidence/SHA256SUMS",
+      "file": "README.md",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/historical-evidence/SHA256SUMS",
+      "file": "SOURCES.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/historical-evidence/SHA256SUMS",
+      "file": "checks.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/source-batch-01/SHA256SUMS",
+      "file": "README.md",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/source-batch-01/SHA256SUMS",
+      "file": "SOURCES.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/source-batch-01/SHA256SUMS",
+      "file": "VERIFIED_EVENTS.json",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/source-batch-01/SHA256SUMS",
+      "file": "checks.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/source-batch-01/SHA256SUMS",
+      "file": "lint.log",
+      "pass": true
+    },
+    {
+      "manifest": "docs/verification-m7k/source-batch-01/SHA256SUMS",
+      "file": "verify-source-batch.py",
+      "pass": true
+    }
+  ],
+  "blockingFindings": [],
+  "limits": [
+    "Review does not independently adjudicate source cases.",
+    "Primary incident footage, physical ends and match-specific amendments remain open."
+  ]
+}

@@ -5,7 +5,9 @@ Act as lead TypeScript engineer, independent QA engineer and cricket simulation 
 
 ## Verified baseline and current scope
 - Historical accepted Pass 22 / M7J source commit: `5b8b9da990d657197fb56bbfd33152f87b875f5c`.
-- The Codex migration adds documentation only on top of that immutable commit. Check `git log --oneline -3` and `git diff 5b8b9da -- packages apps scripts tests` to establish no game code was altered.
+- The initial migration added documentation only. Merged PR #2 adds acceptance fixes and presentation changes.
+- Check `git log --oneline -3` and the diff from `5b8b9da`; preserve simulation and save compatibility.
+- Use `docs/CURRENT_STATUS.md` for current acceptance. Dated reports remain historical evidence.
 - Production gameplay uses `synthetic-alpha-01` / `SYNTHETIC_ALPHA`. Research M7F to M7J models and rule adjudication are NOT selectable gameplay models. Do not claim calibration or authorise new models without the recorded acceptance gates.
 - Existing fictional one-season career: eight teams, 14 T20 rounds, 56 fixtures; ODI and five-day red-ball exhibitions; optional T20 tactical opponent.
 
@@ -24,8 +26,12 @@ Act as lead TypeScript engineer, independent QA engineer and cricket simulation 
 4. If npm, browser, machine or data access blocks a test, record BLOCKED with the actual error, then proceed with independent checks. Do not bypass administrator controls.
 5. Commit coherent changes. Separate unpromoted research work from production code and keep all capability flags accurate.
 
-## Immediate first task
-Perform the evidence-based environment audit in `docs/codex-migration/FIRST_CODEX_TASK.md`. Do not start M7K or an unrelated feature pass before reconciling the local Windows browser acceptance and gameplay quality gaps.
+## Current task boundary
+The baseline recovery task is delivered through merged PR #2. Issue #1 retains the owner-PC automation evidence gap.
+The owner authorised M7K research preparation on 26 October 2026. PR #3 records that research preparation.
+All source-case adjudication flags remain false; a merge does not authorise production ledger integration or model promotion.
+Research-model promotion still requires explicit approval.
+Use `docs/CURRENT_STATUS.md` and `docs/ACCEPTANCE_RECONCILIATION.md` before selecting further work.
 
 ## Engineering and reporting standards
 - Strict TypeScript, Zod/JSON Schema contracts and stable versioned commands/events.

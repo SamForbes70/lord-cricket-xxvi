@@ -1,0 +1,13 @@
+{
+  "baseCommit": "f2bf6155fd47bdf10df664b9810b6006b0a9b7ad",
+  "packagesUnchanged": true,
+  "webSourceUnchanged": true,
+  "lockfileUnchanged": true,
+  "workerSha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+  "designReference": "Technical Design V0.1 sections 8 and 22",
+  "protocolSha256": "c640bc03c2d0d1a30651f88ee2d2414445ae31098586b15c0ce98ccad0648bcd",
+  "scenarioPairs": 64,
+  "policyRuns": 128,
+  "repeatedRuns": 64,
+  "note": "Initial grid execution and final CLI-format run agree in their recorded policy summaries. Internal first-seed repeats check every report field."
+}
