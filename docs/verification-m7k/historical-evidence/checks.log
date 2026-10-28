@@ -1,0 +1,6 @@
+PASS: retrieved ca-finch.html contains the cited factual anchors.
+PASS: retrieved bbc-finch.html contains the cited factual anchors.
+PASS: retrieved wisden-mughal.html contains the cited factual anchors.
+PASS: retrieved bbc-freehit.html contains the cited factual anchors.
+PASS: ICC handbook PDF page 145 identifies mens T20I clauses 22.8 and 22.9.
+PASS: both case identities match the source register; all adjudication flags remain false.

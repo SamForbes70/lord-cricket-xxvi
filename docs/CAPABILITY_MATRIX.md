@@ -23,7 +23,8 @@ Dated reports retain the results of their original runs.
 | Replay and determinism | Frozen scoring/vector gates and the 100-case T20 browser/worker corpus pass in recorded runs. |
 | Gameplay model | `synthetic-alpha-01` / `SYNTHETIC_ALPHA`; no empirical-realism claim. |
 | Empirical research | M7F-J candidates remain offline research. No candidate is selectable in gameplay. |
-| M7K | Evidence preparation in unmerged draft PR #3; no adjudicated source fixtures or new production ledger. |
+| M7K | Evidence preparation recorded in PR #3; no adjudicated source fixtures or new production ledger. |
+| Scenario quality harness | Paired baseline/tactical developer tool across all eight teams and grounds; descriptive synthetic results only. |
 | Performance | Reference-hardware browser, season, memory and save/load budgets remain unaccepted. |
 | DLS and limited-overs rain | Disabled. Red-ball delay commands do not establish a calibrated weather scheduler. |
 | Prediction, super overs and DRS | Not enabled. |

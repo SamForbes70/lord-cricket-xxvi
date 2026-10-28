@@ -1,0 +1,286 @@
+{
+  "version": "LC_M7K_SOURCE_BATCH_V1",
+  "archiveSha256": "691f1f42b86c93fbdbc53936ed69479f9306bf39c4c56b4c0729360051075c6d",
+  "matchCount": 7,
+  "eventCount": 11,
+  "gameplayIntegrationPermitted": false,
+  "events": [
+    {
+      "matchId": "1050219",
+      "innings": 2,
+      "over": 19,
+      "attempt": 0,
+      "cohort": "training",
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "3680aae9bb727f688fbfa295ae7afe72709e0771764aa9f87baccd5fcf45730a",
+      "actualDeliveryLabel": "19.1",
+      "matchFileSha256": "600d21695f525dedf33be0a8d18ced880cd321fc21436cdd063857baef296cd5",
+      "matchDates": [
+        "2016-09-24"
+      ],
+      "teams": [
+        "Pakistan",
+        "West Indies"
+      ],
+      "event": {
+        "match_number": 2,
+        "name": "Pakistan v West Indies T20I Series"
+      },
+      "venue": "Dubai International Cricket Stadium",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "1142915",
+      "innings": 1,
+      "over": 19,
+      "attempt": 5,
+      "cohort": "training",
+      "reason": "WIDE_WICKET_MASK",
+      "sourceEventSha256": "3c3e3016aaf8877acb76fd06f6de479e07dc1fd6cce840b7c1a6725bc6135a71",
+      "actualDeliveryLabel": "19.5",
+      "matchFileSha256": "6ed0fac5d1aa145e11a81d0abe1ad2000a7ccb4b7ff712176eaa5c523b827efb",
+      "matchDates": [
+        "2018-07-03"
+      ],
+      "teams": [
+        "Australia",
+        "Zimbabwe"
+      ],
+      "event": {
+        "name": "Zimbabwe Twenty20 Tri-Series",
+        "match_number": 3
+      },
+      "venue": "Harare Sports Club",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "1275051",
+      "innings": 2,
+      "over": 18,
+      "attempt": 0,
+      "cohort": "training",
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "51e739c36ac698573c10cdd555c4600040f26df1b7f1e2a0ab0d1f29744b280a",
+      "actualDeliveryLabel": "18.1",
+      "matchFileSha256": "16ef58c3bec5205a94faead3eb01c39c3962bc1297fd2e99e435a663b8189185",
+      "matchDates": [
+        "2021-09-17"
+      ],
+      "teams": [
+        "Uganda",
+        "Kenya"
+      ],
+      "event": {
+        "name": "Uganda T20 Tri-Series",
+        "stage": "Final"
+      },
+      "venue": "Entebbe Cricket Oval",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "1391336",
+      "innings": 1,
+      "over": 6,
+      "attempt": 5,
+      "cohort": "training",
+      "reason": "UNSUPPORTED_WICKET_TYPE",
+      "sourceEventSha256": "be6013642c73e7b83958fd9f169566bcd7ad7f837f70d80b6318b594a21a9afd",
+      "actualDeliveryLabel": "6.6",
+      "matchFileSha256": "30315ac65096f87fd53240585685cbdd3fcd5d2374fd04416e7c9c0b8e2d9a02",
+      "matchDates": [
+        "2023-08-20"
+      ],
+      "teams": [
+        "Malta",
+        "Romania"
+      ],
+      "event": {
+        "name": "Continental Cup",
+        "stage": "Qualifier"
+      },
+      "venue": "Moara Vlasiei Cricket Ground, Ilfov County",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "222678",
+      "innings": 1,
+      "over": 1,
+      "attempt": 4,
+      "cohort": "training",
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "802b2539db522bd5e4b879cadde738b70c7c886d297d629de8f74510394fd4ac",
+      "actualDeliveryLabel": "1.5",
+      "matchFileSha256": "bcf94c412dea30fb7e29a170aba1389f2f114412646369b659212f19cbd58e14",
+      "matchDates": [
+        "2005-10-21"
+      ],
+      "teams": [
+        "South Africa",
+        "New Zealand"
+      ],
+      "event": null,
+      "venue": "New Wanderers Stadium",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "222678",
+      "innings": 1,
+      "over": 16,
+      "attempt": 4,
+      "cohort": "training",
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "b8aff75d423c94b972c829111f9c44262fdc545a08266f3a0a83bee465c16382",
+      "actualDeliveryLabel": "16.5",
+      "matchFileSha256": "bcf94c412dea30fb7e29a170aba1389f2f114412646369b659212f19cbd58e14",
+      "matchDates": [
+        "2005-10-21"
+      ],
+      "teams": [
+        "South Africa",
+        "New Zealand"
+      ],
+      "event": null,
+      "venue": "New Wanderers Stadium",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "222678",
+      "innings": 2,
+      "over": 17,
+      "attempt": 1,
+      "cohort": "training",
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "9b27494fa570d744df2d8d2fa2e620e3c601a56ebd262c0d1ebd0474eae56069",
+      "actualDeliveryLabel": "17.2",
+      "matchFileSha256": "bcf94c412dea30fb7e29a170aba1389f2f114412646369b659212f19cbd58e14",
+      "matchDates": [
+        "2005-10-21"
+      ],
+      "teams": [
+        "South Africa",
+        "New Zealand"
+      ],
+      "event": null,
+      "venue": "New Wanderers Stadium",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "222678",
+      "innings": 2,
+      "over": 17,
+      "attempt": 6,
+      "cohort": "training",
+      "reason": "INVALID_LEGALITY_CHANNEL",
+      "sourceEventSha256": "2d4dc1503cf11e031d02eb15ea7c6792e3357c18deda3d4f3a3983ee16336e8f",
+      "actualDeliveryLabel": "17.6",
+      "matchFileSha256": "bcf94c412dea30fb7e29a170aba1389f2f114412646369b659212f19cbd58e14",
+      "matchDates": [
+        "2005-10-21"
+      ],
+      "teams": [
+        "South Africa",
+        "New Zealand"
+      ],
+      "event": null,
+      "venue": "New Wanderers Stadium",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "306991",
+      "innings": 1,
+      "over": 2,
+      "attempt": 7,
+      "cohort": "training",
+      "reason": "FREE_HIT_MASK",
+      "sourceEventSha256": "ef50eda853d643c4865067e0e610ca65cbb91377a1a5409c56fbea77b49e436e",
+      "actualDeliveryLabel": "2.6",
+      "matchFileSha256": "a488a3c44db61639f625bf2ce84498d8c94a513595e36af22985a6c0a9932897",
+      "matchDates": [
+        "2007-09-04"
+      ],
+      "teams": [
+        "Kenya",
+        "Pakistan"
+      ],
+      "event": {
+        "match_number": 3,
+        "name": "Twenty20 Quadrangular (in Kenya)"
+      },
+      "venue": "Gymkhana Club Ground",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "660185",
+      "innings": 2,
+      "over": 10,
+      "attempt": 3,
+      "cohort": "training",
+      "reason": "UNSUPPORTED_EXTRA_TYPE",
+      "sourceEventSha256": "2a1f4c0d74e3ed4cbb9d498bb8429e4709b116b3190d737a3ab26365aca96db3",
+      "actualDeliveryLabel": "10.3",
+      "matchFileSha256": "0fa77c2999e4fc54eb5f3c4d184e7490543b096aa95c919e26ea7a1e6a1654c9",
+      "matchDates": [
+        "2013-11-23"
+      ],
+      "teams": [
+        "Kenya",
+        "Netherlands"
+      ],
+      "event": {
+        "group": "B",
+        "match_number": 47,
+        "name": "ICC World Twenty20 Qualifier"
+      },
+      "venue": "ICC Academy",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    },
+    {
+      "matchId": "660185",
+      "innings": 2,
+      "over": 15,
+      "attempt": 2,
+      "cohort": "training",
+      "reason": "FREE_HIT_MASK",
+      "sourceEventSha256": "9cf35b7603783eb084c5d51a08f531b733caa09474dcb158a997a830cb769e65",
+      "actualDeliveryLabel": "15.2",
+      "matchFileSha256": "0fa77c2999e4fc54eb5f3c4d184e7490543b096aa95c919e26ea7a1e6a1654c9",
+      "matchDates": [
+        "2013-11-23"
+      ],
+      "teams": [
+        "Kenya",
+        "Netherlands"
+      ],
+      "event": {
+        "group": "B",
+        "match_number": 47,
+        "name": "ICC World Twenty20 Qualifier"
+      },
+      "venue": "ICC Academy",
+      "sourceEventHashVerified": true,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false
+    }
+  ],
+  "registerSha256": "49354d82f872f5237b5e56fcae9932f2f48b1b733da1e5ccce330547c149adf1"
+}

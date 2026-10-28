@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "python3",
+    "docs/verification-m7k/source-batch-01/verify-source-batch.py",
+    "--archive",
+    "/workspace/m7k-source-research/t20s_male_json.zip",
+    "--out",
+    "/tmp/m7k-integrated-source-batch.json"
+  ],
+  "exitCode": 0,
+  "outputMatchesRecordedJson": true,
+  "sourceEvents": 11,
+  "matches": 7,
+  "workerSha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4"
+}

@@ -1,0 +1,9 @@
+test_complete_unique_coverage_without_approvals (test_m7k_review_selection.ReviewSelectionTests.test_complete_unique_coverage_without_approvals) ... ok
+test_hit_ball_twice_requires_separate_review (test_m7k_review_selection.ReviewSelectionTests.test_hit_ball_twice_requires_separate_review) ... ok
+test_missing_duplicate_and_tampered_provenance_reject (test_m7k_review_selection.ReviewSelectionTests.test_missing_duplicate_and_tampered_provenance_reject) ... ok
+test_selection_is_independent_of_register_order (test_m7k_review_selection.ReviewSelectionTests.test_selection_is_independent_of_register_order) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.010s
+
+OK

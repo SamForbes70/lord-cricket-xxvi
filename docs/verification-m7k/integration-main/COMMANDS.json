@@ -1,0 +1,189 @@
+[
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_m7k_review_selection.py",
+      "-v"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:50.945215+00:00",
+    "seconds": 0.088,
+    "exitCode": 0,
+    "log": "selection-tests.log",
+    "sha256": "8fb0cacdc26b982c5cb4f0fdc512f82f0e8042badcbdebc9ce1ce1712ba138e7"
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/m7k-select-review-cases.py",
+      "--out",
+      "/tmp/m7k-integrated-selection.json"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:51.033538+00:00",
+    "seconds": 0.039,
+    "exitCode": 0,
+    "log": "selection-regeneration.log",
+    "sha256": "7a283a76753a03672271f1bf339fe775bd3124d2e9028741c1cc3b3d48d6e480"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_synthetic_quality_summary.py",
+      "-v"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:51.072893+00:00",
+    "seconds": 0.083,
+    "exitCode": 0,
+    "log": "summary-tests.log",
+    "sha256": "c74d3c432f90790439c79548e4fbbcedaeb4d60fc96d818841c401bfb6323d1e"
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/m7j-restore-fixtures.py"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:51.155662+00:00",
+    "seconds": 0.034,
+    "exitCode": 0,
+    "log": "restore-research-fixtures.log",
+    "sha256": "98a134661741054f2aeb092d881aa107bef75167edb67231e7c73a6c67fb20c7"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_m7*.py",
+      "-v"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:51.189502+00:00",
+    "seconds": 1.338,
+    "exitCode": 0,
+    "log": "research-python.log",
+    "sha256": "ea42538fedec510e80ff709daa6028a54eaf37fe139504d33a06337b0da44bd1"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "schemas:check"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:52.528008+00:00",
+    "seconds": 0.483,
+    "exitCode": 0,
+    "log": "schemas.log",
+    "sha256": "7b7a75d02a7b65f7e3bc1983ebd70d2124f1a1737cdd5d732b54dde8a1858065"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:53.011391+00:00",
+    "seconds": 4.274,
+    "exitCode": 0,
+    "log": "build.log",
+    "sha256": "2a3c9fde0e9f52ae1ab69e735db01e8d7797ee10afc5c9fc7e01a6196737acc9"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "startedAtUtc": "2026-10-28T02:35:57.285821+00:00",
+    "seconds": 4.134,
+    "exitCode": 0,
+    "log": "typecheck.log",
+    "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "startedAtUtc": "2026-10-28T02:36:01.419618+00:00",
+    "seconds": 3.669,
+    "exitCode": 0,
+    "log": "lint.log",
+    "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "fixtures:engine"
+    ],
+    "startedAtUtc": "2026-10-28T02:36:05.088889+00:00",
+    "seconds": 0.559,
+    "exitCode": 0,
+    "log": "scoring-fixtures.log",
+    "sha256": "29518f19349c020bb7b2f1602b1688c45d933915ad86dd2f3b5b8b9f91dce590"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "vectors:check"
+    ],
+    "startedAtUtc": "2026-10-28T02:36:05.647832+00:00",
+    "seconds": 0.145,
+    "exitCode": 0,
+    "log": "vectors.log",
+    "sha256": "0fed95bd9940c4a9db447da39a20b0930f12de85e904e35fc02736e70020e7a1"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "probability:check"
+    ],
+    "startedAtUtc": "2026-10-28T02:36:05.793167+00:00",
+    "seconds": 0.177,
+    "exitCode": 0,
+    "log": "probability.log",
+    "sha256": "1cbd56a455937dc9a8462479070f2fd87d2ed6730ea34ebb0d420de3458f45f7"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "generator:check"
+    ],
+    "startedAtUtc": "2026-10-28T02:36:05.970510+00:00",
+    "seconds": 0.134,
+    "exitCode": 0,
+    "log": "generator.log",
+    "sha256": "110ddf3972b8f79164c8732d45c6f77ff75a8b2d14cedc7b1d43caee545e9b9b"
+  },
+  {
+    "argv": [
+      "npm",
+      "test",
+      "--",
+      "--maxWorkers=2"
+    ],
+    "startedAtUtc": "2026-10-28T02:36:06.105304+00:00",
+    "seconds": 44.539,
+    "exitCode": 0,
+    "log": "unit.log",
+    "sha256": "b34fba25db8b1241c176f8d4b40a290775a77acc0b46f72c77616a12ac24e610"
+  }
+]

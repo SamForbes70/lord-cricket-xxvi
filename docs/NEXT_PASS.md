@@ -1,7 +1,9 @@
 # Lord Cricket XXVI - NEXT PASS after M7J
 
-**M7K started:** owner-authorised planning and research evidence work in [draft PR #3](https://github.com/SamForbes70/lord-cricket-xxvi/pull/3).
-It remains unmerged. See [current status](CURRENT_STATUS.md) for acceptance and the immediate engineering activities.
+**M7K started:** planning and evidence preparation, authorised 26 October 2026.
+See [M7K_PLAN.md](M7K_PLAN.md) for ordered slices, acceptance gates and the 69-case evidence worksheet.
+[Current status](CURRENT_STATUS.md) records the merged capability corrections and model-quality harness.
+Production ledger integration and research-model promotion remain gated separately.
 
 Baseline: M7J committed source (record exact hash in PASS_22_M7J_REPORT.md).
 

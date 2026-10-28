@@ -1,7 +1,8 @@
 # Current game and acceptance status
 
 Lord Cricket XXVI is a playable single-season management alpha.
-Main includes merged [PR #2](https://github.com/SamForbes70/lord-cricket-xxvi/pull/2), merge commit `036c212`.
+Main includes merged PR #2, capability reconciliation from PR #4 and the scenario harness from PR #5.
+The integration baseline is `b4aceda`; each merge retains the historical simulation and save boundaries.
 The accepted gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
 M7 quality validation and M8 release acceptance remain incomplete.
 
@@ -39,7 +40,7 @@ Reference-hardware performance budgets and empirical model promotion remain unac
 ## M7K and PR review
 
 The owner authorised M7K research preparation on 26 October 2026.
-[Draft PR #3](https://github.com/SamForbes70/lord-cricket-xxvi/pull/3) remains unmerged.
+[PR #3](https://github.com/SamForbes70/lord-cricket-xxvi/pull/3) records research preparation, rather than gameplay integration.
 Its reviewed head `5baea6a` has four passing checks across push and PR workflows.
 The review verifies 31 committed evidence hashes and identifies no blocking implementation defect.
 The review covers the selector, provenance checks, CI and research-only capability boundary.
@@ -47,6 +48,8 @@ It does not independently adjudicate a cricket incident.
 [pr3-review.json](verification-status-quality/pr3-review.json) retains exact check links and review limits.
 
 PR #3 contains the 69-case worksheet, 45 representative observed signatures and source evidence.
+Its integration with `b4aceda` retains both Linux Python check steps and the 542-test TypeScript suite.
+Fresh local integration results are retained under `verification-m7k/integration-main/`.
 Eleven event hashes across seven matches match the historical register.
 Two priority cases have independent published corroboration, but zero source-derived fixtures have adjudication approval.
 M7K has not integrated a new production scorer, ledger, save version or gameplay model.
@@ -55,7 +58,7 @@ M7K has not integrated a new production scorer, ledger, save version or gameplay
 
 The current work completes the first four activities from the owner's status assessment:
 
-1. Review PR #3 and its latest CI, preserving its unmerged research boundary.
+1. Review PR #3 and its CI, preserving its research-only boundary.
 2. Reconcile capability descriptions, including the inaccurate exhibition footer.
 3. Reconcile baseline acceptance, human evidence and the owner-PC automation gap.
 4. Run a fixed-seed scoring-quality diagnostic without changing coefficients.
@@ -70,4 +73,13 @@ Exceptional-event review and ordinary scoring-quality diagnosis remain separate 
 Reviewed fixtures must precede production-capable v2 scorer integration.
 New model/rule versions must preserve historical saves and exact v1 replay.
 Empirical evaluation requires a new untouched cohort and explicit thresholds, rather than reused development holdout data.
-Research-model promotion, PR merging and release publication require their own explicit instructions.
+The owner authorised integrating and merging PR #3 as research preparation on 28 October 2026.
+Production ledger acceptance, research-model promotion and release publication retain their separate gates.
+
+
+## Scenario quality tooling
+
+Merged PR #5 provides the [scenario quality harness](SCENARIO_QUALITY_HARNESS.md).
+Its four additional tests bring the TypeScript suite to 542 tests across 31 files.
+The retained default grid has 64 paired scenarios, 128 policy runs and 64 deterministic repeat checks.
+The grid compares existing policies without changing gameplay coefficients or approving empirical realism.

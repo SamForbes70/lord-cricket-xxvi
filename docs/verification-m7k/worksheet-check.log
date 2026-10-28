@@ -1,0 +1,3 @@
+PASS: all 69 source identities, hashes, dispositions and evidence requests preserved.
+PASS: zero approvals, chronology confirmations or invented evidence references.
+PASS: input register SHA-256 and disabled gameplay integration match.

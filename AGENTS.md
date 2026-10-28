@@ -28,7 +28,8 @@ Act as lead TypeScript engineer, independent QA engineer and cricket simulation 
 
 ## Current task boundary
 The baseline recovery task is delivered through merged PR #2. Issue #1 retains the owner-PC automation evidence gap.
-The owner authorised M7K research preparation on 26 October 2026. PR #3 remains separate and unmerged.
+The owner authorised M7K research preparation on 26 October 2026. PR #3 records that research preparation.
+All source-case adjudication flags remain false; a merge does not authorise production ledger integration or model promotion.
 Research-model promotion still requires explicit approval.
 Use `docs/CURRENT_STATUS.md` and `docs/ACCEPTANCE_RECONCILIATION.md` before selecting further work.
 

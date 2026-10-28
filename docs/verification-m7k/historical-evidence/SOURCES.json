@@ -1,0 +1,290 @@
+{
+  "retrievalDates": "See per-source UTC retrieval timestamps.",
+  "rawFilesTracked": false,
+  "evidenceSources": [
+    {
+      "sourceId": "lords-laws.html",
+      "url": "https://www.lords.org/mcc/the-laws-of-cricket",
+      "retrievedAt": "2026-10-27T20:59:19.588594+00:00",
+      "status": 200,
+      "bytes": 80380,
+      "sha256": "e3dc6d390040ac511c100731203a92089375a98fce073591d75eb017c4181819",
+      "localPath": "/workspace/m7k-source-research/second-batch/lords-laws.html",
+      "finalUrl": "https://www.lords.org/mcc/about-the-laws-of-cricket"
+    },
+    {
+      "sourceId": "mcc-2022.docx",
+      "url": "https://www.lords.org/getmedia/81bd1d01-c7e7-42f6-ac70-80473a050c32/Laws-of-Cricket-2017-Code-3rd-Edition-2022_1.docx",
+      "retrievedAt": "2026-10-27T20:59:52.159497+00:00",
+      "status": 200,
+      "bytes": 935522,
+      "sha256": "82abcf89f983361dcf42af229d2b7abed95165fc2db7409380d35825d04b8d3b",
+      "localPath": "/workspace/m7k-source-research/second-batch/mcc-2022.docx",
+      "finalUrl": "https://www.lords.org/getmedia/81bd1d01-c7e7-42f6-ac70-80473a050c32/Laws-of-Cricket-2017-Code-3rd-Edition-2022_1.docx"
+    },
+    {
+      "sourceId": "mcc-2017.doc",
+      "url": "https://www.lords.org/getmedia/353a5bca-3bc0-41fb-94ab-e920b2221c67/MCC-Laws-of-Cricket-2017-Final-version-clean-10-Aug.doc",
+      "retrievedAt": "2026-10-27T20:59:52.160162+00:00",
+      "status": 200,
+      "bytes": 1818624,
+      "sha256": "aaf2ce1a5404c6e60d8dda817fd8eab4352e7d31a2bdd9a2c4432e3e3634a0c7",
+      "localPath": "/workspace/m7k-source-research/second-batch/mcc-2017.doc",
+      "finalUrl": "https://www.lords.org/getmedia/353a5bca-3bc0-41fb-94ab-e920b2221c67/MCC-Laws-of-Cricket-2017-Final-version-clean-10-Aug.doc"
+    },
+    {
+      "sourceId": "mcc-2019.pdf",
+      "url": "https://www.lords.org/getmedia/690fa6de-5c47-4356-a58d-4efb57236a8e/2nd-Edition-of-the-2017-code-2019_2.pdf",
+      "retrievedAt": "2026-10-27T20:59:52.160529+00:00",
+      "status": 200,
+      "bytes": 2318895,
+      "sha256": "7901d9b87862f9a62142c1f2f3a211497834cf96d414e8889e0e887539e6377b",
+      "localPath": "/workspace/m7k-source-research/second-batch/mcc-2019.pdf",
+      "finalUrl": "https://www.lords.org/getmedia/690fa6de-5c47-4356-a58d-4efb57236a8e/2nd-Edition-of-the-2017-code-2019_2.pdf"
+    },
+    {
+      "sourceId": "icc-2017-handbook.pdf",
+      "url": "https://usacricket.org/wp-content/uploads/2018/02/ICC-Playing-Handbook-2017_2018_DIGITAL.pdf",
+      "retrievedAt": "2026-10-27T21:00:05.414991+00:00",
+      "status": 200,
+      "bytes": 8769360,
+      "sha256": "a1127b1bac659508d2d29c0257d9ec25a363989af5171625d868877c820d2574",
+      "localPath": "/workspace/m7k-source-research/second-batch/icc-2017-handbook.pdf",
+      "finalUrl": "https://usacricket.org/wp-content/uploads/2018/02/ICC-Playing-Handbook-2017_2018_DIGITAL.pdf"
+    },
+    {
+      "sourceId": "wisden-mughal.html",
+      "url": "https://www.wisden.com/cricket-news/watch-first-hit-ball-twice-dismissal-internationals-three-months-before-mathews-timed-out",
+      "retrievedAt": "2026-10-27T21:00:28.028938+00:00",
+      "status": 200,
+      "bytes": 780650,
+      "sha256": "997085de4a71c36c95b77557d68e2ce5db9591bb142d4b1c5924092c1612222f",
+      "localPath": "/workspace/m7k-source-research/second-batch/wisden-mughal.html",
+      "finalUrl": "https://www.wisden.com/cricket-news/watch-first-hit-ball-twice-dismissal-internationals-three-months-before-mathews-timed-out"
+    },
+    {
+      "sourceId": "ca-finch.html",
+      "url": "https://www.cricket.com.au/news/aaron-finch-highest-ever-t20-score-australia-zimbabwe-t20-tri-series-harare-highlights-century/2018-07-03",
+      "retrievedAt": "2026-10-27T21:00:28.029418+00:00",
+      "status": 200,
+      "bytes": 95579,
+      "sha256": "63a37812d667a34a9483f6be46f12a4dca35d687fa10488e4eef1da679b222bb",
+      "localPath": "/workspace/m7k-source-research/second-batch/ca-finch.html",
+      "finalUrl": "https://www.cricket.com.au/news/3297161"
+    },
+    {
+      "sourceId": "bbc-finch.html",
+      "url": "https://www.bbc.com/sport/cricket/44696476",
+      "retrievedAt": "2026-10-27T21:00:28.029809+00:00",
+      "status": 200,
+      "bytes": 388217,
+      "sha256": "4f7e8088519bd54766bf94d5097f247e4ad867d3b22b63efdc2004f32d03d698",
+      "localPath": "/workspace/m7k-source-research/second-batch/bbc-finch.html",
+      "finalUrl": "https://www.bbc.com/sport/cricket/44696476"
+    },
+    {
+      "sourceId": "bbc-freehit.html",
+      "url": "https://www.bbc.co.uk/sport/cricket/33295761",
+      "retrievedAt": "2026-10-27T21:00:28.030215+00:00",
+      "status": 200,
+      "bytes": 448114,
+      "sha256": "87d9e1e559db9a6776b31358a0e3fac1d6d4c90aad7f4ee2113cff99d69c7c09",
+      "localPath": "/workspace/m7k-source-research/second-batch/bbc-freehit.html",
+      "finalUrl": "https://www.bbc.co.uk/sport/cricket/33295761"
+    }
+  ],
+  "discoveryAndFailedRequests": [
+    {
+      "url": "https://html.duckduckgo.com/html/?q=Fanyan%20Mughal%20hit%20ball%20twice%20Romania%202023",
+      "retrievedAt": "2026-10-27T20:59:19.586613+00:00",
+      "status": 202,
+      "bytes": 14298,
+      "sha256": "b8fdab44f803af5c0e6b02f582da14996d169a9c00770e811a69e2edc02a0065",
+      "localPath": "/workspace/m7k-source-research/second-batch/ddg-0.html",
+      "finalUrl": "https://html.duckduckgo.com/html/?q=Fanyan%20Mughal%20hit%20ball%20twice%20Romania%202023"
+    },
+    {
+      "url": "https://html.duckduckgo.com/html/?q=Aaron%20Finch%20172%20hit%20wicket%20wide%20Zimbabwe%202018",
+      "retrievedAt": "2026-10-27T20:59:19.587439+00:00",
+      "status": 202,
+      "bytes": 14312,
+      "sha256": "97a2aca46eaadb0e0f9a5bbe68e6d96820b3cd7d644d6ead0f07075819dea6bb",
+      "localPath": "/workspace/m7k-source-research/second-batch/ddg-1.html",
+      "finalUrl": "https://html.duckduckgo.com/html/?q=Aaron%20Finch%20172%20hit%20wicket%20wide%20Zimbabwe%202018"
+    },
+    {
+      "url": "https://html.duckduckgo.com/html/?q=ICC%20mens%20T20I%20playing%20conditions%202017%20pdf",
+      "retrievedAt": "2026-10-27T20:59:19.587943+00:00",
+      "status": 202,
+      "bytes": 14304,
+      "sha256": "8327c3203f5057b1885a7492379425a23ff5c8f38e868f37ac0d9adcb40537ec",
+      "localPath": "/workspace/m7k-source-research/second-batch/ddg-2.html",
+      "finalUrl": "https://html.duckduckgo.com/html/?q=ICC%20mens%20T20I%20playing%20conditions%202017%20pdf"
+    },
+    {
+      "url": "https://www.icc-cricket.com/about/cricket/rules-and-regulations",
+      "retrievedAt": "2026-10-27T20:59:19.588294+00:00",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://www.lords.org/mcc/the-laws-of-cricket",
+      "retrievedAt": "2026-10-27T20:59:19.588594+00:00",
+      "status": 200,
+      "bytes": 80380,
+      "sha256": "e3dc6d390040ac511c100731203a92089375a98fce073591d75eb017c4181819",
+      "localPath": "/workspace/m7k-source-research/second-batch/lords-laws.html",
+      "finalUrl": "https://www.lords.org/mcc/about-the-laws-of-cricket"
+    },
+    {
+      "url": "https://www.abc.net.au/news/search?query=Aaron%20Finch%20172",
+      "retrievedAt": "2026-10-27T20:59:44.532445+00:00",
+      "status": 200,
+      "bytes": 187533,
+      "sha256": "4221bd47cf4539ffe252da7eccd747eb73af865ccd315a8a6206082fa825018e",
+      "localPath": "/workspace/m7k-source-research/second-batch/abc-search.html",
+      "finalUrl": "https://www.abc.net.au/news/search?query=Aaron%20Finch%20172"
+    },
+    {
+      "url": "https://www.cricket.com.au/search?query=Finch%20172",
+      "retrievedAt": "2026-10-27T20:59:44.532881+00:00",
+      "status": 200,
+      "bytes": 35881,
+      "sha256": "2354552b776e34a21d733714701fbd00276795674d22938e36513e76c3ea7cd0",
+      "localPath": "/workspace/m7k-source-research/second-batch/ca-search.html",
+      "finalUrl": "https://www.cricket.com.au/search?query=Finch%20172"
+    },
+    {
+      "url": "https://search.yahoo.com/search?p=Fanyan%20Mughal%20hit%20ball%20twice",
+      "retrievedAt": "2026-10-27T20:59:44.533216+00:00",
+      "error": "HTTP Error 500: Internal Server Error"
+    },
+    {
+      "url": "https://search.brave.com/search?q=ICC%20T20%202017%20playing%20conditions%20pdf",
+      "retrievedAt": "2026-10-27T20:59:44.533744+00:00",
+      "status": 200,
+      "bytes": 206993,
+      "sha256": "4eb0d4e9a34b3ad4aec04910f08a91f9643c463b4b15d47feb2acf3214bedf09",
+      "localPath": "/workspace/m7k-source-research/second-batch/brave-search.html",
+      "finalUrl": "https://search.brave.com/search?q=ICC%20T20%202017%20playing%20conditions%20pdf"
+    },
+    {
+      "url": "https://www.lords.org/getmedia/81bd1d01-c7e7-42f6-ac70-80473a050c32/Laws-of-Cricket-2017-Code-3rd-Edition-2022_1.docx",
+      "retrievedAt": "2026-10-27T20:59:52.159497+00:00",
+      "status": 200,
+      "bytes": 935522,
+      "sha256": "82abcf89f983361dcf42af229d2b7abed95165fc2db7409380d35825d04b8d3b",
+      "localPath": "/workspace/m7k-source-research/second-batch/mcc-2022.docx",
+      "finalUrl": "https://www.lords.org/getmedia/81bd1d01-c7e7-42f6-ac70-80473a050c32/Laws-of-Cricket-2017-Code-3rd-Edition-2022_1.docx"
+    },
+    {
+      "url": "https://www.lords.org/getmedia/353a5bca-3bc0-41fb-94ab-e920b2221c67/MCC-Laws-of-Cricket-2017-Final-version-clean-10-Aug.doc",
+      "retrievedAt": "2026-10-27T20:59:52.160162+00:00",
+      "status": 200,
+      "bytes": 1818624,
+      "sha256": "aaf2ce1a5404c6e60d8dda817fd8eab4352e7d31a2bdd9a2c4432e3e3634a0c7",
+      "localPath": "/workspace/m7k-source-research/second-batch/mcc-2017.doc",
+      "finalUrl": "https://www.lords.org/getmedia/353a5bca-3bc0-41fb-94ab-e920b2221c67/MCC-Laws-of-Cricket-2017-Final-version-clean-10-Aug.doc"
+    },
+    {
+      "url": "https://www.lords.org/getmedia/690fa6de-5c47-4356-a58d-4efb57236a8e/2nd-Edition-of-the-2017-code-2019_2.pdf",
+      "retrievedAt": "2026-10-27T20:59:52.160529+00:00",
+      "status": 200,
+      "bytes": 2318895,
+      "sha256": "7901d9b87862f9a62142c1f2f3a211497834cf96d414e8889e0e887539e6377b",
+      "localPath": "/workspace/m7k-source-research/second-batch/mcc-2019.pdf",
+      "finalUrl": "https://www.lords.org/getmedia/690fa6de-5c47-4356-a58d-4efb57236a8e/2nd-Edition-of-the-2017-code-2019_2.pdf"
+    },
+    {
+      "url": "https://resources.pulse.icc-cricket.com/ICC/document/2023/05/29/f107f3dc-4c8f-44d1-936b-5180806e5354/ICC-Men-s-T20I-Playing-Conditions-June-2023-Clean.pdf",
+      "retrievedAt": "2026-10-27T21:00:05.414527+00:00",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "url": "https://usacricket.org/wp-content/uploads/2018/02/ICC-Playing-Handbook-2017_2018_DIGITAL.pdf",
+      "retrievedAt": "2026-10-27T21:00:05.414991+00:00",
+      "status": 200,
+      "bytes": 8769360,
+      "sha256": "a1127b1bac659508d2d29c0257d9ec25a363989af5171625d868877c820d2574",
+      "localPath": "/workspace/m7k-source-research/second-batch/icc-2017-handbook.pdf",
+      "finalUrl": "https://usacricket.org/wp-content/uploads/2018/02/ICC-Playing-Handbook-2017_2018_DIGITAL.pdf"
+    },
+    {
+      "url": "https://resources.pulse.icc-cricket.com/ICC/document/2021/07/05/874a426e-fe06-4415-b0f5-5148a4aa0ef8/ICC-Playing-Conditions-05-Men-s-Twenty20-International-May-2021.pdf",
+      "retrievedAt": "2026-10-27T21:00:05.415373+00:00",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "url": "https://search.brave.com/search?q=Fanyan%20Mughal%20hit%20ball%20twice%20Romania%20August%202023",
+      "retrievedAt": "2026-10-27T21:00:05.415706+00:00",
+      "status": 200,
+      "bytes": 219635,
+      "sha256": "23957e9850c17d9ac9cab8ccf5b440b63c85dd990b96c58f95d93ccc03b8471d",
+      "localPath": "/workspace/m7k-source-research/second-batch/brave-case-0.html",
+      "finalUrl": "https://search.brave.com/search?q=Fanyan%20Mughal%20hit%20ball%20twice%20Romania%20August%202023"
+    },
+    {
+      "url": "https://search.brave.com/search?q=Aaron%20Finch%20172%20hit%20wicket%20wide%20Zimbabwe%20July%202018",
+      "retrievedAt": "2026-10-27T21:00:05.416087+00:00",
+      "status": 200,
+      "bytes": 223753,
+      "sha256": "ff9cdbeadc8d2eaf8c26240f74753bd4c855eacc7b0e622f5c9bce79e31bc90a",
+      "localPath": "/workspace/m7k-source-research/second-batch/brave-case-1.html",
+      "finalUrl": "https://search.brave.com/search?q=Aaron%20Finch%20172%20hit%20wicket%20wide%20Zimbabwe%20July%202018"
+    },
+    {
+      "url": "https://search.brave.com/search?q=ICC%20T20%20playing%20conditions%202013%20free%20hit%20foot%20fault%20no%20ball",
+      "retrievedAt": "2026-10-27T21:00:05.484493+00:00",
+      "status": 200,
+      "bytes": 238388,
+      "sha256": "de7de66673c391924796f035f24e32d8b31e2ad7285d0991c69a81323ab51dda",
+      "localPath": "/workspace/m7k-source-research/second-batch/brave-case-2.html",
+      "finalUrl": "https://search.brave.com/search?q=ICC%20T20%20playing%20conditions%202013%20free%20hit%20foot%20fault%20no%20ball"
+    },
+    {
+      "url": "https://www.wisden.com/cricket-news/watch-first-hit-ball-twice-dismissal-internationals-three-months-before-mathews-timed-out",
+      "retrievedAt": "2026-10-27T21:00:28.028938+00:00",
+      "status": 200,
+      "bytes": 780650,
+      "sha256": "997085de4a71c36c95b77557d68e2ce5db9591bb142d4b1c5924092c1612222f",
+      "localPath": "/workspace/m7k-source-research/second-batch/wisden-mughal.html",
+      "finalUrl": "https://www.wisden.com/cricket-news/watch-first-hit-ball-twice-dismissal-internationals-three-months-before-mathews-timed-out"
+    },
+    {
+      "url": "https://www.cricket.com.au/news/aaron-finch-highest-ever-t20-score-australia-zimbabwe-t20-tri-series-harare-highlights-century/2018-07-03",
+      "retrievedAt": "2026-10-27T21:00:28.029418+00:00",
+      "status": 200,
+      "bytes": 95579,
+      "sha256": "63a37812d667a34a9483f6be46f12a4dca35d687fa10488e4eef1da679b222bb",
+      "localPath": "/workspace/m7k-source-research/second-batch/ca-finch.html",
+      "finalUrl": "https://www.cricket.com.au/news/3297161"
+    },
+    {
+      "url": "https://www.bbc.com/sport/cricket/44696476",
+      "retrievedAt": "2026-10-27T21:00:28.029809+00:00",
+      "status": 200,
+      "bytes": 388217,
+      "sha256": "4f7e8088519bd54766bf94d5097f247e4ad867d3b22b63efdc2004f32d03d698",
+      "localPath": "/workspace/m7k-source-research/second-batch/bbc-finch.html",
+      "finalUrl": "https://www.bbc.com/sport/cricket/44696476"
+    },
+    {
+      "url": "https://www.bbc.co.uk/sport/cricket/33295761",
+      "retrievedAt": "2026-10-27T21:00:28.030215+00:00",
+      "status": 200,
+      "bytes": 448114,
+      "sha256": "87d9e1e559db9a6776b31358a0e3fac1d6d4c90aad7f4ee2113cff99d69c7c09",
+      "localPath": "/workspace/m7k-source-research/second-batch/bbc-freehit.html",
+      "finalUrl": "https://www.bbc.co.uk/sport/cricket/33295761"
+    },
+    {
+      "url": "https://search.brave.com/search?q=%22T20I%22%20%22June%202023%22%20%22pdf%22%20playing%20conditions",
+      "retrievedAt": "2026-10-27T21:00:28.030599+00:00",
+      "status": 200,
+      "bytes": 103550,
+      "sha256": "8ecc077ba79061fe62e805ffe51c7af2c4082726f24248f1046a42bce051e609",
+      "localPath": "/workspace/m7k-source-research/second-batch/brave-2023-conditions.html",
+      "finalUrl": "https://search.brave.com/search?q=%22T20I%22%20%22June%202023%22%20%22pdf%22%20playing%20conditions"
+    }
+  ],
+  "rawResearchDirectory": "/workspace/m7k-source-research/second-batch"
+}

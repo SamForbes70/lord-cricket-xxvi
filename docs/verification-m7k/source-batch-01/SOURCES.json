@@ -1,0 +1,125 @@
+{
+  "accessDate": "2026-10-27",
+  "rawResearchDirectory": "/workspace/m7k-source-research",
+  "rawDataTracked": false,
+  "sources": [
+    {
+      "url": "https://cricsheet.org/downloads/it20s_male_json.zip",
+      "retrievedAt": "2026-10-27T08:18:37.000851+00:00",
+      "localPath": "/workspace/m7k-source-research/it20s_male_json.zip",
+      "status": 200,
+      "bytes": 944582,
+      "sha256": "0da5dc95daad244a63ca1435a2778ce2a71199860bc8248091f35cf3688f64ba",
+      "headers": {
+        "cache-control": "public, max-age=2592000",
+        "expires": "Thu, 26 Nov 2026 08:18:38 GMT",
+        "content-type": "application/zip",
+        "last-modified": "Wed, 07 Oct 2026 17:13:11 GMT",
+        "accept-ranges": "bytes",
+        "content-length": "944582",
+        "date": "Tue, 27 Oct 2026 08:18:38 GMT",
+        "server": "envoy",
+        "x-served-by": "web2.ams1",
+        "x-ua-compatible": "IE=Edge,chrome=1",
+        "x-envoy-upstream-service-time": "176",
+        "connection": "close"
+      }
+    },
+    {
+      "url": "https://cricsheet.org/licensing/",
+      "retrievedAt": "2026-10-27T08:18:37.001328+00:00",
+      "localPath": "/workspace/m7k-source-research/licensing.html",
+      "status": 200,
+      "bytes": 6147,
+      "sha256": "79127cfeb762aabfbcd10e8b2a15b52ddac5a981268ddd105ed3ba99685f93c8",
+      "headers": {
+        "cache-control": "public, max-age=0",
+        "expires": "Tue, 27 Oct 2026 08:18:38 GMT",
+        "content-type": "text/html; charset=utf-8",
+        "last-modified": "Sun, 25 Oct 2026 18:44:00 GMT",
+        "accept-ranges": "bytes",
+        "content-length": "6147",
+        "date": "Tue, 27 Oct 2026 08:18:38 GMT",
+        "server": "envoy",
+        "x-served-by": "web2.ams1",
+        "x-ua-compatible": "IE=Edge,chrome=1",
+        "x-envoy-upstream-service-time": "406",
+        "connection": "close"
+      }
+    },
+    {
+      "url": "https://cricsheet.org/format/json/",
+      "retrievedAt": "2026-10-27T08:18:37.001840+00:00",
+      "localPath": "/workspace/m7k-source-research/json-format.html",
+      "status": 200,
+      "bytes": 158646,
+      "sha256": "cf2a1253dfd02644b3406e93eae4e323b08d06fe469cacf3117d2863abdc2ef2",
+      "headers": {
+        "cache-control": "public, max-age=0",
+        "expires": "Tue, 27 Oct 2026 08:18:37 GMT",
+        "content-type": "text/html; charset=utf-8",
+        "last-modified": "Wed, 07 Oct 2026 16:50:30 GMT",
+        "accept-ranges": "bytes",
+        "content-length": "158646",
+        "date": "Tue, 27 Oct 2026 08:18:37 GMT",
+        "server": "envoy",
+        "x-served-by": "web2.ams1",
+        "x-ua-compatible": "IE=Edge,chrome=1",
+        "x-envoy-upstream-service-time": "174",
+        "connection": "close"
+      }
+    },
+    {
+      "url": "https://cricsheet.org/downloads/t20s_male_json.zip",
+      "status": 200,
+      "retrievedAt": "2026-10-27T08:19:14.800954+00:00",
+      "bytes": 14551021,
+      "sha256": "691f1f42b86c93fbdbc53936ed69479f9306bf39c4c56b4c0729360051075c6d",
+      "localPath": "/workspace/m7k-source-research/t20s_male_json.zip"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Hit_the_ball_twice",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Aaron_Finch",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://www.lords.org/mcc/the-laws-of-cricket/hit-the-ball-twice?aliaspath=%2FMCC%2FThe-Laws-of-Cricket%2FHit-the-ball-twice",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://www.lords.org/getmedia/a4ef9f77-2a25-4f5b-a286-4601f08e6334/Laws-of-Cricket-2017-Code-4th-Edition-%282026%29_5.pdf",
+      "status": 200,
+      "sha256": "38ce30020b31cc997c4b05f90dcb3dbc6782336690606b7eda511245f2be8a87",
+      "bytes": 983617,
+      "localPath": "/workspace/m7k-source-research/reference-3"
+    },
+    {
+      "url": "https://www.espncricinfo.com/series/1391283/scorecard/1391336",
+      "error": "HTTP 403 Forbidden; attempted URL did not establish a verified scorecard route."
+    },
+    {
+      "url": "https://www.icc-cricket.com/about/cricket/rules-and-regulations/playing-conditions",
+      "error": "HTTP 403 Forbidden"
+    },
+    {
+      "url": "https://cricsheet.org/downloads/1391336_json.zip",
+      "error": "HTTP 404 Not Found; individual ZIP route unavailable."
+    }
+  ],
+  "archiveCrc": {
+    "it20s_male_json.zip": {
+      "entries": 242,
+      "badEntry": null,
+      "selectedMatchesFound": 0
+    },
+    "t20s_male_json.zip": {
+      "entries": 3648,
+      "badEntry": null,
+      "selectedMatchesFound": 7
+    }
+  },
+  "searchLimit": "Google returned a JavaScript challenge. Bing returned off-topic results; neither supplied usable case evidence."
+}

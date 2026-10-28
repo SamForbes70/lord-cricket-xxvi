@@ -1,0 +1,83 @@
+[
+  {
+    "command": [
+      "npm",
+      "run",
+      "schemas:check"
+    ],
+    "exitCode": 0,
+    "seconds": 0.577
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "exitCode": 0,
+    "seconds": 4.304
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "exitCode": 0,
+    "seconds": 3.884
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exitCode": 0,
+    "seconds": 3.476
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "fixtures:audit"
+    ],
+    "exitCode": 0,
+    "seconds": 0.417
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "fixtures:engine"
+    ],
+    "exitCode": 0,
+    "seconds": 0.461
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "vectors:check"
+    ],
+    "exitCode": 0,
+    "seconds": 0.106
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "probability:check"
+    ],
+    "exitCode": 0,
+    "seconds": 0.161
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "generator:check"
+    ],
+    "exitCode": 0,
+    "seconds": 0.127
+  }
+]
