@@ -1,0 +1,634 @@
+{
+  "version": "LC_M7K_ENGINEERING_ORACLES_V1",
+  "provenance": "HAND_AUTHORED_SYNTHETIC_EXPECTATIONS_NOT_SOURCE_ADJUDICATION",
+  "physicalEnds": "Explicit synthetic NORTH/SOUTH coordinates; no historical ground-end claim.",
+  "cases": [
+    {
+      "id": "dot",
+      "seed": {
+        "version": "LC_M7K_LEDGER_RESEARCH_V1",
+        "model": "m7k-ledger-research-01",
+        "inningsId": "synthetic-fixture",
+        "reviewReference": "SF-2026-10-28-owner-continuation",
+        "context": {
+          "rulesId": "LC_T20_01",
+          "inningsIndex": 0,
+          "deliveryIndex": 0,
+          "battingTeamId": "team-A",
+          "bowlingTeamId": "team-B",
+          "strikerId": "p1",
+          "nonStrikerId": "p2",
+          "bowlerId": "b1",
+          "keeperId": "keeper",
+          "outfieldIds": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7",
+            "f8",
+            "f9"
+          ],
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          },
+          "strikerEnd": "NORTH",
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "allocatedBalls": 120,
+          "targetToWin": null,
+          "freeHitPending": false,
+          "ballAgeLegalBalls": 0
+        },
+        "battingOrder": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7",
+          "p8",
+          "p9",
+          "p10",
+          "p11"
+        ]
+      },
+      "commands": [
+        {
+          "commandId": "dot",
+          "sequence": 0,
+          "kind": "DELIVERY",
+          "resolution": {
+            "stage": "DELIVERY",
+            "legality": "LEGAL",
+            "batRuns": 0,
+            "extras": {
+              "wides": 0,
+              "noBalls": 0,
+              "byes": 0,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "completedRuns": 0,
+            "attemptedRuns": 0,
+            "boundary": "NONE",
+            "dismissal": null,
+            "endsAfter": {
+              "north": "p1",
+              "south": "p2"
+            },
+            "batContact": false,
+            "attemptedStroke": true,
+            "shotSector": null,
+            "trajectory": null,
+            "executedLength": null,
+            "fieldOutcome": "NONE",
+            "elapsedSeconds": 25
+          }
+        }
+      ],
+      "expected": {
+        "context": {
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 1,
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          }
+        },
+        "batting": {
+          "p1": {
+            "runs": 0,
+            "balls": 1,
+            "status": "ACTIVE"
+          }
+        },
+        "bowling": {
+          "b1": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 1
+          }
+        },
+        "extras": {
+          "penalties": 0
+        }
+      },
+      "nextAction": "ADVANCE"
+    },
+    {
+      "id": "batting-penalty",
+      "seed": {
+        "version": "LC_M7K_LEDGER_RESEARCH_V1",
+        "model": "m7k-ledger-research-01",
+        "inningsId": "synthetic-fixture",
+        "reviewReference": "SF-2026-10-28-owner-continuation",
+        "context": {
+          "rulesId": "LC_T20_01",
+          "inningsIndex": 0,
+          "deliveryIndex": 0,
+          "battingTeamId": "team-A",
+          "bowlingTeamId": "team-B",
+          "strikerId": "p1",
+          "nonStrikerId": "p2",
+          "bowlerId": "b1",
+          "keeperId": "keeper",
+          "outfieldIds": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7",
+            "f8",
+            "f9"
+          ],
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          },
+          "strikerEnd": "NORTH",
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "allocatedBalls": 120,
+          "targetToWin": null,
+          "freeHitPending": false,
+          "ballAgeLegalBalls": 0
+        },
+        "battingOrder": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7",
+          "p8",
+          "p9",
+          "p10",
+          "p11"
+        ]
+      },
+      "commands": [
+        {
+          "commandId": "batting-penalty",
+          "sequence": 0,
+          "kind": "PENALTY",
+          "beneficiary": "BATTING",
+          "deadBallConfirmed": true,
+          "reviewReference": "engineering-synthetic-oracle"
+        }
+      ],
+      "expected": {
+        "context": {
+          "runs": 5,
+          "wickets": 0,
+          "legalBalls": 0,
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          }
+        },
+        "batting": {
+          "p1": {
+            "runs": 0,
+            "balls": 0,
+            "status": "ACTIVE"
+          }
+        },
+        "bowling": {
+          "b1": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0
+          }
+        },
+        "extras": {
+          "penalties": 5
+        }
+      },
+      "nextAction": "ADVANCE"
+    },
+    {
+      "id": "fielding-penalty",
+      "seed": {
+        "version": "LC_M7K_LEDGER_RESEARCH_V1",
+        "model": "m7k-ledger-research-01",
+        "inningsId": "synthetic-fixture",
+        "reviewReference": "SF-2026-10-28-owner-continuation",
+        "context": {
+          "rulesId": "LC_T20_01",
+          "inningsIndex": 0,
+          "deliveryIndex": 0,
+          "battingTeamId": "team-A",
+          "bowlingTeamId": "team-B",
+          "strikerId": "p1",
+          "nonStrikerId": "p2",
+          "bowlerId": "b1",
+          "keeperId": "keeper",
+          "outfieldIds": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7",
+            "f8",
+            "f9"
+          ],
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          },
+          "strikerEnd": "NORTH",
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "allocatedBalls": 120,
+          "targetToWin": null,
+          "freeHitPending": false,
+          "ballAgeLegalBalls": 0
+        },
+        "battingOrder": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7",
+          "p8",
+          "p9",
+          "p10",
+          "p11"
+        ]
+      },
+      "commands": [
+        {
+          "commandId": "fielding-penalty",
+          "sequence": 0,
+          "kind": "PENALTY",
+          "beneficiary": "FIELDING",
+          "deadBallConfirmed": true,
+          "reviewReference": "engineering-synthetic-oracle"
+        }
+      ],
+      "expected": {
+        "context": {
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          }
+        },
+        "batting": {
+          "p1": {
+            "runs": 0,
+            "balls": 0,
+            "status": "ACTIVE"
+          }
+        },
+        "bowling": {
+          "b1": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0
+          }
+        },
+        "extras": {
+          "penalties": 0
+        }
+      },
+      "nextAction": "ADVANCE"
+    },
+    {
+      "id": "retired_out",
+      "seed": {
+        "version": "LC_M7K_LEDGER_RESEARCH_V1",
+        "model": "m7k-ledger-research-01",
+        "inningsId": "synthetic-fixture",
+        "reviewReference": "SF-2026-10-28-owner-continuation",
+        "context": {
+          "rulesId": "LC_T20_01",
+          "inningsIndex": 0,
+          "deliveryIndex": 0,
+          "battingTeamId": "team-A",
+          "bowlingTeamId": "team-B",
+          "strikerId": "p1",
+          "nonStrikerId": "p2",
+          "bowlerId": "b1",
+          "keeperId": "keeper",
+          "outfieldIds": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7",
+            "f8",
+            "f9"
+          ],
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          },
+          "strikerEnd": "NORTH",
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "allocatedBalls": 120,
+          "targetToWin": null,
+          "freeHitPending": false,
+          "ballAgeLegalBalls": 0
+        },
+        "battingOrder": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7",
+          "p8",
+          "p9",
+          "p10",
+          "p11"
+        ]
+      },
+      "commands": [
+        {
+          "commandId": "retired_out",
+          "sequence": 0,
+          "kind": "RETIRE",
+          "playerId": "p1",
+          "status": "RETIRED_OUT",
+          "returnPermitted": false,
+          "deadBallConfirmed": true,
+          "reviewReference": "engineering-synthetic-oracle"
+        }
+      ],
+      "expected": {
+        "context": {
+          "runs": 0,
+          "wickets": 1,
+          "legalBalls": 0,
+          "endsBefore": {
+            "north": null,
+            "south": "p2"
+          }
+        },
+        "batting": {
+          "p1": {
+            "runs": 0,
+            "balls": 0,
+            "status": "RETIRED_OUT"
+          }
+        },
+        "bowling": {
+          "b1": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0
+          }
+        },
+        "extras": {
+          "penalties": 0
+        }
+      },
+      "nextAction": "SELECT_BATTER"
+    },
+    {
+      "id": "retired_not_out",
+      "seed": {
+        "version": "LC_M7K_LEDGER_RESEARCH_V1",
+        "model": "m7k-ledger-research-01",
+        "inningsId": "synthetic-fixture",
+        "reviewReference": "SF-2026-10-28-owner-continuation",
+        "context": {
+          "rulesId": "LC_T20_01",
+          "inningsIndex": 0,
+          "deliveryIndex": 0,
+          "battingTeamId": "team-A",
+          "bowlingTeamId": "team-B",
+          "strikerId": "p1",
+          "nonStrikerId": "p2",
+          "bowlerId": "b1",
+          "keeperId": "keeper",
+          "outfieldIds": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7",
+            "f8",
+            "f9"
+          ],
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          },
+          "strikerEnd": "NORTH",
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "allocatedBalls": 120,
+          "targetToWin": null,
+          "freeHitPending": false,
+          "ballAgeLegalBalls": 0
+        },
+        "battingOrder": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7",
+          "p8",
+          "p9",
+          "p10",
+          "p11"
+        ]
+      },
+      "commands": [
+        {
+          "commandId": "retired_not_out",
+          "sequence": 0,
+          "kind": "RETIRE",
+          "playerId": "p1",
+          "status": "RETIRED_NOT_OUT",
+          "returnPermitted": false,
+          "deadBallConfirmed": true,
+          "reviewReference": "engineering-synthetic-oracle"
+        }
+      ],
+      "expected": {
+        "context": {
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "endsBefore": {
+            "north": null,
+            "south": "p2"
+          }
+        },
+        "batting": {
+          "p1": {
+            "runs": 0,
+            "balls": 0,
+            "status": "RETIRED_NOT_OUT"
+          }
+        },
+        "bowling": {
+          "b1": {
+            "runs": 0,
+            "wickets": 0,
+            "legalBalls": 0
+          }
+        },
+        "extras": {
+          "penalties": 0
+        }
+      },
+      "nextAction": "SELECT_BATTER"
+    },
+    {
+      "id": "wide-hit-wicket",
+      "seed": {
+        "version": "LC_M7K_LEDGER_RESEARCH_V1",
+        "model": "m7k-ledger-research-01",
+        "inningsId": "synthetic-fixture",
+        "reviewReference": "SF-2026-10-28-owner-continuation",
+        "context": {
+          "rulesId": "LC_T20_01",
+          "inningsIndex": 0,
+          "deliveryIndex": 0,
+          "battingTeamId": "team-A",
+          "bowlingTeamId": "team-B",
+          "strikerId": "p1",
+          "nonStrikerId": "p2",
+          "bowlerId": "b1",
+          "keeperId": "keeper",
+          "outfieldIds": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7",
+            "f8",
+            "f9"
+          ],
+          "endsBefore": {
+            "north": "p1",
+            "south": "p2"
+          },
+          "strikerEnd": "NORTH",
+          "runs": 0,
+          "wickets": 0,
+          "legalBalls": 0,
+          "allocatedBalls": 120,
+          "targetToWin": null,
+          "freeHitPending": false,
+          "ballAgeLegalBalls": 0
+        },
+        "battingOrder": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7",
+          "p8",
+          "p9",
+          "p10",
+          "p11"
+        ]
+      },
+      "commands": [
+        {
+          "commandId": "wide-hit-wicket",
+          "sequence": 0,
+          "kind": "DELIVERY",
+          "resolution": {
+            "stage": "DELIVERY",
+            "legality": "WIDE",
+            "batRuns": 0,
+            "extras": {
+              "wides": 1,
+              "noBalls": 0,
+              "byes": 0,
+              "legByes": 0,
+              "penalties": 0
+            },
+            "completedRuns": 0,
+            "attemptedRuns": 0,
+            "boundary": "NONE",
+            "dismissal": {
+              "kind": "HIT_WICKET",
+              "playerId": "p1",
+              "wicketEnd": "NORTH",
+              "fielderId": null
+            },
+            "endsAfter": {
+              "north": null,
+              "south": "p2"
+            },
+            "batContact": false,
+            "attemptedStroke": false,
+            "shotSector": null,
+            "trajectory": null,
+            "executedLength": null,
+            "fieldOutcome": "NONE",
+            "elapsedSeconds": 25
+          }
+        }
+      ],
+      "expected": {
+        "context": {
+          "runs": 1,
+          "wickets": 1,
+          "legalBalls": 0,
+          "endsBefore": {
+            "north": null,
+            "south": "p2"
+          }
+        },
+        "batting": {
+          "p1": {
+            "runs": 0,
+            "balls": 0,
+            "status": "OUT"
+          }
+        },
+        "bowling": {
+          "b1": {
+            "runs": 1,
+            "wickets": 1,
+            "legalBalls": 0
+          }
+        },
+        "extras": {
+          "wides": 1
+        }
+      },
+      "nextAction": "SELECT_BATTER"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # M7K: scorer integration and model feasibility
 
-Status: STARTED, planning and evidence preparation only. Owner authorisation: 26 October 2026.
+Status: STARTED, evidence preparation and isolated research tooling. Owner authorisation: 26 October 2026.
 Baseline: `036c21239026a36ee9eaf4aac8e766ec74e2854e`, including merged PR #2.
 This pass defines implementation gates; it does not implement or promote a new gameplay model.
 
@@ -179,3 +179,12 @@ The standard conditions restrict initial free hits to foot-fault no-balls.
 All five registered free-hit cases predate the July 2015 expansion to all no-balls.
 Match adoption, no-ball causes and independent adjudication remain unconfirmed.
 The update changes no inherited case classification or approval flag.
+
+
+## Owner-directed research implementation
+
+SF confirmed all presented review material on 28 October 2026 and directed work to continue.
+[Research tooling](verification-m7k/ledger/README.md) records the statement, engineering fixtures, ledger, replay, recovery and evaluation code.
+The engineering fixtures use explicit synthetic expectations; they do not fill missing historical incident metadata.
+Source-derived K1 fixture coverage and production acceptance remain separate from this implementation.
+A new untouched cohort remains required for actual K4 evaluation.

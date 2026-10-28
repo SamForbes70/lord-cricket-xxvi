@@ -1,0 +1,21 @@
+[2m[WebServer] [22m(node:46388) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:46401) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:46419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/m7k/archive.spec.ts:6:1 › fresh browser imports and recovers a candidate without changing the v1 path (662ms)
+  ✓  2 [chromium] › tests/m7k/archive.spec.ts:32:1 › browser rejects damaged checkpoints and v1/version substitutions (281ms)
+(node:46623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [firefox] › tests/m7k/archive.spec.ts:6:1 › fresh browser imports and recovers a candidate without changing the v1 path (1.4s)
+  ✓  4 [firefox] › tests/m7k/archive.spec.ts:32:1 › browser rejects damaged checkpoints and v1/version substitutions (328ms)
+
+  4 passed (6.3s)

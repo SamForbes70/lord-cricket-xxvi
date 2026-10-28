@@ -1,0 +1,19 @@
+{
+  "baseline": "dcc6157252714c2ff65fe29c59a5d4cf00eee376",
+  "protectedPaths": [
+    "apps",
+    "packages",
+    "package-lock.json",
+    "schemas",
+    "docs/verification-m7j",
+    "docs/verification-m7k/LC_M7K_EVIDENCE_WORKSHEET.json",
+    "docs/verification-m7k/LC_M7K_REPRESENTATIVE_REVIEW.json",
+    "docs/verification-m7k/source-context"
+  ],
+  "protectedPathsMatchBaseline": true,
+  "simulationWorkerSha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+  "sourceDerivedFixtureCoverage": "INCOMPLETE_INCIDENT_SPECIFIC_FIELDS_NOT_SUPPLIED",
+  "ownerReview": "SF, 28 October 2026; statement retained verbatim",
+  "gameplayIntegrationPermitted": false,
+  "realUntouchedCohortEvaluation": "NOT_RUN_NO_SEALED_COHORT_SUPPLIED"
+}
