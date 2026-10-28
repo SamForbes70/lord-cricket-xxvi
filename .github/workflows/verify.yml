@@ -17,7 +17,7 @@ jobs:
       - run: npx playwright install --with-deps chromium firefox
       - name: M7K review selection provenance and reproducibility
         run: |
-          python3 -m unittest discover -s tests -p test_m7k_review_selection.py -v
+          python3 -m unittest discover -s tests -p "test_m7k_*.py" -v
           python3 scripts/m7k-select-review-cases.py --out "$RUNNER_TEMP/m7k-review.json"
           diff docs/verification-m7k/LC_M7K_REPRESENTATIVE_REVIEW.json "$RUNNER_TEMP/m7k-review.json"
       - run: npm run verify:07a

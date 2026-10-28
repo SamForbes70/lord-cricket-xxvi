@@ -6,7 +6,7 @@ This is the **recovered complete TypeScript source repository with its full avai
 
 PR #2 is merged. [Current status](docs/CURRENT_STATUS.md) supersedes historical browser blockers and archive-absence notes.
 [Acceptance reconciliation](docs/ACCEPTANCE_RECONCILIATION.md) separates hosted tests, owner playthrough and remaining evidence gaps.
-M7K research preparation is authorised, with work in unmerged draft PR #3. Gameplay promotion remains separately gated.
+PR #3 merged M7K research preparation on 28 October 2026. Gameplay promotion remains separately gated.
 
 ## Open this project
 1. Extract the outer ZIP to a normal Windows folder, e.g. `C:\Projects\Lord_Cricket_XXVI_Codex_Migration_2026-10-21`.

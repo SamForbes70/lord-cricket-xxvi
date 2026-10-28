@@ -1,0 +1,266 @@
+[
+  {
+    "argv": [
+      "python3",
+      "scripts/m7k-audit-source-context.py",
+      "--archive",
+      "/workspace/m7k-source-research/t20s_male_json.zip",
+      "--out",
+      "/tmp/m7k-context-repeated.json"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:28.431807+00:00",
+    "seconds": 0.117,
+    "exitCode": 0,
+    "log": "source-audit.log",
+    "sha256": "ae5d9a4ca2f0eab0610316d69d9788126c56e98eeacf98abc2e48bd10ce33d4a"
+  },
+  {
+    "argv": [
+      "cmp",
+      "/workspace/lord-cricket-xxvi/docs/verification-m7k/source-context/SOURCE_CONTEXT.json",
+      "/tmp/m7k-context-repeated.json"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:28.549514+00:00",
+    "seconds": 0.003,
+    "exitCode": 0,
+    "log": "source-byte-compare.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/m7j-restore-fixtures.py"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:28.552800+00:00",
+    "seconds": 0.022,
+    "exitCode": 0,
+    "log": "restore-fixtures.log",
+    "sha256": "98a134661741054f2aeb092d881aa107bef75167edb67231e7c73a6c67fb20c7"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_m7*.py",
+      "-v"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:28.574571+00:00",
+    "seconds": 1.287,
+    "exitCode": 0,
+    "log": "research-python.log",
+    "sha256": "9ff8b2a95560a175f602f229cce9872acd834a1ff291bf44566826518f53314d"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_synthetic_quality_summary.py",
+      "-v"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:29.862273+00:00",
+    "seconds": 0.084,
+    "exitCode": 0,
+    "log": "summary-python.log",
+    "sha256": "6bce69d05a2be9dc89c7140f5badd8292dc3422a9c6c47ae835e0bb9a41b50f8"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "schemas:check"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:29.947073+00:00",
+    "seconds": 0.487,
+    "exitCode": 0,
+    "log": "schemas-check.log",
+    "sha256": "7b7a75d02a7b65f7e3bc1983ebd70d2124f1a1737cdd5d732b54dde8a1858065"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:30.434959+00:00",
+    "seconds": 4.25,
+    "exitCode": 0,
+    "log": "build.log",
+    "sha256": "b292b5b2bcbacc0d5b7106f13be024bf63d4db4afd0afff61be3dd486a9391ba"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:34.685872+00:00",
+    "seconds": 4.076,
+    "exitCode": 0,
+    "log": "typecheck.log",
+    "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:38.762441+00:00",
+    "seconds": 3.254,
+    "exitCode": 0,
+    "log": "lint.log",
+    "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "fixtures:engine"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:42.016665+00:00",
+    "seconds": 0.468,
+    "exitCode": 0,
+    "log": "fixtures-engine.log",
+    "sha256": "29518f19349c020bb7b2f1602b1688c45d933915ad86dd2f3b5b8b9f91dce590"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "vectors:check"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:42.485069+00:00",
+    "seconds": 0.124,
+    "exitCode": 0,
+    "log": "vectors-check.log",
+    "sha256": "0fed95bd9940c4a9db447da39a20b0930f12de85e904e35fc02736e70020e7a1"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "probability:check"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:42.610032+00:00",
+    "seconds": 0.167,
+    "exitCode": 0,
+    "log": "probability-check.log",
+    "sha256": "1cbd56a455937dc9a8462479070f2fd87d2ed6730ea34ebb0d420de3458f45f7"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "generator:check"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:42.777056+00:00",
+    "seconds": 0.13,
+    "exitCode": 0,
+    "log": "generator-check.log",
+    "sha256": "110ddf3972b8f79164c8732d45c6f77ff75a8b2d14cedc7b1d43caee545e9b9b"
+  },
+  {
+    "argv": [
+      "npm",
+      "test",
+      "--",
+      "--maxWorkers=2"
+    ],
+    "startedAtUtc": "2026-10-28T03:02:42.907090+00:00",
+    "seconds": 38.144,
+    "exitCode": 0,
+    "log": "unit.log",
+    "sha256": "f912ab74fbaa0b59f3d9915cb4a4f8d70ff918977c99a95d67e8cb05bc0b2f6e"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "smoke",
+      "--",
+      "--reporter=list"
+    ],
+    "startedAtUtc": "2026-10-28T03:03:21.051416+00:00",
+    "seconds": 10.301,
+    "exitCode": 1,
+    "log": "browser-smoke.log",
+    "sha256": "4fe8d13dabdba95ef762a2c32a6c04a42251f13dbc665b57ee7e8370a1d7edd1"
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/m7k-audit-source-context.py",
+      "--archive",
+      "/workspace/m7k-source-research/t20s_male_json.zip",
+      "--out",
+      "/tmp/m7k-context-repeated.json"
+    ],
+    "environmentOverrides": {},
+    "startedAtUtc": "2026-10-28T03:04:43.046087+00:00",
+    "seconds": 0.12,
+    "exitCode": 0,
+    "log": "source-audit-final.log",
+    "sha256": "ae5d9a4ca2f0eab0610316d69d9788126c56e98eeacf98abc2e48bd10ce33d4a"
+  },
+  {
+    "argv": [
+      "cmp",
+      "/workspace/lord-cricket-xxvi/docs/verification-m7k/source-context/SOURCE_CONTEXT.json",
+      "/tmp/m7k-context-repeated.json"
+    ],
+    "environmentOverrides": {},
+    "startedAtUtc": "2026-10-28T03:04:43.166333+00:00",
+    "seconds": 0.002,
+    "exitCode": 0,
+    "log": "source-byte-compare-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_m7*.py",
+      "-v"
+    ],
+    "environmentOverrides": {},
+    "startedAtUtc": "2026-10-28T03:04:43.168499+00:00",
+    "seconds": 1.428,
+    "exitCode": 0,
+    "log": "research-python-final.log",
+    "sha256": "df66e3e5f11227fc120be89f768a7a89a22aae316fc32e73491432b2649f0298"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "smoke",
+      "--",
+      "--workers=2",
+      "--reporter=list"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T03:04:44.597064+00:00",
+    "seconds": 181.959,
+    "exitCode": 0,
+    "log": "browser-smoke-configured.log",
+    "sha256": "6511d3fef19316e6e4eef439c86e6fb17f13b261d38a3b6fe7c9c242307b54f7"
+  }
+]

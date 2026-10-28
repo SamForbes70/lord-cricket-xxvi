@@ -2,7 +2,7 @@
 
 Lord Cricket XXVI is a playable single-season management alpha.
 Main includes merged PR #2, capability reconciliation from PR #4 and the scenario harness from PR #5.
-The integration baseline is `b4aceda`; each merge retains the historical simulation and save boundaries.
+PR #3 merged as `4aa71d9` after integration with `b4aceda`. Historical simulation and save boundaries remain intact.
 The accepted gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
 M7 quality validation and M8 release acceptance remain incomplete.
 
@@ -41,7 +41,7 @@ Reference-hardware performance budgets and empirical model promotion remain unac
 
 The owner authorised M7K research preparation on 26 October 2026.
 [PR #3](https://github.com/SamForbes70/lord-cricket-xxvi/pull/3) records research preparation, rather than gameplay integration.
-Its reviewed head `5baea6a` has four passing checks across push and PR workflows.
+Its integrated head `0b0d410` passed four checks across push and PR workflows before the merge.
 The review verifies 31 committed evidence hashes and identifies no blocking implementation defect.
 The review covers the selector, provenance checks, CI and research-only capability boundary.
 It does not independently adjudicate a cricket incident.
@@ -75,6 +75,13 @@ New model/rule versions must preserve historical saves and exact v1 replay.
 Empirical evaluation requires a new untouched cohort and explicit thresholds, rather than reused development holdout data.
 The owner authorised integrating and merging PR #3 as research preparation on 28 October 2026.
 Production ledger acceptance, research-model promotion and release publication retain their separate gates.
+
+## M7K source coverage follow-up
+
+[Source context](verification-m7k/source-context/README.md) verifies all 69 registered event hashes across 65 matches and 45 observed signatures.
+It extends the previous 11-event batch with player identities, recorded values and neighbouring source addresses.
+Source order and recorded values remain observations for review; no source case gains independent adjudication.
+K1 requires independent decisions and applicable conditions before K2 ledger implementation.
 
 
 ## Scenario quality tooling

@@ -40,6 +40,8 @@ Original match JSON supplies source context, but cannot alone certify umpire chr
 Public scorecards alone may also omit that chronology.
 A reviewer must cite independently checked primary evidence and preserve contradictory or inconclusive findings.
 No external reviewer has supplied decisions during this pass.
+[Source context](verification-m7k/source-context/README.md) verifies all 69 source hashes across the 45 observed signatures.
+Its player identities and neighbouring source addresses support further independent review.
 
 ## Selected source identities
 

@@ -1,0 +1,16 @@
+{
+  "baseline": "4aa71d99b79daa65db313999bc497b9d8b00309d",
+  "protectedPaths": [
+    "apps",
+    "packages",
+    "package-lock.json",
+    "docs/verification-m7j/LC_M7I_INPUT_REGISTER.json",
+    "docs/verification-m7j/LC_M7J_ADJUDICATION_REGISTER.json",
+    "docs/verification-m7k/LC_M7K_EVIDENCE_WORKSHEET.json",
+    "docs/verification-m7k/LC_M7K_REPRESENTATIVE_REVIEW.json"
+  ],
+  "protectedPathsMatchBaseline": true,
+  "acceptedFixtureCount": 0,
+  "gameplayIntegrationPermitted": false,
+  "archiveSha256": "691f1f42b86c93fbdbc53936ed69479f9306bf39c4c56b4c0729360051075c6d"
+}
