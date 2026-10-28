@@ -60,6 +60,10 @@ The other retained non-official archive contains zero matches after that date.
 These are upper bounds before checking innings completeness, rules and other eligibility criteria.
 The current protocol requires at least 200 evaluation matches.
 The selected available archives therefore cannot supply a qualifying new forward-time cohort.
+A fresh all-format archive of men's matches played in the last 30 days contains 42 forward-dated matches.
+Its metadata separates these into 18 T20, 11 ODI, nine ODM, one Test and three MDM matches.
+The broader source therefore supplies the same 18 T20 candidates, rather than enough additional T20 matches.
+`RECENT_SOURCE_FETCH.json`, `RECENT_FORWARD_INVENTORY.json` and `RECENT_FORMAT_COUNTS.json` retain this check.
 This finding does not claim that no other qualifying dataset exists.
 
 The inventory extracts dates and source hashes without outcome metrics, fitting or candidate evaluation.

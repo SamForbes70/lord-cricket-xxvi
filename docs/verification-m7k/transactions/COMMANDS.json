@@ -120,5 +120,22 @@
     "exitCode": 0,
     "log": "inventory-byte-compare.log",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/m7k-inventory-forward.py",
+      "--archive",
+      "/workspace/m7k-source-research/forward-inventory/recently_played_30_male_json.zip",
+      "--after-date",
+      "2026-10-14",
+      "--out",
+      "docs/verification-m7k/transactions/RECENT_FORWARD_INVENTORY.json"
+    ],
+    "startedAtUtc": "2026-10-28T10:53:01.494316+00:00",
+    "seconds": 0.147,
+    "exitCode": 0,
+    "log": "recent-inventory.log",
+    "sha256": "ec9556964d35ba66e4e2435fdd776deaa49a41481923ca0e5251528a7b540e34"
   }
 ]

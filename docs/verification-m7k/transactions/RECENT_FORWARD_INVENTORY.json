@@ -1,0 +1,264 @@
+{
+  "version": "LC_M7K_FORWARD_METADATA_INVENTORY_V1",
+  "archiveSha256": "e9c3968c6a16ccceb219c9f5f2ac75a51c02c64791619c57fcfa8f9449e0b408",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "priorDevelopmentLatestDate": "2026-10-14",
+  "minimumEvaluationMatches": 200,
+  "forwardMatchCount": 42,
+  "evaluationStatus": "BLOCKED_INSUFFICIENT_FORWARD_MATCHES",
+  "outcomesEvaluated": false,
+  "matches": [
+    {
+      "matchId": "1554418",
+      "date": "2026-10-15",
+      "lastDate": "2026-10-15",
+      "sourceSha256": "543b8e31bfcdb8c2aa825bda41eb6f1594c311b436a479e32ec0f4d5c303355b"
+    },
+    {
+      "matchId": "1529234",
+      "date": "2026-10-17",
+      "lastDate": "2026-10-17",
+      "sourceSha256": "7f4894132fcfd31a97aa746bfab099cc92d5871ad170fc0da8319c2f53e207f2"
+    },
+    {
+      "matchId": "1544851",
+      "date": "2026-10-17",
+      "lastDate": "2026-10-17",
+      "sourceSha256": "fdc2d561ef116c47b1d74bb592085878ced0c0fb9b109d4c6526a5dd63c2ed08"
+    },
+    {
+      "matchId": "1554419",
+      "date": "2026-10-17",
+      "lastDate": "2026-10-17",
+      "sourceSha256": "82e1260a1cce4cd590184c35afc20f91eb564747bd726930c341ac0a1c055f09"
+    },
+    {
+      "matchId": "1555117",
+      "date": "2026-10-17",
+      "lastDate": "2026-10-17",
+      "sourceSha256": "1d0c37b56d5f8c3e134f549e44352265c21d598ba1687e98de60b6045d7445c9"
+    },
+    {
+      "matchId": "1525660",
+      "date": "2026-10-18",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "c4472498e8cbd6294e36ea579296855acd0654ef2c24a2c88465c55ba8395b1e"
+    },
+    {
+      "matchId": "1550713",
+      "date": "2026-10-18",
+      "lastDate": "2026-10-18",
+      "sourceSha256": "128347eb239059eab50134231a43f4ba6c140fead912b6c93d39f016e6a36d42"
+    },
+    {
+      "matchId": "1544867",
+      "date": "2026-10-19",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "62cf3c59eaef21bf5a5ea549775477efdcea6b62a147a205b711595e66d9e0ee"
+    },
+    {
+      "matchId": "1544868",
+      "date": "2026-10-19",
+      "lastDate": "2026-10-21",
+      "sourceSha256": "f6d4672a4c60c3a6b4946d0a341f6d917c09355c811b02a9d6eaeb3a3153cc0a"
+    },
+    {
+      "matchId": "1544869",
+      "date": "2026-10-19",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "fc0a11284f207efe7d3b9776a300c3202ff427f10b9898dd0cd3427ec1279c9d"
+    },
+    {
+      "matchId": "1554420",
+      "date": "2026-10-19",
+      "lastDate": "2026-10-19",
+      "sourceSha256": "91e679e64c555af5a65a663b1ffff0bb676bd54f14f87823dfa830bc79935342"
+    },
+    {
+      "matchId": "1550714",
+      "date": "2026-10-20",
+      "lastDate": "2026-10-20",
+      "sourceSha256": "0ae3cd2a413be92fbf689d130819832c14b8b1e679b50a04ef23406891aafb8f"
+    },
+    {
+      "matchId": "1557520",
+      "date": "2026-10-20",
+      "lastDate": "2026-10-20",
+      "sourceSha256": "f902ebe90aca96443ba823c6a0f855e134527c56b3281df33750e9ce25e6d952"
+    },
+    {
+      "matchId": "1557521",
+      "date": "2026-10-20",
+      "lastDate": "2026-10-20",
+      "sourceSha256": "633f6ce07029d6b78d8e34288d109438e114a7035eb7edd94b77a08fc5278a94"
+    },
+    {
+      "matchId": "1557522",
+      "date": "2026-10-20",
+      "lastDate": "2026-10-20",
+      "sourceSha256": "04bb2670c991761c301c661ab1d92e4d891f5d002af3ecdda2a35329e4792556"
+    },
+    {
+      "matchId": "1557523",
+      "date": "2026-10-21",
+      "lastDate": "2026-10-21",
+      "sourceSha256": "bff9598120900f5e737f8ba3d8fef58e99a91b7f5797a98fce1632dca9439042"
+    },
+    {
+      "matchId": "1557524",
+      "date": "2026-10-21",
+      "lastDate": "2026-10-21",
+      "sourceSha256": "24b46d6ce3432d9c4a6542d19e6145e075281893c8d74eb0dae818efd501fef9"
+    },
+    {
+      "matchId": "1557525",
+      "date": "2026-10-21",
+      "lastDate": "2026-10-21",
+      "sourceSha256": "64b33b339e17b5bbe31692f683fc7adc5037ba423669b88549fea30c8b5dbaa6"
+    },
+    {
+      "matchId": "1559440",
+      "date": "2026-10-21",
+      "lastDate": "2026-10-21",
+      "sourceSha256": "44c2ddbae44433c770ba39d41f1b04d5281725dd360515811bef8d0c4fcf9bba"
+    },
+    {
+      "matchId": "1539432",
+      "date": "2026-10-22",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "dc4d845a15b661ea5ce5f630d27b472b25d0b3c9cbcd0d37951f02f49a3df19b"
+    },
+    {
+      "matchId": "1550715",
+      "date": "2026-10-22",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "d8ccd9bec25e4690b59c76c6d753f2fe9d1fa041f43202698c8f2fae28b0801e"
+    },
+    {
+      "matchId": "1558231",
+      "date": "2026-10-22",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "c4be54a3173371f132e99e5e0c477295a08384e82c207ec500ca9d778c07d42c"
+    },
+    {
+      "matchId": "1559441",
+      "date": "2026-10-22",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "12879097a775967f0e91b25e91c7e6064091388168145940783e82d319515e80"
+    },
+    {
+      "matchId": "1559442",
+      "date": "2026-10-22",
+      "lastDate": "2026-10-22",
+      "sourceSha256": "c369d16cbb50beba63a5b3396b80419a13992fd462253f294d87e37ecad0dc7f"
+    },
+    {
+      "matchId": "1557526",
+      "date": "2026-10-23",
+      "lastDate": "2026-10-23",
+      "sourceSha256": "3beab5e21095c636001a31d17dbdaabad66b0ec963ff415415e185602c3bf1d4"
+    },
+    {
+      "matchId": "1557527",
+      "date": "2026-10-23",
+      "lastDate": "2026-10-23",
+      "sourceSha256": "e284bb0a5a539f6ddf0ddc45779170d12b7886505c5cabc7ed9e9cb016b08fbe"
+    },
+    {
+      "matchId": "1557528",
+      "date": "2026-10-23",
+      "lastDate": "2026-10-23",
+      "sourceSha256": "7c6a1771ff76cbac4cb6c482c355e189651cf73c078e302801d928fcfdeef027"
+    },
+    {
+      "matchId": "1539433",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "08170281a2c54547ba0744f9341421ecdcd828a413ab19fe2b8d48a398e553d8"
+    },
+    {
+      "matchId": "1544852",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "b46fd4e0bdd73e19d9f3ac11e67ba14f7fb0f32abfc1d29fff1827e6aa7bbfe7"
+    },
+    {
+      "matchId": "1544853",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "e4a8e349f872f35ed2dfac472f6fabd860590b18a1af455e12b2c5461ac51975"
+    },
+    {
+      "matchId": "1557529",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "6a318977f92f4949390b372b29c2e7193a4f7beacc83d8b18de3cc0d5bb522e4"
+    },
+    {
+      "matchId": "1557530",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "3ed0e0425c9f365db9802c8b0d0bbed88459b621b64fd04d21c64f3fa9b78791"
+    },
+    {
+      "matchId": "1557531",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "da1bcf13a752a70d194af8b557a54ccb85afd7c1f42c1d69ebf10c6d856289c5"
+    },
+    {
+      "matchId": "1558232",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "4f65e291e412fae3ad7e3abf9e21c9a38c2e05bbb8bc400762ff42f2ede137d7"
+    },
+    {
+      "matchId": "1559443",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "51364991d2f2d441170748101e67d1ed8bed015fda5fb464b673552be544900d"
+    },
+    {
+      "matchId": "1559444",
+      "date": "2026-10-24",
+      "lastDate": "2026-10-24",
+      "sourceSha256": "506d0087361bb4570ebdcebfa0a23c90e23a58b0efc6028a181a625d15dede73"
+    },
+    {
+      "matchId": "1550716",
+      "date": "2026-10-25",
+      "lastDate": "2026-10-25",
+      "sourceSha256": "465213ad2b4063f5df963a5cf7857be15356d051606daf04770e74c82b5d9b2b"
+    },
+    {
+      "matchId": "1557532",
+      "date": "2026-10-25",
+      "lastDate": "2026-10-25",
+      "sourceSha256": "f2a75f5592c8f8d37688e94ccb3231d31c74ac1c977a18363c93be9dfc5ed8c7"
+    },
+    {
+      "matchId": "1557533",
+      "date": "2026-10-25",
+      "lastDate": "2026-10-25",
+      "sourceSha256": "3852ed29f70c22f640ee835e17e1f17ebe869edd691fac6139d6785d23159dcd"
+    },
+    {
+      "matchId": "1557534",
+      "date": "2026-10-25",
+      "lastDate": "2026-10-25",
+      "sourceSha256": "28919c231193d9cc527202b5149309fc2ecc4e765f71133bbac45aa3e482112a"
+    },
+    {
+      "matchId": "1559445",
+      "date": "2026-10-25",
+      "lastDate": "2026-10-25",
+      "sourceSha256": "5b263e1f97421927ba6b464d7db138c2cf6c92af20905ef92e8978e66892eecf"
+    },
+    {
+      "matchId": "1559563",
+      "date": "2026-10-25",
+      "lastDate": "2026-10-25",
+      "sourceSha256": "e5d37e3932044f67e418d5c9940a968b81bcb21e0d42767d110b373a43273dbb"
+    }
+  ]
+}
