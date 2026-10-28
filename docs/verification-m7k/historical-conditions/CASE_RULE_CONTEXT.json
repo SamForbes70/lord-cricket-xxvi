@@ -1,0 +1,129 @@
+{
+  "version": "LC_M7K_HISTORICAL_RULE_CONTEXT_V1",
+  "sourceCaseCount": 5,
+  "acceptedFixtureCount": 0,
+  "gameplayIntegrationPermitted": false,
+  "sourceContextSha256": "d583137fea1b0aa112c98246482e95e6c2d7be4f94e929d2f469d04a265b2804",
+  "checkedSourceCount": 5,
+  "cases": [
+    {
+      "matchId": "306991",
+      "innings": 1,
+      "over": 2,
+      "attempt": 7,
+      "sourceEventSha256": "ef50eda853d643c4865067e0e610ca65cbb91377a1a5409c56fbea77b49e436e",
+      "cohort": "training",
+      "matchDates": [
+        "2007-09-04"
+      ],
+      "precedingSourceEventSha256": "70d182e8b857b7dfffee9e0b4406d6ce160701474788d84e8d3a5857d85e9503",
+      "precedingObservedExtras": {
+        "noballs": 1
+      },
+      "ruleContextReferences": [],
+      "ruleContextStatus": "CONTEMPORARY_CONDITIONS_NOT_RETRIEVED",
+      "noBallCauseConfirmed": false,
+      "applicableConditionsConfirmed": false,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false,
+      "freeHitEligibility": "UNCONFIRMED",
+      "reviewStatus": "AWAITING_EXTERNAL_EVIDENCE"
+    },
+    {
+      "matchId": "412698",
+      "innings": 1,
+      "over": 17,
+      "attempt": 6,
+      "sourceEventSha256": "00c91b521a4e0afa546d30fac3d280ebfaa7c8e6b89c20d331c1e78dcac573a7",
+      "cohort": "training",
+      "matchDates": [
+        "2010-05-10"
+      ],
+      "precedingSourceEventSha256": "668122e3e04ec06d5e6102651cbffceeda100ac8768ef6a4a371e8b13d26be34",
+      "precedingObservedExtras": {
+        "noballs": 1
+      },
+      "ruleContextReferences": [],
+      "ruleContextStatus": "CONTEMPORARY_CONDITIONS_NOT_RETRIEVED",
+      "noBallCauseConfirmed": false,
+      "applicableConditionsConfirmed": false,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false,
+      "freeHitEligibility": "UNCONFIRMED",
+      "reviewStatus": "AWAITING_EXTERNAL_EVIDENCE"
+    },
+    {
+      "matchId": "489212",
+      "innings": 2,
+      "over": 15,
+      "attempt": 5,
+      "sourceEventSha256": "dd5b26139a6575bb4ff9211174f9094e3c8b9c1f5f67cd5044e41a9c87881dc4",
+      "cohort": "training",
+      "matchDates": [
+        "2011-04-21"
+      ],
+      "precedingSourceEventSha256": "6569bc0dcc51d9a56c9fd315339a8f29dd2e7cf5d256d52fa6c9727fd974d677",
+      "precedingObservedExtras": {
+        "noballs": 1
+      },
+      "ruleContextReferences": [],
+      "ruleContextStatus": "CONTEMPORARY_CONDITIONS_NOT_RETRIEVED",
+      "noBallCauseConfirmed": false,
+      "applicableConditionsConfirmed": false,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false,
+      "freeHitEligibility": "UNCONFIRMED",
+      "reviewStatus": "AWAITING_EXTERNAL_EVIDENCE"
+    },
+    {
+      "matchId": "533293",
+      "innings": 2,
+      "over": 19,
+      "attempt": 2,
+      "sourceEventSha256": "503d215eabf21a19b7cfa89304cf9d6193e6641a993f2fc93488d00b415bedec",
+      "cohort": "training",
+      "matchDates": [
+        "2012-10-01"
+      ],
+      "precedingSourceEventSha256": "2ff2f6db2164c8c0c25737d3fdaf8bb9238798c7b86cf1a455c69f8efcd0aeeb",
+      "precedingObservedExtras": {
+        "noballs": 1
+      },
+      "ruleContextReferences": [
+        "icc-t20-2012-saca.pdf"
+      ],
+      "ruleContextStatus": "STANDARD_CONTEXT_RETRIEVED_MATCH_ADOPTION_UNCONFIRMED",
+      "noBallCauseConfirmed": false,
+      "applicableConditionsConfirmed": false,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false,
+      "freeHitEligibility": "UNCONFIRMED",
+      "reviewStatus": "AWAITING_EXTERNAL_EVIDENCE"
+    },
+    {
+      "matchId": "660185",
+      "innings": 2,
+      "over": 15,
+      "attempt": 2,
+      "sourceEventSha256": "9cf35b7603783eb084c5d51a08f531b733caa09474dcb158a997a830cb769e65",
+      "cohort": "training",
+      "matchDates": [
+        "2013-11-23"
+      ],
+      "precedingSourceEventSha256": "d008d9d2b0f7e5b007515d808f1ad35e085863b2f464de1f84b3191dbb8d35ac",
+      "precedingObservedExtras": {
+        "noballs": 1
+      },
+      "ruleContextReferences": [
+        "silo-handbook.html"
+      ],
+      "ruleContextStatus": "STANDARD_CONTEXT_RETRIEVED_MATCH_ADOPTION_UNCONFIRMED",
+      "noBallCauseConfirmed": false,
+      "applicableConditionsConfirmed": false,
+      "independentlyAdjudicated": false,
+      "chronologyConfirmed": false,
+      "freeHitEligibility": "UNCONFIRMED",
+      "reviewStatus": "AWAITING_EXTERNAL_EVIDENCE"
+    }
+  ]
+}

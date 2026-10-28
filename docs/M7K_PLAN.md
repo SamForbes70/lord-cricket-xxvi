@@ -170,3 +170,12 @@ The audit covers every selected signature and retains preceding and following so
 It records player identities, source run sums and observed wicket kinds for review.
 Source values establish provenance, rather than umpire chronology, physical ends or accepted scorecards.
 K1 still requires independent adjudication before K2 implementation.
+
+
+## Historical free-hit conditions
+
+[Historical conditions](verification-m7k/historical-conditions/README.md) add a retrieved ICC-authored 2012 PDF and a qualified 2013 transcription.
+The standard conditions restrict initial free hits to foot-fault no-balls.
+All five registered free-hit cases predate the July 2015 expansion to all no-balls.
+Match adoption, no-ball causes and independent adjudication remain unconfirmed.
+The update changes no inherited case classification or approval flag.

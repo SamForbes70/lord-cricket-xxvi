@@ -1,0 +1,88 @@
+[
+  {
+    "argv": [
+      "python3",
+      "docs/verification-m7k/historical-conditions/verify-historical-context.py",
+      "--raw-dir",
+      "/workspace/m7k-source-research/third-batch",
+      "--out",
+      "/tmp/m7k-historical-repeat.json"
+    ],
+    "startedAtUtc": "2026-10-28T07:46:06.971476+00:00",
+    "seconds": 0.352,
+    "exitCode": 0,
+    "log": "source-verification.log",
+    "sha256": "0fc36e9aa59cb66989f8f5431efa729c2ea63d92e5e0894ddcd1486a5d1ec2df"
+  },
+  {
+    "argv": [
+      "cmp",
+      "/workspace/lord-cricket-xxvi/docs/verification-m7k/historical-conditions/CASE_RULE_CONTEXT.json",
+      "/tmp/m7k-historical-repeat.json"
+    ],
+    "startedAtUtc": "2026-10-28T07:46:07.324088+00:00",
+    "seconds": 0.001,
+    "exitCode": 0,
+    "log": "reproduction.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_m7*.py",
+      "-v"
+    ],
+    "startedAtUtc": "2026-10-28T07:46:07.325938+00:00",
+    "seconds": 1.319,
+    "exitCode": 0,
+    "log": "research-python.log",
+    "sha256": "dba2d28118c3e9e13110eae9afaf257c078314e62e966a308ba0998437d45685"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "verify:09:core"
+    ],
+    "startedAtUtc": "2026-10-28T07:46:08.645608+00:00",
+    "seconds": 46.146,
+    "exitCode": 0,
+    "log": "core.log",
+    "sha256": "066b9c287e1ffc75a1f52ba1ac8b0e0ff7316bdc5a212a7048d0a34cbfb46575"
+  },
+  {
+    "argv": [
+      "python3",
+      "docs/verification-m7k/historical-conditions/verify-historical-context.py",
+      "--raw-dir",
+      "/workspace/m7k-source-research/third-batch",
+      "--out",
+      "/tmp/m7k-historical-final.json",
+      "--negative-out",
+      "docs/verification-m7k/historical-conditions/NEGATIVE_CHECKS.json"
+    ],
+    "startedAtUtc": "2026-10-28T07:47:48.758386+00:00",
+    "seconds": 0.612,
+    "exitCode": 0,
+    "log": "final-source-and-negative-checks.log",
+    "sha256": "0fc36e9aa59cb66989f8f5431efa729c2ea63d92e5e0894ddcd1486a5d1ec2df"
+  },
+  {
+    "argv": [
+      "cmp",
+      "docs/verification-m7k/historical-conditions/CASE_RULE_CONTEXT.json",
+      "/tmp/m7k-historical-final.json"
+    ],
+    "startedAtUtc": "2026-10-28T07:47:49.370452+00:00",
+    "seconds": 0.002,
+    "exitCode": 0,
+    "log": "final-reproduction.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]
