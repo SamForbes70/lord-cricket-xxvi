@@ -1,0 +1,15 @@
+{
+  "baseline": "931da3bd950d9d6020b57204c9d56276546f2f0f",
+  "protectedPathsMatchBaseline": true,
+  "protectedPaths": [
+    "apps",
+    "packages",
+    "package-lock.json",
+    "schemas",
+    "docs/verification-m7j",
+    "docs/verification-m7k/LC_M7K_EVIDENCE_WORKSHEET.json",
+    "docs/verification-m7k/LC_M7K_REPRESENTATIVE_REVIEW.json"
+  ],
+  "simulationWorkerSha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+  "gameplayIntegrationPermitted": false
+}

@@ -60,7 +60,7 @@ jobs:
         id: build
       - name: M7K isolated research archive acceptance
         run: |
-          npx vitest run tests/unit/m7k-ledger.test.ts tests/unit/m7k-journal.test.ts
+          npx vitest run tests/unit/m7k-ledger.test.ts tests/unit/m7k-journal.test.ts tests/unit/m7k-book-journal.test.ts tests/unit/m7k-historical-probes.test.ts
           npx vite build --config vite.m7k.config.ts
           npx playwright test --config playwright.m7k.config.ts --reporter list
       - name: Validate frozen world bytes before browser acceptance

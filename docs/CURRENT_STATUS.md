@@ -102,5 +102,14 @@ SF confirmed the presented review material on 28 October 2026 and directed imple
 [Research ledger and evaluation tools](verification-m7k/ledger/README.md) record that instruction and the implemented boundaries.
 The separate tooling supplies a T20 research ledger, reconciliation, replay, journal recovery and offline evaluation reports.
 Historical source records remain unchanged; six engineering fixtures supply explicit synthetic expectations.
-Incident-specific fixture coverage, durable cross-innings transactions and untouched-cohort evaluation remain incomplete.
+Incident-specific fixture coverage and untouched-cohort evaluation remain incomplete. A shared research journal now supplies durable cross-innings transactions.
 No candidate enters gameplay or an existing save.
+
+
+## Durable transaction follow-up
+
+PR #8 merged as `931da3b` after four passing checks.
+[Shared transactions](verification-m7k/transactions/README.md) add one durable acceptance point for both innings and real-process-exit recovery tests.
+Two conditional historical probes verify scorer arithmetic without claiming missing historical context.
+A fresh source inventory finds 18 forward-dated matches before eligibility checks, below the required 200.
+The remaining fixture and evaluation gates stay explicit; gameplay and existing saves remain unchanged.

@@ -1,0 +1,9 @@
+{
+  "sourceURL": "https://cricsheet.org/downloads/recently_played_30_male_json.zip",
+  "retrievedAtUtc": "2026-10-28T10:51:20.888931+00:00",
+  "licence": "ODC-By 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "scope": "All-format male recent-match metadata upper bound; no outcome analysis.",
+  "status": 200,
+  "archiveSha256": "e9c3968c6a16ccceb219c9f5f2ac75a51c02c64791619c57fcfa8f9449e0b408"
+}

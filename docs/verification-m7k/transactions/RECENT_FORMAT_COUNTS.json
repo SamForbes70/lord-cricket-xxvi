@@ -1,0 +1,14 @@
+{
+  "scope": "Metadata only; no outcome analysis",
+  "sourceArchiveSha256": "e9c3968c6a16ccceb219c9f5f2ac75a51c02c64791619c57fcfa8f9449e0b408",
+  "forwardMatchCountAllFormats": 42,
+  "matchTypes": {
+    "MDM": 3,
+    "ODI": 11,
+    "ODM": 9,
+    "T20": 18,
+    "Test": 1
+  },
+  "forwardT20CountBeforeEligibility": 18,
+  "minimumEvaluationMatches": 200
+}

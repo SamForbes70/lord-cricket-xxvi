@@ -1,0 +1,50 @@
+{
+  "headRefOid": "c882f026b013282444ad7e35dc8e9c97f3907e5a",
+  "mergeCommit": {
+    "oid": "931da3bd950d9d6020b57204c9d56276546f2f0f"
+  },
+  "state": "MERGED",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-28T09:27:06Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40663510142/job/122732125833",
+      "name": "pass07a",
+      "startedAt": "2026-10-28T09:20:50Z",
+      "status": "COMPLETED",
+      "workflowName": "verify"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-28T09:26:16Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40663500287/job/122732095220",
+      "name": "pass07a",
+      "startedAt": "2026-10-28T09:20:46Z",
+      "status": "COMPLETED",
+      "workflowName": "verify"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-28T09:25:41Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40663510142/job/122732126300",
+      "name": "windows-browser-acceptance",
+      "startedAt": "2026-10-28T09:20:49Z",
+      "status": "COMPLETED",
+      "workflowName": "verify"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-28T09:26:39Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/SamForbes70/lord-cricket-xxvi/actions/runs/40663500287/job/122732095653",
+      "name": "windows-browser-acceptance",
+      "startedAt": "2026-10-28T09:20:46Z",
+      "status": "COMPLETED",
+      "workflowName": "verify"
+    }
+  ],
+  "url": "https://github.com/SamForbes70/lord-cricket-xxvi/pull/8"
+}
