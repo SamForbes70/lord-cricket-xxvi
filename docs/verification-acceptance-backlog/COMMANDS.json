@@ -175,5 +175,30 @@
     "exitCode": 0,
     "log": "final-benchmark-build.log",
     "sha256": "7e118e57129ee2efe0ddcd30b8b03920fda8909cd66a3127157bddde64852367"
+  },
+  {
+    "argv": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/unit/offscreen-fixture.test.ts"
+    ],
+    "startedAtUtc": "2026-10-28T12:29:35.325078+00:00",
+    "seconds": 7.985,
+    "exitCode": 0,
+    "log": "windows-timeout-regression.log",
+    "sha256": "1be7ab0e5262795044009673a039a45ac414cdec0c25c2f20ab205988fc111e7"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "startedAtUtc": "2026-10-28T12:29:43.310522+00:00",
+    "seconds": 4.466,
+    "exitCode": 0,
+    "log": "windows-timeout-typecheck.log",
+    "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
   }
 ]

@@ -80,3 +80,13 @@ The source and cohort findings remain in [the transaction report](../verificatio
 The collector does not infer human observations or relabel previously inspected matches as untouched.
 Issue #1 remains open until actual owner-PC evidence satisfies its retained criterion.
 No additional owner review approval is requested by this implementation.
+
+
+## Native Windows functional deadlines
+
+The first full Windows collector run exposed two inherited off-screen round tests exceeding Vitest's default five-second deadline.
+The tests took approximately 6.1 and 6.3 seconds on that runner.
+`WINDOWS_FAILURE.json` retains the failed cases, counts, run/job references and artifact hash.
+Only these two multi-fixture functional tests receive a bounded 30-second allowance.
+Their assertions remain unchanged, and the independent performance probes keep their original proposed budgets.
+All nine off-screen tests and typecheck pass after this adjustment.
