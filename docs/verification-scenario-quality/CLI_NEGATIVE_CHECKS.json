@@ -1,0 +1,17 @@
+[
+  {
+    "argument": "--seeds-per-cell=2=bad",
+    "exitCode": 1,
+    "error": "QUALITY_SEED_COUNT"
+  },
+  {
+    "argument": "--unexpected=1",
+    "exitCode": 1,
+    "error": "QUALITY_UNKNOWN_ARGUMENT"
+  },
+  {
+    "argument": "--seeds-per-cell=0",
+    "exitCode": 1,
+    "error": "QUALITY_SEED_COUNT"
+  }
+]

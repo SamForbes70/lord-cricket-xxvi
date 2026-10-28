@@ -150,3 +150,12 @@ chronology or attribution of every rare event. The current playable
 `synthetic-alpha-01` and historical saves remain unchanged. See
 `docs/M7J_RUNBOOK.md` and ADR-032. Cricsheet data: https://cricsheet.org/,
 ODC-By 1.0: https://cricsheet.org/licensing/.
+
+
+## M7 scenario quality harness
+
+Run `npm run m7:scenarios -- --seeds-per-cell=2 --out=scenarios.json` after building.
+The developer tool compares existing baseline/tactical policies across all eight teams and grounds.
+It preserves accepted event/scorecard hashes and separates first innings from chase endings.
+See [SCENARIO_QUALITY_HARNESS.md](docs/SCENARIO_QUALITY_HARNESS.md) for scope, results and limits.
+This adds a reproducible quality tool; it does not change the playable scoring model.

@@ -1,0 +1,38 @@
+
+> lord-cricket-xxvi@0.1.0 build
+> tsc -b && vite build --config apps/web/vite.config.ts && vite build --config vite.runtime.config.ts
+
+vite v7.1.7 building for production...
+transforming...
+✓ 166 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                               0.72 kB │ gzip:  0.41 kB
+dist/engineering.html                         0.72 kB │ gzip:  0.41 kB
+dist/assets/match.worker-CvFgBjcU.js        601.44 kB
+dist/assets/engineering-BrDsDFp9.css          1.37 kB │ gzip:  0.63 kB
+dist/assets/main-DU29MV68.css                12.31 kB │ gzip:  3.48 kB
+dist/assets/engineering-DjJLFLCG.js           3.22 kB │ gzip:  1.49 kB
+dist/assets/season-persistence-BwG5leb3.js  282.91 kB │ gzip: 84.68 kB
+dist/assets/main-BE6BqX3z.js                510.92 kB │ gzip: 92.94 kB
+✓ built in 2.16s
+vite v7.1.7 building for production...
+transforming...
+✓ 130 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                               0.36 kB │ gzip:  0.24 kB
+dist/assets/determinism.worker-D3V9ukrk.js  149.87 kB
+dist/assets/t20.worker-COxBWk0V.js          535.76 kB
+dist/assets/index-Ch9BfyuA.js               537.41 kB │ gzip: 92.06 kB
+✓ built in 1.70s
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

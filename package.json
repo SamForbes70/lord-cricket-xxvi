@@ -88,7 +88,8 @@
     "m7i:test": "python3 -m unittest discover -s tests -p test_m7i_quality.py -v",
     "m7j:adjudication": "python3 scripts/m7j-exception-audit.py",
     "m7j:restore-fixtures": "python3 scripts/m7j-restore-fixtures.py",
-    "m7j:test": "vitest run tests/unit/m7j-adjudication.test.ts && python3 -m unittest discover -s tests -p test_m7j_exception_audit.py -v"
+    "m7j:test": "vitest run tests/unit/m7j-adjudication.test.ts && python3 -m unittest discover -s tests -p test_m7j_exception_audit.py -v",
+    "m7:scenarios": "node --import tsx scripts/run-quality-scenarios.ts"
   },
   "dependencies": {
     "react": "19.1.1",
