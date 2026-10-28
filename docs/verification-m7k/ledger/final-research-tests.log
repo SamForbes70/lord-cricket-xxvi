@@ -1,0 +1,15 @@
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ✓ tests/unit/m7k-journal.test.ts (9 tests) 71ms
+ ✓ tests/unit/m7k-ledger.test.ts (22 tests) 546ms
+   ✓ M7K isolated research ledger > closes at 120 legal balls while enforcing over decisions and quotas  346ms
+ ✓ tests/unit/m7k-evaluation.test.ts (16 tests) 1639ms
+   ✓ M7K sealed-cohort evaluation tooling > runs the offline CLI and rejects an unfrozen protocol before reading result files  1100ms
+   ✓ M7K sealed-cohort evaluation tooling > reports both innings, competitions, training-defined bands, ablations and repeatable uncertainty  322ms
+
+ Test Files  3 passed (3)
+      Tests  47 passed (47)
+   Start at  09:18:40
+   Duration  2.28s (transform 297ms, setup 0ms, collect 1.11s, tests 2.26s, environment 0ms, prepare 223ms)
+

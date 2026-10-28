@@ -1,0 +1,164 @@
+[
+  {
+    "argv": [
+      "python3",
+      "scripts/m7j-restore-fixtures.py"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:12:07.691555+00:00",
+    "seconds": 0.027,
+    "exitCode": 0,
+    "log": "restore-research-fixtures.log",
+    "sha256": "98a134661741054f2aeb092d881aa107bef75167edb67231e7c73a6c67fb20c7"
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_m7*.py",
+      "-v"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:12:07.719191+00:00",
+    "seconds": 1.422,
+    "exitCode": 0,
+    "log": "research-python.log",
+    "sha256": "eb60df351f73593c67d3ddfbcfee31a4e3fe6125987f4cf2ab227020f9fc3886"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "verify:09:core"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:12:09.142034+00:00",
+    "seconds": 46.075,
+    "exitCode": 0,
+    "log": "core.log",
+    "sha256": "7ecc5c8da6cc211d2a8a564e020f20422879c8eb66d9b9c7382fbd0de75f0f4f"
+  },
+  {
+    "argv": [
+      "npx",
+      "vite",
+      "build",
+      "--config",
+      "vite.m7k.config.ts"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:12:55.218043+00:00",
+    "seconds": 1.017,
+    "exitCode": 0,
+    "log": "browser-bundle.log",
+    "sha256": "a0a377e58cd258ec22ec52999f6155433c852ea52186440b56b251c77e056cf7"
+  },
+  {
+    "argv": [
+      "npx",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.m7k.config.ts",
+      "--reporter=list"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:12:56.235720+00:00",
+    "seconds": 9.644,
+    "exitCode": 1,
+    "log": "candidate-browser.log",
+    "sha256": "260ed67d5552926e9f9e2cdc85484d462c3c2e6de5566af8a988d2c6c38f650b"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "verify:09:core"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:14:49.408576+00:00",
+    "seconds": 46.12,
+    "exitCode": 0,
+    "log": "final-core.log",
+    "sha256": "fb2b8aaa1bd3a2a35dd6b2c4cd4a5c9d58796913dc9e65cf7b5c4a6fdd8fe07e"
+  },
+  {
+    "argv": [
+      "npx",
+      "vite",
+      "build",
+      "--config",
+      "vite.m7k.config.ts"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:15:35.528834+00:00",
+    "seconds": 0.994,
+    "exitCode": 0,
+    "log": "final-browser-bundle.log",
+    "sha256": "5d6815d318a52164c406e54b9e24a942457762c6ce7ba9da46381a74b38283b8"
+  },
+  {
+    "argv": [
+      "npx",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.m7k.config.ts",
+      "--reporter=list"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:15:36.523094+00:00",
+    "seconds": 7.27,
+    "exitCode": 0,
+    "log": "final-candidate-browser.log",
+    "sha256": "4b942bf631862721cbee524d691f1db17374c539d15b3512e603be6c84a6e1ca"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "smoke",
+      "--",
+      "--workers=2",
+      "--reporter=list"
+    ],
+    "environmentOverrides": {
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+      "LCXXVI_CHROMIUM_EXECUTABLE": "/usr/bin/chromium"
+    },
+    "startedAtUtc": "2026-10-28T09:15:43.793919+00:00",
+    "seconds": 191.061,
+    "exitCode": 0,
+    "log": "historical-browser-smoke.log",
+    "sha256": "0b2b452e49c01ca3856cc618e4804a7ca6ecb01a6d86ead04453dea9aa3b9495"
+  }
+]

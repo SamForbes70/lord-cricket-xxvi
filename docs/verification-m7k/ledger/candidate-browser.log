@@ -1,0 +1,90 @@
+[2m[WebServer] [22m(node:44478) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:44491) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:44509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:44509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/m7k/archive.spec.ts:7:1 › fresh browser imports and recovers a candidate without changing the v1 path (426ms)
+(node:44642) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:44642) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium] › tests/m7k/archive.spec.ts:36:1 › browser rejects damaged checkpoints and v1/version substitutions (466ms)
+(node:44778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:44778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [firefox] › tests/m7k/archive.spec.ts:7:1 › fresh browser imports and recovers a candidate without changing the v1 path (1.0s)
+(node:44971) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:44971) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [firefox] › tests/m7k/archive.spec.ts:36:1 › browser rejects damaged checkpoints and v1/version substitutions (1.1s)
+
+
+  1) [chromium] › tests/m7k/archive.spec.ts:7:1 › fresh browser imports and recovers a candidate without changing the v1 path 
+
+    Error: page.addScriptTag: Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-ZMGFL+lYmTn1afMBKjzzvq7VGbfARVbr2uoQ6BEkaWk='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.
+
+      10 |     const context = await browser.newContext();
+      11 |     try {
+    > 12 |       const page = await context.newPage(); await page.goto("/"); await page.addScriptTag({ path: resolve("tests/m7k/dist/m7k-browser.js") });
+         |                                                                   ^
+      13 |       const result = await page.evaluate(({ archive, tail }) => window.m7kArchiveCheck(archive, tail), { archive: exportArchive(initial), tail: accepted.events });
+      14 |       expect(result.hash).toBe(hash(accepted.projection)); expect(result.events).toBe(1); expect(importArchive(result.archive)).toEqual(accepted);
+      15 |     } finally { await context.close(); }
+        at /workspace/lord-cricket-xxvi/tests/m7k/archive.spec.ts:12:67
+
+  2) [chromium] › tests/m7k/archive.spec.ts:36:1 › browser rejects damaged checkpoints and v1/version substitutions 
+
+    Error: page.addScriptTag: Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-ZMGFL+lYmTn1afMBKjzzvq7VGbfARVbr2uoQ6BEkaWk='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.
+
+      17 | });
+      18 | test("browser rejects damaged checkpoints and v1/version substitutions", async ({ page }) => {
+    > 19 |   await page.goto("/"); await page.addScriptTag({ path: resolve("tests/m7k/dist/m7k-browser.js") });
+         |                         ^
+      20 |   const archive = JSON.parse(exportArchive(createLedger(fixtures.cases[0].seed)));
+      21 |   for (const damaged of [{ ...archive, version: "LC_T20_MATCH_V1" }, { ...archive, model: "synthetic-alpha-01" }, { ...archive, checkpoint: { sequence: 0, projectionHash: "bad" } }]) {
+      22 |     const rejected = await page.evaluate(raw => { try { window.m7kArchiveCheck(raw, []); return false; } catch { return true; } }, JSON.stringify(damaged));
+        at /workspace/lord-cricket-xxvi/tests/m7k/archive.spec.ts:19:25
+
+    Error Context: test-results/archive-browser-rejects-da-a2b20-nd-v1-version-substitutions-chromium/error-context.md
+
+  3) [firefox] › tests/m7k/archive.spec.ts:7:1 › fresh browser imports and recovers a candidate without changing the v1 path 
+
+    Error: page.addScriptTag: [JavaScript Error: "Content-Security-Policy: The page’s settings blocked an inline script (script-src-elem) from being executed because it violates the following directive: “script-src 'self'”. Consider using a hash ('sha256-ZMGFL+lYmTn1afMBKjzzvq7VGbfARVbr2uoQ6BEkaWk=') or a nonce." {file: "debugger eval code line 290 > eval" line: 7}]
+
+      10 |     const context = await browser.newContext();
+      11 |     try {
+    > 12 |       const page = await context.newPage(); await page.goto("/"); await page.addScriptTag({ path: resolve("tests/m7k/dist/m7k-browser.js") });
+         |                                                                   ^
+      13 |       const result = await page.evaluate(({ archive, tail }) => window.m7kArchiveCheck(archive, tail), { archive: exportArchive(initial), tail: accepted.events });
+      14 |       expect(result.hash).toBe(hash(accepted.projection)); expect(result.events).toBe(1); expect(importArchive(result.archive)).toEqual(accepted);
+      15 |     } finally { await context.close(); }
+        at /workspace/lord-cricket-xxvi/tests/m7k/archive.spec.ts:12:67
+
+  4) [firefox] › tests/m7k/archive.spec.ts:36:1 › browser rejects damaged checkpoints and v1/version substitutions 
+
+    Error: page.addScriptTag: [JavaScript Error: "Content-Security-Policy: The page’s settings blocked an inline script (script-src-elem) from being executed because it violates the following directive: “script-src 'self'”. Consider using a hash ('sha256-ZMGFL+lYmTn1afMBKjzzvq7VGbfARVbr2uoQ6BEkaWk=') or a nonce." {file: "debugger eval code line 290 > eval" line: 7}]
+
+      17 | });
+      18 | test("browser rejects damaged checkpoints and v1/version substitutions", async ({ page }) => {
+    > 19 |   await page.goto("/"); await page.addScriptTag({ path: resolve("tests/m7k/dist/m7k-browser.js") });
+         |                         ^
+      20 |   const archive = JSON.parse(exportArchive(createLedger(fixtures.cases[0].seed)));
+      21 |   for (const damaged of [{ ...archive, version: "LC_T20_MATCH_V1" }, { ...archive, model: "synthetic-alpha-01" }, { ...archive, checkpoint: { sequence: 0, projectionHash: "bad" } }]) {
+      22 |     const rejected = await page.evaluate(raw => { try { window.m7kArchiveCheck(raw, []); return false; } catch { return true; } }, JSON.stringify(damaged));
+        at /workspace/lord-cricket-xxvi/tests/m7k/archive.spec.ts:19:25
+
+    Error Context: test-results/archive-browser-rejects-da-a2b20-nd-v1-version-substitutions-firefox/error-context.md
+
+  4 failed
+    [chromium] › tests/m7k/archive.spec.ts:7:1 › fresh browser imports and recovers a candidate without changing the v1 path 
+    [chromium] › tests/m7k/archive.spec.ts:36:1 › browser rejects damaged checkpoints and v1/version substitutions 
+    [firefox] › tests/m7k/archive.spec.ts:7:1 › fresh browser imports and recovers a candidate without changing the v1 path 
+    [firefox] › tests/m7k/archive.spec.ts:36:1 › browser rejects damaged checkpoints and v1/version substitutions 

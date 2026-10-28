@@ -94,3 +94,13 @@ Merged PR #5 provides the [scenario quality harness](SCENARIO_QUALITY_HARNESS.md
 Its four additional tests bring the TypeScript suite to 542 tests across 31 files.
 The retained default grid has 64 paired scenarios, 128 policy runs and 64 deterministic repeat checks.
 The grid compares existing policies without changing gameplay coefficients or approving empirical realism.
+
+
+## Isolated M7K implementation after owner confirmation
+
+SF confirmed the presented review material on 28 October 2026 and directed implementation to continue.
+[Research ledger and evaluation tools](verification-m7k/ledger/README.md) record that instruction and the implemented boundaries.
+The separate tooling supplies a T20 research ledger, reconciliation, replay, journal recovery and offline evaluation reports.
+Historical source records remain unchanged; six engineering fixtures supply explicit synthetic expectations.
+Incident-specific fixture coverage, durable cross-innings transactions and untouched-cohort evaluation remain incomplete.
+No candidate enters gameplay or an existing save.

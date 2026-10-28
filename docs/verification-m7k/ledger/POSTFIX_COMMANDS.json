@@ -1,0 +1,41 @@
+[
+  {
+    "argv": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/unit/m7k-ledger.test.ts",
+      "tests/unit/m7k-journal.test.ts",
+      "tests/unit/m7k-evaluation.test.ts"
+    ],
+    "startedAtUtc": "2026-10-28T09:18:40.254827+00:00",
+    "seconds": 2.94,
+    "exitCode": 0,
+    "log": "final-research-tests.log",
+    "sha256": "3a58d2d5c9a5bc6e4257346373d6b79669bac9ffc22759b7f1ad10efced8bbbc"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "startedAtUtc": "2026-10-28T09:18:43.194628+00:00",
+    "seconds": 3.641,
+    "exitCode": 0,
+    "log": "final-lint.log",
+    "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+  },
+  {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "startedAtUtc": "2026-10-28T09:18:46.836206+00:00",
+    "seconds": 4.518,
+    "exitCode": 0,
+    "log": "final-typecheck.log",
+    "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+  }
+]
