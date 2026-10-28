@@ -903,8 +903,8 @@ export function MatchApp() {
         <p>
           Original world: 160 fictional players, 8 squads. T20, ODI and five-day
           red-ball exhibitions use custom game rules; no certified ICC
-          compliance or empirical realism. DLS, careers and tactical AI are
-          unavailable.
+          compliance or empirical realism. A one-season T20 career and optional
+          T20 tactical captain are available. DLS remains disabled.
         </p>
       </footer>
     </main>

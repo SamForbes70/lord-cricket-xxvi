@@ -12,6 +12,8 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - name: Synthetic diagnostic summary checks
+        run: python3 -m unittest discover -s tests -p test_synthetic_quality_summary.py -v
       - run: npx playwright install --with-deps chromium firefox
       - run: npm run verify:07a
       - name: Exhibition layout regressions in both browsers

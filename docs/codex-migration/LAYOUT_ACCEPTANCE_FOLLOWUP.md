@@ -1,5 +1,6 @@
 # Layout and CI acceptance follow-up
 
+> Dated evidence snapshot. [Current status](../CURRENT_STATUS.md) records later merges, acceptance and research authorisation.
 22 October 2026, Australia/Brisbane. Follow-up to the baseline at `68f0e0a`, on PR #2's existing branch. This is presentation and verification work, not M7K or model promotion.
 
 ## Fixed layout failures

@@ -1,5 +1,6 @@
 # Codex baseline recovery and environment acceptance
 
+> Dated evidence snapshot. [Current status](../CURRENT_STATUS.md) records later merges, acceptance and research authorisation.
 > This is the original baseline snapshot before the layout fix. The current [layout and CI follow-up](LAYOUT_ACCEPTANCE_FOLLOWUP.md) records the repaired failures, stronger regression tests and subsequent evidence. Original failed results below remain historical observations.
 
 22 October 2026 (Australia/Brisbane). This run was performed on a Linux cloud host, not the owner's Windows PC.

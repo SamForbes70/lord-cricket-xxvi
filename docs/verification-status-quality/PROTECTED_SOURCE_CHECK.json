@@ -1,0 +1,9 @@
+{
+  "baseCommit": "036c21239026a36ee9eaf4aac8e766ec74e2854e",
+  "packageFilesByteIdentical": 243,
+  "workerPath": "apps/web/dist/assets/match.worker-CvFgBjcU.js",
+  "workerSha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+  "workerMatchesOwnerRelease": true,
+  "fixtureSetupSha256": "f219d2075d5acd935bdfc3bfad50d2865085c9cf3435b6d5dbc69e878cb78495",
+  "dependencyLockUnchanged": true
+}

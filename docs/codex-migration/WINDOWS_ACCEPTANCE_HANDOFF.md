@@ -1,10 +1,12 @@
 # Windows and human acceptance handoff
 
-The workflow in `.github/workflows/verify.yml` provides automated Windows-runner acceptance and retains its own logs/screenshots. Check PR #2 for that result. The owner's **local Windows and human M3** gate remains **NOT RUN** until an actual tester records it. Hosted automation is not a human playthrough or a reference-PC performance result; Linux runs do not fulfil Windows coverage.
+Hosted Windows Chromium/Firefox automation passes in PR #2. Sam reports a successful Windows Edge human playthrough.
+Owner-PC Chromium/Firefox automation remains NOT RUN; hosted jobs do not establish that separate result.
+[Acceptance reconciliation](../ACCEPTANCE_RECONCILIATION.md) records exact evidence and missing details.
 
 ## Automated browser run on Windows
 
-Use a clean checkout of PR #2's `codex/baseline-recovery-acceptance` branch, Node >=22.12, npm, Git and Python 3. Preserve any local changes; do not reset a working checkout to prepare acceptance. Keep an existing `LCXXVI_CHROMIUM_EXECUTABLE` override unset unless it intentionally names a supported Windows Chromium executable.
+Use a clean checkout of `main`, Node >=22.12, npm, Git and Python 3. Preserve any local changes; do not reset a working checkout to prepare acceptance. Keep an existing `LCXXVI_CHROMIUM_EXECUTABLE` override unset unless it intentionally names a supported Windows Chromium executable.
 
 Use a fresh clean clone if an existing checkout already converted frozen JSON files to CRLF. The branch's `.gitattributes` preserves LF on new checkouts; pulling that rule alone may leave previously checked-out files untouched. Do not force-overwrite files to repair this. The frozen-world validation below must pass before browser acceptance.
 
@@ -39,7 +41,7 @@ Do not use the Linux-only `playwright.m6g.config.ts` on Windows: its executable 
 
 Run `node start.mjs` after building and use a dedicated browser profile or export existing `.lcxxvi` careers first. Never clear an owner's IndexedDB to obtain a clean test. Follow [M3_HUMAN_ACCEPTANCE.md](../M3_HUMAN_ACCEPTANCE.md) for the full match: XIs/captain/keeper, toss, batting/bowling choices, tactics, both innings, eligibility explanations, terminal controls and replay/scorecard verification. Check desktop 100%/150%, narrow display and keyboard navigation with your own eyes and input.
 
-The checklist's historical note that M4 saves are disabled is not current capability evidence: M4 durability is implemented and automated separately. Human acceptance remains a distinct, unsigned gate until an actual tester completes it.
+The checklist's historical note that M4 saves are disabled is not current capability evidence: M4 durability is implemented and automated separately. The owner has completed the match and repeat replay check. Individual unrecorded fields remain identified in the human record.
 
 Return a completed record containing:
 
@@ -51,6 +53,8 @@ Return a completed record containing:
 
 ## Preserved owner release
 
-The original owner ZIP is not mounted in the cloud task. When it becomes available, retain the original bytes, record its SHA-256, inspect its manifest and verify available expected hashes before extraction. Extract outside the source checkout, preserving all existing saves and source changes.
+The original owner ZIP is available and its recorded comparison passes.
+See [OWNER_RELEASE_COMPARISON.md](OWNER_RELEASE_COMPARISON.md) for hashes and results.
+For any future comparison, preserve the archive bytes and extract outside the checkout.
 
 Compare the actual extracted index/assets and local HTTP responses with the rebuilt app. Record intentional differences from this PR's layout changes separately from unexpected differences. In particular, the simulation worker must retain its accepted hash; a changed presentation bundle is expected after the layout fix. Use separate ports/processes and fresh automated profiles. Do not label comparison with historical hash records as a fresh verification of the owner archive.
