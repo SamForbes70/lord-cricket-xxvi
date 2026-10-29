@@ -2,12 +2,11 @@
 import { spawnSync } from "node:child_process";
 import { performance } from "node:perf_hooks";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 const directory=process.env.LCXXVI_VERIFY_DIR ?? "docs/verification-pass07a";
 mkdirSync(directory,{recursive:true});
 const startedAt=new Date().toISOString();
-const unitTestsExpected=542;
 const worldFixture=JSON.parse(readFileSync("tests/fixtures/world/negative-cases.json","utf8"));
 const extra = [
   ["world-content",["run","world:check"],{assertions: "independent complete 160/8/8 audit, twelve vectors, world/manifest hashes, strict AJV >=91 (additive schemas allowed)"}],
@@ -28,6 +27,7 @@ const run=(executable,args,label,options={})=>{
   console.log(`${label}: ${status}`);
   return entry;
 };
+rmSync(join(directory,"results.json"),{force:true});
 const inheritedRun=run(process.execPath,["scripts/verify.mjs"],"inherited-orchestrator",{
   env:{...process.env,LCXXVI_VERIFY_DIR:directory}
 });
@@ -40,7 +40,8 @@ for(const [name,args,metadata] of extra){
   extras.push({...result,...metadata});
 }
 const allGates=[...inherited.map(r=>({...r,log:r.gate+".log"})),...extras];
-const accepted = inheritedRun.status==="PASS" && inherited.length===12 && allGates.length===16 &&
+const unitEvidence = inherited.find(gate => gate.gate === "unit")?.unitEvidence ?? null;
+const accepted = unitEvidence !== null && inheritedRun.status==="PASS" && inherited.length===12 && allGates.length===16 &&
   allGates.every(g=>g.status==="PASS") &&
   extras.length===4 && worldFixture.cases.length===40;
 const hash=(path)=>createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -64,7 +65,7 @@ const result={version:"LC_PASS_07A_VERIFICATION_V1",status:accepted?"PASS":"FAIL
  originalVerifiedSourceZipSha256:"95e71cb5aae066885f73594d788e6df2edc54b4a1a6a49c12b365cc104af5648",
  inheritedGateCount:inherited.length, allGateCount:allGates.length,
  passedGateCount:allGates.filter(g=>g.status==="PASS").length,
- unitTestsExpected,smokeTestsExpected:23,negativeWorldCases:worldFixture.cases.filter(c=>c.target!=="setup").length,
+ unitTestsObserved:unitEvidence?.passed ?? null,unitEvidence,smokeTestsExpected:23,negativeWorldCases:worldFixture.cases.filter(c=>c.target!=="setup").length,
  negativeSetupCases:worldFixture.cases.filter(c=>c.target==="setup").length,
  independentWorldAuditExpected:{players:160,teams:8,grounds:8,randomVectors:12},
  immutableSetupExpected:{format:"T20",xiCount:[11,11],setupVersion:"LC_T20_SETUP_V1"},

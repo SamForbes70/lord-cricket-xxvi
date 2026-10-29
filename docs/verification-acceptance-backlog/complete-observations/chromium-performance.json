@@ -1,0 +1,226 @@
+{
+  "version": "LC_BROWSER_ACCEPTANCE_OBSERVATIONS_V1",
+  "browser": "chromium",
+  "browserVersion": "154.0.8037.57",
+  "observations": {
+    "commands": [
+      {
+        "label": "Call heads",
+        "ms": 13.5,
+        "startedAtMs": 906.2000000029802,
+        "completedAtMs": 919.7000000029802
+      },
+      {
+        "label": "Bat first",
+        "ms": 18,
+        "startedAtMs": 1073.5,
+        "completedAtMs": 1091.5
+      },
+      {
+        "label": "Walen Sableholt",
+        "ms": 15.100000001490116,
+        "startedAtMs": 1223,
+        "completedAtMs": 1238.1000000014901
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 15.699999995529652,
+        "startedAtMs": 1373.8000000044703,
+        "completedAtMs": 1389.5
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 21,
+        "startedAtMs": 1441,
+        "completedAtMs": 1462
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23.69999999552965,
+        "startedAtMs": 1590.3000000044703,
+        "completedAtMs": 1614
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18.5,
+        "startedAtMs": 1739.3000000044703,
+        "completedAtMs": 1757.8000000044703
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16.400000005960464,
+        "startedAtMs": 1889.3999999985099,
+        "completedAtMs": 1905.8000000044703
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 15.299999997019768,
+        "startedAtMs": 2022.7000000029802,
+        "completedAtMs": 2038
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.30000000447035,
+        "startedAtMs": 2190,
+        "completedAtMs": 2207.3000000044703
+      },
+      {
+        "label": "Next delivery",
+        "ms": 26.399999998509884,
+        "startedAtMs": 2355.2000000029802,
+        "completedAtMs": 2381.60000000149
+      },
+      {
+        "label": "Next delivery",
+        "ms": 15.300000004470348,
+        "startedAtMs": 2439,
+        "completedAtMs": 2454.3000000044703
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 17,
+        "startedAtMs": 2571.39999999851,
+        "completedAtMs": 2588.39999999851
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17,
+        "startedAtMs": 2721.5,
+        "completedAtMs": 2738.5
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.200000002980232,
+        "startedAtMs": 2871.60000000149,
+        "completedAtMs": 2888.8000000044703
+      },
+      {
+        "label": "Zerin Wrenbrook",
+        "ms": 15.700000002980232,
+        "startedAtMs": 3039,
+        "completedAtMs": 3054.7000000029802
+      },
+      {
+        "label": "Next delivery",
+        "ms": 19.100000001490116,
+        "startedAtMs": 3188.5,
+        "completedAtMs": 3207.60000000149
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18.600000001490116,
+        "startedAtMs": 3255.7000000029802,
+        "completedAtMs": 3274.3000000044703
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20.80000000447035,
+        "startedAtMs": 3322,
+        "completedAtMs": 3342.8000000044703
+      },
+      {
+        "label": "Next delivery",
+        "ms": 21.100000001490116,
+        "startedAtMs": 3472.89999999851,
+        "completedAtMs": 3494
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 15.5,
+        "startedAtMs": 3539.39999999851,
+        "completedAtMs": 3554.89999999851
+      },
+      {
+        "label": "Next delivery",
+        "ms": 19.600000001490116,
+        "startedAtMs": 3689.5,
+        "completedAtMs": 3709.10000000149
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18.799999997019768,
+        "startedAtMs": 3837.60000000149,
+        "completedAtMs": 3856.39999999851
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.700000002980232,
+        "startedAtMs": 4004.60000000149,
+        "completedAtMs": 4022.3000000044703
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.30000000447035,
+        "startedAtMs": 4156,
+        "completedAtMs": 4173.30000000447
+      },
+      {
+        "label": "Next delivery",
+        "ms": 13.399999998509884,
+        "startedAtMs": 4313.10000000149,
+        "completedAtMs": 4326.5
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16.299999997019768,
+        "startedAtMs": 4372.30000000447,
+        "completedAtMs": 4388.60000000149
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 18.600000001490116,
+        "startedAtMs": 4522.5,
+        "completedAtMs": 4541.10000000149
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.299999997019768,
+        "startedAtMs": 4588.70000000298,
+        "completedAtMs": 4606
+      },
+      {
+        "label": "Next delivery",
+        "ms": 29,
+        "startedAtMs": 4739.5,
+        "completedAtMs": 4768.5
+      }
+    ],
+    "longTasks": [
+      {
+        "startedAtMs": 84.20000000298023,
+        "ms": 148
+      }
+    ],
+    "longTaskSupported": true,
+    "jsHeapBytes": 16563077,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    }
+  },
+  "commandAcknowledgement": {
+    "samples": 30,
+    "p95Ms": 26.399999998509884,
+    "proposedBudgetMs": 100,
+    "observedWithinProposedBudget": true,
+    "scope": "Click dispatch to committed revision rendered without exhibition save; includes browser and worker scheduling."
+  },
+  "longTasks": {
+    "supported": true,
+    "maximumPageLifetimeMs": 148,
+    "maximumDuringMeasuredCommandsMs": null,
+    "proposedMaximumMs": 50,
+    "scope": "Separate page-lifetime tasks from tasks overlapping measured command windows; entries expose tasks at least 50 ms."
+  },
+  "status": "OBSERVATIONS_ONLY_REFERENCE_HARDWARE_UNVERIFIED",
+  "remainingBudgets": [
+    "T20 engine-only match p95",
+    "Five-day match p95",
+    "56-match league",
+    "IndexedDB save p95",
+    "Active-game load p95",
+    "Total application memory including workers and native allocations"
+  ],
+  "referenceHardwareAccepted": false
+}

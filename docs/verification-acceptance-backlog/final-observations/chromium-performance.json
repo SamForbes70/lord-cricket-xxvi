@@ -1,0 +1,226 @@
+{
+  "version": "LC_BROWSER_ACCEPTANCE_OBSERVATIONS_V1",
+  "browser": "chromium",
+  "browserVersion": "154.0.8037.57",
+  "observations": {
+    "commands": [
+      {
+        "label": "Call heads",
+        "ms": 14.5,
+        "startedAtMs": 964.3999999985099,
+        "completedAtMs": 978.8999999985099
+      },
+      {
+        "label": "Bat first",
+        "ms": 17.100000001490116,
+        "startedAtMs": 1032.3999999985099,
+        "completedAtMs": 1049.5
+      },
+      {
+        "label": "Ulen Elmcroft",
+        "ms": 11.800000004470348,
+        "startedAtMs": 1117.2999999970198,
+        "completedAtMs": 1129.1000000014901
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 13.799999997019768,
+        "startedAtMs": 1181,
+        "completedAtMs": 1194.7999999970198
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 22.200000002980232,
+        "startedAtMs": 1331.7999999970198,
+        "completedAtMs": 1354
+      },
+      {
+        "label": "Next delivery",
+        "ms": 31.799999997019768,
+        "startedAtMs": 1420.3999999985099,
+        "completedAtMs": 1452.1999999955297
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.899999998509884,
+        "startedAtMs": 1534.2999999970198,
+        "completedAtMs": 1552.1999999955297
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.100000001490116,
+        "startedAtMs": 1618.3999999985099,
+        "completedAtMs": 1635.5
+      },
+      {
+        "label": "Next delivery",
+        "ms": 19.80000000447035,
+        "startedAtMs": 1716.6999999955297,
+        "completedAtMs": 1736.5
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.5,
+        "startedAtMs": 1781,
+        "completedAtMs": 1798.5
+      },
+      {
+        "label": "Next delivery",
+        "ms": 13.600000001490116,
+        "startedAtMs": 1882.7999999970198,
+        "completedAtMs": 1896.3999999985099
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 13.600000001490116,
+        "startedAtMs": 1982.5,
+        "completedAtMs": 1996.1000000014901
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18.299999997019768,
+        "startedAtMs": 2130.89999999851,
+        "completedAtMs": 2149.1999999955297
+      },
+      {
+        "label": "Next delivery",
+        "ms": 25.100000001490116,
+        "startedAtMs": 2233.39999999851,
+        "completedAtMs": 2258.5
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16.5,
+        "startedAtMs": 2350.10000000149,
+        "completedAtMs": 2366.60000000149
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16.80000000447035,
+        "startedAtMs": 2416.7999999970198,
+        "completedAtMs": 2433.60000000149
+      },
+      {
+        "label": "Next delivery",
+        "ms": 15.899999998509884,
+        "startedAtMs": 2518.10000000149,
+        "completedAtMs": 2534
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18.80000000447035,
+        "startedAtMs": 2627.1999999955297,
+        "completedAtMs": 2646
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 19.899999998509884,
+        "startedAtMs": 2698.39999999851,
+        "completedAtMs": 2718.2999999970198
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.5,
+        "startedAtMs": 2781.2999999970198,
+        "completedAtMs": 2798.7999999970198
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16.799999997019768,
+        "startedAtMs": 2882.10000000149,
+        "completedAtMs": 2898.89999999851
+      },
+      {
+        "label": "Next delivery",
+        "ms": 17.30000000447035,
+        "startedAtMs": 2947.6999999955297,
+        "completedAtMs": 2965
+      },
+      {
+        "label": "Next delivery",
+        "ms": 15.399999998509884,
+        "startedAtMs": 3023.5,
+        "completedAtMs": 3038.89999999851
+      },
+      {
+        "label": "Next delivery",
+        "ms": 21.899999998509884,
+        "startedAtMs": 3097.10000000149,
+        "completedAtMs": 3119
+      },
+      {
+        "label": "Next delivery",
+        "ms": 15.200000002980232,
+        "startedAtMs": 3182.6999999955297,
+        "completedAtMs": 3197.89999999851
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 14.599999994039536,
+        "startedAtMs": 3248.60000000149,
+        "completedAtMs": 3263.1999999955297
+      },
+      {
+        "label": "Next delivery",
+        "ms": 18.599999994039536,
+        "startedAtMs": 3432.60000000149,
+        "completedAtMs": 3451.1999999955297
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 16,
+        "startedAtMs": 3579.6999999955297,
+        "completedAtMs": 3595.6999999955297
+      },
+      {
+        "label": "Next delivery",
+        "ms": 16.200000002980232,
+        "startedAtMs": 3764.89999999851,
+        "completedAtMs": 3781.10000000149
+      },
+      {
+        "label": "Next delivery",
+        "ms": 20.100000001490116,
+        "startedAtMs": 3830.89999999851,
+        "completedAtMs": 3851
+      }
+    ],
+    "longTasks": [
+      {
+        "startedAtMs": 79,
+        "ms": 153
+      }
+    ],
+    "longTaskSupported": true,
+    "jsHeapBytes": 11101671,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    }
+  },
+  "commandAcknowledgement": {
+    "samples": 30,
+    "p95Ms": 25.100000001490116,
+    "proposedBudgetMs": 100,
+    "observedWithinProposedBudget": true,
+    "scope": "Click dispatch to committed revision rendered without exhibition save; includes browser and worker scheduling."
+  },
+  "longTasks": {
+    "supported": true,
+    "maximumPageLifetimeMs": 153,
+    "maximumDuringMeasuredCommandsMs": null,
+    "proposedMaximumMs": 50,
+    "scope": "Separate page-lifetime tasks from tasks overlapping measured command windows; entries expose tasks at least 50 ms."
+  },
+  "status": "OBSERVATIONS_ONLY_REFERENCE_HARDWARE_UNVERIFIED",
+  "remainingBudgets": [
+    "T20 engine-only match p95",
+    "Five-day match p95",
+    "56-match league",
+    "IndexedDB save p95",
+    "Active-game load p95",
+    "Total application memory including workers and native allocations"
+  ],
+  "referenceHardwareAccepted": false
+}

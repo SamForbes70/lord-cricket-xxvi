@@ -147,7 +147,7 @@ describe("Pass 12D deterministic off-screen T20 fixture execution", () => {
     expect(individual.outcome.scorecardSha256).toBe(first.scorecardSha256);
     expect(individual.outcome.eventLogSha256).toBe(first.eventLogSha256);
     expect(individual.outcome.commandLogSha256).toBe(first.commandLogSha256);
-  });
+  }, 30_000);
 
   test("can pause before the user's fixture while simulating the other three matches", () => {
     const { seasonSchedule, careerState } = baseline();
@@ -164,7 +164,7 @@ describe("Pass 12D deterministic off-screen T20 fixture execution", () => {
     const skipped = seasonSchedule.fixtures.find((fixture) => fixture.fixtureId === round.result.skippedUserFixtureId)!;
     expect([skipped.homeTeamId, skipped.awayTeamId]).toContain("team-01");
     expect(round.result.outcomes.every((outcome) => ![outcome.homeTeamId, outcome.awayTeamId].includes("team-01"))).toBe(true);
-  });
+  }, 30_000);
 
   test("rejects duplicate fixture execution, wrong career date and insufficient availability", () => {
     const { seasonSchedule, careerState } = baseline();

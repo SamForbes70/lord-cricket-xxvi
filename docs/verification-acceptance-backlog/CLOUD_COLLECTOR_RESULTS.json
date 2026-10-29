@@ -1,0 +1,323 @@
+{
+  "version": "LC_OWNER_ACCEPTANCE_EVIDENCE_V1",
+  "startedAtUtc": "2026-10-28T11:55:09.605Z",
+  "directory": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457",
+  "declaredOwnerPc": false,
+  "hostedCi": false,
+  "host": {
+    "platform": "linux",
+    "release": "6.18.55",
+    "arch": "x64",
+    "logicalCpus": 5,
+    "availableParallelism": 4,
+    "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+    "totalMemoryBytes": 35743760384,
+    "fingerprint": "7c238a6943520f1b60250c186a904b96bbc8720512edb4eaf5ede169a70bc1bf"
+  },
+  "source": {
+    "commit": "0fba56c12613e048083689cc929427cac0d9d7c4",
+    "dirty": true,
+    "lockfileSha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884",
+    "scoringKernelSha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+    "completedCommit": "0fba56c12613e048083689cc929427cac0d9d7c4",
+    "completedDirty": true,
+    "frozenInputsUnchanged": true
+  },
+  "browserOverrides": {
+    "chromiumExecutableOverridePresent": true,
+    "firefoxContentSandboxDisabled": false
+  },
+  "node": "v24.19.0",
+  "commands": [
+    {
+      "name": "browser-installation",
+      "executable": "npm",
+      "args": [
+        "exec",
+        "--",
+        "playwright",
+        "install",
+        "chromium",
+        "firefox"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:09.606Z",
+      "elapsedMs": 15994,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/browser-installation.log",
+      "sha256": "90924e23c8ce6fa347321ab6e074d32c89032b37777967e534c3654bcdaab2db"
+    },
+    {
+      "name": "schemas-check",
+      "executable": "npm",
+      "args": [
+        "run",
+        "schemas:check"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:25.600Z",
+      "elapsedMs": 428,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/schemas-check.log",
+      "sha256": "7b7a75d02a7b65f7e3bc1983ebd70d2124f1a1737cdd5d732b54dde8a1858065"
+    },
+    {
+      "name": "build",
+      "executable": "npm",
+      "args": [
+        "run",
+        "build"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:26.029Z",
+      "elapsedMs": 4112,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/build.log",
+      "sha256": "7f1de9361a07adb03a13ce9d5bb1987d4412eb09f2f87f1e6a639ee45a008480"
+    },
+    {
+      "name": "typecheck",
+      "executable": "npm",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:30.141Z",
+      "elapsedMs": 4241,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/typecheck.log",
+      "sha256": "131ddabc4f3f5c237034e9e57b0800ef384d3c79ac9183fa447d4168b9084b1c"
+    },
+    {
+      "name": "lint",
+      "executable": "npm",
+      "args": [
+        "run",
+        "lint"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:34.383Z",
+      "elapsedMs": 3451,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/lint.log",
+      "sha256": "b473255a36fc12139b73ce07aa06a534bd9043761128443b09b210f1de7668ef"
+    },
+    {
+      "name": "fixtures-engine",
+      "executable": "npm",
+      "args": [
+        "run",
+        "fixtures:engine"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:37.835Z",
+      "elapsedMs": 465,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/fixtures-engine.log",
+      "sha256": "29518f19349c020bb7b2f1602b1688c45d933915ad86dd2f3b5b8b9f91dce590"
+    },
+    {
+      "name": "frozen-world",
+      "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "args": [
+        "scripts/verify-world.mjs"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:38.304Z",
+      "elapsedMs": 1316,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/frozen-world.log",
+      "sha256": "ed2f69652ef40954b217aa92461497e51bb499ff556bbe92348e0d21e04106ca"
+    },
+    {
+      "name": "unit",
+      "executable": "npm",
+      "args": [
+        "test",
+        "--",
+        "--maxWorkers=2",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile=test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/unit.json"
+      ],
+      "startedAtUtc": "2026-10-28T11:55:39.620Z",
+      "elapsedMs": 41064,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": {
+        "passed": 608,
+        "failed": 0,
+        "skipped": 0,
+        "files": 38,
+        "source": "CURRENT_RUN_VITEST_JSON"
+      },
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/unit.log",
+      "sha256": "e9ad60e9c79e4feaefdef6da8a8232bc0e5562be33b4f442cf0d241bb100f322"
+    },
+    {
+      "name": "match-ui",
+      "executable": "npm",
+      "args": [
+        "exec",
+        "--",
+        "playwright",
+        "test",
+        "--config=playwright.ui.config.ts",
+        "--reporter=list,json",
+        "--output=test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/ui",
+        "--trace=retain-on-failure"
+      ],
+      "startedAtUtc": "2026-10-28T11:56:20.684Z",
+      "elapsedMs": 63234,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": {
+        "passed": 6,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "source": "CURRENT_RUN_PLAYWRIGHT_JSON"
+      },
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/match-ui.log",
+      "sha256": "0d41ad1350e83482e6adfd62a05996ce3722505471125ae0142407a3e37b47cf"
+    },
+    {
+      "name": "career",
+      "executable": "npm",
+      "args": [
+        "exec",
+        "--",
+        "playwright",
+        "test",
+        "--config=playwright.m6g.portable.config.ts",
+        "--reporter=list,json",
+        "--output=test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/career",
+        "--trace=retain-on-failure"
+      ],
+      "startedAtUtc": "2026-10-28T11:57:23.918Z",
+      "elapsedMs": 85512,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": {
+        "passed": 4,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "source": "CURRENT_RUN_PLAYWRIGHT_JSON"
+      },
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/career.log",
+      "sha256": "cfa2ec8724855dca1e52770c3c662e26af2480966320cf25c8c985ade482520f"
+    },
+    {
+      "name": "research-browser-build",
+      "executable": "npm",
+      "args": [
+        "exec",
+        "--",
+        "vite",
+        "build",
+        "--config=vite.m7k.config.ts"
+      ],
+      "startedAtUtc": "2026-10-28T11:58:49.430Z",
+      "elapsedMs": 1050,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": null,
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/research-browser-build.log",
+      "sha256": "0047a5d4fabb624309f93ba17df91d09f6397554b1e82f5d1ce77a7078bbbc95"
+    },
+    {
+      "name": "research-browser",
+      "executable": "npm",
+      "args": [
+        "exec",
+        "--",
+        "playwright",
+        "test",
+        "--config=playwright.m7k.config.ts",
+        "--reporter=list,json",
+        "--output=test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/research",
+        "--trace=retain-on-failure"
+      ],
+      "startedAtUtc": "2026-10-28T11:58:50.481Z",
+      "elapsedMs": 7228,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": {
+        "passed": 4,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "source": "CURRENT_RUN_PLAYWRIGHT_JSON"
+      },
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/research-browser.log",
+      "sha256": "560d9d18dcd5f6c72789d38dcbd13277d2872418fc3aeea9440252c745581224"
+    },
+    {
+      "name": "performance-observations",
+      "executable": "npm",
+      "args": [
+        "exec",
+        "--",
+        "playwright",
+        "test",
+        "--config=playwright.acceptance.config.ts",
+        "--reporter=list,json",
+        "--output=test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/performance",
+        "--trace=retain-on-failure"
+      ],
+      "startedAtUtc": "2026-10-28T11:58:57.709Z",
+      "elapsedMs": 13192,
+      "exitCode": 0,
+      "signal": null,
+      "status": "PASS",
+      "evidence": {
+        "passed": 2,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "source": "CURRENT_RUN_PLAYWRIGHT_JSON"
+      },
+      "evidenceError": null,
+      "log": "test-results/owner-acceptance-2026-10-28T11-55-09-594Z-63457/performance-observations.log",
+      "sha256": "d24f5edd0a27a89e0529f4beb106db9b6d55784af9ca88ec96fd869c47180eb7"
+    }
+  ],
+  "status": "PASS",
+  "ownerPcGate": "NOT_ESTABLISHED",
+  "referenceHardwarePerformance": "NOT_ACCEPTED_INCOMPLETE_BUDGET_COVERAGE",
+  "humanChecklist": "EXISTING_OWNER_REPORT_RETAINED_NO_NEW_OBSERVATIONS_INFERRED",
+  "completedAtUtc": "2026-10-28T11:59:10.911Z"
+}

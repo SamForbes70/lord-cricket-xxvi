@@ -4,6 +4,13 @@ Hosted Windows Chromium/Firefox automation passes in PR #2. Sam reports a succes
 Owner-PC Chromium/Firefox automation remains NOT RUN; hosted jobs do not establish that separate result.
 [Acceptance reconciliation](../ACCEPTANCE_RECONCILIATION.md) records exact evidence and missing details.
 
+## One-command collector
+
+The [local acceptance collector](../LOCAL_ACCEPTANCE_COLLECTOR.md) now runs the build and both-browser suites and records source and host metadata.
+Run `node scripts/owner-acceptance.mjs --owner-pc` from a clean latest checkout on the owner's Windows PC.
+The collector retains logs and actual exit codes, uses fresh profiles and uploads no files.
+The detailed commands below remain available for diagnosis.
+
 ## Automated browser run on Windows
 
 Use a clean checkout of `main`, Node >=22.12, npm, Git and Python 3. Preserve any local changes; do not reset a working checkout to prepare acceptance. Keep an existing `LCXXVI_CHROMIUM_EXECUTABLE` override unset unless it intentionally names a supported Windows Chromium executable.

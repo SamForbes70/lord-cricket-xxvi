@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ✓ tests/unit/offscreen-fixture.test.ts (9 tests) 6657ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > runs a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once  559ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > shared XI and condition helpers reproduce the accepted off-screen fixture outcome  451ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > replay and command resimulation remain exact for an off-screen fixture  969ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > uses manual availability when selecting the XI and falls back to the second keeper  382ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > round execution sorts fixture IDs and is batch-order independent by construction  2070ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > can pause before the user's fixture while simulating the other three matches  1325ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > rejects duplicate fixture execution, wrong career date and insufficient availability  486ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > detects outcome tampering through the canonical outcome hash  412ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  12:29:35
+   Duration  7.34s (transform 230ms, setup 0ms, collect 465ms, tests 6.66s, environment 0ms, prepare 65ms)
+

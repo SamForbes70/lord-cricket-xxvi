@@ -1,0 +1,22 @@
+{
+  "runId": 40687063724,
+  "jobId": 122812038395,
+  "head": "515a3522a04090a76a73775a0d1b170cf4016bf8",
+  "artifactId": 12815118291,
+  "artifactSha256": "5df3a784872b8de1a2d97069a11aa94a24e981a8f69eaeb2d9ced701b48ff6cd",
+  "totalTests": 609,
+  "passedTests": 607,
+  "failedTests": [
+    {
+      "name": "Pass 12D deterministic off-screen T20 fixture execution round execution sorts fixture IDs and is batch-order independent by construction",
+      "durationMs": 6133.290400000002,
+      "failure": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "name": "Pass 12D deterministic off-screen T20 fixture execution can pause before the user's fixture while simulating the other three matches",
+      "durationMs": 6289.927900000001,
+      "failure": "Error: STACK_TRACE_ERROR"
+    }
+  ],
+  "resolution": "Raise only the two multi-fixture functional deadlines from 5 seconds to 30 seconds. Preserve all assertions and separate performance measurements."
+}
