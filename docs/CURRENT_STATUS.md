@@ -6,13 +6,16 @@ PR #3 merged as `4aa71d9` after integration with `b4aceda`. Historical simulatio
 The accepted gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
 M7 quality validation and M8 release acceptance remain incomplete.
 
-## Latest acceptance tooling
+## Latest acceptance and M7K verification
 
-PR #9 merged as `0fba56c` with four passing checks and durable cross-innings research transactions.
-[Acceptance backlog audit](verification-acceptance-backlog/README.md) records the current collector and remaining external gates.
-Fresh final core verification passes 609 TypeScript tests and 87 research Python tests.
-The full acceptance wrapper now reports the observed current-run total instead of hard-coded historical counts.
-[The owner-PC collector](LOCAL_ACCEPTANCE_COLLECTOR.md) automates local browser evidence without opening existing browser profiles.
+PR #12 merged as `b755034` after four passing Linux and Windows checks.
+It fixes career acceptance waits and adds a delayed-save regression with durable reload checks.
+[The completion report](verification-m7k/completion/REPORT.md) records the latest work and remaining evidence gates.
+Fresh unit verification passes 624 TypeScript tests; Python discovery passes 93 tests.
+Research browser acceptance now checks all seven engineering fixtures in both physical-end orientations.
+These synthetic expectations remain separate from complete historical source fixtures.
+The source audit verifies 69 events across 65 matches; the refreshed forward inventory still contains 18 candidates.
+[The owner-PC collector](LOCAL_ACCEPTANCE_COLLECTOR.md) runs local acceptance without opening existing browser profiles.
 Cloud and hosted runs remain separate from owner-PC and reference-laptop acceptance.
 
 ## Implemented product
@@ -41,7 +44,9 @@ The match, layout and repeated replay checks pass by owner report.
 The owner-archive comparison passes 23 manifest hashes, 894 historical source files and 16 HTTP asset checks.
 Simulation-worker and persistence-module bytes agree with the original release.
 
-Owner-PC Chromium/Firefox automation remains NOT RUN.
+The latest supplied owner-PC run passed 609 unit tests and all six match UI tests.
+Its career suite passed three tests and failed Firefox's five-second save assertion.
+PR #12 fixes that assertion; the updated owner-PC result has not been supplied.
 Individual human metadata and some separate checklist observations remain NOT RECORDED.
 Reference-hardware performance budgets and empirical model promotion remain unaccepted.
 [ACCEPTANCE_RECONCILIATION.md](ACCEPTANCE_RECONCILIATION.md) records those distinctions and issue #1's residual gate.

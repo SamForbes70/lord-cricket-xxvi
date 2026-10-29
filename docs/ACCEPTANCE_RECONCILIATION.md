@@ -16,7 +16,7 @@ It does not certify an empirical model or reference-hardware performance.
 | Linux Chromium/Firefox | PASS in recorded runs | Baseline and layout follow-up include UI, persistence, formats and career evidence. |
 | Hosted Windows Chromium/Firefox | PASS in recorded runs | Six match UI tests and four portable career tests on native Windows runners. |
 | Owner-PC installation/build | PASS by supplied output | Node v24.22.0; successful `npm.cmd ci` and `npm.cmd run build`. |
-| Owner-PC Chromium/Firefox automation | NOT RUN | No direct connection or execution result from the owner's machine. |
+| Owner-PC Chromium/Firefox automation | INCOMPLETE | Supplied run on `c5dc22a`: 609 unit tests and six UI tests pass; career three pass, Firefox save assertion fails. PR #12 fixes the test; updated owner result is pending. |
 | Owner Windows Edge match | PASS by owner report | Full match, usable layout and repeated replay verification; exact result/hashes in the human record. |
 | Formal human metadata | PARTIAL | Exact Windows/browser versions, tested commit and viewport dimensions were not supplied. |
 | Individual human checklist observations | PARTIAL | Keyboard-focus visibility, unavailable-bowler explanations and terminal controls lack separate observations. |

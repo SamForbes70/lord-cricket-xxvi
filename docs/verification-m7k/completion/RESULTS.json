@@ -1,0 +1,61 @@
+{
+  "recordedAtUtc": "2026-10-29T12:03:58.506247+00:00",
+  "unit": {
+    "passed": 624,
+    "failed": 0,
+    "pending": 0,
+    "files": 39
+  },
+  "python": {
+    "passed": 93
+  },
+  "candidateBrowsers": {
+    "startTime": "2026-10-29T12:08:45.319Z",
+    "duration": 32160.819999999996,
+    "expected": 30,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "engineeringFixtures": 7,
+  "orientationsPerFixture": 2,
+  "historicalProbes": 2,
+  "acceptedCompleteHistoricalFixtures": 0,
+  "sourceVerifiedCases": 69,
+  "sourceVerifiedMatches": 65,
+  "forwardCandidateMatches": 18,
+  "minimumEvaluationMatches": 200,
+  "outcomesOpenedForEvaluation": false,
+  "ownerPcLatestSuppliedRun": "FAIL_ON_c5dc22a_CAREER_FIREFOX_FIVE_SECOND_ASSERTION",
+  "ownerPcUpdatedRerun": "NOT_SUPPLIED",
+  "referenceHardwarePerformance": "BLOCKED_NO_QUALIFYING_HOST_OR_TOTAL_MEMORY_EVIDENCE",
+  "gameplayPromotion": "NOT_AUTHORISED",
+  "productionSmoke": {
+    "passed": 23
+  },
+  "productionUi": {
+    "passed": 6,
+    "failed": 0,
+    "flaky": 0,
+    "skipped": 0
+  },
+  "schemas": {
+    "checked": 167,
+    "status": "PASS"
+  },
+  "build": "PASS",
+  "typecheck": "PASS",
+  "lint": "PASS",
+  "scoringFixtures": "PASS",
+  "randomVectors": "PASS",
+  "probabilityVectors": "PASS",
+  "generatorVectors": "PASS",
+  "performanceBrowsers": {
+    "startTime": "2026-10-29T12:06:45.037Z",
+    "duration": 185297.339,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
