@@ -1,0 +1,96 @@
+{
+  "commands": [
+    {
+      "command": "npm test -- --maxWorkers=2 --reporter=default --reporter=json --outputFile=/workspace/completion-final-unit.json",
+      "status": "PASS",
+      "tests": 624,
+      "exitCode": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_*.py",
+      "status": "PASS",
+      "tests": 93,
+      "exitCode": 0
+    },
+    {
+      "command": "npx playwright test --reporter list",
+      "status": "PASS",
+      "tests": 23,
+      "exitCode": 0
+    },
+    {
+      "command": "npx playwright test --config playwright.ui.config.ts --reporter list,json --output /workspace/completion-ui",
+      "status": "PASS",
+      "tests": 6,
+      "exitCode": 0
+    },
+    {
+      "command": "npx playwright test --config playwright.m7k.config.ts --reporter list,json",
+      "status": "PASS",
+      "tests": 30,
+      "exitCode": 0
+    },
+    {
+      "command": "npx playwright test --config playwright.acceptance.config.ts --reporter list,json",
+      "status": "PASS",
+      "tests": 4,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run schemas:check",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run lint",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run fixtures:engine",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run vectors:check",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run probability:check",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run generator:check",
+      "status": "PASS",
+      "tests": null,
+      "exitCode": 0
+    }
+  ],
+  "browserEnvironment": {
+    "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+    "sandbox": "NORMAL_BROWSER_SANDBOX_ON_APPROVED_EXECUTION_HOST"
+  },
+  "dataDownload": "curl --fail --location --retry 2 --output /workspace/m7k-completion-data/t20s_male_json.zip https://cricsheet.org/downloads/t20s_male_json.zip",
+  "sourceAudit": "python3 scripts/m7k-audit-source-context.py --archive /workspace/m7k-completion-data/t20s_male_json.zip --out /workspace/m7k-completion-data/SOURCE_CONTEXT.json",
+  "forwardInventory": "python3 scripts/m7k-inventory-forward.py --archive /workspace/m7k-completion-data/t20s_male_json.zip --after-date 2026-10-14 --out /workspace/m7k-completion-data/FORWARD_INVENTORY.json",
+  "performanceQualification": "SHARED_CLOUD_HOST_OBSERVATIONS_ONLY; some overlap with unit and candidate verification, not a controlled reference-hardware run"
+}

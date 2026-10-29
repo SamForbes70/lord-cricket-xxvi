@@ -1,0 +1,86 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run --maxWorkers=2 --reporter=default --reporter=json --outputFile=/workspace/completion-final-unit.json
+
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ✓ tests/unit/offscreen-fixture.test.ts (9 tests) 7692ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > runs a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once  725ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > shared XI and condition helpers reproduce the accepted off-screen fixture outcome  539ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > replay and command resimulation remain exact for an off-screen fixture  1209ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > uses manual availability when selecting the XI and falls back to the second keeper  350ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > round execution sorts fixture IDs and is batch-order independent by construction  2267ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > can pause before the user's fixture while simulating the other three matches  1430ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > rejects duplicate fixture execution, wrong career date and insufficient availability  618ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > detects outcome tampering through the canonical outcome hash  548ms
+ ✓ tests/unit/odi-match.test.ts (10 tests) 6219ms
+   ✓ Pass 10 / M5A ODI format > ends the first innings on exactly 300 legal balls with no phantom 301st ball  371ms
+   ✓ Pass 10 / M5A ODI format > runs, replays, resimulates and rehydrates a complete seeded ODI  3452ms
+   ✓ Pass 10 / M5A ODI format > round-trips a complete ODI through the portable save archive  2151ms
+ ✓ tests/unit/persistence-m4.test.ts (4 tests) 6804ms
+   ✓ M4 deterministic persistence and portable archive > produces byte-identical final state across repeated save/rehydrate cycles  6418ms
+ ✓ tests/unit/red5-match.test.ts (10 tests) 6448ms
+   ✓ Pass 11 / M5B red-ball profile > makes the new ball available after 480 legal balls and resets only ball age  635ms
+   ✓ Pass 11 / M5B red-ball profile > completes a deterministic five-day exhibition and reproduces its final chain  5255ms
+ ✓ tests/unit/t20-match.test.ts (15 tests) 4905ms
+   ✓ Pass 07B independently authored match fixtures > rejects hash-tampered event, state, chain, wrong version and invalid stage pack  1783ms
+   ✓ Pass 07B independently authored match fixtures > pins first complete seeded match scorecard as regression observation distinct from independent rule goldens  594ms
+   ✓ Pass 07B independently authored match fixtures > fully seeded match reconciles scorecard/events and event-prefix interrupted replay at every event  1657ms
+ ✓ tests/unit/season-persistence.test.ts (10 tests) 37352ms
+   ✓ M6F durable season state and archive > reloads an active portable save and can advance into the next scheduled round  1344ms
+ ✓ tests/unit/quality-scenarios.test.ts (4 tests) 2824ms
+   ✓ M7 scenario quality harness > covers all teams and grounds with immutable deterministic paired cells  533ms
+   ✓ M7 scenario quality harness > observing either policy preserves its authoritative engine and scorecard hashes  1888ms
+   ✓ M7 scenario quality harness > keeps winning chases separate and rejects duplicated or mismatched pairs  400ms
+ ✓ tests/unit/m7b-opponent.test.ts (2 tests) 2823ms
+   ✓ M7B optional opponent through authoritative T20 engine > opponent never commands the human team or advances a ball automatically  1595ms
+   ✓ M7B optional opponent through authoritative T20 engine > same seed and choices produce bit-identical event chains  1226ms
+ ✓ tests/unit/career-application-service.test.ts (2 tests) 2621ms
+   ✓ Pass 12G-R career application service > creates a durable career, persists training, stops at the user fixture and completes it exactly once  2601ms
+ ✓ tests/unit/match-ui.test.ts (6 tests) 1667ms
+   ✓ M3 production worker controller > completes a manual match, stops at decisions, blocks ineligible bowlers, proves replay, keeps seed private and prevents terminal deliveries  1393ms
+ ✓ tests/unit/m7k-evaluation.test.ts (16 tests) 1666ms
+   ✓ M7K sealed-cohort evaluation tooling > runs the offline CLI and rejects an unfrozen protocol before reading result files  1032ms
+   ✓ M7K sealed-cohort evaluation tooling > reports both innings, competitions, training-defined bands, ablations and repeatable uncertainty  399ms
+ ✓ tests/unit/m7-ai-analytics.test.ts (7 tests) 1991ms
+   ✓ M7 canonical T20 match analytics > reconciles every summary against one complete accepted T20 event chain  748ms
+   ✓ M7 tactical captain engine integration > both captains use legal accepted engine commands and remain deterministic under replay  1236ms
+ ✓ tests/unit/contracts.test.ts (29 tests) 1550ms
+   ✓ every generated schema compiles with strict AJV 2020-12  1361ms
+ ✓ tests/unit/scoring-fixtures.test.ts (84 tests) 804ms
+   ✓ runs a real scorer comparison gate against the retained corpus  572ms
+ ✓ tests/unit/season-projections.test.ts (8 tests) 779ms
+   ✓ Pass 12E league table, NRR and season statistical projections > adapts a validated Pass 12D outcome into the shared season projection path  724ms
+ ✓ tests/unit/career-training.test.ts (10 tests) 526ms
+ ✓ tests/unit/m7k-book-journal.test.ts (9 tests) 572ms
+   ✓ M7K durable cross-innings transactions > recovers both innings after a real writer-process exit before checkpoint publication  465ms
+ ✓ tests/unit/m7k-ledger.test.ts (22 tests) 465ms
+ ✓ tests/unit/t20-setup.test.ts (20 tests) 337ms
+ ✓ tests/unit/m7k-oracle-acceptance.test.ts (14 tests) 273ms
+ ✓ tests/unit/world.test.ts (28 tests) 314ms
+ ✓ tests/unit/owner-acceptance-plan.test.ts (3 tests) 233ms
+ ✓ tests/unit/m7g-research-scoring.test.ts (5 tests) 287ms
+ ✓ tests/unit/career-condition.test.ts (9 tests) 279ms
+ ✓ tests/unit/m7h-research-chase.test.ts (6 tests) 160ms
+ ✓ tests/unit/scoring-kernel.test.ts (134 tests) 170ms
+ ✓ tests/unit/probability.test.ts (23 tests) 145ms
+ ✓ tests/unit/m7b-controller.test.ts (1 test) 109ms
+ ✓ tests/unit/m7k-journal.test.ts (10 tests) 72ms
+ ✓ tests/unit/generator.test.ts (19 tests) 121ms
+ ✓ tests/unit/season-scheduler.test.ts (8 tests) 63ms
+ ✓ tests/unit/random-service.test.ts (44 tests) 41ms
+ ✓ tests/unit/m7f-research-joint.test.ts (5 tests) 21ms
+ ✓ tests/unit/m7j-adjudication.test.ts (12 tests) 20ms
+ ✓ tests/unit/m7k-historical-probes.test.ts (4 tests) 12ms
+ ✓ tests/unit/determinism.test.ts (6 tests) 10ms
+ ✓ tests/unit/acceptance-evidence.test.ts (4 tests) 6ms
+ ✓ tests/unit/defaults.test.ts (3 tests) 4ms
+ ✓ tests/unit/red5-clock.test.ts (9 tests) 5ms
+
+ Test Files  39 passed (39)
+      Tests  624 passed (624)
+   Start at  12:08:40
+   Duration  54.48s (transform 1.15s, setup 0ms, collect 10.52s, tests 90.39s, environment 7ms, prepare 2.42s)
+
+JSON report written to /workspace/completion-final-unit.json

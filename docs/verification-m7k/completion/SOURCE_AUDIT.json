@@ -1,0 +1,12 @@
+{
+  "version": "LC_M7K_SOURCE_CONTEXT_V1",
+  "sourceCaseCount": 69,
+  "matchCount": 65,
+  "signatureCount": 45,
+  "acceptedFixtureCount": 0,
+  "gameplayIntegrationPermitted": false,
+  "contextMeaning": "Source array order and recorded values only; not umpire chronology, accepted totals or physical ends.",
+  "archiveSha256": "691f1f42b86c93fbdbc53936ed69479f9306bf39c4c56b4c0729360051075c6d",
+  "registerSha256": "49354d82f872f5237b5e56fcae9932f2f48b1b733da1e5ccce330547c149adf1",
+  "selectionSha256": "3d464f525348511111390d3305b46df5c5cc527b3186a3a2ce3222f12e8d1069"
+}

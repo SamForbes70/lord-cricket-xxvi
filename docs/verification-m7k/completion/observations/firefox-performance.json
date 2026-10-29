@@ -1,0 +1,221 @@
+{
+  "version": "LC_BROWSER_ACCEPTANCE_OBSERVATIONS_V1",
+  "browser": "firefox",
+  "browserVersion": "142.0.1",
+  "observations": {
+    "commands": [
+      {
+        "label": "Call heads",
+        "ms": 19,
+        "startedAtMs": 1064,
+        "completedAtMs": 1083
+      },
+      {
+        "label": "Bat first",
+        "ms": 23,
+        "startedAtMs": 1246,
+        "completedAtMs": 1269
+      },
+      {
+        "label": "Walen Sableholt",
+        "ms": 29,
+        "startedAtMs": 1431,
+        "completedAtMs": 1460
+      },
+      {
+        "label": "Pavan Zornstone",
+        "ms": 26,
+        "startedAtMs": 1614,
+        "completedAtMs": 1640
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 31,
+        "startedAtMs": 1798,
+        "completedAtMs": 1829
+      },
+      {
+        "label": "Next delivery",
+        "ms": 38,
+        "startedAtMs": 1997,
+        "completedAtMs": 2035
+      },
+      {
+        "label": "Next delivery",
+        "ms": 27,
+        "startedAtMs": 2179,
+        "completedAtMs": 2206
+      },
+      {
+        "label": "Next delivery",
+        "ms": 25,
+        "startedAtMs": 2362,
+        "completedAtMs": 2387
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22,
+        "startedAtMs": 2546,
+        "completedAtMs": 2568
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22,
+        "startedAtMs": 2729,
+        "completedAtMs": 2751
+      },
+      {
+        "label": "Next delivery",
+        "ms": 29,
+        "startedAtMs": 2913,
+        "completedAtMs": 2942
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 23,
+        "startedAtMs": 3013,
+        "completedAtMs": 3036
+      },
+      {
+        "label": "Next delivery",
+        "ms": 28,
+        "startedAtMs": 3198,
+        "completedAtMs": 3226
+      },
+      {
+        "label": "Next delivery",
+        "ms": 25,
+        "startedAtMs": 3379,
+        "completedAtMs": 3404
+      },
+      {
+        "label": "Next delivery",
+        "ms": 31,
+        "startedAtMs": 3563,
+        "completedAtMs": 3594
+      },
+      {
+        "label": "Next delivery",
+        "ms": 30,
+        "startedAtMs": 3762,
+        "completedAtMs": 3792
+      },
+      {
+        "label": "Next delivery",
+        "ms": 29,
+        "startedAtMs": 3929,
+        "completedAtMs": 3958
+      },
+      {
+        "label": "Next delivery",
+        "ms": 30,
+        "startedAtMs": 4113,
+        "completedAtMs": 4143
+      },
+      {
+        "label": "Talor Elmholt",
+        "ms": 19,
+        "startedAtMs": 4297,
+        "completedAtMs": 4316
+      },
+      {
+        "label": "Next delivery",
+        "ms": 23,
+        "startedAtMs": 4396,
+        "completedAtMs": 4419
+      },
+      {
+        "label": "Rilan Rookfield",
+        "ms": 20,
+        "startedAtMs": 4581,
+        "completedAtMs": 4601
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22,
+        "startedAtMs": 4781,
+        "completedAtMs": 4803
+      },
+      {
+        "label": "Next delivery",
+        "ms": 24,
+        "startedAtMs": 4966,
+        "completedAtMs": 4990
+      },
+      {
+        "label": "Next delivery",
+        "ms": 27,
+        "startedAtMs": 5145,
+        "completedAtMs": 5172
+      },
+      {
+        "label": "Next delivery",
+        "ms": 55,
+        "startedAtMs": 5346,
+        "completedAtMs": 5401
+      },
+      {
+        "label": "Next delivery",
+        "ms": 28,
+        "startedAtMs": 5530,
+        "completedAtMs": 5558
+      },
+      {
+        "label": "Fenn Glenthorne",
+        "ms": 21,
+        "startedAtMs": 5697,
+        "completedAtMs": 5718
+      },
+      {
+        "label": "Next delivery",
+        "ms": 30,
+        "startedAtMs": 5879,
+        "completedAtMs": 5909
+      },
+      {
+        "label": "Next delivery",
+        "ms": 22,
+        "startedAtMs": 6062,
+        "completedAtMs": 6084
+      },
+      {
+        "label": "Zerin Wrenbrook",
+        "ms": 22,
+        "startedAtMs": 6232,
+        "completedAtMs": 6254
+      }
+    ],
+    "longTasks": [],
+    "longTaskSupported": false,
+    "jsHeapBytes": null,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    }
+  },
+  "commandAcknowledgement": {
+    "samples": 30,
+    "p95Ms": 38,
+    "proposedBudgetMs": 100,
+    "observedWithinProposedBudget": true,
+    "scope": "Click dispatch to committed revision rendered without exhibition save; includes browser and worker scheduling."
+  },
+  "longTasks": {
+    "supported": false,
+    "maximumPageLifetimeMs": null,
+    "maximumDuringMeasuredCommandsMs": null,
+    "proposedMaximumMs": 50,
+    "scope": "Separate page-lifetime tasks from tasks overlapping measured command windows; entries expose tasks at least 50 ms."
+  },
+  "status": "OBSERVATIONS_ONLY_REFERENCE_HARDWARE_UNVERIFIED",
+  "remainingBudgets": [
+    "T20 engine-only match p95",
+    "Five-day match p95",
+    "56-match league",
+    "IndexedDB save p95",
+    "Active-game load p95",
+    "Total application memory including workers and native allocations"
+  ],
+  "referenceHardwareAccepted": false
+}
