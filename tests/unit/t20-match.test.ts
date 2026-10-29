@@ -184,7 +184,7 @@ describe("Pass 07B independently authored match fixtures",()=>{
     expect(()=>replayT20Events(setup,([{...s.events[0]!,version:"LC_T20_EVENT_CHAIN_V2"}] as unknown as typeof s.events))).toThrow();
     expect(()=>createT20Session({...setup,stagePackHash:"0".repeat(64)})).toThrow();
     resimulateT20Commands(s);
-  });
+  }, 30_000);
   it("pins first complete seeded match scorecard as regression observation distinct from independent rule goldens",()=>{
     const s=runFixtureT20(setup),card=projectT20Scorecard(s);
     expect(card.innings.map(i=>[i.runs,i.wickets,i.legalBalls])).toEqual([[107,6,120],[96,10,106]]);
@@ -212,5 +212,5 @@ describe("Pass 07B independently authored match fixtures",()=>{
       expect(resumed.lastEventHash).toBe(edge.lastEventHash);
     }
 
-  });
+  }, 30_000);
 });

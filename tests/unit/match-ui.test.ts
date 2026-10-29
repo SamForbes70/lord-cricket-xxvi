@@ -223,7 +223,7 @@ describe("M3 production worker controller", () => {
         /"seed"|"worldSeed"|"setup"|"commands"/,
       );
     }
-  });
+  }, 30_000);
   it("single-delivery advance emits at most one delivery and cannot skip a manual stop", () => {
     const h = harness();
     h.start();

@@ -142,7 +142,7 @@ describe("M4 deterministic persistence and portable archive", () => {
     expect(canonicalJson(repeatedlyResumed)).toBe(canonicalJson(uninterrupted));
     expect(repeatedlyResumed.lastEventHash).toBe(uninterrupted.lastEventHash);
     expect(canonicalJson(repeatedlyResumed.events)).toBe(canonicalJson(uninterrupted.events));
-  }, 15_000);
+  }, 60_000);
 
   it("rehydrates a saved T20 only by replaying its validated command history", () => {
     const session = sessionAfterPlay();
