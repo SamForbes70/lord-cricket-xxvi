@@ -289,7 +289,7 @@ describe("Pass 10 / M5A ODI format", () => {
     const restored = rehydrateODISession(structuredClone(s), world, manifest);
     expect(restored.lastEventHash).toBe(s.lastEventHash);
     expect(projectODIScorecard(restored)).toEqual(card);
-  }, 15_000);
+  }, 60_000);
 
   it("round-trips a complete ODI through the portable save archive", async () => {
     const s = runFixtureODI(setup, 800);

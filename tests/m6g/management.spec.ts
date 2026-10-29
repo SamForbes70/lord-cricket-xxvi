@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 test("M6G management career creates, persists, navigates, progresses and completes", async ({ page, browser }, testInfo) => {
+  test.setTimeout(300_000);
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Start a Career/i })).toBeVisible();
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
@@ -25,11 +28,29 @@ test("M6G management career creates, persists, navigates, progresses and complet
   await page.getByRole("button", { name: "Home", exact: true }).click();
   await testInfo.attach("career-home-150", { body: await page.screenshot(), contentType: "image/png" });
 
+  // A delayed hash keeps the real save path pending beyond the old five-second assertion deadline.
+  await page.evaluate(() => {
+    const digest = crypto.subtle.digest.bind(crypto.subtle);
+    crypto.subtle.digest = async (...args: Parameters<SubtleCrypto["digest"]>) => {
+      crypto.subtle.digest = digest;
+      const result = await digest(...args);
+      await new Promise((resolve) => setTimeout(resolve, 6_000));
+      return result;
+    };
+  });
+
   for (let managed = 0; managed < 14; managed += 1) {
     const advance = page.getByRole("button", { name: "Advance to match day" });
     if (await advance.isVisible().catch(() => false)) await advance.click();
     await page.getByRole("button", { name: "Simulate match" }).click();
-    await expect(page.locator(".save-badge strong")).toHaveText("Saved");
+    await expect(page.getByText(`${managed + 1}/14 managed-team fixtures complete.`, { exact: true })).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 60_000 });
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    if (managed === 0) {
+      await page.reload();
+      await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 60_000 });
+      await expect(page.getByText("1/14 managed-team fixtures complete.", { exact: true })).toBeVisible();
+    }
   }
   await expect(page.getByText("Season complete", { exact: true }).first()).toBeVisible();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
@@ -49,6 +70,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
   const importedContext = await browser.newContext();
   try {
     const importedPage = await importedContext.newPage();
+    importedPage.on("pageerror", (error) => pageErrors.push(error.message));
     await importedPage.goto(page.url());
     await expect(importedPage.getByRole("heading", { name: /Start a Career/i })).toBeVisible();
     await importedPage.getByLabel("Choose .lcxxvi archive").setInputFiles(archivePath!);
@@ -61,6 +83,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
   } finally {
     await importedContext.close();
   }
+  expect(pageErrors).toEqual([]);
 });
 
 test("M6G primary career controls are keyboard reachable at 1366x768", async ({ page }) => {

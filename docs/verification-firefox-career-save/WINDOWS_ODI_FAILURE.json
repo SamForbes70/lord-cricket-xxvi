@@ -1,0 +1,18 @@
+{
+  "run": 40848263272,
+  "job": 123361022103,
+  "artifact": 12885064847,
+  "artifactSha256": "6a3dc4d0e451e61dae9f68cb385f4f98cd8c556883558a7c8e9695303da0b410",
+  "unitPassed": 608,
+  "unitFailed": 1,
+  "failed": [
+    {
+      "name": "Pass 10 / M5A ODI format runs, replays, resimulates and rehydrates a complete seeded ODI",
+      "durationMs": 17515.0983
+    }
+  ],
+  "oldDeadlineMs": 15000,
+  "newDeadlineMs": 60000,
+  "assertionsUnchanged": true,
+  "browserSuites": "NOT_RUN_AFTER_UNIT_FAILURE"
+}

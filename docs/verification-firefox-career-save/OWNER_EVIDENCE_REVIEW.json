@@ -1,0 +1,31 @@
+{
+  "archiveSha256": "37ba6d3237a30c62c397e649eeaab7ee1de463dae4f2d1c961247010f3be2b20",
+  "sourceCommit": "c5dc22af295245c7713160fa19097180d5943998",
+  "cleanSourceBeforeAndAfter": true,
+  "allElevenLogHashesVerified": true,
+  "unitTestsPassed": 609,
+  "matchUiTestsPassed": 6,
+  "career": {
+    "passed": 3,
+    "failed": 1,
+    "browser": "firefox",
+    "assertion": "Saved",
+    "observed": "Saving",
+    "deadlineMs": 5000,
+    "snapshotCompletedFixtures": 3,
+    "snapshotManagedFixtures": 0
+  },
+  "researchAndPerformance": "NOT_RUN",
+  "cspInvestigation": {
+    "source": "zod/v4/core/util.js allowsEval",
+    "probe": "new Function inside try/catch; returns false when CSP blocks eval",
+    "ownerTrace": "Probe errors precede Simulate match click",
+    "policy": "UNCHANGED"
+  },
+  "diagnosis": "The five-second assertion covers simulation and persistence of a full round, not just storage latency. The trace does not establish a permanent stalled save.",
+  "regression": "Delay one real hash result by 6000ms, retain its bytes, then require managed progress, Saved, reload, complete season and portable import/reload.",
+  "newOperationDeadlineMs": 60000,
+  "newCareerScenarioDeadlineMs": 300000,
+  "productionCodeAndSaves": "UNCHANGED",
+  "ownerPcAcceptance": "RERUN_REQUIRED"
+}
