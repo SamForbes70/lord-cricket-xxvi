@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright PLAYWRIGHT_JSON_OUTPUT_NAME=/workspace/firefox-career-final.json npx playwright test --config playwright.m6g.portable.config.ts --reporter list,json --output /workspace/firefox-career-final --trace retain-on-failure",
+  "stats": {
+    "startTime": "2026-10-29T09:13:47.394Z",
+    "duration": 104302.203,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "reportSha256": "fdd50cab1ed385d247594a1b4711239448b1f754e8c2c04df82dc62734f2b7ca",
+  "logSha256": "8a7652bdeb7159bc524d141ed822f89327284af1342cd5fded6e62c026eeeca7",
+  "typecheck": "PASS",
+  "lint": "PASS",
+  "productionAndPolicyChanges": false,
+  "restrictedInitialBaseline": "BLOCKED: Firefox startup stalled in restricted execution; stopped and used normal browser sandbox on approved host",
+  "redRun": "FAIL as expected: six-second hash delay exceeded old five-second Saved assertion",
+  "ownerPcRerun": "NOT_RUN"
+}

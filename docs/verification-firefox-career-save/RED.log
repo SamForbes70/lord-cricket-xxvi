@@ -1,0 +1,48 @@
+[WebServer] (node:2165) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2178) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:2196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [firefox] › tests/m6g/management.spec.ts:2:1 › M6G management career creates, persists, navigates, progresses and completes (7.6s)
+
+
+  1) [firefox] › tests/m6g/management.spec.ts:2:1 › M6G management career creates, persists, navigates, progresses and completes 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('.save-badge strong')
+    Expected: "Saved"
+    Received: "Saving"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 5000ms
+      - waiting for locator('.save-badge strong')
+        8 × locator resolved to <strong>Saving</strong>
+          - unexpected value "Saving"
+
+
+      41 |     if (await advance.isVisible().catch(() => false)) await advance.click();
+      42 |     await page.getByRole("button", { name: "Simulate match" }).click();
+    > 43 |     await expect(page.locator(".save-badge strong")).toHaveText("Saved");
+         |                                                      ^
+      44 |   }
+      45 |   await expect(page.getByText("Season complete", { exact: true }).first()).toBeVisible();
+      46 |   await page.getByRole("button", { name: "Statistics", exact: true }).click();
+        at /workspace/lord-cricket-xxvi/tests/m6g/management.spec.ts:43:54
+
+    Error Context: ../firefox-career-red/management-M6G-management--6f6fc-es-progresses-and-completes-firefox/error-context.md
+
+  1 failed
+    [firefox] › tests/m6g/management.spec.ts:2:1 › M6G management career creates, persists, navigates, progresses and completes 
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

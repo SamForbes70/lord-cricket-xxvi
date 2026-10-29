@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "stats": {
+    "startTime": "2026-10-29T09:11:52.513Z",
+    "duration": 100490.059,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "note": "Initial updated wait passed both browsers. Final verification adds progress-first ordering and captures import page errors before navigation."
+}
