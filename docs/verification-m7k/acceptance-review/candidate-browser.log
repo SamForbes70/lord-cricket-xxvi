@@ -1,0 +1,47 @@
+[2m[WebServer] [22m(node:26967) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:26980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 30 tests using 1 worker
+
+(node:26998) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26998) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/m7k/archive.spec.ts:9:3 › dot: original ends import and recover in fresh contexts (381ms)
+  ✓   2 [chromium] › tests/m7k/archive.spec.ts:9:3 › dot: mirrored ends import and recover in fresh contexts (326ms)
+  ✓   3 [chromium] › tests/m7k/archive.spec.ts:9:3 › batting-penalty: original ends import and recover in fresh contexts (392ms)
+  ✓   4 [chromium] › tests/m7k/archive.spec.ts:9:3 › batting-penalty: mirrored ends import and recover in fresh contexts (261ms)
+  ✓   5 [chromium] › tests/m7k/archive.spec.ts:9:3 › fielding-penalty: original ends import and recover in fresh contexts (320ms)
+  ✓   6 [chromium] › tests/m7k/archive.spec.ts:9:3 › fielding-penalty: mirrored ends import and recover in fresh contexts (273ms)
+  ✓   7 [chromium] › tests/m7k/archive.spec.ts:9:3 › retired_out: original ends import and recover in fresh contexts (275ms)
+  ✓   8 [chromium] › tests/m7k/archive.spec.ts:9:3 › retired_out: mirrored ends import and recover in fresh contexts (338ms)
+  ✓   9 [chromium] › tests/m7k/archive.spec.ts:9:3 › retired_not_out: original ends import and recover in fresh contexts (325ms)
+  ✓  10 [chromium] › tests/m7k/archive.spec.ts:9:3 › retired_not_out: mirrored ends import and recover in fresh contexts (396ms)
+  ✓  11 [chromium] › tests/m7k/archive.spec.ts:9:3 › wide-hit-wicket: original ends import and recover in fresh contexts (499ms)
+  ✓  12 [chromium] › tests/m7k/archive.spec.ts:9:3 › wide-hit-wicket: mirrored ends import and recover in fresh contexts (511ms)
+  ✓  13 [chromium] › tests/m7k/archive.spec.ts:9:3 › no-ball-wide-free-hit-chain: original ends import and recover in fresh contexts (931ms)
+  ✓  14 [chromium] › tests/m7k/archive.spec.ts:9:3 › no-ball-wide-free-hit-chain: mirrored ends import and recover in fresh contexts (825ms)
+  ✓  15 [chromium] › tests/m7k/archive.spec.ts:38:1 › browser rejects damaged checkpoints and v1/version substitutions (210ms)
+(node:27806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 [firefox] › tests/m7k/archive.spec.ts:9:3 › dot: original ends import and recover in fresh contexts (1.8s)
+  ✓  17 [firefox] › tests/m7k/archive.spec.ts:9:3 › dot: mirrored ends import and recover in fresh contexts (877ms)
+  ✓  18 [firefox] › tests/m7k/archive.spec.ts:9:3 › batting-penalty: original ends import and recover in fresh contexts (975ms)
+  ✓  19 [firefox] › tests/m7k/archive.spec.ts:9:3 › batting-penalty: mirrored ends import and recover in fresh contexts (963ms)
+  ✓  20 [firefox] › tests/m7k/archive.spec.ts:9:3 › fielding-penalty: original ends import and recover in fresh contexts (935ms)
+  ✓  21 [firefox] › tests/m7k/archive.spec.ts:9:3 › fielding-penalty: mirrored ends import and recover in fresh contexts (916ms)
+  ✓  22 [firefox] › tests/m7k/archive.spec.ts:9:3 › retired_out: original ends import and recover in fresh contexts (1.0s)
+  ✓  23 [firefox] › tests/m7k/archive.spec.ts:9:3 › retired_out: mirrored ends import and recover in fresh contexts (1.1s)
+  ✓  24 [firefox] › tests/m7k/archive.spec.ts:9:3 › retired_not_out: original ends import and recover in fresh contexts (869ms)
+  ✓  25 [firefox] › tests/m7k/archive.spec.ts:9:3 › retired_not_out: mirrored ends import and recover in fresh contexts (756ms)
+  ✓  26 [firefox] › tests/m7k/archive.spec.ts:9:3 › wide-hit-wicket: original ends import and recover in fresh contexts (648ms)
+  ✓  27 [firefox] › tests/m7k/archive.spec.ts:9:3 › wide-hit-wicket: mirrored ends import and recover in fresh contexts (793ms)
+  ✓  28 [firefox] › tests/m7k/archive.spec.ts:9:3 › no-ball-wide-free-hit-chain: original ends import and recover in fresh contexts (1.9s)
+  ✓  29 [firefox] › tests/m7k/archive.spec.ts:9:3 › no-ball-wide-free-hit-chain: mirrored ends import and recover in fresh contexts (1.6s)
+  ✓  30 [firefox] › tests/m7k/archive.spec.ts:38:1 › browser rejects damaged checkpoints and v1/version substitutions (374ms)
+
+  30 passed (26.1s)

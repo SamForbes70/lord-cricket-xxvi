@@ -1,0 +1,33 @@
+{
+  "version": "LC_M7K_ACCEPTANCE_REVIEW_V1",
+  "reviewedAtUtc": "2026-10-29T13:08:26.635970+00:00",
+  "requestedSteps": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "sourceArchiveUrl": "https://cricsheet.org/downloads/all_male_json.zip",
+  "sourceArchiveSha256": "d9c9821830336f33d84645ee522c89daf161addcbcf54f8c86b7baba824fe00d",
+  "formatFilter": "T20",
+  "previousDevelopmentCutoff": "2026-10-14",
+  "forwardCandidatesBeforeEligibility": 18,
+  "minimumEvaluationMatches": 200,
+  "outcomesEvaluated": false,
+  "completeHistoricalFixturePacketsSupplied": 0,
+  "historicalCasesAccepted": 0,
+  "candidateEngineeringFixtures": 7,
+  "referenceHardwareResultsSupplied": false,
+  "completeApplicationMemoryResultsSupplied": false,
+  "steps": {
+    "2": "BLOCKED_MISSING_INCIDENT_FACTS;_EXECUTABLE_INTAKE_IMPLEMENTED",
+    "3": "PASS_ENGINEERING_FIXTURES;HISTORICAL_PACKET_RUN_NOT_POSSIBLE_WITHOUT_STEP_2",
+    "4": "BLOCKED_INSUFFICIENT_FORWARD_T20_DATA",
+    "5": "BLOCKED_NO_QUALIFYING_HARDWARE_RESULTS",
+    "6": "REVIEW_COMPLETE_M7K_NOT_ACCEPTED"
+  },
+  "gameplayIntegrationPermitted": false,
+  "modelPromotionAuthorised": false,
+  "rawSourceArchiveTracked": false
+}

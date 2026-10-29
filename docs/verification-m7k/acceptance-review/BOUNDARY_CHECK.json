@@ -1,0 +1,7 @@
+{
+  "baseline": "64535fcc57db8542560f2d0ac7ffb4ab700e3a90",
+  "productionDiffEmpty": true,
+  "simulationWorkerSha256": "60df03f74ca1595fab9ec8a6c041445f8f1c039b0d634503fe8913f31c83dac4",
+  "rules": "LC_T20_MATCH_V1",
+  "model": "synthetic-alpha-01"
+}

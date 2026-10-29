@@ -8,7 +8,7 @@ import zipfile
 from pathlib import Path
 
 
-def inventory(archive, cutoff):
+def inventory(archive, cutoff, match_type=None):
     datetime.date.fromisoformat(cutoff)
     rows = []
     with zipfile.ZipFile(archive) as source:
@@ -20,7 +20,10 @@ def inventory(archive, cutoff):
             if not name.endswith(".json"):
                 continue
             raw = source.read(name)
-            dates = json.loads(raw)["info"]["dates"]
+            info = json.loads(raw)["info"]
+            if match_type is not None and info.get("match_type") != match_type:
+                continue
+            dates = info["dates"]
             if not dates:
                 raise ValueError("Missing match dates")
             for date in dates:
@@ -28,11 +31,14 @@ def inventory(archive, cutoff):
             if min(dates) > cutoff:
                 rows.append({"matchId": Path(name).stem, "date": min(dates), "lastDate": max(dates),
                              "sourceSha256": hashlib.sha256(raw).hexdigest()})
-    return {"version": "LC_M7K_FORWARD_METADATA_INVENTORY_V1", "archiveSha256": hashlib.sha256(Path(archive).read_bytes()).hexdigest(),
+    result = {"version": "LC_M7K_FORWARD_METADATA_INVENTORY_V1", "archiveSha256": hashlib.sha256(Path(archive).read_bytes()).hexdigest(),
             "licenceNoticeSha256": hashlib.sha256(notice).hexdigest(), "priorDevelopmentLatestDate": cutoff,
             "minimumEvaluationMatches": 200, "forwardMatchCount": len(rows),
             "evaluationStatus": "BLOCKED_INSUFFICIENT_FORWARD_MATCHES" if len(rows) < 200 else "ELIGIBILITY_AND_SEAL_REVIEW_REQUIRED",
             "outcomesEvaluated": False, "matches": sorted(rows, key=lambda row: (row["date"], row["matchId"]))}
+    if match_type is not None:
+        result["matchTypeFilter"] = match_type
+    return result
 
 
 def main():
@@ -40,8 +46,9 @@ def main():
     parser.add_argument("--archive", required=True)
     parser.add_argument("--after-date", required=True)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--match-type", choices=["T20", "ODI", "ODM", "Test", "MDM"])
     args = parser.parse_args()
-    result = inventory(args.archive, args.after_date)
+    result = inventory(args.archive, args.after_date, args.match_type)
     Path(args.out).write_text(json.dumps(result, indent=2) + "\n")
     print(f"{result['evaluationStatus']}: {result['forwardMatchCount']} forward-dated matches before eligibility checks; minimum 200.")
 

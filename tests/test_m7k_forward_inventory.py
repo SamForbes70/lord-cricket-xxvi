@@ -28,6 +28,19 @@ class ForwardInventoryTests(unittest.TestCase):
             self.assertFalse(result["outcomesEvaluated"])
             self.assertEqual(result, MODULE.inventory(archive, "2026-10-14"))
 
+    def test_format_filter_excludes_other_formats_and_unknown_types(self):
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "formats.zip"
+            with zipfile.ZipFile(archive, "w") as source:
+                source.writestr("LICENSE.txt", "Synthetic test data")
+                for index, kind in enumerate(["T20", "ODI", "ODM", "Test", "MDM", None]):
+                    source.writestr(f"{index}.json", json.dumps({"info": {"dates": ["2026-10-15"], "match_type": kind}}))
+            result = MODULE.inventory(archive, "2026-10-14", "T20")
+            self.assertEqual(result["forwardMatchCount"], 1)
+            self.assertEqual(result["matchTypeFilter"], "T20")
+            self.assertEqual(result["matches"][0]["matchId"], "0")
+            self.assertEqual(MODULE.inventory(archive, "2026-10-14")["forwardMatchCount"], 6)
+
     def test_invalid_cutoff_rejects_before_archive_access(self):
         with self.assertRaises(ValueError):
             MODULE.inventory("missing.zip", "not-a-date")

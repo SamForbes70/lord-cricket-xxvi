@@ -11,12 +11,20 @@ M7 quality validation and M8 release acceptance remain incomplete.
 PR #12 merged as `b755034` after four passing Linux and Windows checks.
 It fixes career acceptance waits and adds a delayed-save regression with durable reload checks.
 [The completion report](verification-m7k/completion/REPORT.md) records the latest work and remaining evidence gates.
-Fresh unit verification passes 624 TypeScript tests; Python discovery passes 93 tests.
+Fresh unit verification passes 638 TypeScript tests; Python discovery passes 94 tests.
 Research browser acceptance now checks all seven engineering fixtures in both physical-end orientations.
 These synthetic expectations remain separate from complete historical source fixtures.
 The source audit verifies 69 events across 65 matches; the refreshed forward inventory still contains 18 candidates.
 [The owner-PC collector](LOCAL_ACCEPTANCE_COLLECTOR.md) runs local acceptance without opening existing browser profiles.
 Cloud and hosted runs remain separate from owner-PC and reference-laptop acceptance.
+
+## Steps 2–6 acceptance review
+
+[The acceptance review](verification-m7k/acceptance-review/REPORT.md) adds executable intake for complete historical fixture packets.
+It checks every expected prefix against ledger execution, replay and checkpoint recovery.
+A broader all-format men's archive still supplies only 18 forward-dated T20 candidates before eligibility checks.
+Historical decisions, sufficient untouched data and qualifying hardware measurements remain missing.
+Overall M7K acceptance remains incomplete; gameplay promotion remains unauthorised.
 
 ## Implemented product
 
