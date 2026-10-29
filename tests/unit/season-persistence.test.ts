@@ -124,7 +124,7 @@ beforeAll(async () => {
     controlledTeamId: "team-01", schedule, careerState: userPlayed.careerState, projection,
     completedMatches: [...completions, userCompletion].sort((a, b) => a.fixtureOrdinal - b.fixtureOrdinal), revision: 4, phase: "ACTIVE",
   });
-}, 120_000);
+}, 300_000);
 
 describe("M6F durable season state and archive", () => {
   it("binds schedule, career, projection and canonical completions into one hashed state", async () => {

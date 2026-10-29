@@ -1,0 +1,60 @@
+{
+  "sourceArchive": "owner-acceptance-2026-10-29T00-38-03-846Z-18476.zip",
+  "archiveSha256": "25eb22b335aef6ce0eb33fdd56c3125e450ab9eb11e9793a1ebce15f15ad06cd",
+  "testedCommit": "1352dc65df73b100325790dbd0be8029c04fe84c",
+  "ownerSourceCleanBeforeAndAfter": true,
+  "allNineLogHashesVerified": true,
+  "ownerResult": "FAIL",
+  "unitCounts": {
+    "numTotalTests": 609,
+    "numPassedTests": 593,
+    "numFailedTests": 6,
+    "numPendingTests": 10
+  },
+  "browserSuites": "NOT_RUN_AFTER_UNIT_FAILURE",
+  "failures": [
+    {
+      "test": "M3 production worker controller completes a manual match, stops at decisions, blocks ineligible bowlers, proves replay, keeps seed private and prevents terminal deliveries",
+      "durationMs": 5044.9423
+    },
+    {
+      "test": "Pass 12D deterministic off-screen T20 fixture execution runs a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once",
+      "durationMs": 5077.4522
+    },
+    {
+      "test": "Pass 12D deterministic off-screen T20 fixture execution replay and command resimulation remain exact for an off-screen fixture",
+      "durationMs": 7049.0848000000005
+    },
+    {
+      "test": "M4 deterministic persistence and portable archive produces byte-identical final state across repeated save/rehydrate cycles",
+      "durationMs": 20434.250399999997
+    },
+    {
+      "test": "Pass 07B independently authored match fixtures rejects hash-tampered event, state, chain, wrong version and invalid stage pack",
+      "durationMs": 6638.1166
+    },
+    {
+      "test": "Pass 07B independently authored match fixtures fully seeded match reconciles scorecard/events and event-prefix interrupted replay at every event",
+      "durationMs": 6483.7541
+    }
+  ],
+  "setupHook": {
+    "file": "tests/unit/season-persistence.test.ts",
+    "oldDeadlineMs": 120000,
+    "newDeadlineMs": 300000,
+    "affectedPendingTests": 10
+  },
+  "changes": {
+    "fiveFullMatchTests": {
+      "oldDeadlineMs": 5000,
+      "newDeadlineMs": 30000
+    },
+    "saveRehydrateCycles": {
+      "oldDeadlineMs": 15000,
+      "newDeadlineMs": 60000
+    }
+  },
+  "assertionsUnchanged": true,
+  "productionCodeUnchanged": true,
+  "performanceBudgetsUnchanged": true
+}

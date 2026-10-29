@@ -80,7 +80,7 @@ describe("Pass 12D deterministic off-screen T20 fixture execution", () => {
     expect(simulated.careerState.appliedMatchConditions).toHaveLength(1);
     expect(simulated.careerState.appliedMatchConditions[0]!.matchId).toBe(fixture.matchId);
     expect(Object.values(simulated.outcome.conditionDelta.playerFatigueDeltaBp).every((value) => value > 0)).toBe(true);
-  });
+  }, 30_000);
 
   test("shared XI and condition helpers reproduce the accepted off-screen fixture outcome", () => {
     const { seasonSchedule, careerState } = baseline();
@@ -110,7 +110,7 @@ describe("Pass 12D deterministic off-screen T20 fixture execution", () => {
     const replay = replayT20Events(simulated.session.setup, simulated.session.events, simulated.outcome.eventChain);
     expect(replay.lastEventHash).toBe(simulated.session.lastEventHash);
     expect(() => resimulateT20Commands(simulated.session)).not.toThrow();
-  });
+  }, 30_000);
 
   test("uses manual availability when selecting the XI and falls back to the second keeper", () => {
     const seasonSchedule = schedule();

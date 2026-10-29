@@ -1,0 +1,212 @@
+{
+  "command": "npm test -- --maxWorkers=2 --reporter=default --reporter=json --outputFile=/workspace/owner-deadline-unit.json",
+  "status": "PASS",
+  "tests": 609,
+  "failed": 0,
+  "pending": 0,
+  "reportSha256": "bb2b44ec130aece26a59a89be9309065038331d3dd5010abd7e1bf11c2863c60",
+  "logSha256": "7db0750617858c309d399390094a2bfc18cbf5c00dc501bf1168102d65fcaa97",
+  "files": [
+    {
+      "file": "acceptance-evidence.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "career-application-service.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "career-condition.test.ts",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "file": "career-training.test.ts",
+      "status": "passed",
+      "tests": 10
+    },
+    {
+      "file": "contracts.test.ts",
+      "status": "passed",
+      "tests": 29
+    },
+    {
+      "file": "defaults.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "determinism.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "generator.test.ts",
+      "status": "passed",
+      "tests": 19
+    },
+    {
+      "file": "m7-ai-analytics.test.ts",
+      "status": "passed",
+      "tests": 7
+    },
+    {
+      "file": "m7b-controller.test.ts",
+      "status": "passed",
+      "tests": 1
+    },
+    {
+      "file": "m7b-opponent.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "m7f-research-joint.test.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "m7g-research-scoring.test.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "m7h-research-chase.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "m7j-adjudication.test.ts",
+      "status": "passed",
+      "tests": 12
+    },
+    {
+      "file": "m7k-book-journal.test.ts",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "file": "m7k-evaluation.test.ts",
+      "status": "passed",
+      "tests": 16
+    },
+    {
+      "file": "m7k-historical-probes.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "m7k-journal.test.ts",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "file": "m7k-ledger.test.ts",
+      "status": "passed",
+      "tests": 22
+    },
+    {
+      "file": "match-ui.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "odi-match.test.ts",
+      "status": "passed",
+      "tests": 10
+    },
+    {
+      "file": "offscreen-fixture.test.ts",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "file": "owner-acceptance-plan.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "persistence-m4.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "probability.test.ts",
+      "status": "passed",
+      "tests": 23
+    },
+    {
+      "file": "quality-scenarios.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "random-service.test.ts",
+      "status": "passed",
+      "tests": 44
+    },
+    {
+      "file": "red5-clock.test.ts",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "file": "red5-match.test.ts",
+      "status": "passed",
+      "tests": 10
+    },
+    {
+      "file": "scoring-fixtures.test.ts",
+      "status": "passed",
+      "tests": 84
+    },
+    {
+      "file": "scoring-kernel.test.ts",
+      "status": "passed",
+      "tests": 134
+    },
+    {
+      "file": "season-persistence.test.ts",
+      "status": "passed",
+      "tests": 10
+    },
+    {
+      "file": "season-projections.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "season-scheduler.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "t20-match.test.ts",
+      "status": "passed",
+      "tests": 15
+    },
+    {
+      "file": "t20-setup.test.ts",
+      "status": "passed",
+      "tests": 20
+    },
+    {
+      "file": "world.test.ts",
+      "status": "passed",
+      "tests": 28
+    }
+  ],
+  "otherPassedCommands": [
+    "npm run schemas:check",
+    "npm run build",
+    "npm run typecheck",
+    "npm run lint",
+    "npm run fixtures:engine",
+    "npm run vectors:check",
+    "npm run probability:check",
+    "npm run generator:check"
+  ],
+  "ownerPcRerun": "NOT_RUN"
+}
