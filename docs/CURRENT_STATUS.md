@@ -11,7 +11,9 @@ M7 quality validation and M8 release acceptance remain incomplete.
 The owner adopted [the standing brief](STANDING_DEVELOPMENT_BRIEF.md) on 30 October 2026.
 [The delivery plan](V01_DELIVERY_PLAN.md) records seven batches and a separate empirical research track.
 Batch 1 records authority, scope reconciliation and review of research commit `b93bccb`.
-Player pages and pitch inspection are the next product slices.
+Player pages and pre-match pitch inspection are delivered in batch 2, pending integration of this revision.
+The next product slices are staged names and colours, roster import and basic settings.
+The [batch 2 report](verification-v01-batch2/REPORT.md) records verification and limits.
 A labelled synthetic-alpha release remains distinct from empirical model promotion.
 
 ## Latest acceptance and M7K verification

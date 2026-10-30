@@ -1,0 +1,25 @@
+[WebServer] (node:27191) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:27204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:27222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/m6g/player-page.spec.ts:13:1 › player profiles preserve format across players and reload without changing the career (880ms)
+  ✓  2 [chromium] › tests/m6g/player-page.spec.ts:77:1 › a completed career match links statistics to the correct player profile (3.0s)
+  ✓  3 [chromium] › tests/m6g/player-page.spec.ts:129:1 › pitch inspection keeps the primary match action in view at 150 percent (474ms)
+  ✓  4 [chromium] › tests/m6g/player-page.spec.ts:174:1 › player profiles fit a narrow viewport at 150 percent text scale (537ms)
+(node:27365) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27365) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [firefox] › tests/m6g/player-page.spec.ts:13:1 › player profiles preserve format across players and reload without changing the career (2.4s)
+  ✓  6 [firefox] › tests/m6g/player-page.spec.ts:77:1 › a completed career match links statistics to the correct player profile (4.6s)
+  ✓  7 [firefox] › tests/m6g/player-page.spec.ts:129:1 › pitch inspection keeps the primary match action in view at 150 percent (909ms)
+  ✓  8 [firefox] › tests/m6g/player-page.spec.ts:174:1 › player profiles fit a narrow viewport at 150 percent text scale (998ms)
+
+  8 passed (17.3s)

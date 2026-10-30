@@ -1,0 +1,19 @@
+{
+  "version": "LC_V01_BATCH2_EVIDENCE_V1",
+  "baseline": "c666902bb1cdb568712945093fabf22f69dec324",
+  "files": {
+    "REPORT.md": "e2339079d77c0438eba887c6e47083dd282d7800a626d62e1e97f41b4b117227",
+    "build.log": "30feed38412124339d0e214b1ee94df185269801847c30aeb42ee858538bd000",
+    "career.log": "c3d29504797430084b7e4e420469e540317d0c170efb494f9495bcb62a8b33c8",
+    "gates.log": "22df1877a82d04db6606169705a626d87b71d4def7c8c0fccce1630f50ec5b29",
+    "interrupted-sandbox-career.log": "7502f0d42f570e02bbdbc8ff24c8a97619325b61f8b1f288e2c99a562615a35b",
+    "interrupted-sandbox-ui.log": "646e6fdb2cdd1fb1da8fab0e6ab06a49d5a12b175fad63097820ab27257e798e",
+    "player-focused.log": "ebb41f1dd80159eb422f1f4e92503e6ae93b22c645ead5b985c190b9bc33d502",
+    "python.log": "b6ddddfab6c68ee65442587610972f82d805fb144cc4727e955f40a5a24a2f07",
+    "smoke.log": "43aa5c407c185cb8e3d837f98ca5d891143ca079991bcc844cd92a6551dbbe0a",
+    "static-checks.log": "c20bcff1c95eb657fb4ea8016df9b3b1a622fc72db7a5302f951246098cc8d30",
+    "ui.log": "3613a2d3da8bdfaea8dbe0bbe355567186a59895725f34f650ba31914bf5390b",
+    "unit.log": "c04420abcd70452d6971b16bd6f0e66bd993d98d7f82be790a94e467d7ed0542",
+    "vitest-results.json": "4e1d84da88004dac55f72cc97b353e954c0c7c81e25e71f07b585626ea066412"
+  }
+}
