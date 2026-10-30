@@ -1,5 +1,6 @@
 export * from "./core.js";
 export * from "./configuration.js";
+export * from "./new-game-world.js";
 export * from "./protocol.js";
 export * from "./determinism.js";
 export * from "./validation.js";

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
 import { createRoot } from "react-dom/client";
 import {
@@ -17,6 +17,8 @@ import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
 import { PitchInspection } from "./match/PitchInspection.js";
+import { WorldEditor } from "./world/WorldEditor.js";
+import type { NewGameWorldCopy, WorldPack } from "@lcxxvi/contracts";
 
 type Body = Request extends infer R
   ? R extends Request
@@ -46,6 +48,21 @@ export function MatchApp() {
   const lastAiChecked = useRef<string>("");
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [view, setView] = useState<View | null>(null);
+  const [stagedWorld, setStagedWorld] = useState<NewGameWorldCopy | null>(null);
+  const [editingWorld, setEditingWorld] = useState(false);
+  const [restoreWorldFocus, setRestoreWorldFocus] = useState(false);
+  const editWorldButton = useRef<HTMLButtonElement>(null);
+  const displayCatalog = useMemo(() => {
+    if (!catalog || !stagedWorld) return catalog;
+    const world = stagedWorld.world;
+    const players = new Map(world.players.map(player => [player.playerId, player.name]));
+    const teams = new Map(world.teams.map(team => [team.teamId, team.name]));
+    const grounds = new Map(world.grounds.map(ground => [ground.groundId, ground.name]));
+    return {
+      teams: catalog.teams.map(team => ({ ...team, name: teams.get(team.id) ?? team.name, players: team.players.map(player => ({ ...player, name: players.get(player.id) ?? player.name })) })),
+      grounds: catalog.grounds.map(ground => ({ ...ground, name: grounds.get(ground.id) ?? ground.name })),
+    };
+  }, [catalog, stagedWorld]);
   const [busy, setBusy] = useState(true),
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
@@ -168,6 +185,12 @@ export function MatchApp() {
       decisionRef.current?.focus({ preventScroll: true });
     }
   }, [view]);
+  useEffect(() => {
+    if (restoreWorldFocus && !editingWorld && !view) {
+      editWorldButton.current?.focus();
+      setRestoreWorldFocus(false);
+    }
+  }, [editingWorld, restoreWorldFocus, view]);
 
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.
@@ -190,7 +213,8 @@ export function MatchApp() {
   }
   function saveCopy() {
     if (!view) return;
-    const title = `${view.teams[0]?.name ?? "Team 1"} v ${view.teams[1]?.name ?? "Team 2"} · ${new Date().toLocaleString()}`;
+    const fullTitle = `${view.teams[0]?.name ?? "Team 1"} v ${view.teams[1]?.name ?? "Team 2"} · ${new Date().toLocaleString()}`;
+    const title = fullTitle.length > 80 ? `${fullTitle.slice(0, 79)}…` : fullTitle;
     send({ type: "MANUAL_SAVE", title });
   }
   function exportSave(saveId: string | null = null) {
@@ -328,14 +352,24 @@ export function MatchApp() {
               delegate either team to the deterministic tactical captain.
             </p>
           </section>
-          {catalog ? (
-            <Setup
-              catalog={catalog}
-              busy={busy || fatal}
-              start={(format, selections, groundId) =>
-                send({ type: "START", format, selections, groundId })
-              }
-            />
+          {displayCatalog ? (
+            <>
+              <section className="world-customization" aria-label="Exhibition world">
+                {editingWorld ? <WorldEditor base={careerWorld} initial={stagedWorld} purpose="exhibition" onClose={() => { setEditingWorld(false); setRestoreWorldFocus(true); }} onStage={copy => { setStagedWorld(copy); setEditingWorld(false); setRestoreWorldFocus(true); }} /> : <div className="action-row">
+                  <button ref={editWorldButton} type="button" disabled={busy || fatal} onClick={() => setEditingWorld(true)}>Edit names and colours</button>
+                  {stagedWorld && <button type="button" disabled={busy || fatal} onClick={() => setStagedWorld(null)}>Use original world</button>}
+                </div>}
+                {stagedWorld && <p role="status">Edited world ready for a new exhibition. Saved matches remain unchanged.</p>}
+              </section>
+              <Setup
+                catalog={displayCatalog}
+                world={stagedWorld?.world ?? careerWorld}
+                busy={busy || fatal || editingWorld}
+                start={(format, selections, groundId) =>
+                  send({ type: "START", format, selections, groundId, ...(stagedWorld ? { worldCopy: stagedWorld } : {}) })
+                }
+              />
+            </>
           ) : (
             <p role="status">Loading the approved fictional world…</p>
           )}
@@ -358,6 +392,7 @@ export function MatchApp() {
             className="scorestrip"
             aria-label="Match scoreboard"
             data-testid="scorestrip"
+            style={view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : undefined}
           >
             <div>
               <p>
@@ -815,6 +850,7 @@ export function MatchApp() {
         <div className="save-file-actions">
           {view && (
             <>
+              {!careerLaunch.current && <button type="button" disabled={busy || fatal} onClick={() => send({ type: "BOOT", fresh: true })}>New exhibition</button>}
               <button
                 type="button"
                 disabled={busy || fatal || persistence?.readOnly}
@@ -913,10 +949,12 @@ export function MatchApp() {
 }
 function Setup({
   catalog,
+  world,
   busy,
   start,
 }: {
   catalog: Catalog;
+  world: WorldPack;
   busy: boolean;
   start: (
     format: "T20" | "ODI" | "RED_BALL",
@@ -986,7 +1024,7 @@ function Setup({
             ))}
           </select>
         </label>
-        <PitchInspection ground={careerWorld.grounds.find((item) => item.groundId === ground)} format={format} />
+        <PitchInspection ground={world.grounds.find((item) => item.groundId === ground)} format={format} />
         <div className="team-grid">
           {teams.map((s, index) => {
             const t = catalog.teams.find((t) => t.id === s.teamId)!;

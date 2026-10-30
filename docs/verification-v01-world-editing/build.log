@@ -1,0 +1,38 @@
+
+> lord-cricket-xxvi@0.1.0 build
+> tsc -b && vite build --config apps/web/vite.config.ts && vite build --config vite.runtime.config.ts
+
+vite v7.1.7 building for production...
+transforming...
+✓ 172 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                               0.72 kB │ gzip:  0.41 kB
+dist/engineering.html                         0.72 kB │ gzip:  0.41 kB
+dist/assets/match.worker-DkaTSVLC.js        608.59 kB
+dist/assets/engineering-BrDsDFp9.css          1.37 kB │ gzip:  0.63 kB
+dist/assets/main-mZ5U9OZe.css                13.95 kB │ gzip:  3.85 kB
+dist/assets/engineering-CJg4h8-H.js           3.22 kB │ gzip:  1.49 kB
+dist/assets/season-persistence-CRVJydng.js  283.17 kB │ gzip: 84.76 kB
+dist/assets/main-ClF2unYP.js                528.76 kB │ gzip: 97.70 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.56s
+vite v7.1.7 building for production...
+transforming...
+✓ 131 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                               0.36 kB │ gzip:  0.24 kB
+dist/assets/determinism.worker-CK2Zf07t.js  150.11 kB
+dist/assets/t20.worker-CUChRDi5.js          536.00 kB
+dist/assets/index-CVlTzDnd.js               537.65 kB │ gzip: 92.12 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.83s

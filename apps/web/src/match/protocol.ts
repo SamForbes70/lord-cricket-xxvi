@@ -5,6 +5,7 @@ import {
   T20CommandSchema,
   Red5CommandSchema,
   T20TeamSelectionSchema,
+  NewGameWorldCopySchema,
   type T20Command,
   type T20Scorecard,
   type ODIScorecard,
@@ -74,8 +75,7 @@ const base = {
   requestId: z.string().regex(/^ui-[0-9]+$/),
   expectedRevision: z.number().int().nonnegative(),
 };
-export const CareerFixtureLaunchSchema = z.strictObject({
-  launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V1"),
+const careerFixtureShape = {
   saveId: z.string().min(1).max(160),
   seasonId: z.string().min(1).max(128),
   scheduleSha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -92,7 +92,11 @@ export const CareerFixtureLaunchSchema = z.strictObject({
   selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
   careerStateSha256: z.string().regex(/^[a-f0-9]{64}$/),
   managedTeamId: z.string().min(1).max(128).optional(),
-});
+};
+export const CareerFixtureLaunchSchema = z.discriminatedUnion("launchVersion", [
+  z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V1") }),
+  z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V2"), worldCopy: NewGameWorldCopySchema }),
+]);
 
 export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({ ...base, type: z.literal("BOOT"), fresh: z.boolean().optional(), careerFixture: CareerFixtureLaunchSchema.nullable().optional() }),
@@ -103,6 +107,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
     selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]),
     groundId: z.string().min(1),
     careerFixture: CareerFixtureLaunchSchema.nullable().optional(),
+    worldCopy: NewGameWorldCopySchema.nullable().optional(),
   }),
   z.strictObject({
     ...base,
@@ -175,6 +180,7 @@ export type View = {
     captainId: string;
     keeperId: string;
     playerIds: string[];
+    colours?: [string, string];
   }[];
   names: Record<string, string>;
   ground: string;

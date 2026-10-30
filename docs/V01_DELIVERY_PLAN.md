@@ -19,12 +19,12 @@ Scope reconciliation: [ADR-033](decisions/ADR-033-V01-SYNTHETIC-ALPHA-DELIVERY.m
 
 ## Next eligible work
 
-V01-003 and V01-004 deliver player pages and pre-match pitch inspection.
-Their backlog status records integration pending when this revision is authored.
-After verifying the merge, mark both items DONE without requesting approval.
+PR #15 merged V01-003 and V01-004.
+V01-005 adds names and colours for new careers and exhibitions, pending integration of this revision.
+After verifying the merge, mark V01-005 DONE without requesting approval.
 
-Continue with V01-005: names and colours in a validated new-game world copy.
-V01-006 follows with staged roster import, then V01-007 completes basic settings.
+Continue with V01-006: staged roster import with validated references and explicit priors.
+V01-007 then completes basic settings.
 Preserve stable IDs, historical snapshots, existing saves and frozen simulation outcomes.
 Keep new packs versioned and validate all imported references and content.
 
@@ -55,7 +55,7 @@ Do not replace missing owner observations with hosted CI results.
 ## Reconciliation of the earlier gap list
 
 The earlier chat list identifies candidate work; the committed backlog records the actionable scope.
-Full charts, editing and broader match controls remain product work.
+Full charts, roster import and broader match controls remain product work.
 Existing match save copies, basic analytics, red-ball delays and T20 opposition remain implemented capabilities.
 Optional prediction and verified DLS remain gated extensions.
 Multiyear management, finances, contracts, youth, online play, DRS and 3D presentation remain deferred.

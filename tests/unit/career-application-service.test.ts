@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
-import type { SeasonSaveSummary, T20SeasonState } from "@lcxxvi/contracts";
+import type { NewGameWorldCopy, SeasonSaveSummary, T20SeasonState } from "@lcxxvi/contracts";
 import type { SeasonDurableCommit, SeasonLoadResult } from "@lcxxvi/persistence";
-import { CareerApplicationService, type CareerSeasonRepository } from "../../apps/web/src/career/service.js";
+import { CareerApplicationService, careerWorld, type CareerSeasonRepository } from "../../apps/web/src/career/service.js";
+import { createNewGameWorldCopy } from "../../apps/web/src/world/new-game-world.js";
 
 class MemorySeasonRepository implements CareerSeasonRepository {
-  private rows = new Map<string, { summary: SeasonSaveSummary; state: T20SeasonState }>();
+  private rows = new Map<string, { summary: SeasonSaveSummary; state: T20SeasonState; worldCopy: NewGameWorldCopy | null }>();
   private leases = new Map<string, string>();
   private active: string | null = null;
 
@@ -25,15 +26,16 @@ class MemorySeasonRepository implements CareerSeasonRepository {
       completedFixtures: input.state.completedMatches.length, phase: input.state.phase,
       stateSha256: input.state.stateSha256, updatedAt: input.updatedAt,
     };
-    this.rows.set(input.saveId, { summary, state: structuredClone(input.state) });
+    this.rows.set(input.saveId, { summary, state: structuredClone(input.state), worldCopy: structuredClone(input.worldCopy ?? prior?.worldCopy ?? null) });
     if (input.setActive !== false) this.active = input.saveId;
     return summary;
   }
   async load(saveId: string): Promise<SeasonLoadResult | null> {
     const row = this.rows.get(saveId); if (!row) return null;
-    return { summary: row.summary, state: structuredClone(row.state), recovered: false, recoveredFromGeneration: null, corruptedGenerations: [] };
+    return { summary: row.summary, state: structuredClone(row.state), recovered: false, recoveredFromGeneration: null, corruptedGenerations: [], worldCopy: structuredClone(row.worldCopy) };
   }
   async activeSaveId() { return this.active; }
+  async clearActiveSaveId(saveId: string) { if (this.active === saveId) this.active = null; }
 }
 
 describe("Pass 12G-R career application service", () => {
@@ -72,5 +74,28 @@ describe("Pass 12G-R career application service", () => {
     await reader.loadCareer(writer.getSaveId()!);
     expect(reader.isReadOnly()).toBe(true);
     await expect(reader.setTraining(reader.squadView()!.players[0]!.playerId, "REST")).rejects.toThrow(/read-only/i);
+  });
+
+  test("separates edited and original career names across creation, leave and reload", async () => {
+    const repo = new MemorySeasonRepository();
+    const service = new CareerApplicationService("owner", repo);
+    await service.createCareer("team-01");
+    const originalId = service.getSaveId()!;
+    await service.leaveCareer();
+    const draft = structuredClone(careerWorld);
+    draft.teams[0]!.name = "Harbour XI";
+    draft.players[0]!.name = "Rhea Harbour";
+    const copy = createNewGameWorldCopy(draft, careerWorld);
+    await service.createCareer("team-01", copy);
+    const editedId = service.getSaveId()!;
+    expect(service.teamName("team-01")).toBe("Harbour XI");
+    expect(service.playerName("p001")).toBe("Rhea Harbour");
+    await service.loadCareer(originalId);
+    expect(service.teamName("team-01")).toBe("Aster Harbour");
+    expect(service.playerName("p001")).toBe("Ulen Elmcroft");
+    await service.loadCareer(editedId);
+    expect(service.teamName("team-01")).toBe("Harbour XI");
+    expect(service.playerName("p001")).toBe("Rhea Harbour");
+    expect(Object.isFrozen(service.getWorld().players[0])).toBe(true);
   });
 });

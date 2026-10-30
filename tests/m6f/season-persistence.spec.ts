@@ -30,7 +30,17 @@ test("M6F IndexedDB season commits are atomic and recover from previous generati
     summaryCount: 1,
     activeSaveId: "season-browser-save",
     acquiredAfterRelease: true,
+    copySaveAfterAbort: null,
+    orphanPackAfterAbort: null,
+    copyRecovered: true,
+    copyRecoveredRevision: 4,
+    copyRecoveredTeam: "Harbour XI",
   });
   expect(String(record.abortCode)).toContain("SEASON_SAVE_INJECTED_ABORT");
   expect(String(record.duplicateCode)).toContain("SEASON_SAVE_DUPLICATE_COMMAND_ALREADY_COMMITTED");
+  expect(String(record.copyAbort)).toContain("SEASON_SAVE_INJECTED_ABORT");
+  expect(String(record.immutableCode)).toContain("SEASON_WORLD_COPY_IMMUTABLE");
+  expect(String(record.missingCopyCode)).toContain("SEASON_WORLD_COPY_REQUIRED");
+  expect(String(record.damagedCopyCode)).toContain("SEASON_WORLD_COPY_MISSING_OR_DAMAGED");
+  expect(String(record.damagedCopyCommitCode)).toContain("SEASON_WORLD_COPY_CONFLICT");
 });

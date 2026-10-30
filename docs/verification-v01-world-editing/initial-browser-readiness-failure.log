@@ -1,0 +1,75 @@
+[WebServer] (node:36968) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:36981) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:36999) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36999) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/m6g/new-game-editing.spec.ts:36:1 › edited career names and colours survive reload, switching and portable import (5.0s)
+  ✘  2 [chromium] › tests/m6g/new-game-editing.spec.ts:130:1 › edited match presentation survives reload and portable import (1.1m)
+(node:37409) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37409) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [firefox] › tests/m6g/new-game-editing.spec.ts:36:1 › edited career names and colours survive reload, switching and portable import (8.8s)
+  ✘  4 [firefox] › tests/m6g/new-game-editing.spec.ts:130:1 › edited match presentation survives reload and portable import (1.1m)
+
+
+  1) [chromium] › tests/m6g/new-game-editing.spec.ts:130:1 › edited match presentation survives reload and portable import
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('scorestrip')
+    Expected substring: "Harbour <script>window.editedWorldXss=1</script>"
+    Timeout: 60000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" with timeout 60000ms
+      - waiting for getByTestId('scorestrip')
+
+
+      79 |     await imported.goto(new URL("/#exhibition", page.url()).toString());
+      80 |     await imported.getByLabel("Import saved game").setInputFiles(archive!);
+    > 81 |     await expect(imported.getByTestId("scorestrip")).toContainText(editedTeam, { timeout: 60_000 });
+         |                                                      ^
+      82 |     await expect(imported.getByTestId("scorestrip")).toHaveCSS("box-shadow", /rgb\(17, 119, 204\)/);
+      83 |   } finally {
+      84 |     await context.close();
+        at /workspace/lord-cricket-xxvi/tests/m6g/new-game-editing.spec.ts:81:54
+
+    Error Context: test-results/new-game-editing-edited-ma-c25e1--reload-and-portable-import-chromium/error-context.md
+
+  2) [firefox] › tests/m6g/new-game-editing.spec.ts:130:1 › edited match presentation survives reload and portable import
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('scorestrip')
+    Expected substring: "Harbour <script>window.editedWorldXss=1</script>"
+    Timeout: 60000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" with timeout 60000ms
+      - waiting for getByTestId('scorestrip')
+
+
+      79 |     await imported.goto(new URL("/#exhibition", page.url()).toString());
+      80 |     await imported.getByLabel("Import saved game").setInputFiles(archive!);
+    > 81 |     await expect(imported.getByTestId("scorestrip")).toContainText(editedTeam, { timeout: 60_000 });
+         |                                                      ^
+      82 |     await expect(imported.getByTestId("scorestrip")).toHaveCSS("box-shadow", /rgb\(17, 119, 204\)/);
+      83 |   } finally {
+      84 |     await context.close();
+        at /workspace/lord-cricket-xxvi/tests/m6g/new-game-editing.spec.ts:81:54
+
+    Error Context: test-results/new-game-editing-edited-ma-c25e1--reload-and-portable-import-firefox/error-context.md
+
+  2 failed
+    [chromium] › tests/m6g/new-game-editing.spec.ts:130:1 › edited match presentation survives reload and portable import
+    [firefox] › tests/m6g/new-game-editing.spec.ts:130:1 › edited match presentation survives reload and portable import
+  2 passed (2.4m)

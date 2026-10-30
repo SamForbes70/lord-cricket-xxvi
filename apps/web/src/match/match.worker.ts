@@ -1,6 +1,6 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson } from "@lcxxvi/contracts";
+import { canonicalJson, type NewGameWorldCopy } from "@lcxxvi/contracts";
 import type { T20Session, ODISession, Red5Session } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
@@ -25,6 +25,7 @@ const worldBytes = new TextEncoder().encode(worldText);
 const repository = new IndexedDbSaveRepository();
 const ownerId = self.name || `tab-${randomHex(16)}`;
 let activeSaveId: string | null = null;
+let activeWorldCopy: NewGameWorldCopy | null = null;
 let readOnly = false;
 let recovered = false;
 let recoveredFromGeneration: number | null = null;
@@ -62,21 +63,26 @@ function sessionFormat(raw: unknown): "T20" | "ODI" | "RED_BALL" {
   const value = raw as { setup?: { format?: unknown } };
   return value?.setup?.format === "ODI" ? "ODI" : value?.setup?.format === "RED_BALL" ? "RED_BALL" : "T20";
 }
-function metadata(session: AnySession) {
+function metadata(session: AnySession, copy: NewGameWorldCopy | null = null) {
+  const display = copy?.world;
   return {
     matchGameId: String(session.setup.gameId),
     matchId: String(session.setup.matchId),
     teams: [
-      String(session.setup.teams[0].name),
-      String(session.setup.teams[1].name),
+      display?.teams.find(team => team.teamId === session.setup.teams[0].teamId)?.name ?? String(session.setup.teams[0].name),
+      display?.teams.find(team => team.teamId === session.setup.teams[1].teamId)?.name ?? String(session.setup.teams[1].name),
     ] as [string, string],
-    ground: String(session.setup.ground.name),
+    ground: display?.grounds.find(ground => ground.groundId === session.setup.ground.groundId)?.name ?? String(session.setup.ground.name),
     phase: String(session.core.phase),
     completed: session.core.phase === "COMPLETE",
   };
 }
-function defaultTitle(session: AnySession): string {
-  return `${session.setup.teams[0].name} v ${session.setup.teams[1].name}`;
+function defaultTitle(session: AnySession, copy: NewGameWorldCopy | null): string {
+  const names = metadata(session, copy).teams;
+  return `${names[0]} v ${names[1]}`;
+}
+function applyWorldCopy(target: MatchController, copy: NewGameWorldCopy | null) {
+  target.setWorldCopy(copy);
 }
 
 function durableHistoryFromSession(session: AnySession) {
@@ -141,6 +147,8 @@ async function restoreSave(saveId: string): Promise<void> {
   if (!loaded) throw new Error("Save not found.");
   controller = makeController(sessionFormat(loaded.session));
   controller.restore(loaded.session);
+  applyWorldCopy(controller, loaded.worldCopy ?? null);
+  activeWorldCopy = loaded.worldCopy ?? null;
   recovered = loaded.recovered;
   recoveredFromGeneration = loaded.recoveredFromGeneration;
   let targetId = saveId;
@@ -163,7 +171,8 @@ async function restoreSave(saveId: string): Promise<void> {
         saveId,
         session.revision,
       ),
-      metadata: metadata(session),
+      metadata: metadata(session, activeWorldCopy),
+      worldCopy: activeWorldCopy,
       ownerId,
       now: nowMs(),
       updatedAt: nowIso(),
@@ -185,6 +194,7 @@ async function initialise(): Promise<void> {
   } catch {
     // Keep the catalogue usable when the active pointer is stale/corrupt beyond recovery.
     activeSaveId = null;
+    activeWorldCopy = null;
     readOnly = false;
     controller = makeController();
     await repository.setActiveSaveId(null);
@@ -199,6 +209,8 @@ async function rollback(error: unknown, requestId: string): Promise<Response> {
       if (loaded) {
         controller = makeController(sessionFormat(loaded.session));
         controller.restore(loaded.session);
+        applyWorldCopy(controller, loaded.worldCopy ?? null);
+        activeWorldCopy = loaded.worldCopy ?? null;
       }
     } catch {
       /* leave current controller only if durable recovery itself is unavailable */
@@ -215,6 +227,7 @@ async function commitCandidate(
   const session = controller.snapshot();
   if (!session || response.error) return decorate(response);
   if (request.type === "START") {
+    activeWorldCopy = request.careerFixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? request.careerFixture.worldCopy : request.worldCopy ?? null;
     activeSaveId = `auto:${session.setup.gameId}`;
     readOnly = !(await repository.acquireLease(activeSaveId, ownerId, nowMs()));
     if (readOnly)
@@ -244,7 +257,7 @@ async function commitCandidate(
     const summary = await repository.commit({
       saveId,
       kind: "AUTO",
-      title: defaultTitle(session),
+      title: defaultTitle(session, activeWorldCopy),
       expectedRevision:
         request.type === "START" ? null : request.expectedRevision,
       session,
@@ -259,7 +272,8 @@ async function commitCandidate(
         responseJson: canonicalJson(response),
         committedRevision: session.revision,
       },
-      metadata: metadata(session),
+      metadata: metadata(session, activeWorldCopy),
+      worldCopy: activeWorldCopy,
       ownerId,
       now: nowMs(),
       updatedAt: nowIso(),
@@ -296,6 +310,7 @@ async function commitCandidate(
         }
       }
       activeSaveId = null;
+      activeWorldCopy = null;
       readOnly = false;
       controller = makeController();
       await repository.setActiveSaveId(null);
@@ -366,6 +381,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         if (!readOnly) await repository.releaseLease(request.saveId, ownerId);
         await repository.delete(request.saveId);
         activeSaveId = null;
+        activeWorldCopy = null;
         readOnly = false;
         recovered = false;
         recoveredFromGeneration = null;
@@ -400,6 +416,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         loaded.summary,
         archivePins,
         nowIso(),
+        loaded.worldCopy ?? null,
       );
       return decorate(controller.currentResponse(request.requestId), archive);
     } catch (e) {
@@ -422,6 +439,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         sessionFormat(imported.session),
       );
       validationController.restore(imported.session);
+      applyWorldCopy(validationController, imported.worldCopy);
       const session = validationController.snapshot()!;
       const target = `import-${randomHex(10)}`;
       if (!(await repository.acquireLease(target, ownerId, nowMs())))
@@ -436,7 +454,8 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         events: session.events,
         command: null,
         historyCommands: durableHistoryFromSession(session),
-        metadata: metadata(session),
+        metadata: metadata(session, imported.worldCopy),
+        worldCopy: imported.worldCopy,
         ownerId,
         now: nowMs(),
         updatedAt: nowIso(),
@@ -444,6 +463,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       if (activeSaveId && !readOnly)
         await repository.releaseLease(activeSaveId, ownerId);
       activeSaveId = target;
+      activeWorldCopy = imported.worldCopy;
       readOnly = false;
       recovered = false;
       recoveredFromGeneration = null;
@@ -475,11 +495,16 @@ async function handle(raw: unknown): Promise<Response> {
     const matchesCareerFixture =
       current?.setup.gameId === request.careerFixture.matchGameId &&
       current?.setup.matchId === request.careerFixture.matchId;
+    const requestedCopy = request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? request.careerFixture.worldCopy : null;
+    if (matchesCareerFixture && canonicalJson(requestedCopy) !== canonicalJson(activeWorldCopy)) {
+      return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different world copy."));
+    }
     if (!matchesCareerFixture) {
       if (activeSaveId && !readOnly) {
         try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
       }
       activeSaveId = null;
+      activeWorldCopy = null;
       readOnly = false;
       recovered = false;
       recoveredFromGeneration = null;
@@ -491,6 +516,7 @@ async function handle(raw: unknown): Promise<Response> {
       try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
     }
     activeSaveId = null;
+    activeWorldCopy = null;
     readOnly = false;
     recovered = false;
     recoveredFromGeneration = null;

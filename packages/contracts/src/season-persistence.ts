@@ -83,6 +83,12 @@ export const SeasonPortableManifestSchema = z.strictObject({
   files: z.record(z.string().min(1), z.strictObject({ bytes: CounterSchema, sha256: HashSchema })),
 });
 
+export const SeasonPortableManifestV2Schema = SeasonPortableManifestSchema.extend({
+  archiveVersion: z.literal("LC_T20_SEASON_PORTABLE_V2"),
+  saveSchema: z.literal("LC_SEASON_SAVE_V2_PRESENTATION"),
+  worldCopySha256: HashSchema,
+});
+
 export type T20SeasonStateCore = z.infer<typeof T20SeasonStateCoreSchema>;
 export type T20SeasonState = z.infer<typeof T20SeasonStateSchema>;
 export type SeasonSaveSummary = z.infer<typeof SeasonSaveSummarySchema>;
@@ -91,3 +97,4 @@ export type SeasonArchiveCore = z.infer<typeof SeasonArchiveCoreSchema>;
 export type SeasonArchive = z.infer<typeof SeasonArchiveSchema>;
 export type SeasonRecoveryDiagnostic = z.infer<typeof SeasonRecoveryDiagnosticSchema>;
 export type SeasonPortableManifest = z.infer<typeof SeasonPortableManifestSchema>;
+export type SeasonPortableManifestV2 = z.infer<typeof SeasonPortableManifestV2Schema>;

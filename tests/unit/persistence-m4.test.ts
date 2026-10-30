@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { canonicalJson } from "@lcxxvi/contracts";
+import { canonicalJson, WorldPackSchema } from "@lcxxvi/contracts";
+import { createNewGameWorldCopy } from "../../apps/web/src/world/new-game-world.js";
+import { rewriteZipEntryText } from "../helpers/rewrite-zip-entry.js";
 import { createPortableArchive, readPortableArchive, type SaveSummary } from "@lcxxvi/persistence";
 import { rehydrateT20Session } from "@lcxxvi/simulation";
 import { createMatchController } from "../../apps/web/src/match/controller.js";
@@ -161,8 +163,24 @@ describe("M4 deterministic persistence and portable archive", () => {
     const read = await readPortableArchive(bytes, ARCHIVE_PINS);
     expect(canonicalJson(read.session)).toBe(canonicalJson(session));
     expect(read.summary).toEqual(summary);
+    expect(read.worldCopy).toBeNull();
     await expect(readPortableArchive(tamperEntry(bytes, "game.json"), ARCHIVE_PINS)).rejects.toThrow(/CRC|HASH/);
     await expect(readPortableArchive(bytes, { ...ARCHIVE_PINS, engine: "LC_T20_MATCH_FUTURE" })).rejects.toThrow(/PIN_UNSUPPORTED_engine/);
+  });
+
+  it("preserves a match presentation copy without rewriting the frozen session", async () => {
+    const session = sessionAfterPlay();
+    const base = WorldPackSchema.parse(JSON.parse(new TextDecoder().decode(worldBytes)));
+    const draft = structuredClone(base);
+    draft.players[0]!.name = "A new name";
+    const copy = createNewGameWorldCopy(draft, base);
+    const bytes = await createPortableArchive(session, summaryFor(session), ARCHIVE_PINS, "2026-10-04T02:00:00.000Z", copy);
+    const read = await readPortableArchive(bytes, ARCHIVE_PINS);
+    expect(read.manifest.archiveVersion).toBe("LC_ARCHIVE_V2_PRESENTATION");
+    expect(read.worldCopy).toEqual(copy);
+    expect(canonicalJson(read.session)).toBe(canonicalJson(session));
+    await expect(readPortableArchive(tamperEntry(bytes, "world-copy.json"), ARCHIVE_PINS)).rejects.toThrow(/CRC|HASH/);
+    await expect(readPortableArchive(rewriteZipEntryText(bytes, "manifest.json", "LC_ARCHIVE_V2_PRESENTATION", "LC_ARCHIVE_V9_PRESENTATION"), ARCHIVE_PINS)).rejects.toThrow("ARCHIVE_VERSION_UNSUPPORTED");
   });
 
   it("rejects a path-traversal local file name before exposing an imported game", async () => {

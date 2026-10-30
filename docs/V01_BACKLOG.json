@@ -55,7 +55,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Open a player by stable ID from squad and statistics.",
@@ -75,7 +75,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Show the selected ground and effective pitch parameters before toss.",
@@ -95,7 +95,7 @@
       "dependsOn": [
         "V01-003"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Edit names and colours without changing stable entity IDs.",

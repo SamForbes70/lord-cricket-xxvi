@@ -1,0 +1,21 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "REPORT.md": "8a3d0e86ea3e609e7a9292362cf1a731452a99788966ce2958db74e22ee1b282",
+    "build.log": "b35dc67bc0657a68c4ba8e5dd05fa48629b997c8b5dcc41a8121d77ec690e756",
+    "career-complete.log": "7accbecd9ed14736054d1c16e5d31489d8a2a8b59ba5ff43038f735543c87b31",
+    "career-persistence.log": "7da7258e525479d960211261a0367e201d4cbc295eefdf9481ec88aa403f2884",
+    "edited-career.log": "0a0cc8dfc80679317c799f7789fdf5e57cc1abaabb7de357136a72b1fc1c2b49",
+    "exhibition.log": "43081a689b29b2ba2965e32b3e597c183ada441efcfc7aeac51add7e87c76d93",
+    "gates.log": "989ba6007a12551b5a4ce8a68dfecf8483886252c2447396d6eb63d41804cafd",
+    "initial-browser-readiness-failure.log": "0e058c883c767d46ce4bf4fa09ee8b8dcac90e4248d535370033b978a38c2a62",
+    "initial-layout-failure.log": "701d56767286275e1adc1810c4b2e05431b9d775cd3e8b58b7a84d393fa4878a",
+    "initial-unit-failure.log": "ffd02c8814c21576d6965f76e2b4788ec5591d18205f829fd0a17e3002f2d161",
+    "match-persistence.log": "fd77c2454e2ff7108bbd81d252515decd6f5db6bae60670c42b12c98f0c9dfbf",
+    "smoke.log": "c2d1adea497bdd3150b8510f961e4253c7b3dff8998eaa55bc83ee823c5d1cfa",
+    "static.log": "30d3775cba4bee85ee8d70765513ff0fbfd49271ecfae4895c79f93b297c04c0",
+    "ui-complete.log": "733b429bdc8d8edf48ed32764dab704cee93910724f89eb7d09ae2ec158c426e",
+    "unit.log": "8c1062b9553fadafe8595ede9046ee6e7e6c1ac1f398e237c5d90ea59397ff7e",
+    "vitest-results.json": "599358b385d95d3a86ff59c535c53943389fa03f6a5c016dcd850b3f23d8110d"
+  }
+}

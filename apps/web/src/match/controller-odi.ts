@@ -20,7 +20,8 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type ODICommand, type DeliveryRecorded } from "@lcxxvi/contracts";
+import { type ODICommand, type DeliveryRecorded, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
   ODI_PINS,
@@ -79,6 +80,10 @@ export function createODIMatchController(
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name })),
   };
   let session: ODISession | null = null;
+  let displayWorld = world;
+  function setWorldCopy(copy: NewGameWorldCopy | null) {
+    displayWorld = copy ? validateNewGameWorldCopy(copy, world).world : world;
+  }
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
     requestId: string;
@@ -94,10 +99,10 @@ export function createODIMatchController(
       l = c.innings[c.activeInningsIndex],
       i = l?.innings;
     const names = Object.fromEntries(
-      s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, p.name])),
+      s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, displayWorld.players.find(player => player.playerId === p.playerId)?.name ?? p.name])),
     );
     const tn = (id: string | null) =>
-      s.setup.teams.find((t) => t.teamId === id)?.name ?? "";
+      displayWorld.teams.find((t) => t.teamId === id)?.name ?? "";
     const decisionTeamId =
       c.phase === "TOSS"
         ? s.setup.teams[0].teamId
@@ -137,7 +142,7 @@ export function createODIMatchController(
                 : l!.bowling[p.playerId]!.legalBalls >= 60
                   ? "Ten-over limit reached"
                   : "";
-      return { id: p.playerId, name: p.name, reason };
+      return { id: p.playerId, name: names[p.playerId] ?? p.name, reason };
     });
     let advanceReason =
       c.phase === "COMPLETE"
@@ -201,13 +206,14 @@ export function createODIMatchController(
       decisionTeamId,
       teams: s.setup.teams.map((t) => ({
         id: t.teamId,
-        name: t.name,
+        name: tn(t.teamId),
         captainId: t.captainId,
         keeperId: t.keeperId,
         playerIds: [...t.playerIds],
+        ...(displayWorld.packId !== world.packId ? { colours: [...displayWorld.teams.find(team => team.teamId === t.teamId)!.colours] as [string, string] } : {}),
       })),
       names,
-      ground: s.setup.ground.name,
+      ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
       candidates,
@@ -282,6 +288,7 @@ export function createODIMatchController(
   }
   function restore(raw: unknown): void {
     session = rehydrateODISession(raw, worldBytes, manifest);
+    setWorldCopy(null);
     seen.clear();
     audit.splice(
       0,
@@ -314,6 +321,7 @@ export function createODIMatchController(
   }
   return {
     restore,
+    setWorldCopy,
     snapshot,
     currentResponse,
     handle(raw: unknown): Response {
@@ -341,6 +349,8 @@ export function createODIMatchController(
           if (request.format !== "ODI")
             throw new Error("ODI controller received a non-ODI start.");
           if (session) throw new Error("A match is already in progress.");
+          if (request.careerFixture) throw new Error("Career fixtures require T20.");
+          setWorldCopy(request.worldCopy ?? null);
           const setup = validateODIMatchSetup(
             {
               setupVersion: "LC_ODI_SETUP_V1",
