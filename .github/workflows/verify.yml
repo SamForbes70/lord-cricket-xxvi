@@ -11,6 +11,8 @@ jobs:
         with:
           node-version: "22"
           cache: npm
+      - name: Record evidence boundary
+        run: node -e "require('fs').appendFileSync(process.env.GITHUB_ENV, 'LCXXVI_CI_STARTED_AT=' + Date.now() + '\n')"
       - run: npm ci
       - name: Synthetic diagnostic summary checks
         run: python3 -m unittest discover -s tests -p test_synthetic_quality_summary.py -v
@@ -33,8 +35,14 @@ jobs:
         run: npx playwright test --config playwright.ui.config.ts --grep "desktop essential" --reporter list --output test-results/layout --trace retain-on-failure
         env:
           LCXXVI_UI_EVIDENCE_DIR: test-results/layout/images
+      - name: Retain structured verification evidence
+        if: always()
+        run: node scripts/ci-evidence.mjs --kind=linux
+        env:
+          LCXXVI_UPSTREAM_STATUS: ${{ job.status }}
       - uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: pass07a-verification
           path: |
@@ -42,7 +50,7 @@ jobs:
             test-results/layout/
             test-results/acceptance-observations/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
   windows-browser-acceptance:
     runs-on: windows-latest
     timeout-minutes: 20
@@ -58,14 +66,22 @@ jobs:
         run: |
           node -e "console.log(process.platform, process.version)"
           git rev-parse HEAD
+      - name: Record evidence boundary
+        run: node -e "require('fs').appendFileSync(process.env.GITHUB_ENV, 'LCXXVI_CI_STARTED_AT=' + Date.now() + '\n')"
       - run: npm ci
       - name: Collect hosted Windows build and browser evidence
         run: node scripts/owner-acceptance.mjs --skip-install
+      - name: Retain structured verification evidence
+        if: always()
+        run: node scripts/ci-evidence.mjs --kind=windows
+        env:
+          LCXXVI_UPSTREAM_STATUS: ${{ job.status }}
       - uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: windows-browser-acceptance
           path: |
             test-results/owner-acceptance-*/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7

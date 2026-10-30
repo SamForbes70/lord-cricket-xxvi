@@ -1,0 +1,27 @@
+{
+  "commands": [
+    "npm run schemas:check",
+    "npm run build",
+    "npm run typecheck",
+    "npm run lint",
+    "npm run fixtures:engine",
+    "npm run vectors:check",
+    "npm run probability:check",
+    "npm run generator:check",
+    "npm test -- --maxWorkers=2 --reporter=default --reporter=json --outputFile=/workspace/acceptance-review-final-unit.json",
+    "python3 -m unittest discover -s tests -p test_*.py",
+    "npx vitest run tests/unit/m7k-historical-fixture.test.ts",
+    "npx vite build --config vite.m7k.config.ts",
+    "npx playwright test --reporter list",
+    "npx playwright test --config playwright.m7k.config.ts --reporter list,json",
+    "python3 scripts/m7k-inventory-forward.py --archive /workspace/m7k-completion-data/all_male_json.zip --after-date 2026-10-14 --match-type T20 --out docs/verification-m7k/acceptance-review/ALL_MALE_FORWARD_T20.json"
+  ],
+  "allExitCodes": 0,
+  "browserEnvironment": {
+    "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright",
+    "normalBrowserSandbox": true
+  },
+  "historicalFixtureIntake": "Synthetic test packets only; no real reviewed packet supplied",
+  "newEmpiricalEvaluation": "NOT_RUN_INSUFFICIENT_DATA",
+  "referenceHardware": "NOT_RUN_NO_QUALIFYING_HOST"
+}

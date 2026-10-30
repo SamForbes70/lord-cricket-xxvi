@@ -1,19 +1,25 @@
-# Lord Cricket XXVI - NEXT PASS after M7J
+# Next development slice
 
-**M7K started:** planning and evidence preparation, authorised 26 October 2026.
-See [M7K_PLAN.md](M7K_PLAN.md) for ordered slices, acceptance gates and the 69-case evidence worksheet.
-[Current status](CURRENT_STATUS.md) records the merged capability corrections and model-quality harness.
-Production ledger integration and research-model promotion remain gated separately.
+The active target is the original V0.1 synthetic alpha under the owner's standing brief.
+[The delivery plan](V01_DELIVERY_PLAN.md) and `V01_BACKLOG.json` supersede the earlier research-only work queue.
+[Current status](CURRENT_STATUS.md) records actual implemented capability and evidence.
 
-Baseline: M7J committed source (record exact hash in PASS_22_M7J_REPORT.md).
+## Batch 1
 
-Priorities:
+Persist the standing authority, design reconciliation, backlog and outstanding research review.
+Complete integration after final-diff review and passing Linux/Windows checks.
 
-1. Obtain independently adjudicated representative cases from the 69-row M7I register, including full umpire chronology, match playing conditions, award beneficiary, ground-end metadata and reliable extras credit. Preserve original source hashes and decisions.
-2. Version a new *production-capable* delivery/administration event stream and innings ledger only when every required invariant, interrupted save/replay path and old-schema version negotiation has fixtures. Do not write v2 events into v1 saved matches.
-3. Resolve remaining anomalies: repeated No-ball extras, free-hit inconsistency, boundary + run-out ordering, multiple dismissals in one source row, true retired-out timing. Never silently coerce invalid source evidence into legal events.
-4. Assemble a research candidate with full traceable scorer integration and test two-innings match cohorts, strength variation, fatigue, captain tactical ablations and unbiased opponent/competition comparison. Model evaluation must use a *new untouched* forward-time cohort, not the repeatedly inspected M7E-H development holdout.
-5. Keep `synthetic-alpha-01` intact for historical save replay. Linux and hosted Windows browser runs pass; Sam reports a successful Windows Edge playthrough.
-   Owner-PC automation and unrecorded human checklist details remain separate evidence gaps. Run performance budgets on reference hardware before M8.
+## Batch 2: player-facing essentials
 
-M7J is a safe research-rule prerequisite, NOT gameplay-ready completion of those tasks. Details and fixture evidence: ADR-032 and `docs/M7J_RUNBOOK.md`.
+V01-003: player pages with persistent format filters.
+V01-004: pre-match pitch and conditions inspection.
+Then deliver staged names/colours editing, validated new-game roster import and basic settings.
+Use existing immutable world data for the first two slices.
+Preserve existing saves and frozen simulation outcomes.
+
+## Parallel research and acceptance
+
+[M7K_PLAN.md](M7K_PLAN.md) remains the research plan; its historical and cohort gates stay explicit.
+Historical decisions, sufficient untouched matches and qualifying hardware measurements remain external evidence needs.
+They do not stop unrelated product work.
+Research-model promotion and public deployment require separate approval.

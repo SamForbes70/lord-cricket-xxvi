@@ -2,6 +2,14 @@
 
 This is the **recovered complete TypeScript source repository with its full available Git history**. It was restored from the Pass 22 / M7J bundle in the original 17 October 2026 owner package. The code from historical commit `5b8b9da990d657197fb56bbfd33152f87b875f5c` was verified byte-for-byte against every source ZIP entry (894 entries).
 
+## Active development brief
+
+The owner adopted autonomous V0.1 synthetic-alpha delivery on 30 October 2026.
+Read [the standing brief](docs/STANDING_DEVELOPMENT_BRIEF.md) and [the delivery plan](docs/V01_DELIVERY_PLAN.md).
+`docs/V01_BACKLOG.json` holds the persistent queue and acceptance criteria.
+Resume the next eligible slice without requesting routine approval again.
+Research evidence gaps stay separate from independent product development.
+
 ## Current acceptance
 
 PR #2 is merged. [Current status](docs/CURRENT_STATUS.md) supersedes historical browser blockers and archive-absence notes.

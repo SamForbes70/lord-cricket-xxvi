@@ -1,0 +1,33 @@
+{
+  "unit": {
+    "passed": 638,
+    "failed": 0,
+    "pending": 0,
+    "files": 40
+  },
+  "python": {
+    "passed": 94
+  },
+  "productionSmoke": {
+    "passed": 23
+  },
+  "candidateBrowser": {
+    "startTime": "2026-10-29T13:05:24.270Z",
+    "duration": 26124.809,
+    "expected": 30,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "schemas": 167,
+  "build": "PASS",
+  "typecheck": "PASS",
+  "lint": "PASS",
+  "scorerFixtures": "PASS",
+  "rngProbabilityGeneratorVectors": "PASS",
+  "historicalPacketCliTests": 14,
+  "actualHistoricalPacketsExecuted": 0,
+  "actualEmpiricalEvaluationPerformed": false,
+  "qualifyingHardwareMeasured": false,
+  "modelPromotion": false
+}
