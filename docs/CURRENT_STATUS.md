@@ -6,6 +6,14 @@ PR #3 merged as `4aa71d9` after integration with `b4aceda`. Historical simulatio
 The accepted gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
 M7 quality validation and M8 release acceptance remain incomplete.
 
+## Active V0.1 delivery
+
+The owner adopted [the standing brief](STANDING_DEVELOPMENT_BRIEF.md) on 30 October 2026.
+[The delivery plan](V01_DELIVERY_PLAN.md) records seven batches and a separate empirical research track.
+Batch 1 records authority, scope reconciliation and review of research commit `b93bccb`.
+Player pages and pitch inspection are the next product slices.
+A labelled synthetic-alpha release remains distinct from empirical model promotion.
+
 ## Latest acceptance and M7K verification
 
 PR #12 merged as `b755034` after four passing Linux and Windows checks.

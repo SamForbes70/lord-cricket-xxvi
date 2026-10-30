@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "deliveryItems": 29,
+  "researchItems": 3,
+  "allIdsUnique": true,
+  "dependenciesExist": true,
+  "dependencyGraphAcyclic": true,
+  "releaseDependsOnAllDeliveryItems": true,
+  "localLinksChecked": 25,
+  "designSha256Verified": true
+}

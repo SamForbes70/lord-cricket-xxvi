@@ -1,0 +1,41 @@
+{
+  "reviewedCommit": "b93bccb9a72ea5f09f23c835bef724b77b4eb3bb",
+  "baselineMain": "64535fcc57db8542560f2d0ac7ffb4ab700e3a90",
+  "reviewedOn": "2026-10-30",
+  "scope": [
+    "research fixture schemas and prefix verification",
+    "CLI source identity, non-overwrite output and provenance",
+    "format-filter compatibility",
+    "source/evidence boundaries"
+  ],
+  "blockingFindings": [],
+  "limits": [
+    "Review declarations are not independent authentication.",
+    "No complete historical packets, real empirical evaluation or reference-hardware acceptance established."
+  ],
+  "evidenceFilesVerified": [
+    "ALL_MALE_FORWARD_T20.json",
+    "BOUNDARY_CHECK.json",
+    "COMMANDS.json",
+    "DECISION.json",
+    "FIXTURE_PACKET.md",
+    "REPORT.md",
+    "VALIDATION.json",
+    "candidate-browser.log",
+    "python.log",
+    "smoke.log",
+    "unit.log"
+  ],
+  "targetedTests": {
+    "historicalFixtureTests": 14,
+    "forwardInventoryTests": 4,
+    "status": "PASS"
+  },
+  "priorPushCi": {
+    "run": 40879594000,
+    "conclusion": "SUCCESS",
+    "scope": "Two push checks on research commit; not current integration CI."
+  },
+  "productionDiffEmpty": true,
+  "integration": "Pending final combined PR checks"
+}

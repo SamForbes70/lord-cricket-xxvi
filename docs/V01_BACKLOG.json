@@ -1,0 +1,665 @@
+{
+  "version": "LC_V01_DELIVERY_BACKLOG_V1",
+  "adoptedOn": "2026-10-30",
+  "timezone": "Australia/Brisbane",
+  "target": "V0.1 SYNTHETIC_ALPHA",
+  "authority": "STANDING_DEVELOPMENT_BRIEF.md",
+  "items": [
+    {
+      "id": "V01-001",
+      "batch": 1,
+      "title": "Adopt standing brief and reconcile scope",
+      "designSections": [
+        1,
+        3,
+        23,
+        25
+      ],
+      "dependsOn": [],
+      "status": "DONE",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Persist owner authority and preserved boundaries.",
+        "Link the active queue from agent and start documents.",
+        "Keep empirical claims separate from synthetic-alpha release acceptance."
+      ]
+    },
+    {
+      "id": "V01-002",
+      "batch": 1,
+      "title": "Review and integrate outstanding research intake",
+      "designSections": [
+        8,
+        22
+      ],
+      "dependsOn": [
+        "V01-001"
+      ],
+      "status": "DELIVERED_PENDING_INTEGRATION",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Inspect b93bccb and verify its evidence hashes.",
+        "Run targeted intake and metadata-filter tests.",
+        "Merge only after final-diff review and green Linux/Windows CI."
+      ]
+    },
+    {
+      "id": "V01-003",
+      "batch": 2,
+      "title": "Player pages with persistent format filters",
+      "designSections": [
+        5,
+        17,
+        18
+      ],
+      "dependsOn": [
+        "V01-001"
+      ],
+      "status": "READY",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Open a player by stable ID from squad and statistics.",
+        "Separate base skills, condition and recorded performance.",
+        "Persist format filters and explain missing statistics."
+      ]
+    },
+    {
+      "id": "V01-004",
+      "batch": 2,
+      "title": "Pre-match pitch and conditions inspection",
+      "designSections": [
+        1,
+        13,
+        17
+      ],
+      "dependsOn": [
+        "V01-001"
+      ],
+      "status": "READY",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Show the selected ground and effective pitch parameters before toss.",
+        "Explain disabled model effects without implying gameplay influence.",
+        "Keep forecasts separate from hidden future schedules."
+      ]
+    },
+    {
+      "id": "V01-005",
+      "batch": 2,
+      "title": "Names and colours in a new-game world copy",
+      "designSections": [
+        1,
+        5,
+        17
+      ],
+      "dependsOn": [
+        "V01-003"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Edit names and colours without changing stable entity IDs.",
+        "Version and validate the new-game world copy.",
+        "Preserve historical match snapshots and escape all rendered text."
+      ]
+    },
+    {
+      "id": "V01-006",
+      "batch": 2,
+      "title": "Validated new-game roster import",
+      "designSections": [
+        1,
+        5,
+        21
+      ],
+      "dependsOn": [
+        "V01-005"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Stage imported worlds with size, schema and reference validation.",
+        "Apply explicit priors for permitted missing statistical data.",
+        "Reject executable content, invalid XIs and malformed rosters.",
+        "Preserve export/import of referenced custom packs."
+      ]
+    },
+    {
+      "id": "V01-007",
+      "batch": 2,
+      "title": "Complete basic settings and player navigation",
+      "designSections": [
+        17
+      ],
+      "dependsOn": [
+        "V01-003"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Add the specified 115 percent text scale.",
+        "Keep keyboard focus, reduced motion and narrow layouts usable.",
+        "Retain player identity and format filter across navigation."
+      ]
+    },
+    {
+      "id": "V01-008",
+      "batch": 3,
+      "title": "Broader bounded simulation scopes",
+      "designSections": [
+        9,
+        17,
+        19
+      ],
+      "dependsOn": [
+        "V01-004"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Add next-decision, innings and match scopes.",
+        "Stop at every required decision and commit boundary.",
+        "Prove scope choices do not change accepted results."
+      ]
+    },
+    {
+      "id": "V01-009",
+      "batch": 3,
+      "title": "Cancellation and boundary-applied commands",
+      "designSections": [
+        9,
+        19,
+        21
+      ],
+      "dependsOn": [
+        "V01-008"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Cancel long batches at safe boundaries.",
+        "Report the accepted sequence for queued commands.",
+        "Reject stale revisions without advancing random counters."
+      ]
+    },
+    {
+      "id": "V01-010",
+      "batch": 3,
+      "title": "Granular user delegation",
+      "designSections": [
+        9,
+        15,
+        17
+      ],
+      "dependsOn": [
+        "V01-008"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Delegate each supported decision category explicitly.",
+        "Record delegation in command history and save/replay.",
+        "Keep unsupported categories disabled."
+      ]
+    },
+    {
+      "id": "V01-011",
+      "batch": 3,
+      "title": "Match continuity across management navigation",
+      "designSections": [
+        4,
+        17
+      ],
+      "dependsOn": [
+        "V01-009"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Keep the active match authority alive while inspecting management screens.",
+        "Restore projections without a second engine or duplicate commands.",
+        "Preserve durable recovery if the application closes."
+      ]
+    },
+    {
+      "id": "V01-012",
+      "batch": 4,
+      "title": "Analytics across enabled formats",
+      "designSections": [
+        18
+      ],
+      "dependsOn": [
+        "V01-001"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Extend event-derived analytics to ODI and red ball.",
+        "Reconcile scorecards and handle follow-on innings order.",
+        "Show a dedicated fall-of-wickets view."
+      ]
+    },
+    {
+      "id": "V01-013",
+      "batch": 4,
+      "title": "Incremental analytics and rebuild controls",
+      "designSections": [
+        18,
+        21
+      ],
+      "dependsOn": [
+        "V01-012"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Track applied sequence and reject gaps or duplicate application.",
+        "Match incremental output to a full rebuild.",
+        "Expose background rebuild progress and cancellation."
+      ]
+    },
+    {
+      "id": "V01-014",
+      "batch": 4,
+      "title": "Complete analytical charts",
+      "designSections": [
+        10,
+        18
+      ],
+      "dependsOn": [
+        "V01-012"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Render a score worm and a shot-sector wagon wheel.",
+        "Preserve left-handed view transforms without changing stored events.",
+        "Show categorical executed pitch maps only where data exists.",
+        "Never invent measured trajectories or extras shot locations."
+      ]
+    },
+    {
+      "id": "V01-015",
+      "batch": 4,
+      "title": "CSV and printable scorecards",
+      "designSections": [
+        18,
+        21
+      ],
+      "dependsOn": [
+        "V01-012"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Export UTF-8 CSV with formula-prefix protection.",
+        "Provide printable HTML with format, rules and model status.",
+        "Test escaping, missing values and score reconciliation."
+      ]
+    },
+    {
+      "id": "V01-016",
+      "batch": 4,
+      "title": "Previewable diagnostic event exports",
+      "designSections": [
+        18,
+        21
+      ],
+      "dependsOn": [
+        "V01-015"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Export canonical event data with version and failure metadata.",
+        "Make export opt-in and previewable.",
+        "Keep private data and raw licensed research out of automatic uploads."
+      ]
+    },
+    {
+      "id": "V01-017",
+      "batch": 5,
+      "title": "Manual career save copies",
+      "designSections": [
+        20
+      ],
+      "dependsOn": [
+        "V01-001"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Create a named career copy without altering the source slot.",
+        "Respect writer leases and revisions.",
+        "Prove reload and portable round-trip equivalence."
+      ]
+    },
+    {
+      "id": "V01-018",
+      "batch": 5,
+      "title": "Completed career event archives and replay",
+      "designSections": [
+        16,
+        18,
+        20,
+        21
+      ],
+      "dependsOn": [
+        "V01-017"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Retain versioned completed-match event history.",
+        "Expose replay without recomputing new historical outcomes.",
+        "Bound storage and archive sizes with explicit recovery behaviour.",
+        "Preserve existing v1 careers without silent migration."
+      ]
+    },
+    {
+      "id": "V01-019",
+      "batch": 5,
+      "title": "Career save and recovery usability",
+      "designSections": [
+        17,
+        20
+      ],
+      "dependsOn": [
+        "V01-017",
+        "V01-018"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Explain save errors and recovery choices clearly.",
+        "Retain corrupted originals and offer validated older generations.",
+        "Keep manual copies, import and export keyboard accessible."
+      ]
+    },
+    {
+      "id": "V01-020",
+      "batch": 6,
+      "title": "ODI tactical captain",
+      "designSections": [
+        9,
+        15
+      ],
+      "dependsOn": [
+        "V01-010"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Use public observations and accepted ODI commands.",
+        "Respect quotas, field phases and remaining resources.",
+        "Record repeatable legal decisions with no hidden bonuses."
+      ]
+    },
+    {
+      "id": "V01-021",
+      "batch": 6,
+      "title": "Red-ball tactical captain",
+      "designSections": [
+        9,
+        15
+      ],
+      "dependsOn": [
+        "V01-010"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Use lead, wickets and remaining time in legal choices.",
+        "Keep workload and field decisions within the selected profile.",
+        "Preserve manual control for undelegated categories."
+      ]
+    },
+    {
+      "id": "V01-022",
+      "batch": 6,
+      "title": "Declaration and follow-on evaluation",
+      "designSections": [
+        15
+      ],
+      "dependsOn": [
+        "V01-021"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Compare cloned continuations without consuming live random draws.",
+        "Use an explicit versioned utility and planning budget.",
+        "Test declaration, follow-on, innings win and draw cases."
+      ]
+    },
+    {
+      "id": "V01-023",
+      "batch": 6,
+      "title": "Seeded weather and uncertain forecasts",
+      "designSections": [
+        13
+      ],
+      "dependsOn": [
+        "V01-009"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Generate versioned segments in an independent random domain.",
+        "Apply interruptions only at safe event boundaries.",
+        "Show uncertain forecasts without revealing the hidden schedule.",
+        "Preserve clock fixtures and keep limited-overs rain disabled."
+      ]
+    },
+    {
+      "id": "V01-024",
+      "batch": 7,
+      "title": "Synthetic quality and tactical exploitation gates",
+      "designSections": [
+        3,
+        8,
+        9,
+        15,
+        22
+      ],
+      "dependsOn": [
+        "V01-020",
+        "V01-021"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Run fixed paired scenarios across skills, fields and pitches.",
+        "Investigate the documented low-scoring baseline.",
+        "Record monotonicity, dominant tactics and supported claims.",
+        "Use a new version for any changed result-generating behaviour."
+      ]
+    },
+    {
+      "id": "V01-025",
+      "batch": 7,
+      "title": "Cross-format replay and release-scale diagnostics",
+      "designSections": [
+        8,
+        22
+      ],
+      "dependsOn": [
+        "V01-024"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Run at least 100 fixed replay matches per enabled format.",
+        "Run the specified 10000 simulations per format with reproducible seeds.",
+        "Report innings, phases, tails, uncertainty and stopping conditions.",
+        "Make synthetic claims without claiming empirical calibration."
+      ]
+    },
+    {
+      "id": "V01-026",
+      "batch": 7,
+      "title": "Accessibility release audit",
+      "designSections": [
+        17,
+        22
+      ],
+      "dependsOn": [
+        "V01-007",
+        "V01-014",
+        "V01-019"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Verify keyboard, focus, contrast, screen-reader behaviour and browser zoom.",
+        "Retain 150 percent, long-name and narrow-layout browser checks.",
+        "Record remaining human observations without fabricating metadata."
+      ]
+    },
+    {
+      "id": "V01-027",
+      "batch": 7,
+      "title": "Offline assets and safe updates",
+      "designSections": [
+        4,
+        20,
+        21
+      ],
+      "dependsOn": [
+        "V01-018"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Verify offline asset availability and startup.",
+        "Offer updates outside active transactions.",
+        "Retain supported engine assets or an explicit recovery build."
+      ]
+    },
+    {
+      "id": "V01-028",
+      "batch": 7,
+      "title": "Reference-hardware performance acceptance",
+      "designSections": [
+        21
+      ],
+      "dependsOn": [
+        "V01-025"
+      ],
+      "status": "BLOCKED_EXTERNAL",
+      "track": "EXTERNAL_EVIDENCE",
+      "acceptanceCriteria": [
+        "Measure all eight budgets on a recorded qualifying host.",
+        "Include worker and native allocations in total application memory.",
+        "Keep cloud observations separate from reference acceptance."
+      ]
+    },
+    {
+      "id": "V01-029",
+      "batch": 7,
+      "title": "Release record and packaging",
+      "designSections": [
+        23,
+        25
+      ],
+      "dependsOn": [
+        "V01-001",
+        "V01-002",
+        "V01-003",
+        "V01-004",
+        "V01-005",
+        "V01-006",
+        "V01-007",
+        "V01-008",
+        "V01-009",
+        "V01-010",
+        "V01-011",
+        "V01-012",
+        "V01-013",
+        "V01-014",
+        "V01-015",
+        "V01-016",
+        "V01-017",
+        "V01-018",
+        "V01-019",
+        "V01-020",
+        "V01-021",
+        "V01-022",
+        "V01-023",
+        "V01-024",
+        "V01-025",
+        "V01-026",
+        "V01-027",
+        "V01-028"
+      ],
+      "status": "PLANNED",
+      "track": "PRODUCT",
+      "acceptanceCriteria": [
+        "Reconcile every advertised capability with passing evidence.",
+        "Package the tested commit, manifests, known limits and recovery instructions.",
+        "Record owner-PC and human evidence honestly.",
+        "Keep public deployment separately authorised."
+      ]
+    },
+    {
+      "id": "RES-001",
+      "batch": 0,
+      "title": "Historical incident decisions and executable packets",
+      "designSections": [
+        11,
+        22
+      ],
+      "dependsOn": [],
+      "status": "BLOCKED_EXTERNAL",
+      "track": "RESEARCH",
+      "acceptanceCriteria": [
+        "Obtain missing incident facts and cited decisions.",
+        "Run complete expected prefixes through the reviewed-packet runner.",
+        "Retain rejected and inconclusive cases."
+      ]
+    },
+    {
+      "id": "RES-002",
+      "batch": 0,
+      "title": "Untouched empirical evaluation cohort",
+      "designSections": [
+        8
+      ],
+      "dependsOn": [],
+      "status": "BLOCKED_EXTERNAL",
+      "track": "RESEARCH",
+      "acceptanceCriteria": [
+        "Obtain at least 200 eligible forward evaluation matches and the required training cohort.",
+        "Freeze candidate and protocol before outcome opening.",
+        "Preserve rights, source hashes and exclusions."
+      ]
+    },
+    {
+      "id": "RES-003",
+      "batch": 0,
+      "title": "Empirical candidate and promotion review",
+      "designSections": [
+        8,
+        23,
+        25
+      ],
+      "dependsOn": [
+        "RES-001",
+        "RES-002"
+      ],
+      "status": "BLOCKED_EXTERNAL",
+      "track": "RESEARCH",
+      "acceptanceCriteria": [
+        "Evaluate both innings, strengths, fatigue and tactics with uncertainty.",
+        "Preserve old model and save dispatch.",
+        "Obtain separate explicit approval before gameplay promotion."
+      ]
+    }
+  ],
+  "designSource": {
+    "path": "docs/codex-migration/original-design/Lord_Cricket_XXVI_Technical_Design_V0_1.docx",
+    "sha256": "58e2576437d1a8a6f3e291f794284fc7163485324877d2381797cba0dcf5b7f9"
+  },
+  "baselineMainCommit": "64535fcc57db8542560f2d0ac7ffb4ab700e3a90",
+  "reviewedResearchCommit": "b93bccb9a72ea5f09f23c835bef724b77b4eb3bb"
+}
