@@ -5,6 +5,8 @@ import {
   careerWorld,
   type CareerUserMatchResult,
 } from "./service.js";
+import { PlayerPage, type PlayerFormat } from "./PlayerPage.js";
+import { PitchInspection } from "../match/PitchInspection.js";
 import "./career.css";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
@@ -17,7 +19,7 @@ if (!owner) {
 }
 const service = new CareerApplicationService(owner);
 
-type Screen = "HOME" | "CAREER" | "SQUAD" | "FIXTURES" | "STATISTICS" | "SETTINGS";
+type Screen = "HOME" | "CAREER" | "SQUAD" | "FIXTURES" | "STATISTICS" | "SETTINGS" | "PLAYER";
 const directives: TrainingDirective[] = ["REST", "BATTING_PRACTICE", "BOWLING_PRACTICE", "FIELDING_PRACTICE"];
 
 function metric(value: number | null, divisor = 100): string {
@@ -31,6 +33,19 @@ function percentageBp(value: number): string {
 export function CareerApp() {
   const [, redraw] = useState(0);
   const [screen, setScreen] = useState<Screen>("HOME");
+  const [playerId, setPlayerId] = useState<string | null>(null);
+  const [playerOrigin, setPlayerOrigin] = useState<"SQUAD" | "STATISTICS">("SQUAD");
+  const [restorePlayerFocus, setRestorePlayerFocus] = useState<string | null>(null);
+  const [playerFormat, setPlayerFormat] = useState<PlayerFormat>(() => {
+    const stored = localStorage.getItem("lcxxvi-player-format");
+    return stored === "ODI" || stored === "RED_BALL" ? stored : "T20";
+  });
+  function openPlayer(id: string, origin: "SQUAD" | "STATISTICS") {
+    setPlayerId(id); setPlayerOrigin(origin); setScreen("PLAYER");
+  }
+  function changePlayerFormat(value: PlayerFormat) {
+    setPlayerFormat(value); localStorage.setItem("lcxxvi-player-format", value);
+  }
   const [busy, setBusy] = useState(true);
   const [uiError, setUiError] = useState("");
   const [savedCareers, setSavedCareers] = useState<Awaited<ReturnType<typeof service.listCareers>>>([]);
@@ -40,6 +55,12 @@ export function CareerApp() {
   const state = service.getState();
 
   useEffect(() => service.subscribe(() => redraw((value) => value + 1)), []);
+  useEffect(() => {
+    if (restorePlayerFocus && screen === playerOrigin) {
+      document.getElementById(`player-link-${playerOrigin}-${restorePlayerFocus}`)?.focus();
+      setRestorePlayerFocus(null);
+    }
+  }, [screen, playerOrigin, restorePlayerFocus]);
   useEffect(() => {
     let alive = true;
     void (async () => {
@@ -234,6 +255,7 @@ export function CareerApp() {
                       <button disabled={busy || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
                     </div>
                   )}
+                  <PitchInspection ground={careerWorld.grounds.find(ground => ground.groundId === nextFixture.groundId)} format="T20" />
                 </>
               ) : <p>No remaining managed fixture.</p>}
             </article>
@@ -281,7 +303,7 @@ export function CareerApp() {
           <p>Training changes affect temporary readiness and daily recovery only. There is no permanent attribute growth in V0.1.</p>
           <div className="table-wrap"><table><thead><tr><th>Player</th><th>Role</th><th>Availability</th><th>Fatigue</th><th>Bat</th><th>Bowl</th><th>Field</th><th>Training</th></tr></thead><tbody>{service.squadView()?.players.map((condition) => {
             const player = careerWorld.players.find((candidate) => candidate.playerId === condition.playerId)!;
-            return <tr key={condition.playerId}><td><strong>{player.name}</strong><small>{player.playerId}</small></td><td>{player.role}</td><td>{condition.availability}{condition.availabilityReason ? <small>{condition.availabilityReason}</small> : null}</td><td>{percentageBp(condition.fatigueBp)}</td><td>{condition.battingReadiness > 0 ? "+" : ""}{condition.battingReadiness}</td><td>{condition.bowlingReadiness > 0 ? "+" : ""}{condition.bowlingReadiness}</td><td>{condition.fieldingReadiness > 0 ? "+" : ""}{condition.fieldingReadiness}</td><td><label className="sr-label" htmlFor={`training-${condition.playerId}`}>Training for {player.name}</label><select id={`training-${condition.playerId}`} disabled={busy || service.isReadOnly() || state.phase === "COMPLETE"} value={condition.directive} onChange={(event) => void action(async () => { await service.setTraining(condition.playerId, event.currentTarget.value as TrainingDirective); })}>{directives.map((directive) => <option key={directive} value={directive}>{directive.replaceAll("_", " ")}</option>)}</select></td></tr>;
+            return <tr key={condition.playerId}><td><button type="button" className="player-link" id={`player-link-SQUAD-${player.playerId}`} aria-label={`View ${player.name}`} onClick={() => openPlayer(player.playerId, "SQUAD")}>{player.name}</button><small>{player.playerId}</small></td><td>{player.role}</td><td>{condition.availability}{condition.availabilityReason ? <small>{condition.availabilityReason}</small> : null}</td><td>{percentageBp(condition.fatigueBp)}</td><td>{condition.battingReadiness > 0 ? "+" : ""}{condition.battingReadiness}</td><td>{condition.bowlingReadiness > 0 ? "+" : ""}{condition.bowlingReadiness}</td><td>{condition.fieldingReadiness > 0 ? "+" : ""}{condition.fieldingReadiness}</td><td><label className="sr-label" htmlFor={`training-${condition.playerId}`}>Training for {player.name}</label><select id={`training-${condition.playerId}`} disabled={busy || service.isReadOnly() || state.phase === "COMPLETE"} value={condition.directive} onChange={(event) => void action(async () => { await service.setTraining(condition.playerId, event.currentTarget.value as TrainingDirective); })}>{directives.map((directive) => <option key={directive} value={directive}>{directive.replaceAll("_", " ")}</option>)}</select></td></tr>;
           })}</tbody></table></div>
         </section>
       )}
@@ -313,9 +335,17 @@ export function CareerApp() {
             <div className="career-panel"><h4>Wickets</h4><ol>{state.projection.leaders.wickets.map((entry) => <li key={entry.playerId}><span>{service.playerName(entry.playerId)}</span><strong>{entry.value}</strong></li>)}</ol></div>
           </div>
           <h3>Full player statistics</h3>
-          <div className="table-wrap"><table><thead><tr><th>Player</th><th>Team</th><th>M</th><th>Runs</th><th>Avg</th><th>SR</th><th>Wkts</th><th>Bowl Avg</th><th>Econ</th><th>Bowl SR</th></tr></thead><tbody>{state.projection.players.map((player) => <tr key={player.playerId}><td>{service.playerName(player.playerId)}</td><td>{service.teamName(player.teamId)}</td><td>{player.matches}</td><td>{player.runs}</td><td>{metric(player.battingAverageX100)}</td><td>{metric(player.strikeRateX100)}</td><td>{player.bowlingWickets}</td><td>{metric(player.bowlingAverageX100)}</td><td>{metric(player.economyX100)}</td><td>{metric(player.bowlingStrikeRateX100)}</td></tr>)}</tbody></table></div>
+          <div className="table-wrap"><table><thead><tr><th>Player</th><th>Team</th><th>M</th><th>Runs</th><th>Avg</th><th>SR</th><th>Wkts</th><th>Bowl Avg</th><th>Econ</th><th>Bowl SR</th></tr></thead><tbody>{state.projection.players.map((player) => <tr key={player.playerId}><td><button type="button" className="player-link" id={`player-link-STATISTICS-${player.playerId}`} aria-label={`View ${service.playerName(player.playerId)}`} onClick={() => openPlayer(player.playerId, "STATISTICS")}>{service.playerName(player.playerId)}</button></td><td>{service.teamName(player.teamId)}</td><td>{player.matches}</td><td>{player.runs}</td><td>{metric(player.battingAverageX100)}</td><td>{metric(player.strikeRateX100)}</td><td>{player.bowlingWickets}</td><td>{metric(player.bowlingAverageX100)}</td><td>{metric(player.economyX100)}</td><td>{metric(player.bowlingStrikeRateX100)}</td></tr>)}</tbody></table></div>
         </section>
       )}
+
+      {screen === "PLAYER" && (() => {
+        const player = careerWorld.players.find(candidate => candidate.playerId === playerId);
+        return player ? <PlayerPage player={player} condition={service.playerCondition(player.playerId)}
+          stats={state.projection.players.find(candidate => candidate.playerId === player.playerId) ?? null}
+          format={playerFormat} onFormat={changePlayerFormat} onBack={() => { setRestorePlayerFocus(player.playerId); setScreen(playerOrigin); }}
+          backLabel={playerOrigin === "SQUAD" ? "Back to squad" : "Back to statistics"} /> : null;
+      })()}
 
       {screen === "SETTINGS" && (
         <section aria-labelledby="settings-heading">

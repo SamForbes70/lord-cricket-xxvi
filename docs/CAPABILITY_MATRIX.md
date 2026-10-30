@@ -10,7 +10,9 @@ Dated reports retain the results of their original runs.
 | Match formats | T20, ODI and five-day red-ball exhibitions under documented custom rules. |
 | Match interface | XIs, captain/keeper, toss, batting/bowling choices, field controls and complete scorecards. |
 | One-season career | Eight teams, 14 rounds and 56 fixtures, with managed interactive or simulated fixtures. |
-| Management screens | Home, Career, Squad, Fixtures, Statistics and Settings. |
+| Management screens | Home, Career, Squad, Fixtures, Statistics, Settings and player pages. |
+| Player pages | Base ratings by format, current T20 career condition and recorded season statistics. Squad and statistics link by stable player ID. |
+| Pitch inspection | The selected exhibition ground and next career fixture show the seam and spin values used by the match model. Unused conditions and unavailable forecasts are labelled. |
 | Training and condition | Rest/practice, availability, fatigue and temporary readiness; no permanent skill growth. |
 | Tactical captain | Optional deterministic public-view T20 policy; legal controls are browser-tested. Empirical tactical quality is unaccepted. |
 | Fixture autopilot | Separate deterministic baseline completion policy; it is not the tactical captain. |

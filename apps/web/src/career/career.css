@@ -44,3 +44,9 @@
 .reduced-motion *, .reduced-motion *::before, .reduced-motion *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
 @media (max-width: 900px) { .team-picker { grid-template-columns:repeat(2,minmax(0,1fr)); } .dashboard-grid,.career-summary-grid,.stats-grid,.settings-grid { grid-template-columns:1fr; } .career-masthead { align-items:flex-start; } }
 @media (max-width: 620px) { .career-shell { padding:14px; } .team-picker,.save-list { grid-template-columns:1fr; } .career-masthead { flex-direction:column; } .career-nav a { margin-left:0; } }
+
+.player-detail-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 260px),1fr)); gap:14px; margin-top:16px; }
+.player-details { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 16px; margin:0; }
+.player-details dt { overflow-wrap:anywhere; }
+.player-details dd { margin:0; text-align:right; font-variant-numeric:tabular-nums; }
+.career-shell .player-link { padding:0; border:0; background:none; color:#155b3a; text-decoration:underline; text-align:left; }

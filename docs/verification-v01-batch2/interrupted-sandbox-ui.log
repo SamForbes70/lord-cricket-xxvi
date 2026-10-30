@@ -1,0 +1,51 @@
+[WebServer] (node:24650) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:24674) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:24712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+chromium keyboard step 0 AWAITING_INNINGS
+chromium keyboard step 10 READY
+chromium keyboard step 20 READY
+chromium keyboard step 30 AWAITING_BATTER
+chromium keyboard step 40 AWAITING_BATTER
+chromium keyboard step 50 AWAITING_BATTER
+chromium keyboard step 60 AWAITING_BATTER
+chromium keyboard step 70 AWAITING_BOWLER
+chromium keyboard step 80 AWAITING_BOWLER
+chromium keyboard step 90 AWAITING_BOWLER
+chromium keyboard step 100 AWAITING_BATTER
+  ✓  1 [chromium] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls (26.8s)
+  ✓  2 [chromium] › tests/ui/match.spec.ts:129:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (2.2s)
+  ✓  3 [chromium] › tests/ui/match.spec.ts:210:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (1.8s)
+  ✓  4 [chromium] › tests/ui/pitch-inspection.spec.ts:4:1 › shows the selected ground's effective pitch before the toss in every format (1.2s)
+(node:25063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [firefox] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls (1.4m)
+
+
+  1) [firefox] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls
+
+    Test was interrupted.
+
+    Error: browserContext.newPage: Test ended.
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-ui/match-a-full-keyboard-only-95ebb-ntity-and-terminal-controls-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-ui/match-a-full-keyboard-only-95ebb-ntity-and-terminal-controls-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 interrupted
+    [firefox] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls
+  3 did not run
+  4 passed (2.0m)

@@ -1,0 +1,27 @@
+[WebServer] (node:25786) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:25799) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 10 tests using 1 worker
+
+(node:25822) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25822) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/m6g/management.spec.ts:2:1 › M6G management career creates, persists, navigates, progresses and completes (41.2s)
+  ✓   2 [chromium] › tests/m6g/management.spec.ts:152:1 › M6G primary career controls are keyboard reachable at 1366x768 (324ms)
+  ✓   3 [chromium] › tests/m6g/player-page.spec.ts:13:1 › player profiles preserve format across players and reload without changing the career (850ms)
+  ✓   4 [chromium] › tests/m6g/player-page.spec.ts:77:1 › a completed career match links statistics to the correct player profile (2.9s)
+  ✓   5 [chromium] › tests/m6g/player-page.spec.ts:129:1 › pitch inspection keeps the primary match action in view at 150 percent (435ms)
+(node:26348) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26348) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 [firefox] › tests/m6g/management.spec.ts:2:1 › M6G management career creates, persists, navigates, progresses and completes (57.3s)
+  ✓   7 [firefox] › tests/m6g/management.spec.ts:152:1 › M6G primary career controls are keyboard reachable at 1366x768 (420ms)
+  ✓   8 [firefox] › tests/m6g/player-page.spec.ts:13:1 › player profiles preserve format across players and reload without changing the career (1.4s)
+  ✓   9 [firefox] › tests/m6g/player-page.spec.ts:77:1 › a completed career match links statistics to the correct player profile (5.0s)
+  ✓  10 [firefox] › tests/m6g/player-page.spec.ts:129:1 › pitch inspection keeps the primary match action in view at 150 percent (791ms)
+
+  10 passed (1.9m)

@@ -15,7 +15,8 @@ import {
 } from "./match/protocol.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
-import type { CareerUserMatchLaunch } from "./career/service.js";
+import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
+import { PitchInspection } from "./match/PitchInspection.js";
 
 type Body = Request extends infer R
   ? R extends Request
@@ -957,6 +958,35 @@ function Setup({
     <section className="setup">
       <fieldset disabled={busy}>
         <legend>Choose teams and XIs</legend>
+        <label>
+          Format{" "}
+          <select
+            aria-label="Format"
+            value={format}
+            onChange={(e) =>
+              setFormat(e.target.value as "T20" | "ODI" | "RED_BALL")
+            }
+          >
+            <option value="T20">T20 · 20 overs</option>
+            <option value="ODI">ODI · 50 overs</option>
+            <option value="RED_BALL">Red ball · five days</option>
+          </select>
+        </label>
+        <label>
+          Ground{" "}
+          <select
+            aria-label="Ground"
+            value={ground}
+            onChange={(e) => setGround(e.target.value)}
+          >
+            {catalog.grounds.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <PitchInspection ground={careerWorld.grounds.find((item) => item.groundId === ground)} format={format} />
         <div className="team-grid">
           {teams.map((s, index) => {
             const t = catalog.teams.find((t) => t.id === s.teamId)!;
@@ -1062,34 +1092,6 @@ function Setup({
             );
           })}
         </div>
-        <label>
-          Format{" "}
-          <select
-            aria-label="Format"
-            value={format}
-            onChange={(e) =>
-              setFormat(e.target.value as "T20" | "ODI" | "RED_BALL")
-            }
-          >
-            <option value="T20">T20 · 20 overs</option>
-            <option value="ODI">ODI · 50 overs</option>
-            <option value="RED_BALL">Red ball · five days</option>
-          </select>
-        </label>
-        <label>
-          Ground{" "}
-          <select
-            aria-label="Ground"
-            value={ground}
-            onChange={(e) => setGround(e.target.value)}
-          >
-            {catalog.grounds.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-        </label>
         <p>
           Suggested XIs are preselected for review. All match decisions remain
           manual.

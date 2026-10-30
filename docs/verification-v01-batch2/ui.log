@@ -1,0 +1,49 @@
+[WebServer] (node:25636) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:25649) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:25667) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25667) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+chromium keyboard step 0 AWAITING_INNINGS
+chromium keyboard step 10 READY
+chromium keyboard step 20 READY
+chromium keyboard step 30 AWAITING_BOWLER
+chromium keyboard step 40 AWAITING_BOWLER
+chromium keyboard step 50 AWAITING_BOWLER
+chromium keyboard step 60 READY
+chromium keyboard step 70 READY
+chromium keyboard step 80 READY
+chromium keyboard step 90 READY
+chromium keyboard step 100 AWAITING_BOWLER
+chromium keyboard step 110 READY
+  ✓  1 [chromium] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls (25.7s)
+  ✓  2 [chromium] › tests/ui/match.spec.ts:129:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (2.0s)
+  ✓  3 [chromium] › tests/ui/match.spec.ts:210:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (2.1s)
+  ✓  4 [chromium] › tests/ui/pitch-inspection.spec.ts:4:1 › shows the selected ground's effective pitch before the toss in every format (1.0s)
+(node:26002) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26002) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+firefox keyboard step 0 AWAITING_INNINGS
+firefox keyboard step 10 READY
+firefox keyboard step 20 AWAITING_BOWLER
+firefox keyboard step 30 AWAITING_BATTER
+firefox keyboard step 40 AWAITING_BOWLER
+firefox keyboard step 50 AWAITING_BOWLER
+firefox keyboard step 60 AWAITING_BATTER
+firefox keyboard step 70 AWAITING_BATTER
+firefox keyboard step 80 AWAITING_BOWLER
+firefox keyboard step 90 AWAITING_BATTER
+firefox keyboard step 100 AWAITING_BOWLER
+firefox keyboard step 110 COMPLETE
+  ✓  5 [firefox] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls (37.4s)
+  ✓  6 [firefox] › tests/ui/match.spec.ts:129:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (2.8s)
+  ✓  7 [firefox] › tests/ui/match.spec.ts:210:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (2.5s)
+  ✓  8 [firefox] › tests/ui/pitch-inspection.spec.ts:4:1 › shows the selected ground's effective pitch before the toss in every format (1.6s)
+
+  8 passed (1.3m)

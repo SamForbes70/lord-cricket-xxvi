@@ -606,6 +606,14 @@ export class CareerApplicationService {
     return projectSquadTrainingCondition(state.careerState, state.controlledTeamId, DEFAULT_CAREER_AVAILABILITY_PACK);
   }
 
+  playerCondition(playerId: string) {
+    if (!this.state) return null;
+    const team = world.teams.find(candidate => candidate.squadIds.includes(playerId));
+    if (!team) return null;
+    return projectSquadTrainingCondition(this.state.careerState, team.teamId, DEFAULT_CAREER_AVAILABILITY_PACK)
+      .players.find(player => player.playerId === playerId) ?? null;
+  }
+
   teamName(teamId: string | null | undefined): string {
     return world.teams.find((team) => team.teamId === teamId)?.name ?? teamId ?? "Unknown team";
   }

@@ -35,7 +35,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Inspect b93bccb and verify its evidence hashes.",
@@ -55,7 +55,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "READY",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Open a player by stable ID from squad and statistics.",
@@ -75,7 +75,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "READY",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Show the selected ground and effective pitch parameters before toss.",

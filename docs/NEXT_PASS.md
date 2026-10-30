@@ -4,18 +4,13 @@ The active target is the original V0.1 synthetic alpha under the owner's standin
 [The delivery plan](V01_DELIVERY_PLAN.md) and `V01_BACKLOG.json` supersede the earlier research-only work queue.
 [Current status](CURRENT_STATUS.md) records actual implemented capability and evidence.
 
-## Batch 1
-
-Persist the standing authority, design reconciliation, backlog and outstanding research review.
-Complete integration after final-diff review and passing Linux/Windows checks.
-
 ## Batch 2: player-facing essentials
 
-V01-003: player pages with persistent format filters.
-V01-004: pre-match pitch and conditions inspection.
-Then deliver staged names/colours editing, validated new-game roster import and basic settings.
-Use existing immutable world data for the first two slices.
-Preserve existing saves and frozen simulation outcomes.
+V01-003 and V01-004 deliver player pages and pre-match pitch inspection.
+Confirm their integration before marking them DONE.
+Continue with V01-005, staged names and colours editing for new games.
+Then deliver V01-006, validated roster import, and V01-007, basic settings.
+Preserve stable IDs, existing saves, frozen simulation outcomes and historical snapshots.
 
 ## Parallel research and acceptance
 
