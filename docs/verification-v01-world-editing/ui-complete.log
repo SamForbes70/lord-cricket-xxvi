@@ -1,0 +1,50 @@
+[WebServer] (node:61625) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:61686) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 10 tests using 1 worker
+
+(node:61709) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61709) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/ui/edited-world.spec.ts:2:1 › edited standalone exhibitions survive reload and import in every format (8.5s)
+chromium keyboard step 0 AWAITING_INNINGS
+chromium keyboard step 10 READY
+chromium keyboard step 20 AWAITING_BOWLER
+chromium keyboard step 30 READY
+chromium keyboard step 40 READY
+chromium keyboard step 50 READY
+chromium keyboard step 60 READY
+chromium keyboard step 70 AWAITING_BATTER
+chromium keyboard step 80 READY
+chromium keyboard step 90 READY
+chromium keyboard step 100 READY
+chromium keyboard step 110 READY
+  ✓   2 [chromium] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls (32.4s)
+  ✓   3 [chromium] › tests/ui/match.spec.ts:129:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (2.1s)
+  ✓   4 [chromium] › tests/ui/match.spec.ts:210:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (2.2s)
+  ✓   5 [chromium] › tests/ui/pitch-inspection.spec.ts:4:1 › shows the selected ground's effective pitch before the toss in every format (1.1s)
+(node:62482) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62482) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 [firefox] › tests/ui/edited-world.spec.ts:2:1 › edited standalone exhibitions survive reload and import in every format (13.4s)
+firefox keyboard step 0 AWAITING_INNINGS
+firefox keyboard step 10 READY
+firefox keyboard step 20 AWAITING_BOWLER
+firefox keyboard step 30 AWAITING_BATTER
+firefox keyboard step 40 AWAITING_BOWLER
+firefox keyboard step 50 AWAITING_BATTER
+firefox keyboard step 60 AWAITING_BOWLER
+firefox keyboard step 70 AWAITING_BOWLER
+firefox keyboard step 80 READY
+firefox keyboard step 90 READY
+firefox keyboard step 100 READY
+  ✓   7 [firefox] › tests/ui/match.spec.ts:58:1 › a full keyboard-only human-command match, replay identity and terminal controls (34.2s)
+  ✓   8 [firefox] › tests/ui/match.spec.ts:129:1 › desktop essential strip, 150% scale, reduced motion, narrow view and long names (3.4s)
+  ✓   9 [firefox] › tests/ui/match.spec.ts:210:1 › selection validity, tactics acceptance and explicit rejection of invalid named fields (2.6s)
+  ✓  10 [firefox] › tests/ui/pitch-inspection.spec.ts:4:1 › shows the selected ground's effective pitch before the toss in every format (1.6s)
+
+  10 passed (1.7m)

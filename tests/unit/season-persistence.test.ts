@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
-import { canonicalJson, type SeasonSaveSummary, type T20SeasonState } from "@lcxxvi/contracts";
+import { canonicalJson, WorldPackSchema, type SeasonSaveSummary, type T20SeasonState } from "@lcxxvi/contracts";
+import { createNewGameWorldCopy } from "../../apps/web/src/world/new-game-world.js";
+import { rewriteZipEntryText } from "../helpers/rewrite-zip-entry.js";
 import { T20_LEAGUE_COMPETITION } from "@lcxxvi/data";
 import {
   advanceCareerDayV2,
@@ -202,6 +204,21 @@ describe("M6F durable season state and archive", () => {
     expect(canonicalJson(read.state)).toBe(canonicalJson(partialState));
     expect(read.seasonArchive).toBeNull();
     expect(read.summary).toEqual(summary(partialState));
+    expect(read.worldCopy).toBeNull();
+  });
+
+  it("round-trips an immutable edited world in the new archive version", async () => {
+    const base = WorldPackSchema.parse(JSON.parse(new TextDecoder().decode(worldBytes)));
+    const draft = structuredClone(base);
+    draft.teams[0]!.name = "Harbour XI";
+    const copy = createNewGameWorldCopy(draft, base);
+    const bytes = await createSeasonPortableArchive(partialState, summary(partialState), "2026-10-05T10:00:00.000Z", null, copy);
+    const read = await readSeasonPortableArchive(bytes);
+    expect(read.manifest.archiveVersion).toBe("LC_T20_SEASON_PORTABLE_V2");
+    expect(read.worldCopy).toEqual(copy);
+    expect(canonicalJson(read.state)).toBe(canonicalJson(partialState));
+    await expect(readSeasonPortableArchive(tamperLocalEntry(bytes, "world-copy.json"))).rejects.toThrow(/CRC|HASH/);
+    await expect(readSeasonPortableArchive(rewriteZipEntryText(bytes, "manifest.json", "LC_T20_SEASON_PORTABLE_V2", "LC_T20_SEASON_PORTABLE_V9"))).rejects.toThrow("SEASON_ARCHIVE_VERSION_UNSUPPORTED");
   });
 
   it("reloads an active portable save and can advance into the next scheduled round", async () => {

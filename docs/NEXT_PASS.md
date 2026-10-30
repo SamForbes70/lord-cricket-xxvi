@@ -6,10 +6,10 @@ The active target is the original V0.1 synthetic alpha under the owner's standin
 
 ## Batch 2: player-facing essentials
 
-V01-003 and V01-004 deliver player pages and pre-match pitch inspection.
-Confirm their integration before marking them DONE.
-Continue with V01-005, staged names and colours editing for new games.
-Then deliver V01-006, validated roster import, and V01-007, basic settings.
+PR #15 merged V01-003 and V01-004.
+V01-005 adds names and colours for new careers and exhibitions, pending integration of this revision.
+Confirm its merge before marking it DONE.
+Continue with V01-006, validated new-game roster import, then V01-007, basic settings.
 Preserve stable IDs, existing saves, frozen simulation outcomes and historical snapshots.
 
 ## Parallel research and acceptance

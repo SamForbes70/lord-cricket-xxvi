@@ -380,3 +380,64 @@ test("repository abort injection proves command-batch atomicity and duplicate co
   );
   expect(result.afterDuplicateRevision).toBe(1);
 });
+
+test("edited match world is atomic, immutable and retained during recovery", async ({ page }) => {
+  await page.goto("/#exhibition");
+  const paths = {
+    persistence: `/@fs/${path.resolve("packages/persistence/src/index.ts")}`,
+    contracts: `/@fs/${path.resolve("packages/contracts/src/index.ts")}`,
+    editing: `/@fs/${path.resolve("apps/web/src/world/new-game-world.ts")}`,
+    world: `/@fs/${path.resolve("packages/data/worlds/fictional-eight-01.json")}`,
+  };
+  const result = await page.evaluate(async (urls) => {
+    const persistence = await import(urls.persistence) as typeof import("../../packages/persistence/src/index.js");
+    const contracts = await import(urls.contracts) as typeof import("../../packages/contracts/src/index.js");
+    const editing = await import(urls.editing) as typeof import("../../apps/web/src/world/new-game-world.js");
+    const world = contracts.WorldPackSchema.parse(await fetch(urls.world).then(response => response.json()));
+    const draft = structuredClone(world);
+    draft.teams[0]!.name = "Harbour XI";
+    const copy = editing.createNewGameWorldCopy(draft, world);
+    const hash = await persistence.sha256Text(contracts.canonicalJson(copy));
+    const databaseName = `m4-world-copy-${crypto.randomUUID()}`;
+    const repo = new persistence.IndexedDbSaveRepository(databaseName);
+    const now = Date.now();
+    await repo.acquireLease("world-match", "owner", now);
+    const base = {
+      saveId: "world-match", kind: "AUTO" as const, title: "Edited fixture", expectedRevision: null,
+      session: { revision: 1, events: [{ sequence: 1 }] }, revision: 1, events: [{ sequence: 1 }], command: null,
+      metadata: { matchGameId: "g", matchId: "m", teams: ["Harbour XI", "B"] as [string, string], ground: "G", phase: "TOSS", completed: false },
+      ownerId: "owner", now, updatedAt: "2026-10-04T02:00:00.000Z", worldCopy: copy,
+    };
+    let abort = "";
+    try { await repo.commit({ ...base, testAbortAfterWrites: true }); } catch (error) { abort = String(error); }
+    const afterAbort = await repo.load(base.saveId);
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open(databaseName);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const orphan = await new Promise<unknown>((resolve, reject) => {
+      const request = db.transaction("worldPacks", "readonly").objectStore("worldPacks").get(hash);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    await repo.commit(base);
+    const changed = structuredClone(world);
+    changed.teams[0]!.name = "Another team";
+    let immutable = "";
+    try { await repo.commit({ ...base, expectedRevision: 1, worldCopy: editing.createNewGameWorldCopy(changed, world) }); } catch (error) { immutable = String(error); }
+    let missingCopy = "";
+    try { await repo.commit({ ...base, expectedRevision: 1, worldCopy: null }); } catch (error) { missingCopy = String(error); }
+    await repo.commit({ ...base, expectedRevision: 1, revision: 2, session: { revision: 2, events: [{ sequence: 1 }] } });
+    await repo.corruptCurrentCheckpoint(base.saveId);
+    const recovered = await repo.load(base.saveId);
+    return { abort, afterAbort, orphan: orphan ?? null, immutable, missingCopy, recovered: recovered?.recovered, revision: recovered?.summary.revision, team: recovered?.worldCopy?.world.teams[0]?.name };
+  }, paths);
+  expect(result.abort).toContain("SAVE_INJECTED_ABORT");
+  expect(result.afterAbort).toBeNull();
+  expect(result.orphan).toBeNull();
+  expect(result.immutable).toContain("SAVE_WORLD_COPY_IMMUTABLE");
+  expect(result.missingCopy).toContain("SAVE_WORLD_COPY_REQUIRED");
+  expect(result).toMatchObject({ recovered: true, revision: 1, team: "Harbour XI" });
+});

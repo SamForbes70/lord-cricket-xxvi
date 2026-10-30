@@ -1,5 +1,7 @@
-import { IndexedDbSeasonRepository, sealT20SeasonState } from "@lcxxvi/persistence";
-import type { T20SeasonState } from "@lcxxvi/contracts";
+import { IndexedDbSeasonRepository, sealT20SeasonState, seasonSha256Text } from "@lcxxvi/persistence";
+import { canonicalJson, WorldPackSchema, type T20SeasonState } from "@lcxxvi/contracts";
+import originalWorld from "../../packages/data/worlds/fictional-eight-01.json" with { type: "json" };
+import { createNewGameWorldCopy } from "../../apps/web/src/world/new-game-world.js";
 
 declare global {
   interface Window {
@@ -57,6 +59,64 @@ window.runSeasonPersistenceBrowser = async (rawState: T20SeasonState) => {
   const activeSaveId = await repo.activeSaveId();
   await repo.releaseLease("season-browser-save", owner);
   const acquiredAfterRelease = await repo.acquireLease("season-browser-save", secondOwner, 1007);
+  const world = WorldPackSchema.parse(originalWorld);
+  const edited = structuredClone(world);
+  edited.teams[0]!.name = "Harbour XI";
+  const copy = createNewGameWorldCopy(edited, world);
+  const copyHash = await seasonSha256Text(canonicalJson(copy));
+  const copySave = { ...base, saveId: "season-world-copy", setActive: false };
+  await repo.acquireLease(copySave.saveId, owner, 1010);
+  let copyAbort = "";
+  try {
+    await repo.commit({ ...copySave, expectedRevision: null, state: state4, command: null, worldCopy: copy, now: 1011, updatedAt: "2026-10-05T10:11:00.000Z", testAbortAfterWrites: true });
+  } catch (error) { copyAbort = String(error); }
+  const afterCopyAbort = await repo.load(copySave.saveId);
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open(databaseName);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  const orphanPack = await new Promise<unknown>((resolve, reject) => {
+    const request = db.transaction("worldPacks", "readonly").objectStore("worldPacks").get(copyHash);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  db.close();
+  await repo.commit({ ...copySave, expectedRevision: null, state: state4, command: null, worldCopy: copy, now: 1012, updatedAt: "2026-10-05T10:12:00.000Z" });
+  let missingCopyCode = "";
+  try {
+    await repo.commit({ ...copySave, expectedRevision: 4, state: state5, command: null, now: 1013, updatedAt: "2026-10-05T10:13:00.000Z" });
+  } catch (error) { missingCopyCode = String(error); }
+  const changed = structuredClone(world);
+  changed.teams[0]!.name = "Another name";
+  let immutableCode = "";
+  try {
+    await repo.commit({ ...copySave, expectedRevision: 4, state: state5, command: null, worldCopy: createNewGameWorldCopy(changed, world), now: 1013, updatedAt: "2026-10-05T10:13:00.000Z" });
+  } catch (error) { immutableCode = String(error); }
+  await repo.commit({ ...copySave, expectedRevision: 4, state: state5, command: null, worldCopy: copy, now: 1014, updatedAt: "2026-10-05T10:14:00.000Z" });
+  await repo.corruptCurrentCheckpoint(copySave.saveId);
+  const recoveredCopy = await repo.load(copySave.saveId);
+  const corruptDb = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open(databaseName);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  await new Promise<void>((resolve, reject) => {
+    const tx = corruptDb.transaction("worldPacks", "readwrite");
+    const store = tx.objectStore("worldPacks");
+    const request = store.get(copyHash);
+    request.onsuccess = () => store.put({ ...request.result, payload: `${String(request.result.payload)} ` });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+  corruptDb.close();
+  let damagedCopyCode = "";
+  try { await repo.load(copySave.saveId); } catch (error) { damagedCopyCode = String(error); }
+  let damagedCopyCommitCode = "";
+  try {
+    await repo.commit({ ...copySave, expectedRevision: 5, state: state6, command: null, worldCopy: copy, now: 1015, updatedAt: "2026-10-05T10:15:00.000Z" });
+  } catch (error) { damagedCopyCommitCode = String(error); }
   return {
     acquired,
     beforeAbortRevision: beforeAbort?.state.revision,
@@ -71,5 +131,15 @@ window.runSeasonPersistenceBrowser = async (rawState: T20SeasonState) => {
     summaryCount: summaries.length,
     activeSaveId,
     acquiredAfterRelease,
+    copyAbort,
+    copySaveAfterAbort: afterCopyAbort,
+    orphanPackAfterAbort: orphanPack ?? null,
+    immutableCode,
+    missingCopyCode,
+    copyRecovered: recoveredCopy?.recovered,
+    copyRecoveredRevision: recoveredCopy?.state.revision,
+    copyRecoveredTeam: recoveredCopy?.worldCopy?.world.teams[0]?.name,
+    damagedCopyCode,
+    damagedCopyCommitCode,
   };
 };

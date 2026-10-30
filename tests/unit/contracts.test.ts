@@ -230,8 +230,8 @@ it("every generated schema compiles with strict AJV 2020-12", () => {
   const files = readdirSync("packages/contracts/schemas").filter((f) =>
     f.endsWith("Schema.json"),
   );
-  expect(files.length).toBe(167); // 163 inherited plus four isolated M7J research schemas
-  for (const added of ["M7JAdjudicationRequest", "M7JAdjudicationResult", "M7JAdminEvent", "M7JExceptionalCommand"]) {
+  expect(files.length).toBe(169);
+  for (const added of ["M7JAdjudicationRequest", "M7JAdjudicationResult", "M7JAdminEvent", "M7JExceptionalCommand", "NewGameWorldCopy", "SeasonPortableManifestV2"]) {
     expect(files).toContain(`${added}Schema.json`);
   }
   for (const f of files)

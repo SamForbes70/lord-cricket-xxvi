@@ -1,0 +1,246 @@
+
+> lord-cricket-xxvi@0.1.0 test
+> vitest run --maxWorkers=2 --reporter=default --reporter=json --outputFile=/workspace/v01-edit-unit.json
+
+
+ RUN  v3.2.4 /workspace/lord-cricket-xxvi
+
+ ✓ tests/unit/offscreen-fixture.test.ts (9 tests) 11710ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > runs a scheduled fixture through LC_T20_MATCH_V1 and applies engine fatigue exactly once  1357ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > shared XI and condition helpers reproduce the accepted off-screen fixture outcome  1002ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > replay and command resimulation remain exact for an off-screen fixture  2001ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > uses manual availability when selecting the XI and falls back to the second keeper  747ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > round execution sorts fixture IDs and is batch-order independent by construction  3260ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > can pause before the user's fixture while simulating the other three matches  1787ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > rejects duplicate fixture execution, wrong career date and insufficient availability  892ms
+   ✓ Pass 12D deterministic off-screen T20 fixture execution > detects outcome tampering through the canonical outcome hash  634ms
+ ✓ tests/unit/persistence-m4.test.ts (5 tests) 5871ms
+   ✓ M4 deterministic persistence and portable archive > produces byte-identical final state across repeated save/rehydrate cycles  5437ms
+ ✓ tests/unit/odi-match.test.ts (10 tests) 5595ms
+   ✓ Pass 10 / M5A ODI format > ends the first innings on exactly 300 legal balls with no phantom 301st ball  330ms
+   ✓ Pass 10 / M5A ODI format > runs, replays, resimulates and rehydrates a complete seeded ODI  3188ms
+   ✓ Pass 10 / M5A ODI format > round-trips a complete ODI through the portable save archive  1917ms
+ ✓ tests/unit/red5-match.test.ts (10 tests) 4493ms
+   ✓ Pass 11 / M5B red-ball profile > makes the new ball available after 480 legal balls and resets only ball age  367ms
+   ✓ Pass 11 / M5B red-ball profile > completes a deterministic five-day exhibition and reproduces its final chain  3755ms
+ ✓ tests/unit/t20-match.test.ts (15 tests) 3422ms
+   ✓ Pass 07B independently authored match fixtures > rejects hash-tampered event, state, chain, wrong version and invalid stage pack  1157ms
+   ✓ Pass 07B independently authored match fixtures > pins first complete seeded match scorecard as regression observation distinct from independent rule goldens  358ms
+   ✓ Pass 07B independently authored match fixtures > fully seeded match reconciles scorecard/events and event-prefix interrupted replay at every event  1419ms
+ ✓ tests/unit/season-persistence.test.ts (11 tests) 36359ms
+   ✓ M6F durable season state and archive > reloads an active portable save and can advance into the next scheduled round  1281ms
+ ✓ tests/unit/career-application-service.test.ts (3 tests) 2522ms
+   ✓ Pass 12G-R career application service > creates a durable career, persists training, stops at the user fixture and completes it exactly once  2272ms
+ ✓ tests/unit/m7b-opponent.test.ts (2 tests) 2551ms
+   ✓ M7B optional opponent through authoritative T20 engine > opponent never commands the human team or advances a ball automatically  1605ms
+   ✓ M7B optional opponent through authoritative T20 engine > same seed and choices produce bit-identical event chains  945ms
+ ✓ tests/unit/quality-scenarios.test.ts (4 tests) 3049ms
+   ✓ M7 scenario quality harness > covers all teams and grounds with immutable deterministic paired cells  540ms
+   ✓ M7 scenario quality harness > observing either policy preserves its authoritative engine and scorecard hashes  2055ms
+   ✓ M7 scenario quality harness > keeps winning chases separate and rejects duplicated or mismatched pairs  451ms
+ ✓ tests/unit/match-ui.test.ts (6 tests) 1722ms
+   ✓ M3 production worker controller > completes a manual match, stops at decisions, blocks ineligible bowlers, proves replay, keeps seed private and prevents terminal deliveries  1391ms
+ ✓ tests/unit/m7k-evaluation.test.ts (16 tests) 1806ms
+   ✓ M7K sealed-cohort evaluation tooling > runs the offline CLI and rejects an unfrozen protocol before reading result files  1189ms
+   ✓ M7K sealed-cohort evaluation tooling > reports both innings, competitions, training-defined bands, ablations and repeatable uncertainty  351ms
+ ❯ tests/unit/contracts.test.ts (29 tests | 1 failed) 194ms
+   ✓ normative Appendix A/B/G boundary > accepts Appendix B command unchanged in both validators 125ms
+   ✓ normative Appendix A/B/G boundary > accepts aggression 0 0ms
+   ✓ normative Appendix A/B/G boundary > accepts aggression 1 0ms
+   ✓ normative Appendix A/B/G boundary > accepts aggression 2 0ms
+   ✓ normative Appendix A/B/G boundary > accepts aggression 3 0ms
+   ✓ normative Appendix A/B/G boundary > accepts aggression 4 0ms
+   ✓ normative Appendix A/B/G boundary > rejects malformed aggression -1 4ms
+   ✓ normative Appendix A/B/G boundary > rejects malformed aggression 5 0ms
+   ✓ normative Appendix A/B/G boundary > rejects malformed aggression 1.5 0ms
+   ✓ normative Appendix A/B/G boundary > rejects malformed aggression 3 0ms
+   ✓ normative Appendix A/B/G boundary > rejects malformed aggression null 0ms
+   ✓ normative Appendix A/B/G boundary > rejects malformed aggression Infinity 0ms
+   ✓ normative Appendix A/B/G boundary > rejects malformed aggression NaN 0ms
+   ✓ normative Appendix A/B/G boundary > rejects unknown root and nested fields 1ms
+   ✓ normative Appendix A/B/G boundary > rejects missing and unsafe counters 0ms
+   ✓ normative Appendix A/B/G boundary > preserves Unicode names through 80 code points 7ms
+   ✓ normative Appendix A/B/G boundary > requires all three format profiles and all skill fields 1ms
+   ✓ normative Appendix A/B/G boundary > checks true calendar dates and positive sector total 2ms
+   ✓ normative Appendix A/B/G boundary > checks nine unique field players and slots 2ms
+   ✓ normative Appendix A/B/G boundary > checks keyed batting plans 0ms
+   ✓ normative Appendix A/B/G boundary > accepts nullable delivery fields and rejects invalid sectors 16ms
+   ✓ normative Appendix A/B/G boundary > requires one-based event sequences and full SHA256 hashes 1ms
+   ✓ normative Appendix A/B/G boundary > rejects arbitrary administrative payloads and unknown discriminators 1ms
+   ✓ normative Appendix A/B/G boundary > requires unused result margins to be null 2ms
+   ✓ normative Appendix A/B/G boundary > pins all three custom rule manifests with rain disabled 11ms
+   ✓ normative Appendix A/B/G boundary > rejects portable archive traversal and excess size 1ms
+   ✓ normative Appendix A/B/G boundary > rejects unsupported versions or mismatched content hashes 1ms
+   × every generated schema compiles with strict AJV 2020-12 7ms
+     → expected 169 to be 167 // Object.is equality
+   ✓ generated tuples reject missing and excess entries just like runtime 6ms
+ ✓ tests/unit/m7-ai-analytics.test.ts (7 tests) 1777ms
+   ✓ M7 canonical T20 match analytics > reconciles every summary against one complete accepted T20 event chain  641ms
+   ✓ M7 tactical captain engine integration > both captains use legal accepted engine commands and remain deterministic under replay  1129ms
+ ✓ tests/unit/m7k-historical-fixture.test.ts (14 tests) 1423ms
+   ✓ M7K historical fixture intake > CLI rejects an unknown source without publishing an output report  406ms
+   ✓ M7K historical fixture intake > CLI records hashes and refuses to overwrite an existing result  951ms
+ ✓ tests/unit/season-projections.test.ts (8 tests) 730ms
+   ✓ Pass 12E league table, NRR and season statistical projections > adapts a validated Pass 12D outcome into the shared season projection path  688ms
+ ❯ tests/unit/scoring-fixtures.test.ts (84 tests | 1 failed) 844ms
+   ✓ hand-authored valid resolution cases > F01: Wide at five legal balls 3ms
+   ✓ hand-authored valid resolution cases > F02: No-ball hit for four 1ms
+   ✓ hand-authored valid resolution cases > F03: No-ball with two byes 0ms
+   ✓ hand-authored valid resolution cases > F04: Single on sixth legal ball 0ms
+   ✓ hand-authored valid resolution cases > F05: Striker caught on sixth ball 0ms
+   ✓ hand-authored valid resolution cases > F06: Free hit followed by wide 0ms
+   ✓ hand-authored valid resolution cases > F07: Winning automatic wide 0ms
+   ✓ hand-authored valid resolution cases > F08: Two needed, legal six 0ms
+   ✓ hand-authored valid resolution cases > F09: All out level in chase 0ms
+   ✓ hand-authored valid resolution cases > RO1: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > RO1-SIXTH: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > RO2: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > RO2-SIXTH: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > RO3: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > RO3-SIXTH: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > RO4: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > RO4-SIXTH: Run-out after one completed run, attempting second 0ms
+   ✓ hand-authored valid resolution cases > S01: Legal dot 0ms
+   ✓ hand-authored valid resolution cases > S02: Two bat runs 0ms
+   ✓ hand-authored valid resolution cases > S03: Single bye 0ms
+   ✓ hand-authored valid resolution cases > S04: Four leg-byes 0ms
+   ✓ hand-authored valid resolution cases > S05: Wide boundary 0ms
+   ✓ hand-authored valid resolution cases > S06: Free hit followed by another no-ball 0ms
+   ✓ hand-authored valid resolution cases > S07: Free-hit aerial ball stopped 0ms
+   ✓ hand-authored valid resolution cases > S08: Early dead ball 0ms
+   ✓ hand-authored valid resolution cases > S09: Caught and bowled 0ms
+   ✓ hand-authored valid resolution cases > S10: STUMPED on a wide 0ms
+   ✓ hand-authored valid resolution cases > S11: HIT_WICKET on a wide 0ms
+   ✓ hand-authored valid resolution cases > S12: Winning automatic no-ball 0ms
+   ✓ hand-authored valid resolution cases > S13: Red-ball no-ball 0ms
+   ✓ hand-authored valid resolution cases > S14: Target reached on final allocated ball 0ms
+   ✓ hand-authored valid resolution cases > S15: Legal BOWLED 0ms
+   ✓ hand-authored valid resolution cases > S16: Legal LBW 0ms
+   ✓ hand-authored valid resolution cases > S17: Legal HIT_WICKET 0ms
+   ✓ hand-authored valid resolution cases > S18: Run-out on a free hit 0ms
+   ✓ hand-authored valid resolution cases > S19: First innings allocation exhausted 0ms
+   ✓ hand-authored valid resolution cases > S20: Legal four 0ms
+   ✓ hand-authored valid resolution cases > S21: Single leg-bye 0ms
+   ✓ hand-authored valid resolution cases > S22: Wide plus completed single 0ms
+   ✓ hand-authored valid resolution cases > S23: No-ball and single off bat 0ms
+   ✓ hand-authored valid resolution cases > S24: No-ball and two leg-byes 0ms
+   ✓ hand-authored valid resolution cases > S25: No-ball run-out after one completed bat run 0ms
+   ✓ hand-authored valid resolution cases > S26: Wide run-out after one completed run 0ms
+   ✓ hand-authored valid resolution cases > S27: ODI delivered no-ball 0ms
+   ✓ hand-authored valid resolution cases > S28: Three completed bat runs 0ms
+   ✓ invalid input rejects without mutation > I01: Wide and no-ball together 1ms
+   ✓ invalid input rejects without mutation > I02: Bat runs and byes together 0ms
+   ✓ invalid input rejects without mutation > I03: Byes and leg-byes together 0ms
+   ✓ invalid input rejects without mutation > I04: Leg-bye without attempted stroke 0ms
+   ✓ invalid input rejects without mutation > I05: Caught on no-ball 0ms
+   ✓ invalid input rejects without mutation > I06: Bowled on free hit 0ms
+   ✓ invalid input rejects without mutation > I07: LBW on wide 0ms
+   ✓ invalid input rejects without mutation > I08: Non-striker caught 0ms
+   ✓ invalid input rejects without mutation > I09: Run-out receives unknown fielder 0ms
+   ✓ invalid input rejects without mutation > I10: Boundary with physical running 0ms
+   ✓ invalid input rejects without mutation > I11: No-ball automatic run incorrectly swaps ends 0ms
+   ✓ invalid input rejects without mutation > I12: Duplicate starting batters 0ms
+   ✓ invalid input rejects without mutation > I13: Dead ball scores 0ms
+   ✓ invalid input rejects without mutation > I14: Penalty scoring reserved 0ms
+   ✓ invalid input rejects without mutation > I15: Negative run count 1ms
+   ✓ invalid input rejects without mutation > I16: Fractional physical run count 0ms
+   ✓ invalid input rejects without mutation > I17: Illegal unknown property 0ms
+   ✓ invalid input rejects without mutation > I18: Score overflow 0ms
+   ✓ invalid input rejects without mutation > I19: Post-winning-extra contact not truncated 0ms
+   ✓ invalid input rejects without mutation > I20: Premature immediate penalty 0ms
+   ✓ invalid input rejects without mutation > I21: Allotted balls already exhausted 0ms
+   ✓ invalid input rejects without mutation > I22: Red-ball free-hit state 0ms
+   ✓ invalid input rejects without mutation > I23: Stumping by outfielder 0ms
+   ✓ invalid input rejects without mutation > I24: Catch without bat contact 0ms
+   ✓ invalid input rejects without mutation > I25: Dismissed batter still occupies an end 0ms
+   ✓ invalid input rejects without mutation > I26: Both ends assigned to survivor 0ms
+   ✓ invalid input rejects without mutation > I27: Attempt index before legal-ball count 0ms
+   ✓ invalid input rejects without mutation > I28: Limited-overs profile with unlimited allocation 0ms
+   ✓ invalid input rejects without mutation > I29: Third T20 innings 0ms
+   ✓ locks all Appendix D cases and fixture IDs to a reviewed digest 9ms
+   ✓ validates the entire corpus against independent emitted JSON Schema 184ms
+   ✓ never allows derived event fields at the resolution input boundary 1ms
+   ✓ runs a real scorer comparison gate against the retained corpus  609ms
+   ✓ future observation harness rejects corrupted score, strike and bowler credit 11ms
+   ✓ covers both run-out batters and ends at ordinary and sixth-ball boundaries 2ms
+   ✓ independently pins red-ball expected margins, targets and completion distinctions 1ms
+   ✓ pins the five independently authored clock expectations 0ms
+   ✓ distinguishes reserved persistence/NRR expectations from executed subsystems 0ms
+   × accounts for all exported schema definitions 5ms
+     → expected [ 'CounterSchema', …(164) ] to have a length of 163 but got 165
+ ✓ tests/unit/career-training.test.ts (10 tests) 616ms
+ ✓ tests/unit/new-game-world.test.ts (3 tests) 405ms
+ ✓ tests/unit/m7k-book-journal.test.ts (9 tests) 654ms
+   ✓ M7K durable cross-innings transactions > recovers both innings after a real writer-process exit before checkpoint publication  532ms
+ ✓ tests/unit/m7k-ledger.test.ts (22 tests) 474ms
+   ✓ M7K isolated research ledger > closes at 120 legal balls while enforcing over decisions and quotas  301ms
+ ✓ tests/unit/t20-setup.test.ts (20 tests) 365ms
+ ✓ tests/unit/m7k-oracle-acceptance.test.ts (14 tests) 261ms
+ ✓ tests/unit/world.test.ts (28 tests) 319ms
+ ✓ tests/unit/career-condition.test.ts (9 tests) 196ms
+ ✓ tests/unit/m7g-research-scoring.test.ts (5 tests) 239ms
+ ✓ tests/unit/owner-acceptance-plan.test.ts (3 tests) 197ms
+ ✓ tests/unit/m7h-research-chase.test.ts (6 tests) 136ms
+ ✓ tests/unit/scoring-kernel.test.ts (134 tests) 212ms
+ ✓ tests/unit/probability.test.ts (23 tests) 103ms
+ ✓ tests/unit/generator.test.ts (19 tests) 104ms
+ ✓ tests/unit/m7b-controller.test.ts (1 test) 126ms
+ ✓ tests/unit/m7k-journal.test.ts (10 tests) 58ms
+ ✓ tests/unit/season-scheduler.test.ts (8 tests) 46ms
+ ✓ tests/unit/random-service.test.ts (44 tests) 60ms
+ ✓ tests/unit/m7f-research-joint.test.ts (5 tests) 27ms
+ ✓ tests/unit/m7j-adjudication.test.ts (12 tests) 25ms
+ ✓ tests/unit/m7k-historical-probes.test.ts (4 tests) 17ms
+ ✓ tests/unit/ci-evidence.test.ts (7 tests) 13ms
+ ✓ tests/unit/acceptance-evidence.test.ts (4 tests) 7ms
+ ✓ tests/unit/determinism.test.ts (6 tests) 9ms
+ ✓ tests/unit/defaults.test.ts (3 tests) 4ms
+ ✓ tests/unit/red5-clock.test.ts (9 tests) 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/contracts.test.ts > every generated schema compiles with strict AJV 2020-12
+AssertionError: expected 169 to be 167 // Object.is equality
+
+- Expected
++ Received
+
+- 167
++ 169
+
+ ❯ tests/unit/contracts.test.ts:233:24
+    231|     f.endsWith("Schema.json"),
+    232|   );
+    233|   expect(files.length).toBe(167); // 163 inherited plus four isolated …
+       |                        ^
+    234|   for (const added of ["M7JAdjudicationRequest", "M7JAdjudicationResul…
+    235|     expect(files).toContain(`${added}Schema.json`);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/unit/scoring-fixtures.test.ts > accounts for all exported schema definitions
+AssertionError: expected [ 'CounterSchema', …(164) ] to have a length of 163 but got 165
+
+- Expected
++ Received
+
+- 163
++ 165
+
+ ❯ tests/unit/scoring-fixtures.test.ts:183:17
+    181|     )
+    182|     .map(([name]) => name);
+    183|   expect(names).toHaveLength(163); // 163 frozen contracts remain in t…
+       |                 ^
+    184|   expect(names.filter((n) => n.startsWith("M7J"))).toHaveLength(0);
+    185| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 40 passed (42)
+      Tests  2 failed | 649 passed (651)
+   Start at  13:16:58
+   Duration  54.61s (transform 1.36s, setup 0ms, collect 11.45s, tests 88.75s, environment 8ms, prepare 2.70s)
+
+JSON report written to /workspace/v01-edit-unit.json

@@ -6,14 +6,17 @@ import {
   T20SeasonStateSchema,
   SeasonArchiveCoreSchema,
   SeasonArchiveSchema,
+  NewGameWorldCopySchema,
   type SeasonDurableCommand,
   type SeasonSaveSummary,
   type T20SeasonState,
   type T20SeasonStateCore,
   type SeasonArchive,
+  type NewGameWorldCopy,
 } from "@lcxxvi/contracts";
 
 export const SEASON_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V1" as const;
+export const SEASON_PRESENTATION_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V2_PRESENTATION" as const;
 export const SEASON_RECORD_TYPE = "SEASON" as const;
 export const SEASON_WRITER_LEASE_MS = 12_000;
 const DB_NAME = "lord-cricket-xxvi";
@@ -21,7 +24,8 @@ const DB_VERSION = 1;
 
 type SeasonGameRecord = SeasonSaveSummary & {
   recordType: typeof SEASON_RECORD_TYPE;
-  schemaVersion: typeof SEASON_SAVE_SCHEMA_VERSION;
+  schemaVersion: typeof SEASON_SAVE_SCHEMA_VERSION | typeof SEASON_PRESENTATION_SAVE_SCHEMA_VERSION;
+  worldCopySha256?: string;
   checkpointSerial: number;
   checkpointGeneration: number;
 };
@@ -50,6 +54,7 @@ export type SeasonDurableCommit = {
   now: number;
   updatedAt: string;
   setActive?: boolean;
+  worldCopy?: NewGameWorldCopy | null;
   testAbortAfterWrites?: boolean;
 };
 
@@ -59,6 +64,7 @@ export type SeasonLoadResult = {
   recovered: boolean;
   recoveredFromGeneration: number | null;
   corruptedGenerations: readonly number[];
+  worldCopy?: NewGameWorldCopy | null;
 };
 
 function req<T>(request: IDBRequest<T>): Promise<T> {
@@ -81,6 +87,11 @@ export async function seasonSha256Text(text: string): Promise<string> {
   const bytes = new TextEncoder().encode(text);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return bytesHex(new Uint8Array(digest));
+}
+export async function validateStoredWorldCopy(raw: unknown): Promise<NewGameWorldCopy> {
+  const copy = NewGameWorldCopySchema.parse(raw);
+  if (await seasonSha256Text(canonicalJson(copy.world)) !== copy.worldCanonicalSha256) throw new Error("WORLD_COPY_HASH_MISMATCH");
+  return copy;
 }
 function leaseKey(saveId: string) { return `lease:${saveId}`; }
 function activeKey() { return "activeSeasonSaveId"; }
@@ -288,11 +299,19 @@ export class IndexedDbSeasonRepository {
     assertSeason(input.updatedAt.length > 0 && !Number.isNaN(Date.parse(input.updatedAt)), "UPDATED_AT_INVALID");
     const payload = canonicalJson(state), snapshotHash = await seasonSha256Text(payload);
     const projectionPayload = canonicalJson(state.projection), projectionHash = await seasonSha256Text(projectionPayload);
+    const worldCopy = input.worldCopy ? await validateStoredWorldCopy(input.worldCopy) : null;
+    const worldCopyPayload = worldCopy ? canonicalJson(worldCopy) : null;
+    const suppliedCopyHash = worldCopyPayload ? await seasonSha256Text(worldCopyPayload) : null;
     const db = await this.open();
-    const tx = db.transaction(["games", "snapshots", "commands", "settings", "projections"], "readwrite");
+    const tx = db.transaction(["games", "snapshots", "commands", "settings", "projections", "worldPacks"], "readwrite");
     const games = tx.objectStore("games"), snapshots = tx.objectStore("snapshots"), commands = tx.objectStore("commands"), settings = tx.objectStore("settings"), projections = tx.objectStore("projections");
     const existing = await req(games.get(input.saveId)) as SeasonGameRecord | undefined;
     if (existing && existing.recordType !== SEASON_RECORD_TYPE) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_SAVE_ID_CONFLICT"); }
+    if (existing && ![SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION].includes(existing.schemaVersion)) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_SAVE_SCHEMA_UNSUPPORTED"); }
+    if (existing && suppliedCopyHash && suppliedCopyHash !== existing.worldCopySha256) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_IMMUTABLE"); }
+    if (existing?.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION && !existing.worldCopySha256) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_MISSING"); }
+    if (existing?.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION && !suppliedCopyHash) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_REQUIRED"); }
+    if (existing?.schemaVersion === SEASON_SAVE_SCHEMA_VERSION && existing.worldCopySha256) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_VERSION_MISMATCH"); }
     const lease = await req(settings.get(leaseKey(input.saveId))) as LeaseRecord | undefined;
     if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= input.now) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_SAVE_READ_ONLY"); }
     const durableRevision = existing?.revision ?? 0;
@@ -307,7 +326,15 @@ export class IndexedDbSeasonRepository {
     if (command) commands.put({ saveId: input.saveId, ...command } satisfies CommandRecord);
     projections.put({ saveId: input.saveId, scope: "T20_SEASON", key: state.seasonId, payload: projectionPayload, sha256: projectionHash } satisfies ProjectionRecord);
     const summary = summaryFor({ ...input, state });
-    games.put({ ...summary, recordType: SEASON_RECORD_TYPE, schemaVersion: SEASON_SAVE_SCHEMA_VERSION, checkpointSerial: serial, checkpointGeneration: generation } satisfies SeasonGameRecord);
+    const copyHash = existing?.worldCopySha256 ?? suppliedCopyHash;
+    if (worldCopyPayload && suppliedCopyHash) {
+      const packs = tx.objectStore("worldPacks");
+      const previous = await req(packs.get(suppliedCopyHash)) as { hash: string; payload: string } | undefined;
+      if (!previous && existing) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_MISSING"); }
+      if (previous && previous.payload !== worldCopyPayload) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_CONFLICT"); }
+      if (!previous) packs.add({ hash: suppliedCopyHash, payload: worldCopyPayload });
+    }
+    games.put({ ...summary, recordType: SEASON_RECORD_TYPE, schemaVersion: copyHash ? SEASON_PRESENTATION_SAVE_SCHEMA_VERSION : SEASON_SAVE_SCHEMA_VERSION, ...(copyHash ? { worldCopySha256: copyHash } : {}), checkpointSerial: serial, checkpointGeneration: generation } satisfies SeasonGameRecord);
     if (input.setActive !== false) settings.put({ key: activeKey(), value: input.saveId } satisfies SettingRecord);
     settings.put({ ...lease, expiresAt: input.now + SEASON_WRITER_LEASE_MS } satisfies LeaseRecord);
     if (input.testAbortAfterWrites) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("SEASON_SAVE_INJECTED_ABORT"); }
@@ -316,12 +343,20 @@ export class IndexedDbSeasonRepository {
 
   async load(saveId: string): Promise<SeasonLoadResult | null> {
     const db = await this.open();
-    const tx = db.transaction(["games", "snapshots"], "readonly");
+    const tx = db.transaction(["games", "snapshots", "worldPacks"], "readonly");
     const game = await req(tx.objectStore("games").get(saveId)) as SeasonGameRecord | undefined;
     if (!game) { await txDone(tx); return null; }
-    if (game.recordType !== SEASON_RECORD_TYPE || game.schemaVersion !== SEASON_SAVE_SCHEMA_VERSION) { await txDone(tx); throw new Error("SEASON_SAVE_SCHEMA_UNSUPPORTED"); }
+    if (game.recordType !== SEASON_RECORD_TYPE || ![SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION].includes(game.schemaVersion)) { await txDone(tx); throw new Error("SEASON_SAVE_SCHEMA_UNSUPPORTED"); }
+    if (game.schemaVersion === SEASON_SAVE_SCHEMA_VERSION && game.worldCopySha256) { await txDone(tx); throw new Error("SEASON_WORLD_COPY_VERSION_MISMATCH"); }
     const rows = await req(tx.objectStore("snapshots").index("saveId").getAll(saveId)) as SeasonCheckpoint[];
+    const worldRow = game.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256
+      ? await req(tx.objectStore("worldPacks").get(game.worldCopySha256)) as { hash: string; payload: string } | undefined : undefined;
     await txDone(tx);
+    let worldCopy: NewGameWorldCopy | null = null;
+    if (game.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION) {
+      if (!worldRow || !game.worldCopySha256 || await seasonSha256Text(worldRow.payload) !== game.worldCopySha256) throw new Error("SEASON_WORLD_COPY_MISSING_OR_DAMAGED");
+      worldCopy = await validateStoredWorldCopy(JSON.parse(worldRow.payload));
+    }
     const recoveredCheckpoint = await recoverSeasonCheckpoint(rows, game.checkpointSerial);
     const { state, checkpoint, recovered, corruptedGenerations } = recoveredCheckpoint;
     const summary = SeasonSaveSummarySchema.parse({
@@ -330,13 +365,22 @@ export class IndexedDbSeasonRepository {
       completedFixtures: state.completedMatches.length, phase: state.phase, stateSha256: state.stateSha256,
       updatedAt: recovered ? checkpoint.createdAt : game.updatedAt,
     });
-    return { summary, state, recovered, recoveredFromGeneration: recovered ? checkpoint.generation : null, corruptedGenerations };
+    return { summary, state, recovered, recoveredFromGeneration: recovered ? checkpoint.generation : null, corruptedGenerations, worldCopy };
   }
 
   async activeSaveId(): Promise<string | null> {
     const db = await this.open(); const tx = db.transaction("settings", "readonly");
     const row = await req(tx.objectStore("settings").get(activeKey())) as SettingRecord | undefined; await txDone(tx);
     return typeof row?.value === "string" ? row.value : null;
+  }
+
+  async clearActiveSaveId(saveId: string): Promise<void> {
+    const db = await this.open();
+    const tx = db.transaction("settings", "readwrite");
+    const store = tx.objectStore("settings");
+    const row = await req(store.get(activeKey())) as SettingRecord | undefined;
+    if (row?.value === saveId) store.delete(activeKey());
+    await txDone(tx);
   }
 
   /** Verification-only fault injection: damages the newest checkpoint without replacing it. */

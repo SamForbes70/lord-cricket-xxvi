@@ -12,6 +12,8 @@ import {
   type T20SeasonState,
   type T20TeamSelection,
   type TrainingDirective,
+  type NewGameWorldCopy,
+  type WorldPack,
 } from "@lcxxvi/contracts";
 import {
   DEFAULT_CAREER_AVAILABILITY_PACK,
@@ -44,6 +46,7 @@ import {
   readSeasonPortableArchive,
   sealT20SeasonState,
 } from "@lcxxvi/persistence";
+import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 
 const worldBytes = new TextEncoder().encode(worldText);
 const world = validateDefaultWorld(JSON.parse(worldText), worldManifest).world;
@@ -51,10 +54,21 @@ const hasher = createStateHasher();
 const START_DATE = "2027-01-03";
 const FINAL_COMPLETED_AT_SUFFIX = "T23:59:59.000Z";
 
+function immutableWorldCopy(raw: NewGameWorldCopy): NewGameWorldCopy {
+  const copy = validateNewGameWorldCopy(raw, world);
+  function freeze(value: unknown): void {
+    if (value && typeof value === "object" && !Object.isFrozen(value)) {
+      for (const child of Object.values(value)) freeze(child);
+      Object.freeze(value);
+    }
+  }
+  freeze(copy);
+  return copy;
+}
+
 export type SaveStatus = "Idle" | "Saving" | "Saved" | "Read-only" | "Recovered" | "Error";
 
-export type CareerUserMatchLaunch = {
-  launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V1";
+type CareerUserMatchLaunchCore = {
   saveId: string;
   seasonId: string;
   scheduleSha256: string;
@@ -72,6 +86,10 @@ export type CareerUserMatchLaunch = {
   careerStateSha256: string;
   managedTeamId?: string;
 };
+export type CareerUserMatchLaunch = CareerUserMatchLaunchCore & (
+  | { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V1" }
+  | { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V2"; worldCopy: NewGameWorldCopy }
+);
 
 export type CareerUserMatchResult = {
   resultVersion: "LC_CAREER_USER_MATCH_RESULT_V1";
@@ -119,12 +137,14 @@ export type CareerSeasonRepository = {
   commit(input: SeasonDurableCommit): Promise<SeasonSaveSummary>;
   load(saveId: string): Promise<SeasonLoadResult | null>;
   activeSaveId(): Promise<string | null>;
+  clearActiveSaveId(saveId: string): Promise<void>;
 };
 
 export class CareerApplicationService {
   private readonly repository: CareerSeasonRepository;
   private readonly listeners = new Set<() => void>();
   private state: T20SeasonState | null = null;
+  private worldCopy: NewGameWorldCopy | null = null;
   private saveId: string | null = null;
   private ownerId: string;
   private readOnly = false;
@@ -148,6 +168,14 @@ export class CareerApplicationService {
 
   getState(): T20SeasonState | null {
     return this.state;
+  }
+
+  getWorld(): WorldPack {
+    return this.worldCopy?.world ?? world;
+  }
+
+  getWorldCopy(): NewGameWorldCopy | null {
+    return this.worldCopy ? structuredClone(this.worldCopy) : null;
   }
 
   getSaveId(): string | null {
@@ -174,6 +202,19 @@ export class CareerApplicationService {
     return this.repository.list();
   }
 
+  async leaveCareer(): Promise<void> {
+    if (this.saveId) {
+      if (!this.readOnly) await this.repository.releaseLease(this.saveId, this.ownerId);
+      await this.repository.clearActiveSaveId(this.saveId);
+    }
+    this.state = null;
+    this.worldCopy = null;
+    this.saveId = null;
+    this.readOnly = false;
+    this.recovered = false;
+    this.setStatus("Idle");
+  }
+
   private setStatus(status: SaveStatus, error = ""): void {
     this.status = status;
     this.error = error;
@@ -193,8 +234,9 @@ export class CareerApplicationService {
     }
   }
 
-  async createCareer(teamId: string): Promise<T20SeasonState> {
+  async createCareer(teamId: string, copyRaw: NewGameWorldCopy | null = null): Promise<T20SeasonState> {
     if (!T20_LEAGUE_COMPETITION.teamIds.includes(teamId)) throw new Error("Unknown managed team.");
+    const copy = copyRaw ? immutableWorldCopy(copyRaw) : null;
     if (this.saveId && !this.readOnly) await this.repository.releaseLease(this.saveId, this.ownerId);
     const key = crypto.randomUUID().replaceAll("-", "").slice(0, 20);
     const gameId = `career-game-${key}`;
@@ -231,7 +273,7 @@ export class CareerApplicationService {
     const saveId = `season:${seasonId}`;
     if (!(await this.repository.acquireLease(saveId, this.ownerId, Date.now()))) throw new Error("New career save is locked.");
     this.setStatus("Saving");
-    const teamName = this.teamName(teamId);
+    const teamName = (copy?.world ?? world).teams.find(team => team.teamId === teamId)!.name;
     await this.repository.commit({
       saveId,
       kind: "AUTO",
@@ -243,8 +285,10 @@ export class CareerApplicationService {
       now: Date.now(),
       updatedAt: nowIso(),
       setActive: true,
+      worldCopy: copy,
     });
     this.state = state;
+    this.worldCopy = copy;
     this.saveId = saveId;
     this.readOnly = false;
     this.recovered = false;
@@ -253,9 +297,10 @@ export class CareerApplicationService {
   }
 
   async loadCareer(saveId: string): Promise<T20SeasonState> {
-    if (this.saveId && this.saveId !== saveId && !this.readOnly) await this.repository.releaseLease(this.saveId, this.ownerId);
     const loaded = await this.repository.load(saveId);
     if (!loaded) throw new Error("Career save not found.");
+    const copy = loaded.worldCopy ? immutableWorldCopy(loaded.worldCopy) : null;
+    if (this.saveId && this.saveId !== saveId && !this.readOnly) await this.repository.releaseLease(this.saveId, this.ownerId);
     let targetSaveId = saveId;
     let readOnly = !(await this.repository.acquireLease(saveId, this.ownerId, Date.now()));
     if (loaded.recovered && !readOnly) {
@@ -272,6 +317,7 @@ export class CareerApplicationService {
         now: Date.now(),
         updatedAt: nowIso(),
         setActive: true,
+        worldCopy: copy,
       });
       await this.repository.releaseLease(saveId, this.ownerId);
       readOnly = false;
@@ -287,9 +333,11 @@ export class CareerApplicationService {
         now: Date.now(),
         updatedAt: loaded.summary.updatedAt,
         setActive: true,
+        worldCopy: copy,
       });
     }
     this.state = loaded.state;
+    this.worldCopy = copy;
     this.saveId = targetSaveId;
     this.readOnly = readOnly;
     this.recovered = loaded.recovered;
@@ -336,6 +384,7 @@ export class CareerApplicationService {
         now: Date.now(),
         updatedAt: nowIso(),
         setActive: true,
+        worldCopy: this.worldCopy,
       });
       this.state = next;
       this.recovered = false;
@@ -457,7 +506,9 @@ export class CareerApplicationService {
       worldManifest,
     });
     return {
-      launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V1",
+      ...(this.worldCopy
+        ? { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V2" as const, worldCopy: structuredClone(this.worldCopy) }
+        : { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V1" as const }),
       saveId,
       seasonId: state.seasonId,
       scheduleSha256: state.schedule.scheduleSha256,
@@ -553,11 +604,12 @@ export class CareerApplicationService {
     const loaded = await this.repository.load(saveId);
     if (!loaded) throw new Error("Career save not found.");
     const archive = state.phase === "COMPLETE" ? await createT20SeasonArchive(state, deterministicCompletedAt(state)) : null;
-    return createSeasonPortableArchive(state, loaded.summary, nowIso(), archive);
+    return createSeasonPortableArchive(state, loaded.summary, nowIso(), archive, loaded.worldCopy ?? null);
   }
 
   async importCareer(bytes: Uint8Array): Promise<T20SeasonState> {
     const imported = await readSeasonPortableArchive(bytes);
+    const copy = imported.worldCopy ? immutableWorldCopy(imported.worldCopy) : null;
     if (this.saveId && !this.readOnly) await this.repository.releaseLease(this.saveId, this.ownerId);
     const saveId = `import-${crypto.randomUUID().replaceAll("-", "")}`;
     if (!(await this.repository.acquireLease(saveId, this.ownerId, Date.now()))) throw new Error("Imported career slot is locked.");
@@ -573,8 +625,10 @@ export class CareerApplicationService {
       now: Date.now(),
       updatedAt: nowIso(),
       setActive: true,
+      worldCopy: copy,
     });
     this.state = imported.state;
+    this.worldCopy = copy;
     this.saveId = saveId;
     this.readOnly = false;
     this.recovered = false;
@@ -615,15 +669,15 @@ export class CareerApplicationService {
   }
 
   teamName(teamId: string | null | undefined): string {
-    return world.teams.find((team) => team.teamId === teamId)?.name ?? teamId ?? "Unknown team";
+    return this.getWorld().teams.find((team) => team.teamId === teamId)?.name ?? teamId ?? "Unknown team";
   }
 
   playerName(playerId: string): string {
-    return world.players.find((player) => player.playerId === playerId)?.name ?? playerId;
+    return this.getWorld().players.find((player) => player.playerId === playerId)?.name ?? playerId;
   }
 
   groundName(groundId: string): string {
-    return world.grounds.find((ground) => ground.groundId === groundId)?.name ?? groundId;
+    return this.getWorld().grounds.find((ground) => ground.groundId === groundId)?.name ?? groundId;
   }
 
   resultText(completion: T20SeasonMatchCompletion): string {

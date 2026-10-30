@@ -4,7 +4,9 @@ import {
   type MatchState,
   type EventEnvelope,
   type CommandReceipt,
+  type NewGameWorldCopy,
 } from "@lcxxvi/contracts";
+import { validateStoredWorldCopy } from "./season.js";
 
 /** Legacy generic persistence contract retained for compatibility with earlier passes. */
 export interface CommitBatch {
@@ -26,6 +28,7 @@ export interface SchemaMigration {
 }
 
 export const SAVE_SCHEMA_VERSION = "LC_SAVE_V1" as const;
+export const PRESENTATION_SAVE_SCHEMA_VERSION = "LC_SAVE_V2_PRESENTATION" as const;
 export const DB_NAME = "lord-cricket-xxvi";
 export const DB_VERSION = 1;
 export const WRITER_LEASE_MS = 12_000;
@@ -65,6 +68,7 @@ export type DurableCommit = {
   command: DurableCommand | null;
   historyCommands?: readonly DurableCommand[];
   setActive?: boolean;
+  worldCopy?: NewGameWorldCopy | null;
   metadata: Omit<
     SaveSummary,
     | "saveId"
@@ -87,10 +91,12 @@ export type LoadResult = {
   session: unknown;
   recovered: boolean;
   recoveredFromGeneration: number | null;
+  worldCopy?: NewGameWorldCopy | null;
 };
 
 type GameRecord = SaveSummary & {
-  schemaVersion: typeof SAVE_SCHEMA_VERSION;
+  schemaVersion: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION;
+  worldCopySha256?: string;
   checkpointSerial: number;
   checkpointGeneration: number;
 };
@@ -396,6 +402,9 @@ export class IndexedDbSaveRepository {
     const now = input.now;
     const payload = canonicalJson(input.session);
     const snapshotHash = await sha256Text(payload);
+    const worldCopy = input.worldCopy ? await validateStoredWorldCopy(input.worldCopy) : null;
+    const worldCopyPayload = worldCopy ? canonicalJson(worldCopy) : null;
+    const suppliedCopyHash = worldCopyPayload ? await sha256Text(worldCopyPayload) : null;
     const eventRows = await Promise.all(
       input.events.map(async (event) => {
         const eventPayload = canonicalJson(event);
@@ -408,7 +417,7 @@ export class IndexedDbSaveRepository {
       }),
     );
     const tx = db.transaction(
-      ["games", "snapshots", "events", "commands", "settings", "projections"],
+      ["games", "snapshots", "events", "commands", "settings", "projections", "worldPacks"],
       "readwrite",
     );
     const games = tx.objectStore("games"),
@@ -419,6 +428,21 @@ export class IndexedDbSaveRepository {
     const existing = (await req(games.get(input.saveId))) as
       | GameRecord
       | undefined;
+    if (existing && ![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION].includes(existing.schemaVersion)) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_SCHEMA_UNSUPPORTED");
+    }
+    if (existing && suppliedCopyHash && suppliedCopyHash !== existing.worldCopySha256) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_IMMUTABLE");
+    }
+    if (existing?.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && !existing.worldCopySha256) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_MISSING");
+    }
+    if (existing?.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && !suppliedCopyHash) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_REQUIRED");
+    }
+    if (existing?.schemaVersion === SAVE_SCHEMA_VERSION && existing.worldCopySha256) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH");
+    }
     const lease = (await req(settings.get(leaseKey(input.saveId)))) as
       | LeaseRecord
       | undefined;
@@ -537,9 +561,18 @@ export class IndexedDbSaveRepository {
       updatedAt: createdAt,
       completed: input.metadata.completed,
     };
+    const copyHash = existing?.worldCopySha256 ?? suppliedCopyHash;
+    if (worldCopyPayload && suppliedCopyHash) {
+      const packs = tx.objectStore("worldPacks");
+      const previous = await req(packs.get(suppliedCopyHash)) as { hash: string; payload: string } | undefined;
+      if (!previous && existing) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_MISSING"); }
+      if (previous && previous.payload !== worldCopyPayload) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_CONFLICT"); }
+      if (!previous) packs.add({ hash: suppliedCopyHash, payload: worldCopyPayload });
+    }
     games.put({
       ...summary,
-      schemaVersion: SAVE_SCHEMA_VERSION,
+      schemaVersion: copyHash ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
+      ...(copyHash ? { worldCopySha256: copyHash } : {}),
       checkpointSerial: serial,
       checkpointGeneration: generation,
     } satisfies GameRecord);
@@ -608,6 +641,7 @@ export class IndexedDbSaveRepository {
       events: eventRows,
       command: null,
       historyCommands,
+      worldCopy: loaded.worldCopy ?? null,
       setActive: false,
       ownerId,
       now,
@@ -616,10 +650,10 @@ export class IndexedDbSaveRepository {
         matchGameId: String(setup?.gameId ?? loaded.summary.matchGameId),
         matchId: String(setup?.matchId ?? loaded.summary.matchId),
         teams: [
-          String(teams[0]?.name ?? loaded.summary.teams[0]),
-          String(teams[1]?.name ?? loaded.summary.teams[1]),
+          loaded.worldCopy ? loaded.summary.teams[0] : String(teams[0]?.name ?? loaded.summary.teams[0]),
+          loaded.worldCopy ? loaded.summary.teams[1] : String(teams[1]?.name ?? loaded.summary.teams[1]),
         ],
-        ground: String(ground.name ?? loaded.summary.ground),
+        ground: loaded.worldCopy ? loaded.summary.ground : String(ground.name ?? loaded.summary.ground),
         phase: String(core.phase ?? loaded.summary.phase),
         completed: core.phase === "COMPLETE",
       },
@@ -628,7 +662,7 @@ export class IndexedDbSaveRepository {
 
   async load(saveId: string): Promise<LoadResult | null> {
     const db = await this.open();
-    const tx = db.transaction(["games", "snapshots"], "readonly");
+    const tx = db.transaction(["games", "snapshots", "worldPacks"], "readonly");
     const game = (await req(tx.objectStore("games").get(saveId))) as
       | GameRecord
       | undefined;
@@ -636,14 +670,22 @@ export class IndexedDbSaveRepository {
       await txDone(tx);
       return null;
     }
-    if (game.schemaVersion !== SAVE_SCHEMA_VERSION) {
+    if (![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION].includes(game.schemaVersion)) {
       await txDone(tx);
       throw new Error(`SAVE_SCHEMA_UNSUPPORTED: ${String(game.schemaVersion)}`);
     }
+    if (game.schemaVersion === SAVE_SCHEMA_VERSION && game.worldCopySha256) { await txDone(tx); throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH"); }
     const rows = (await req(
       tx.objectStore("snapshots").index("saveId").getAll(saveId),
     )) as SnapshotRecord[];
+    const worldRow = game.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256
+      ? await req(tx.objectStore("worldPacks").get(game.worldCopySha256)) as { hash: string; payload: string } | undefined : undefined;
     await txDone(tx);
+    let worldCopy: NewGameWorldCopy | null = null;
+    if (game.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION) {
+      if (!worldRow || !game.worldCopySha256 || await sha256Text(worldRow.payload) !== game.worldCopySha256) throw new Error("SAVE_WORLD_COPY_MISSING_OR_DAMAGED");
+      worldCopy = await validateStoredWorldCopy(JSON.parse(worldRow.payload));
+    }
     const ordered = rows.sort(
       (a, b) => b.checkpointSerial - a.checkpointSerial,
     );
@@ -659,6 +701,7 @@ export class IndexedDbSaveRepository {
           session,
           recovered,
           recoveredFromGeneration: recovered ? row.generation : null,
+          worldCopy,
         };
       } catch {
         /* try older generation */

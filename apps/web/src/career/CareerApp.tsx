@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { TrainingDirective } from "@lcxxvi/contracts";
 import {
   CareerApplicationService,
@@ -7,6 +7,8 @@ import {
 } from "./service.js";
 import { PlayerPage, type PlayerFormat } from "./PlayerPage.js";
 import { PitchInspection } from "../match/PitchInspection.js";
+import { WorldEditor } from "../world/WorldEditor.js";
+import type { NewGameWorldCopy } from "../world/new-game-world.js";
 import "./career.css";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
@@ -34,6 +36,10 @@ export function CareerApp() {
   const [, redraw] = useState(0);
   const [screen, setScreen] = useState<Screen>("HOME");
   const [playerId, setPlayerId] = useState<string | null>(null);
+  const [stagedWorld, setStagedWorld] = useState<NewGameWorldCopy | null>(null);
+  const [editingWorld, setEditingWorld] = useState(false);
+  const [restoreEditorFocus, setRestoreEditorFocus] = useState(false);
+  const editWorldButton = useRef<HTMLButtonElement>(null);
   const [playerOrigin, setPlayerOrigin] = useState<"SQUAD" | "STATISTICS">("SQUAD");
   const [restorePlayerFocus, setRestorePlayerFocus] = useState<string | null>(null);
   const [playerFormat, setPlayerFormat] = useState<PlayerFormat>(() => {
@@ -55,6 +61,12 @@ export function CareerApp() {
   const state = service.getState();
 
   useEffect(() => service.subscribe(() => redraw((value) => value + 1)), []);
+  useEffect(() => {
+    if (restoreEditorFocus && !editingWorld) {
+      editWorldButton.current?.focus();
+      setRestoreEditorFocus(false);
+    }
+  }, [editingWorld, restoreEditorFocus]);
   useEffect(() => {
     if (restorePlayerFocus && screen === playerOrigin) {
       document.getElementById(`player-link-${playerOrigin}-${restorePlayerFocus}`)?.focus();
@@ -106,7 +118,8 @@ export function CareerApp() {
 
   async function createCareer(teamId: string) {
     await action(async () => {
-      await service.createCareer(teamId);
+      await service.createCareer(teamId, stagedWorld);
+      setStagedWorld(null);
       setScreen("HOME");
     });
   }
@@ -143,12 +156,13 @@ export function CareerApp() {
   }
 
   const controlledTeam = state?.controlledTeamId ?? null;
+  const displayWorld = state ? service.getWorld() : stagedWorld?.world ?? careerWorld;
   const nextFixture = service.nextManagedFixture();
   const completionByFixture = useMemo(
     () => new Map(state?.completedMatches.map((completion) => [completion.fixtureId, completion]) ?? []),
     [state],
   );
-  const team = careerWorld.teams.find((candidate) => candidate.teamId === controlledTeam) ?? null;
+  const team = displayWorld.teams.find((candidate) => candidate.teamId === controlledTeam) ?? null;
   const tableRow = state?.projection.table.find((row) => row.teamId === controlledTeam) ?? null;
 
   if (busy && !state && savedCareers.length === 0) {
@@ -172,7 +186,7 @@ export function CareerApp() {
             <div className="save-list">
               {savedCareers.map((save) => (
                 <button key={save.saveId} disabled={busy} onClick={() => action(async () => { await service.loadCareer(save.saveId); setScreen("HOME"); })}>
-                  {service.teamName(save.controlledTeamId)} · {save.completedFixtures}/56 · {save.phase}
+                  {save.title} · {save.completedFixtures}/56 · {save.phase}
                   <small>{save.currentDate} · revision {save.revision}</small>
                 </button>
               ))}
@@ -182,11 +196,17 @@ export function CareerApp() {
         <section>
           <h2>New career</h2>
           <p>Choose the team you will manage for the fixed 14-round, 56-match season.</p>
+          {editingWorld ? <WorldEditor base={careerWorld} initial={stagedWorld} onClose={() => { setEditingWorld(false); setRestoreEditorFocus(true); }} onStage={copy => { setStagedWorld(copy); setEditingWorld(false); setRestoreEditorFocus(true); }} /> : <div className="action-row">
+            <button ref={editWorldButton} type="button" onClick={() => setEditingWorld(true)}>Edit names and colours</button>
+            {stagedWorld && <button type="button" onClick={() => setStagedWorld(null)}>Use original world</button>}
+          </div>}
+          {stagedWorld && <p role="status">Edited world ready for a new career. Existing careers remain unchanged.</p>}
           <div className="team-picker">
-            {careerWorld.teams.map((candidate) => (
-              <button key={candidate.teamId} className="team-card" disabled={busy} onClick={() => createCareer(candidate.teamId)}>
+            {displayWorld.teams.map((candidate) => (
+              <button key={candidate.teamId} className="team-card" disabled={busy || editingWorld} onClick={() => createCareer(candidate.teamId)}>
                 <strong>{candidate.name}</strong>
-                <span>{service.groundName(candidate.teamId.replace("team", "ground"))}</span>
+                <span>{displayWorld.grounds.find(ground => ground.groundId === candidate.teamId.replace("team", "ground"))?.name}</span>
+                <span className="team-colours" aria-hidden="true">{candidate.colours.map((colour, index) => <i key={index} style={{ backgroundColor: colour }} />)}</span>
               </button>
             ))}
           </div>
@@ -209,6 +229,7 @@ export function CareerApp() {
         <div>
           <p className="eyebrow">LORD CRICKET XXVI · MANAGEMENT</p>
           <h1>{team?.name ?? "Career"}</h1>
+          {team && <div className="team-colours" aria-hidden="true">{team.colours.map((colour, index) => <i key={index} style={{ backgroundColor: colour }} />)}</div>}
           <p>{state.phase === "COMPLETE" ? "Season complete" : `Round ${currentRound} · ${state.careerState.currentDate}`}</p>
         </div>
         <div className="save-badge" data-status={status.toLowerCase()}>
@@ -222,6 +243,7 @@ export function CareerApp() {
           <button key={item} aria-current={screen === item ? "page" : undefined} onClick={() => setScreen(item)}>{item[0] + item.slice(1).toLowerCase()}</button>
         ))}
         <a href="#exhibition" onClick={() => sessionStorage.removeItem(LAUNCH_KEY)}>Exhibition</a>
+        <button disabled={busy} onClick={() => void action(async () => { await service.leaveCareer(); setScreen("HOME"); })}>Choose career</button>
       </nav>
 
       <section className="career-disclosure compact" aria-label="Model disclosure">
@@ -255,7 +277,7 @@ export function CareerApp() {
                       <button disabled={busy || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
                     </div>
                   )}
-                  <PitchInspection ground={careerWorld.grounds.find(ground => ground.groundId === nextFixture.groundId)} format="T20" />
+                  <PitchInspection ground={displayWorld.grounds.find(ground => ground.groundId === nextFixture.groundId)} format="T20" />
                 </>
               ) : <p>No remaining managed fixture.</p>}
             </article>
@@ -302,7 +324,7 @@ export function CareerApp() {
           <h2 id="squad-heading">Squad</h2>
           <p>Training changes affect temporary readiness and daily recovery only. There is no permanent attribute growth in V0.1.</p>
           <div className="table-wrap"><table><thead><tr><th>Player</th><th>Role</th><th>Availability</th><th>Fatigue</th><th>Bat</th><th>Bowl</th><th>Field</th><th>Training</th></tr></thead><tbody>{service.squadView()?.players.map((condition) => {
-            const player = careerWorld.players.find((candidate) => candidate.playerId === condition.playerId)!;
+            const player = displayWorld.players.find((candidate) => candidate.playerId === condition.playerId)!;
             return <tr key={condition.playerId}><td><button type="button" className="player-link" id={`player-link-SQUAD-${player.playerId}`} aria-label={`View ${player.name}`} onClick={() => openPlayer(player.playerId, "SQUAD")}>{player.name}</button><small>{player.playerId}</small></td><td>{player.role}</td><td>{condition.availability}{condition.availabilityReason ? <small>{condition.availabilityReason}</small> : null}</td><td>{percentageBp(condition.fatigueBp)}</td><td>{condition.battingReadiness > 0 ? "+" : ""}{condition.battingReadiness}</td><td>{condition.bowlingReadiness > 0 ? "+" : ""}{condition.bowlingReadiness}</td><td>{condition.fieldingReadiness > 0 ? "+" : ""}{condition.fieldingReadiness}</td><td><label className="sr-label" htmlFor={`training-${condition.playerId}`}>Training for {player.name}</label><select id={`training-${condition.playerId}`} disabled={busy || service.isReadOnly() || state.phase === "COMPLETE"} value={condition.directive} onChange={(event) => void action(async () => { await service.setTraining(condition.playerId, event.currentTarget.value as TrainingDirective); })}>{directives.map((directive) => <option key={directive} value={directive}>{directive.replaceAll("_", " ")}</option>)}</select></td></tr>;
           })}</tbody></table></div>
         </section>
@@ -340,7 +362,7 @@ export function CareerApp() {
       )}
 
       {screen === "PLAYER" && (() => {
-        const player = careerWorld.players.find(candidate => candidate.playerId === playerId);
+        const player = displayWorld.players.find(candidate => candidate.playerId === playerId);
         return player ? <PlayerPage player={player} condition={service.playerCondition(player.playerId)}
           stats={state.projection.players.find(candidate => candidate.playerId === player.playerId) ?? null}
           format={playerFormat} onFormat={changePlayerFormat} onBack={() => { setRestorePlayerFocus(player.playerId); setScreen(playerOrigin); }}

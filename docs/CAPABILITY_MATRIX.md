@@ -7,6 +7,7 @@ Dated reports retain the results of their original runs.
 | Capability | Current boundary |
 | --- | --- |
 | Fictional world | Eight teams, 160 players and eight grounds in the frozen world pack. |
+| New-game editing | New careers and exhibitions use a validated, immutable presentation copy for names and colours. Existing saves and simulation snapshots retain their original versions. |
 | Match formats | T20, ODI and five-day red-ball exhibitions under documented custom rules. |
 | Match interface | XIs, captain/keeper, toss, batting/bowling choices, field controls and complete scorecards. |
 | One-season career | Eight teams, 14 rounds and 56 fixtures, with managed interactive or simulated fixtures. |

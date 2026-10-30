@@ -1,6 +1,8 @@
 .career-shell { max-width: 1440px; margin: 0 auto; padding: 20px 32px 48px; }
 .career-masthead { display:flex; gap:20px; align-items:center; justify-content:space-between; border-bottom:1px solid #d2d5c9; padding-bottom:14px; }
 .career-masthead h1 { margin-bottom: .15em; }
+.career-masthead > div:first-child { min-width:0; max-width:100%; }
+.career-shell h1, .career-shell h2 { overflow-wrap:anywhere; }
 .career-nav { display:flex; flex-wrap:wrap; gap:7px; margin:14px 0; align-items:center; }
 .career-nav button, .career-nav a, .button-link { min-height:40px; border:1px solid #6b8276; border-radius:5px; padding:.55em .8em; background:#fff; color:#143c2d; font-weight:650; text-decoration:none; display:inline-flex; align-items:center; }
 .career-nav button[aria-current="page"] { background:#194b38; color:#fff; }
@@ -26,6 +28,7 @@
 .save-list button { text-align:left; }
 .import-panel { margin-top:24px; max-width:700px; }
 .import-panel input, .settings-actions input { display:block; margin-top:8px; }
+.import-panel input[type="file"], .settings-actions input[type="file"] { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
 .table-wrap { overflow-x:auto; width:100%; margin:10px 0 24px; }
 .career-shell table { border-collapse:collapse; width:100%; min-width:760px; background:#fffdf8; }
 .career-shell th, .career-shell td { text-align:left; border-bottom:1px solid #dedfd7; padding:9px 10px; vertical-align:top; }
@@ -50,3 +53,10 @@
 .player-details dt { overflow-wrap:anywhere; }
 .player-details dd { margin:0; text-align:right; font-variant-numeric:tabular-nums; }
 .career-shell .player-link { padding:0; border:0; background:none; color:#155b3a; text-decoration:underline; text-align:left; }
+.team-colours { display:flex; gap:4px; }
+.team-colours i { width:22px; height:8px; border:1px solid #51655a; }
+.world-editor { margin:16px 0; }
+.world-editor-fields, .world-editor-players { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 220px),1fr)); gap:12px; margin:12px 0; }
+.world-editor label { display:flex; flex-direction:column; gap:4px; }
+.world-editor input, .world-editor select { max-width:100%; min-width:0; }
+.world-editor .action-row { margin:16px 0; }

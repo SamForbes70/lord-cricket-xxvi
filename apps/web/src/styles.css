@@ -228,7 +228,9 @@ label {
 .scorestrip h2 {
   font-size: 1em;
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
+.decision-top h2 { overflow-wrap: anywhere; }
 .score {
   font-size: 2.4em;
   line-height: 1.1;

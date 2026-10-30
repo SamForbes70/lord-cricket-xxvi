@@ -22,7 +22,8 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type T20Command, type DeliveryRecorded } from "@lcxxvi/contracts";
+import { type T20Command, type DeliveryRecorded, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
   UI_VERSION,
@@ -82,6 +83,14 @@ export function createMatchController(
   };
   let session: T20Session | null = null;
   let careerFixture: Extract<Request, { type: "START" }>["careerFixture"] | null = null;
+  let displayWorld = world;
+  function setWorldCopy(copy: NewGameWorldCopy | null) {
+    displayWorld = copy ? validateNewGameWorldCopy(copy, world).world : world;
+  }
+  function bindCareerFixture(fixture: typeof careerFixture) {
+    setWorldCopy(fixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? fixture.worldCopy : null);
+    careerFixture = fixture;
+  }
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
     requestId: string;
@@ -97,10 +106,10 @@ export function createMatchController(
       l = c.innings[c.activeInningsIndex],
       i = l?.innings;
     const names = Object.fromEntries(
-      s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, p.name])),
+      s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, displayWorld.players.find(player => player.playerId === p.playerId)?.name ?? p.name])),
     );
     const tn = (id: string | null) =>
-      s.setup.teams.find((t) => t.teamId === id)?.name ?? "";
+      displayWorld.teams.find((t) => t.teamId === id)?.name ?? "";
     const decisionTeamId =
       c.phase === "TOSS"
         ? s.setup.teams[0].teamId
@@ -140,7 +149,7 @@ export function createMatchController(
                 : l!.bowling[p.playerId]!.legalBalls >= 24
                   ? "Four-over limit reached"
                   : "";
-      return { id: p.playerId, name: p.name, reason };
+      return { id: p.playerId, name: names[p.playerId] ?? p.name, reason };
     });
     let advanceReason =
       c.phase === "COMPLETE"
@@ -204,13 +213,14 @@ export function createMatchController(
       decisionTeamId,
       teams: s.setup.teams.map((t) => ({
         id: t.teamId,
-        name: t.name,
+        name: tn(t.teamId),
         captainId: t.captainId,
         keeperId: t.keeperId,
         playerIds: [...t.playerIds],
+        ...(displayWorld.packId !== world.packId ? { colours: [...displayWorld.teams.find(team => team.teamId === t.teamId)!.colours] as [string, string] } : {}),
       })),
       names,
-      ground: s.setup.ground.name,
+      ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
       candidates,
@@ -325,7 +335,7 @@ export function createMatchController(
   }
   function restore(raw: unknown): void {
     session = rehydrateT20Session(raw, worldBytes, manifest);
-    careerFixture = null;
+    bindCareerFixture(null);
     seen.clear();
     audit.splice(
       0,
@@ -359,6 +369,7 @@ export function createMatchController(
   }
   return {
     restore,
+    setWorldCopy,
     snapshot,
     currentResponse,
     handle(raw: unknown): Response {
@@ -378,7 +389,7 @@ export function createMatchController(
         if (request.type === "BOOT" && request.careerFixture) {
           if (session && (session.setup.gameId !== request.careerFixture.matchGameId || session.setup.matchId !== request.careerFixture.matchId))
             throw new Error("Recovered match does not match the scheduled career fixture.");
-          careerFixture = request.careerFixture;
+          bindCareerFixture(request.careerFixture);
         }
         if (
           request.type !== "BOOT" &&
@@ -391,7 +402,9 @@ export function createMatchController(
           if (request.format !== "T20")
             throw new Error("T20 controller received a non-T20 start.");
           if (session) throw new Error("A match is already in progress.");
-          careerFixture = request.careerFixture ?? null;
+          if (request.careerFixture && request.worldCopy) throw new Error("A career match cannot replace its world copy.");
+          bindCareerFixture(request.careerFixture ?? null);
+          if (!request.careerFixture) setWorldCopy(request.worldCopy ?? null);
           if (careerFixture) {
             if (careerFixture.matchId !== request.careerFixture?.matchId || careerFixture.groundId !== request.groundId)
               throw new Error("Career fixture binding mismatch.");

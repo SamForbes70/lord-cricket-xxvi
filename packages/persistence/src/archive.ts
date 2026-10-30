@@ -1,9 +1,10 @@
-import { canonicalJson, SeasonPortableManifestSchema, SeasonSaveSummarySchema, SeasonArchiveSchema, type SeasonPortableManifest, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState } from "@lcxxvi/contracts";
-import { SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
-import { SEASON_SAVE_SCHEMA_VERSION, validateT20SeasonArchive, validateT20SeasonState } from "./season.js";
+import { canonicalJson, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
+import { SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION, validateStoredWorldCopy, validateT20SeasonArchive, validateT20SeasonState } from "./season.js";
 
 export const ARCHIVE_EXTENSION = ".lcxxvi";
 export const ARCHIVE_VERSION = "LC_ARCHIVE_V1" as const;
+export const PRESENTATION_ARCHIVE_VERSION = "LC_ARCHIVE_V2_PRESENTATION" as const;
 const MAX_ARCHIVE_BYTES = 20 * 1024 * 1024;
 const MAX_EXPANDED_BYTES = 50 * 1024 * 1024;
 const MAX_FILES = 32;
@@ -170,13 +171,14 @@ export type ArchivePins = {
   worldHash: string;
 };
 export type ArchiveManifest = {
-  archiveVersion: typeof ARCHIVE_VERSION;
-  saveSchema: typeof SAVE_SCHEMA_VERSION;
+  archiveVersion: typeof ARCHIVE_VERSION | typeof PRESENTATION_ARCHIVE_VERSION;
+  saveSchema: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION;
   exportedAt: string;
   summary: SaveSummary;
   pins: ArchivePins;
   files: Record<string, { bytes: number; sha256: string }>;
   embeddedPacks: string[];
+  worldCopySha256?: string;
 };
 
 function asRecord(value: unknown, label: string): Record<string, unknown> {
@@ -263,10 +265,11 @@ function validateSummary(value: unknown): asserts value is SaveSummary {
 }
 function validateFileManifest(
   value: unknown,
+  names: readonly string[] = ["game.json", "events.ndjson"],
 ): asserts value is Record<string, { bytes: number; sha256: string }> {
-  strictKeys(value, ["game.json", "events.ndjson"], "ARCHIVE_FILES");
+  strictKeys(value, names, "ARCHIVE_FILES");
   const files = value as Record<string, unknown>;
-  for (const name of ["game.json", "events.ndjson"] as const) {
+  for (const name of names) {
     strictKeys(files[name], ["bytes", "sha256"], `ARCHIVE_FILE_${name}`);
     const meta = files[name] as Record<string, unknown>;
     requireNonNegativeInteger(meta.bytes, `ARCHIVE_FILE_${name}_bytes`);
@@ -280,6 +283,7 @@ export async function createPortableArchive(
   summary: SaveSummary,
   pins: ArchivePins,
   exportedAt: string,
+  worldCopyRaw: unknown | null = null,
 ): Promise<Uint8Array> {
   const gameText = canonicalJson(session);
   const events = asRecord(session, "ARCHIVE_SESSION").events;
@@ -291,6 +295,8 @@ export async function createPortableArchive(
     { name: "game.json", data: encoder.encode(gameText) },
     { name: "events.ndjson", data: encoder.encode(eventsText) },
   ];
+  const worldCopy = worldCopyRaw === null ? null : await validateStoredWorldCopy(worldCopyRaw);
+  if (worldCopy) payloads.push({ name: "world-copy.json", data: encoder.encode(canonicalJson(worldCopy)) });
   const files: Record<string, { bytes: number; sha256: string }> = {};
   for (const p of payloads)
     files[p.name] = {
@@ -298,13 +304,14 @@ export async function createPortableArchive(
       sha256: await sha256Bytes(p.data),
     };
   const manifest: ArchiveManifest = {
-    archiveVersion: ARCHIVE_VERSION,
-    saveSchema: SAVE_SCHEMA_VERSION,
+    archiveVersion: worldCopy ? PRESENTATION_ARCHIVE_VERSION : ARCHIVE_VERSION,
+    saveSchema: worldCopy ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
     exportedAt,
     summary,
     pins,
     files,
-    embeddedPacks: [],
+    embeddedPacks: worldCopy ? ["world-copy.json"] : [],
+    ...(worldCopy ? { worldCopySha256: files["world-copy.json"]!.sha256 } : {}),
   };
   const manifestData = encoder.encode(canonicalJson(manifest));
   return makeZip([{ name: "manifest.json", data: manifestData }, ...payloads]);
@@ -317,12 +324,13 @@ export async function readPortableArchive(
   session: unknown;
   summary: SaveSummary;
   manifest: ArchiveManifest;
+  worldCopy: NewGameWorldCopy | null;
 }> {
   const files = parseZip(bytes);
-  const allowed = new Set(["manifest.json", "game.json", "events.ndjson"]);
+  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "world-copy.json"]);
   for (const name of files.keys())
     if (!allowed.has(name)) throw new Error("ARCHIVE_FILE_NOT_ALLOWED");
-  for (const required of allowed)
+  for (const required of ["manifest.json", "game.json", "events.ndjson"])
     if (!files.has(required)) throw new Error(`ARCHIVE_MISSING_${required}`);
   let manifestValue: unknown;
   try {
@@ -332,6 +340,9 @@ export async function readPortableArchive(
   } catch {
     throw new Error("ARCHIVE_MANIFEST_JSON_INVALID");
   }
+  const version = asRecord(manifestValue, "ARCHIVE_MANIFEST").archiveVersion;
+  if (version !== ARCHIVE_VERSION && version !== PRESENTATION_ARCHIVE_VERSION) throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
+  const presentation = version === PRESENTATION_ARCHIVE_VERSION;
   strictKeys(
     manifestValue,
     [
@@ -342,13 +353,14 @@ export async function readPortableArchive(
       "pins",
       "files",
       "embeddedPacks",
+      ...(presentation ? ["worldCopySha256"] : []),
     ],
     "ARCHIVE_MANIFEST",
   );
   const manifest = manifestValue as ArchiveManifest;
   if (
-    manifest.archiveVersion !== ARCHIVE_VERSION ||
-    manifest.saveSchema !== SAVE_SCHEMA_VERSION
+    !(manifest.archiveVersion === ARCHIVE_VERSION && manifest.saveSchema === SAVE_SCHEMA_VERSION) &&
+    !(manifest.archiveVersion === PRESENTATION_ARCHIVE_VERSION && manifest.saveSchema === PRESENTATION_SAVE_SCHEMA_VERSION)
   )
     throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
   if (
@@ -357,10 +369,12 @@ export async function readPortableArchive(
   )
     throw new Error("ARCHIVE_EXPORTED_AT_INVALID");
   validateSummary(manifest.summary);
-  validateFileManifest(manifest.files);
+  const payloadNames = presentation ? ["game.json", "events.ndjson", "world-copy.json"] : ["game.json", "events.ndjson"];
+  if (files.has("world-copy.json") !== presentation) throw new Error("ARCHIVE_WORLD_COPY_FILE_MISMATCH");
+  validateFileManifest(manifest.files, payloadNames);
   if (
     !Array.isArray(manifest.embeddedPacks) ||
-    manifest.embeddedPacks.length !== 0
+    canonicalJson(manifest.embeddedPacks) !== canonicalJson(presentation ? ["world-copy.json"] : [])
   )
     throw new Error("ARCHIVE_EMBEDDED_PACKS_UNSUPPORTED");
   strictKeys(
@@ -389,7 +403,7 @@ export async function readPortableArchive(
         throw new Error(`ARCHIVE_PIN_UNSUPPORTED_${key}`);
     }
   }
-  for (const name of ["game.json", "events.ndjson"] as const) {
+  for (const name of payloadNames) {
     const data = files.get(name)!,
       meta = manifest.files[name];
     if (
@@ -398,6 +412,14 @@ export async function readPortableArchive(
       meta.sha256 !== (await sha256Bytes(data))
     )
       throw new Error(`ARCHIVE_HASH_MISMATCH_${name}`);
+  }
+  let worldCopy: NewGameWorldCopy | null = null;
+  if (presentation) {
+    const data = files.get("world-copy.json")!;
+    if (await sha256Bytes(data) !== manifest.worldCopySha256) throw new Error("ARCHIVE_WORLD_COPY_HASH_MISMATCH");
+    let raw: unknown;
+    try { raw = JSON.parse(decoder.decode(data)); } catch { throw new Error("ARCHIVE_WORLD_COPY_JSON_INVALID"); }
+    worldCopy = await validateStoredWorldCopy(raw);
   }
   let session: unknown;
   try {
@@ -418,17 +440,19 @@ export async function readPortableArchive(
     canonicalJson(sessionEvents) !== canonicalJson(archiveEvents)
   )
     throw new Error("ARCHIVE_EVENT_STREAM_MISMATCH");
-  return { session, summary: manifest.summary, manifest };
+  return { session, summary: manifest.summary, manifest, worldCopy };
 }
 
 
 export const SEASON_PORTABLE_ARCHIVE_VERSION = "LC_T20_SEASON_PORTABLE_V1" as const;
+export const SEASON_PRESENTATION_ARCHIVE_VERSION = "LC_T20_SEASON_PORTABLE_V2" as const;
 
 export async function createSeasonPortableArchive(
   stateRaw: unknown,
   summaryRaw: unknown,
   exportedAt: string,
   completedArchiveRaw: unknown | null = null,
+  worldCopyRaw: unknown | null = null,
 ): Promise<Uint8Array> {
   const state = await validateT20SeasonState(stateRaw);
   const summary = SeasonSaveSummarySchema.parse(summaryRaw);
@@ -445,14 +469,24 @@ export async function createSeasonPortableArchive(
     { name: "projection.json", data: encoder.encode(canonicalJson(state.projection)) },
   ];
   if (completedArchive) payloads.push({ name: "season-archive.json", data: encoder.encode(canonicalJson(completedArchive)) });
+  const worldCopy = worldCopyRaw === null ? null : await validateStoredWorldCopy(worldCopyRaw);
+  if (worldCopy) payloads.push({ name: "world-copy.json", data: encoder.encode(canonicalJson(worldCopy)) });
   const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
   for (const payload of payloads) fileMeta[payload.name] = { bytes: payload.data.length, sha256: await sha256Bytes(payload.data) };
-  const manifest = SeasonPortableManifestSchema.parse({
-    archiveVersion: SEASON_PORTABLE_ARCHIVE_VERSION,
-    saveSchema: SEASON_SAVE_SCHEMA_VERSION,
+  const manifestValues = {
     exportedAt,
     summary,
     files: fileMeta,
+  };
+  const manifest = worldCopy ? SeasonPortableManifestV2Schema.parse({
+    ...manifestValues,
+    archiveVersion: SEASON_PRESENTATION_ARCHIVE_VERSION,
+    saveSchema: SEASON_PRESENTATION_SAVE_SCHEMA_VERSION,
+    worldCopySha256: fileMeta["world-copy.json"]!.sha256,
+  }) : SeasonPortableManifestSchema.parse({
+    ...manifestValues,
+    archiveVersion: SEASON_PORTABLE_ARCHIVE_VERSION,
+    saveSchema: SEASON_SAVE_SCHEMA_VERSION,
   });
   return makeZip([{ name: "manifest.json", data: encoder.encode(canonicalJson(manifest)) }, ...payloads]);
 }
@@ -460,17 +494,23 @@ export async function createSeasonPortableArchive(
 export async function readSeasonPortableArchive(bytes: Uint8Array): Promise<{
   state: T20SeasonState;
   summary: SeasonSaveSummary;
-  manifest: SeasonPortableManifest;
+  manifest: SeasonPortableManifest | SeasonPortableManifestV2;
   seasonArchive: SeasonArchive | null;
+  worldCopy: NewGameWorldCopy | null;
 }> {
   const files = parseZip(bytes);
-  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "projection.json", "season-archive.json"]);
+  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "projection.json", "season-archive.json", "world-copy.json"]);
   for (const name of files.keys()) if (!allowed.has(name)) throw new Error("SEASON_ARCHIVE_FILE_NOT_ALLOWED");
   for (const required of ["manifest.json", "game.json", "events.ndjson", "projection.json"])
     if (!files.has(required)) throw new Error(`SEASON_ARCHIVE_MISSING_${required}`);
   let manifestRaw: unknown;
   try { manifestRaw = JSON.parse(decoder.decode(files.get("manifest.json")!)); } catch { throw new Error("SEASON_ARCHIVE_MANIFEST_JSON_INVALID"); }
-  const manifest = SeasonPortableManifestSchema.parse(manifestRaw);
+  const version = (manifestRaw as { archiveVersion?: unknown } | null)?.archiveVersion;
+  if (version !== SEASON_PORTABLE_ARCHIVE_VERSION && version !== SEASON_PRESENTATION_ARCHIVE_VERSION) throw new Error("SEASON_ARCHIVE_VERSION_UNSUPPORTED");
+  const manifest = version === SEASON_PRESENTATION_ARCHIVE_VERSION
+    ? SeasonPortableManifestV2Schema.parse(manifestRaw)
+    : SeasonPortableManifestSchema.parse(manifestRaw);
+  if ((manifest.archiveVersion === SEASON_PRESENTATION_ARCHIVE_VERSION) !== files.has("world-copy.json")) throw new Error("SEASON_ARCHIVE_WORLD_COPY_FILE_MISMATCH");
   const actualPayloadNames = [...files.keys()].filter((name) => name !== "manifest.json").sort();
   const declaredNames = Object.keys(manifest.files).sort();
   if (canonicalJson(actualPayloadNames) !== canonicalJson(declaredNames)) throw new Error("SEASON_ARCHIVE_FILE_SET_MISMATCH");
@@ -479,6 +519,14 @@ export async function readSeasonPortableArchive(bytes: Uint8Array): Promise<{
     if (!data) throw new Error(`SEASON_ARCHIVE_MISSING_${name}`);
     const meta = manifest.files[name]!;
     if (data.length !== meta.bytes || await sha256Bytes(data) !== meta.sha256) throw new Error(`SEASON_ARCHIVE_HASH_MISMATCH_${name}`);
+  }
+  let worldCopy: NewGameWorldCopy | null = null;
+  if (manifest.archiveVersion === SEASON_PRESENTATION_ARCHIVE_VERSION) {
+    const payload = files.get("world-copy.json")!;
+    if (await sha256Bytes(payload) !== manifest.worldCopySha256) throw new Error("SEASON_ARCHIVE_WORLD_COPY_HASH_MISMATCH");
+    let raw: unknown;
+    try { raw = JSON.parse(decoder.decode(payload)); } catch { throw new Error("SEASON_ARCHIVE_WORLD_COPY_JSON_INVALID"); }
+    worldCopy = await validateStoredWorldCopy(raw);
   }
   let stateRaw: unknown;
   try { stateRaw = JSON.parse(decoder.decode(files.get("game.json")!)); } catch { throw new Error("SEASON_ARCHIVE_GAME_JSON_INVALID"); }
@@ -502,5 +550,5 @@ export async function readSeasonPortableArchive(bytes: Uint8Array): Promise<{
     if (seasonArchive.stateSha256 !== state.stateSha256) throw new Error("SEASON_ARCHIVE_FINAL_STATE_MISMATCH");
   }
   if ((state.phase === "COMPLETE") !== Boolean(seasonArchive)) throw new Error("SEASON_ARCHIVE_COMPLETION_PAYLOAD_MISMATCH");
-  return { state, summary, manifest, seasonArchive };
+  return { state, summary, manifest, seasonArchive, worldCopy };
 }

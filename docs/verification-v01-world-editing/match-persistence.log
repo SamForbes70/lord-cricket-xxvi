@@ -1,0 +1,20 @@
+[WebServer] (node:60103) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:60121) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:60150) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60150) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium-m4] › tests/m4/persistence.spec.ts:106:1 › autosave resumes exact durable match state after reload and continues (4.7s)
+  ✓  2 [chromium-m4] › tests/m4/persistence.spec.ts:124:1 › a second tab is read-only while the first tab holds the writer lease (3.1s)
+  ✓  3 [chromium-m4] › tests/m4/persistence.spec.ts:141:1 › manual copy, export and staged import preserve a rehydratable match (2.5s)
+  ✓  4 [chromium-m4] › tests/m4/persistence.spec.ts:173:1 › corrupt newest checkpoint recovers an older generation without overwriting the damaged save (4.5s)
+  ✓  5 [chromium-m4] › tests/m4/persistence.spec.ts:215:1 › durable command failure rolls provisional engine state back to the last committed revision (2.2s)
+  ✓  6 [chromium-m4] › tests/m4/persistence.spec.ts:245:1 › repository abort injection proves command-batch atomicity and duplicate command rejection (801ms)
+  ✓  7 [chromium-m4] › tests/m4/persistence.spec.ts:335:1 › edited match world is atomic, immutable and retained during recovery (1.4s)
+
+  7 passed (21.5s)

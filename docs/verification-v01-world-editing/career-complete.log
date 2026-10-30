@@ -1,0 +1,35 @@
+[WebServer] (node:62300) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:62313) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 18 tests using 1 worker
+
+(node:62332) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62332) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/m6g/management.spec.ts:2:1 › M6G management career creates, persists, navigates, progresses and completes (43.5s)
+  ✓   2 [chromium] › tests/m6g/management.spec.ts:152:1 › M6G primary career controls are keyboard reachable at 1366x768 (440ms)
+  ✓   3 [chromium] › tests/m6g/new-game-editing.spec.ts:55:1 › edited career names and colours survive reload, switching and portable import (5.6s)
+  ✓   4 [chromium] › tests/m6g/new-game-editing.spec.ts:149:1 › edited match presentation survives reload and portable import (5.1s)
+  ✓   5 [chromium] › tests/m6g/new-game-editing.spec.ts:202:1 › the editor supports keyboard focus and long names on a narrow screen (3.1s)
+  ✓   6 [chromium] › tests/m6g/player-page.spec.ts:13:1 › player profiles preserve format across players and reload without changing the career (1.3s)
+  ✓   7 [chromium] › tests/m6g/player-page.spec.ts:77:1 › a completed career match links statistics to the correct player profile (2.8s)
+  ✓   8 [chromium] › tests/m6g/player-page.spec.ts:129:1 › pitch inspection keeps the primary match action in view at 150 percent (555ms)
+  ✓   9 [chromium] › tests/m6g/player-page.spec.ts:174:1 › player profiles fit a narrow viewport at 150 percent text scale (610ms)
+(node:63307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:63307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [firefox] › tests/m6g/management.spec.ts:2:1 › M6G management career creates, persists, navigates, progresses and completes (58.1s)
+  ✓  11 [firefox] › tests/m6g/management.spec.ts:152:1 › M6G primary career controls are keyboard reachable at 1366x768 (429ms)
+  ✓  12 [firefox] › tests/m6g/new-game-editing.spec.ts:55:1 › edited career names and colours survive reload, switching and portable import (8.9s)
+  ✓  13 [firefox] › tests/m6g/new-game-editing.spec.ts:149:1 › edited match presentation survives reload and portable import (8.0s)
+  ✓  14 [firefox] › tests/m6g/new-game-editing.spec.ts:202:1 › the editor supports keyboard focus and long names on a narrow screen (5.3s)
+  ✓  15 [firefox] › tests/m6g/player-page.spec.ts:13:1 › player profiles preserve format across players and reload without changing the career (1.6s)
+  ✓  16 [firefox] › tests/m6g/player-page.spec.ts:77:1 › a completed career match links statistics to the correct player profile (4.9s)
+  ✓  17 [firefox] › tests/m6g/player-page.spec.ts:129:1 › pitch inspection keeps the primary match action in view at 150 percent (816ms)
+  ✓  18 [firefox] › tests/m6g/player-page.spec.ts:174:1 › player profiles fit a narrow viewport at 150 percent text scale (926ms)
+
+  18 passed (2.6m)
