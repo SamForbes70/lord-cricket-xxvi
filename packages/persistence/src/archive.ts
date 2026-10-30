@@ -280,6 +280,18 @@ function validateFileManifest(
   }
 }
 
+function validateRosterArchivePins(session: Record<string, unknown>, pins: ArchivePins): void {
+  const setup = asRecord(session.setup, "ARCHIVE_SETUP");
+  const versions = asRecord(setup.versions, "ARCHIVE_SETUP_VERSIONS");
+  const execution = asRecord(session.executionManifest, "ARCHIVE_EXECUTION");
+  const actual = { engine: execution.engine, eventChain: execution.eventChain, random: versions.random,
+    model: versions.model, modelHash: versions.modelHash, rules: versions.rules,
+    rulesHash: versions.rulesHash, worldHash: versions.worldHash };
+  if (canonicalJson(pins) !== canonicalJson(actual) || execution.engine !== "LC_T20_MATCH_ROSTER_V2" ||
+      execution.worldHash !== versions.worldHash || execution.modelHash !== versions.modelHash ||
+      execution.rulesHash !== versions.rulesHash || execution.randomVersion !== versions.random) throw new Error("ARCHIVE_ROSTER_PINS_MISMATCH");
+}
+
 export async function createPortableArchive(
   session: unknown,
   summary: SaveSummary,
@@ -293,6 +305,7 @@ export async function createPortableArchive(
   const isRoster = setup?.setupVersion === "LC_T20_ROSTER_SETUP_V2";
   const rosterPack = rosterPackRaw === null ? null : StagedRosterPackSchema.parse(rosterPackRaw);
   if (isRoster !== Boolean(rosterPack) || (rosterPack && worldCopyRaw !== null)) throw new Error("ARCHIVE_ROSTER_REQUIRED");
+  if (rosterPack) validateRosterArchivePins(sessionRecord, pins);
   if (rosterPack && (setup?.rosterPackHash !== await sha256Bytes(encoder.encode(canonicalJson(rosterPack))) || asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash !== await sha256Bytes(encoder.encode(canonicalJson(rosterPack.world))) || pins.engine !== "LC_T20_MATCH_ROSTER_V2" || pins.worldHash !== asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash)) throw new Error("ARCHIVE_ROSTER_MISMATCH");
   const gameText = canonicalJson(session);
   const events = sessionRecord.events;
@@ -463,6 +476,7 @@ export async function readPortableArchive(
   const gameRecord = asRecord(session, "ARCHIVE_GAME");
   const setup = gameRecord.setup ? asRecord(gameRecord.setup, "ARCHIVE_SETUP") : null;
   if ((setup?.setupVersion === "LC_T20_ROSTER_SETUP_V2") !== roster) throw new Error("ARCHIVE_ROSTER_VERSION_MISMATCH");
+  if (rosterPack) validateRosterArchivePins(gameRecord, manifest.pins);
   if (rosterPack && (setup?.rosterPackHash !== manifest.rosterPackSha256 || asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash !== await sha256Bytes(encoder.encode(canonicalJson(rosterPack.world))) || manifest.pins.engine !== "LC_T20_MATCH_ROSTER_V2" || manifest.pins.worldHash !== asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash)) throw new Error("ARCHIVE_ROSTER_MISMATCH");
   const sessionEvents = gameRecord.events;
   if (

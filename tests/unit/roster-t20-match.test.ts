@@ -71,6 +71,7 @@ describe("roster-aware T20 match", () => {
     const saved = next(session);
     const pins: ArchivePins = { engine: saved.executionManifest.engine, eventChain: saved.executionManifest.eventChain, random: saved.setup.versions.random, model: saved.setup.versions.model, modelHash: saved.setup.versions.modelHash, rules: saved.setup.versions.rules, rulesHash: saved.setup.versions.rulesHash, worldHash: saved.setup.versions.worldHash };
     const summary: SaveSummary = { saveId: "save", kind: "AUTO", title: "Roster", matchGameId: saved.setup.gameId, matchId: saved.setup.matchId, teams: [saved.setup.teams[0].name, saved.setup.teams[1].name], ground: saved.setup.ground.name, phase: saved.core.phase, revision: saved.revision, eventCount: saved.events.length, lastEventHash: saved.lastEventHash, updatedAt: "2026-10-30T00:00:00Z", completed: false };
+    await expect(createPortableArchive(saved, summary, { ...pins, rulesHash: "0".repeat(64) }, summary.updatedAt, null, pack)).rejects.toThrow("ARCHIVE_ROSTER_PINS_MISMATCH");
     const bytes = await createPortableArchive(saved, summary, pins, summary.updatedAt, null, pack);
     const archive = await readPortableArchive(bytes, pins);
     expect(archive.manifest.archiveVersion).toBe("LC_ARCHIVE_V3_ROSTER");

@@ -23,12 +23,14 @@ The new `LC_SAVE_V3_ROSTER` record stores a roster pack with each match checkpoi
 The repository rejects missing or changed packs and recovers an earlier checkpoint.
 The application does not yet create or open these saves.
 The `LC_ARCHIVE_V3_ROSTER` format embeds the pack and rejects damaged data.
+The archive checks match, model, rule and world pins.
 The archive has a 20 MiB size limit.
 The application does not yet offer roster archive import or export.
 Roster careers, ODI and red-ball roster matches, and the user interface remain incomplete.
 
 On Linux with Node v24.19.0, the production build, type check and lint passed.
-The complete unit suite passed 665 tests in 45 files.
+The complete unit suite passed 665 tests in 45 files before the final archive pin check.
+After that check, the targeted roster and existing archive suites passed ten tests.
 Schema verification passed 174 generated schemas.
 The scoring, random, probability and generator checks passed.
 The full Chromium match-save suite passed eight checks.
