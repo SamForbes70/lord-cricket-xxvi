@@ -1,0 +1,48 @@
+[WebServer] (node:88836) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:88849) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:88869) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88869) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/m4/roster-persistence.spec.ts:3:1 › roster match saves commit atomically and recover with their original pack (1.6s)
+(node:88973) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88973) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [firefox] › tests/m4/roster-persistence.spec.ts:3:1 › roster match saves commit atomically and recover with their original pack (1.0s)
+
+
+  1) [firefox] › tests/m4/roster-persistence.spec.ts:3:1 › roster match saves commit atomically and recover with their original pack
+
+    Error: page.goto: Navigation to "http://127.0.0.1:4190/#exhibition" is interrupted by another navigation to "http://127.0.0.1:4190/#exhibition"
+    Call log:
+      - navigating to "http://127.0.0.1:4190/#exhibition", waiting until "load"
+
+
+      3 |
+      4 | test("roster match saves commit atomically and recover with their original pack", async ({ page }) => {
+    > 5 |   await page.goto("/#exhibition");
+        |              ^
+      6 |   const paths = {
+      7 |     persistence: `/@fs/${path.resolve("packages/persistence/src/index.ts")}`,
+      8 |     contracts: `/@fs/${path.resolve("packages/contracts/src/index.ts")}`,
+        at /workspace/lord-cricket-xxvi-roster/tests/m4/roster-persistence.spec.ts:5:14
+
+    Error Context: test-results-m4/roster-persistence-roster--dfe02-er-with-their-original-pack-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-m4/roster-persistence-roster--dfe02-er-with-their-original-pack-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-m4/roster-persistence-roster--dfe02-er-with-their-original-pack-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [firefox] › tests/m4/roster-persistence.spec.ts:3:1 › roster match saves commit atomically and recover with their original pack
+  1 passed (6.2s)

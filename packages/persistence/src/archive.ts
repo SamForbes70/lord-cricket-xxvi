@@ -1,10 +1,11 @@
-import { canonicalJson, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
-import { SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
+import { StagedRosterPackSchema, type StagedRosterPack, canonicalJson, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
 import { SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION, validateStoredWorldCopy, validateT20SeasonArchive, validateT20SeasonState } from "./season.js";
 
 export const ARCHIVE_EXTENSION = ".lcxxvi";
 export const ARCHIVE_VERSION = "LC_ARCHIVE_V1" as const;
 export const PRESENTATION_ARCHIVE_VERSION = "LC_ARCHIVE_V2_PRESENTATION" as const;
+export const ROSTER_ARCHIVE_VERSION = "LC_ARCHIVE_V3_ROSTER" as const;
 const MAX_ARCHIVE_BYTES = 20 * 1024 * 1024;
 const MAX_EXPANDED_BYTES = 50 * 1024 * 1024;
 const MAX_FILES = 32;
@@ -171,14 +172,15 @@ export type ArchivePins = {
   worldHash: string;
 };
 export type ArchiveManifest = {
-  archiveVersion: typeof ARCHIVE_VERSION | typeof PRESENTATION_ARCHIVE_VERSION;
-  saveSchema: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION;
+  archiveVersion: typeof ARCHIVE_VERSION | typeof PRESENTATION_ARCHIVE_VERSION | typeof ROSTER_ARCHIVE_VERSION;
+  saveSchema: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION | typeof ROSTER_SAVE_SCHEMA_VERSION;
   exportedAt: string;
   summary: SaveSummary;
   pins: ArchivePins;
   files: Record<string, { bytes: number; sha256: string }>;
   embeddedPacks: string[];
   worldCopySha256?: string;
+  rosterPackSha256?: string;
 };
 
 function asRecord(value: unknown, label: string): Record<string, unknown> {
@@ -284,9 +286,16 @@ export async function createPortableArchive(
   pins: ArchivePins,
   exportedAt: string,
   worldCopyRaw: unknown | null = null,
+  rosterPackRaw: unknown | null = null,
 ): Promise<Uint8Array> {
+  const sessionRecord = asRecord(session, "ARCHIVE_SESSION");
+  const setup = sessionRecord.setup ? asRecord(sessionRecord.setup, "ARCHIVE_SETUP") : null;
+  const isRoster = setup?.setupVersion === "LC_T20_ROSTER_SETUP_V2";
+  const rosterPack = rosterPackRaw === null ? null : StagedRosterPackSchema.parse(rosterPackRaw);
+  if (isRoster !== Boolean(rosterPack) || (rosterPack && worldCopyRaw !== null)) throw new Error("ARCHIVE_ROSTER_REQUIRED");
+  if (rosterPack && (setup?.rosterPackHash !== await sha256Bytes(encoder.encode(canonicalJson(rosterPack))) || asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash !== await sha256Bytes(encoder.encode(canonicalJson(rosterPack.world))) || pins.engine !== "LC_T20_MATCH_ROSTER_V2" || pins.worldHash !== asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash)) throw new Error("ARCHIVE_ROSTER_MISMATCH");
   const gameText = canonicalJson(session);
-  const events = asRecord(session, "ARCHIVE_SESSION").events;
+  const events = sessionRecord.events;
   if (!Array.isArray(events)) throw new Error("ARCHIVE_SESSION_EVENTS_INVALID");
   const eventsText =
     events.map((e: unknown) => canonicalJson(e)).join("\n") +
@@ -297,6 +306,7 @@ export async function createPortableArchive(
   ];
   const worldCopy = worldCopyRaw === null ? null : await validateStoredWorldCopy(worldCopyRaw);
   if (worldCopy) payloads.push({ name: "world-copy.json", data: encoder.encode(canonicalJson(worldCopy)) });
+  if (rosterPack) payloads.push({ name: "roster-pack.json", data: encoder.encode(canonicalJson(rosterPack)) });
   const files: Record<string, { bytes: number; sha256: string }> = {};
   for (const p of payloads)
     files[p.name] = {
@@ -304,17 +314,20 @@ export async function createPortableArchive(
       sha256: await sha256Bytes(p.data),
     };
   const manifest: ArchiveManifest = {
-    archiveVersion: worldCopy ? PRESENTATION_ARCHIVE_VERSION : ARCHIVE_VERSION,
-    saveSchema: worldCopy ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
+    archiveVersion: rosterPack ? ROSTER_ARCHIVE_VERSION : worldCopy ? PRESENTATION_ARCHIVE_VERSION : ARCHIVE_VERSION,
+    saveSchema: rosterPack ? ROSTER_SAVE_SCHEMA_VERSION : worldCopy ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
     exportedAt,
     summary,
     pins,
     files,
-    embeddedPacks: worldCopy ? ["world-copy.json"] : [],
+    embeddedPacks: rosterPack ? ["roster-pack.json"] : worldCopy ? ["world-copy.json"] : [],
+    ...(rosterPack ? { rosterPackSha256: files["roster-pack.json"]!.sha256 } : {}),
     ...(worldCopy ? { worldCopySha256: files["world-copy.json"]!.sha256 } : {}),
   };
   const manifestData = encoder.encode(canonicalJson(manifest));
-  return makeZip([{ name: "manifest.json", data: manifestData }, ...payloads]);
+  const archive = makeZip([{ name: "manifest.json", data: manifestData }, ...payloads]);
+  if (archive.length > MAX_ARCHIVE_BYTES) throw new Error("ARCHIVE_SIZE_INVALID");
+  return archive;
 }
 
 export async function readPortableArchive(
@@ -325,9 +338,10 @@ export async function readPortableArchive(
   summary: SaveSummary;
   manifest: ArchiveManifest;
   worldCopy: NewGameWorldCopy | null;
+  rosterPack: StagedRosterPack | null;
 }> {
   const files = parseZip(bytes);
-  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "world-copy.json"]);
+  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "world-copy.json", "roster-pack.json"]);
   for (const name of files.keys())
     if (!allowed.has(name)) throw new Error("ARCHIVE_FILE_NOT_ALLOWED");
   for (const required of ["manifest.json", "game.json", "events.ndjson"])
@@ -341,8 +355,9 @@ export async function readPortableArchive(
     throw new Error("ARCHIVE_MANIFEST_JSON_INVALID");
   }
   const version = asRecord(manifestValue, "ARCHIVE_MANIFEST").archiveVersion;
-  if (version !== ARCHIVE_VERSION && version !== PRESENTATION_ARCHIVE_VERSION) throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
+  if (version !== ARCHIVE_VERSION && version !== PRESENTATION_ARCHIVE_VERSION && version !== ROSTER_ARCHIVE_VERSION) throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
   const presentation = version === PRESENTATION_ARCHIVE_VERSION;
+  const roster = version === ROSTER_ARCHIVE_VERSION;
   strictKeys(
     manifestValue,
     [
@@ -354,13 +369,15 @@ export async function readPortableArchive(
       "files",
       "embeddedPacks",
       ...(presentation ? ["worldCopySha256"] : []),
+      ...(roster ? ["rosterPackSha256"] : []),
     ],
     "ARCHIVE_MANIFEST",
   );
   const manifest = manifestValue as ArchiveManifest;
   if (
     !(manifest.archiveVersion === ARCHIVE_VERSION && manifest.saveSchema === SAVE_SCHEMA_VERSION) &&
-    !(manifest.archiveVersion === PRESENTATION_ARCHIVE_VERSION && manifest.saveSchema === PRESENTATION_SAVE_SCHEMA_VERSION)
+    !(manifest.archiveVersion === PRESENTATION_ARCHIVE_VERSION && manifest.saveSchema === PRESENTATION_SAVE_SCHEMA_VERSION) &&
+    !(manifest.archiveVersion === ROSTER_ARCHIVE_VERSION && manifest.saveSchema === ROSTER_SAVE_SCHEMA_VERSION)
   )
     throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
   if (
@@ -369,12 +386,13 @@ export async function readPortableArchive(
   )
     throw new Error("ARCHIVE_EXPORTED_AT_INVALID");
   validateSummary(manifest.summary);
-  const payloadNames = presentation ? ["game.json", "events.ndjson", "world-copy.json"] : ["game.json", "events.ndjson"];
+  const payloadNames = roster ? ["game.json", "events.ndjson", "roster-pack.json"] : presentation ? ["game.json", "events.ndjson", "world-copy.json"] : ["game.json", "events.ndjson"];
+  if (files.has("roster-pack.json") !== roster) throw new Error("ARCHIVE_ROSTER_FILE_MISMATCH");
   if (files.has("world-copy.json") !== presentation) throw new Error("ARCHIVE_WORLD_COPY_FILE_MISMATCH");
   validateFileManifest(manifest.files, payloadNames);
   if (
     !Array.isArray(manifest.embeddedPacks) ||
-    canonicalJson(manifest.embeddedPacks) !== canonicalJson(presentation ? ["world-copy.json"] : [])
+    canonicalJson(manifest.embeddedPacks) !== canonicalJson(roster ? ["roster-pack.json"] : presentation ? ["world-copy.json"] : [])
   )
     throw new Error("ARCHIVE_EMBEDDED_PACKS_UNSUPPORTED");
   strictKeys(
@@ -413,6 +431,14 @@ export async function readPortableArchive(
     )
       throw new Error(`ARCHIVE_HASH_MISMATCH_${name}`);
   }
+  let rosterPack: StagedRosterPack | null = null;
+  if (roster) {
+    const data = files.get("roster-pack.json")!;
+    if (await sha256Bytes(data) !== manifest.rosterPackSha256) throw new Error("ARCHIVE_ROSTER_HASH_MISMATCH");
+    let raw: unknown;
+    try { raw = JSON.parse(decoder.decode(data)); } catch { throw new Error("ARCHIVE_ROSTER_JSON_INVALID"); }
+    rosterPack = StagedRosterPackSchema.parse(raw);
+  }
   let worldCopy: NewGameWorldCopy | null = null;
   if (presentation) {
     const data = files.get("world-copy.json")!;
@@ -434,13 +460,17 @@ export async function readPortableArchive(
         .split("\n")
         .map((line) => JSON.parse(line))
     : [];
-  const sessionEvents = asRecord(session, "ARCHIVE_GAME").events;
+  const gameRecord = asRecord(session, "ARCHIVE_GAME");
+  const setup = gameRecord.setup ? asRecord(gameRecord.setup, "ARCHIVE_SETUP") : null;
+  if ((setup?.setupVersion === "LC_T20_ROSTER_SETUP_V2") !== roster) throw new Error("ARCHIVE_ROSTER_VERSION_MISMATCH");
+  if (rosterPack && (setup?.rosterPackHash !== manifest.rosterPackSha256 || asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash !== await sha256Bytes(encoder.encode(canonicalJson(rosterPack.world))) || manifest.pins.engine !== "LC_T20_MATCH_ROSTER_V2" || manifest.pins.worldHash !== asRecord(setup?.versions, "ARCHIVE_SETUP_VERSIONS").worldHash)) throw new Error("ARCHIVE_ROSTER_MISMATCH");
+  const sessionEvents = gameRecord.events;
   if (
     !Array.isArray(sessionEvents) ||
     canonicalJson(sessionEvents) !== canonicalJson(archiveEvents)
   )
     throw new Error("ARCHIVE_EVENT_STREAM_MISMATCH");
-  return { session, summary: manifest.summary, manifest, worldCopy };
+  return { session, summary: manifest.summary, manifest, worldCopy, rosterPack };
 }
 
 

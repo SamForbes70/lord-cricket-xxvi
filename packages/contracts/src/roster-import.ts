@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CounterSchema, FormatSkillsSchema, HashSchema, IDSchema, PlayerSchema } from "./core.js";
 import { WorldPackSchema } from "./configuration.js";
+import { T20MatchExecutionManifestSchema } from "./t20-match.js";
 
 export const ROSTER_IMPORT_MAX_BYTES = 25_000_000;
 export const ROSTER_FORMATS = ["T20", "ODI", "RED_BALL"] as const;
@@ -25,4 +26,8 @@ export type StagedRosterPack = z.infer<typeof StagedRosterPackSchema>;
 export const RosterMatchPreparationSchema = z.strictObject({
   gameId: IDSchema, matchId: IDSchema, seed: z.string().min(1).max(256), format: z.enum(ROSTER_FORMATS),
   selection: RosterMatchSelectionSchema,
+});
+
+export const RosterT20ExecutionManifestSchema = T20MatchExecutionManifestSchema.extend({
+  engine: z.literal("LC_T20_MATCH_ROSTER_V2"),
 });

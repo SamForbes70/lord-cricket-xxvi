@@ -1,5 +1,7 @@
 import {
   canonicalJson,
+  StagedRosterPackSchema,
+  type StagedRosterPack,
   type ID,
   type MatchState,
   type EventEnvelope,
@@ -29,6 +31,7 @@ export interface SchemaMigration {
 
 export const SAVE_SCHEMA_VERSION = "LC_SAVE_V1" as const;
 export const PRESENTATION_SAVE_SCHEMA_VERSION = "LC_SAVE_V2_PRESENTATION" as const;
+export const ROSTER_SAVE_SCHEMA_VERSION = "LC_SAVE_V3_ROSTER" as const;
 export const DB_NAME = "lord-cricket-xxvi";
 export const DB_VERSION = 1;
 export const WRITER_LEASE_MS = 12_000;
@@ -69,6 +72,7 @@ export type DurableCommit = {
   historyCommands?: readonly DurableCommand[];
   setActive?: boolean;
   worldCopy?: NewGameWorldCopy | null;
+  rosterPack?: StagedRosterPack | null;
   metadata: Omit<
     SaveSummary,
     | "saveId"
@@ -92,11 +96,13 @@ export type LoadResult = {
   recovered: boolean;
   recoveredFromGeneration: number | null;
   worldCopy?: NewGameWorldCopy | null;
+  rosterPack?: StagedRosterPack | null;
 };
 
 type GameRecord = SaveSummary & {
-  schemaVersion: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION;
+  schemaVersion: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION | typeof ROSTER_SAVE_SCHEMA_VERSION;
   worldCopySha256?: string;
+  rosterPackSha256?: string;
   checkpointSerial: number;
   checkpointGeneration: number;
 };
@@ -405,6 +411,16 @@ export class IndexedDbSaveRepository {
     const worldCopy = input.worldCopy ? await validateStoredWorldCopy(input.worldCopy) : null;
     const worldCopyPayload = worldCopy ? canonicalJson(worldCopy) : null;
     const suppliedCopyHash = worldCopyPayload ? await sha256Text(worldCopyPayload) : null;
+    const rosterPack = input.rosterPack ? StagedRosterPackSchema.parse(input.rosterPack) : null;
+    if (rosterPack && worldCopy) throw new Error("SAVE_WORLD_TYPE_CONFLICT");
+    if (objectRecord(objectRecord(input.session).setup).setupVersion === "LC_T20_ROSTER_SETUP_V2" && !rosterPack) throw new Error("SAVE_ROSTER_REQUIRED");
+    const rosterPayload = rosterPack ? canonicalJson(rosterPack) : null;
+    const suppliedRosterHash = rosterPayload ? await sha256Text(rosterPayload) : null;
+    if (rosterPack) {
+      const setup = objectRecord(objectRecord(input.session).setup);
+      if (setup.setupVersion !== "LC_T20_ROSTER_SETUP_V2" || setup.rosterPackHash !== suppliedRosterHash ||
+          objectRecord(setup.versions).worldHash !== await sha256Text(canonicalJson(rosterPack.world))) throw new Error("SAVE_ROSTER_SESSION_MISMATCH");
+    }
     const eventRows = await Promise.all(
       input.events.map(async (event) => {
         const eventPayload = canonicalJson(event);
@@ -428,7 +444,7 @@ export class IndexedDbSaveRepository {
     const existing = (await req(games.get(input.saveId))) as
       | GameRecord
       | undefined;
-    if (existing && ![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION].includes(existing.schemaVersion)) {
+    if (existing && ![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION].includes(existing.schemaVersion)) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_SCHEMA_UNSUPPORTED");
     }
     if (existing && suppliedCopyHash && suppliedCopyHash !== existing.worldCopySha256) {
@@ -440,8 +456,17 @@ export class IndexedDbSaveRepository {
     if (existing?.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && !suppliedCopyHash) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_REQUIRED");
     }
-    if (existing?.schemaVersion === SAVE_SCHEMA_VERSION && existing.worldCopySha256) {
+    if (existing && existing.schemaVersion !== PRESENTATION_SAVE_SCHEMA_VERSION && existing.worldCopySha256) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH");
+    }
+    if (existing && suppliedRosterHash && (existing.schemaVersion !== ROSTER_SAVE_SCHEMA_VERSION || existing.rosterPackSha256 !== suppliedRosterHash)) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_IMMUTABLE");
+    }
+    if (existing?.schemaVersion === ROSTER_SAVE_SCHEMA_VERSION && (!existing.rosterPackSha256 || !suppliedRosterHash)) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_REQUIRED");
+    }
+    if (existing && existing.schemaVersion !== ROSTER_SAVE_SCHEMA_VERSION && existing.rosterPackSha256) {
+      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_VERSION_MISMATCH");
     }
     const lease = (await req(settings.get(leaseKey(input.saveId)))) as
       | LeaseRecord
@@ -569,9 +594,17 @@ export class IndexedDbSaveRepository {
       if (previous && previous.payload !== worldCopyPayload) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_CONFLICT"); }
       if (!previous) packs.add({ hash: suppliedCopyHash, payload: worldCopyPayload });
     }
+    if (rosterPayload && suppliedRosterHash) {
+      const packs = tx.objectStore("worldPacks");
+      const previous = await req(packs.get(suppliedRosterHash)) as { hash: string; payload: string } | undefined;
+      if (!previous && existing) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_MISSING"); }
+      if (previous && previous.payload !== rosterPayload) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_CONFLICT"); }
+      if (!previous) packs.add({ hash: suppliedRosterHash, payload: rosterPayload });
+    }
     games.put({
       ...summary,
-      schemaVersion: copyHash ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
+      schemaVersion: suppliedRosterHash ? ROSTER_SAVE_SCHEMA_VERSION : copyHash ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
+      ...(suppliedRosterHash ? { rosterPackSha256: suppliedRosterHash } : {}),
       ...(copyHash ? { worldCopySha256: copyHash } : {}),
       checkpointSerial: serial,
       checkpointGeneration: generation,
@@ -642,6 +675,7 @@ export class IndexedDbSaveRepository {
       command: null,
       historyCommands,
       worldCopy: loaded.worldCopy ?? null,
+      rosterPack: loaded.rosterPack ?? null,
       setActive: false,
       ownerId,
       now,
@@ -670,22 +704,30 @@ export class IndexedDbSaveRepository {
       await txDone(tx);
       return null;
     }
-    if (![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION].includes(game.schemaVersion)) {
+    if (![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION].includes(game.schemaVersion)) {
       await txDone(tx);
       throw new Error(`SAVE_SCHEMA_UNSUPPORTED: ${String(game.schemaVersion)}`);
     }
-    if (game.schemaVersion === SAVE_SCHEMA_VERSION && game.worldCopySha256) { await txDone(tx); throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH"); }
+    if (game.schemaVersion !== PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256) { await txDone(tx); throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH"); }
     const rows = (await req(
       tx.objectStore("snapshots").index("saveId").getAll(saveId),
     )) as SnapshotRecord[];
+    const rosterRow = game.schemaVersion === ROSTER_SAVE_SCHEMA_VERSION && game.rosterPackSha256
+      ? await req(tx.objectStore("worldPacks").get(game.rosterPackSha256)) as { hash: string; payload: string } | undefined : undefined;
     const worldRow = game.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256
       ? await req(tx.objectStore("worldPacks").get(game.worldCopySha256)) as { hash: string; payload: string } | undefined : undefined;
     await txDone(tx);
+    let rosterPack: StagedRosterPack | null = null;
+    if (game.schemaVersion === ROSTER_SAVE_SCHEMA_VERSION) {
+      if (!rosterRow || !game.rosterPackSha256 || await sha256Text(rosterRow.payload) !== game.rosterPackSha256) throw new Error("SAVE_ROSTER_MISSING_OR_DAMAGED");
+      rosterPack = StagedRosterPackSchema.parse(JSON.parse(rosterRow.payload));
+    } else if (game.rosterPackSha256) throw new Error("SAVE_ROSTER_VERSION_MISMATCH");
     let worldCopy: NewGameWorldCopy | null = null;
     if (game.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION) {
       if (!worldRow || !game.worldCopySha256 || await sha256Text(worldRow.payload) !== game.worldCopySha256) throw new Error("SAVE_WORLD_COPY_MISSING_OR_DAMAGED");
       worldCopy = await validateStoredWorldCopy(JSON.parse(worldRow.payload));
     }
+    const rosterWorldHash = rosterPack ? await sha256Text(canonicalJson(rosterPack.world)) : null;
     const ordered = rows.sort(
       (a, b) => b.checkpointSerial - a.checkpointSerial,
     );
@@ -693,6 +735,9 @@ export class IndexedDbSaveRepository {
       if ((await sha256Text(row.payload)) !== row.sha256) continue;
       try {
         const session = JSON.parse(row.payload);
+        const setup = objectRecord(objectRecord(session).setup);
+        if (rosterPack && (setup.setupVersion !== "LC_T20_ROSTER_SETUP_V2" || setup.rosterPackHash !== game.rosterPackSha256 || objectRecord(setup.versions).worldHash !== rosterWorldHash)) continue;
+        if (!rosterPack && setup.setupVersion === "LC_T20_ROSTER_SETUP_V2") continue;
         const recovered = row.checkpointSerial !== game.checkpointSerial;
         return {
           summary: recovered
@@ -702,6 +747,7 @@ export class IndexedDbSaveRepository {
           recovered,
           recoveredFromGeneration: recovered ? row.generation : null,
           worldCopy,
+          rosterPack,
         };
       } catch {
         /* try older generation */

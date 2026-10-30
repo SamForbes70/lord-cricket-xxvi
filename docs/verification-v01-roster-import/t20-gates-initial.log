@@ -1,0 +1,111 @@
+
+> lord-cricket-xxvi@0.1.0 schemas:check
+> node --import tsx scripts/generate-schemas.ts --check
+
+174 JSON Schemas verified
+
+> lord-cricket-xxvi@0.1.0 fixtures:engine
+> node --import tsx scripts/audit-fixtures.ts --require-scorer
+
+{
+  "fixtureVersion": "1.0.0",
+  "fixtureAuthoredWithoutScorer": true,
+  "fixtureAudit": "PASS",
+  "counts": {
+    "deliveries": 45,
+    "rejections": 29,
+    "terminal": 4,
+    "clock": 5,
+    "deferred": 4
+  },
+  "scorerComparison": "PASS",
+  "matchedDeliveryCases": 45,
+  "matchedLedgerCases": 45,
+  "rejectedByScorer": 29,
+  "terminalClockPersistenceNrrComparison": "NOT_IMPLEMENTED",
+  "scoringEngine": "LC_SCORING_V1",
+  "milestone": "M0_PARTIAL",
+  "nextPass": "Pass 07: bounded seeded T20 orchestration"
+}
+
+> lord-cricket-xxvi@0.1.0 vectors:check
+> python3 scripts/check-determinism-vectors.py
+
+PASS: 24 random-address and 8 state-hash vectors independently verified
+
+> lord-cricket-xxvi@0.1.0 probability:check
+> python3 scripts/reference_probability.py
+
+PASS Python independent Decimal LUT: 1601 entries; checksum d0cb73226646dec41e482127fc745ef64213f1c71f898ed7ad8c345ce591f825
+PASS model: d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab; 15 mass/draw vectors; 4 boundaries
+PASS manual fraction identities, masks, empty-mass guard and category-order tie-breaking
+
+> lord-cricket-xxvi@0.1.0 generator:check
+> python3 scripts/check-generator-vectors.py
+
+PASS: 9 independently hashed generator fixtures and exact length/legality mass oracles
+.....................................................E.......E.EE.............................
+======================================================================
+ERROR: test_generated_evidence_has_no_player_names_or_gameplay_claim (test_m7h_player.M7HPlayerTests.test_generated_evidence_has_no_player_names_or_gameplay_claim)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/lord-cricket-xxvi-roster/tests/test_m7h_player.py", line 27, in test_generated_evidence_has_no_player_names_or_gameplay_claim
+    report=json.loads((ROOT/'reference/m7h/LC_M7H_PLAYER_PREDICTIVE_EVALUATION.json').read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/lord-cricket-xxvi-roster/reference/m7h/LC_M7H_PLAYER_PREDICTIVE_EVALUATION.json'
+
+======================================================================
+ERROR: test_rare_register_has_no_simulated_resolutions (test_m7i_quality.M7IQuality.test_rare_register_has_no_simulated_resolutions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/lord-cricket-xxvi-roster/tests/test_m7i_quality.py", line 64, in test_rare_register_has_no_simulated_resolutions
+    r=json.loads((ROOT/'reference/m7i/LC_M7I_RARE_DELIVERY_REGISTER.json').read_text())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/lord-cricket-xxvi-roster/reference/m7i/LC_M7I_RARE_DELIVERY_REGISTER.json'
+
+======================================================================
+ERROR: test_skill_claims_remain_disabled (test_m7i_quality.M7IQuality.test_skill_claims_remain_disabled)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/lord-cricket-xxvi-roster/tests/test_m7i_quality.py", line 72, in test_skill_claims_remain_disabled
+    r=json.loads((ROOT/'reference/m7i/LC_M7I_PLAYER_GENERALISATION.json').read_text())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/lord-cricket-xxvi-roster/reference/m7i/LC_M7I_PLAYER_GENERALISATION.json'
+
+======================================================================
+ERROR: test_tail_stratification_reconciles_all_600 (test_m7i_quality.M7IQuality.test_tail_stratification_reconciles_all_600)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/lord-cricket-xxvi-roster/tests/test_m7i_quality.py", line 57, in test_tail_stratification_reconciles_all_600
+    r=json.loads((ROOT/'reference/m7i/LC_M7I_CHASE_TAIL_DIAGNOSTIC.json').read_text())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/lord-cricket-xxvi-roster/reference/m7i/LC_M7I_CHASE_TAIL_DIAGNOSTIC.json'
+
+----------------------------------------------------------------------
+Ran 94 tests in 1.800s
+
+FAILED (errors=4)
