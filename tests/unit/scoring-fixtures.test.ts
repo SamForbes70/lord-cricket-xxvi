@@ -180,7 +180,11 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(165);
+  expect(names).toHaveLength(169);
+  expect(names).toContain("RosterMatchPreparationSchema");
+  expect(names).toContain("RosterImportSourceSchema");
+  expect(names).toContain("StagedRosterPackSchema");
+  expect(names).toContain("RosterMatchSelectionSchema");
   expect(names).toContain("NewGameWorldCopySchema");
   expect(names).toContain("SeasonPortableManifestV2Schema");
   expect(names.filter((n) => n.startsWith("M7J"))).toHaveLength(0);

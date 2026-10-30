@@ -1,0 +1,9 @@
+# Roster import: work in progress
+
+This branch contains staging validation only. The contracts and validators live in shared packages so the match worker can validate a pack independently. It is not connected to a game and does not complete V01-006.
+
+The draft JSON format accepts structural world and player data with optional format skill and exposure records. Missing skill values use an explicit provisional midpoint of 50 on the 0–100 scale. Missing exposure is recorded separately and represented as zero recorded balls. Imported records use a confidence value of 1000 basis points and a canonical source hash. These are declared synthetic defaults, not measured player ability.
+
+The validator checks size, version, schema, rules and variation references, unique player assignments, and the ability to select a keeper and five bowlers. A staged pack can be rebuilt from its source to detect changed data or priors. A separate check validates both selected XIs, captain, keeper, bowling capacity and ground. A frozen preparation snapshot records the chosen players, world and pack hashes, rules and model pins for each format; engines do not yet accept it. Unknown fields are rejected. Six focused unit tests, type checking and lint pass on Linux with Node v24.19.0. The complete unit run passed 660 tests across 44 files; 173 generated schemas also passed verification. The existing edited-career browser checks passed all six cases in Chromium and Firefox.
+
+The remaining work must bind a validated copy to new-game simulation and portable saves using explicit new versions. It must preserve frozen game replays and existing saves, exercise malformed archives and failure recovery, and verify the player-facing flow in both browsers. The present staging code must not be presented as a playable import.
