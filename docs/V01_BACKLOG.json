@@ -95,7 +95,7 @@
       "dependsOn": [
         "V01-003"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Edit names and colours without changing stable entity IDs.",

@@ -12,9 +12,9 @@ The owner adopted [the standing brief](STANDING_DEVELOPMENT_BRIEF.md) on 30 Octo
 [The delivery plan](V01_DELIVERY_PLAN.md) records seven batches and a separate empirical research track.
 Batch 1 records authority, scope reconciliation and review of research commit `b93bccb`.
 PR #15 merged player pages and pre-match pitch inspection.
-New careers and exhibitions can use edited names and colours, pending integration of this revision.
+PR #16 merged edited names and colours for new careers and exhibitions.
 Matches in all three formats and portable saves retain the edited copy.
-The next product slices are roster import and basic settings.
+Roster import staging is under development; playable import and basic settings remain to do.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.
 The [world editing report](verification-v01-world-editing/REPORT.md) records this slice.
 A labelled synthetic-alpha release remains distinct from empirical model promotion.

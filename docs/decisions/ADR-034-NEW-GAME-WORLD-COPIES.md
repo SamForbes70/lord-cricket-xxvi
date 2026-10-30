@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for the V01-005 implementation, pending integration.
+Accepted; V01-005 merged in PR #16.
 
 ## Decision
 
