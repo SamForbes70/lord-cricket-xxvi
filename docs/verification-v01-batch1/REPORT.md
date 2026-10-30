@@ -38,3 +38,18 @@ A continuation checks that result before advancing V01-002 to DONE.
 The next product slice is V01-003, player pages with persistent format filters.
 V01-004, pre-match pitch and conditions inspection, follows without a new approval request.
 Neither requires the missing empirical cohort or historical incident records.
+
+## Demonstrated CI artifact failure
+
+The initial integration tests pass, but both jobs fail when GitHub rejects artifact uploads because storage quota is exhausted.
+`CI_STORAGE_FAILURE.json` records the failed jobs and log hashes.
+
+The workflow now publishes fresh structured results and checksums into mandatory job summaries and chunked job logs.
+It rejects stale reports, source mismatches, missing observations and failed upstream verification.
+Seven tests cover this evidence path, including reconstruction from log chunks.
+Full artifact uploads remain best effort with seven-day retention.
+Only that upload step can continue after failure; test and structured-evidence failures still fail CI.
+
+No stored artifact or owner data is deleted, and no paid storage is purchased.
+The quota remains an infrastructure limit; screenshots and traces require successful full uploads.
+Future quota exhaustion therefore does not erase the structured acceptance record or mislabel failed verification as successful.

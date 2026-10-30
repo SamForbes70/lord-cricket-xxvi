@@ -1,0 +1,10 @@
+{
+  "command": "npm test -- --maxWorkers=2 --reporter=default --reporter=json --outputFile=/workspace/v01-batch1-unit.json",
+  "passed": 645,
+  "failed": 0,
+  "pending": 0,
+  "files": 41,
+  "ciEvidenceTests": 7,
+  "typecheck": "PASS",
+  "lint": "PASS"
+}

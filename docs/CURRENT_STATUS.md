@@ -19,7 +19,7 @@ A labelled synthetic-alpha release remains distinct from empirical model promoti
 PR #12 merged as `b755034` after four passing Linux and Windows checks.
 It fixes career acceptance waits and adds a delayed-save regression with durable reload checks.
 [The completion report](verification-m7k/completion/REPORT.md) records the latest work and remaining evidence gates.
-Fresh unit verification passes 638 TypeScript tests; Python discovery passes 94 tests.
+Fresh unit verification passes 645 TypeScript tests; Python discovery passes 94 tests.
 Research browser acceptance now checks all seven engineering fixtures in both physical-end orientations.
 These synthetic expectations remain separate from complete historical source fixtures.
 The source audit verifies 69 events across 65 matches; the refreshed forward inventory still contains 18 candidates.
