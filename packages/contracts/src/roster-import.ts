@@ -2,12 +2,13 @@ import { z } from "zod";
 import { CounterSchema, FormatSkillsSchema, HashSchema, IDSchema, PlayerSchema } from "./core.js";
 import { WorldPackSchema } from "./configuration.js";
 import { SeasonFixtureSchema, SeasonRoundSchema } from "./competition.js";
-import { AppliedMatchConditionSchema, PlayerCareerConditionSchema, PlayerReadinessSchema, PlayerTrainingAssignmentSchema } from "./career.js";
+import { AppliedMatchConditionSchema, MatchConditionDeltaSchema, PlayerCareerConditionSchema, PlayerReadinessSchema, PlayerTrainingAssignmentSchema } from "./career.js";
 import { T20MatchExecutionManifestSchema } from "./t20-match.js";
 import { ODIMatchExecutionManifestSchema } from "./odi-match.js";
 import { Red5MatchExecutionManifestSchema } from "./red-ball-match.js";
 import { OffscreenFixtureOutcomeSchema } from "./season-execution.js";
 import { SeasonPlayerStatsSchema, T20SeasonMatchCompletionSchema, T20SeasonProjectionStateSchema } from "./season-projections.js";
+import { SeasonPortableManifestSchema } from "./season-persistence.js";
 
 export const ROSTER_IMPORT_MAX_BYTES = 25_000_000;
 export const ROSTER_FORMATS = ["T20", "ODI", "RED_BALL"] as const;
@@ -87,12 +88,23 @@ export const RosterSeasonProjectionSchema = T20SeasonProjectionStateSchema.exten
 });
 export type RosterSeasonMatchCompletion = z.infer<typeof RosterSeasonMatchCompletionSchema>;
 export type RosterSeasonProjection = z.infer<typeof RosterSeasonProjectionSchema>;
+export const RosterManagedFixtureOutcomeSchema = z.strictObject({
+  version: z.literal("LC_T20_ROSTER_MANAGED_FIXTURE_V1"),
+  completion: RosterSeasonMatchCompletionSchema,
+  conditionDelta: MatchConditionDeltaSchema,
+  outcomeSha256: HashSchema,
+});
 
 export const RosterSeasonStateSchema = z.strictObject({
   version: z.literal("LC_T20_ROSTER_SEASON_STATE_V2"),
   careerId: IDSchema, controlledTeamId: IDSchema, schedule: RosterSeasonScheduleSchema,
   careerState: RosterCareerDayStateSchema, projection: RosterSeasonProjectionSchema,
-  outcomes: z.array(RosterOffscreenFixtureOutcomeSchema).max(56), revision: CounterSchema,
+  outcomes: z.array(z.union([RosterOffscreenFixtureOutcomeSchema, RosterManagedFixtureOutcomeSchema])).max(56), revision: CounterSchema,
   phase: z.enum(["ACTIVE", "COMPLETE"]), stateSha256: HashSchema,
 });
 export type RosterSeasonState = z.infer<typeof RosterSeasonStateSchema>;
+export const RosterSeasonPortableManifestSchema = SeasonPortableManifestSchema.extend({
+  archiveVersion: z.literal("LC_T20_ROSTER_SEASON_PORTABLE_V1"),
+  saveSchema: z.literal("LC_SEASON_SAVE_V3_ROSTER"),
+  rosterPackSha256: HashSchema,
+});

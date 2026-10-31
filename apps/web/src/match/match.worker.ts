@@ -527,8 +527,12 @@ async function handle(raw: unknown): Promise<Response> {
       current?.setup.gameId === request.careerFixture.matchGameId &&
       current?.setup.matchId === request.careerFixture.matchId;
     const requestedCopy = request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? request.careerFixture.worldCopy : null;
+    const requestedRoster = request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? request.careerFixture.rosterPack : null;
     if (matchesCareerFixture && canonicalJson(requestedCopy) !== canonicalJson(activeWorldCopy)) {
       return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different world copy."));
+    }
+    if (matchesCareerFixture && canonicalJson(requestedRoster) !== canonicalJson(activeRosterPack)) {
+      return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different roster."));
     }
     if (!matchesCareerFixture) {
       if (activeSaveId && !readOnly) {

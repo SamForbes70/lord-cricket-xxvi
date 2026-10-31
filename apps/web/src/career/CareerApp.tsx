@@ -175,6 +175,7 @@ export function CareerApp() {
         <header className="career-masthead">
           <div><p className="eyebrow">LORD CRICKET XXVI</p><h1>Start a <span>Career</span></h1></div>
           <a className="button-link" href="#exhibition" onClick={() => sessionStorage.removeItem(LAUNCH_KEY)}>Exhibition matches</a>
+          <a className="button-link" href="#roster-career">Imported roster career</a>
         </header>
         <section className="career-disclosure" aria-label="Product status">
           <strong>Playable alpha.</strong> Fictional eight-team dataset · SYNTHETIC_ALPHA model · one T20 season · no transfers, contracts, finances, international management or verified DLS.

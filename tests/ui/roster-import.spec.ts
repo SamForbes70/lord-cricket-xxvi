@@ -50,7 +50,11 @@ test("an imported roster completes a T20 match and verifies its replay", async (
   world.teams[0].name = "Imported Harbour";
   const source = JSON.stringify({ version: "LC_ROSTER_IMPORT_V1", sourceId: "complete-match", world: { ...world, players } });
   await page.goto("/#exhibition");
-  await expect(page.getByLabel("Import roster")).toBeEnabled({ timeout: 30_000 });
+  try { await expect(page.getByLabel("Import roster")).toBeEnabled({ timeout: 30_000 }); }
+  catch (error) {
+    console.error(`Roster import startup: ${page.url()} ${(await page.locator("body").innerText()).slice(0, 4000)}`);
+    throw error;
+  }
   await page.getByLabel("Import roster").setInputFiles({ name: "roster.json", mimeType: "application/json", buffer: Buffer.from(source) });
   await expect(page.getByRole("status").filter({ hasText: "Imported roster ready" })).toBeVisible();
   await page.getByRole("button", { name: "Confirm XIs and start" }).click();

@@ -2,7 +2,7 @@
 
 Imported rosters are available for exhibition matches in T20, ODI and red-ball formats. The import screen accepts a JSON roster, provides a template, and reports validation errors. Missing ratings use a declared synthetic prior of 50. The roster is bound to versioned match sessions, browser saves and portable match archives. Existing V1 match entry points and saves remain separate.
 
-The branch also contains a separate roster career foundation: a deterministic eight-team schedule, player condition and training state, off-screen T20 simulation, standings and player statistics, and a versioned browser save with checkpoints. The career foundation is not yet connected to the player-facing career, interactive fixtures or portable career archives. It must not be described as a complete playable roster career.
+The branch also contains an imported-roster career. It has a deterministic eight-team schedule, training, managed and simulated T20 fixtures, standings and player statistics. Versioned browser saves and portable archives retain the roster pack. The integration remains unmerged and requires final hosted verification.
 
 ## Verification on Linux
 
@@ -18,4 +18,16 @@ The updated build, type check, lint and all 183 generated schemas passed. The co
 
 The roster career persistence test passed in Chromium and Firefox, including an injected transaction abort, duplicate-command rejection and recovery of the preceding checkpoint. Firefox did not reach the test page in the initial sandboxed runs; both browsers passed on the later run outside the cloud sandbox. Rejected roster save transactions now register the abort listener before aborting. The earlier suspicion that this caused the Firefox stall was not confirmed.
 
-The remaining career work includes the management screens and interactive user fixtures, connecting saves to those screens, portable career archives, recovery workflows, and full browser and human acceptance. The current career code only simulates fixtures off-screen and is not accessible through the career interface.
+The career foundation above initially supported off-screen fixtures only. The later integration section records the player-facing and managed-match work.
+
+## Roster career integration in progress
+
+The branch now exposes an imported-roster T20 career. It supports roster staging, team selection, training directives and managed or simulated fixtures. The managed fixture result is replayed against its roster before the career accepts it. Career saves use a separate version and embed the roster pack. A portable archive includes the career and roster. The career can create a new copy from an older recovered checkpoint.
+
+A Linux run completed all 56 simulated fixtures. Each team played 14 matches. Chromium and Firefox each passed a managed-match, reload and archive-transfer check. Both browsers also passed a damaged-checkpoint recovery and copy check. An initial managed-match test failed because an undefined response field could not be saved. The field is now omitted until a result exists, and the browser tests passed on rerun.
+
+A later local unit run passed 678 tests in 52 files. Build, type check, lint and 185 schema checks passed during this work. The hosted run for `28200d8` exposed a separate Windows Chromium failure: one roster exhibition test could not find the import control. Twenty-one other browser checks passed. The cause remains under investigation. CI now prints failed command output when artefacts are unavailable.
+
+The integration is not yet merged. Complete final review and hosted verification before treating it as delivered. Earlier acceptance and human evidence applies only to its recorded build.
+
+A Linux Chromium startup repetition passed ten isolated contexts. The Windows failure has not been reproduced locally. The failing test now records the page state if startup fails again.

@@ -1,6 +1,6 @@
-import { StagedRosterPackSchema, type StagedRosterPack, canonicalJson, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type RosterSeasonState, StagedRosterPackSchema, type StagedRosterPack, canonicalJson, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
 import { SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
-import { SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION, validateStoredWorldCopy, validateT20SeasonArchive, validateT20SeasonState } from "./season.js";
+import { SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SEASON_SAVE_VERSION, validateStoredWorldCopy, validateT20SeasonArchive, validateT20SeasonState } from "./season.js";
 
 export const ARCHIVE_EXTENSION = ".lcxxvi";
 export const ARCHIVE_VERSION = "LC_ARCHIVE_V1" as const;
@@ -596,4 +596,59 @@ export async function readSeasonPortableArchive(bytes: Uint8Array): Promise<{
   }
   if ((state.phase === "COMPLETE") !== Boolean(seasonArchive)) throw new Error("SEASON_ARCHIVE_COMPLETION_PAYLOAD_MISMATCH");
   return { state, summary, manifest, seasonArchive, worldCopy };
+}
+
+export const ROSTER_SEASON_PORTABLE_VERSION = "LC_T20_ROSTER_SEASON_PORTABLE_V1" as const;
+
+async function validateRosterArchiveContents(stateRaw: unknown, packRaw: unknown, summaryRaw: unknown) {
+  const state = RosterSeasonStateSchema.parse(stateRaw);
+  const rosterPack = StagedRosterPackSchema.parse(packRaw);
+  const summary = SeasonSaveSummarySchema.parse(summaryRaw);
+  const bytes = (value: unknown) => encoder.encode(canonicalJson(value));
+  const { stateSha256, ...core } = state;
+  if (await sha256Bytes(bytes(core)) !== stateSha256 ||
+      await sha256Bytes(bytes(rosterPack)) !== state.schedule.rosterPackHash ||
+      await sha256Bytes(bytes(rosterPack.world)) !== state.schedule.worldHash ||
+      state.careerState.rosterPackHash !== state.schedule.rosterPackHash ||
+      state.careerState.scheduleSha256 !== state.schedule.scheduleSha256 ||
+      summary.stateSha256 !== stateSha256 || summary.seasonId !== state.schedule.request.seasonId ||
+      summary.careerId !== state.careerId || summary.controlledTeamId !== state.controlledTeamId ||
+      summary.currentDate !== state.careerState.currentDate || summary.revision !== state.revision ||
+      summary.completedFixtures !== state.outcomes.length || summary.phase !== state.phase) {
+    throw new Error("ROSTER_SEASON_ARCHIVE_BINDING_MISMATCH");
+  }
+  return { state, rosterPack, summary };
+}
+
+export async function createRosterSeasonPortableArchive(stateRaw: unknown, packRaw: unknown, summaryRaw: unknown, exportedAt: string): Promise<Uint8Array> {
+  const { state, rosterPack, summary } = await validateRosterArchiveContents(stateRaw, packRaw, summaryRaw);
+  const payloads: Entry[] = [
+    { name: "game.json", data: encoder.encode(canonicalJson(state)) },
+    { name: "roster-pack.json", data: encoder.encode(canonicalJson(rosterPack)) },
+  ];
+  const files: Record<string, { bytes: number; sha256: string }> = {};
+  for (const item of payloads) files[item.name] = { bytes: item.data.length, sha256: await sha256Bytes(item.data) };
+  const manifest = RosterSeasonPortableManifestSchema.parse({ archiveVersion: ROSTER_SEASON_PORTABLE_VERSION,
+    saveSchema: ROSTER_SEASON_SAVE_VERSION, exportedAt, summary, files, rosterPackSha256: files["roster-pack.json"]!.sha256 });
+  const archive = makeZip([{ name: "manifest.json", data: encoder.encode(canonicalJson(manifest)) }, ...payloads]);
+  if (archive.length > MAX_ARCHIVE_BYTES) throw new Error("ARCHIVE_SIZE_INVALID");
+  return archive;
+}
+
+export async function readRosterSeasonPortableArchive(bytes: Uint8Array): Promise<{ state: RosterSeasonState; rosterPack: StagedRosterPack; summary: SeasonSaveSummary }> {
+  const files = parseZip(bytes);
+  if (canonicalJson([...files.keys()].sort()) !== canonicalJson(["game.json", "manifest.json", "roster-pack.json"])) throw new Error("ROSTER_SEASON_ARCHIVE_FILE_SET_MISMATCH");
+  const parse = (name: string): unknown => {
+    try { return JSON.parse(decoder.decode(files.get(name)!)); } catch { throw new Error("ROSTER_SEASON_ARCHIVE_JSON_INVALID"); }
+  };
+  const raw = parse("manifest.json");
+  if ((raw as { archiveVersion?: unknown } | null)?.archiveVersion !== ROSTER_SEASON_PORTABLE_VERSION) throw new Error("ROSTER_SEASON_ARCHIVE_VERSION_UNSUPPORTED");
+  const manifest = RosterSeasonPortableManifestSchema.parse(raw);
+  if (canonicalJson(Object.keys(manifest.files).sort()) !== canonicalJson(["game.json", "roster-pack.json"])) throw new Error("ROSTER_SEASON_ARCHIVE_FILE_SET_MISMATCH");
+  for (const name of ["game.json", "roster-pack.json"]) {
+    const payload = files.get(name)!; const meta = manifest.files[name]!;
+    if (payload.length !== meta.bytes || await sha256Bytes(payload) !== meta.sha256) throw new Error("ROSTER_SEASON_ARCHIVE_HASH_MISMATCH");
+  }
+  if (manifest.rosterPackSha256 !== manifest.files["roster-pack.json"]!.sha256) throw new Error("ROSTER_SEASON_ARCHIVE_PACK_MISMATCH");
+  return validateRosterArchiveContents(parse("game.json"), parse("roster-pack.json"), manifest.summary);
 }

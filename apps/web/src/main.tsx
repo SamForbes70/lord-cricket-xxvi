@@ -15,6 +15,7 @@ import {
 } from "./match/protocol.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
+import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
 import { PitchInspection } from "./match/PitchInspection.js";
 import { WorldEditor } from "./world/WorldEditor.js";
@@ -144,6 +145,7 @@ export function MatchApp() {
       if (r.careerResult) {
         sessionStorage.setItem("lcxxvi-career-match-result", JSON.stringify(r.careerResult));
       }
+      if (r.rosterCareerSession) sessionStorage.setItem("lcxxvi-roster-career-match-result", JSON.stringify(r.rosterCareerSession));
       if (r.catalog && !r.view && careerLaunch.current && !careerStartIssued.current) {
         careerStartIssued.current = true;
         const requestId = `ui-${++serial.current}`;
@@ -158,6 +160,7 @@ export function MatchApp() {
           selections: careerLaunch.current.selections,
           groundId: careerLaunch.current.groundId,
           careerFixture: careerLaunch.current,
+          ...(careerLaunch.current.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? { rosterPack: careerLaunch.current.rosterPack } : {}),
         });
       }
       if (r.archive) {
@@ -364,7 +367,7 @@ export function MatchApp() {
           <strong>Scheduled career match</strong>
           <span>Round {careerLaunch.current.roundNumber} · this result will return to the management career only after the match is complete.</span>
           {view?.phase === "COMPLETE" && (
-            <button className="primary" onClick={() => { window.location.hash = "#career"; }}>Return result to career</button>
+            <button className="primary" onClick={() => { window.location.hash = careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? "#roster-career" : "#career"; }}>Return result to career</button>
           )}
         </div>
       )}
@@ -1369,7 +1372,7 @@ function RootApp() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-  return hash === "#exhibition" ? <MatchApp /> : <CareerApp />;
+  return hash === "#exhibition" ? <MatchApp /> : hash === "#roster-career" ? <RosterCareerApp /> : <CareerApp />;
 }
 
 const root = document.getElementById("root");
