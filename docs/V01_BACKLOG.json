@@ -250,7 +250,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Track applied sequence and reject gaps or duplicate application.",

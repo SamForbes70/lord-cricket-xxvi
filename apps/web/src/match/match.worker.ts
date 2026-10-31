@@ -1,6 +1,7 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
 import { canonicalJson, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import { createMatchAnalyticsAccumulator } from "@lcxxvi/projections";
 import type { T20Session, ODISession, Red5Session, RosterT20Session, RosterODISession, RosterRed5Session } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
@@ -17,6 +18,7 @@ import {
   RED5_ARCHIVE_PINS,
   RequestSchema,
   UI_VERSION,
+  PINS,
   type Request,
   type Response,
 } from "./protocol.js";
@@ -37,6 +39,7 @@ type MatchController =
   | ReturnType<typeof createRed5MatchController>;
 let controller: MatchController = makeController();
 let initialised = false;
+let activeAnalyticsRebuild: { requestId: string; revision: number; cancelled: boolean } | null = null;
 
 function randomHex(bytesCount: number): string {
   const bytes = crypto.getRandomValues(new Uint8Array(bytesCount));
@@ -522,6 +525,26 @@ async function handle(raw: unknown): Promise<Response> {
   }
   const request = parsed.data;
   await initialise();
+  if (request.type === "CANCEL_ANALYTICS") return decorate(controller.currentResponse(request.requestId));
+  if (request.type === "REBUILD_ANALYTICS") {
+    const session = controller.snapshot();
+    if (!session || session.core.phase !== "COMPLETE") return decorate(controller.currentResponse(request.requestId, "Complete the match before rebuilding analytics."));
+    if (request.expectedRevision !== session.revision) return decorate(controller.currentResponse(request.requestId, "Stale match revision."));
+    const task = { requestId: request.requestId, revision: session.revision, cancelled: false };
+    activeAnalyticsRebuild = task;
+    const accumulator = createMatchAnalyticsAccumulator(session.setup.format === "RED_BALL" ? 4 : 2);
+    try {
+      for (let offset = 0; offset < session.events.length; offset += 32) {
+        for (const event of session.events.slice(offset, offset + 32)) accumulator.append(event);
+        self.postMessage({ type: "ANALYTICS_PROGRESS", version: UI_VERSION, pins: PINS, requestId: request.requestId, applied: accumulator.appliedSequence, total: session.events.length });
+        await new Promise<void>(resolve => setTimeout(resolve, 10));
+        if (task.cancelled) return { ...await decorate(controller.currentResponse(request.requestId)), analyticsRebuild: { state: "CANCELLED", applied: accumulator.appliedSequence, total: session.events.length } };
+      }
+      const response = await decorate(controller.currentResponse(request.requestId));
+      if (!response.view?.scorecard || !response.view.analytics || canonicalJson(accumulator.snapshot(response.view.scorecard)) !== canonicalJson(response.view.analytics)) throw new Error("Analytics rebuild does not match the incremental result.");
+      return { ...response, analyticsRebuild: { state: "COMPLETE", applied: accumulator.appliedSequence, total: session.events.length } };
+    } finally { if (activeAnalyticsRebuild === task) activeAnalyticsRebuild = null; }
+  }
   if (request.type === "BOOT" && request.careerFixture) {
     const current = controller.snapshot();
     const matchesCareerFixture =
@@ -626,6 +649,11 @@ async function handle(raw: unknown): Promise<Response> {
 let queue = Promise.resolve();
 self.onmessage = (event: MessageEvent<unknown>) => {
   const raw = event.data;
+  const parsed = RequestSchema.safeParse(raw);
+  if (parsed.success && parsed.data.type === "CANCEL_ANALYTICS") {
+    if (activeAnalyticsRebuild?.requestId === parsed.data.targetRequestId && activeAnalyticsRebuild.revision === parsed.data.expectedRevision) activeAnalyticsRebuild.cancelled = true;
+    return;
+  }
   queue = queue.then(async () => {
     try {
       self.postMessage(await handle(raw));

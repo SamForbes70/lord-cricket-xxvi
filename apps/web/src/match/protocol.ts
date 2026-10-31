@@ -120,6 +120,8 @@ export const RequestSchema = z.discriminatedUnion("type", [
   }),
   z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128) }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
+  z.strictObject({ ...base, type: z.literal("REBUILD_ANALYTICS") }),
+  z.strictObject({ ...base, type: z.literal("CANCEL_ANALYTICS"), targetRequestId: z.string().regex(/^ui-[0-9]+$/) }),
   z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
   z.strictObject({
     ...base,
@@ -258,4 +260,6 @@ export type Response = {
   careerResult?: CareerMatchResult | null;
   rosterCareerSession?: unknown;
   acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
+  analyticsRebuild?: { state: "COMPLETE" | "CANCELLED"; applied: number; total: number };
 };
+export type AnalyticsProgress = { type: "ANALYTICS_PROGRESS"; version: typeof UI_VERSION; pins: typeof PINS; requestId: string; applied: number; total: number };

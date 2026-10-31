@@ -12,6 +12,7 @@ import {
   type Response,
   type Verification,
   type PersistenceView,
+  type AnalyticsProgress,
 } from "./match/protocol.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
@@ -86,6 +87,8 @@ export function MatchApp() {
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
   const [verification, setVerification] = useState<Verification | null>(null);
+  const rebuildRequest = useRef<string | null>(null);
+  const [analyticsRebuild, setAnalyticsRebuild] = useState<{ state: "IDLE" | "RUNNING" | "STOPPING" | "COMPLETE" | "CANCELLED"; applied: number; total: number }>({ state: "IDLE", applied: 0, total: 0 });
   const [persistence, setPersistence] = useState<PersistenceView | null>(null);
   const [scale, setScale] = useState(() => {
       const saved = localStorage.getItem("lcxxvi-match-scale");
@@ -108,8 +111,12 @@ export function MatchApp() {
   }, [scale, commentary, density]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
-    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(body.type)) setBatchProgress(null);
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
+      setBatchProgress(null);
+      setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
+    }
     const requestId = `ui-${++serial.current}`;
+    if (body.type === "REBUILD_ANALYTICS") { rebuildRequest.current = requestId; setAnalyticsRebuild({ state: "RUNNING", applied: 0, total: 0 }); }
     inflight.current = requestId;
     setBusy(true);
     setError("");
@@ -137,7 +144,7 @@ export function MatchApp() {
       name: owner,
     });
     worker.current = w;
-    w.onmessage = (e: MessageEvent<Response>) => {
+    w.onmessage = (e: MessageEvent<Response | AnalyticsProgress>) => {
       const r = e.data;
       if (
         r.version !== UI_VERSION ||
@@ -148,6 +155,10 @@ export function MatchApp() {
         setError(
           "This page and match worker have different versions. Reload before starting.",
         );
+        return;
+      }
+      if ("type" in r) {
+        if (r.type === "ANALYTICS_PROGRESS" && r.requestId === rebuildRequest.current) setAnalyticsRebuild(current => ({ ...current, applied: r.applied, total: r.total }));
         return;
       }
       if (r.requestId !== inflight.current) return;
@@ -181,6 +192,10 @@ export function MatchApp() {
       if (r.catalog) setCatalog(r.catalog);
       setView(r.view);
       setVerification(r.verification);
+      if (r.requestId === rebuildRequest.current) {
+        rebuildRequest.current = null;
+        setAnalyticsRebuild(r.analyticsRebuild ? { ...r.analyticsRebuild } : { state: "IDLE", applied: 0, total: 0 });
+      }
       if (r.persistence) setPersistence(r.persistence);
       if (r.careerResult) {
         sessionStorage.setItem("lcxxvi-career-match-result", JSON.stringify(r.careerResult));
@@ -218,6 +233,8 @@ export function MatchApp() {
       }
     };
     const failed = () => {
+      rebuildRequest.current = null;
+      setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
       advanceBatch.current = null;
       setBatchState("idle");
       setFatal(true);
@@ -342,6 +359,11 @@ export function MatchApp() {
     setBatchProgress(null);
     setBatchState("running");
     act({ kind: "ADVANCE", payload: { scope: "OVER" } });
+  }
+  function cancelAnalyticsRebuild() {
+    if (!rebuildRequest.current) return;
+    setAnalyticsRebuild(current => ({ ...current, state: "STOPPING" }));
+    worker.current?.postMessage({ version: UI_VERSION, type: "CANCEL_ANALYTICS", requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, targetRequestId: rebuildRequest.current });
   }
   function stopAdvance() {
     if (!advanceBatch.current) return;
@@ -849,7 +871,7 @@ export function MatchApp() {
               )}
             </section>
           )}
-          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} />}
+          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>
