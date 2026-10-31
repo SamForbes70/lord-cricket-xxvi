@@ -81,6 +81,7 @@ test("cancellation waits for the current command to commit", async ({ page }) =>
   await expect(page.getByText("Stopping after this commit…")).toBeVisible();
   await settle(page);
   await expect(page.getByRole("button", { name: "Stop simulation" })).toHaveCount(0);
+  await expect(page.getByText(/^Committed events \d+–\d+\.$/)).toBeVisible();
   await expect(page.locator("#decision")).toHaveAttribute("data-revision", String(before + 1));
   await page.reload();
   await settle(page);

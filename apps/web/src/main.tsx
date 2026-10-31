@@ -34,8 +34,9 @@ export function MatchApp() {
     serial = useRef(0),
     inflight = useRef<string | null>(null),
     currentRevision = useRef(0);
-  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number; cancel: boolean } | null>(null);
+  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number; cancel: boolean; from: number | null } | null>(null);
   const [batchState, setBatchState] = useState<"idle" | "running" | "stopping">("idle");
+  const [batchProgress, setBatchProgress] = useState<{ from: number; to: number } | null>(null);
   const careerLaunch = useRef<CareerUserMatchLaunch | null>((() => {
     try {
       const raw = sessionStorage.getItem("lcxxvi-career-match-launch");
@@ -107,6 +108,7 @@ export function MatchApp() {
   }, [scale, commentary, density]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(body.type)) setBatchProgress(null);
     const requestId = `ui-${++serial.current}`;
     inflight.current = requestId;
     setBusy(true);
@@ -156,6 +158,10 @@ export function MatchApp() {
       let batchError = "";
       if (batch) {
         const acknowledged = r.acknowledgement?.commandId === r.requestId && r.acknowledgement.committedRevision === r.revision;
+        if (acknowledged && r.acknowledgement) {
+          batch.from ??= r.acknowledgement.fromSequence;
+          setBatchProgress({ from: batch.from, to: r.acknowledgement.toSequence });
+        }
         const continueBatch = !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
           !r.persistence?.readOnly && (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) && --batch.remaining > 0;
         if (continueBatch) {
@@ -303,6 +309,7 @@ export function MatchApp() {
   }
   function act(action: Action) {
     if (!view || inflight.current || fatal) return;
+    if (!advanceBatch.current) setBatchProgress(null);
     const i = view.innings[view.activeIndex]?.innings;
     const team =
       "teamId" in action.payload
@@ -331,7 +338,8 @@ export function MatchApp() {
   }
   function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
     if (!view || inflight.current || fatal || view.advanceReason || persistence?.readOnly) return;
-    advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512, cancel: false };
+    advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512, cancel: false, from: null };
+    setBatchProgress(null);
     setBatchState("running");
     act({ kind: "ADVANCE", payload: { scope: "OVER" } });
   }
@@ -606,6 +614,7 @@ export function MatchApp() {
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
+            {batchProgress && <p role="status">Committed events {batchProgress.from}–{batchProgress.to}.</p>}
             <fieldset disabled={busy || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
