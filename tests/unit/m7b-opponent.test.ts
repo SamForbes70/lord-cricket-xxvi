@@ -18,6 +18,27 @@ function fixture() {
 }
 
 describe("M7B optional opponent through authoritative T20 engine", () => {
+  test("delegation permits only selected decision categories", () => {
+    let session = fixture();
+    const categories = { CALL_TOSS: "TOSS", CHOOSE_INNINGS: "INNINGS", SET_BATTER: "BATTER", SET_BOWLER: "BOWLER", SET_BATTING_PLAN: "BATTING_PLAN", SET_BOWLING_PLAN: "BOWLING_PLAN" } as const;
+    const observed = new Set<string>();
+    while (session.core.phase !== "COMPLETE") {
+      if (session.revision >= 900) throw new Error("M7B_MATCH_STALLED");
+      for (const team of session.setup.teams) {
+        const proposed = proposeOpponentT20Command(session, team.teamId);
+        expect(proposeOpponentT20Command(session, team.teamId, [])).toBeNull();
+        if (proposed) {
+          const category = categories[proposed.kind as keyof typeof categories];
+          expect(category).toBeDefined();
+          expect(proposeOpponentT20Command(session, team.teamId, [category!])).toEqual(proposed);
+          observed.add(category!);
+        }
+      }
+      session = executeT20Command(session, fixtureAutopilotStep(session)).session;
+    }
+    expect(observed.has("BOWLER")).toBe(true);
+    expect(observed.has("BATTER")).toBe(true);
+  }, 120000);
   test("opponent never commands the human team or advances a ball automatically", () => {
     let session=fixture();
     const aiId = session.setup.teams[1]!.teamId;
