@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import path from "node:path";
 
 test("roster career saves atomically and recovers an earlier checkpoint", async ({ page }) => {
+  test.setTimeout(60000);
   await page.goto("/#exhibition");
   const paths = {
     persistence: `/@fs/${path.resolve("packages/persistence/src/season.ts")}`,

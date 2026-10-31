@@ -402,16 +402,16 @@ export class IndexedDbSeasonRepository {
     const db = await this.open(); const tx = db.transaction(["games", "snapshots", "commands", "settings", "worldPacks"], "readwrite");
     const games = tx.objectStore("games"), snapshots = tx.objectStore("snapshots"), settings = tx.objectStore("settings"), packs = tx.objectStore("worldPacks");
     const existing = await req(games.get(input.saveId)) as (SeasonSaveSummary & { recordType: string; schemaVersion: string; rosterPackSha256: string; checkpointSerial: number; checkpointGeneration: number }) | undefined;
-    if (existing && (existing.recordType !== ROSTER_SEASON_RECORD_TYPE || existing.schemaVersion !== ROSTER_SEASON_SAVE_VERSION)) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_SAVE_ID_CONFLICT"); }
-    if (existing && existing.rosterPackSha256 !== packHash) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_IMMUTABLE"); }
+    if (existing && (existing.recordType !== ROSTER_SEASON_RECORD_TYPE || existing.schemaVersion !== ROSTER_SEASON_SAVE_VERSION)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_SAVE_ID_CONFLICT"); }
+    if (existing && existing.rosterPackSha256 !== packHash) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_IMMUTABLE"); }
     const lease = await req(settings.get(leaseKey(input.saveId))) as LeaseRecord | undefined;
-    if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= input.now) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_READ_ONLY"); }
-    if ((existing && input.expectedRevision !== existing.revision) || (!existing && input.expectedRevision !== null)) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_STALE_REVISION"); }
-    if (existing && (state.revision !== existing.revision + 1 || !command)) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_INVALID_REVISION"); }
-    if (command && await req(tx.objectStore("commands").get([input.saveId, command.commandId]))) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_DUPLICATE_COMMAND"); }
+    if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= input.now) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_READ_ONLY"); }
+    if ((existing && input.expectedRevision !== existing.revision) || (!existing && input.expectedRevision !== null)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_STALE_REVISION"); }
+    if (existing && (state.revision !== existing.revision + 1 || !command)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_INVALID_REVISION"); }
+    if (command && await req(tx.objectStore("commands").get([input.saveId, command.commandId]))) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_DUPLICATE_COMMAND"); }
     const priorPack = await req(packs.get(packHash)) as { hash: string; payload: string } | undefined;
-    if (existing && !priorPack) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_MISSING"); }
-    if (priorPack && priorPack.payload !== packPayload) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_CONFLICT"); }
+    if (existing && !priorPack) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_MISSING"); }
+    if (priorPack && priorPack.payload !== packPayload) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_CONFLICT"); }
     if (!priorPack) packs.add({ hash: packHash, payload: packPayload });
     const serial = (existing?.checkpointSerial ?? -1) + 1, generation = serial % 3;
     snapshots.put({ saveId: input.saveId, generation, checkpointSerial: serial, revision: state.revision, payload, sha256: snapshotHash, createdAt: input.updatedAt } satisfies SeasonCheckpoint);
