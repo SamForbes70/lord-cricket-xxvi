@@ -15,3 +15,5 @@ Six Chromium and Firefox full-match checks covered rebuild and cancellation in a
 The production smoke suite passed 23 checks across Chromium and Firefox.
 Firefox used the cloud host sandbox override.
 Hosted CI is blocked by the GitHub Actions budget and remains required before merge.
+
+After integration with the merged delegation changes, `npm run verify:09:core` passed 188 schema checks and 688 unit tests in 53 files. Three Chromium and three Firefox checks passed for completed T20 analytics, delegated decisions and checkpoint recovery. The first Firefox attempt could not start because the browser binary was missing; the passing rerun used a newly installed Playwright Firefox with the Linux sandbox override. Hosted checks on the updated base did not start because an Actions budget prevented further use.
