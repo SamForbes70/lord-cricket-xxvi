@@ -20,7 +20,8 @@ import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
 import { PitchInspection } from "./match/PitchInspection.js";
 import { WorldEditor } from "./world/WorldEditor.js";
-import type { NewGameWorldCopy, StagedRosterPack, WorldPack } from "@lcxxvi/contracts";
+import { delegationForTeam, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack, type WorldPack } from "@lcxxvi/contracts";
+import type { DelegationCategory } from "./match/ai-opponent.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
@@ -52,7 +53,9 @@ export function MatchApp() {
     if (c?.managedTeamId) return c.homeTeamId === c.managedTeamId ? c.awayTeamId : c.homeTeamId;
     return sessionStorage.getItem("lcxxvi-optional-ai-team");
   });
-  const lastAiChecked = useRef<string>("");
+  const lastAiChecked = useRef<Record<string, string>>({});
+  const [delegation, setDelegation] = useState<DelegationJournal>({ version: "LC_DELEGATION_JOURNAL_V1", changes: [] });
+  const [delegationTeam, setDelegationTeam] = useState("");
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [view, setView] = useState<View | null>(null);
   const [stagedWorld, setStagedWorld] = useState<NewGameWorldCopy | null>(null);
@@ -114,6 +117,7 @@ export function MatchApp() {
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
+      lastAiChecked.current = {};
     }
     const requestId = `ui-${++serial.current}`;
     if (body.type === "REBUILD_ANALYTICS") { rebuildRequest.current = requestId; setAnalyticsRebuild({ state: "RUNNING", applied: 0, total: 0 }); }
@@ -197,6 +201,7 @@ export function MatchApp() {
         setAnalyticsRebuild(r.analyticsRebuild ? { ...r.analyticsRebuild } : { state: "IDLE", applied: 0, total: 0 });
       }
       if (r.persistence) setPersistence(r.persistence);
+      if (r.delegation) setDelegation(r.delegation);
       if (r.careerResult) {
         sessionStorage.setItem("lcxxvi-career-match-result", JSON.stringify(r.careerResult));
       }
@@ -272,18 +277,25 @@ export function MatchApp() {
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.
   useEffect(() => {
-    if (!view || view.format !== "T20" || !aiTeamId || busy || fatal || error || persistence?.readOnly) return;
-    if (!view.teams.some(t => t.id === aiTeamId)) return;
+    if (!view || view.format !== "T20" || busy || fatal || error || persistence?.readOnly) return;
     if (view.phase === "COMPLETE") return;
-    const stamp = `${aiTeamId}:${view.revision}`;
-    if (lastAiChecked.current === stamp) return;
-    lastAiChecked.current = stamp;
-    send({ type: "AI_STEP", teamId: aiTeamId });
-  }, [view, aiTeamId, busy, fatal, error, persistence?.readOnly]);
+    const candidates = [
+      ...(aiTeamId && view.teams.some(team => team.id === aiTeamId) ? [{ teamId: aiTeamId, delegated: false }] : []),
+      ...view.teams.filter(team => team.id !== aiTeamId && delegationForTeam(delegation, team.id).length > 0).map(team => ({ teamId: team.id, delegated: true })),
+    ];
+    for (const candidate of candidates) {
+      const key = `${candidate.delegated ? "delegated" : "opponent"}:${candidate.teamId}`;
+      const stamp = `${view.revision}:${delegation.changes.length}`;
+      if (lastAiChecked.current[key] === stamp) continue;
+      lastAiChecked.current[key] = stamp;
+      send({ type: "AI_STEP", ...candidate });
+      return;
+    }
+  }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly]);
   function changeAiOpponent(id: string) {
     const next = id || null;
     setAiTeamId(next);
-    lastAiChecked.current = "";
+    lastAiChecked.current = {};
     if (careerLaunch.current) return;
     if (next) sessionStorage.setItem("lcxxvi-optional-ai-team", next);
     else sessionStorage.removeItem("lcxxvi-optional-ai-team");
@@ -456,7 +468,7 @@ export function MatchApp() {
       )}
       {persistence?.recovered && (
         <p className="recovery" role="status">
-          Recovered from the previous valid checkpoint. The damaged source save
+          Recovered from a valid checkpoint. The damaged source save
           was preserved.
         </p>
       )}
@@ -824,6 +836,24 @@ export function MatchApp() {
               </div>
             </fieldset>
           </section>
+          {view.format === "T20" && (() => {
+            const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
+            const selected = delegationForTeam(delegation, selectedTeam.id);
+            const choices: [DelegationCategory, string][] = [["TOSS", "Toss call"], ["INNINGS", "Bat or bowl"], ["BATTER", "Batter selection"], ["BOWLER", "Bowler selection"], ["BATTING_PLAN", "Batting plan"], ["BOWLING_PLAN", "Bowling plan"]];
+            return <details className="career-panel">
+              <summary>Delegate individual decisions</summary>
+              <p>Choose which decisions the tactical captain may make. These choices are saved with the match.</p>
+              <label>Delegation team <select value={selectedTeam.id} disabled={busy || fatal} onChange={event => setDelegationTeam(event.currentTarget.value)}>{view.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
+              {aiTeamId === selectedTeam.id && <p>The tactical captain controls this team until you change the opponent setting.</p>}
+              <fieldset disabled={busy || fatal || Boolean(persistence?.readOnly) || aiTeamId === selectedTeam.id}>
+                <legend>Delegated decisions</legend>
+                {choices.map(([category, label]) => <label key={category}><input type="checkbox" checked={selected.includes(category)} onChange={event => {
+                  const categories = event.currentTarget.checked ? [...selected, category] : selected.filter(value => value !== category);
+                  send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories });
+                }} /> {label}</label>)}
+              </fieldset>
+            </details>;
+          })()}
           {view.phase === "READY" && (
             <Tactics
               key={`${view.revision}`}

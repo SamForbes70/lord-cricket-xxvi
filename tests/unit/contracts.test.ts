@@ -230,12 +230,19 @@ it("every generated schema compiles with strict AJV 2020-12", () => {
   const files = readdirSync("packages/contracts/schemas").filter((f) =>
     f.endsWith("Schema.json"),
   );
-  expect(files.length).toBe(185);
+  expect(files.length).toBe(188);
+  for (const name of ["DelegationCategorySchema.json", "DelegationChangeSchema.json", "DelegationJournalSchema.json"]) expect(files).toContain(name);
   for (const added of ["M7JAdjudicationRequest", "M7JAdjudicationResult", "M7JAdminEvent", "M7JExceptionalCommand", "NewGameWorldCopy", "SeasonPortableManifestV2"]) {
     expect(files).toContain(`${added}Schema.json`);
   }
   for (const f of files)
     expect(schema(f.replace("Schema.json", ""))).toBeTypeOf("function");
+});
+
+it("the delegation change schema rejects duplicate categories", () => {
+  const validate = schema("DelegationChange");
+  expect(validate({ commandId: "one", expectedRevision: 0, matchRevision: 0, teamId: "team", categories: ["BOWLER", "BOWLER"] })).toBe(false);
+  expect(validate({ commandId: "one", expectedRevision: 0, matchRevision: 0, teamId: "team", categories: ["BOWLER"] })).toBe(true);
 });
 
 it("generated tuples reject missing and excess entries just like runtime", () => {

@@ -7,6 +7,8 @@ import {
   T20TeamSelectionSchema,
   NewGameWorldCopySchema,
   StagedRosterPackSchema,
+  DelegationCategorySchema,
+  type DelegationJournal,
   type T20Command,
   type T20Scorecard,
   type ODIScorecard,
@@ -118,7 +120,8 @@ export const RequestSchema = z.discriminatedUnion("type", [
     origin: z.enum(["HUMAN", "AI"]),
     command: z.union([T20CommandSchema, Red5CommandSchema]),
   }),
-  z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128) }),
+  z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128), delegated: z.boolean().optional() }),
+  z.strictObject({ ...base, type: z.literal("SET_DELEGATION"), teamId: z.string().min(1).max(128), expectedDelegationRevision: z.number().int().nonnegative(), categories: z.array(DelegationCategorySchema).max(6).refine(values => new Set(values).size === values.length) }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
   z.strictObject({ ...base, type: z.literal("REBUILD_ANALYTICS") }),
   z.strictObject({ ...base, type: z.literal("CANCEL_ANALYTICS"), targetRequestId: z.string().regex(/^ui-[0-9]+$/) }),
@@ -262,5 +265,6 @@ export type Response = {
   rosterCareerSession?: unknown;
   acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
   analyticsRebuild?: { state: "COMPLETE" | "CANCELLED"; applied: number; total: number };
+  delegation?: DelegationJournal;
 };
 export type AnalyticsProgress = { type: "ANALYTICS_PROGRESS"; version: typeof UI_VERSION; pins: typeof PINS; requestId: string; applied: number; total: number };
