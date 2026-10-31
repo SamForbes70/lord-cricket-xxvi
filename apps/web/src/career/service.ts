@@ -235,6 +235,26 @@ export class CareerApplicationService {
     }
   }
 
+  async inspectActiveCareer(): Promise<void> {
+    const saveId = await this.repository.activeSaveId();
+    if (!saveId) {
+      this.state = null;
+      this.worldCopy = null;
+      this.saveId = null;
+      this.readOnly = true;
+      this.setStatus("Idle");
+      return;
+    }
+    const loaded = await this.repository.load(saveId);
+    if (!loaded) throw new Error("Career save not found.");
+    this.state = loaded.state;
+    this.worldCopy = loaded.worldCopy ? immutableWorldCopy(loaded.worldCopy) : null;
+    this.saveId = saveId;
+    this.readOnly = true;
+    this.recovered = loaded.recovered;
+    this.setStatus("Read-only");
+  }
+
   async createCareer(teamId: string, copyRaw: NewGameWorldCopy | null = null): Promise<T20SeasonState> {
     if (!T20_LEAGUE_COMPETITION.teamIds.includes(teamId)) throw new Error("Unknown managed team.");
     const copy = copyRaw ? immutableWorldCopy(copyRaw) : null;
