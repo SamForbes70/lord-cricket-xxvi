@@ -22,7 +22,10 @@ export function RosterCareerApp() {
   const [saves, setSaves] = useState<SeasonSaveSummary[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [scale, setScale] = useState(() => localStorage.getItem("lcxxvi-career-scale") ?? "100");
+  const [scale, setScale] = useState(() => {
+    const saved = localStorage.getItem("lcxxvi-career-scale");
+    return saved && ["90", "100", "115", "125", "150"].includes(saved) ? saved : "100";
+  });
   async function refresh() { setSaves(await repo.listRoster()); }
   async function run(work: () => Promise<void>) {
     setBusy(true); setError("");

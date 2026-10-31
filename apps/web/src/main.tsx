@@ -84,11 +84,25 @@ export function MatchApp() {
     [error, setError] = useState("");
   const [verification, setVerification] = useState<Verification | null>(null);
   const [persistence, setPersistence] = useState<PersistenceView | null>(null);
-  const [scale, setScale] = useState("100"),
-    [commentary, setCommentary] = useState("full"),
-    [density, setDensity] = useState("comfortable");
+  const [scale, setScale] = useState(() => {
+      const saved = localStorage.getItem("lcxxvi-match-scale");
+      return saved && ["100", "115", "125", "150"].includes(saved) ? saved : "100";
+    }),
+    [commentary, setCommentary] = useState(() => {
+      const saved = localStorage.getItem("lcxxvi-match-commentary");
+      return saved && ["full", "brief", "off"].includes(saved) ? saved : "full";
+    }),
+    [density, setDensity] = useState(() => {
+      const saved = localStorage.getItem("lcxxvi-match-density");
+      return saved && ["comfortable", "compact"].includes(saved) ? saved : "comfortable";
+    });
   const decisionRef = useRef<HTMLHeadingElement>(null),
     lastPhase = useRef("");
+  useEffect(() => {
+    localStorage.setItem("lcxxvi-match-scale", scale);
+    localStorage.setItem("lcxxvi-match-commentary", commentary);
+    localStorage.setItem("lcxxvi-match-density", density);
+  }, [scale, commentary, density]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
     const requestId = `ui-${++serial.current}`;

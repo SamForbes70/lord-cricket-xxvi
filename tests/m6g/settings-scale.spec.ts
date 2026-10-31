@@ -15,3 +15,9 @@ test("115 percent career text persists across navigation and roster careers", as
   await expect(page.getByLabel("Text scale")).toHaveValue("115");
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
+
+test("invalid career text scale falls back to 100 percent", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("lcxxvi-career-scale", "unsupported"));
+  await page.goto("/#roster-career");
+  await expect(page.getByLabel("Text scale")).toHaveValue("100");
+});

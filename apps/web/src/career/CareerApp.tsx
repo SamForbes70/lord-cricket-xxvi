@@ -55,7 +55,10 @@ export function CareerApp() {
   const [busy, setBusy] = useState(true);
   const [uiError, setUiError] = useState("");
   const [savedCareers, setSavedCareers] = useState<Awaited<ReturnType<typeof service.listCareers>>>([]);
-  const [scale, setScale] = useState(() => localStorage.getItem("lcxxvi-career-scale") ?? "100");
+  const [scale, setScale] = useState(() => {
+    const saved = localStorage.getItem("lcxxvi-career-scale");
+    return saved && ["90", "100", "115", "125", "150"].includes(saved) ? saved : "100";
+  });
   const [density, setDensity] = useState(() => localStorage.getItem("lcxxvi-career-density") ?? "comfortable");
   const [reducedMotion, setReducedMotion] = useState(() => localStorage.getItem("lcxxvi-career-motion") === "reduced");
   const state = service.getState();
