@@ -32,6 +32,21 @@ function firstAllOutZero(){let s=ready(createT20Session(setup));let wickets=0;wh
   s=applyT20FixtureResolution(s,resolution(s,{bowled:true}));wickets++;expect(wickets).toBeLessThanOrEqual(10);
 }return s;}
 describe("Pass 07B independently authored match fixtures",()=>{
+  it("reaches the same cricket state with delivery and over advances",()=>{
+    const initial=ready(createT20Session(setup));
+    const advance=(s:T20Session,scope:"DELIVERY"|"OVER")=>executeT20Command(s,{
+      kind:"ADVANCE",payload:{scope},commandId:`scope-${scope}-${s.revision}`,expectedRevision:s.revision,actorId:"SYSTEM"
+    }).session;
+    const over=advance(initial,"OVER");
+    let deliveries=initial;
+    const initialOver=Math.floor(initial.core.innings[initial.core.activeInningsIndex]!.innings.legalBalls/6);
+    while(deliveries.core.phase==="READY" && Math.floor(deliveries.core.innings[deliveries.core.activeInningsIndex]!.innings.legalBalls/6)===initialOver){
+      deliveries=advance(deliveries,"DELIVERY");
+    }
+    expect(deliveries.core).toEqual(over.core);
+    expect(deliveries.events.filter(event=>event.type==="DELIVERY_RECORDED").map(event=>event.payload))
+      .toEqual(over.events.filter(event=>event.type==="DELIVERY_RECORDED").map(event=>event.payload));
+  });
   it("uses frozen verified XI and returns immutable command receipt on retry, rejects stale/invalid without a draw",()=>{
     const s=createT20Session(setup);
     const cmd=fixtureAutopilotStep(s);
