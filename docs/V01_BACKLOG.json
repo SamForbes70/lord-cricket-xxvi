@@ -326,7 +326,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Create a named career copy without altering the source slot.",

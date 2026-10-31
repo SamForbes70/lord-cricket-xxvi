@@ -18,6 +18,7 @@ type OpenCareer = { saveId: string; state: RosterSeasonState; pack: StagedRoster
 export function RosterCareerApp() {
   const [pack, setPack] = useState<StagedRosterPack | null>(null);
   const [teamId, setTeamId] = useState("");
+  const [copyName, setCopyName] = useState("");
   const [active, setActive] = useState<OpenCareer | null>(null);
   const [saves, setSaves] = useState<SeasonSaveSummary[]>([]);
   const [error, setError] = useState("");
@@ -69,6 +70,20 @@ export function RosterCareerApp() {
       }
     });
   }, []);
+  async function copyCareer() {
+    if (!active || active.recovered) throw new Error("Open an intact career before creating a copy.");
+    const title = copyName.trim();
+    if (!title || title.length > 120) throw new Error("Enter a copy name of 1 to 120 characters.");
+    const now = Date.now(), copyId = id("roster-career-copy");
+    if (!await repo.acquireLease(active.saveId, owner, now)) throw new Error("This career is open in another tab.");
+    if (!await repo.acquireLease(copyId, owner, now)) throw new Error("The copy slot is locked.");
+    try {
+      await repo.commitRoster({ saveId: copyId, kind: "MANUAL", title, expectedRevision: null, state: active.state, rosterPack: active.pack,
+        command: null, ownerId: owner, now, updatedAt: new Date().toISOString(), setActive: false,
+        copySource: { saveId: active.saveId, revision: active.state.revision, stateSha256: active.state.stateSha256, now: () => Date.now() } });
+    } finally { await repo.releaseLease(copyId, owner); }
+    setCopyName("");
+  }
   async function play() {
     if (!active) return;
     let current = active;
@@ -103,6 +118,8 @@ export function RosterCareerApp() {
     {active && <section className="career-panel"><h2>{active.pack.world.teams.find(team => team.teamId === active.state.controlledTeamId)?.name}</h2><p>{active.state.outcomes.length}/56 fixtures · {active.state.phase} · {active.state.careerState.currentDate}</p>
       {active.recovered && <p role="status">An older checkpoint was recovered. Create a copy to continue.</p>}
       {active.recovered && <button disabled={busy} onClick={() => void run(async () => setActive(await save(null, active.state, active.pack)))}>Create recovered copy</button>}
+      <label>Copy name <input value={copyName} maxLength={120} onChange={event => setCopyName(event.currentTarget.value)} /></label>
+      <button disabled={busy || active.recovered || !copyName.trim()} onClick={() => void run(copyCareer)}>Save career copy</button>
       <button disabled={busy || active.recovered || active.state.phase === "COMPLETE"} onClick={() => void run(play)}>Play next managed match</button>
       <button disabled={busy || active.recovered || active.state.phase === "COMPLETE"} onClick={() => void run(async () => setActive(await save(active, simulateNextRosterSeasonFixture(active.state, active.pack), active.pack)))}>Simulate next fixture</button>
       <button disabled={busy} onClick={() => void run(async () => { const loaded = await repo.loadRoster(active.saveId); if (!loaded) throw new Error("Career save not found."); const bytes = await createRosterSeasonPortableArchive(active.state, active.pack, loaded.summary, new Date().toISOString()); const blob = new Blob([new Uint8Array(bytes).buffer], { type: "application/zip" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "lord-cricket-roster-career.lcxxvi"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 0); })}>Export career</button>

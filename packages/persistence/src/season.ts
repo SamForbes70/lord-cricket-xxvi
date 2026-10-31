@@ -60,6 +60,7 @@ export type SeasonDurableCommit = {
   setActive?: boolean;
   worldCopy?: NewGameWorldCopy | null;
   testAbortAfterWrites?: boolean;
+  copySource?: { saveId: string; revision: number; stateSha256: string; now: () => number };
 };
 
 export type SeasonLoadResult = {
@@ -316,8 +317,14 @@ export class IndexedDbSeasonRepository {
     if (existing?.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION && !existing.worldCopySha256) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_MISSING"); }
     if (existing?.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION && !suppliedCopyHash) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_REQUIRED"); }
     if (existing?.schemaVersion === SEASON_SAVE_SCHEMA_VERSION && existing.worldCopySha256) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_WORLD_COPY_VERSION_MISMATCH"); }
+    const copyNow = input.copySource?.now() ?? input.now;
+    if (input.copySource) {
+      const source = await req(games.get(input.copySource.saveId)) as SeasonGameRecord | undefined;
+      const sourceLease = await req(settings.get(leaseKey(input.copySource.saveId))) as LeaseRecord | undefined;
+      if (existing || input.copySource.saveId === input.saveId || !source || source.recordType !== SEASON_RECORD_TYPE || ![SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION].includes(source.schemaVersion) || source.revision !== input.copySource.revision || source.stateSha256 !== input.copySource.stateSha256 || (source.worldCopySha256 ?? null) !== suppliedCopyHash || state.stateSha256 !== input.copySource.stateSha256 || !sourceLease || sourceLease.ownerId !== input.ownerId || sourceLease.expiresAt <= copyNow) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("SEASON_COPY_SOURCE_CHANGED_OR_LOCKED"); }
+    }
     const lease = await req(settings.get(leaseKey(input.saveId))) as LeaseRecord | undefined;
-    if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= input.now) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SEASON_SAVE_READ_ONLY"); }
+    if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= copyNow) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("SEASON_SAVE_READ_ONLY"); }
     const durableRevision = existing?.revision ?? 0;
     if (input.expectedRevision !== null && durableRevision !== input.expectedRevision) { tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error(`SEASON_SAVE_STALE_REVISION:${input.expectedRevision}:${durableRevision}`); }
     if (command) {
@@ -384,7 +391,7 @@ export class IndexedDbSeasonRepository {
 
   async commitRoster(input: { saveId: string; kind: "AUTO" | "MANUAL" | "IMPORTED"; title: string; expectedRevision: number | null;
     state: RosterSeasonState; rosterPack: StagedRosterPack; command: SeasonDurableCommand | null;
-    ownerId: string; now: number; updatedAt: string; setActive?: boolean; testAbortAfterWrites?: boolean }): Promise<SeasonSaveSummary> {
+    ownerId: string; now: number; updatedAt: string; setActive?: boolean; testAbortAfterWrites?: boolean; copySource?: { saveId: string; revision: number; stateSha256: string; now: () => number } }): Promise<SeasonSaveSummary> {
     const state = RosterSeasonStateSchema.parse(input.state);
     const pack = StagedRosterPackSchema.parse(input.rosterPack);
     const { stateSha256, ...core } = state;
@@ -404,8 +411,14 @@ export class IndexedDbSeasonRepository {
     const existing = await req(games.get(input.saveId)) as (SeasonSaveSummary & { recordType: string; schemaVersion: string; rosterPackSha256: string; checkpointSerial: number; checkpointGeneration: number }) | undefined;
     if (existing && (existing.recordType !== ROSTER_SEASON_RECORD_TYPE || existing.schemaVersion !== ROSTER_SEASON_SAVE_VERSION)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_SAVE_ID_CONFLICT"); }
     if (existing && existing.rosterPackSha256 !== packHash) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_IMMUTABLE"); }
+    const copyNow = input.copySource?.now() ?? input.now;
+    if (input.copySource) {
+      const source = await req(games.get(input.copySource.saveId)) as (SeasonSaveSummary & { recordType: string; schemaVersion: string; rosterPackSha256: string }) | undefined;
+      const sourceLease = await req(settings.get(leaseKey(input.copySource.saveId))) as LeaseRecord | undefined;
+      if (existing || input.copySource.saveId === input.saveId || !source || source.recordType !== ROSTER_SEASON_RECORD_TYPE || source.schemaVersion !== ROSTER_SEASON_SAVE_VERSION || source.revision !== input.copySource.revision || source.stateSha256 !== input.copySource.stateSha256 || source.rosterPackSha256 !== packHash || state.stateSha256 !== input.copySource.stateSha256 || !sourceLease || sourceLease.ownerId !== input.ownerId || sourceLease.expiresAt <= copyNow) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_COPY_SOURCE_CHANGED_OR_LOCKED"); }
+    }
     const lease = await req(settings.get(leaseKey(input.saveId))) as LeaseRecord | undefined;
-    if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= input.now) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_READ_ONLY"); }
+    if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= copyNow) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_READ_ONLY"); }
     if ((existing && input.expectedRevision !== existing.revision) || (!existing && input.expectedRevision !== null)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_STALE_REVISION"); }
     if (existing && (state.revision !== existing.revision + 1 || !command)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_INVALID_REVISION"); }
     if (command && await req(tx.objectStore("commands").get([input.saveId, command.commandId]))) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_DUPLICATE_COMMAND"); }

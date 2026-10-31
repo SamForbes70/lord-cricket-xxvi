@@ -598,6 +598,22 @@ export class CareerApplicationService {
     });
   }
 
+  async createManualCopy(title: string): Promise<void> {
+    const name = title.trim();
+    if (!name || name.length > 120) throw new Error("Enter a copy name of 1 to 120 characters.");
+    const { state, saveId } = this.requireWritable();
+    const copyId = `career-copy-${crypto.randomUUID()}`;
+    const now = Date.now();
+    if (!await this.repository.acquireLease(saveId, this.ownerId, now)) throw new Error("This career is open in another tab.");
+    if (!await this.repository.acquireLease(copyId, this.ownerId, now)) throw new Error("The copy slot is locked.");
+    try {
+      await this.repository.commit({ saveId: copyId, kind: "MANUAL", title: name, expectedRevision: null, state, command: null,
+        ownerId: this.ownerId, now, updatedAt: nowIso(), setActive: false, worldCopy: this.worldCopy,
+        copySource: { saveId, revision: state.revision, stateSha256: state.stateSha256, now: () => Date.now() } });
+    } finally { await this.repository.releaseLease(copyId, this.ownerId); }
+    this.setStatus("Saved");
+  }
+
   async exportCareer(): Promise<Uint8Array> {
     if (!this.state || !this.saveId) throw new Error("No career is loaded.");
     const state = this.state;
