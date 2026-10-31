@@ -6,6 +6,7 @@ import { DELIVERY_STAGE_PACK_SHA256, MODEL_PACK_SHA256, RULE_MANIFESTS, SYNTHETI
 import { createStateHasher } from "./determinism.js";
 
 const prior = Object.fromEntries(Object.keys(FormatSkillsSchema.shape).map(key => [key, 50])) as WorldPack["players"][number]["skills"]["T20"];
+export const ROSTER_NEW_PACK_MAX_BYTES = 8 * 1024 * 1024;
 
 export type StagedRosterImport = {
   world: WorldPack;
@@ -51,13 +52,18 @@ export function stageRosterImport(text: string, allowedRules: readonly string[],
   return { world, sourceHash, priorFields };
 }
 
-export function createStagedRosterPack(sourceText: string, allowedRules: readonly string[], allowedVariations: readonly string[]): StagedRosterPack {
+function buildStagedRosterPack(sourceText: string, allowedRules: readonly string[], allowedVariations: readonly string[]): StagedRosterPack {
   return StagedRosterPackSchema.parse({ version: "LC_STAGED_ROSTER_PACK_V1", sourceText, ...stageRosterImport(sourceText, allowedRules, allowedVariations) });
+}
+export function createStagedRosterPack(sourceText: string, allowedRules: readonly string[], allowedVariations: readonly string[]): StagedRosterPack {
+  const pack = buildStagedRosterPack(sourceText, allowedRules, allowedVariations);
+  if (new TextEncoder().encode(canonicalJson(pack)).byteLength > ROSTER_NEW_PACK_MAX_BYTES) throw new Error("Roster pack exceeds the 8 MiB limit for new games.");
+  return pack;
 }
 
 export function validateStagedRosterPack(raw: unknown, allowedRules: readonly string[], allowedVariations: readonly string[]): StagedRosterPack {
   const pack = StagedRosterPackSchema.parse(raw);
-  const rebuilt = createStagedRosterPack(pack.sourceText, allowedRules, allowedVariations);
+  const rebuilt = buildStagedRosterPack(pack.sourceText, allowedRules, allowedVariations);
   if (canonicalJson(pack) !== canonicalJson(rebuilt)) throw new Error("Roster pack contents do not match the staged source and priors.");
   return pack;
 }

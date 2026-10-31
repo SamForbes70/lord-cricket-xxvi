@@ -32,6 +32,13 @@ describe("staged roster import", () => {
     expect(stage(source).sourceHash).toBe(result.sourceHash);
   });
 
+  it("rejects oversized new packs while retaining validation of earlier packs", () => {
+    const sourceText = JSON.stringify(input()) + " ".repeat(8 * 1024 * 1024);
+    expect(() => createStagedRosterPack(sourceText, world.rulesIds, ["stock"])).toThrow("8 MiB");
+    const existing = { version: "LC_STAGED_ROSTER_PACK_V1" as const, sourceText, ...stageRosterImport(sourceText, world.rulesIds, ["stock"]) };
+    expect(validateStagedRosterPack(existing, world.rulesIds, ["stock"]).sourceHash).toBe(existing.sourceHash);
+  }, 30_000);
+
   it("fills all three profiles when statistical objects are absent", () => {
     const source = input();
     const player = source.world.players[0]!;

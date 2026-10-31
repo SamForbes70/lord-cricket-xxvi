@@ -37,3 +37,5 @@ The hosted Linux run for `28200d8` reported 678 passing assertions but failed on
 The original managed-match save ID was shared across fixtures. Consecutive fixtures now use distinct IDs. Browser checks cover starting and reloading the next managed fixture after returning a result.
 
 The local production smoke run passed all 23 checks. Three repetitions of the exact previously failing Chromium match test passed locally. These results do not explain the hosted Windows startup failure.
+
+A size review reproduced a staged roster pack of 22,354,888 bytes from a valid 22,163,577-byte source. That pack exceeds the 20 MiB portable archive limit before match data is added. New staged packs now have an 8 MiB limit, leaving space for game data. Earlier staged packs still validate for recovery. The complete archive remains limited to 20 MiB, and unusually large match or career data can still exceed that archive limit.

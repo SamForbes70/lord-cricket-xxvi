@@ -90,7 +90,7 @@ export function RosterCareerApp() {
   }
   return <main className="career-shell" style={{ fontSize: `${Number(scale) / 100}rem` }}>
     <header className="career-masthead"><div><p className="eyebrow">LORD CRICKET XXVI</p><h1>Imported roster career</h1></div><a href="#career">Standard career</a></header>
-    <p>One fictional T20 season. Missing ratings use the synthetic prior of 50.</p>
+    <p>One fictional T20 season. Missing ratings use the synthetic prior of 50. New roster packs can be up to 8 MiB; complete archives can be up to 20 MiB.</p>
     <label>Text scale <select value={scale} onChange={event => { setScale(event.target.value); localStorage.setItem("lcxxvi-career-scale", event.target.value); }}><option value="90">90%</option><option value="100">100%</option><option value="115">115%</option><option value="125">125%</option><option value="150">150%</option></select></label>
     {error && <p role="alert" className="career-error">{error}</p>}
     <section className="career-panel"><h2>Import roster</h2><label>Roster JSON <input type="file" accept=".json,application/json" disabled={busy} onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) void run(async () => { const next = createStagedRosterPack(await file.text(), RULE_MANIFESTS.map(rule => rule.rulesId), SYNTHETIC_ALPHA_PACK.manifest.variationIds); setPack(next); setTeamId(next.world.teams[0]?.teamId ?? ""); }); }} /></label>
