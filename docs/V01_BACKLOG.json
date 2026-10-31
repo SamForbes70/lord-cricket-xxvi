@@ -194,7 +194,7 @@
       "dependsOn": [
         "V01-008"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Delegate each supported decision category explicitly.",

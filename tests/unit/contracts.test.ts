@@ -239,6 +239,12 @@ it("every generated schema compiles with strict AJV 2020-12", () => {
     expect(schema(f.replace("Schema.json", ""))).toBeTypeOf("function");
 });
 
+it("the delegation change schema rejects duplicate categories", () => {
+  const validate = schema("DelegationChange");
+  expect(validate({ commandId: "one", expectedRevision: 0, matchRevision: 0, teamId: "team", categories: ["BOWLER", "BOWLER"] })).toBe(false);
+  expect(validate({ commandId: "one", expectedRevision: 0, matchRevision: 0, teamId: "team", categories: ["BOWLER"] })).toBe(true);
+});
+
 it("generated tuples reject missing and excess entries just like runtime", () => {
   const valid = {
     schemaVersion: "1.0.0",

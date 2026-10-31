@@ -35,6 +35,7 @@ export interface SchemaMigration {
 export const SAVE_SCHEMA_VERSION = "LC_SAVE_V1" as const;
 export const PRESENTATION_SAVE_SCHEMA_VERSION = "LC_SAVE_V2_PRESENTATION" as const;
 export const ROSTER_SAVE_SCHEMA_VERSION = "LC_SAVE_V3_ROSTER" as const;
+export const DELEGATION_SAVE_SCHEMA_VERSION = "LC_SAVE_V4_DELEGATION" as const;
 export const DB_NAME = "lord-cricket-xxvi";
 export const DB_VERSION = 1;
 export const WRITER_LEASE_MS = 12_000;
@@ -104,13 +105,21 @@ export type LoadResult = {
   delegationJournal?: DelegationJournal;
 };
 
+type BaseSaveSchema = typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION | typeof ROSTER_SAVE_SCHEMA_VERSION;
 type GameRecord = SaveSummary & {
-  schemaVersion: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION | typeof ROSTER_SAVE_SCHEMA_VERSION;
+  schemaVersion: BaseSaveSchema | typeof DELEGATION_SAVE_SCHEMA_VERSION;
+  baseSchemaVersion?: BaseSaveSchema;
   worldCopySha256?: string;
   rosterPackSha256?: string;
   checkpointSerial: number;
   checkpointGeneration: number;
 };
+function baseSaveSchema(game: GameRecord): BaseSaveSchema {
+  const base = game.schemaVersion === DELEGATION_SAVE_SCHEMA_VERSION ? game.baseSchemaVersion : game.schemaVersion;
+  if (![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION].includes(base as BaseSaveSchema)) throw new Error("SAVE_SCHEMA_UNSUPPORTED");
+  if (game.schemaVersion !== DELEGATION_SAVE_SCHEMA_VERSION && game.baseSchemaVersion !== undefined) throw new Error("SAVE_SCHEMA_UNSUPPORTED");
+  return base as BaseSaveSchema;
+}
 type SnapshotRecord = {
   saveId: string;
   generation: number;
@@ -387,6 +396,7 @@ export class IndexedDbSaveRepository {
     const row = await req(tx.objectStore("settings").get(delegationKey(saveId))) as SettingRecord | undefined;
     await txDone(tx);
     if (!game) throw new Error("SAVE_NOT_FOUND");
+    if (game.schemaVersion === DELEGATION_SAVE_SCHEMA_VERSION && !row) throw new Error("DELEGATION_ACTIVE_MISSING");
     const journal = row ? await readDelegationRecord(row.value, saveId) : { version: "LC_DELEGATION_JOURNAL_V1" as const, changes: [] };
     if (journal.changes.some(change => change.matchRevision > game.revision)) throw new Error("DELEGATION_AHEAD_OF_SAVE");
     return journal;
@@ -406,6 +416,7 @@ export class IndexedDbSaveRepository {
       const row = await req(settings.get(delegationKey(saveId))) as SettingRecord | undefined;
       if (!game) throw new Error("SAVE_NOT_FOUND");
       if (!lease || lease.ownerId !== ownerId || lease.expiresAt <= now) throw new Error("SAVE_READ_ONLY");
+      const baseSchemaVersion = baseSaveSchema(game);
       if (canonicalJson(row?.value ?? null) !== canonicalJson(expectedRecord)) throw new Error("DELEGATION_STALE_REVISION");
       if (journal.changes.at(-1)?.matchRevision !== game.revision) throw new Error("DELEGATION_STALE_MATCH");
       const snapshots = tx.objectStore("snapshots");
@@ -414,6 +425,7 @@ export class IndexedDbSaveRepository {
       settings.put({ key: delegationKey(saveId), value: nextRecord } satisfies SettingRecord);
       settings.put({ key: delegationCheckpointKey(saveId, snapshot.generation), value: { checkpointSerial: snapshot.checkpointSerial, record: nextRecord } } satisfies SettingRecord);
       snapshots.put({ ...snapshot, delegationTracked: true } satisfies SnapshotRecord);
+      tx.objectStore("games").put({ ...game, schemaVersion: DELEGATION_SAVE_SCHEMA_VERSION, baseSchemaVersion } satisfies GameRecord);
       await txDone(tx);
       return journal;
     } catch (error) {
@@ -514,28 +526,28 @@ export class IndexedDbSaveRepository {
     const existing = (await req(games.get(input.saveId))) as
       | GameRecord
       | undefined;
-    if (existing && ![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION].includes(existing.schemaVersion)) {
-      tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_SCHEMA_UNSUPPORTED");
-    }
+    let existingBase: BaseSaveSchema | null = null;
+    try { if (existing) existingBase = baseSaveSchema(existing); }
+    catch (error) { tx.abort(); throw error; }
     if (existing && suppliedCopyHash && suppliedCopyHash !== existing.worldCopySha256) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_IMMUTABLE");
     }
-    if (existing?.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && !existing.worldCopySha256) {
+    if (existingBase === PRESENTATION_SAVE_SCHEMA_VERSION && !existing?.worldCopySha256) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_MISSING");
     }
-    if (existing?.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && !suppliedCopyHash) {
+    if (existingBase === PRESENTATION_SAVE_SCHEMA_VERSION && !suppliedCopyHash) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_REQUIRED");
     }
-    if (existing && existing.schemaVersion !== PRESENTATION_SAVE_SCHEMA_VERSION && existing.worldCopySha256) {
+    if (existing && existingBase !== PRESENTATION_SAVE_SCHEMA_VERSION && existing.worldCopySha256) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH");
     }
-    if (existing && suppliedRosterHash && (existing.schemaVersion !== ROSTER_SAVE_SCHEMA_VERSION || existing.rosterPackSha256 !== suppliedRosterHash)) {
+    if (existing && suppliedRosterHash && (existingBase !== ROSTER_SAVE_SCHEMA_VERSION || existing.rosterPackSha256 !== suppliedRosterHash)) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_IMMUTABLE");
     }
-    if (existing?.schemaVersion === ROSTER_SAVE_SCHEMA_VERSION && (!existing.rosterPackSha256 || !suppliedRosterHash)) {
+    if (existingBase === ROSTER_SAVE_SCHEMA_VERSION && (!existing?.rosterPackSha256 || !suppliedRosterHash)) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_REQUIRED");
     }
-    if (existing && existing.schemaVersion !== ROSTER_SAVE_SCHEMA_VERSION && existing.rosterPackSha256) {
+    if (existing && existingBase !== ROSTER_SAVE_SCHEMA_VERSION && existing.rosterPackSha256) {
       tx.abort(); try { await txDone(tx); } catch { /* expected abort */ } throw new Error("SAVE_ROSTER_VERSION_MISMATCH");
     }
     const lease = (await req(settings.get(leaseKey(input.saveId)))) as
@@ -619,6 +631,7 @@ export class IndexedDbSaveRepository {
       tx.abort();
       throw new Error("DELEGATION_STALE_REVISION");
     }
+    if (existing?.schemaVersion === DELEGATION_SAVE_SCHEMA_VERSION && !expectedDelegation) { tx.abort(); throw new Error("DELEGATION_ACTIVE_MISSING"); }
     const checkpointJournal = delegation ?? existingJournal;
     const checkpointRecord = suppliedDelegation ?? expectedDelegation;
     if (checkpointJournal?.changes.some(change => change.matchRevision > input.revision)) {
@@ -689,7 +702,8 @@ export class IndexedDbSaveRepository {
     }
     games.put({
       ...summary,
-      schemaVersion: suppliedRosterHash ? ROSTER_SAVE_SCHEMA_VERSION : copyHash ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
+      schemaVersion: checkpointJournal?.changes.length ? DELEGATION_SAVE_SCHEMA_VERSION : suppliedRosterHash ? ROSTER_SAVE_SCHEMA_VERSION : copyHash ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
+      ...(checkpointJournal?.changes.length ? { baseSchemaVersion: suppliedRosterHash ? ROSTER_SAVE_SCHEMA_VERSION : copyHash ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION } : {}),
       ...(suppliedRosterHash ? { rosterPackSha256: suppliedRosterHash } : {}),
       ...(copyHash ? { worldCopySha256: copyHash } : {}),
       checkpointSerial: serial,
@@ -792,27 +806,35 @@ export class IndexedDbSaveRepository {
       await txDone(tx);
       return null;
     }
-    if (![SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION].includes(game.schemaVersion)) {
-      await txDone(tx);
-      throw new Error(`SAVE_SCHEMA_UNSUPPORTED: ${String(game.schemaVersion)}`);
-    }
-    if (game.schemaVersion !== PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256) { await txDone(tx); throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH"); }
+    let base: BaseSaveSchema;
+    try { base = baseSaveSchema(game); }
+    catch { await txDone(tx); throw new Error(`SAVE_SCHEMA_UNSUPPORTED: ${String(game.schemaVersion)}`); }
+    if (base !== PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256) { await txDone(tx); throw new Error("SAVE_WORLD_COPY_VERSION_MISMATCH"); }
     const rows = (await req(
       tx.objectStore("snapshots").index("saveId").getAll(saveId),
     )) as SnapshotRecord[];
     const delegationRows = await Promise.all([0, 1, 2].map(generation => req(tx.objectStore("settings").get(delegationCheckpointKey(saveId, generation))))) as (SettingRecord | undefined)[];
-    const rosterRow = game.schemaVersion === ROSTER_SAVE_SCHEMA_VERSION && game.rosterPackSha256
+    const activeDelegation = await req(tx.objectStore("settings").get(delegationKey(saveId))) as SettingRecord | undefined;
+    const rosterRow = base === ROSTER_SAVE_SCHEMA_VERSION && game.rosterPackSha256
       ? await req(tx.objectStore("worldPacks").get(game.rosterPackSha256)) as { hash: string; payload: string } | undefined : undefined;
-    const worldRow = game.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256
+    const worldRow = base === PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256
       ? await req(tx.objectStore("worldPacks").get(game.worldCopySha256)) as { hash: string; payload: string } | undefined : undefined;
     await txDone(tx);
+    let activeJournal: DelegationJournal | null = null;
+    let activeJournalDamaged = false;
+    if (game.schemaVersion === DELEGATION_SAVE_SCHEMA_VERSION) {
+      try {
+        if (!activeDelegation) throw new Error("DELEGATION_ACTIVE_MISSING");
+        activeJournal = await readDelegationRecord(activeDelegation.value, saveId);
+      } catch { activeJournalDamaged = true; }
+    }
     let rosterPack: StagedRosterPack | null = null;
-    if (game.schemaVersion === ROSTER_SAVE_SCHEMA_VERSION) {
+    if (base === ROSTER_SAVE_SCHEMA_VERSION) {
       if (!rosterRow || !game.rosterPackSha256 || await sha256Text(rosterRow.payload) !== game.rosterPackSha256) throw new Error("SAVE_ROSTER_MISSING_OR_DAMAGED");
       rosterPack = StagedRosterPackSchema.parse(JSON.parse(rosterRow.payload));
     } else if (game.rosterPackSha256) throw new Error("SAVE_ROSTER_VERSION_MISMATCH");
     let worldCopy: NewGameWorldCopy | null = null;
-    if (game.schemaVersion === PRESENTATION_SAVE_SCHEMA_VERSION) {
+    if (base === PRESENTATION_SAVE_SCHEMA_VERSION) {
       if (!worldRow || !game.worldCopySha256 || await sha256Text(worldRow.payload) !== game.worldCopySha256) throw new Error("SAVE_WORLD_COPY_MISSING_OR_DAMAGED");
       worldCopy = await validateStoredWorldCopy(JSON.parse(worldRow.payload));
     }
@@ -834,7 +856,8 @@ export class IndexedDbSaveRepository {
           delegationJournal = await readDelegationRecord(checkpoint.record, saveId);
           if (delegationJournal.changes.some(change => change.matchRevision > row.revision)) continue;
         } else if (checkpoint?.checkpointSerial === row.checkpointSerial) continue;
-        const recovered = row.checkpointSerial !== game.checkpointSerial;
+        const recovered = row.checkpointSerial !== game.checkpointSerial || (game.schemaVersion === DELEGATION_SAVE_SCHEMA_VERSION &&
+          (activeJournalDamaged || !delegationJournal || canonicalJson(activeJournal) !== canonicalJson(delegationJournal)));
         return {
           summary: recovered
             ? recoveredSummary(game, session, row)

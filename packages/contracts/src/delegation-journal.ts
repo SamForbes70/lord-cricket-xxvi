@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const DelegationCategorySchema = z.enum(["TOSS", "INNINGS", "BATTER", "BOWLER", "BATTING_PLAN", "BOWLING_PLAN"]);
-const CategoriesSchema = z.array(DelegationCategorySchema).max(6).refine(values => new Set(values).size === values.length);
+const CategoriesSchema = z.array(DelegationCategorySchema).max(6).refine(values => new Set(values).size === values.length).meta({ uniqueItems: true });
 export const DelegationChangeSchema = z.strictObject({
   commandId: z.string().min(1).max(128),
   expectedRevision: z.number().int().nonnegative(),

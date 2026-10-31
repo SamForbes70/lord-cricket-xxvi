@@ -32,6 +32,7 @@
             "maxLength": 128
           },
           "categories": {
+            "uniqueItems": true,
             "maxItems": 6,
             "type": "array",
             "items": {

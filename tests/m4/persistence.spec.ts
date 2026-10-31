@@ -459,6 +459,11 @@ test("delegation history checks the writer lease and durable match revision", as
     await repo.commit(base);
     const change = { commandId: "one", expectedRevision: 0, matchRevision: 1, teamId: "team-a", categories: ["BOWLER"] };
     const first = await repo.appendDelegation(saveId, owner, now, change);
+    const version = await new Promise<string>((resolve, reject) => {
+      const request = indexedDB.open(database);
+      request.onsuccess = () => { const db = request.result; const get = db.transaction("games", "readonly").objectStore("games").get(saveId); get.onsuccess = () => { resolve(get.result.schemaVersion); db.close(); }; get.onerror = () => reject(get.error); };
+      request.onerror = () => reject(request.error);
+    });
     const retry = await repo.appendDelegation(saveId, owner, now, change);
     const failures: string[] = [];
     for (const [writer, next] of [["other", { ...change, commandId: "two", expectedRevision: 1 }], [owner, { ...change, commandId: "two", expectedRevision: 1, matchRevision: 0 }]] as const) {
@@ -466,6 +471,13 @@ test("delegation history checks the writer lease and durable match revision", as
       catch (error) { failures.push(error instanceof Error ? error.message : String(error)); }
     }
     const restored = await new IndexedDbSaveRepository(database).loadDelegationJournal(saveId);
+    await repo.cloneSave(saveId, "race", "MANUAL", "Race", owner, now, "2026-10-04T02:00:00.000Z");
+    const race = await Promise.allSettled(["two", "three"].map(commandId => repo.appendDelegation("race", owner, now, { ...change, commandId, expectedRevision: 1 })));
+    const raceJournal = await repo.loadDelegationJournal("race");
+    const raceDb = await new Promise<IDBDatabase>((resolve, reject) => { const request = indexedDB.open(database); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    await new Promise<void>((resolve, reject) => { const tx = raceDb.transaction("settings", "readwrite"); tx.objectStore("settings").delete("delegation:race"); tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); });
+    raceDb.close();
+    const recoveredActive = await repo.load("race");
     const events = [{ sequence: 1, kind: "FIXTURE" }, { sequence: 2, kind: "FIXTURE" }];
     await repo.commit({ ...base, expectedRevision: 1, revision: 2, session: { revision: 2, events }, events });
     await repo.appendDelegation(saveId, owner, now, { ...change, commandId: "two", expectedRevision: 1, matchRevision: 2, categories: ["BATTER"] });
@@ -483,7 +495,7 @@ test("delegation history checks the writer lease and durable match revision", as
     await repo.cloneSave(saveId, "copy", "MANUAL", "Copy", owner, now, "2026-10-04T02:00:00.000Z");
     const copied = await repo.loadDelegationJournal("copy");
     await repo.delete(saveId);
-    return { first, retry, restored, recovered, copied, failures };
+    return { first, retry, restored, recovered, copied, failures, version, race: race.map(item => item.status), raceLength: raceJournal.changes.length, recoveredActive: recoveredActive?.recovered, activeJournal: recoveredActive?.delegationJournal, raceJournal };
   }, moduleUrl);
   expect(result.retry).toEqual(result.first);
   expect(result.restored).toEqual(result.first);
@@ -491,4 +503,9 @@ test("delegation history checks the writer lease and durable match revision", as
   expect(result.recovered?.recovered).toBe(true);
   expect(result.recovered?.delegationJournal).toEqual(result.first);
   expect(result.failures).toEqual(["SAVE_READ_ONLY", "DELEGATION_STALE_MATCH"]);
+  expect(result.race.sort()).toEqual(["fulfilled", "rejected"]);
+  expect(result.raceLength).toBe(2);
+  expect(result.version).toBe("LC_SAVE_V4_DELEGATION");
+  expect(result.recoveredActive).toBe(true);
+  expect(result.activeJournal).toEqual(result.raceJournal);
 });

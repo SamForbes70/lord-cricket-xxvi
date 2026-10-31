@@ -36,8 +36,7 @@ describe("M7B optional opponent through authoritative T20 engine", () => {
       }
       session = executeT20Command(session, fixtureAutopilotStep(session)).session;
     }
-    expect(observed.has("BOWLER")).toBe(true);
-    expect(observed.has("BATTER")).toBe(true);
+    for (const category of Object.values(categories)) expect(observed.has(category)).toBe(true);
   }, 120000);
   test("opponent never commands the human team or advances a ball automatically", () => {
     let session=fixture();
