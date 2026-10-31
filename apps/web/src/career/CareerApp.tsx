@@ -55,7 +55,10 @@ export function CareerApp() {
   const [busy, setBusy] = useState(true);
   const [uiError, setUiError] = useState("");
   const [savedCareers, setSavedCareers] = useState<Awaited<ReturnType<typeof service.listCareers>>>([]);
-  const [scale, setScale] = useState(() => localStorage.getItem("lcxxvi-career-scale") ?? "100");
+  const [scale, setScale] = useState(() => {
+    const saved = localStorage.getItem("lcxxvi-career-scale");
+    return saved && ["90", "100", "115", "125", "150"].includes(saved) ? saved : "100";
+  });
   const [density, setDensity] = useState(() => localStorage.getItem("lcxxvi-career-density") ?? "comfortable");
   const [reducedMotion, setReducedMotion] = useState(() => localStorage.getItem("lcxxvi-career-motion") === "reduced");
   const state = service.getState();
@@ -374,7 +377,7 @@ export function CareerApp() {
         <section aria-labelledby="settings-heading">
           <h2 id="settings-heading">Settings</h2>
           <div className="settings-grid">
-            <label>Text scale<select value={scale} onChange={(event) => setScale(event.currentTarget.value)}><option value="90">90%</option><option value="100">100%</option><option value="125">125%</option><option value="150">150%</option></select></label>
+            <label>Text scale<select value={scale} onChange={(event) => setScale(event.currentTarget.value)}><option value="90">90%</option><option value="100">100%</option><option value="115">115%</option><option value="125">125%</option><option value="150">150%</option></select></label>
             <label>Layout density<select value={density} onChange={(event) => setDensity(event.currentTarget.value)}><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
             <label className="check-label"><input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.currentTarget.checked)} /> Reduced motion</label>
           </div>
