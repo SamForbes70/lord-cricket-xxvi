@@ -116,3 +116,25 @@ test("player profiles fit a narrow viewport at 150 percent text scale", async ({
     expect(box!.x + box!.width).toBeLessThanOrEqual(widths.viewport);
   }
 });
+
+test("keyboard navigation retains player format and reduced motion", async ({ page }) => {
+  await startCareer(page);
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByLabel("Reduced motion").check();
+  await expect(page.locator("main.career-shell")).toHaveClass(/reduced-motion/);
+  await page.getByRole("button", { name: "Squad", exact: true }).click();
+  const player = page.getByRole("button", { name: "View Ulen Elmcroft", exact: true });
+  await player.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "Player: Ulen Elmcroft" })).toBeFocused();
+  await page.getByLabel("Player format").selectOption("ODI");
+  await page.getByRole("button", { name: "Back to squad" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(player).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Player format")).toHaveValue("ODI");
+  await page.reload();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await expect(page.getByLabel("Reduced motion")).toBeChecked();
+  await expect(page.locator("main.career-shell")).toHaveClass(/reduced-motion/);
+});
