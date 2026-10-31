@@ -154,7 +154,7 @@
       "dependsOn": [
         "V01-004"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Add next-decision, innings and match scopes.",
@@ -174,7 +174,7 @@
       "dependsOn": [
         "V01-008"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Cancel long batches at safe boundaries.",
@@ -194,7 +194,7 @@
       "dependsOn": [
         "V01-008"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Delegate each supported decision category explicitly.",

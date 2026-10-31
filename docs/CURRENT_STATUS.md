@@ -19,7 +19,9 @@ PR #18 merged 115% text scale and persistent match preferences as `4aeb41b`.
 New roster packs are limited to 8 MiB; complete portable archives are limited to 20 MiB.
 PR #20 completed settings and player-navigation acceptance.
 PR #19 added durable command acknowledgements.
-Bounded simulation and cancellation remain planned.
+PR #21 merged bounded simulation controls.
+PR #22 merged safe cancellation and committed event-range reporting.
+Granular delegation remains planned.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.
 The [world editing report](verification-v01-world-editing/REPORT.md) records this slice.
 A labelled synthetic-alpha release remains distinct from empirical model promotion.

@@ -46,6 +46,9 @@ for (const format of ["T20", "ODI", "RED_BALL"] as const) test(`${format} worker
   expect(result.stored.committedRevision).toBe(result.original.revision);
   expect(result.original.acknowledgement!.fromSequence).toBeLessThanOrEqual(result.original.acknowledgement!.toSequence);
   expect(result.duplicate.acknowledgement).toEqual(result.original.acknowledgement);
+  expect(result.duplicate.revision).toBe(result.original.revision);
+  expect(result.duplicate.view.lastEventHash).toBe(result.original.view.lastEventHash);
+  expect(result.duplicate.persistence.saveId).toBe(result.original.persistence.saveId);
   expect(result.rejected.error).toContain("Stale");
   expect(result.rejected.acknowledgement).toBeUndefined();
   expect(result.rejected.revision).toBe(result.original.revision);
