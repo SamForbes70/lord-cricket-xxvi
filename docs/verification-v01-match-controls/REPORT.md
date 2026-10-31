@@ -8,4 +8,4 @@ This slice prepares the command boundary for later batch controls. It does not a
 
 The full local unit suite passed 679 tests in 52 files. The production smoke suite passed 23 checks. Fixture audit, scorer comparison, random vectors, probability vectors and generator vectors passed.
 
-Hosted CI did not start. GitHub reported failed account payments or a spending limit that needs to be increased. The draft pull request remains unmerged until its required checks pass.
+Initial hosted CI attempts did not start because an Actions budget blocked them. Later check results are recorded on PR #19.
