@@ -871,7 +871,7 @@ export function MatchApp() {
               )}
             </section>
           )}
-          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
+          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} hands={view.hands} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>

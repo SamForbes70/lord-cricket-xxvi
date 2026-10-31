@@ -89,6 +89,9 @@ describe("M7 canonical T20 match analytics", () => {
     expect(analytics.overSummaries.reduce((a, over) => a + over.runs, 0)).toBe(card.innings[0]!.runs + card.innings[1]!.runs);
     expect(analytics.partnerships.reduce((a, pair) => a + pair.runs, 0)).toBe(card.innings[0]!.runs + card.innings[1]!.runs);
     expect(analytics.worm.length).toBe(session.events.filter(e => e.type === "DELIVERY_RECORDED").length);
+    const recordedLengths = session.events.filter(e => e.type === "DELIVERY_RECORDED").map(e => (e.payload as { event: { executedLength: string | null } }).event.executedLength);
+    expect(analytics.unrecordedLengths).toBe(recordedLengths.filter(length => length === null).length);
+    for (const entry of analytics.pitchLengths) expect(entry.attempts).toBe(recordedLengths.filter(length => length === entry.length).length);
     expect(() => projectT20MatchAnalytics(session.events, { ...card, innings: [{ ...card.innings[0]!, runs: card.innings[0]!.runs + 1 }, card.innings[1]!] })).toThrow(/RUN_RECONCILIATION/);
   }, 120000);
 });

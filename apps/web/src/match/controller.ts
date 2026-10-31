@@ -229,6 +229,7 @@ export function createMatchController(
         ...(displayWorld.packId !== world.packId ? { colours: [...displayWorld.teams.find(team => team.teamId === t.teamId)!.colours] as [string, string] } : {}),
       })),
       names,
+      hands: Object.fromEntries(s.setup.teams.flatMap(team => team.xi.map(player => [player.playerId, player.batHand]))),
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
