@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { appendDelegationChange, delegationForTeam, replayDelegationJournal } from "../../apps/web/src/match/delegation-journal.js";
+import { appendDelegationChange, delegationForTeam, replayDelegationJournal } from "@lcxxvi/contracts";
 
 const empty = { version: "LC_DELEGATION_JOURNAL_V1", changes: [] };
 const first = { commandId: "one", expectedRevision: 0, matchRevision: 4, teamId: "team-a", categories: ["BOWLER"] };
