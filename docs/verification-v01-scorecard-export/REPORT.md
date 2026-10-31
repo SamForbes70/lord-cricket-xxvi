@@ -12,3 +12,5 @@ CSV fields are quoted and embedded quotes are escaped. Cells that begin with spr
 - Firefox used `MOZ_DISABLE_CONTENT_SANDBOX=1` on the Linux host. Chromium used the host executable.
 
 The browser checks emulate print media; they do not confirm output from a physical printer. This branch depends on PR #25 and requires hosted CI before integration.
+
+A hosted Windows run stopped the match UI suite at its 15-minute process deadline after 49 checks had passed. The runner reported `ETIMEDOUT`; no assertion failure was reported. The match UI deadline is now 20 minutes and the hosted job limit is 45 minutes. The acceptance-plan unit tests and lint passed after this change. A new hosted run must complete the full suite.
