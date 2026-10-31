@@ -34,7 +34,7 @@ function next(session: RosterRed5Session) {
 }
 
 describe("roster-aware red-ball match", () => {
-  it("plays a complete match and reconstructs saved command prefixes", () => {
+  it("plays a complete match and reconstructs saved command prefixes", async () => {
     const { pack, session } = start();
     expect(session.executionManifest.engine).toBe("LC_RED5_MATCH_ROSTER_V2");
     expect(session.setup.versions.worldHash).not.toBe(FROZEN_WORLD_PINS.worldCanonicalSha256);
@@ -43,6 +43,7 @@ describe("roster-aware red-ball match", () => {
     for (let steps = 0; current.core.phase !== "COMPLETE"; steps++) {
       expect(steps).toBeLessThan(3000);
       current = next(current);
+      if (steps % 20 === 0) await new Promise<void>(resolve => setImmediate(resolve));
       if (steps === 5 || steps === 20 || steps === 50) {
         expect(rehydrateRosterRed5Session(structuredClone(current), pack)).toEqual(current);
       }
@@ -52,16 +53,18 @@ describe("roster-aware red-ball match", () => {
     expect(replayRosterRed5Session(current, pack).core).toEqual(current.core);
   }, 180_000);
 
-  it("uses imported ratings in delivery outcomes", () => {
+  it("uses imported ratings in delivery outcomes", async () => {
     let low = start(0).session;
     let high = start(100).session;
     for (let steps = 0; low.core.phase !== "COMPLETE"; steps++) {
       expect(steps).toBeLessThan(3000);
       low = next(low);
+      if (steps % 20 === 0) await new Promise<void>(resolve => setImmediate(resolve));
     }
     for (let steps = 0; high.core.phase !== "COMPLETE"; steps++) {
       expect(steps).toBeLessThan(3000);
       high = next(high);
+      if (steps % 20 === 0) await new Promise<void>(resolve => setImmediate(resolve));
     }
     expect(low.core.innings.map(innings => innings.innings.runs)).not.toEqual(high.core.innings.map(innings => innings.innings.runs));
   }, 180_000);

@@ -31,3 +31,9 @@ A later local unit run passed 678 tests in 52 files. Build, type check, lint and
 The integration is not yet merged. Complete final review and hosted verification before treating it as delivered. Earlier acceptance and human evidence applies only to its recorded build.
 
 A Linux Chromium startup repetition passed ten isolated contexts. The Windows failure has not been reproduced locally. The failing test now records the page state if startup fails again.
+
+The hosted Linux run for `28200d8` reported 678 passing assertions but failed on a Vitest `onTaskUpdate` worker timeout. The long red-ball tests now yield to the event loop during match loops. Their match and replay assertions remain unchanged. A fresh hosted run must confirm whether this resolves the timeout.
+
+The original managed-match save ID was shared across fixtures. Consecutive fixtures now use distinct IDs. Browser checks cover starting and reloading the next managed fixture after returning a result.
+
+The local production smoke run passed all 23 checks. Three repetitions of the exact previously failing Chromium match test passed locally. These results do not explain the hosted Windows startup failure.

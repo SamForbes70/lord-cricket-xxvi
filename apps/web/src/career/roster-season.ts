@@ -74,7 +74,7 @@ export function completeRosterManagedFixture(raw: unknown, pack: StagedRosterPac
   const session = rehydrateRosterT20Session(rawSession, pack);
   const fixture = ready.fixture;
   const selections = session.setup.teams.map(team => ({ teamId: team.teamId, playerIds: [...team.playerIds], captainId: team.captainId, keeperId: team.keeperId }));
-  if (session.core.phase !== "COMPLETE" || session.setup.gameId !== state.schedule.request.gameId || session.setup.matchId !== fixture.matchId || session.setup.seed !== fixture.matchSeed || session.setup.ground.groundId !== fixture.groundId || hash(selections) !== hash(ready.selections)) throw new Error("ROSTER_SEASON_MANAGED_SESSION_MISMATCH");
+  if (session.core.phase !== "COMPLETE" || session.setup.gameId !== `career-match-${fixture.fixtureId}` || session.setup.matchId !== fixture.matchId || session.setup.seed !== fixture.matchSeed || session.setup.ground.groundId !== fixture.groundId || hash(selections) !== hash(ready.selections)) throw new Error("ROSTER_SEASON_MANAGED_SESSION_MISMATCH");
   const baseline = session as unknown as T20Session;
   const scorecard = projectT20Scorecard(baseline);
   const scorecardSha256 = hash(scorecard);

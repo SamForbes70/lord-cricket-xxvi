@@ -80,7 +80,7 @@ export function RosterCareerApp() {
       saveId: current.saveId, seasonId: current.state.schedule.request.seasonId, scheduleSha256: current.state.schedule.scheduleSha256,
       fixtureId: fixture.fixtureId, fixtureOrdinal: fixture.ordinal, roundNumber: fixture.roundNumber, matchDayDate: fixture.matchDayDate,
       homeTeamId: fixture.homeTeamId, awayTeamId: fixture.awayTeamId, groundId: fixture.groundId, matchId: fixture.matchId,
-      matchGameId: current.state.schedule.request.gameId, matchSeed: fixture.matchSeed, selections: [...ready.selections],
+      matchGameId: `career-match-${fixture.fixtureId}`, matchSeed: fixture.matchSeed, selections: [...ready.selections],
       careerStateSha256: current.state.stateSha256, managedTeamId: current.state.controlledTeamId };
     sessionStorage.setItem(launchKey, JSON.stringify(launch)); window.location.hash = "#exhibition";
   }

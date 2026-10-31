@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import world from "../../packages/data/worlds/fictional-eight-01.json" with { type: "json" };
-import { createStagedRosterPack, simulateRosterOffscreenFixture } from "@lcxxvi/simulation";
+import { createRosterT20Session, createStagedRosterPack, executeRosterT20Command, fixtureAutopilotStep, type T20Session } from "@lcxxvi/simulation";
 import { changeRosterSeasonTraining, completeRosterManagedFixture, createRosterSeason, hasAcceptedRosterManagedFixture, prepareRosterManagedFixture, simulateNextRosterSeasonFixture, validateRosterSeasonState } from "../../apps/web/src/career/roster-season.js";
 
 describe("roster season state", () => {
@@ -28,14 +28,18 @@ describe("roster season state", () => {
     expect(() => validateRosterSeasonState(second, wrongPack)).toThrow();
     const managed = createRosterSeason(pack, { careerId: "managed", controlledTeamId: initial.schedule.fixtures[0]!.homeTeamId, seasonId: "season", gameId: "game", seasonSeed: "seed", startDate: "2027-01-03" });
     const ready = prepareRosterManagedFixture(managed, pack);
-    const played = simulateRosterOffscreenFixture(pack, managed.schedule, ready.careerState, ready.fixture.fixtureId);
-    const finished = completeRosterManagedFixture(managed, pack, played.session);
+    let played = createRosterT20Session(pack, { gameId: `career-match-${ready.fixture.fixtureId}`, matchId: ready.fixture.matchId, seed: ready.fixture.matchSeed, format: "T20", selection: { groundId: ready.fixture.groundId, teams: ready.selections } });
+    for (let steps = 0; played.core.phase !== "COMPLETE"; steps++) {
+      expect(steps).toBeLessThan(1400);
+      played = executeRosterT20Command(played, fixtureAutopilotStep(played as unknown as T20Session)).session;
+    }
+    const finished = completeRosterManagedFixture(managed, pack, played);
     expect(finished.outcomes[0]).toMatchObject({ version: "LC_T20_ROSTER_MANAGED_FIXTURE_V1", completion: { source: "USER_MATCH" } });
     expect(finished.careerState.appliedMatchConditions).toHaveLength(1);
-    expect(hasAcceptedRosterManagedFixture(finished, pack, played.session)).toBe(true);
-    const changedSession = structuredClone(played.session); changedSession.core.phase = "SETUP";
+    expect(hasAcceptedRosterManagedFixture(finished, pack, played)).toBe(true);
+    const changedSession = structuredClone(played); changedSession.core.phase = "SETUP";
     expect(() => hasAcceptedRosterManagedFixture(finished, pack, changedSession)).toThrow();
     expect(validateRosterSeasonState(JSON.parse(JSON.stringify(finished)), pack)).toEqual(finished);
-    expect(() => completeRosterManagedFixture(finished, pack, played.session)).toThrow();
+    expect(() => completeRosterManagedFixture(finished, pack, played)).toThrow();
   }, 30_000);
 });
