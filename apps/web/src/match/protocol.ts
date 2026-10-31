@@ -257,4 +257,5 @@ export type Response = {
   archive?: Uint8Array | null;
   careerResult?: CareerMatchResult | null;
   rosterCareerSession?: unknown;
+  acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
 };
