@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("match worker acknowledges committed commands and rejects stale commands", async ({ page }) => {
+for (const format of ["T20", "ODI", "RED_BALL"] as const) test(`${format} worker acknowledges committed commands and rejects stale commands`, async ({ page }) => {
   await page.addInitScript(() => {
     const target = window as unknown as { matchRequests: unknown[]; matchResponses: unknown[]; matchWorker?: Worker };
     target.matchRequests = []; target.matchResponses = [];
@@ -19,6 +19,7 @@ test("match worker acknowledges committed commands and rejects stale commands", 
     };
   });
   await page.goto("/#exhibition");
+  await page.getByLabel("Format", { exact: true }).selectOption(format);
   await page.getByRole("button", { name: "Confirm XIs and start" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
   await page.getByRole("button", { name: "Call heads" }).click();
