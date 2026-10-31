@@ -64,6 +64,29 @@ for (const format of ["T20", "ODI", "RED_BALL"]) test(`${format} bounded advance
     await expect(page.locator("#decision")).toHaveAttribute("data-phase", phase!);
   }
 });
+test("cancellation waits for the current command to commit", async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (message: unknown, ...options: unknown[]) {
+      const request = message as { type?: string; command?: { kind?: string } };
+      if (request.type === "COMMAND" && request.command?.kind === "ADVANCE") {
+        setTimeout(() => Reflect.apply(original, this, [message, ...options]), 500);
+      } else Reflect.apply(original, this, [message, ...options]);
+    };
+  });
+  await startReady(page);
+  const before = Number(await page.locator("#decision").getAttribute("data-revision"));
+  await page.getByRole("button", { name: "Finish match", exact: true }).click();
+  await page.getByRole("button", { name: "Stop simulation" }).click();
+  await expect(page.getByText("Stopping after this commit…")).toBeVisible();
+  await settle(page);
+  await expect(page.getByRole("button", { name: "Stop simulation" })).toHaveCount(0);
+  await expect(page.getByText(/^Committed events \d+–\d+\.$/)).toBeVisible();
+  await expect(page.locator("#decision")).toHaveAttribute("data-revision", String(before + 1));
+  await page.reload();
+  await settle(page);
+  await expect(page.locator("#decision")).toHaveAttribute("data-revision", String(before + 1));
+});
 async function shot(page: Page, browser: string, name: string) {
   mkdirSync(dir, { recursive: true });
   await page.screenshot({

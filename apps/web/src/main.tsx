@@ -34,7 +34,9 @@ export function MatchApp() {
     serial = useRef(0),
     inflight = useRef<string | null>(null),
     currentRevision = useRef(0);
-  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number } | null>(null);
+  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number; cancel: boolean; from: number | null } | null>(null);
+  const [batchState, setBatchState] = useState<"idle" | "running" | "stopping">("idle");
+  const [batchProgress, setBatchProgress] = useState<{ from: number; to: number } | null>(null);
   const careerLaunch = useRef<CareerUserMatchLaunch | null>((() => {
     try {
       const raw = sessionStorage.getItem("lcxxvi-career-match-launch");
@@ -106,6 +108,7 @@ export function MatchApp() {
   }, [scale, commentary, density]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(body.type)) setBatchProgress(null);
     const requestId = `ui-${++serial.current}`;
     inflight.current = requestId;
     setBusy(true);
@@ -155,7 +158,11 @@ export function MatchApp() {
       let batchError = "";
       if (batch) {
         const acknowledged = r.acknowledgement?.commandId === r.requestId && r.acknowledgement.committedRevision === r.revision;
-        const continueBatch = acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
+        if (acknowledged && r.acknowledgement) {
+          batch.from ??= r.acknowledgement.fromSequence;
+          setBatchProgress({ from: batch.from, to: r.acknowledgement.toSequence });
+        }
+        const continueBatch = !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
           !r.persistence?.readOnly && (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) && --batch.remaining > 0;
         if (continueBatch) {
           const requestId = `ui-${++serial.current}`;
@@ -166,6 +173,7 @@ export function MatchApp() {
           if (!r.error && !acknowledged) batchError = "Simulation stopped because the last command was not acknowledged.";
           else if (!r.error && batch.remaining <= 0) batchError = "Simulation stopped at its command limit.";
           advanceBatch.current = null;
+          setBatchState("idle");
         }
       }
       setBusy(inflight.current !== null);
@@ -210,6 +218,8 @@ export function MatchApp() {
       }
     };
     const failed = () => {
+      advanceBatch.current = null;
+      setBatchState("idle");
       setFatal(true);
       setBusy(false);
       setError(
@@ -299,6 +309,7 @@ export function MatchApp() {
   }
   function act(action: Action) {
     if (!view || inflight.current || fatal) return;
+    if (!advanceBatch.current) setBatchProgress(null);
     const i = view.innings[view.activeIndex]?.innings;
     const team =
       "teamId" in action.payload
@@ -327,8 +338,15 @@ export function MatchApp() {
   }
   function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
     if (!view || inflight.current || fatal || view.advanceReason || persistence?.readOnly) return;
-    advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512 };
+    advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512, cancel: false, from: null };
+    setBatchProgress(null);
+    setBatchState("running");
     act({ kind: "ADVANCE", payload: { scope: "OVER" } });
+  }
+  function stopAdvance() {
+    if (!advanceBatch.current) return;
+    advanceBatch.current.cancel = true;
+    setBatchState("stopping");
   }
   useEffect(() => {
     if (error) document.querySelector<HTMLElement>("[role=alert]")?.focus();
@@ -592,9 +610,11 @@ export function MatchApp() {
                 </h2>
               </div>
               <span role="status" className="working">
-                {busy ? "Applying…" : "Up to date"}
+                {batchState === "stopping" ? "Stopping after this commit…" : busy ? "Applying…" : "Up to date"}
               </span>
             </div>
+            {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
+            {batchProgress && <p role="status">Committed events {batchProgress.from}–{batchProgress.to}.</p>}
             <fieldset disabled={busy || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (

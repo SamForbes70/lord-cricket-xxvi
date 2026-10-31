@@ -99,6 +99,23 @@ function resolution(
   };
 }
 describe("Pass 11 / M5B red-ball profile", () => {
+  it("keeps delivery and over advances equivalent", () => {
+    const initial = ready(createRed5Session(setup));
+    const advance = (s: Red5Session, scope: "DELIVERY" | "OVER") => executeRed5Command(s, {
+      kind: "ADVANCE", payload: { scope }, commandId: `scope-${scope}-${s.revision}`, expectedRevision: s.revision, actorId: "SYSTEM",
+    }).session;
+    const over = advance(initial, "OVER");
+    let deliveries = initial;
+    const index = initial.core.activeInningsIndex;
+    const initialOver = Math.floor(initial.core.innings[index]!.innings.legalBalls / 6);
+    while (deliveries.core.phase === "READY" && deliveries.core.activeInningsIndex === index && Math.floor(deliveries.core.innings[index]!.innings.legalBalls / 6) === initialOver) {
+      deliveries = advance(deliveries, "DELIVERY");
+    }
+    expect(deliveries.core).toEqual(over.core);
+    expect(deliveries.events.filter(event => event.type === "DELIVERY_RECORDED").map(event => event.payload))
+      .toEqual(over.events.filter(event => event.type === "DELIVERY_RECORDED").map(event => event.payload));
+  });
+
   it("pins the custom five-day rule profile and corpus", () => {
     const r = RULE_MANIFESTS.find((r) => r.rulesId === "LC_RED5_01")!;
     expect(r).toMatchObject({
