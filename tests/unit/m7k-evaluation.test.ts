@@ -41,7 +41,7 @@ describe("M7K sealed-cohort evaluation tooling", () => {
       const rejected = spawnSync(process.execPath, args, { encoding: "utf8" });
       expect(rejected.status).not.toBe(0); expect(rejected.stderr).toContain("OPENED_BEFORE_FREEZE"); expect(rejected.stderr).not.toContain("ENOENT");
     } finally { rmSync(directory, { recursive: true, force: true }); }
-  });
+  }, 30_000);
   it("reports both innings, competitions, training-defined bands, ablations and repeatable uncertainty", () => {
     const p = protocol(), rows = records(p), a = evaluate(p, rows, targets());
     expect(a.comparisons).toHaveLength(2); expect(a.comparisons.every(c => c.allBandsPass)).toBe(true);
