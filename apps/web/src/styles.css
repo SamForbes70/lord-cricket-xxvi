@@ -614,10 +614,10 @@ code {
   margin-bottom: 0;
 }
 .match-shell .scorestrip {
-  padding-block: 14px;
+  padding-block: 10px;
 }
 .match-shell .active {
-  padding-block: 12px;
+  padding-block: 8px;
 }
 @media (max-width: 800px) {
   .opponent-control {

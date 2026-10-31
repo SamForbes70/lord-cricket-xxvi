@@ -17,7 +17,9 @@ Matches in all three formats and portable saves retain the edited copy.
 PR #17 merged imported-roster exhibitions and a T20 career as `3afec43`.
 PR #18 merged 115% text scale and persistent match preferences as `4aeb41b`.
 New roster packs are limited to 8 MiB; complete portable archives are limited to 20 MiB.
-Additional settings and match-control acceptance remains in progress.
+PR #20 completed settings and player-navigation acceptance.
+PR #19 added durable command acknowledgements.
+Bounded simulation and cancellation remain planned.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.
 The [world editing report](verification-v01-world-editing/REPORT.md) records this slice.
 A labelled synthetic-alpha release remains distinct from empirical model promotion.
