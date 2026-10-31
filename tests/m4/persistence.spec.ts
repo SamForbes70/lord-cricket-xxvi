@@ -441,3 +441,34 @@ test("edited match world is atomic, immutable and retained during recovery", asy
   expect(result.missingCopy).toContain("SAVE_WORLD_COPY_REQUIRED");
   expect(result).toMatchObject({ recovered: true, revision: 1, team: "Harbour XI" });
 });
+
+test("delegation history checks the writer lease and durable match revision", async ({ page }) => {
+  await page.goto("/#exhibition");
+  const moduleUrl = `/@fs/${path.resolve("packages/persistence/src/index.ts")}`;
+  const result = await page.evaluate(async (url) => {
+    const { IndexedDbSaveRepository } = await import(url) as typeof import("../../packages/persistence/src/index.js");
+    const database = `delegation-${crypto.randomUUID()}`;
+    const repo = new IndexedDbSaveRepository(database);
+    const saveId = "save", owner = "owner", now = Date.now();
+    await repo.acquireLease(saveId, owner, now);
+    await repo.commit({ saveId, kind: "AUTO", title: "Fixture", expectedRevision: null,
+      session: { revision: 1, events: [{ sequence: 1, kind: "FIXTURE" }] }, revision: 1,
+      events: [{ sequence: 1, kind: "FIXTURE" }], command: null,
+      metadata: { matchGameId: "g", matchId: "m", teams: ["A", "B"], ground: "G", phase: "TOSS", completed: false },
+      ownerId: owner, now, updatedAt: "2026-10-04T02:00:00.000Z" });
+    const change = { commandId: "one", expectedRevision: 0, matchRevision: 1, teamId: "team-a", categories: ["BOWLER"] };
+    const first = await repo.appendDelegation(saveId, owner, now, change);
+    const retry = await repo.appendDelegation(saveId, owner, now, change);
+    const failures: string[] = [];
+    for (const [writer, next] of [["other", { ...change, commandId: "two", expectedRevision: 1 }], [owner, { ...change, commandId: "two", expectedRevision: 1, matchRevision: 0 }]] as const) {
+      try { await repo.appendDelegation(saveId, writer, now, next); }
+      catch (error) { failures.push(error instanceof Error ? error.message : String(error)); }
+    }
+    const restored = await new IndexedDbSaveRepository(database).loadDelegationJournal(saveId);
+    await repo.delete(saveId);
+    return { first, retry, restored, failures };
+  }, moduleUrl);
+  expect(result.retry).toEqual(result.first);
+  expect(result.restored).toEqual(result.first);
+  expect(result.failures).toEqual(["SAVE_READ_ONLY", "DELEGATION_STALE_MATCH"]);
+});

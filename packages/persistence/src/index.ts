@@ -1,5 +1,8 @@
 import {
   canonicalJson,
+  appendDelegationChange,
+  replayDelegationJournal,
+  type DelegationJournal,
   StagedRosterPackSchema,
   type StagedRosterPack,
   type ID,
@@ -165,6 +168,9 @@ function settingKey(key: string) {
 }
 function leaseKey(saveId: string) {
   return `lease:${saveId}`;
+}
+function delegationKey(saveId: string) {
+  return `delegation:${saveId}`;
 }
 function summaryFromGame(row: GameRecord): SaveSummary {
   return {
@@ -355,6 +361,39 @@ export class IndexedDbSaveRepository {
     const current = (await req(store.get(key))) as LeaseRecord | undefined;
     if (current?.ownerId === ownerId) store.delete(key);
     await txDone(tx);
+  }
+
+  async loadDelegationJournal(saveId: string): Promise<DelegationJournal> {
+    const db = await this.open();
+    const tx = db.transaction(["games", "settings"], "readonly");
+    const game = await req(tx.objectStore("games").get(saveId)) as GameRecord | undefined;
+    const row = await req(tx.objectStore("settings").get(delegationKey(saveId))) as SettingRecord | undefined;
+    await txDone(tx);
+    if (!game) throw new Error("SAVE_NOT_FOUND");
+    const journal = replayDelegationJournal(row?.value ?? { version: "LC_DELEGATION_JOURNAL_V1", changes: [] });
+    if (journal.changes.some(change => change.matchRevision > game.revision)) throw new Error("DELEGATION_AHEAD_OF_SAVE");
+    return journal;
+  }
+
+  async appendDelegation(saveId: string, ownerId: string, now: number, input: unknown): Promise<DelegationJournal> {
+    const db = await this.open();
+    const tx = db.transaction(["games", "settings"], "readwrite");
+    try {
+      const settings = tx.objectStore("settings");
+      const game = await req(tx.objectStore("games").get(saveId)) as GameRecord | undefined;
+      const lease = await req(settings.get(leaseKey(saveId))) as LeaseRecord | undefined;
+      const row = await req(settings.get(delegationKey(saveId))) as SettingRecord | undefined;
+      if (!game) throw new Error("SAVE_NOT_FOUND");
+      if (!lease || lease.ownerId !== ownerId || lease.expiresAt <= now) throw new Error("SAVE_READ_ONLY");
+      const journal = appendDelegationChange(row?.value ?? { version: "LC_DELEGATION_JOURNAL_V1", changes: [] }, input);
+      if (journal.changes.at(-1)?.matchRevision !== game.revision) throw new Error("DELEGATION_STALE_MATCH");
+      settings.put({ key: delegationKey(saveId), value: journal } satisfies SettingRecord);
+      await txDone(tx);
+      return journal;
+    } catch (error) {
+      try { tx.abort(); } catch { /* transaction already closed */ }
+      throw error;
+    }
   }
 
   async historyCommands(
@@ -784,6 +823,7 @@ export class IndexedDbSaveRepository {
     if (active?.value === saveId)
       tx.objectStore("settings").delete(settingKey("activeSaveId"));
     tx.objectStore("settings").delete(leaseKey(saveId));
+    tx.objectStore("settings").delete(delegationKey(saveId));
     await txDone(tx);
   }
 
