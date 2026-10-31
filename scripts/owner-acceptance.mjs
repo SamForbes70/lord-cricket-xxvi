@@ -60,7 +60,7 @@ if (flags.has("--plan")) {
     const status = result.error?.code === "ETIMEDOUT" ? "BLOCKED" : result.status === 0 && !evidenceError ? "PASS" : "FAIL";
     report.commands.push({ name: step.name, executable: invocation.executable, args: invocation.args, startedAtUtc: new Date(started).toISOString(), elapsedMs: Date.now() - started, exitCode: result.status, signal: result.signal, status, evidence, evidenceError, log: logPath, sha256: createHash("sha256").update(log).digest("hex") });
     save(); console.log(`${step.name}: ${status}`);
-    if (status !== "PASS") { report.status = status; process.exitCode = 1; break; }
+    if (status !== "PASS") { console.error(log.slice(-24_000)); report.status = status; process.exitCode = 1; break; }
   }
   const completedRevision = git(["rev-parse", "HEAD"]), completedChanges = git(["status", "--porcelain"]);
   report.source.completedCommit = completedRevision.status === 0 ? completedRevision.stdout.trim() : null;

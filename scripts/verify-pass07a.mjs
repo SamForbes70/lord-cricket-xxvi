@@ -25,6 +25,7 @@ const run=(executable,args,label,options={})=>{
     status,elapsedMs:Math.round(performance.now()-began),log:label+".log",
     ...(result.error?{error:result.error.message}:{})};
   console.log(`${label}: ${status}`);
+  if(status!=="PASS") console.error(log.slice(-32_000));
   return entry;
 };
 rmSync(join(directory,"results.json"),{force:true});
