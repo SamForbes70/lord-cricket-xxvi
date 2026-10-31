@@ -8,6 +8,7 @@ import {
   readPortableArchive,
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
+import { createDiagnostic, type DiagnosticFailure, type DiagnosticPreview } from "./diagnostic-export.js";
 import { proposeOpponentT20Command } from "./ai-opponent.js";
 import { createODIMatchController } from "./controller-odi.js";
 import { createRed5MatchController } from "./controller-red5.js";
@@ -39,6 +40,8 @@ type MatchController =
   | ReturnType<typeof createRed5MatchController>;
 let controller: MatchController = makeController();
 let initialised = false;
+let lastFailure: DiagnosticFailure | null = null;
+let diagnostic: { preview: DiagnosticPreview; bytes: Uint8Array; gameId: string | null; eventHash: string | null } | null = null;
 
 function randomHex(bytesCount: number): string {
   const bytes = crypto.getRandomValues(new Uint8Array(bytesCount));
@@ -214,7 +217,10 @@ async function initialise(): Promise<void> {
   if (!saveId) return;
   try {
     await restoreSave(saveId);
-  } catch {
+  } catch (error) {
+    const code = error instanceof Error && /^[A-Z][A-Z0-9_]{2,80}$/.test(error.message) ? error.message : null;
+    lastFailure = { requestType: "RECOVERY", sequence: null, invariantCode: code, command: null };
+    diagnostic = null;
     // Keep the catalogue usable when the active pointer is stale/corrupt beyond recovery.
     activeSaveId = null;
     activeWorldCopy = null;
@@ -536,6 +542,17 @@ async function handle(raw: unknown): Promise<Response> {
   }
   const request = parsed.data;
   await initialise();
+  if (request.type === "PREVIEW_DIAGNOSTIC") {
+    const session = controller.snapshot();
+    const result = await createDiagnostic(session, lastFailure);
+    diagnostic = { ...result, gameId: session?.setup.gameId ?? null, eventHash: session?.lastEventHash ?? null };
+    return { ...await decorate(controller.currentResponse(request.requestId)), diagnosticPreview: result.preview };
+  }
+  if (request.type === "EXPORT_DIAGNOSTIC") {
+    const session = controller.snapshot();
+    if (!diagnostic || request.sha256 !== diagnostic.preview.sha256 || diagnostic.gameId !== (session?.setup.gameId ?? null) || diagnostic.eventHash !== (session?.lastEventHash ?? null) || diagnostic.preview.revision !== (session?.revision ?? null)) return decorate(controller.currentResponse(request.requestId, "Preview the diagnostic again before downloading."));
+    return { ...await decorate(controller.currentResponse(request.requestId)), diagnosticBytes: diagnostic.bytes };
+  }
   if (request.type === "BOOT" && request.careerFixture) {
     const current = controller.snapshot();
     const matchesCareerFixture =
@@ -653,8 +670,25 @@ self.onmessage = (event: MessageEvent<unknown>) => {
   const raw = event.data;
   queue = queue.then(async () => {
     try {
-      self.postMessage(await handle(raw));
+      const response = await handle(raw);
+      const parsed = RequestSchema.safeParse(raw);
+      if (response.error && parsed.success && !["PREVIEW_DIAGNOSTIC", "EXPORT_DIAGNOSTIC"].includes(parsed.data.type)) {
+        const session = controller.snapshot();
+        lastFailure = { requestType: parsed.data.type, sequence: session ? session.events.length + 1 : null,
+          invariantCode: /^[A-Z][A-Z0-9_]{2,80}$/.test(response.error) ? response.error : null,
+          command: parsed.data.type === "COMMAND" ? parsed.data.command : null };
+        diagnostic = null;
+      } else if (parsed.success && ["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(parsed.data.type) && !response.error && !(parsed.data.type === "BOOT" && lastFailure?.requestType === "RECOVERY")) { lastFailure = null; diagnostic = null; }
+      self.postMessage(response);
     } catch (e) {
+      const failed = RequestSchema.safeParse(raw);
+      if (failed.success && !["PREVIEW_DIAGNOSTIC", "EXPORT_DIAGNOSTIC"].includes(failed.data.type)) {
+        const session = controller.snapshot();
+        const code = e instanceof Error && /^[A-Z][A-Z0-9_]{2,80}$/.test(e.message) ? e.message : null;
+        lastFailure = { requestType: failed.data.type, sequence: session ? session.events.length + 1 : null,
+          invariantCode: code, command: failed.data.type === "COMMAND" ? failed.data.command : null };
+        diagnostic = null;
+      }
       const requestId =
         raw && typeof raw === "object" && "requestId" in raw
           ? String((raw as Record<string, unknown>).requestId)

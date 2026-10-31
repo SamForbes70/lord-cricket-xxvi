@@ -123,6 +123,8 @@ export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128), delegated: z.boolean().optional() }),
   z.strictObject({ ...base, type: z.literal("SET_DELEGATION"), teamId: z.string().min(1).max(128), expectedDelegationRevision: z.number().int().nonnegative(), categories: z.array(DelegationCategorySchema).max(6).refine(values => new Set(values).size === values.length) }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
+  z.strictObject({ ...base, type: z.literal("PREVIEW_DIAGNOSTIC") }),
+  z.strictObject({ ...base, type: z.literal("EXPORT_DIAGNOSTIC"), sha256: z.string().regex(/^[a-f0-9]{64}$/) }),
   z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
   z.strictObject({
     ...base,
@@ -262,4 +264,6 @@ export type Response = {
   rosterCareerSession?: unknown;
   acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
   delegation?: DelegationJournal;
+  diagnosticPreview?: import("./diagnostic-export.js").DiagnosticPreview;
+  diagnosticBytes?: Uint8Array;
 };

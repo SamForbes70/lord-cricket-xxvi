@@ -90,6 +90,7 @@ export function MatchApp() {
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
   const [verification, setVerification] = useState<Verification | null>(null);
+  const [diagnosticPreview, setDiagnosticPreview] = useState<import("./match/diagnostic-export.js").DiagnosticPreview | null>(null);
   const [persistence, setPersistence] = useState<PersistenceView | null>(null);
   const [scale, setScale] = useState(() => {
       const saved = localStorage.getItem("lcxxvi-match-scale");
@@ -112,6 +113,7 @@ export function MatchApp() {
   }, [scale, commentary, density]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
+    if (body.type !== "PREVIEW_DIAGNOSTIC" && body.type !== "EXPORT_DIAGNOSTIC") setDiagnosticPreview(null);
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(body.type)) { setBatchProgress(null); lastAiChecked.current = {}; }
     const requestId = `ui-${++serial.current}`;
     inflight.current = requestId;
@@ -207,6 +209,13 @@ export function MatchApp() {
           careerFixture: careerLaunch.current,
           ...(careerLaunch.current.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? { rosterPack: careerLaunch.current.rosterPack } : {}),
         });
+      }
+      if (r.diagnosticPreview) setDiagnosticPreview(r.diagnosticPreview);
+      if (r.diagnosticBytes) {
+        const bytes = new Uint8Array(r.diagnosticBytes);
+        const url = URL.createObjectURL(new Blob([bytes], { type: "application/json" }));
+        const link = document.createElement("a"); link.href = url; link.download = "lord-cricket-diagnostic.json"; link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
       if (r.archive) {
         const archiveBytes = new Uint8Array(r.archive.byteLength);
@@ -321,6 +330,7 @@ export function MatchApp() {
   }
   function act(action: Action) {
     if (!view || inflight.current || fatal) return;
+    setDiagnosticPreview(null);
     if (!advanceBatch.current) setBatchProgress(null);
     const i = view.innings[view.activeIndex]?.innings;
     const team =
@@ -985,6 +995,19 @@ export function MatchApp() {
           </div>
         </>
       )}
+      <section className="panel" aria-label="Match diagnostic export">
+        <h2>Match diagnostic</h2>
+        <p>The file contains match events, identifiers, the random seed and the most recent rejected command if available. Review it before sharing.</p>
+        <button type="button" disabled={busy || fatal} onClick={() => send({ type: "PREVIEW_DIAGNOSTIC" })}>Preview diagnostic</button>
+        {diagnosticPreview && <div role="region" aria-label="Diagnostic preview">
+          <p>Format: {diagnosticPreview.format ?? "Unavailable"}. Events: {diagnosticPreview.eventCount}. Revision: {diagnosticPreview.revision ?? "Unavailable"}. Size: {diagnosticPreview.byteCount} bytes.</p>
+          <p>Seed: {diagnosticPreview.includesSeed ? "Included in file" : "Unavailable"}. Latest failure: {diagnosticPreview.failure ? `${diagnosticPreview.failure.requestType}, sequence ${diagnosticPreview.failure.sequence ?? "unavailable"}, code ${diagnosticPreview.failure.invariantCode ?? "unavailable"}` : "None recorded in this session"}.</p>
+          <p>File version: LC_MATCH_DIAGNOSTIC_V1. Model status: SYNTHETIC_ALPHA. Engine: {diagnosticPreview.engine ?? "Unavailable"}.</p>
+          <p>Rules hash: <code>{diagnosticPreview.rulesHash ?? "Unavailable"}</code>. Model hash: <code>{diagnosticPreview.modelHash ?? "Unavailable"}</code>.</p>
+          <p>SHA-256: <code>{diagnosticPreview.sha256}</code></p>
+          <button type="button" disabled={busy || fatal} onClick={() => send({ type: "EXPORT_DIAGNOSTIC", sha256: diagnosticPreview.sha256 })}>Download diagnostic</button>
+        </div>}
+      </section>
       <section className="save-manager" aria-label="Save files">
         <div className="save-file-actions">
           {view && (
