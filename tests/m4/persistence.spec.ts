@@ -465,10 +465,13 @@ test("delegation history checks the writer lease and durable match revision", as
       catch (error) { failures.push(error instanceof Error ? error.message : String(error)); }
     }
     const restored = await new IndexedDbSaveRepository(database).loadDelegationJournal(saveId);
+    await repo.cloneSave(saveId, "copy", "MANUAL", "Copy", owner, now, "2026-10-04T02:00:00.000Z");
+    const copied = await repo.loadDelegationJournal("copy");
     await repo.delete(saveId);
-    return { first, retry, restored, failures };
+    return { first, retry, restored, copied, failures };
   }, moduleUrl);
   expect(result.retry).toEqual(result.first);
   expect(result.restored).toEqual(result.first);
+  expect(result.copied).toEqual(result.first);
   expect(result.failures).toEqual(["SAVE_READ_ONLY", "DELEGATION_STALE_MATCH"]);
 });

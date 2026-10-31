@@ -73,6 +73,7 @@ export type DurableCommit = {
   events: readonly { sequence: number; [key: string]: unknown }[];
   command: DurableCommand | null;
   historyCommands?: readonly DurableCommand[];
+  delegationJournal?: DelegationJournal;
   setActive?: boolean;
   worldCopy?: NewGameWorldCopy | null;
   rosterPack?: StagedRosterPack | null;
@@ -445,6 +446,8 @@ export class IndexedDbSaveRepository {
   async commit(input: DurableCommit): Promise<SaveSummary> {
     const db = await this.open();
     const now = input.now;
+    const delegation = input.delegationJournal ? replayDelegationJournal(input.delegationJournal) : null;
+    if (delegation?.changes.some(change => change.matchRevision > input.revision)) throw new Error("DELEGATION_AHEAD_OF_SAVE");
     const payload = canonicalJson(input.session);
     const snapshotHash = await sha256Text(payload);
     const worldCopy = input.worldCopy ? await validateStoredWorldCopy(input.worldCopy) : null;
@@ -535,7 +538,7 @@ export class IndexedDbSaveRepository {
       );
     }
     const initialHistory = input.historyCommands ?? [];
-    if (initialHistory.length && existing) {
+    if ((initialHistory.length || delegation) && existing) {
       tx.abort();
       try {
         await txDone(tx);
@@ -608,6 +611,7 @@ export class IndexedDbSaveRepository {
         saveId: input.saveId,
         ...input.command,
       } satisfies CommandRecord);
+    if (delegation?.changes.length) settings.put({ key: delegationKey(input.saveId), value: delegation } satisfies SettingRecord);
     const summary: SaveSummary = {
       saveId: input.saveId,
       kind: input.kind,
@@ -703,6 +707,7 @@ export class IndexedDbSaveRepository {
       sourceSaveId,
       Number(session.revision ?? 0),
     );
+    const delegationJournal = await this.loadDelegationJournal(sourceSaveId);
     return this.commit({
       saveId: targetSaveId,
       kind,
@@ -713,6 +718,7 @@ export class IndexedDbSaveRepository {
       events: eventRows,
       command: null,
       historyCommands,
+      ...(delegationJournal.changes.length ? { delegationJournal } : {}),
       worldCopy: loaded.worldCopy ?? null,
       rosterPack: loaded.rosterPack ?? null,
       setActive: false,
