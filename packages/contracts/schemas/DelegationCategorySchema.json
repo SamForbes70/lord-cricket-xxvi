@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "TOSS",
+    "INNINGS",
+    "BATTER",
+    "BOWLER",
+    "BATTING_PLAN",
+    "BOWLING_PLAN"
+  ],
+  "$id": "urn:lcxxvi:DelegationCategory:1",
+  "title": "DelegationCategory"
+}
