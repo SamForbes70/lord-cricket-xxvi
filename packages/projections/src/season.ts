@@ -1,5 +1,7 @@
 import {
   OffscreenFixtureOutcomeSchema,
+  RosterOffscreenFixtureOutcomeSchema, RosterSeasonScheduleSchema, RosterSeasonMatchCompletionSchema, RosterSeasonProjectionSchema,
+  type RosterSeasonProjection, type RosterSeasonMatchCompletion,
   SeasonScheduleSchema,
   T20LeagueCompetitionManifestSchema,
   T20SeasonMatchCompletionSchema,
@@ -54,7 +56,7 @@ function equalNrr(a: SeasonTeamTableRow, b: SeasonTeamTableRow): boolean {
 }
 
 function recomputeTable(
-  competition: T20LeagueCompetitionManifest,
+  competition: Pick<T20LeagueCompetitionManifest, "teamIds" | "points">,
   appliedMatches: readonly AppliedSeasonMatch[],
 ): SeasonTeamTableRow[] {
   const rows = new Map<string, SeasonTeamTableRow>();
@@ -281,7 +283,7 @@ function validateCompletionBinding(schedule: SeasonSchedule, completion: T20Seas
 }
 
 function appliedMatch(
-  competition: T20LeagueCompetitionManifest,
+  competition: Pick<T20LeagueCompetitionManifest, "points">,
   completion: T20SeasonMatchCompletion,
 ): AppliedSeasonMatch {
   const home = completion.scorecard.innings.find((innings) => innings.battingTeamId === completion.homeTeamId)!;
@@ -390,4 +392,68 @@ export function validateT20SeasonProjection(input: {
   }
   assertProjection(JSON.stringify(state.leaders) === JSON.stringify(leaders(state.players)), "STATE_LEADERS_MISMATCH");
   return state;
+}
+
+export function rosterCompletionFromOffscreen(scheduleRaw: unknown, outcomeRaw: unknown): RosterSeasonMatchCompletion {
+  const schedule = RosterSeasonScheduleSchema.parse(scheduleRaw);
+  const outcome = RosterOffscreenFixtureOutcomeSchema.parse(outcomeRaw);
+  const fixture = schedule.fixtures.find(entry => entry.fixtureId === outcome.fixtureId);
+  assertProjection(fixture && fixture.matchId === outcome.matchId && outcome.scheduleSha256 === schedule.scheduleSha256, "ROSTER_OUTCOME_FIXTURE_MISMATCH");
+  return RosterSeasonMatchCompletionSchema.parse({ completionVersion: "LC_T20_ROSTER_SEASON_COMPLETION_V2", seasonId: schedule.request.seasonId,
+    scheduleSha256: schedule.scheduleSha256, fixtureId: outcome.fixtureId, matchId: outcome.matchId, fixtureOrdinal: fixture.ordinal,
+    roundNumber: outcome.roundNumber, matchDayDate: outcome.matchDayDate, homeTeamId: outcome.homeTeamId, awayTeamId: outcome.awayTeamId,
+    source: "OFFSCREEN", sourceCompletionSha256: outcome.outcomeSha256, selectedTeams: outcome.selectedTeams,
+    scorecard: outcome.scorecard, scorecardSha256: outcome.scorecardSha256 });
+}
+export function createRosterSeasonProjection(scheduleRaw: unknown): RosterSeasonProjection {
+  const schedule = RosterSeasonScheduleSchema.parse(scheduleRaw);
+  const competition = { teamIds: schedule.teamIds, points: { win: 2 as const, tie: 1 as const, noResult: 1 as const, loss: 0 as const } };
+  return RosterSeasonProjectionSchema.parse({ projectionVersion: "LC_T20_ROSTER_SEASON_PROJECTION_V2", seasonId: schedule.request.seasonId,
+    scheduleSha256: schedule.scheduleSha256, competitionId: "LC_T20_LEAGUE_01", revision: 0,
+    cursor: cursor([]), appliedMatches: [], table: recomputeTable(competition, []), players: [], leaders: { runs: [], wickets: [] } });
+}
+export function validateRosterSeasonProjection(stateRaw: unknown, scheduleRaw: unknown): RosterSeasonProjection {
+  const state = RosterSeasonProjectionSchema.parse(stateRaw);
+  const schedule = RosterSeasonScheduleSchema.parse(scheduleRaw);
+  const competition = { teamIds: schedule.teamIds, points: { win: 2 as const, tie: 1 as const, noResult: 1 as const, loss: 0 as const } };
+  assertProjection(state.seasonId === schedule.request.seasonId && state.scheduleSha256 === schedule.scheduleSha256 &&
+    state.revision === state.appliedMatches.length && JSON.stringify(state.cursor) === JSON.stringify(cursor(state.appliedMatches)) &&
+    JSON.stringify(state.table) === JSON.stringify(recomputeTable(competition, state.appliedMatches)), "ROSTER_PROJECTION_STATE_MISMATCH");
+  assertProjection(new Set(state.appliedMatches.map(match => match.fixtureId)).size === state.appliedMatches.length &&
+    state.appliedMatches.every(match => { const fixture = schedule.fixtures.find(item => item.fixtureId === match.fixtureId); return fixture && fixture.matchId === match.matchId && fixture.ordinal === match.fixtureOrdinal && fixture.homeTeamId === match.homeTeamId && fixture.awayTeamId === match.awayTeamId; }), "ROSTER_PROJECTION_FIXTURE_MISMATCH");
+  for (const player of state.players) {
+    const expected = derivePlayer(rawPlayer(player));
+    for (const key of ["battingAverageX100", "strikeRateX100", "bowlingAverageX100", "economyX100", "bowlingStrikeRateX100"] as const)
+      assertProjection(player[key] === expected[key], `ROSTER_PLAYER_DERIVED_MISMATCH:${player.playerId}:${key}`);
+  }
+  assertProjection(JSON.stringify(state.leaders) === JSON.stringify(leaders(state.players)), "ROSTER_PROJECTION_LEADERS_MISMATCH");
+  return state;
+}
+export function applyRosterSeasonCompletion(stateRaw: unknown, scheduleRaw: unknown, completionRaw: unknown): RosterSeasonProjection {
+  const state = validateRosterSeasonProjection(stateRaw, scheduleRaw);
+  const schedule = RosterSeasonScheduleSchema.parse(scheduleRaw);
+  const completion = RosterSeasonMatchCompletionSchema.parse(completionRaw);
+  assertProjection(state.seasonId === schedule.request.seasonId && state.scheduleSha256 === schedule.scheduleSha256, "ROSTER_STATE_SCHEDULE_MISMATCH");
+  const fixture = schedule.fixtures.find(entry => entry.fixtureId === completion.fixtureId);
+  assertProjection(fixture && completion.seasonId === schedule.request.seasonId && completion.scheduleSha256 === schedule.scheduleSha256 &&
+    fixture.matchId === completion.matchId && fixture.ordinal === completion.fixtureOrdinal && fixture.roundNumber === completion.roundNumber &&
+    fixture.matchDayDate === completion.matchDayDate && fixture.homeTeamId === completion.homeTeamId && fixture.awayTeamId === completion.awayTeamId,
+    "ROSTER_COMPLETION_FIXTURE_MISMATCH");
+  const baseline = T20SeasonMatchCompletionSchema.parse({ ...completion, completionVersion: "LC_T20_SEASON_MATCH_COMPLETION_V1" });
+  const inningsTeams = new Set(baseline.scorecard.innings.map(innings => innings.battingTeamId));
+  assertProjection(baseline.scorecard.matchId === baseline.matchId && baseline.selectedTeams[0].teamId === baseline.homeTeamId &&
+    baseline.selectedTeams[1].teamId === baseline.awayTeamId && inningsTeams.size === 2 && inningsTeams.has(baseline.homeTeamId) &&
+    inningsTeams.has(baseline.awayTeamId) && baseline.scorecard.result.kind !== "DRAW", "ROSTER_COMPLETION_SCORECARD_MISMATCH");
+  if (baseline.scorecard.result.kind === "WIN") assertProjection([baseline.homeTeamId, baseline.awayTeamId].includes(baseline.scorecard.result.winnerTeamId), "ROSTER_COMPLETION_WINNER");
+  const previous = state.appliedMatches.find(match => match.matchId === baseline.matchId || match.fixtureId === baseline.fixtureId);
+  if (previous) {
+    assertProjection(previous.matchId === baseline.matchId && previous.fixtureId === baseline.fixtureId && previous.sourceCompletionSha256 === baseline.sourceCompletionSha256, "ROSTER_COMPLETION_CONFLICT");
+    return state;
+  }
+  assertProjection(!state.appliedMatches.some(match => match.sourceCompletionSha256 === baseline.sourceCompletionSha256), "ROSTER_COMPLETION_SOURCE_REUSED");
+  const competition = { teamIds: schedule.teamIds, points: { win: 2 as const, tie: 1 as const, noResult: 1 as const, loss: 0 as const } };
+  const appliedMatches = [...state.appliedMatches, appliedMatch(competition, baseline)].sort((a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId));
+  const players = updatePlayers(state.players, baseline);
+  return RosterSeasonProjectionSchema.parse({ ...state, revision: state.revision + 1, cursor: cursor(appliedMatches), appliedMatches,
+    table: recomputeTable(competition, appliedMatches), players, leaders: leaders(players) });
 }

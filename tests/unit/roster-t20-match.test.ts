@@ -4,7 +4,7 @@ import { createPortableArchive, readPortableArchive, type ArchivePins, type Save
 import world from "../../packages/data/worlds/fictional-eight-01.json" with { type: "json" };
 import {
   createRosterT20Session, createStagedRosterPack, createT20Session, executeRosterT20Command, fixtureAutopilotStep,
-  rehydrateRosterT20Session, type FrozenT20Setup, type RosterT20Session, type T20Session,
+  rehydrateRosterT20Session, replayRosterT20Session, type FrozenT20Setup, type RosterT20Session, type T20Session,
 } from "@lcxxvi/simulation";
 
 function roster(rating?: number) {
@@ -50,6 +50,7 @@ describe("roster-aware T20 match", () => {
     }
     expect(current.events.length).toBeGreaterThan(0);
     expect(rehydrateRosterT20Session(structuredClone(current), pack)).toEqual(current);
+    expect(replayRosterT20Session(current, pack).core).toEqual(current.core);
   }, 30_000);
 
   it("uses imported ratings in delivery outcomes", () => {

@@ -180,7 +180,21 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(170);
+  expect(names).toHaveLength(179);
+  expect(names).toContain("RosterSeasonStateSchema");
+  expect(names).toContain("RosterSeasonMatchCompletionSchema");
+  expect(names).toContain("RosterSeasonProjectionSchema");
+  expect(names).toContain("RosterOffscreenFixtureOutcomeSchema");
+  expect(names).toContain("RosterCareerDayStateSchema");
+  expect(names).toContain("RosterSeasonStateSchema");
+  expect(names).toContain("RosterSeasonMatchCompletionSchema");
+  expect(names).toContain("RosterSeasonProjectionSchema");
+  expect(names).toContain("RosterOffscreenFixtureOutcomeSchema");
+  expect(names).toContain("RosterCareerDayStateSchema");
+  expect(names).toContain("RosterSeasonScheduleRequestSchema");
+  expect(names).toContain("RosterSeasonScheduleSchema");
+  expect(names).toContain("RosterRed5ExecutionManifestSchema");
+  expect(names).toContain("RosterODIExecutionManifestSchema");
   expect(names).toContain("RosterT20ExecutionManifestSchema");
   expect(names).toContain("RosterMatchPreparationSchema");
   expect(names).toContain("RosterImportSourceSchema");

@@ -6,6 +6,7 @@ import {
   Red5CommandSchema,
   T20TeamSelectionSchema,
   NewGameWorldCopySchema,
+  StagedRosterPackSchema,
   type T20Command,
   type T20Scorecard,
   type ODIScorecard,
@@ -108,6 +109,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
     groundId: z.string().min(1),
     careerFixture: CareerFixtureLaunchSchema.nullable().optional(),
     worldCopy: NewGameWorldCopySchema.nullable().optional(),
+    rosterPack: StagedRosterPackSchema.nullable().optional(),
   }),
   z.strictObject({
     ...base,

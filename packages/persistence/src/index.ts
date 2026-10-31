@@ -413,12 +413,12 @@ export class IndexedDbSaveRepository {
     const suppliedCopyHash = worldCopyPayload ? await sha256Text(worldCopyPayload) : null;
     const rosterPack = input.rosterPack ? StagedRosterPackSchema.parse(input.rosterPack) : null;
     if (rosterPack && worldCopy) throw new Error("SAVE_WORLD_TYPE_CONFLICT");
-    if (objectRecord(objectRecord(input.session).setup).setupVersion === "LC_T20_ROSTER_SETUP_V2" && !rosterPack) throw new Error("SAVE_ROSTER_REQUIRED");
+    if (["LC_T20_ROSTER_SETUP_V2", "LC_ODI_ROSTER_SETUP_V2", "LC_RED5_ROSTER_SETUP_V2"].includes(String(objectRecord(objectRecord(input.session).setup).setupVersion)) && !rosterPack) throw new Error("SAVE_ROSTER_REQUIRED");
     const rosterPayload = rosterPack ? canonicalJson(rosterPack) : null;
     const suppliedRosterHash = rosterPayload ? await sha256Text(rosterPayload) : null;
     if (rosterPack) {
       const setup = objectRecord(objectRecord(input.session).setup);
-      if (setup.setupVersion !== "LC_T20_ROSTER_SETUP_V2" || setup.rosterPackHash !== suppliedRosterHash ||
+      if (!["LC_T20_ROSTER_SETUP_V2", "LC_ODI_ROSTER_SETUP_V2", "LC_RED5_ROSTER_SETUP_V2"].includes(String(setup.setupVersion)) || setup.rosterPackHash !== suppliedRosterHash ||
           objectRecord(setup.versions).worldHash !== await sha256Text(canonicalJson(rosterPack.world))) throw new Error("SAVE_ROSTER_SESSION_MISMATCH");
     }
     const eventRows = await Promise.all(
@@ -736,8 +736,8 @@ export class IndexedDbSaveRepository {
       try {
         const session = JSON.parse(row.payload);
         const setup = objectRecord(objectRecord(session).setup);
-        if (rosterPack && (setup.setupVersion !== "LC_T20_ROSTER_SETUP_V2" || setup.rosterPackHash !== game.rosterPackSha256 || objectRecord(setup.versions).worldHash !== rosterWorldHash)) continue;
-        if (!rosterPack && setup.setupVersion === "LC_T20_ROSTER_SETUP_V2") continue;
+        if (rosterPack && (!["LC_T20_ROSTER_SETUP_V2", "LC_ODI_ROSTER_SETUP_V2", "LC_RED5_ROSTER_SETUP_V2"].includes(String(setup.setupVersion)) || setup.rosterPackHash !== game.rosterPackSha256 || objectRecord(setup.versions).worldHash !== rosterWorldHash)) continue;
+        if (!rosterPack && ["LC_T20_ROSTER_SETUP_V2", "LC_ODI_ROSTER_SETUP_V2", "LC_RED5_ROSTER_SETUP_V2"].includes(String(setup.setupVersion))) continue;
         const recovered = row.checkpointSerial !== game.checkpointSerial;
         return {
           summary: recovered

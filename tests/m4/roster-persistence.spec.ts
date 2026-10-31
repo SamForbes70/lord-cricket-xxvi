@@ -44,7 +44,19 @@ test("roster match saves commit atomically and recover with their original pack"
     checkDb.close();
     await repo.commit(base);
     const second = simulation.executeRosterT20Command(first, { commandId: "confirm", expectedRevision: 0, actorId: "SYSTEM", kind: "CONFIRM_TEAMS", payload: {} }).session;
-    await repo.commit({ ...base, expectedRevision: 0, revision: second.revision, events: second.events, session: second });
+    const saved = await repo.commit({ ...base, expectedRevision: 0, revision: second.revision, events: second.events, session: second });
+    const pins = { engine: second.executionManifest.engine, eventChain: second.executionManifest.eventChain,
+      random: second.setup.versions.random, model: second.setup.versions.model, modelHash: second.setup.versions.modelHash,
+      rules: second.setup.versions.rules, rulesHash: second.setup.versions.rulesHash, worldHash: second.setup.versions.worldHash };
+    const archiveBytes = await persistence.createPortableArchive(second, saved, pins, base.updatedAt, null, pack);
+    const imported = await persistence.readPortableArchive(archiveBytes, pins);
+    const importedSession = simulation.rehydrateRosterT20Session(imported.session, imported.rosterPack!);
+    const target = new persistence.IndexedDbSaveRepository(`${name}-import`);
+    await target.acquireLease("import", "owner", now);
+    await target.commit({ ...base, saveId: "import", kind: "IMPORTED", session: importedSession,
+      revision: importedSession.revision, events: importedSession.events, rosterPack: imported.rosterPack });
+    const reopened = await target.load("import");
+    const reopenedSession = simulation.rehydrateRosterT20Session(reopened!.session, reopened!.rosterPack!);
     let missing = "";
     try { await repo.commit({ ...base, expectedRevision: 1, revision: 2, rosterPack: null }); } catch (error) { missing = String(error); }
     await repo.corruptCurrentCheckpoint("match");
@@ -61,11 +73,13 @@ test("roster match saves commit atomically and recover with their original pack"
     try { await repo.load("match"); } catch (error) { damaged = String(error); }
     let damagedWrite = "";
     try { await repo.commit({ ...base, expectedRevision: 1, revision: 2, session: second, events: second.events }); } catch (error) { damagedWrite = String(error); }
-    return { abort, empty, orphan: orphan ?? null, missing, recovered: recovered?.recovered, revision: restored.revision, damaged, damagedWrite };
+    return { abort, empty, orphan: orphan ?? null, importedRevision: reopenedSession.revision, importedHash: reopenedSession.lastEventHash, expectedHash: second.lastEventHash, missing, recovered: recovered?.recovered, revision: restored.revision, damaged, damagedWrite };
   }, paths);
   expect(result.abort).toContain("SAVE_INJECTED_ABORT");
   expect(result.empty).toBeNull();
   expect(result.orphan).toBeNull();
+  expect(result.importedRevision).toBe(1);
+  expect(result.importedHash).toBe(result.expectedHash);
   expect(result.missing).toContain("SAVE_ROSTER_REQUIRED");
   expect(result.recovered).toBe(true);
   expect(result.revision).toBe(0);

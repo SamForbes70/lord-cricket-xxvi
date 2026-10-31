@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "LC_T20_ROSTER_SCHEDULE_V2"
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "seasonId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "gameId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "seasonSeed": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+        }
+      },
+      "required": [
+        "seasonId",
+        "gameId",
+        "seasonSeed",
+        "startDate"
+      ],
+      "additionalProperties": false
+    },
+    "rosterPackHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "teamIds": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "groundIds": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "homeGroundIds": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "rounds": {
+      "minItems": 14,
+      "maxItems": 14,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "roundNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 14
+          },
+          "matchDayDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "fixtureIds": {
+            "minItems": 4,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          }
+        },
+        "required": [
+          "roundNumber",
+          "matchDayDate",
+          "fixtureIds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "fixtures": {
+      "minItems": 56,
+      "maxItems": 56,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "matchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "ordinal": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 55
+          },
+          "roundNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 14
+          },
+          "roundFixtureIndex": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "matchDayDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "homeTeamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "awayTeamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "groundId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "matchSeed": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "status": {
+            "type": "string",
+            "const": "SCHEDULED"
+          }
+        },
+        "required": [
+          "fixtureId",
+          "matchId",
+          "ordinal",
+          "roundNumber",
+          "roundFixtureIndex",
+          "matchDayDate",
+          "homeTeamId",
+          "awayTeamId",
+          "groundId",
+          "matchSeed",
+          "status"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "scheduleSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "version",
+    "request",
+    "rosterPackHash",
+    "worldHash",
+    "teamIds",
+    "groundIds",
+    "homeGroundIds",
+    "rounds",
+    "fixtures",
+    "scheduleSha256"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:RosterSeasonSchedule:1",
+  "title": "RosterSeasonSchedule"
+}

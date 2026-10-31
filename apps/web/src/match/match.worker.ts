@@ -1,7 +1,7 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson, type NewGameWorldCopy } from "@lcxxvi/contracts";
-import type { T20Session, ODISession, Red5Session } from "@lcxxvi/simulation";
+import { canonicalJson, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import type { T20Session, ODISession, Red5Session, RosterT20Session, RosterODISession, RosterRed5Session } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
   createPortableArchive,
@@ -26,6 +26,7 @@ const repository = new IndexedDbSaveRepository();
 const ownerId = self.name || `tab-${randomHex(16)}`;
 let activeSaveId: string | null = null;
 let activeWorldCopy: NewGameWorldCopy | null = null;
+let activeRosterPack: StagedRosterPack | null = null;
 let readOnly = false;
 let recovered = false;
 let recoveredFromGeneration: number | null = null;
@@ -84,6 +85,22 @@ function defaultTitle(session: AnySession, copy: NewGameWorldCopy | null): strin
 function applyWorldCopy(target: MatchController, copy: NewGameWorldCopy | null) {
   target.setWorldCopy(copy);
 }
+
+function restoreController(target: MatchController, raw: unknown, roster: StagedRosterPack | null) {
+  if (roster && sessionFormat(raw) === "ODI") (target as ReturnType<typeof createODIMatchController>).restore(raw, roster);
+  else if (roster && sessionFormat(raw) === "T20") (target as ReturnType<typeof createMatchController>).restore(raw, roster);
+  else if (roster && sessionFormat(raw) === "RED_BALL") (target as ReturnType<typeof createRed5MatchController>).restore(raw, roster);
+  else if (roster) throw new Error("Imported roster match format is unsupported.");
+  else target.restore(raw);
+}
+function rosterPins(session: RosterT20Session | RosterODISession | RosterRed5Session) {
+  return { engine: session.executionManifest.engine, eventChain: session.executionManifest.eventChain,
+    random: session.setup.versions.random, model: session.setup.versions.model, modelHash: session.setup.versions.modelHash,
+    rules: session.setup.versions.rules, rulesHash: session.setup.versions.rulesHash, worldHash: session.setup.versions.worldHash };
+}
+const ROSTER_ARCHIVE_POLICY = { engine: "LC_T20_MATCH_ROSTER_V2", eventChain: ARCHIVE_PINS.eventChain, random: ARCHIVE_PINS.random, model: ARCHIVE_PINS.model, modelHash: ARCHIVE_PINS.modelHash, rules: ARCHIVE_PINS.rules, rulesHash: ARCHIVE_PINS.rulesHash };
+const ROSTER_RED5_ARCHIVE_POLICY = { engine: "LC_RED5_MATCH_ROSTER_V2", eventChain: RED5_ARCHIVE_PINS.eventChain, random: RED5_ARCHIVE_PINS.random, model: RED5_ARCHIVE_PINS.model, modelHash: RED5_ARCHIVE_PINS.modelHash, rules: RED5_ARCHIVE_PINS.rules, rulesHash: RED5_ARCHIVE_PINS.rulesHash };
+const ROSTER_ODI_ARCHIVE_POLICY = { engine: "LC_ODI_MATCH_ROSTER_V2", eventChain: ODI_ARCHIVE_PINS.eventChain, random: ODI_ARCHIVE_PINS.random, model: ODI_ARCHIVE_PINS.model, modelHash: ODI_ARCHIVE_PINS.modelHash, rules: ODI_ARCHIVE_PINS.rules, rulesHash: ODI_ARCHIVE_PINS.rulesHash };
 
 function durableHistoryFromSession(session: AnySession) {
   return session.commands.map((command) => {
@@ -146,9 +163,10 @@ async function restoreSave(saveId: string): Promise<void> {
   const loaded = await repository.load(saveId);
   if (!loaded) throw new Error("Save not found.");
   controller = makeController(sessionFormat(loaded.session));
-  controller.restore(loaded.session);
+  restoreController(controller, loaded.session, loaded.rosterPack ?? null);
   applyWorldCopy(controller, loaded.worldCopy ?? null);
   activeWorldCopy = loaded.worldCopy ?? null;
+  activeRosterPack = loaded.rosterPack ?? null;
   recovered = loaded.recovered;
   recoveredFromGeneration = loaded.recoveredFromGeneration;
   let targetId = saveId;
@@ -173,6 +191,7 @@ async function restoreSave(saveId: string): Promise<void> {
       ),
       metadata: metadata(session, activeWorldCopy),
       worldCopy: activeWorldCopy,
+      rosterPack: activeRosterPack,
       ownerId,
       now: nowMs(),
       updatedAt: nowIso(),
@@ -195,6 +214,7 @@ async function initialise(): Promise<void> {
     // Keep the catalogue usable when the active pointer is stale/corrupt beyond recovery.
     activeSaveId = null;
     activeWorldCopy = null;
+    activeRosterPack = null;
     readOnly = false;
     controller = makeController();
     await repository.setActiveSaveId(null);
@@ -208,9 +228,10 @@ async function rollback(error: unknown, requestId: string): Promise<Response> {
       const loaded = await repository.load(activeSaveId);
       if (loaded) {
         controller = makeController(sessionFormat(loaded.session));
-        controller.restore(loaded.session);
+        restoreController(controller, loaded.session, loaded.rosterPack ?? null);
         applyWorldCopy(controller, loaded.worldCopy ?? null);
         activeWorldCopy = loaded.worldCopy ?? null;
+        activeRosterPack = loaded.rosterPack ?? null;
       }
     } catch {
       /* leave current controller only if durable recovery itself is unavailable */
@@ -228,6 +249,7 @@ async function commitCandidate(
   if (!session || response.error) return decorate(response);
   if (request.type === "START") {
     activeWorldCopy = request.careerFixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? request.careerFixture.worldCopy : request.worldCopy ?? null;
+    activeRosterPack = request.rosterPack ?? null;
     activeSaveId = `auto:${session.setup.gameId}`;
     readOnly = !(await repository.acquireLease(activeSaveId, ownerId, nowMs()));
     if (readOnly)
@@ -274,6 +296,7 @@ async function commitCandidate(
       },
       metadata: metadata(session, activeWorldCopy),
       worldCopy: activeWorldCopy,
+      rosterPack: activeRosterPack,
       ownerId,
       now: nowMs(),
       updatedAt: nowIso(),
@@ -311,6 +334,7 @@ async function commitCandidate(
       }
       activeSaveId = null;
       activeWorldCopy = null;
+      activeRosterPack = null;
       readOnly = false;
       controller = makeController();
       await repository.setActiveSaveId(null);
@@ -382,6 +406,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         await repository.delete(request.saveId);
         activeSaveId = null;
         activeWorldCopy = null;
+      activeRosterPack = null;
         readOnly = false;
         recovered = false;
         recoveredFromGeneration = null;
@@ -410,13 +435,14 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       const loaded = await repository.load(saveId);
       if (!loaded) throw new Error("Save not found.");
       const fmt = sessionFormat(loaded.session);
-      const archivePins = fmt === "ODI" ? ODI_ARCHIVE_PINS : fmt === "RED_BALL" ? RED5_ARCHIVE_PINS : ARCHIVE_PINS;
+      const archivePins = loaded.rosterPack ? rosterPins(loaded.session as RosterT20Session | RosterODISession | RosterRed5Session) : fmt === "ODI" ? ODI_ARCHIVE_PINS : fmt === "RED_BALL" ? RED5_ARCHIVE_PINS : ARCHIVE_PINS;
       const archive = await createPortableArchive(
         loaded.session,
         loaded.summary,
         archivePins,
         nowIso(),
         loaded.worldCopy ?? null,
+        loaded.rosterPack ?? null,
       );
       return decorate(controller.currentResponse(request.requestId), archive);
     } catch (e) {
@@ -432,13 +458,16 @@ async function handlePersistence(request: Request): Promise<Response | null> {
     try {
       const imported = await readPortableArchive(request.archive, [
         ARCHIVE_PINS,
+        ROSTER_ARCHIVE_POLICY,
+        ROSTER_ODI_ARCHIVE_POLICY,
+        ROSTER_RED5_ARCHIVE_POLICY,
         ODI_ARCHIVE_PINS,
   RED5_ARCHIVE_PINS,
       ]);
       const validationController = makeController(
         sessionFormat(imported.session),
       );
-      validationController.restore(imported.session);
+      restoreController(validationController, imported.session, imported.rosterPack);
       applyWorldCopy(validationController, imported.worldCopy);
       const session = validationController.snapshot()!;
       const target = `import-${randomHex(10)}`;
@@ -456,6 +485,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         historyCommands: durableHistoryFromSession(session),
         metadata: metadata(session, imported.worldCopy),
         worldCopy: imported.worldCopy,
+        rosterPack: imported.rosterPack,
         ownerId,
         now: nowMs(),
         updatedAt: nowIso(),
@@ -464,6 +494,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         await repository.releaseLease(activeSaveId, ownerId);
       activeSaveId = target;
       activeWorldCopy = imported.worldCopy;
+      activeRosterPack = imported.rosterPack;
       readOnly = false;
       recovered = false;
       recoveredFromGeneration = null;
@@ -505,6 +536,7 @@ async function handle(raw: unknown): Promise<Response> {
       }
       activeSaveId = null;
       activeWorldCopy = null;
+      activeRosterPack = null;
       readOnly = false;
       recovered = false;
       recoveredFromGeneration = null;
@@ -517,6 +549,7 @@ async function handle(raw: unknown): Promise<Response> {
     }
     activeSaveId = null;
     activeWorldCopy = null;
+    activeRosterPack = null;
     readOnly = false;
     recovered = false;
     recoveredFromGeneration = null;

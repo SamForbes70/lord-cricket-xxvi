@@ -6,7 +6,7 @@ import {
 import { SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 import { createStateHasher } from "./determinism.js";
 import { prepareRosterMatch } from "./roster-import.js";
-import { executeT20Command, T20_CONDITION_POLICY_HASH, type T20Core, type T20Session } from "./t20-match.js";
+import { executeT20Command, replayT20EventsFromInitial, eventChainManifest, T20_CONDITION_POLICY_HASH, type T20Core, type T20Session } from "./t20-match.js";
 import type { FrozenT20Setup } from "./world-setup.js";
 
 const hash = createStateHasher().hash;
@@ -91,4 +91,16 @@ export function rehydrateRosterT20Session(raw: unknown, pack: StagedRosterPack):
       hash(stored.executionManifest) !== hash(rebuilt.executionManifest) || stored.genesisHash !== rebuilt.genesisHash ||
       stored.lastEventHash !== rebuilt.lastEventHash) fail("SAVE_REPLAY_MISMATCH");
   return rebuilt;
+}
+
+export function replayRosterT20Session(session: RosterT20Session, pack: StagedRosterPack): T20Session {
+  const validated = rehydrateRosterT20Session(session, pack);
+  const setup = validated.setup;
+  const initial = createRosterT20Session(pack, {
+    gameId: setup.gameId, matchId: setup.matchId, seed: setup.seed, format: "T20",
+    selection: { groundId: setup.ground.groundId, teams: setup.teams.map(team => ({
+      teamId: team.teamId, playerIds: [...team.playerIds], captainId: team.captainId, keeperId: team.keeperId,
+    })) },
+  });
+  return replayT20EventsFromInitial(initial as unknown as T20Session, validated.events, eventChainManifest(validated as unknown as T20Session));
 }

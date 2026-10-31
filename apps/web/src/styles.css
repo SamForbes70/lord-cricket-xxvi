@@ -632,3 +632,6 @@ code {
 .analytics-sectors>div { display:grid; grid-template-columns:5rem minmax(4rem,1fr) 2rem; align-items:center; gap:.5rem; margin:.4rem 0; }
 .analytics-sector-track { height:10px; background:#d5ded9; border-radius:4px; }
 .analytics-sector-track>span { display:block; height:100%; background:var(--accent,#5c927e); border-radius:4px; }
+
+.roster-file { display: flex; flex-direction: column; min-width: 0; max-width: 100%; }
+.roster-file input { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }

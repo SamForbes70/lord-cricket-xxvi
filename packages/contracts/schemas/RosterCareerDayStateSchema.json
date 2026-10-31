@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "LC_T20_ROSTER_CAREER_DAY_V3"
+    },
+    "careerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "scheduleSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "rosterPackHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "finalScheduledDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "currentDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "playerConditions": {
+      "minItems": 22,
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "fatigueBp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "lastUpdatedDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "playerId",
+          "fatigueBp",
+          "lastUpdatedDate"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "playerReadiness": {
+      "minItems": 22,
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "batting": {
+            "type": "integer",
+            "minimum": -3,
+            "maximum": 3
+          },
+          "bowling": {
+            "type": "integer",
+            "minimum": -3,
+            "maximum": 3
+          },
+          "fielding": {
+            "type": "integer",
+            "minimum": -3,
+            "maximum": 3
+          },
+          "lastUpdatedDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "playerId",
+          "batting",
+          "bowling",
+          "fielding",
+          "lastUpdatedDate"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "trainingAssignments": {
+      "minItems": 22,
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "directive": {
+            "type": "string",
+            "enum": [
+              "REST",
+              "BATTING_PRACTICE",
+              "BOWLING_PRACTICE",
+              "FIELDING_PRACTICE"
+            ]
+          }
+        },
+        "required": [
+          "playerId",
+          "directive"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "appliedMatchConditions": {
+      "maxItems": 56,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "matchCompletionKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "matchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "matchDayDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "payloadSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "matchCompletionKey",
+          "matchId",
+          "matchDayDate",
+          "payloadSha256"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "stateSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "version",
+    "careerId",
+    "scheduleSha256",
+    "rosterPackHash",
+    "worldHash",
+    "startDate",
+    "finalScheduledDate",
+    "currentDate",
+    "revision",
+    "playerConditions",
+    "playerReadiness",
+    "trainingAssignments",
+    "appliedMatchConditions",
+    "stateSha256"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:RosterCareerDayState:1",
+  "title": "RosterCareerDayState"
+}

@@ -1,5 +1,7 @@
 import {
   type ODISession,
+  type RosterODISession,
+  createRosterODISession, executeRosterODICommand, rehydrateRosterODISession, replayRosterODISession,
   verifyFrozenWorldBytes,
   validateODIMatchSetup,
   createODISession,
@@ -20,7 +22,7 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type ODICommand, type DeliveryRecorded, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { type ODICommand, type DeliveryRecorded, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
@@ -80,9 +82,10 @@ export function createODIMatchController(
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name })),
   };
   let session: ODISession | null = null;
+  let rosterPack: StagedRosterPack | null = null;
   let displayWorld = world;
   function setWorldCopy(copy: NewGameWorldCopy | null) {
-    displayWorld = copy ? validateNewGameWorldCopy(copy, world).world : world;
+    displayWorld = rosterPack?.world ?? (copy ? validateNewGameWorldCopy(copy, world).world : world);
   }
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
@@ -234,15 +237,12 @@ export function createODIMatchController(
       throw new Error(
         "Complete the match before verifying its final scorecard.",
       );
-    const replay = replayODIEvents(
-      session.setup,
-      session.events,
-      odiEventChainManifest(session),
-    );
+    const replay = rosterPack ? replayRosterODISession(session as unknown as RosterODISession, rosterPack)
+      : replayODIEvents(session.setup, session.events, odiEventChainManifest(session));
     const score = projectODIScorecard(session);
     if (hash(projectODIScorecard(replay)) !== hash(score))
       throw new Error("Replay scorecard mismatch.");
-    resimulateODICommands(session);
+    if (!rosterPack) resimulateODICommands(session);
     return {
       revision: session.revision,
       eventsSha256: hash(session.events),
@@ -278,7 +278,7 @@ export function createODIMatchController(
       throw new Error(
         "Only human commands are accepted by this match interface.",
       );
-    session = executeODICommand(session, cmd).session;
+    session = rosterPack ? executeRosterODICommand(session as unknown as RosterODISession, cmd).session as unknown as ODISession : executeODICommand(session, cmd).session;
     audit.push({
       requestId: request.requestId,
       origin: "HUMAN",
@@ -286,8 +286,9 @@ export function createODIMatchController(
       engineActorId: cmd.actorId,
     });
   }
-  function restore(raw: unknown): void {
-    session = rehydrateODISession(raw, worldBytes, manifest);
+  function restore(raw: unknown, rawRosterPack: StagedRosterPack | null = null): void {
+    rosterPack = rawRosterPack;
+    session = rosterPack ? rehydrateRosterODISession(raw, rosterPack) as unknown as ODISession : rehydrateODISession(raw, worldBytes, manifest);
     setWorldCopy(null);
     seen.clear();
     audit.splice(
@@ -350,7 +351,16 @@ export function createODIMatchController(
             throw new Error("ODI controller received a non-ODI start.");
           if (session) throw new Error("A match is already in progress.");
           if (request.careerFixture) throw new Error("Career fixtures require T20.");
+          if (request.rosterPack && request.worldCopy) throw new Error("Choose either a roster or an edited world.");
+          rosterPack = request.rosterPack ?? null;
           setWorldCopy(request.worldCopy ?? null);
+          if (rosterPack) {
+            const draft = createRosterODISession(rosterPack, { ...privateIdentity(), seed: privateSeed(), format: "ODI", selection: { groundId: request.groundId, teams: request.selections } });
+            const cmd: ODICommand = { kind: "CONFIRM_TEAMS", payload: {}, actorId: "SYSTEM", commandId: id, expectedRevision: 0 };
+            session = executeRosterODICommand(draft, cmd).session as unknown as ODISession;
+            displayWorld = rosterPack.world;
+            audit.push({ requestId: id, origin: "HUMAN", commandKind: "CONFIRM_TEAMS", engineActorId: "SYSTEM" });
+          } else {
           const setup = validateODIMatchSetup(
             {
               setupVersion: "LC_ODI_SETUP_V1",
@@ -404,6 +414,7 @@ export function createODIMatchController(
             commandKind: "CONFIRM_TEAMS",
             engineActorId: "SYSTEM",
           });
+          }
         } else if (request.type === "COMMAND") execute(request);
         else if (request.type === "VERIFY") verification = verify();
       } catch (e) {

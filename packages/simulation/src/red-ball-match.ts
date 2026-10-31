@@ -1097,7 +1097,14 @@ export function replayRed5Events(
   events: readonly Red5MatchEvent[],
   manifest?: ReturnType<typeof Red5EventChainManifestSchema.parse>,
 ) {
-  const s = createRed5Session(setup);
+  return replayRed5EventsFromInitial(createRed5Session(setup), events, manifest);
+}
+export function replayRed5EventsFromInitial(
+  s: Red5Session,
+  events: readonly Red5MatchEvent[],
+  manifest?: ReturnType<typeof Red5EventChainManifestSchema.parse>,
+) {
+  assert(s.revision === 0 && s.events.length === 0 && s.core.phase === "SETUP", "REPLAY_INITIAL_STATE");
   for (const [i, raw] of events.entries()) {
     const e = Red5MatchEventSchema.parse(raw);
     assert(

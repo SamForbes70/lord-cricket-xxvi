@@ -1,6 +1,11 @@
 import { projectT20MatchAnalytics } from "@lcxxvi/projections";
 import {
   type T20Session,
+  type RosterT20Session,
+  createRosterT20Session,
+  executeRosterT20Command,
+  rehydrateRosterT20Session,
+  replayRosterT20Session,
   verifyFrozenWorldBytes,
   validateT20MatchSetup,
   createT20Session,
@@ -22,7 +27,7 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type T20Command, type DeliveryRecorded, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { type T20Command, type DeliveryRecorded, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
@@ -82,10 +87,11 @@ export function createMatchController(
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name })),
   };
   let session: T20Session | null = null;
+  let rosterPack: StagedRosterPack | null = null;
   let careerFixture: Extract<Request, { type: "START" }>["careerFixture"] | null = null;
   let displayWorld = world;
   function setWorldCopy(copy: NewGameWorldCopy | null) {
-    displayWorld = copy ? validateNewGameWorldCopy(copy, world).world : world;
+    displayWorld = rosterPack?.world ?? (copy ? validateNewGameWorldCopy(copy, world).world : world);
   }
   function bindCareerFixture(fixture: typeof careerFixture) {
     setWorldCopy(fixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? fixture.worldCopy : null);
@@ -281,15 +287,13 @@ export function createMatchController(
       throw new Error(
         "Complete the match before verifying its final scorecard.",
       );
-    const replay = replayT20Events(
-      session.setup,
-      session.events,
-      eventChainManifest(session),
-    );
+    const replay = rosterPack
+      ? replayRosterT20Session(session as unknown as RosterT20Session, rosterPack)
+      : replayT20Events(session.setup, session.events, eventChainManifest(session));
     const score = projectT20Scorecard(session);
     if (hash(projectT20Scorecard(replay)) !== hash(score))
       throw new Error("Replay scorecard mismatch.");
-    resimulateT20Commands(session);
+    if (!rosterPack) resimulateT20Commands(session);
     return {
       revision: session.revision,
       eventsSha256: hash(session.events),
@@ -325,7 +329,9 @@ export function createMatchController(
       throw new Error(
         "Only human-owned or explicitly delegated AI-owned commands may change the team decision.",
       );
-    session = executeT20Command(session, cmd).session;
+    session = rosterPack
+      ? executeRosterT20Command(session as unknown as RosterT20Session, cmd).session as unknown as T20Session
+      : executeT20Command(session, cmd).session;
     audit.push({
       requestId: request.requestId,
       origin: request.origin,
@@ -333,8 +339,9 @@ export function createMatchController(
       engineActorId: cmd.actorId,
     });
   }
-  function restore(raw: unknown): void {
-    session = rehydrateT20Session(raw, worldBytes, manifest);
+  function restore(raw: unknown, rawRosterPack: StagedRosterPack | null = null): void {
+    rosterPack = rawRosterPack;
+    session = rosterPack ? rehydrateRosterT20Session(raw, rosterPack) as unknown as T20Session : rehydrateT20Session(raw, worldBytes, manifest);
     bindCareerFixture(null);
     seen.clear();
     audit.splice(
@@ -403,6 +410,8 @@ export function createMatchController(
             throw new Error("T20 controller received a non-T20 start.");
           if (session) throw new Error("A match is already in progress.");
           if (request.careerFixture && request.worldCopy) throw new Error("A career match cannot replace its world copy.");
+          if (request.rosterPack && (request.careerFixture || request.worldCopy)) throw new Error("An imported roster cannot replace a career or edited world.");
+          rosterPack = request.rosterPack ?? null;
           bindCareerFixture(request.careerFixture ?? null);
           if (!request.careerFixture) setWorldCopy(request.worldCopy ?? null);
           if (careerFixture) {
@@ -416,6 +425,13 @@ export function createMatchController(
           const identity = careerFixture
             ? { gameId: careerFixture.matchGameId, matchId: careerFixture.matchId }
             : privateIdentity();
+          if (rosterPack) {
+            const draft = createRosterT20Session(rosterPack, { ...identity, seed: privateSeed(), format: "T20", selection: { groundId: request.groundId, teams: request.selections } });
+            const cmd: T20Command = { kind: "CONFIRM_TEAMS", payload: {}, actorId: "SYSTEM", commandId: id, expectedRevision: 0 };
+            session = executeRosterT20Command(draft, cmd).session as unknown as T20Session;
+            displayWorld = rosterPack.world;
+            audit.push({ requestId: id, origin: "HUMAN", commandKind: "CONFIRM_TEAMS", engineActorId: "SYSTEM" });
+          } else {
           const setup = validateT20MatchSetup(
             {
               setupVersion: "LC_T20_SETUP_V1",
@@ -469,6 +485,7 @@ export function createMatchController(
             commandKind: "CONFIRM_TEAMS",
             engineActorId: "SYSTEM",
           });
+          }
         } else if (request.type === "COMMAND") execute(request);
         else if (request.type === "VERIFY") verification = verify();
       } catch (e) {
