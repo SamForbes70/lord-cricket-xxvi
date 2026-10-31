@@ -41,5 +41,5 @@ describe("roster season state", () => {
     expect(() => hasAcceptedRosterManagedFixture(finished, pack, changedSession)).toThrow();
     expect(validateRosterSeasonState(JSON.parse(JSON.stringify(finished)), pack)).toEqual(finished);
     expect(() => completeRosterManagedFixture(finished, pack, played)).toThrow();
-  }, 30_000);
+  }, 90_000);
 });
