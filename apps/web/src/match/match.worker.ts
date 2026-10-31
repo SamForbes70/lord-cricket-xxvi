@@ -1,6 +1,6 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import { canonicalJson, delegationForTeam, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
 import type { T20Session, ODISession, Red5Session, RosterT20Session, RosterODISession, RosterRed5Session } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
@@ -30,6 +30,8 @@ let activeRosterPack: StagedRosterPack | null = null;
 let readOnly = false;
 let recovered = false;
 let recoveredFromGeneration: number | null = null;
+const emptyDelegation = (): DelegationJournal => ({ version: "LC_DELEGATION_JOURNAL_V1", changes: [] });
+let delegation = emptyDelegation();
 type AnySession = T20Session | ODISession | Red5Session;
 type MatchController =
   | ReturnType<typeof createMatchController>
@@ -157,7 +159,7 @@ async function decorate(
   base: Response,
   archive: Uint8Array | null = null,
 ): Promise<Response> {
-  return { ...base, persistence: await persistenceState(), archive };
+  return { ...base, persistence: await persistenceState(), archive, delegation };
 }
 async function restoreSave(saveId: string): Promise<void> {
   const loaded = await repository.load(saveId);
@@ -169,6 +171,7 @@ async function restoreSave(saveId: string): Promise<void> {
   activeRosterPack = loaded.rosterPack ?? null;
   recovered = loaded.recovered;
   recoveredFromGeneration = loaded.recoveredFromGeneration;
+  delegation = loaded.delegationJournal ?? emptyDelegation();
   let targetId = saveId;
   if (loaded.recovered) {
     // Preserve the damaged source untouched. Continuing occurs in a fresh recovered slot.
@@ -189,6 +192,7 @@ async function restoreSave(saveId: string): Promise<void> {
         saveId,
         session.revision,
       ),
+      ...(loaded.delegationJournal ? { delegationJournal: loaded.delegationJournal } : {}),
       metadata: metadata(session, activeWorldCopy),
       worldCopy: activeWorldCopy,
       rosterPack: activeRosterPack,
@@ -215,6 +219,7 @@ async function initialise(): Promise<void> {
     activeSaveId = null;
     activeWorldCopy = null;
     activeRosterPack = null;
+    delegation = emptyDelegation();
     readOnly = false;
     controller = makeController();
     await repository.setActiveSaveId(null);
@@ -232,6 +237,7 @@ async function rollback(error: unknown, requestId: string): Promise<Response> {
         applyWorldCopy(controller, loaded.worldCopy ?? null);
         activeWorldCopy = loaded.worldCopy ?? null;
         activeRosterPack = loaded.rosterPack ?? null;
+        delegation = loaded.delegationJournal ?? emptyDelegation();
       }
     } catch {
       /* leave current controller only if durable recovery itself is unavailable */
@@ -302,6 +308,7 @@ async function commitCandidate(
       updatedAt: nowIso(),
     });
     await repository.setActiveSaveId(saveId);
+    if (request.type === "START") delegation = emptyDelegation();
     recovered = false;
     recoveredFromGeneration = null;
     return {
@@ -316,6 +323,7 @@ async function commitCandidate(
         saves: await repository.list(),
       },
       archive: null,
+      delegation,
       ...(session.receipts[request.requestId] ? { acknowledgement: session.receipts[request.requestId] } : {}),
     };
   } catch (error) {
@@ -336,6 +344,7 @@ async function commitCandidate(
       activeSaveId = null;
       activeWorldCopy = null;
       activeRosterPack = null;
+      delegation = emptyDelegation();
       readOnly = false;
       controller = makeController();
       await repository.setActiveSaveId(null);
@@ -408,6 +417,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         activeSaveId = null;
         activeWorldCopy = null;
       activeRosterPack = null;
+        delegation = emptyDelegation();
         readOnly = false;
         recovered = false;
         recoveredFromGeneration = null;
@@ -436,6 +446,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       const loaded = await repository.load(saveId);
       if (!loaded) throw new Error("Save not found.");
       const fmt = sessionFormat(loaded.session);
+      const delegation = loaded.delegationJournal;
       const archivePins = loaded.rosterPack ? rosterPins(loaded.session as RosterT20Session | RosterODISession | RosterRed5Session) : fmt === "ODI" ? ODI_ARCHIVE_PINS : fmt === "RED_BALL" ? RED5_ARCHIVE_PINS : ARCHIVE_PINS;
       const archive = await createPortableArchive(
         loaded.session,
@@ -444,6 +455,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         nowIso(),
         loaded.worldCopy ?? null,
         loaded.rosterPack ?? null,
+        delegation?.changes.length ? delegation : null,
       );
       return decorate(controller.currentResponse(request.requestId), archive);
     } catch (e) {
@@ -484,6 +496,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         events: session.events,
         command: null,
         historyCommands: durableHistoryFromSession(session),
+        ...(imported.delegationJournal ? { delegationJournal: imported.delegationJournal } : {}),
         metadata: metadata(session, imported.worldCopy),
         worldCopy: imported.worldCopy,
         rosterPack: imported.rosterPack,
@@ -494,6 +507,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       if (activeSaveId && !readOnly)
         await repository.releaseLease(activeSaveId, ownerId);
       activeSaveId = target;
+      delegation = imported.delegationJournal ?? emptyDelegation();
       activeWorldCopy = imported.worldCopy;
       activeRosterPack = imported.rosterPack;
       readOnly = false;
@@ -542,6 +556,7 @@ async function handle(raw: unknown): Promise<Response> {
       activeSaveId = null;
       activeWorldCopy = null;
       activeRosterPack = null;
+      delegation = emptyDelegation();
       readOnly = false;
       recovered = false;
       recoveredFromGeneration = null;
@@ -555,6 +570,7 @@ async function handle(raw: unknown): Promise<Response> {
     activeSaveId = null;
     activeWorldCopy = null;
     activeRosterPack = null;
+    delegation = emptyDelegation();
     readOnly = false;
     recovered = false;
     recoveredFromGeneration = null;
@@ -563,6 +579,15 @@ async function handle(raw: unknown): Promise<Response> {
   }
   const persistenceResponse = await handlePersistence(request);
   if (persistenceResponse) return persistenceResponse;
+  if (request.type === "SET_DELEGATION") {
+    const session = controller.snapshot();
+    if (!session || session.setup.format !== "T20") return decorate(controller.currentResponse(request.requestId, "Delegation requires an active T20 match."));
+    if (!session.setup.teams.some(team => team.teamId === request.teamId)) return decorate(controller.currentResponse(request.requestId, "Unknown delegation team."));
+    if (request.expectedRevision !== session.revision) return decorate(controller.currentResponse(request.requestId, "Stale match revision."));
+    if (readOnly || !activeSaveId || !(await repository.renewLease(activeSaveId, ownerId, nowMs()))) return decorate(controller.currentResponse(request.requestId, "Delegation requires a writable durable save."));
+    delegation = await repository.appendDelegation(activeSaveId, ownerId, nowMs(), { commandId: request.requestId, expectedRevision: request.expectedDelegationRevision, matchRevision: session.revision, teamId: request.teamId, categories: request.categories });
+    return decorate(controller.currentResponse(request.requestId));
+  }
   if (request.type === "AI_STEP") {
     const session = controller.snapshot();
     if (!session || session.setup.format !== "T20")
@@ -571,7 +596,7 @@ async function handle(raw: unknown): Promise<Response> {
       return decorate(controller.currentResponse(request.requestId, "Stale AI decision revision."));
     if (readOnly || !activeSaveId)
       return decorate(controller.currentResponse(request.requestId, "AI decision requires a writable durable save."));
-    const command = proposeOpponentT20Command(session as T20Session, request.teamId);
+    const command = proposeOpponentT20Command(session as T20Session, request.teamId, request.delegated ? delegationForTeam(delegation, request.teamId) : undefined);
     if (!command) return decorate(controller.currentResponse(request.requestId));
     // AI chooses a legal *engine* command through a public view. It receives no seed/future draws.
     // Every AI command is individually committed through the same atomic path as a human command.
@@ -604,7 +629,7 @@ async function handle(raw: unknown): Promise<Response> {
             "Request ID already used with different content.",
           ),
         );
-      const response = decorate(controller.currentResponse(request.requestId));
+      const response = await decorate(controller.currentResponse(request.requestId));
       const acknowledgement = controller.snapshot()?.receipts[request.command.commandId];
       if (!acknowledgement) return decorate(controller.currentResponse(request.requestId, "The saved command receipt is unavailable."));
       return { ...response, acknowledgement };
