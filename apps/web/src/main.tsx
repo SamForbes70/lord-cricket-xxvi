@@ -34,6 +34,7 @@ export function MatchApp() {
     serial = useRef(0),
     inflight = useRef<string | null>(null),
     currentRevision = useRef(0);
+  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number } | null>(null);
   const careerLaunch = useRef<CareerUserMatchLaunch | null>((() => {
     try {
       const raw = sessionStorage.getItem("lcxxvi-career-match-launch");
@@ -150,8 +151,25 @@ export function MatchApp() {
       inflight.current = null;
       currentRevision.current = r.revision;
       serial.current = Math.max(serial.current, 10000 + r.revision);
-      setBusy(false);
-      setError(r.error ?? "");
+      const batch = advanceBatch.current;
+      let batchError = "";
+      if (batch) {
+        const acknowledged = r.acknowledgement?.commandId === r.requestId && r.acknowledgement.committedRevision === r.revision;
+        const continueBatch = acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
+          !r.persistence?.readOnly && (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) && --batch.remaining > 0;
+        if (continueBatch) {
+          const requestId = `ui-${++serial.current}`;
+          inflight.current = requestId;
+          w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
+            command: { kind: "ADVANCE", payload: { scope: "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
+        } else {
+          if (!r.error && !acknowledged) batchError = "Simulation stopped because the last command was not acknowledged.";
+          else if (!r.error && batch.remaining <= 0) batchError = "Simulation stopped at its command limit.";
+          advanceBatch.current = null;
+        }
+      }
+      setBusy(inflight.current !== null);
+      setError(r.error ?? batchError);
       if (r.catalog) setCatalog(r.catalog);
       setView(r.view);
       setVerification(r.verification);
@@ -306,6 +324,11 @@ export function MatchApp() {
         actorId: action.kind === "ADVANCE" ? "SYSTEM" : `USER:${team}`,
       },
     });
+  }
+  function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
+    if (!view || inflight.current || fatal || view.advanceReason || persistence?.readOnly) return;
+    advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512 };
+    act({ kind: "ADVANCE", payload: { scope: "OVER" } });
   }
   useEffect(() => {
     if (error) document.querySelector<HTMLElement>("[role=alert]")?.focus();
@@ -749,9 +772,12 @@ export function MatchApp() {
                 >
                   Finish over
                 </button>
+                <button disabled={!!view.advanceReason} onClick={() => advanceTo("DECISION")}>Next decision</button>
+                <button disabled={!!view.advanceReason} onClick={() => advanceTo("INNINGS")}>Finish innings</button>
+                <button disabled={!!view.advanceReason} onClick={() => advanceTo("MATCH")}>Finish match</button>
                 <span id="advance-reason">
                   {view.advanceReason ||
-                    "Stops whenever a batter or bowler must be chosen."}
+                    "All options stop at required decisions, including batter or bowler selection."}
                 </span>
               </div>
             </fieldset>

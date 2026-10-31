@@ -37,8 +37,9 @@ async function advance(page: Page, keyOnly = false) {
   else await target.click();
   await settle(page);
 }
-async function startReady(page: Page) {
+async function startReady(page: Page, format = "T20") {
   await ready(page);
+  await page.getByLabel("Format", { exact: true }).selectOption(format);
   await page.getByRole("button", { name: "Confirm XIs and start" }).click();
   await settle(page);
   while (
@@ -46,6 +47,23 @@ async function startReady(page: Page) {
   )
     await advance(page);
 }
+for (const format of ["T20", "ODI", "RED_BALL"]) test(`${format} bounded advances stop at decisions and survive reload`, async ({ page }) => {
+  await startReady(page, format);
+  for (const name of ["Next decision", "Finish innings", "Finish match"]) {
+    while (await page.locator("#decision").getAttribute("data-phase") !== "READY") await advance(page);
+    const before = Number(await page.locator("#decision").getAttribute("data-revision"));
+    await page.getByRole("button", { name, exact: true }).click();
+    await settle(page);
+    const phase = await page.locator("#decision").getAttribute("data-phase");
+    const revision = Number(await page.locator("#decision").getAttribute("data-revision"));
+    expect(revision).toBeGreaterThan(before);
+    expect(phase).not.toBe("READY");
+    await page.reload();
+    await settle(page);
+    await expect(page.locator("#decision")).toHaveAttribute("data-revision", String(revision));
+    await expect(page.locator("#decision")).toHaveAttribute("data-phase", phase!);
+  }
+});
 async function shot(page: Page, browser: string, name: string) {
   mkdirSync(dir, { recursive: true });
   await page.screenshot({
