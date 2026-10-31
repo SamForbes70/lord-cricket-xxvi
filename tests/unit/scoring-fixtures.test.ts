@@ -180,7 +180,26 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(165);
+  expect(names).toHaveLength(181);
+  expect(names).toContain("RosterSeasonStateSchema");
+  expect(names).toContain("RosterSeasonMatchCompletionSchema");
+  expect(names).toContain("RosterSeasonProjectionSchema");
+  expect(names).toContain("RosterOffscreenFixtureOutcomeSchema");
+  expect(names).toContain("RosterCareerDayStateSchema");
+  expect(names).toContain("RosterSeasonStateSchema");
+  expect(names).toContain("RosterSeasonMatchCompletionSchema");
+  expect(names).toContain("RosterSeasonProjectionSchema");
+  expect(names).toContain("RosterOffscreenFixtureOutcomeSchema");
+  expect(names).toContain("RosterCareerDayStateSchema");
+  expect(names).toContain("RosterSeasonScheduleRequestSchema");
+  expect(names).toContain("RosterSeasonScheduleSchema");
+  expect(names).toContain("RosterRed5ExecutionManifestSchema");
+  expect(names).toContain("RosterODIExecutionManifestSchema");
+  expect(names).toContain("RosterT20ExecutionManifestSchema");
+  expect(names).toContain("RosterMatchPreparationSchema");
+  expect(names).toContain("RosterImportSourceSchema");
+  expect(names).toContain("StagedRosterPackSchema");
+  expect(names).toContain("RosterMatchSelectionSchema");
   expect(names).toContain("NewGameWorldCopySchema");
   expect(names).toContain("SeasonPortableManifestV2Schema");
   expect(names.filter((n) => n.startsWith("M7J"))).toHaveLength(0);

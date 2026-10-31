@@ -1,0 +1,56 @@
+
+> lord-cricket-xxvi@0.1.0 smoke
+> playwright test --reporter list
+
+[WebServer] (node:72682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:72695) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:72714) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:72727) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 23 tests using 2 workers
+
+(node:72745) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72746) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72745) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72746) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/smoke/app.spec.ts:4:1 › production React shell validates commands without pretending to play (827ms)
+  ✓   2 [chromium] › tests/smoke/determinism.spec.ts:7:1 › Node, browser and worker agree on every frozen address and state vector (667ms)
+  ✓   4 [chromium] › tests/smoke/determinism.spec.ts:118:1 › compiled batch random/hash commands match frozen outputs and reject bad requests (743ms)
+  ✓   3 [chromium] › tests/smoke/app.spec.ts:52:1 › compiled batch app reports accurate capabilities and rejects unsupported commands (1.0s)
+  ✓   5 [chromium] › tests/smoke/generator.spec.ts:7:1 › Node, browser and worker agree on the frozen generator vectors (555ms)
+  ✓   6 [chromium] › tests/smoke/app.spec.ts:78:1 › compiled scoring CLI exercises production scorer and rejects malformed requests (537ms)
+  ✓   7 [chromium] › tests/smoke/generator.spec.ts:92:1 › compiled batch generator command hands validated resolution to scoring adapter (471ms)
+  ✓   8 [chromium] › tests/smoke/probability.spec.ts:13:1 › Node, browser and worker agree on independent probability vectors (589ms)
+  ✓  10 [chromium] › tests/smoke/probability.spec.ts:125:1 › compiled batch probability command matches independent vector and rejects a wrong request (695ms)
+  ✓  11 [chromium] › tests/smoke/world.spec.ts:7:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (403ms)
+  ✓  12 [chromium] › tests/smoke/world.spec.ts:44:1 › compiled batch validates frozen world, immutable setup and rejects tampered input (1.1s)
+(node:73129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [firefox-determinism] › tests/smoke/determinism.spec.ts:7:1 › Node, browser and worker agree on every frozen address and state vector (1.6s)
+  ✓  14 [firefox-determinism] › tests/smoke/generator.spec.ts:7:1 › Node, browser and worker agree on the frozen generator vectors (816ms)
+  ✓  15 [firefox-determinism] › tests/smoke/probability.spec.ts:13:1 › Node, browser and worker agree on independent probability vectors (739ms)
+  ✓   9 [chromium] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 (30.0s)
+  ✓  17 [chromium] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 (24.9s)
+  ✓  16 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 1-25 (48.8s)
+  ✓  18 [chromium] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 (25.2s)
+  ✓  19 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 26-50 (44.0s)
+  ✓  20 [chromium] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 (25.9s)
+(node:73751) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73751) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  22 [firefox-determinism] › tests/smoke/world.spec.ts:7:1 › Node, browser and worker agree on the frozen 07A WORLD_GENERATION addresses (1.3s)
+  ✓  21 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 51-75 (44.5s)
+  ✓  23 [firefox-determinism] › tests/smoke/t20-corpus.spec.ts:13:3 › Node, browser main and browser Worker agree on complete T20 corpus 76-100 (42.6s)
+
+  23 passed (3.2m)

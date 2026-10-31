@@ -16,7 +16,7 @@ function assertCondition(condition: unknown, code: string): asserts condition {
   if (!condition) throw new Error(`INVALID_SEASON_SCHEDULE: ${code}`);
 }
 
-function addCalendarDays(isoDate: string, days: number): string {
+export function addCalendarDays(isoDate: string, days: number): string {
   const [yearText, monthText, dayText] = isoDate.split("-");
   let year = Number(yearText);
   let month = Number(monthText);
@@ -44,7 +44,7 @@ function addCalendarDays(isoDate: string, days: number): string {
   return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-function firstHalfPairings(teamIds: readonly string[]) {
+export function firstHalfPairings(teamIds: readonly string[]) {
   const rotating = [...teamIds];
   const rounds: Array<Array<readonly [string, string]>> = [];
   for (let roundIndex = 0; roundIndex < 7; roundIndex += 1) {

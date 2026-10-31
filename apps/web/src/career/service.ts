@@ -89,6 +89,7 @@ type CareerUserMatchLaunchCore = {
 export type CareerUserMatchLaunch = CareerUserMatchLaunchCore & (
   | { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V1" }
   | { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V2"; worldCopy: NewGameWorldCopy }
+  | { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER"; rosterPack: import("@lcxxvi/contracts").StagedRosterPack }
 );
 
 export type CareerUserMatchResult = {

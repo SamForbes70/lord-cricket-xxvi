@@ -1,5 +1,7 @@
 import {
   type Red5Session,
+  type RosterRed5Session,
+  createRosterRed5Session, executeRosterRed5Command, rehydrateRosterRed5Session, replayRosterRed5Session,
   verifyFrozenWorldBytes,
   validateRed5MatchSetup,
   createRed5Session,
@@ -20,7 +22,7 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type Red5Command, type DeliveryRecorded, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { type Red5Command, type DeliveryRecorded, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
@@ -80,9 +82,10 @@ export function createRed5MatchController(
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name })),
   };
   let session: Red5Session | null = null;
+  let rosterPack: StagedRosterPack | null = null;
   let displayWorld = world;
   function setWorldCopy(copy: NewGameWorldCopy | null) {
-    displayWorld = copy ? validateNewGameWorldCopy(copy, world).world : world;
+    displayWorld = rosterPack?.world ?? (copy ? validateNewGameWorldCopy(copy, world).world : world);
   }
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
@@ -241,15 +244,12 @@ export function createRed5MatchController(
       throw new Error(
         "Complete the match before verifying its final scorecard.",
       );
-    const replay = replayRed5Events(
-      session.setup,
-      session.events,
-      red5EventChainManifest(session),
-    );
+    const replay = rosterPack ? replayRosterRed5Session(session as unknown as RosterRed5Session, rosterPack)
+      : replayRed5Events(session.setup, session.events, red5EventChainManifest(session));
     const score = projectRed5Scorecard(session);
     if (hash(projectRed5Scorecard(replay)) !== hash(score))
       throw new Error("Replay scorecard mismatch.");
-    resimulateRed5Commands(session);
+    if (!rosterPack) resimulateRed5Commands(session);
     return {
       revision: session.revision,
       eventsSha256: hash(session.events),
@@ -285,7 +285,7 @@ export function createRed5MatchController(
       throw new Error(
         "Only human commands are accepted by this match interface.",
       );
-    session = executeRed5Command(session, cmd).session;
+    session = rosterPack ? executeRosterRed5Command(session as unknown as RosterRed5Session, cmd).session as unknown as Red5Session : executeRed5Command(session, cmd).session;
     audit.push({
       requestId: request.requestId,
       origin: "HUMAN",
@@ -293,8 +293,9 @@ export function createRed5MatchController(
       engineActorId: cmd.actorId,
     });
   }
-  function restore(raw: unknown): void {
-    session = rehydrateRed5Session(raw, worldBytes, manifest);
+  function restore(raw: unknown, rawRosterPack: StagedRosterPack | null = null): void {
+    rosterPack = rawRosterPack;
+    session = rosterPack ? rehydrateRosterRed5Session(raw, rosterPack) as unknown as Red5Session : rehydrateRed5Session(raw, worldBytes, manifest);
     setWorldCopy(null);
     seen.clear();
     audit.splice(
@@ -357,7 +358,16 @@ export function createRed5MatchController(
             throw new Error("Red-ball controller received a non-red-ball start.");
           if (session) throw new Error("A match is already in progress.");
           if (request.careerFixture) throw new Error("Career fixtures require T20.");
+          if (request.rosterPack && request.worldCopy) throw new Error("Choose either a roster or an edited world.");
+          rosterPack = request.rosterPack ?? null;
           setWorldCopy(request.worldCopy ?? null);
+          if (rosterPack) {
+            const draft = createRosterRed5Session(rosterPack, { ...privateIdentity(), seed: privateSeed(), format: "RED_BALL", selection: { groundId: request.groundId, teams: request.selections } });
+            const cmd: Red5Command = { kind: "CONFIRM_TEAMS", payload: {}, actorId: "SYSTEM", commandId: id, expectedRevision: 0 };
+            session = executeRosterRed5Command(draft, cmd).session as unknown as Red5Session;
+            displayWorld = rosterPack.world;
+            audit.push({ requestId: id, origin: "HUMAN", commandKind: "CONFIRM_TEAMS", engineActorId: "SYSTEM" });
+          } else {
           const setup = validateRed5MatchSetup(
             {
               setupVersion: "LC_RED5_SETUP_V1",
@@ -411,6 +421,7 @@ export function createRed5MatchController(
             commandKind: "CONFIRM_TEAMS",
             engineActorId: "SYSTEM",
           });
+          }
         } else if (request.type === "COMMAND") execute(request);
         else if (request.type === "VERIFY") verification = verify();
       } catch (e) {

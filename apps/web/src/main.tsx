@@ -15,10 +15,13 @@ import {
 } from "./match/protocol.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
+import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
 import { PitchInspection } from "./match/PitchInspection.js";
 import { WorldEditor } from "./world/WorldEditor.js";
-import type { NewGameWorldCopy, WorldPack } from "@lcxxvi/contracts";
+import type { NewGameWorldCopy, StagedRosterPack, WorldPack } from "@lcxxvi/contracts";
+import { createStagedRosterPack } from "@lcxxvi/simulation";
+import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
 type Body = Request extends infer R
   ? R extends Request
@@ -49,10 +52,23 @@ export function MatchApp() {
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [view, setView] = useState<View | null>(null);
   const [stagedWorld, setStagedWorld] = useState<NewGameWorldCopy | null>(null);
+  const [stagedRoster, setStagedRoster] = useState<StagedRosterPack | null>(null);
   const [editingWorld, setEditingWorld] = useState(false);
   const [restoreWorldFocus, setRestoreWorldFocus] = useState(false);
   const editWorldButton = useRef<HTMLButtonElement>(null);
   const displayCatalog = useMemo(() => {
+    if (stagedRoster) {
+      const world = stagedRoster.world;
+      const byId = new Map(world.players.map(player => [player.playerId, player]));
+      return { teams: world.teams.map(team => {
+        const players = team.squadIds.map(id => byId.get(id)!);
+        const keeper = players.find(player => player.role === "KEEPER")!;
+        const bowlers = players.filter(player => player !== keeper && isBowlingCapable(player)).slice(0, 5);
+        const xi = [keeper, ...bowlers, ...players.filter(player => player !== keeper && !bowlers.includes(player))].slice(0, 11);
+        return { id: team.teamId, name: team.name, players: players.map(player => ({ id: player.playerId, name: player.name, role: player.role, style: player.bowlingStyle, canBowl: isBowlingCapable(player) })),
+          suggested: { teamId: team.teamId, playerIds: xi.map(player => player.playerId), captainId: keeper.playerId, keeperId: keeper.playerId } };
+      }), grounds: world.grounds.map(ground => ({ id: ground.groundId, name: ground.name })) };
+    }
     if (!catalog || !stagedWorld) return catalog;
     const world = stagedWorld.world;
     const players = new Map(world.players.map(player => [player.playerId, player.name]));
@@ -62,7 +78,7 @@ export function MatchApp() {
       teams: catalog.teams.map(team => ({ ...team, name: teams.get(team.id) ?? team.name, players: team.players.map(player => ({ ...player, name: players.get(player.id) ?? player.name })) })),
       grounds: catalog.grounds.map(ground => ({ ...ground, name: grounds.get(ground.id) ?? ground.name })),
     };
-  }, [catalog, stagedWorld]);
+  }, [catalog, stagedWorld, stagedRoster]);
   const [busy, setBusy] = useState(true),
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
@@ -129,6 +145,7 @@ export function MatchApp() {
       if (r.careerResult) {
         sessionStorage.setItem("lcxxvi-career-match-result", JSON.stringify(r.careerResult));
       }
+      if (r.rosterCareerSession) sessionStorage.setItem("lcxxvi-roster-career-match-result", JSON.stringify(r.rosterCareerSession));
       if (r.catalog && !r.view && careerLaunch.current && !careerStartIssued.current) {
         careerStartIssued.current = true;
         const requestId = `ui-${++serial.current}`;
@@ -143,6 +160,7 @@ export function MatchApp() {
           selections: careerLaunch.current.selections,
           groundId: careerLaunch.current.groundId,
           careerFixture: careerLaunch.current,
+          ...(careerLaunch.current.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? { rosterPack: careerLaunch.current.rosterPack } : {}),
         });
       }
       if (r.archive) {
@@ -210,6 +228,28 @@ export function MatchApp() {
     if (careerLaunch.current) return;
     if (next) sessionStorage.setItem("lcxxvi-optional-ai-team", next);
     else sessionStorage.removeItem("lcxxvi-optional-ai-team");
+  }
+  async function importRoster(file: File | null) {
+    if (!file) return;
+    try {
+      if (file.size > 25_000_000) throw new Error("Roster file exceeds 25 MB.");
+      const pack = createStagedRosterPack(await file.text(), RULE_MANIFESTS.map(rule => rule.rulesId), SYNTHETIC_ALPHA_PACK.manifest.variationIds);
+      setStagedRoster(pack);
+      setStagedWorld(null);
+      setError("");
+    } catch (reason) {
+      setError(reason instanceof Error && reason.name !== "ZodError" ? reason.message : "Invalid roster file. Check its required fields and supported values.");
+    }
+  }
+  function downloadRosterTemplate() {
+    const players = careerWorld.players.map(player => Object.fromEntries(Object.entries(player).filter(([key]) => key !== "provenance")));
+    const source = { version: "LC_ROSTER_IMPORT_V1", sourceId: "my-roster", world: { ...careerWorld, players } };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(source, null, 2)], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "lord-cricket-roster-template.json";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   }
   function saveCopy() {
     if (!view) return;
@@ -327,7 +367,7 @@ export function MatchApp() {
           <strong>Scheduled career match</strong>
           <span>Round {careerLaunch.current.roundNumber} · this result will return to the management career only after the match is complete.</span>
           {view?.phase === "COMPLETE" && (
-            <button className="primary" onClick={() => { window.location.hash = "#career"; }}>Return result to career</button>
+            <button className="primary" onClick={() => { window.location.hash = careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? "#roster-career" : "#career"; }}>Return result to career</button>
           )}
         </div>
       )}
@@ -355,18 +395,25 @@ export function MatchApp() {
           {displayCatalog ? (
             <>
               <section className="world-customization" aria-label="Exhibition world">
-                {editingWorld ? <WorldEditor base={careerWorld} initial={stagedWorld} purpose="exhibition" onClose={() => { setEditingWorld(false); setRestoreWorldFocus(true); }} onStage={copy => { setStagedWorld(copy); setEditingWorld(false); setRestoreWorldFocus(true); }} /> : <div className="action-row">
+                {editingWorld ? <WorldEditor base={careerWorld} initial={stagedWorld} purpose="exhibition" onClose={() => { setEditingWorld(false); setRestoreWorldFocus(true); }} onStage={copy => { setStagedRoster(null); setStagedWorld(copy); setEditingWorld(false); setRestoreWorldFocus(true); }} /> : <div className="action-row">
                   <button ref={editWorldButton} type="button" disabled={busy || fatal} onClick={() => setEditingWorld(true)}>Edit names and colours</button>
                   {stagedWorld && <button type="button" disabled={busy || fatal} onClick={() => setStagedWorld(null)}>Use original world</button>}
                 </div>}
                 {stagedWorld && <p role="status">Edited world ready for a new exhibition. Saved matches remain unchanged.</p>}
+                <div className="action-row">
+                  <button type="button" disabled={busy || fatal || editingWorld} onClick={downloadRosterTemplate}>Download roster template</button>
+                  <label className="roster-file">Import roster <input type="file" accept=".json,application/json" disabled={busy || fatal || editingWorld} onChange={event => { const file = event.currentTarget.files?.[0] ?? null; event.currentTarget.value = ""; void importRoster(file); }} /></label>
+                  {stagedRoster && <button type="button" disabled={busy || fatal} onClick={() => setStagedRoster(null)}>Use original roster</button>}
+                </div>
+                {stagedRoster && <p role="status">Imported roster ready for an exhibition. Missing ratings use the declared prior of 50.</p>}
               </section>
               <Setup
+                key={stagedRoster?.world.packId ?? stagedWorld?.world.packId ?? "original"}
                 catalog={displayCatalog}
-                world={stagedWorld?.world ?? careerWorld}
+                world={stagedRoster?.world ?? stagedWorld?.world ?? careerWorld}
                 busy={busy || fatal || editingWorld}
                 start={(format, selections, groundId) =>
-                  send({ type: "START", format, selections, groundId, ...(stagedWorld ? { worldCopy: stagedWorld } : {}) })
+                  send({ type: "START", format, selections, groundId, ...(stagedWorld ? { worldCopy: stagedWorld } : {}), ...(stagedRoster ? { rosterPack: stagedRoster } : {}) })
                 }
               />
             </>
@@ -967,7 +1014,7 @@ function Setup({
     structuredClone(catalog.teams[1]!.suggested),
   ]);
   const [ground, setGround] = useState(catalog.grounds[0]!.id);
-  const [format, setFormat] = useState<"T20" | "ODI" | "RED_BALL">("T20");
+  const [format, setFormat] = useState<"T20" | "ODI" | "RED_BALL">(() => world.rulesIds.includes("LC_T20_01") ? "T20" : world.rulesIds.includes("LC_ODI_01") ? "ODI" : "RED_BALL");
   const reasons = teams
     .map((s, index) => {
       const t = catalog.teams.find((t) => t.id === s.teamId)!;
@@ -1005,9 +1052,9 @@ function Setup({
               setFormat(e.target.value as "T20" | "ODI" | "RED_BALL")
             }
           >
-            <option value="T20">T20 · 20 overs</option>
-            <option value="ODI">ODI · 50 overs</option>
-            <option value="RED_BALL">Red ball · five days</option>
+            <option value="T20" disabled={!world.rulesIds.includes("LC_T20_01")}>T20 · 20 overs</option>
+            <option value="ODI" disabled={!world.rulesIds.includes("LC_ODI_01")}>ODI · 50 overs</option>
+            <option value="RED_BALL" disabled={!world.rulesIds.includes("LC_RED5_01")}>Red ball · five days</option>
           </select>
         </label>
         <label>
@@ -1325,7 +1372,7 @@ function RootApp() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-  return hash === "#exhibition" ? <MatchApp /> : <CareerApp />;
+  return hash === "#exhibition" ? <MatchApp /> : hash === "#roster-career" ? <RosterCareerApp /> : <CareerApp />;
 }
 
 const root = document.getElementById("root");

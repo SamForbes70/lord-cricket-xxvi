@@ -890,7 +890,14 @@ export function replayODIEvents(
   events: readonly ODIMatchEvent[],
   manifest?: ReturnType<typeof ODIEventChainManifestSchema.parse>,
 ): ODISession {
-  const s = createODISession(setup);
+  return replayODIEventsFromInitial(createODISession(setup), events, manifest);
+}
+export function replayODIEventsFromInitial(
+  s: ODISession,
+  events: readonly ODIMatchEvent[],
+  manifest?: ReturnType<typeof ODIEventChainManifestSchema.parse>,
+): ODISession {
+  assert(s.revision === 0 && s.events.length === 0 && s.core.phase === "SETUP", "REPLAY_INITIAL_STATE");
   for (const [index, raw] of events.entries()) {
     const e = ODIMatchEventSchema.parse(raw);
     assert(

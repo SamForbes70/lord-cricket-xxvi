@@ -20,8 +20,7 @@ Scope reconciliation: [ADR-033](decisions/ADR-033-V01-SYNTHETIC-ALPHA-DELIVERY.m
 ## Next eligible work
 
 PR #15 merged V01-003 and V01-004.
-V01-005 adds names and colours for new careers and exhibitions, pending integration of this revision.
-After verifying the merge, mark V01-005 DONE without requesting approval.
+PR #16 merged V01-005, names and colours for new careers and exhibitions.
 
 Continue with V01-006: staged roster import with validated references and explicit priors.
 V01-007 then completes basic settings.

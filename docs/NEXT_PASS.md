@@ -7,8 +7,7 @@ The active target is the original V0.1 synthetic alpha under the owner's standin
 ## Batch 2: player-facing essentials
 
 PR #15 merged V01-003 and V01-004.
-V01-005 adds names and colours for new careers and exhibitions, pending integration of this revision.
-Confirm its merge before marking it DONE.
+PR #16 merged V01-005, names and colours for new careers and exhibitions.
 Continue with V01-006, validated new-game roster import, then V01-007, basic settings.
 Preserve stable IDs, existing saves, frozen simulation outcomes and historical snapshots.
 

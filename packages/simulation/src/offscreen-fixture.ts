@@ -123,7 +123,7 @@ type PlayerCondition = {
   fieldingReadiness: number;
 };
 
-function supportedSelectionScore(player: Readonly<Player>, condition: PlayerCondition): number {
+export function supportedSelectionScore(player: Readonly<Player>, condition: PlayerCondition): number {
   const skills = player.skills.T20;
   const batting = skills.defence + skills.timing + skills.power + skills.rotation + skills.vsPace + skills.vsSpin
     + condition.battingReadiness * 6;

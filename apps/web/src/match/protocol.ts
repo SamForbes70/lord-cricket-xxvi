@@ -6,6 +6,7 @@ import {
   Red5CommandSchema,
   T20TeamSelectionSchema,
   NewGameWorldCopySchema,
+  StagedRosterPackSchema,
   type T20Command,
   type T20Scorecard,
   type ODIScorecard,
@@ -96,6 +97,7 @@ const careerFixtureShape = {
 export const CareerFixtureLaunchSchema = z.discriminatedUnion("launchVersion", [
   z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V1") }),
   z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V2"), worldCopy: NewGameWorldCopySchema }),
+  z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER"), rosterPack: StagedRosterPackSchema }),
 ]);
 
 export const RequestSchema = z.discriminatedUnion("type", [
@@ -108,6 +110,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
     groundId: z.string().min(1),
     careerFixture: CareerFixtureLaunchSchema.nullable().optional(),
     worldCopy: NewGameWorldCopySchema.nullable().optional(),
+    rosterPack: StagedRosterPackSchema.nullable().optional(),
   }),
   z.strictObject({
     ...base,
@@ -253,4 +256,5 @@ export type Response = {
   persistence?: PersistenceView;
   archive?: Uint8Array | null;
   careerResult?: CareerMatchResult | null;
+  rosterCareerSession?: unknown;
 };

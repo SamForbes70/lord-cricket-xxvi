@@ -75,6 +75,7 @@ for (const [name, args] of gates) {
     elapsedMs: Date.now() - started,
   });
   console.log(`${name}: ${results.at(-1).status}`);
+  if (results.at(-1).status !== "PASS") console.error(log.slice(-24_000));
 }
 const manifest = {
   verifiedAt: new Date().toISOString(),

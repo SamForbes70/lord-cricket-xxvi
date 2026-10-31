@@ -7,6 +7,8 @@ import {
   SeasonArchiveCoreSchema,
   SeasonArchiveSchema,
   NewGameWorldCopySchema,
+  RosterSeasonStateSchema, StagedRosterPackSchema,
+  type RosterSeasonState, type StagedRosterPack,
   type SeasonDurableCommand,
   type SeasonSaveSummary,
   type T20SeasonState,
@@ -18,6 +20,8 @@ import {
 export const SEASON_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V1" as const;
 export const SEASON_PRESENTATION_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V2_PRESENTATION" as const;
 export const SEASON_RECORD_TYPE = "SEASON" as const;
+export const ROSTER_SEASON_SAVE_VERSION = "LC_SEASON_SAVE_V3_ROSTER" as const;
+export const ROSTER_SEASON_RECORD_TYPE = "ROSTER_SEASON" as const;
 export const SEASON_WRITER_LEASE_MS = 12_000;
 const DB_NAME = "lord-cricket-xxvi";
 const DB_VERSION = 1;
@@ -366,6 +370,91 @@ export class IndexedDbSeasonRepository {
       updatedAt: recovered ? checkpoint.createdAt : game.updatedAt,
     });
     return { summary, state, recovered, recoveredFromGeneration: recovered ? checkpoint.generation : null, corruptedGenerations, worldCopy };
+  }
+
+  async listRoster(): Promise<SeasonSaveSummary[]> {
+    const db = await this.open(); const tx = db.transaction("games", "readonly");
+    const rows = await req(tx.objectStore("games").getAll()) as Array<Record<string, unknown>>; await txDone(tx);
+    return rows.filter(row => row.recordType === ROSTER_SEASON_RECORD_TYPE).map(row => SeasonSaveSummarySchema.parse({
+      saveId: row.saveId, kind: row.kind, title: row.title, seasonId: row.seasonId, careerId: row.careerId,
+      controlledTeamId: row.controlledTeamId, currentDate: row.currentDate, revision: row.revision,
+      completedFixtures: row.completedFixtures, phase: row.phase, stateSha256: row.stateSha256, updatedAt: row.updatedAt,
+    })).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  }
+
+  async commitRoster(input: { saveId: string; kind: "AUTO" | "MANUAL" | "IMPORTED"; title: string; expectedRevision: number | null;
+    state: RosterSeasonState; rosterPack: StagedRosterPack; command: SeasonDurableCommand | null;
+    ownerId: string; now: number; updatedAt: string; setActive?: boolean; testAbortAfterWrites?: boolean }): Promise<SeasonSaveSummary> {
+    const state = RosterSeasonStateSchema.parse(input.state);
+    const pack = StagedRosterPackSchema.parse(input.rosterPack);
+    const { stateSha256, ...core } = state;
+    const payload = canonicalJson(state), snapshotHash = await seasonSha256Text(payload);
+    const packPayload = canonicalJson(pack), packHash = await seasonSha256Text(packPayload);
+    if (await seasonSha256Text(canonicalJson(core)) !== stateSha256 || state.schedule.rosterPackHash !== packHash ||
+        state.schedule.worldHash !== await seasonSha256Text(canonicalJson(pack.world)) || state.careerState.rosterPackHash !== packHash ||
+        state.careerState.scheduleSha256 !== state.schedule.scheduleSha256) throw new Error("ROSTER_SEASON_SAVE_BINDING_MISMATCH");
+    const command = input.command ? SeasonDurableCommandSchema.parse(input.command) : null;
+    if (command && command.committedRevision !== state.revision) throw new Error("ROSTER_SEASON_COMMAND_REVISION_MISMATCH");
+    const summary = SeasonSaveSummarySchema.parse({ saveId: input.saveId, kind: input.kind, title: input.title,
+      seasonId: state.schedule.request.seasonId, careerId: state.careerId, controlledTeamId: state.controlledTeamId,
+      currentDate: state.careerState.currentDate, revision: state.revision, completedFixtures: state.outcomes.length,
+      phase: state.phase, stateSha256, updatedAt: input.updatedAt });
+    const db = await this.open(); const tx = db.transaction(["games", "snapshots", "commands", "settings", "worldPacks"], "readwrite");
+    const games = tx.objectStore("games"), snapshots = tx.objectStore("snapshots"), settings = tx.objectStore("settings"), packs = tx.objectStore("worldPacks");
+    const existing = await req(games.get(input.saveId)) as (SeasonSaveSummary & { recordType: string; schemaVersion: string; rosterPackSha256: string; checkpointSerial: number; checkpointGeneration: number }) | undefined;
+    if (existing && (existing.recordType !== ROSTER_SEASON_RECORD_TYPE || existing.schemaVersion !== ROSTER_SEASON_SAVE_VERSION)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_SAVE_ID_CONFLICT"); }
+    if (existing && existing.rosterPackSha256 !== packHash) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_IMMUTABLE"); }
+    const lease = await req(settings.get(leaseKey(input.saveId))) as LeaseRecord | undefined;
+    if (!lease || lease.ownerId !== input.ownerId || lease.expiresAt <= input.now) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_READ_ONLY"); }
+    if ((existing && input.expectedRevision !== existing.revision) || (!existing && input.expectedRevision !== null)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_STALE_REVISION"); }
+    if (existing && (state.revision !== existing.revision + 1 || !command)) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_INVALID_REVISION"); }
+    if (command && await req(tx.objectStore("commands").get([input.saveId, command.commandId]))) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_DUPLICATE_COMMAND"); }
+    const priorPack = await req(packs.get(packHash)) as { hash: string; payload: string } | undefined;
+    if (existing && !priorPack) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_MISSING"); }
+    if (priorPack && priorPack.payload !== packPayload) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_PACK_CONFLICT"); }
+    if (!priorPack) packs.add({ hash: packHash, payload: packPayload });
+    const serial = (existing?.checkpointSerial ?? -1) + 1, generation = serial % 3;
+    snapshots.put({ saveId: input.saveId, generation, checkpointSerial: serial, revision: state.revision, payload, sha256: snapshotHash, createdAt: input.updatedAt } satisfies SeasonCheckpoint);
+    if (command) tx.objectStore("commands").put({ saveId: input.saveId, ...command });
+    games.put({ ...summary, recordType: ROSTER_SEASON_RECORD_TYPE, schemaVersion: ROSTER_SEASON_SAVE_VERSION,
+      rosterPackSha256: packHash, checkpointSerial: serial, checkpointGeneration: generation });
+    settings.put({ ...lease, expiresAt: input.now + SEASON_WRITER_LEASE_MS } satisfies LeaseRecord);
+    if (input.setActive !== false) settings.put({ key: "activeRosterSeasonSaveId", value: input.saveId } satisfies SettingRecord);
+    if (input.testAbortAfterWrites) { const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ } throw new Error("ROSTER_SEASON_INJECTED_ABORT"); }
+    await txDone(tx); return summary;
+  }
+
+  async loadRoster(saveId: string): Promise<{ summary: SeasonSaveSummary; state: RosterSeasonState; rosterPack: StagedRosterPack; recovered: boolean; recoveredFromGeneration: number | null } | null> {
+    const db = await this.open(); const tx = db.transaction(["games", "snapshots", "worldPacks"], "readonly");
+    const game = await req(tx.objectStore("games").get(saveId)) as (SeasonSaveSummary & { recordType: string; schemaVersion: string; rosterPackSha256: string; checkpointSerial: number }) | undefined;
+    if (!game) { await txDone(tx); return null; }
+    if (game.recordType !== ROSTER_SEASON_RECORD_TYPE || game.schemaVersion !== ROSTER_SEASON_SAVE_VERSION) { await txDone(tx); throw new Error("ROSTER_SEASON_SAVE_VERSION_UNSUPPORTED"); }
+    const rows = await req(tx.objectStore("snapshots").index("saveId").getAll(saveId)) as SeasonCheckpoint[];
+    const row = await req(tx.objectStore("worldPacks").get(game.rosterPackSha256)) as { hash: string; payload: string } | undefined; await txDone(tx);
+    if (!row || await seasonSha256Text(row.payload) !== game.rosterPackSha256) throw new Error("ROSTER_SEASON_PACK_MISSING_OR_DAMAGED");
+    const rosterPack = StagedRosterPackSchema.parse(JSON.parse(row.payload));
+    for (const checkpoint of rows.sort((a, b) => b.checkpointSerial - a.checkpointSerial)) {
+      if (await seasonSha256Text(checkpoint.payload) !== checkpoint.sha256) continue;
+      try {
+        const state = RosterSeasonStateSchema.parse(JSON.parse(checkpoint.payload));
+        const { stateSha256, ...core } = state;
+        if (checkpoint.revision !== state.revision || await seasonSha256Text(canonicalJson(core)) !== stateSha256 || state.schedule.rosterPackHash !== game.rosterPackSha256 ||
+            state.schedule.worldHash !== await seasonSha256Text(canonicalJson(rosterPack.world)) || state.careerState.rosterPackHash !== game.rosterPackSha256 ||
+            state.careerState.scheduleSha256 !== state.schedule.scheduleSha256) continue;
+        const recovered = checkpoint.checkpointSerial !== game.checkpointSerial;
+        const summary = SeasonSaveSummarySchema.parse({ saveId, kind: game.kind, title: game.title, seasonId: state.schedule.request.seasonId,
+          careerId: state.careerId, controlledTeamId: state.controlledTeamId, currentDate: state.careerState.currentDate,
+          revision: state.revision, completedFixtures: state.outcomes.length, phase: state.phase, stateSha256, updatedAt: recovered ? checkpoint.createdAt : game.updatedAt });
+        return { summary, state, rosterPack, recovered, recoveredFromGeneration: recovered ? checkpoint.generation : null };
+      } catch { /* try an older checkpoint */ }
+    }
+    throw new Error("ROSTER_SEASON_SAVE_CORRUPT");
+  }
+
+  async activeRosterSaveId(): Promise<string | null> {
+    const db = await this.open(); const tx = db.transaction("settings", "readonly");
+    const row = await req(tx.objectStore("settings").get("activeRosterSeasonSaveId")) as SettingRecord | undefined; await txDone(tx);
+    return typeof row?.value === "string" ? row.value : null;
   }
 
   async activeSaveId(): Promise<string | null> {

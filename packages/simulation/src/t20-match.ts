@@ -299,7 +299,10 @@ export function executeT20Command(input:T20Session,raw:unknown):{session:T20Sess
 }
 /** Verify every chained event and every rule transition without sampling any random number. */
 export function replayT20Events(setup:FrozenT20Setup,events:readonly T20MatchEvent[],manifest?:ReturnType<typeof T20EventChainManifestSchema.parse>):T20Session{
-  const s=createT20Session(setup);
+  return replayT20EventsFromInitial(createT20Session(setup),events,manifest);
+}
+export function replayT20EventsFromInitial(s:T20Session,events:readonly T20MatchEvent[],manifest?:ReturnType<typeof T20EventChainManifestSchema.parse>):T20Session{
+  assert(s.revision===0&&s.events.length===0&&s.core.phase==="SETUP","REPLAY_INITIAL_STATE");
   for(const [index,raw] of events.entries()){
     const e=T20MatchEventSchema.parse(raw);
     assert(e.sequence===index+1&&e.previousHash===s.lastEventHash,"REPLAY_CHAIN_GAP");

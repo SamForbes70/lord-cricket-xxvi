@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "engine": {
+      "type": "string",
+      "const": "LC_ODI_MATCH_ROSTER_V2"
+    },
+    "eventChain": {
+      "type": "string",
+      "const": "LC_ODI_EVENT_CHAIN_V1"
+    },
+    "conditionPolicy": {
+      "type": "string",
+      "const": "LC_ODI_CONDITIONS_V1"
+    },
+    "conditionPolicyHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "setupHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "worldHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "rulesHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "modelHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "stagePackHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "randomVersion": {
+      "type": "string",
+      "const": "SHA256_COUNTER_V1"
+    },
+    "scoringVersion": {
+      "type": "string",
+      "const": "LC_SCORING_V1"
+    },
+    "probabilityVersion": {
+      "type": "string",
+      "const": "LC_INTEGER_PROBABILITY_V1"
+    }
+  },
+  "required": [
+    "engine",
+    "eventChain",
+    "conditionPolicy",
+    "conditionPolicyHash",
+    "setupHash",
+    "worldHash",
+    "rulesHash",
+    "modelHash",
+    "stagePackHash",
+    "randomVersion",
+    "scoringVersion",
+    "probabilityVersion"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:RosterODIExecutionManifest:1",
+  "title": "RosterODIExecutionManifest"
+}
