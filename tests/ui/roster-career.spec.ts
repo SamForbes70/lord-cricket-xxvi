@@ -18,6 +18,7 @@ test("an imported roster career plays, saves and transfers a managed fixture", a
   await expect(page.getByText("0/56 fixtures")).toBeVisible({ timeout: 30_000 });
   await page.getByRole("button", { name: "Play next managed match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
+  await page.getByLabel("Tactical captain").selectOption("");
   for (let steps = 0; await page.locator("#decision").getAttribute("data-phase") !== "COMPLETE"; steps++) {
     expect(steps).toBeLessThan(450);
     const phase = await page.locator("#decision").getAttribute("data-phase");
