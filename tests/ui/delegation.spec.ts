@@ -80,7 +80,7 @@ test("recovery restores choices from the matching checkpoint", async ({ page }) 
     db.close(); return active.value as string;
   });
   await page.reload();
-  await expect(page.locator("p.recovery")).toContainText("Recovered from the previous valid checkpoint", { timeout: 30_000 });
+  await expect(page.locator("p.recovery")).toContainText("Recovered from a valid checkpoint", { timeout: 30_000 });
   await page.getByText("Delegate individual decisions").click();
   await expect(page.getByLabel("Bowler selection")).toBeChecked();
   await expect(page.getByLabel("Batting plan")).not.toBeChecked();

@@ -254,7 +254,7 @@ test("corrupt newest checkpoint recovers an older generation without overwriting
 
   await page.reload();
   await expect(page.locator("p.recovery")).toContainText(
-    "Recovered from the previous valid checkpoint",
+    "Recovered from a valid checkpoint",
   );
   const recoveredId = await activeSaveId(page);
   expect(recoveredId).toMatch(/^recovered-/);

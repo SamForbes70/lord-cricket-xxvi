@@ -26,3 +26,6 @@ The initial core run after adding contracts failed two old schema-count assertio
 The assertions were updated to include the three new schemas, and the core rerun passed.
 An initial browser check attempted import before worker startup; it passed after waiting for readiness.
 Hosted Linux and Windows checks remain required on the final pull request head.
+The recovery message was then made accurate for both current and older checkpoints.
+Two focused Chromium and Firefox delegation recovery checks passed after that text change.
+The original Chromium checkpoint-recovery check also passed.

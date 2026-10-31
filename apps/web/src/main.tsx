@@ -445,7 +445,7 @@ export function MatchApp() {
       )}
       {persistence?.recovered && (
         <p className="recovery" role="status">
-          Recovered from the previous valid checkpoint. The damaged source save
+          Recovered from a valid checkpoint. The damaged source save
           was preserved.
         </p>
       )}
