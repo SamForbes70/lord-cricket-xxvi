@@ -327,6 +327,7 @@ export function MatchApp() {
             onChange={(e) => setScale(e.target.value)}
           >
             <option value="100">100%</option>
+            <option value="115">115%</option>
             <option value="125">125%</option>
             <option value="150">150%</option>
           </select>

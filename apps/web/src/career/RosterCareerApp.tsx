@@ -22,6 +22,7 @@ export function RosterCareerApp() {
   const [saves, setSaves] = useState<SeasonSaveSummary[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [scale, setScale] = useState(() => localStorage.getItem("lcxxvi-career-scale") ?? "100");
   async function refresh() { setSaves(await repo.listRoster()); }
   async function run(work: () => Promise<void>) {
     setBusy(true); setError("");
@@ -84,9 +85,10 @@ export function RosterCareerApp() {
       careerStateSha256: current.state.stateSha256, managedTeamId: current.state.controlledTeamId };
     sessionStorage.setItem(launchKey, JSON.stringify(launch)); window.location.hash = "#exhibition";
   }
-  return <main className="career-shell">
+  return <main className="career-shell" style={{ fontSize: `${Number(scale) / 100}rem` }}>
     <header className="career-masthead"><div><p className="eyebrow">LORD CRICKET XXVI</p><h1>Imported roster career</h1></div><a href="#career">Standard career</a></header>
     <p>One fictional T20 season. Missing ratings use the synthetic prior of 50.</p>
+    <label>Text scale <select value={scale} onChange={event => { setScale(event.target.value); localStorage.setItem("lcxxvi-career-scale", event.target.value); }}><option value="90">90%</option><option value="100">100%</option><option value="115">115%</option><option value="125">125%</option><option value="150">150%</option></select></label>
     {error && <p role="alert" className="career-error">{error}</p>}
     <section className="career-panel"><h2>Import roster</h2><label>Roster JSON <input type="file" accept=".json,application/json" disabled={busy} onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) void run(async () => { const next = createStagedRosterPack(await file.text(), RULE_MANIFESTS.map(rule => rule.rulesId), SYNTHETIC_ALPHA_PACK.manifest.variationIds); setPack(next); setTeamId(next.world.teams[0]?.teamId ?? ""); }); }} /></label>
       <button type="button" onClick={() => { const players = careerWorld.players.map(player => Object.fromEntries(Object.entries(player).filter(([key]) => key !== "provenance"))); const blob = new Blob([JSON.stringify({ version: "LC_ROSTER_IMPORT_V1", sourceId: "my-roster", world: { ...careerWorld, players } }, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "lord-cricket-roster-template.json"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 0); }}>Download roster template</button>
