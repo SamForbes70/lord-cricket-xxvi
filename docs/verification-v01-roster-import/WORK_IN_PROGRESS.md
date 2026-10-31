@@ -28,7 +28,7 @@ A Linux run completed all 56 simulated fixtures. Each team played 14 matches. Ch
 
 A later local unit run passed 678 tests in 52 files. Build, type check, lint and 185 schema checks passed during this work. The hosted run for `28200d8` exposed a separate Windows Chromium failure: one roster exhibition test could not find the import control. Twenty-one other browser checks passed. The cause remains under investigation. CI now prints failed command output when artefacts are unavailable.
 
-The integration is not yet merged. Complete final review and hosted verification before treating it as delivered. Earlier acceptance and human evidence applies only to its recorded build.
+PR #17 merged as `3afec43` after four hosted Linux and Windows checks passed. Earlier human evidence applies only to its recorded build.
 
 A Linux Chromium startup repetition passed ten isolated contexts. The Windows failure has not been reproduced locally. The failing test now records the page state if startup fails again.
 
@@ -41,3 +41,5 @@ The local production smoke run passed all 23 checks. Three repetitions of the ex
 A size review reproduced a staged roster pack of 22,354,888 bytes from a valid 22,163,577-byte source. That pack exceeds the 20 MiB portable archive limit before match data is added. New staged packs now have an 8 MiB limit, leaving space for game data. Earlier staged packs still validate for recovery. The complete archive remains limited to 20 MiB, and unusually large match or career data can still exceed that archive limit.
 
 A hosted Firefox career test timed out while waiting for a batter or bowler control. The test and tactical opponent could act on the same decision. The test now selects manual decisions before driving the match. A fresh hosted run must confirm the result.
+
+The final local unit run passed 679 tests in 52 files. Both hosted Linux checks and both hosted Windows checks passed for `6679ad3`. GitHub artefact storage was full; structured verification records remain in the job logs.

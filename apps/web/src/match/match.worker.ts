@@ -316,6 +316,7 @@ async function commitCandidate(
         saves: await repository.list(),
       },
       archive: null,
+      ...(session.receipts[request.requestId] ? { acknowledgement: session.receipts[request.requestId] } : {}),
     };
   } catch (error) {
     if (request.type === "START") {
@@ -603,7 +604,10 @@ async function handle(raw: unknown): Promise<Response> {
             "Request ID already used with different content.",
           ),
         );
-      return decorate(controller.currentResponse(request.requestId));
+      const response = decorate(controller.currentResponse(request.requestId));
+      const acknowledgement = controller.snapshot()?.receipts[request.command.commandId];
+      if (!acknowledgement) return decorate(controller.currentResponse(request.requestId, "The saved command receipt is unavailable."));
+      return { ...response, acknowledgement };
     }
   }
   if ((request.type === "START" || request.type === "COMMAND") && readOnly)
