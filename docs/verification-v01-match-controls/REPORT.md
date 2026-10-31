@@ -10,4 +10,6 @@ The full local unit suite passed 679 tests in 52 files. The production smoke sui
 
 Initial hosted CI attempts did not start because an Actions budget blocked them. Later check results are recorded on PR #19.
 
-After the budget was restored, hosted Windows job `124419533087` reached its 20-minute limit. Its unit, match UI, career and research-browser commands passed. The performance observations had not finished. The Windows job limit is now 30 minutes. Test assertions and individual deadlines are unchanged.
+After the budget was restored, hosted Windows job `124419533087` reached its 20-minute limit. Its unit, match UI, career and research-browser commands passed. The performance observations had not finished. The Windows job limit is now 30 minutes.
+
+Hosted Windows job `124424225377` then timed out after 10 seconds while clicking “Play next managed match” following a career export and import. This action can simulate and save intervening fixtures. Its click deadline is now 60 seconds. The save, match and reload assertions remain unchanged. The focused career test passed locally in Chromium and Firefox; Firefox required the cloud host's sandbox override. The hosted checks on the final commit determine Windows acceptance.

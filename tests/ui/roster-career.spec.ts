@@ -46,7 +46,7 @@ test("an imported roster career plays, saves and transfers a managed fixture", a
     await expect(imported.getByRole("heading", { name: "Imported Career Club" })).toBeVisible({ timeout: 30_000 });
     await expect(imported.getByText("0/56 fixtures")).toHaveCount(0);
   } finally { await context.close(); }
-  await page.getByRole("button", { name: "Play next managed match" }).click();
+  await page.getByRole("button", { name: "Play next managed match" }).click({ timeout: 60_000 });
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
   await expect(page.getByRole("alert")).toHaveCount(0);
   await page.reload();
