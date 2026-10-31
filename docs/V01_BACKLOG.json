@@ -115,7 +115,7 @@
       "dependsOn": [
         "V01-005"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Stage imported worlds with size, schema and reference validation.",
@@ -134,7 +134,7 @@
       "dependsOn": [
         "V01-003"
       ],
-      "status": "PLANNED",
+      "status": "IN_PROGRESS",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Add the specified 115 percent text scale.",

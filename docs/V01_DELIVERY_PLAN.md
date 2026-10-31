@@ -22,8 +22,9 @@ Scope reconciliation: [ADR-033](decisions/ADR-033-V01-SYNTHETIC-ALPHA-DELIVERY.m
 PR #15 merged V01-003 and V01-004.
 PR #16 merged V01-005, names and colours for new careers and exhibitions.
 
-Continue with V01-006: staged roster import with validated references and explicit priors.
-V01-007 then completes basic settings.
+PR #17 merged V01-006, including imported-roster exhibitions and T20 careers.
+PR #18 added the 115% scale and persistent match preferences.
+Complete V01-007 acceptance, then continue V01-008 and V01-009 match controls.
 Preserve stable IDs, historical snapshots, existing saves and frozen simulation outcomes.
 Keep new packs versioned and validate all imported references and content.
 
@@ -54,7 +55,7 @@ Do not replace missing owner observations with hosted CI results.
 ## Reconciliation of the earlier gap list
 
 The earlier chat list identifies candidate work; the committed backlog records the actionable scope.
-Full charts, roster import and broader match controls remain product work.
+Full charts and broader match controls remain product work.
 Existing match save copies, basic analytics, red-ball delays and T20 opposition remain implemented capabilities.
 Optional prediction and verified DLS remain gated extensions.
 Multiyear management, finances, contracts, youth, online play, DRS and 3D presentation remain deferred.

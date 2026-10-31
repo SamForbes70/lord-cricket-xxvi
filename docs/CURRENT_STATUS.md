@@ -14,7 +14,10 @@ Batch 1 records authority, scope reconciliation and review of research commit `b
 PR #15 merged player pages and pre-match pitch inspection.
 PR #16 merged edited names and colours for new careers and exhibitions.
 Matches in all three formats and portable saves retain the edited copy.
-Roster import staging is under development; playable import and basic settings remain to do.
+PR #17 merged imported-roster exhibitions and a T20 career as `3afec43`.
+PR #18 merged 115% text scale and persistent match preferences as `4aeb41b`.
+New roster packs are limited to 8 MiB; complete portable archives are limited to 20 MiB.
+Additional settings and match-control acceptance remains in progress.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.
 The [world editing report](verification-v01-world-editing/REPORT.md) records this slice.
 A labelled synthetic-alpha release remains distinct from empirical model promotion.
@@ -24,7 +27,8 @@ A labelled synthetic-alpha release remains distinct from empirical model promoti
 PR #12 merged as `b755034` after four passing Linux and Windows checks.
 It fixes career acceptance waits and adds a delayed-save regression with durable reload checks.
 [The completion report](verification-m7k/completion/REPORT.md) records the latest work and remaining evidence gates.
-Fresh unit verification passes 645 TypeScript tests; Python discovery passes 94 tests.
+The recorded M7K completion run passed 645 TypeScript tests and 94 Python tests.
+The roster work later passed 679 local unit tests and four hosted Linux and Windows checks.
 Research browser acceptance now checks all seven engineering fixtures in both physical-end orientations.
 These synthetic expectations remain separate from complete historical source fixtures.
 The source audit verifies 69 events across 65 matches; the refreshed forward inventory still contains 18 candidates.
