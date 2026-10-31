@@ -10,7 +10,8 @@ PR #15 merged V01-003 and V01-004.
 PR #16 merged V01-005, names and colours for new careers and exhibitions.
 PR #17 merged V01-006, validated roster import for exhibitions and T20 careers.
 PR #18 added the 115% scale and persistent match preferences.
-Complete V01-007 acceptance, then build bounded simulation scopes and cancellation.
+PR #20 completed V01-007 acceptance.
+Build bounded simulation scopes and cancellation next.
 Preserve stable IDs, existing saves, frozen simulation outcomes and historical snapshots.
 
 ## Parallel research and acceptance

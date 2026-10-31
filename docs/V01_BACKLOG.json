@@ -134,7 +134,7 @@
       "dependsOn": [
         "V01-003"
       ],
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Add the specified 115 percent text scale.",
