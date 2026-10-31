@@ -5,7 +5,20 @@ import { adviseT20Captain } from "@lcxxvi/ai";
 import { fixtureAutopilotStep, type T20Session } from "@lcxxvi/simulation";
 import type { T20Command } from "@lcxxvi/contracts";
 
-export function proposeOpponentT20Command(session: Readonly<T20Session>, teamId: string): T20Command | null {
+export type DelegationCategory = "TOSS" | "INNINGS" | "BATTER" | "BOWLER" | "BATTING_PLAN" | "BOWLING_PLAN";
+
+export function proposeOpponentT20Command(session: Readonly<T20Session>, teamId: string, categories?: readonly DelegationCategory[]): T20Command | null {
+  const command = proposeT20Command(session, teamId);
+  if (!command || !categories) return command;
+  const category: Partial<Record<T20Command["kind"], DelegationCategory>> = {
+    CALL_TOSS: "TOSS", CHOOSE_INNINGS: "INNINGS", SET_BATTER: "BATTER", SET_BOWLER: "BOWLER",
+    SET_BATTING_PLAN: "BATTING_PLAN", SET_BOWLING_PLAN: "BOWLING_PLAN",
+  };
+  const selected = category[command.kind];
+  return selected && categories.includes(selected) ? command : null;
+}
+
+function proposeT20Command(session: Readonly<T20Session>, teamId: string): T20Command | null {
   if (!session.setup.teams.some(t => t.teamId === teamId)) throw new Error("LC_T20_AI_UNKNOWN_TEAM");
   const phase = session.core.phase;
   if (phase === "COMPLETE" || phase === "SETUP") return null;
