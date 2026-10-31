@@ -9,3 +9,5 @@ This slice prepares the command boundary for later batch controls. It does not a
 The full local unit suite passed 679 tests in 52 files. The production smoke suite passed 23 checks. Fixture audit, scorer comparison, random vectors, probability vectors and generator vectors passed.
 
 Initial hosted CI attempts did not start because an Actions budget blocked them. Later check results are recorded on PR #19.
+
+After the budget was restored, hosted Windows job `124419533087` reached its 20-minute limit. Its unit, match UI, career and research-browser commands passed. The performance observations had not finished. The Windows job limit is now 30 minutes. Test assertions and individual deadlines are unchanged.
