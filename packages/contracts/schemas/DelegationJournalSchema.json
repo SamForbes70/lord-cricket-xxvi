@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "LC_DELEGATION_JOURNAL_V1"
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "commandId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "matchRevision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "categories": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "TOSS",
+                "INNINGS",
+                "BATTER",
+                "BOWLER",
+                "BATTING_PLAN",
+                "BOWLING_PLAN"
+              ]
+            }
+          }
+        },
+        "required": [
+          "commandId",
+          "expectedRevision",
+          "matchRevision",
+          "teamId",
+          "categories"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "version",
+    "changes"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:DelegationJournal:1",
+  "title": "DelegationJournal"
+}

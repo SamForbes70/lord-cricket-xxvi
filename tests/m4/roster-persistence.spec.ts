@@ -56,7 +56,8 @@ test("roster match saves commit atomically and recover with their original pack"
     const target = new persistence.IndexedDbSaveRepository(`${name}-import`);
     await target.acquireLease("import", "owner", now);
     await target.commit({ ...base, saveId: "import", kind: "IMPORTED", session: importedSession,
-      revision: importedSession.revision, events: importedSession.events, rosterPack: imported.rosterPack });
+      revision: importedSession.revision, events: importedSession.events, rosterPack: imported.rosterPack, delegationJournal: withDelegation.delegationJournal! });
+    const importedDelegation = await target.loadDelegationJournal("import");
     const reopened = await target.load("import");
     const reopenedSession = simulation.rehydrateRosterT20Session(reopened!.session, reopened!.rosterPack!);
     let missing = "";
@@ -75,7 +76,7 @@ test("roster match saves commit atomically and recover with their original pack"
     try { await repo.load("match"); } catch (error) { damaged = String(error); }
     let damagedWrite = "";
     try { await repo.commit({ ...base, expectedRevision: 1, revision: 2, session: second, events: second.events }); } catch (error) { damagedWrite = String(error); }
-    return { abort, empty, orphan: orphan ?? null, importedRevision: reopenedSession.revision, importedHash: reopenedSession.lastEventHash, expectedHash: second.lastEventHash, missing, recovered: recovered?.recovered, revision: restored.revision, damaged, damagedWrite, delegationMatches: JSON.stringify(withDelegation.delegationJournal) === JSON.stringify(journal), delegationVersion: withDelegation.manifest.archiveVersion };
+    return { abort, empty, orphan: orphan ?? null, importedRevision: reopenedSession.revision, importedHash: reopenedSession.lastEventHash, expectedHash: second.lastEventHash, missing, recovered: recovered?.recovered, revision: restored.revision, damaged, damagedWrite, delegationMatches: JSON.stringify(importedDelegation) === JSON.stringify(journal), delegationVersion: withDelegation.manifest.archiveVersion };
   }, paths);
   expect(result.abort).toContain("SAVE_INJECTED_ABORT");
   expect(result.empty).toBeNull();
