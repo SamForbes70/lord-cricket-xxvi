@@ -164,6 +164,7 @@ describe("M4 deterministic persistence and portable archive", () => {
     expect(canonicalJson(read.session)).toBe(canonicalJson(session));
     expect(read.summary).toEqual(summary);
     expect(read.worldCopy).toBeNull();
+    expect(read.delegationJournal).toBeNull();
     await expect(readPortableArchive(tamperEntry(bytes, "game.json"), ARCHIVE_PINS)).rejects.toThrow(/CRC|HASH/);
     await expect(readPortableArchive(bytes, { ...ARCHIVE_PINS, engine: "LC_T20_MATCH_FUTURE" })).rejects.toThrow(/PIN_UNSUPPORTED_engine/);
   });
@@ -181,6 +182,30 @@ describe("M4 deterministic persistence and portable archive", () => {
     expect(canonicalJson(read.session)).toBe(canonicalJson(session));
     await expect(readPortableArchive(tamperEntry(bytes, "world-copy.json"), ARCHIVE_PINS)).rejects.toThrow(/CRC|HASH/);
     await expect(readPortableArchive(rewriteZipEntryText(bytes, "manifest.json", "LC_ARCHIVE_V2_PRESENTATION", "LC_ARCHIVE_V9_PRESENTATION"), ARCHIVE_PINS)).rejects.toThrow("ARCHIVE_VERSION_UNSUPPORTED");
+  });
+
+  it("round-trips versioned delegation history with original and edited worlds", async () => {
+    const session = sessionAfterPlay();
+    const journal = { version: "LC_DELEGATION_JOURNAL_V1", changes: [{ commandId: "delegate-1", expectedRevision: 0,
+      matchRevision: session.revision, teamId: session.setup.teams[0].teamId, categories: ["BOWLER"] }] };
+    const base = WorldPackSchema.parse(JSON.parse(new TextDecoder().decode(worldBytes)));
+    const draft = structuredClone(base);
+    draft.players[0]!.name = "A new name";
+    const copy = createNewGameWorldCopy(draft, base);
+    for (const world of [null, copy]) {
+      const bytes = await createPortableArchive(session, summaryFor(session), ARCHIVE_PINS, "2026-10-04T02:00:00.000Z", world, null, journal);
+      const read = await readPortableArchive(bytes, ARCHIVE_PINS);
+      expect(read.manifest.archiveVersion).toBe("LC_ARCHIVE_V4_DELEGATION");
+      expect(read.delegationJournal).toEqual(journal);
+      expect(read.worldCopy).toEqual(world);
+      expect(read.session).toEqual(session);
+      await expect(readPortableArchive(tamperEntry(bytes, "delegation.json"), ARCHIVE_PINS)).rejects.toThrow(/CRC|HASH/);
+      await expect(readPortableArchive(rewriteZipEntryText(bytes, "manifest.json", "LC_ARCHIVE_V4_DELEGATION", "LC_ARCHIVE_V5_DELEGATION"), ARCHIVE_PINS)).rejects.toThrow("ARCHIVE_VERSION_UNSUPPORTED");
+    }
+    await expect(createPortableArchive(session, summaryFor(session), ARCHIVE_PINS, "2026-10-04T02:00:00.000Z", null, null,
+      { ...journal, changes: [{ ...journal.changes[0], teamId: "unknown" }] })).rejects.toThrow("ARCHIVE_DELEGATION_SESSION_MISMATCH");
+    await expect(createPortableArchive(session, summaryFor(session), ARCHIVE_PINS, "2026-10-04T02:00:00.000Z", null, null,
+      { ...journal, changes: [{ ...journal.changes[0], matchRevision: session.revision + 1 }] })).rejects.toThrow("ARCHIVE_DELEGATION_SESSION_MISMATCH");
   });
 
   it("rejects a path-traversal local file name before exposing an imported game", async () => {
