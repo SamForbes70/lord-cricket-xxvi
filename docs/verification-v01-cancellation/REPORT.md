@@ -12,3 +12,7 @@ The cancellation test delayed a command, requested a stop and reloaded the commi
 Firefox used the cloud host sandbox override.
 An earlier type check failed on the test delay helper; the corrected helper passed the core run.
 Hosted checks remain required. The full V01-009 command-sequence reporting criterion remains under review.
+
+Two targeted unit suites added fixed-setup ODI and red-ball advance comparisons.
+Both suites passed: 22 tests total.
+They compare cricket state and delivery outcomes across delivery and over commands.

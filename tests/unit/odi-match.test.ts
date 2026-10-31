@@ -115,6 +115,23 @@ function resolution(
 }
 
 describe("Pass 10 / M5A ODI format", () => {
+  it("keeps delivery and over advances equivalent", () => {
+    const initial = ready(createODISession(setup));
+    const advance = (s: ODISession, scope: "DELIVERY" | "OVER") => executeODICommand(s, {
+      kind: "ADVANCE", payload: { scope }, commandId: `scope-${scope}-${s.revision}`, expectedRevision: s.revision, actorId: "SYSTEM",
+    }).session;
+    const over = advance(initial, "OVER");
+    let deliveries = initial;
+    const index = initial.core.activeInningsIndex;
+    const initialOver = Math.floor(initial.core.innings[index]!.innings.legalBalls / 6);
+    while (deliveries.core.phase === "READY" && deliveries.core.activeInningsIndex === index && Math.floor(deliveries.core.innings[index]!.innings.legalBalls / 6) === initialOver) {
+      deliveries = advance(deliveries, "DELIVERY");
+    }
+    expect(deliveries.core).toEqual(over.core);
+    expect(deliveries.events.filter(event => event.type === "DELIVERY_RECORDED").map(event => event.payload))
+      .toEqual(over.events.filter(event => event.type === "DELIVERY_RECORDED").map(event => event.payload));
+  });
+
   it("locks the machine-readable ODI edge corpus to the frozen rule profile", () => {
     expect(edgeCorpus.version).toBe("LC_ODI_EDGE_CORPUS_V1");
     expect(edgeCorpus.rulesId).toBe("LC_ODI_01");
