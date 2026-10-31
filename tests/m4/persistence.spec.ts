@@ -451,11 +451,12 @@ test("delegation history checks the writer lease and durable match revision", as
     const repo = new IndexedDbSaveRepository(database);
     const saveId = "save", owner = "owner", now = Date.now();
     await repo.acquireLease(saveId, owner, now);
-    await repo.commit({ saveId, kind: "AUTO", title: "Fixture", expectedRevision: null,
+    const base = { saveId, kind: "AUTO" as const, title: "Fixture", expectedRevision: null,
       session: { revision: 1, events: [{ sequence: 1, kind: "FIXTURE" }] }, revision: 1,
       events: [{ sequence: 1, kind: "FIXTURE" }], command: null,
-      metadata: { matchGameId: "g", matchId: "m", teams: ["A", "B"], ground: "G", phase: "TOSS", completed: false },
-      ownerId: owner, now, updatedAt: "2026-10-04T02:00:00.000Z" });
+      metadata: { matchGameId: "g", matchId: "m", teams: ["A", "B"] as [string, string], ground: "G", phase: "TOSS", completed: false },
+      ownerId: owner, now, updatedAt: "2026-10-04T02:00:00.000Z" };
+    await repo.commit(base);
     const change = { commandId: "one", expectedRevision: 0, matchRevision: 1, teamId: "team-a", categories: ["BOWLER"] };
     const first = await repo.appendDelegation(saveId, owner, now, change);
     const retry = await repo.appendDelegation(saveId, owner, now, change);
@@ -465,13 +466,29 @@ test("delegation history checks the writer lease and durable match revision", as
       catch (error) { failures.push(error instanceof Error ? error.message : String(error)); }
     }
     const restored = await new IndexedDbSaveRepository(database).loadDelegationJournal(saveId);
+    const events = [{ sequence: 1, kind: "FIXTURE" }, { sequence: 2, kind: "FIXTURE" }];
+    await repo.commit({ ...base, expectedRevision: 1, revision: 2, session: { revision: 2, events }, events });
+    await repo.appendDelegation(saveId, owner, now, { ...change, commandId: "two", expectedRevision: 1, matchRevision: 2, categories: ["BATTER"] });
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open(database); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction("settings", "readwrite"), store = tx.objectStore("settings");
+      const request = store.get("delegation-checkpoint:save:1");
+      request.onsuccess = () => { const row = request.result; row.value.record.journal.changes[0].categories = []; store.put(row); };
+      tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+    const recovered = await repo.load(saveId);
     await repo.cloneSave(saveId, "copy", "MANUAL", "Copy", owner, now, "2026-10-04T02:00:00.000Z");
     const copied = await repo.loadDelegationJournal("copy");
     await repo.delete(saveId);
-    return { first, retry, restored, copied, failures };
+    return { first, retry, restored, recovered, copied, failures };
   }, moduleUrl);
   expect(result.retry).toEqual(result.first);
   expect(result.restored).toEqual(result.first);
   expect(result.copied).toEqual(result.first);
+  expect(result.recovered?.recovered).toBe(true);
+  expect(result.recovered?.delegationJournal).toEqual(result.first);
   expect(result.failures).toEqual(["SAVE_READ_ONLY", "DELEGATION_STALE_MATCH"]);
 });

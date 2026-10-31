@@ -189,6 +189,7 @@ async function restoreSave(saveId: string): Promise<void> {
         saveId,
         session.revision,
       ),
+      ...(loaded.delegationJournal ? { delegationJournal: loaded.delegationJournal } : {}),
       metadata: metadata(session, activeWorldCopy),
       worldCopy: activeWorldCopy,
       rosterPack: activeRosterPack,
@@ -436,7 +437,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       const loaded = await repository.load(saveId);
       if (!loaded) throw new Error("Save not found.");
       const fmt = sessionFormat(loaded.session);
-      const delegation = await repository.loadDelegationJournal(saveId);
+      const delegation = loaded.delegationJournal;
       const archivePins = loaded.rosterPack ? rosterPins(loaded.session as RosterT20Session | RosterODISession | RosterRed5Session) : fmt === "ODI" ? ODI_ARCHIVE_PINS : fmt === "RED_BALL" ? RED5_ARCHIVE_PINS : ARCHIVE_PINS;
       const archive = await createPortableArchive(
         loaded.session,
@@ -445,7 +446,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         nowIso(),
         loaded.worldCopy ?? null,
         loaded.rosterPack ?? null,
-        delegation.changes.length ? delegation : null,
+        delegation?.changes.length ? delegation : null,
       );
       return decorate(controller.currentResponse(request.requestId), archive);
     } catch (e) {
