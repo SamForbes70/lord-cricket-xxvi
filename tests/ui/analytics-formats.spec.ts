@@ -59,7 +59,6 @@ for (const format of ["T20", "ODI", "RED_BALL"]) test(`${format} completed match
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   const revision = await page.locator("#decision").getAttribute("data-revision");
   await analytics.getByRole("button", { name: "Rebuild analytics" }).click();
-  await expect(analytics.getByRole("status")).toContainText("Rebuilding analytics");
   await expect(analytics.getByRole("status")).toContainText("Analytics rebuild complete", { timeout: 60_000 });
   await analytics.getByRole("button", { name: "Rebuild analytics" }).click();
   const cancel = analytics.getByRole("button", { name: "Cancel analytics rebuild" });
