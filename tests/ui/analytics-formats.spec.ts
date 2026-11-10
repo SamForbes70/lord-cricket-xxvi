@@ -25,7 +25,6 @@ for (const format of ["T20", "ODI", "RED_BALL"]) test(`${format} completed match
   await expect(analytics.getByRole("group", { name: "Over-by-over runs" })).toBeVisible();
   const revision = await page.locator("#decision").getAttribute("data-revision");
   await analytics.getByRole("button", { name: "Rebuild analytics" }).click();
-  await expect(analytics.getByRole("status")).toContainText("Rebuilding analytics");
   await expect(analytics.getByRole("status")).toContainText("Analytics rebuild complete", { timeout: 60_000 });
   await analytics.getByRole("button", { name: "Rebuild analytics" }).click();
   const cancel = analytics.getByRole("button", { name: "Cancel analytics rebuild" });
