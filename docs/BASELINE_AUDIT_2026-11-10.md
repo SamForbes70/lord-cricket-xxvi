@@ -24,8 +24,14 @@
 | season acceptance | PASS | 56 fixtures; 14 user and 42 off-screen fixtures. |
 | season archive | PASS | Round-trip and deterministic continuation checks passed. |
 | current-head interactive browser | BLOCKED | Chromium failed to start: Unix socket returned EPERM. |
-| owner PC and reference hardware | NOT RUN | Hosted Windows is not the owner's PC. |
-| Windows package | NOT ACCEPTED | Built on Linux. Archive integrity and local HTTP startup passed. |
+| Owner Windows run-through | PASS BY OWNER REPORT | Sam confirmed a completed match and save/reload on Windows. |
+| Reference hardware | NOT RUN | Hardware specifications and performance measurements were not supplied. |
+| Windows package | PARTIAL | Built on Linux. Archive integrity and local HTTP startup passed. |
+
+On 10 November, Sam confirmed the Windows run-through in response to the supplied `19e15de` test package.
+He confirmed a completed match and a save and reload.
+The package checksum, browser version and match details were not independently checked on his PC.
+This does not establish portable archive import or reference-hardware acceptance.
 
 The first core run reached its unit stage and failed because the source context file was absent from the reconstruction.
 The unit suite passed after that file was recovered.
@@ -38,7 +44,7 @@ Both Linux `pass07a` and hosted Windows browser jobs passed.
 These are recorded CI results, not a fresh owner-PC run.
 
 PR #25 passed its recorded hosted checks and merged as `3846282`.
-The new main commit has not completed its post-merge checks.
+Main commit `3846282` passed its recorded post-merge CI run.
 PR #24 also had a passing recorded run.
 PR #27 and PR #31 had passing runs on their recorded heads.
 PR #26 failed a Windows delegation test with `ERR_CONNECTION_FAILED`.
