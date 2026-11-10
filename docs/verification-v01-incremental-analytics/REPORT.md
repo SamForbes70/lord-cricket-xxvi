@@ -32,3 +32,23 @@ A shot-sector snapshot previously shared objects with its accumulator.
 A regression test reproduced mutation of cached results through a returned snapshot.
 Snapshots now copy shot-sector entries. The related 30 T20, ODI and red-ball tests passed locally.
 The branch must pass hosted checks against main after PR #28.
+
+## Current-main integration: 11 November 2026 (Brisbane)
+
+Tested integration `b9eb19288a9204fb8a294d2b7842228c1c1f7847` includes
+main `c37f1e0`, including navigation, scorecard exports and the current Windows
+collector timeout. Linux Node 24.22.1 / npm 11.9.0 verification passed:
+
+- `npm run verify:09:core`: 188 schemas, build, typecheck, lint, scoring fixtures,
+  independent vectors and all 690 tests in 54 files.
+- Six analytics browser checks: T20, ODI and red-ball in Chromium and Firefox,
+  covering rebuild, cancellation-or-completion race, unchanged revision and replay.
+- `npm run management:acceptance`: all 56 fixtures, archive round trips,
+  deterministic continuation and duplicate completion rejection.
+- `npm run smoke -- --workers=1`: all 23 production smoke checks.
+
+Logs, tested revision and SHA-256 values are retained in
+`integration-2026-11-11/`. No browser sandbox override was used.
+Frozen simulation, contracts, world data and the dependency lockfile have no
+diff from main. Hosted checks must pass on the final PR head before merge.
+These runs do not establish owner-PC or reference-hardware acceptance.
