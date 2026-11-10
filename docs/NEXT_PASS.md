@@ -1,26 +1,15 @@
 # Next development slice
 
-The active target is the original V0.1 synthetic alpha under the owner's standing brief.
-[The delivery plan](V01_DELIVERY_PLAN.md) and `V01_BACKLOG.json` supersede the earlier research-only work queue.
-[Current status](CURRENT_STATUS.md) records actual implemented capability and evidence.
+Finish V0.1, then deliver persistent world, player lifecycle and squad economy sequentially, as directed by the owner on 11 November 2026.
 
-## Batch 2: player-facing essentials
+## Immediate implementation
 
-PR #15 merged V01-003 and V01-004.
-PR #16 merged V01-005, names and colours for new careers and exhibitions.
-PR #17 merged V01-006, validated roster import for exhibitions and T20 careers.
-PR #18 added the 115% scale and persistent match preferences.
-PR #20 completed V01-007 acceptance.
-PR #21 merged bounded simulation controls; PR #22 merged safe cancellation.
-PR #23 merged granular T20 delegation as `753db53`.
-PR #25 merged cross-format analytics as `3846282`.
-Review match navigation in PR #24 and incremental analytics in PR #26 next.
-Check the current merge base and required CI before integration.
-Preserve stable IDs, existing saves, frozen simulation outcomes and historical snapshots.
+Complete durable managed-match recovery in draft PR #37. PR #24 already merged in-session navigation; V01-011 remains IN_PROGRESS because the launch and result binding uses session storage. The fresh-tab regression restores the match revision but loses the career handoff. It is not a fix.
 
-## Parallel research and acceptance
+## Integration queue
 
-[M7K_PLAN.md](M7K_PLAN.md) remains the research plan; its historical and cohort gates stay explicit.
-Historical decisions, sufficient untouched matches and qualifying hardware measurements remain external evidence needs.
-They do not stop unrelated product work.
-Research-model promotion and public deployment require separate approval.
+Read [the current dated audit](GITHUB_AUDIT_2026-11-11.md). Review #26 before dependent #27 and reconcile #31 with main. Check live head/base and required checks before merging. Update backlog status only when acceptance and integration are established.
+
+## Continuation
+
+Use [V01_BACKLOG.json](V01_BACKLOG.json) for the remaining acceptance criteria and [AI continuation](AI_CONTINUATION.md) for context. Historical evidence and owner-PC/reference-hardware gaps remain explicit. Missing research evidence does not block independent product work.

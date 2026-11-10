@@ -159,3 +159,7 @@ The developer tool compares existing baseline/tactical policies across all eight
 It preserves accepted event/scorecard hashes and separates first innings from chase endings.
 See [SCENARIO_QUALITY_HARNESS.md](docs/SCENARIO_QUALITY_HARNESS.md) for scope, results and limits.
 This adds a reproducible quality tool; it does not change the playable scoring model.
+
+## Maintained documentation
+
+See the [documentation index](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md), and [AI-only continuation guide](docs/AI_CONTINUATION.md). Read the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) before relying on older queue snapshots.

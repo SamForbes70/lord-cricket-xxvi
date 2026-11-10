@@ -52,3 +52,7 @@ Replace YOUR_USERNAME and URL with your own new private repo. Do not force-push 
 Extract `../ORIGINAL_OWNER_RELEASE/Lord_Cricket_XXVI_START_HERE_2026-10-17.zip` and use `PLAY_LORD_CRICKET.cmd` then `OPEN_LORD_CRICKET.url`. This is a localhost browser app, not a native .exe. Browser careers are saved in IndexedDB, not in the game directory; use Settings export to back them up.
 
 **Important:** The empirical research candidates are not part of production gameplay. Real browser match/save tests and formal human acceptance were still outstanding when this release was packed.
+
+## Maintained documentation
+
+See the [documentation index](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md), and [AI-only continuation guide](docs/AI_CONTINUATION.md). Read the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) before relying on older queue snapshots.
