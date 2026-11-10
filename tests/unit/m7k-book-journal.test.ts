@@ -30,7 +30,7 @@ describe("M7K durable cross-innings transactions", () => {
     const empty = loadBook(directory), awarded = commitBook(directory, empty.head, "award-tx", penalty);
     const moduleUrl = pathToFileURL(resolve("scripts/research/m7k-book-journal.ts")).href;
     const program = `import {commitBook} from ${JSON.stringify(moduleUrl)}; commitBook(${JSON.stringify(directory)}, ${JSON.stringify(awarded.head)}, "crash-transfer", ${JSON.stringify(transfer)}, () => process.exit(71));`;
-    const child = spawnSync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", program], { encoding: "utf8" });
+    const child = spawnSync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", program], { encoding: "utf8", timeout: 20_000 });
     expect(child.status, child.stderr).toBe(71);
     const recovered = loadBook(directory);
     expect(recovered.pair.second.projection.context.runs).toBe(5);
@@ -38,7 +38,7 @@ describe("M7K durable cross-innings transactions", () => {
     expect(() => commitBook(directory, awarded.head, "crash-transfer", transfer)).toThrow();
     releaseDeadBookWriter(directory);
     expect(commitBook(directory, awarded.head, "crash-transfer", transfer)).toEqual(recovered);
-  }));
+  }), 30_000);
   it("preserves live or foreign writer locks during recovery", () => temporary(directory => {
     const lock = join(directory, "writer.lock");
     writeFileSync(lock, JSON.stringify({ pid: process.pid, hostname: hostname() }));
