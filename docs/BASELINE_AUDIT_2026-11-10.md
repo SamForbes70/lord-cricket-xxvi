@@ -65,3 +65,10 @@ These results require final-head and merge-base review before integration.
 8. Re-estimate from the accepted baseline and remaining backlog.
 
 The evidence does not support a reliable completion date.
+
+
+## Subsequent owner test
+
+Sam reported that the Windows test package built from `852a3dc` tested well.
+The report did not specify the actions performed, browser version or machine specifications.
+This report does not establish the full owner-PC checklist or reference-hardware acceptance.
