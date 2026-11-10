@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { projectRed5MatchAnalytics } from "@lcxxvi/projections";
 import {
   createPortableArchive,
   readPortableArchive,
@@ -214,6 +215,12 @@ describe("Pass 11 / M5B red-ball profile", () => {
     expect(s.core.innings[2]!.innings.battingTeamId).toBe(
       s.core.innings[1]!.innings.battingTeamId,
     );
+    s = ready(s);
+    s = applyRed5FixtureResolution(s, resolution(s, { runs: 4 }));
+    const analytics = projectRed5MatchAnalytics(s.events);
+    expect(analytics.finalRuns.slice(0, 3)).toEqual([200, 0, 4]);
+    expect(analytics.finalWickets.slice(0, 3)).toEqual([0, 10, 0]);
+    expect(analytics.fallOfWickets.filter(wicket => wicket.inningsIndex === 1)).toHaveLength(10);
   });
   it("makes the new ball available after 480 legal balls and resets only ball age", () => {
     let s = ready(createRed5Session(setup));
@@ -306,6 +313,10 @@ describe("Pass 11 / M5B red-ball profile", () => {
     expect(s.core.innings.length).toBeGreaterThanOrEqual(3);
     expect(s.core.innings.length).toBeLessThanOrEqual(4);
     const card = projectRed5Scorecard(s);
+    const analytics = projectRed5MatchAnalytics(s.events, card);
+    expect(analytics.finalRuns).toEqual(card.innings.map(innings => innings.runs));
+    expect(analytics.finalWickets).toEqual(card.innings.map(innings => innings.wickets));
+    expect(analytics.finalLegalBalls).toEqual(card.innings.map(innings => innings.legalBalls));
     expect(card.result).toEqual(s.core.result);
     const replay = replayRed5Events(setup, s.events, red5EventChainManifest(s));
     expect(replay.lastEventHash).toBe(s.lastEventHash);

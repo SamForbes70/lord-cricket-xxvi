@@ -1,3 +1,4 @@
+import { projectRed5MatchAnalytics } from "@lcxxvi/projections";
 import {
   type Red5Session,
   type RosterRed5Session,
@@ -229,6 +230,7 @@ export function createRed5MatchController(
       advanceReason,
       commentary,
       scorecard: c.phase === "COMPLETE" ? projectRed5Scorecard(s) : null,
+      analytics: c.phase === "COMPLETE" ? projectRed5MatchAnalytics(s.events, projectRed5Scorecard(s)) : null,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,

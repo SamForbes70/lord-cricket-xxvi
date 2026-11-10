@@ -878,7 +878,7 @@ export function MatchApp() {
               )}
             </section>
           )}
-          {view.format === "T20" && view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} />}
+          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} />}
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>
