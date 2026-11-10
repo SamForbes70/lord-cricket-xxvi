@@ -20,3 +20,6 @@ This branch depends on scorecard PR #28 and needs hosted checks before integrati
 Scorecard export merged in PR #28. This branch now targets main.
 Its earlier hosted checks passed against the previous scorecard branch base.
 Run hosted checks again against the current main integration before merging.
+
+Hosted Linux and Windows checks passed before the navigation integration.
+Run the checks again with the merged navigation changes before integration.
