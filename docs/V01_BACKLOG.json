@@ -289,7 +289,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Export UTF-8 CSV with formula-prefix protection.",
