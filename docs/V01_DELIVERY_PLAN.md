@@ -27,7 +27,8 @@ PR #18 added the 115% scale and persistent match preferences.
 PR #20 completed V01-007 keyboard and settings acceptance.
 PR #21 merged V01-008 bounded advances; PR #22 merged V01-009 cancellation.
 PR #23 merged V01-010 granular T20 delegation as `753db53`.
-Review V01-011 match navigation and V01-012 cross-format analytics next.
+PR #25 merged V01-012 cross-format analytics as `3846282`.
+Review V01-011 match navigation and V01-013 incremental analytics next.
 Preserve stable IDs, historical snapshots, existing saves and frozen simulation outcomes.
 Keep new packs versioned and validate all imported references and content.
 

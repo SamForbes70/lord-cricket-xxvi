@@ -37,7 +37,8 @@ Main push run [41246774645](https://github.com/SamForbes70/lord-cricket-xxvi/act
 Both Linux `pass07a` and hosted Windows browser jobs passed.
 These are recorded CI results, not a fresh owner-PC run.
 
-At review, PR #25 had passed its recorded hosted checks.
+PR #25 passed its recorded hosted checks and merged as `3846282`.
+The new main commit has not completed its post-merge checks.
 PR #24 also had a passing recorded run.
 PR #27 and PR #31 had passing runs on their recorded heads.
 PR #26 failed a Windows delegation test with `ERR_CONNECTION_FAILED`.

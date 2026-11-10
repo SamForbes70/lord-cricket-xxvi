@@ -1,3 +1,4 @@
+import { projectODIMatchAnalytics } from "@lcxxvi/projections";
 import {
   type ODISession,
   type RosterODISession,
@@ -227,6 +228,7 @@ export function createODIMatchController(
       advanceReason,
       commentary,
       scorecard: c.phase === "COMPLETE" ? projectODIScorecard(s) : null,
+      analytics: c.phase === "COMPLETE" ? projectODIMatchAnalytics(s.events, projectODIScorecard(s)) : null,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,

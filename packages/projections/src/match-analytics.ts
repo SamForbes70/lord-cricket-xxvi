@@ -1,10 +1,11 @@
-import type { DeliveryRecorded, T20MatchEvent, T20Scorecard } from "@lcxxvi/contracts";
+import type { DeliveryRecorded, T20MatchEvent, T20Scorecard, ODIMatchEvent, ODIScorecard, Red5MatchEvent, Red5Scorecard } from "@lcxxvi/contracts";
 
 /** Event-derived, presentation-only analytics. No state mutation or invented ball telemetry. */
 export type OverSummary = Readonly<{ inningsIndex: number; overNumber: number; runs: number; wickets: number; legalBalls: number; attempts: number }>;
 export type WormPoint = Readonly<{ inningsIndex: number; sequence: number; legalBalls: number; totalRuns: number; wickets: number }>;
 export type Partnership = Readonly<{ inningsIndex: number; players: readonly [string, string]; runs: number; legalBalls: number; fromSequence: number; toSequence: number }>;
 export type ShotSector = Readonly<{ inningsIndex: number; batterId: string; sector: number; attempts: number; batRuns: number; fours: number; sixes: number }>;
+export type FallOfWicket = Readonly<{ inningsIndex: number; sequence: number; playerId: string; runs: number; wickets: number; legalBalls: number }>;
 export type MatchAnalytics = Readonly<{
   overSummaries: readonly OverSummary[];
   worm: readonly WormPoint[];
@@ -14,6 +15,7 @@ export type MatchAnalytics = Readonly<{
   finalRuns: readonly number[];
   finalLegalBalls: readonly number[];
   finalWickets: readonly number[];
+  fallOfWickets: readonly FallOfWicket[];
 }>;
 
 type MutableOver = { inningsIndex: number; overNumber: number; runs: number; wickets: number; legalBalls: number; attempts: number };
@@ -28,11 +30,24 @@ function sumRuns(d: DeliveryRecorded) { return d.batRuns + d.extras.wides + d.ex
  * in their actual over; wagon wheel only shows sectors explicitly recorded by engine.
  */
 export function projectT20MatchAnalytics(events: readonly T20MatchEvent[], scorecard?: Readonly<T20Scorecard>): MatchAnalytics {
+  return projectMatchAnalytics(events, 2, scorecard);
+}
+
+export function projectODIMatchAnalytics(events: readonly ODIMatchEvent[], scorecard?: Readonly<ODIScorecard>): MatchAnalytics {
+  return projectMatchAnalytics(events, 2, scorecard);
+}
+
+export function projectRed5MatchAnalytics(events: readonly Red5MatchEvent[], scorecard?: Readonly<Red5Scorecard>): MatchAnalytics {
+  return projectMatchAnalytics(events, scorecard?.innings.length ?? 4, scorecard);
+}
+
+function projectMatchAnalytics(events: readonly (T20MatchEvent | ODIMatchEvent | Red5MatchEvent)[], inningsCount: number, scorecard?: Readonly<T20Scorecard | ODIScorecard | Red5Scorecard>): MatchAnalytics {
   const overs = new Map<string, MutableOver>();
   const pairs: MutablePartnership[] = [];
   const shots = new Map<string, MutableSector>();
   const worm: WormPoint[] = [];
-  const runs = [0, 0], wickets = [0, 0], balls = [0, 0];
+  const falls: FallOfWicket[] = [];
+  const runs = Array<number>(inningsCount).fill(0), wickets = Array<number>(inningsCount).fill(0), balls = Array<number>(inningsCount).fill(0);
   let unlocatedShots = 0, priorSequence = 0;
   for (const e of events) {
     guard(e.sequence > priorSequence, "SEQUENCE_ORDER");
@@ -40,7 +55,7 @@ export function projectT20MatchAnalytics(events: readonly T20MatchEvent[], score
     if (e.type !== "DELIVERY_RECORDED") continue;
     const d = (e.payload as { event: DeliveryRecorded }).event;
     const idx = d.inningsIndex;
-    guard(idx === 0 || idx === 1, "INNINGS_INDEX");
+    guard(Number.isInteger(idx) && idx >= 0 && idx < inningsCount, "INNINGS_INDEX");
     const earned = sumRuns(d);
     guard(Number.isSafeInteger(earned) && earned >= 0, "INVALID_RUNS");
     const overNumber = Math.floor(balls[idx]! / 6) + 1;
@@ -77,10 +92,11 @@ export function projectT20MatchAnalytics(events: readonly T20MatchEvent[], score
     runs[idx]! += earned;
     wickets[idx]! += Number(d.dismissal !== null);
     balls[idx]! += Number(d.legalBall);
+    if (d.dismissal) falls.push({ inningsIndex: idx, sequence: e.sequence, playerId: d.dismissal.playerId, runs: runs[idx]!, wickets: wickets[idx]!, legalBalls: balls[idx]! });
     worm.push({ inningsIndex: idx, sequence: e.sequence, legalBalls: balls[idx]!, totalRuns: runs[idx]!, wickets: wickets[idx]! });
   }
   if (scorecard) {
-    for (const idx of [0, 1]) {
+    for (let idx = 0; idx < inningsCount; idx++) {
       const score = scorecard.innings[idx];
       guard(Boolean(score) && runs[idx] === score!.runs, `RUN_RECONCILIATION_${idx}`);
       guard(wickets[idx] === score!.wickets, `WICKET_RECONCILIATION_${idx}`);
@@ -96,5 +112,6 @@ export function projectT20MatchAnalytics(events: readonly T20MatchEvent[], score
     finalRuns: runs,
     finalLegalBalls: balls,
     finalWickets: wickets,
+    fallOfWickets: falls,
   };
 }

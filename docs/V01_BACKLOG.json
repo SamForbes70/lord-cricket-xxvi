@@ -231,7 +231,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Extend event-derived analytics to ODI and red ball.",

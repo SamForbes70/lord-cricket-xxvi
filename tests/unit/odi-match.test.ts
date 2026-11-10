@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { projectODIMatchAnalytics } from "@lcxxvi/projections";
 import { createPortableArchive, readPortableArchive, type SaveSummary } from "@lcxxvi/persistence";
 import { readFileSync } from "node:fs";
 import {
@@ -297,6 +298,15 @@ describe("Pass 10 / M5A ODI format", () => {
     const s = runFixtureODI(setup, 800);
     expect(s.core.phase).toBe("COMPLETE");
     const card = projectODIScorecard(s);
+    const analytics = projectODIMatchAnalytics(s.events, card);
+    expect(analytics.finalRuns).toEqual(card.innings.map(innings => innings.runs));
+    expect(analytics.finalWickets).toEqual(card.innings.map(innings => innings.wickets));
+    expect(analytics.finalLegalBalls).toEqual(card.innings.map(innings => innings.legalBalls));
+    expect(() => projectODIMatchAnalytics(s.events, { ...card, innings: [{ ...card.innings[0]!, runs: card.innings[0]!.runs + 1 }, card.innings[1]!] })).toThrow(/RUN_RECONCILIATION/);
+    for (const [index, innings] of card.innings.entries()) {
+      expect(analytics.fallOfWickets.filter(wicket => wicket.inningsIndex === index).map(({ playerId, runs, legalBalls }) => ({ playerId, runs, legalBalls })))
+        .toEqual(innings.fallOfWickets.map(({ playerId, runs, legalBalls }) => ({ playerId, runs, legalBalls })));
+    }
     expect(card.innings).toHaveLength(2);
     expect(card.innings.every((i) => i.legalBalls <= 300)).toBe(true);
     expect(
