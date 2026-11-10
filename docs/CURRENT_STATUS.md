@@ -21,7 +21,8 @@ PR #20 completed settings and player-navigation acceptance.
 PR #19 added durable command acknowledgements.
 PR #21 merged bounded simulation controls.
 PR #22 merged safe cancellation and committed event-range reporting.
-Granular delegation remains planned.
+PR #23 merged granular T20 decision delegation as `753db53`.
+It records selected categories in a versioned journal carried by saves and archives.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.
 The [world editing report](verification-v01-world-editing/REPORT.md) records this slice.
 A labelled synthetic-alpha release remains distinct from empirical model promotion.
@@ -99,7 +100,7 @@ M7K has not integrated a new production scorer, ledger, save version or gameplay
 
 ## Immediate engineering activities
 
-The current work completes the first four activities from the owner's status assessment:
+The earlier status assessment recorded these four activities:
 
 1. Review PR #3 and its CI, preserving its research-only boundary.
 2. Reconcile capability descriptions, including the inaccurate exhibition footer.
