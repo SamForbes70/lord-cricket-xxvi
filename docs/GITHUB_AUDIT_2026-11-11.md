@@ -30,4 +30,3 @@ The committed backlog records 13 DONE items, one IN_PROGRESS, 14 PLANNED and one
 Earlier integration reports on #26 record 690 local unit tests, six browser checks, 23 smoke checks and a 56-fixture season. #27 records 692 local unit tests and six browser checks. These are branch-specific historical results, not fresh tests of main or this documentation change. Owner-PC checklist, reference hardware and empirical evaluation gaps remain documented in ACCEPTANCE_RECONCILIATION.md and V01_BACKLOG.json.
 
 No release completion is established by this audit. It does not merge code, delete branches or close unresolved issues. PR #37 must remain draft while it contains the failing regression without an implementation.
-
