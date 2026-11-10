@@ -82,6 +82,27 @@ A synthetic model is not an empirically validated model.
 4. Implement a multi-season world as the first V1.0 management slice.
 5. Expand competitions, content, simulation, editing and release operations through the gates above.
 
+## Next implementation slice: managed-match recovery
+
+The current launch and result handoff uses browser session storage.
+A new browser session can lose the binding between a saved match and its career fixture.
+The next implementation must persist and validate that binding before entering a managed match.
+
+Acceptance requires all of the following:
+
+- Bind the career save, fixture, match identity, world or roster version and career revision.
+- Restore an interrupted match from durable state in a fresh browser session.
+- Reject a stale or mismatched binding without overwriting either save.
+- Preserve another tab's writer lease and reject concurrent writes.
+- Return the completed result once, including after an interruption during handoff.
+- Detect a duplicate completion and reject a conflicting result.
+- Retain recoverable data if either the career or match checkpoint is damaged.
+- Test both standard and imported-roster careers, including user-edited worlds.
+- Test existing saves and portable archives without silently changing their meaning.
+
+The implementation must define how obsolete bindings are cleared.
+It must not infer a match outcome from a missing or corrupt binding.
+
 ## Planning limits
 
 The project has no verified V1.0 completion date or resourcing estimate.
