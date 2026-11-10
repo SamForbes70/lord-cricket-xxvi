@@ -235,6 +235,26 @@ export class CareerApplicationService {
     }
   }
 
+  async inspectActiveCareer(): Promise<void> {
+    const saveId = await this.repository.activeSaveId();
+    if (!saveId) {
+      this.state = null;
+      this.worldCopy = null;
+      this.saveId = null;
+      this.readOnly = true;
+      this.setStatus("Idle");
+      return;
+    }
+    const loaded = await this.repository.load(saveId);
+    if (!loaded) throw new Error("Career save not found.");
+    this.state = loaded.state;
+    this.worldCopy = loaded.worldCopy ? immutableWorldCopy(loaded.worldCopy) : null;
+    this.saveId = saveId;
+    this.readOnly = true;
+    this.recovered = loaded.recovered;
+    this.setStatus("Read-only");
+  }
+
   async createCareer(teamId: string, copyRaw: NewGameWorldCopy | null = null): Promise<T20SeasonState> {
     if (!T20_LEAGUE_COMPETITION.teamIds.includes(teamId)) throw new Error("Unknown managed team.");
     const copy = copyRaw ? immutableWorldCopy(copyRaw) : null;
@@ -596,6 +616,22 @@ export class CareerApplicationService {
         phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
       };
     });
+  }
+
+  async createManualCopy(title: string): Promise<void> {
+    const name = title.trim();
+    if (!name || name.length > 120) throw new Error("Enter a copy name of 1 to 120 characters.");
+    const { state, saveId } = this.requireWritable();
+    const copyId = `career-copy-${crypto.randomUUID()}`;
+    const now = Date.now();
+    if (!await this.repository.acquireLease(saveId, this.ownerId, now)) throw new Error("This career is open in another tab.");
+    if (!await this.repository.acquireLease(copyId, this.ownerId, now)) throw new Error("The copy slot is locked.");
+    try {
+      await this.repository.commit({ saveId: copyId, kind: "MANUAL", title: name, expectedRevision: null, state, command: null,
+        ownerId: this.ownerId, now, updatedAt: nowIso(), setActive: false, worldCopy: this.worldCopy,
+        copySource: { saveId, revision: state.revision, stateSha256: state.stateSha256, now: () => Date.now() } });
+    } finally { await this.repository.releaseLease(copyId, this.ownerId); }
+    this.setStatus("Saved");
   }
 
   async exportCareer(): Promise<Uint8Array> {
