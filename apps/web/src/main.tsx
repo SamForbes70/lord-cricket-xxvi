@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
+import { ScorecardExport } from "./match/ScorecardExport.js";
 import { createRoot } from "react-dom/client";
 import {
   PINS,
@@ -882,6 +883,7 @@ export function MatchApp() {
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>
+              {view.scorecard && <ScorecardExport view={view} />}
               {view.innings.length === 0 && (
                 <p>The scorecard starts with the first innings.</p>
               )}

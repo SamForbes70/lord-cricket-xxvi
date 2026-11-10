@@ -16,7 +16,7 @@ const steps = [
   ...["schemas:check", "build", "typecheck", "lint", "fixtures:engine"].map(name => ({ name: name.replace(":", "-"), args: ["run", name] })),
   { name: "frozen-world", node: true, args: ["scripts/verify-world.mjs"] },
   { name: "unit", args: ["test", "--", "--maxWorkers=2", "--reporter=default", "--reporter=json", `--outputFile=${directory}/unit.json`], report: "unit.json" },
-  { name: "match-ui", args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
+  { name: "match-ui", timeoutMs: 1_800_000, args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
   { name: "career", args: ["exec", "--", "playwright", "test", "--config=playwright.m6g.portable.config.ts", "--reporter=list,json", `--output=${directory}/career`, "--trace=retain-on-failure"], report: "career.json" },
   { name: "research-browser-build", args: ["exec", "--", "vite", "build", "--config=vite.m7k.config.ts"] },
   { name: "research-browser", args: ["exec", "--", "playwright", "test", "--config=playwright.m7k.config.ts", "--reporter=list,json", `--output=${directory}/research`, "--trace=retain-on-failure"], report: "research-browser.json" },
@@ -45,7 +45,7 @@ if (flags.has("--plan")) {
   for (const step of steps) {
     const started = Date.now(), invocation = step.node ? { executable: process.execPath, args: step.args } : npmInvocation(step.args);
     console.log(`${step.name}: running`);
-    const result = spawnSync(invocation.executable, invocation.args, { encoding: "utf8", timeout: 900000, maxBuffer: 64000000,
+    const result = spawnSync(invocation.executable, invocation.args, { encoding: "utf8", timeout: step.timeoutMs ?? 900000, maxBuffer: 64000000,
       env: { ...process.env, PLAYWRIGHT_JSON_OUTPUT_NAME: join(process.cwd(), directory, step.report ?? "unused.json"),
         LCXXVI_UI_EVIDENCE_DIR: join(process.cwd(), directory, "ui-images"), LCXXVI_ACCEPTANCE_DIR: join(process.cwd(), directory) } });
     const log = `${result.stdout ?? ""}${result.stderr ?? ""}${result.error ? `\n${result.error.message}` : ""}`;

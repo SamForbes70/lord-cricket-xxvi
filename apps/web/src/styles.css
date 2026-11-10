@@ -635,3 +635,12 @@ code {
 
 .roster-file { display: flex; flex-direction: column; min-width: 0; max-width: 100%; }
 .roster-file input { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+
+.print-scorecard { display: none; }
+.scorecard-export-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+@media print {
+  body > :not(.print-scorecard) { display: none !important; }
+  .print-scorecard { display: block; width: 100%; color: black; background: white; }
+  .print-scorecard table { width: 100%; border-collapse: collapse; }
+  .print-scorecard td { padding: 0.2rem; border: 1px solid #777; }
+}
