@@ -67,6 +67,10 @@ describe("M7 canonical T20 match analytics", () => {
     const detached = accumulator.snapshot();
     (detached.finalRuns as number[])[0] = -1;
     expect(accumulator.snapshot().finalRuns[0]).not.toBe(-1);
+    expect(detached.shotSectors.length).toBeGreaterThan(0);
+    const originalRuns = accumulator.snapshot().shotSectors[0]!.batRuns;
+    (detached.shotSectors[0] as { batRuns: number }).batRuns = -1;
+    expect(accumulator.snapshot().shotSectors[0]!.batRuns).toBe(originalRuns);
   }, 120000);
   test("does not invent scores or tracking data on an empty event stream", () => {
     const analytics = projectT20MatchAnalytics([]);
