@@ -39,6 +39,8 @@ test("a managed match stays authoritative while inspecting career screens", asyn
   await expect(page.getByRole("status").filter({ hasText: "Career inspection only" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Play match" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Simulate match" })).toBeDisabled();
+  await page.getByLabel("Copy name").fill("Inspection copy");
+  await expect(page.getByRole("button", { name: "Save career copy" })).toBeDisabled();
   await page.getByRole("button", { name: "Squad", exact: true }).click();
   await expect(page.getByLabel(/^Training for /).first()).toBeDisabled();
   expect(await careerCheckpoint()).toEqual(beforeInspection);
@@ -92,6 +94,8 @@ test("an imported-roster match stays active while its career is inspected", asyn
   await expect(page.getByText(/Career inspection only/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Play next managed match" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Simulate next fixture" })).toBeDisabled();
+  await expect(page.getByLabel("Copy name")).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Save career copy" })).toBeDisabled();
   await page.getByRole("link", { name: "Return to match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("data-revision", revision!);
   await page.reload();

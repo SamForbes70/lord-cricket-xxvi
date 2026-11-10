@@ -194,7 +194,7 @@
       "dependsOn": [
         "V01-008"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Delegate each supported decision category explicitly.",
@@ -231,7 +231,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Extend event-derived analytics to ODI and red ball.",
@@ -289,7 +289,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Export UTF-8 CSV with formula-prefix protection.",
@@ -326,7 +326,7 @@
       "dependsOn": [
         "V01-001"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Create a named career copy without altering the source slot.",
