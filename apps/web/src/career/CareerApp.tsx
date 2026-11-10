@@ -275,9 +275,6 @@ export function CareerApp() {
                 </>
               ) : nextFixture ? (
                 <>
-                  <p className="big-stat">Round {nextFixture.roundNumber}</p>
-                  <p><strong>{service.teamName(nextFixture.homeTeamId)}</strong> v <strong>{service.teamName(nextFixture.awayTeamId)}</strong></p>
-                  <p>{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
                   {state.careerState.currentDate < nextFixture.matchDayDate ? (
                     <button className="primary" disabled={busy || service.isReadOnly()} onClick={() => action(async () => { await service.simulateToNextUserFixture(); })}>Advance to match day</button>
                   ) : (
@@ -286,6 +283,9 @@ export function CareerApp() {
                       <button disabled={busy || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
                     </div>
                   )}
+                  <p className="big-stat">Round {nextFixture.roundNumber}</p>
+                  <p><strong>{service.teamName(nextFixture.homeTeamId)}</strong> v <strong>{service.teamName(nextFixture.awayTeamId)}</strong></p>
+                  <p>{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
                   <PitchInspection ground={displayWorld.grounds.find(ground => ground.groundId === nextFixture.groundId)} format="T20" />
                 </>
               ) : <p>No remaining managed fixture.</p>}
