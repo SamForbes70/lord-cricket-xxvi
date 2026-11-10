@@ -24,3 +24,11 @@ After integration with the merged delegation changes, `npm run verify:09:core` p
 GitHub Actions run 42807023107 passed Linux and hosted Windows checks for branch head `7ddbfeb` against the earlier cross-format analytics base.
 An earlier Windows run reported a connection failure during archive import; the passing run did not reproduce it.
 The cause remains unconfirmed. The branch now targets main and requires checks on that integration.
+
+
+## Snapshot isolation
+
+A shot-sector snapshot previously shared objects with its accumulator.
+A regression test reproduced mutation of cached results through a returned snapshot.
+Snapshots now copy shot-sector entries. The related 30 T20, ODI and red-ball tests passed locally.
+The branch must pass hosted checks against main after PR #28.
