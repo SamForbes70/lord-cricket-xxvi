@@ -13,3 +13,29 @@ The charts use the event projection shared by incremental analytics and full reb
 - Firefox used `MOZ_DISABLE_CONTENT_SANDBOX=1` on the Linux host. Chromium used the host executable.
 
 The branch depends on the cross-format and incremental analytics changes in PRs #25 and #26. Hosted checks must pass before integration; GitHub Actions jobs were not starting because the account budget was exhausted.
+
+## Current-main integration: 11 November 2026 (Brisbane)
+
+Tested integration `e93d36325d0cd725f5d265adfc4c6ec656280758` includes
+main `c37f1e0` and incremental analytics `b9eb192`. The stylesheet conflict was
+resolved by retaining both chart styles and printable-scorecard styles.
+The current collector's 30-minute match UI timeout is retained; the previous
+Windows branch run used the older 15-minute timeout. This does not establish
+a passing Windows run on the integrated head.
+
+Linux Node 24.22.1 / npm 11.9.0 verification passed all 188 schemas, build,
+typecheck, lint, scoring fixtures, independent vectors and 692 unit tests
+in 55 files. All six T20/ODI/red-ball browser checks passed in Chromium and
+Firefox, including saved-event handedness comparisons, charts, narrow 150%
+layout, rebuild, cancellation-or-completion race and replay.
+
+The browser run used a temporary copy of the existing UI configuration with
+port 4181 to avoid the other worktree's server. Its initial attempt failed
+before tests because the Vite path was resolved relative to `work/`. Setting
+the preview server's cwd to the repository fixed the harness; no product code
+changed for that retry. The configuration, both logs and checksums are retained
+in `integration-2026-11-11/`.
+
+Frozen simulation, contracts, world data and the lockfile have no diff from
+main. Hosted checks on the final head remain required before merge. These
+Linux results do not establish owner-PC or reference-hardware acceptance.
