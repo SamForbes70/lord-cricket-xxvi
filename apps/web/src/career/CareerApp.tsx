@@ -52,6 +52,7 @@ export function CareerApp() {
   function changePlayerFormat(value: PlayerFormat) {
     setPlayerFormat(value); localStorage.setItem("lcxxvi-player-format", value);
   }
+  const [copyName, setCopyName] = useState("");
   const [busy, setBusy] = useState(true);
   const [uiError, setUiError] = useState("");
   const [savedCareers, setSavedCareers] = useState<Awaited<ReturnType<typeof service.listCareers>>>([]);
@@ -253,6 +254,10 @@ export function CareerApp() {
       <section className="career-disclosure compact" aria-label="Model disclosure">
         Fictional data · SYNTHETIC_ALPHA · one-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.
       </section>
+      <section className="career-panel" aria-label="Manual career copy">
+        <label>Copy name <input value={copyName} maxLength={120} onChange={event => setCopyName(event.currentTarget.value)} /></label>
+        <button disabled={busy || service.isReadOnly() || !copyName.trim()} onClick={() => void action(async () => { await service.createManualCopy(copyName); setCopyName(""); })}>Save career copy</button>
+      </section>
       {(uiError || service.getError()) && <p role="alert" tabIndex={-1} className="career-error">{uiError || service.getError()}</p>}
       {service.isReadOnly() && <p className="career-warning">This save is read-only because another tab owns its writer lease.</p>}
       {service.wasRecovered() && <p className="career-warning">Recovered from the newest valid checkpoint. The damaged source save was preserved.</p>}
@@ -270,9 +275,6 @@ export function CareerApp() {
                 </>
               ) : nextFixture ? (
                 <>
-                  <p className="big-stat">Round {nextFixture.roundNumber}</p>
-                  <p><strong>{service.teamName(nextFixture.homeTeamId)}</strong> v <strong>{service.teamName(nextFixture.awayTeamId)}</strong></p>
-                  <p>{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
                   {state.careerState.currentDate < nextFixture.matchDayDate ? (
                     <button className="primary" disabled={busy || service.isReadOnly()} onClick={() => action(async () => { await service.simulateToNextUserFixture(); })}>Advance to match day</button>
                   ) : (
@@ -281,6 +283,9 @@ export function CareerApp() {
                       <button disabled={busy || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
                     </div>
                   )}
+                  <p className="big-stat">Round {nextFixture.roundNumber}</p>
+                  <p><strong>{service.teamName(nextFixture.homeTeamId)}</strong> v <strong>{service.teamName(nextFixture.awayTeamId)}</strong></p>
+                  <p>{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
                   <PitchInspection ground={displayWorld.grounds.find(ground => ground.groundId === nextFixture.groundId)} format="T20" />
                 </>
               ) : <p>No remaining managed fixture.</p>}
