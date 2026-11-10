@@ -125,7 +125,7 @@ export function createMatchAnalyticsAccumulator(inningsCount: number) {
       overSummaries: [...overs.values()].map(x => ({ ...x })),
       worm: worm.map(point => ({ ...point })),
       partnerships: pairs.map(p => ({ ...p, players: [...p.players] as [string, string] })),
-      shotSectors: [...shots.values()].sort((a,b)=>a.inningsIndex-b.inningsIndex || a.batterId.localeCompare(b.batterId) || a.sector-b.sector),
+      shotSectors: [...shots.values()].map(shot => ({ ...shot })).sort((a,b)=>a.inningsIndex-b.inningsIndex || a.batterId.localeCompare(b.batterId) || a.sector-b.sector),
       unlocatedShots,
       finalRuns: runs.slice(0, reportedInnings),
       finalLegalBalls: balls.slice(0, reportedInnings),

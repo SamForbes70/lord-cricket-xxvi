@@ -642,3 +642,12 @@ code {
 .analytics-legend span { display: inline-block; width: 1.25rem; height: 0.3rem; vertical-align: middle; }
 .analytics-pitch { display: block; width: min(100%, 300px); height: auto; }
 .analytics-pitch text { fill: #1c2a20; font-size: 14px; }
+
+.print-scorecard { display: none; }
+.scorecard-export-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+@media print {
+  body > :not(.print-scorecard) { display: none !important; }
+  .print-scorecard { display: block; width: 100%; color: black; background: white; }
+  .print-scorecard table { width: 100%; border-collapse: collapse; }
+  .print-scorecard td { padding: 0.2rem; border: 1px solid #777; }
+}

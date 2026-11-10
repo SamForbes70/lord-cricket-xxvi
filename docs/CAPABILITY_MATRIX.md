@@ -17,12 +17,13 @@ Dated reports retain the results of their original runs.
 | Pitch inspection | The selected exhibition ground and next career fixture show the seam and spin values used by the match model. Unused conditions and unavailable forecasts are labelled. |
 | Training and condition | Rest/practice, availability, fatigue and temporary readiness; no permanent skill growth. |
 | Tactical captain | Optional deterministic public-view T20 policy; legal controls are browser-tested. Empirical tactical quality is unaccepted. |
+| Granular T20 delegation | PR #23 merged six decision categories. A versioned journal persists choices in checkpoints and portable archives. |
 | Fixture autopilot | Separate deterministic baseline completion policy; it is not the tactical captain. |
 | Local saves | IndexedDB commits, writer lease, revisions, checkpoints and validated recovery. |
 | Portable archives | `.lcxxvi` export/import, including browser tests in a fresh context. |
 | Final season | Immutable completion after exactly 56 reconciled fixtures. |
-| Statistics | League table, NRR, player statistics and accepted-event match analytics. |
-| Browser acceptance | Recorded Linux and hosted Windows Chromium/Firefox suites pass. The latest owner-PC run is incomplete; the updated result remains pending. |
+| Statistics | League table, NRR, player statistics and accepted-event match analytics for T20, ODI and red-ball matches. |
+| Browser acceptance | Recorded Linux and hosted Windows Chromium/Firefox suites pass. Sam confirmed a Windows match and save/reload on the `19e15de` package. The full owner-PC checklist remains incomplete. |
 | Human match | Sam reports a successful Windows Edge match, layout check and repeat replay verification. Individual missing fields remain recorded. |
 | Replay and determinism | Frozen scoring/vector gates and the 100-case T20 browser/worker corpus pass in recorded runs. |
 | Gameplay model | `synthetic-alpha-01` / `SYNTHETIC_ALPHA`; no empirical-realism claim. |
