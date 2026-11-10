@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
+import { ScorecardExport } from "./match/ScorecardExport.js";
 import { createRoot } from "react-dom/client";
 import {
   PINS,
@@ -31,7 +32,7 @@ type Body = Request extends infer R
     : never
   : never;
 const overs = (balls: number) => `${Math.floor(balls / 6)}.${balls % 6}`;
-export function MatchApp() {
+export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?: (roster: boolean) => void; onReturnCareer?: (roster: boolean) => void } = {}) {
   const worker = useRef<Worker | null>(null),
     serial = useRef(0),
     inflight = useRef<string | null>(null),
@@ -457,7 +458,7 @@ export function MatchApp() {
           <strong>Scheduled career match</strong>
           <span>Round {careerLaunch.current.roundNumber} · this result will return to the management career only after the match is complete.</span>
           {view?.phase === "COMPLETE" && (
-            <button className="primary" onClick={() => { window.location.hash = careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? "#roster-career" : "#career"; }}>Return result to career</button>
+            <button className="primary" onClick={() => { const roster = careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER"; if (onReturnCareer) onReturnCareer(roster); else window.location.hash = roster ? "#roster-career" : "#career"; }}>Return result to career</button>
           )}
         </div>
       )}
@@ -523,6 +524,7 @@ export function MatchApp() {
           <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
         </section>
       )}
+      {view && careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
       {view && (
         <>
           <section
@@ -905,6 +907,7 @@ export function MatchApp() {
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>
+              {view.scorecard && <ScorecardExport view={view} />}
               {view.innings.length === 0 && (
                 <p>The scorecard starts with the first innings.</p>
               )}
@@ -1480,12 +1483,18 @@ function Tactics({
 }
 function RootApp() {
   const [hash, setHash] = useState(window.location.hash || "#career");
+  const [retainedMatch, setRetainedMatch] = useState(() => sessionStorage.getItem("lcxxvi-inspecting-match") === "1");
   useEffect(() => {
     const onHash = () => setHash(window.location.hash || "#career");
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-  return hash === "#exhibition" ? <MatchApp /> : hash === "#roster-career" ? <RosterCareerApp /> : <CareerApp />;
+  const inspect = (roster: boolean) => { sessionStorage.setItem("lcxxvi-inspecting-match", "1"); setRetainedMatch(true); window.location.hash = roster ? "#roster-career" : "#career"; };
+  const finish = (roster: boolean) => { sessionStorage.removeItem("lcxxvi-inspecting-match"); setRetainedMatch(false); window.location.hash = roster ? "#roster-career" : "#career"; };
+  return <>
+    {(hash === "#exhibition" || retainedMatch) && <div hidden={hash !== "#exhibition"}><MatchApp onInspectCareer={inspect} onReturnCareer={finish} /></div>}
+    {hash !== "#exhibition" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
+  </>;
 }
 
 const root = document.getElementById("root");

@@ -45,7 +45,7 @@ if (flags.has("--plan")) {
   for (const step of steps) {
     const started = Date.now(), invocation = step.node ? { executable: process.execPath, args: step.args } : npmInvocation(step.args);
     console.log(`${step.name}: running`);
-    const result = spawnSync(invocation.executable, invocation.args, { encoding: "utf8", timeout: 900000, maxBuffer: 64000000,
+    const result = spawnSync(invocation.executable, invocation.args, { encoding: "utf8", timeout: step.timeoutMs ?? 900000, maxBuffer: 64000000,
       env: { ...process.env, PLAYWRIGHT_JSON_OUTPUT_NAME: join(process.cwd(), directory, step.report ?? "unused.json"),
         LCXXVI_UI_EVIDENCE_DIR: join(process.cwd(), directory, "ui-images"), LCXXVI_ACCEPTANCE_DIR: join(process.cwd(), directory) } });
     const log = `${result.stdout ?? ""}${result.stderr ?? ""}${result.error ? `\n${result.error.message}` : ""}`;

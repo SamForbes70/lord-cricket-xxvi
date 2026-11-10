@@ -12,7 +12,10 @@ PR #17 merged V01-006, validated roster import for exhibitions and T20 careers.
 PR #18 added the 115% scale and persistent match preferences.
 PR #20 completed V01-007 acceptance.
 PR #21 merged bounded simulation controls; PR #22 merged safe cancellation.
-Build granular delegation next.
+PR #23 merged granular T20 delegation as `753db53`.
+PR #25 merged cross-format analytics as `3846282`.
+Review match navigation in PR #24 and incremental analytics in PR #26 next.
+Check the current merge base and required CI before integration.
 Preserve stable IDs, existing saves, frozen simulation outcomes and historical snapshots.
 
 ## Parallel research and acceptance
