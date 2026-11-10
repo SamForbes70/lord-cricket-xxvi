@@ -22,8 +22,8 @@ PR #19 added durable command acknowledgements.
 PR #21 merged bounded simulation controls.
 PR #22 merged safe cancellation and committed event-range reporting.
 PR #23 merged granular T20 decision delegation as `753db53`.
+The delegation journal carries selected categories in saves and archives.
 PR #25 merged cross-format match analytics as `3846282`.
-It records selected categories in a versioned journal carried by saves and archives.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.
 The [world editing report](verification-v01-world-editing/REPORT.md) records this slice.
 A labelled synthetic-alpha release remains distinct from empirical model promotion.
