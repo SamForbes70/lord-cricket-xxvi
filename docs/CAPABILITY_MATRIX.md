@@ -17,6 +17,7 @@ Dated reports retain the results of their original runs.
 | Pitch inspection | The selected exhibition ground and next career fixture show the seam and spin values used by the match model. Unused conditions and unavailable forecasts are labelled. |
 | Training and condition | Rest/practice, availability, fatigue and temporary readiness; no permanent skill growth. |
 | Tactical captain | Optional deterministic public-view T20 policy; legal controls are browser-tested. Empirical tactical quality is unaccepted. |
+| Granular T20 delegation | PR #23 merged six decision categories. A versioned journal persists choices in checkpoints and portable archives. |
 | Fixture autopilot | Separate deterministic baseline completion policy; it is not the tactical captain. |
 | Local saves | IndexedDB commits, writer lease, revisions, checkpoints and validated recovery. |
 | Portable archives | `.lcxxvi` export/import, including browser tests in a fresh context. |
