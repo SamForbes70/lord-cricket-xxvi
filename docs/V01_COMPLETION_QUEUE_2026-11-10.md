@@ -1,5 +1,7 @@
 # V0.1 completion queue: 10 November 2026
 
+> Historical snapshot. For current merge state and next work, use [the 11 November audit](GITHUB_AUDIT_2026-11-11.md) and [NEXT_PASS](NEXT_PASS.md). The immediate integration list below is superseded.
+
 This queue describes the fictional SYNTHETIC_ALPHA release. The acceptance criteria in V01_BACKLOG.json remain authoritative.
 The source baseline was main commit 19e15de. Main advanced to 852a3dc after PR #25 and PR #30 were merged.
 The 19e15de Windows package was played by Sam, including a match and save/reload.

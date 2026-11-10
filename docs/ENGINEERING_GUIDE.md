@@ -36,7 +36,11 @@ The fictional T20 career has eight teams, 14 rounds and 56 fixtures. Managed fix
 
 A match result must bind to the intended season, schedule, fixture, selected teams and match identity. Standard career completion rejects conflicting results and recognises an existing completion. Imported-roster careers have their own validation path. Do not assume testing one proves the other.
 
+For commands, browser configuration and CI evidence retention, see the [verification guide](VERIFICATION_GUIDE.md).
+
 ## Persistence and compatibility
+
+The [persistence package reference](../packages/persistence/README.md) maps public APIs, object stores, leases and schema families.
 
 The IndexedDB database is `lord-cricket-xxvi`. Match and season storage use shared infrastructure, but their checkpoints and writer leases are separate. Operational lease identities are not simulation randomness. The existing match repository retains three checkpoint generations and validates recovery candidates. Portable `.lcxxvi` archives are validated, not trusted because a checksum matches.
 

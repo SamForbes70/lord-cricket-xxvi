@@ -28,7 +28,10 @@ PR #20 completed V01-007 keyboard and settings acceptance.
 PR #21 merged V01-008 bounded advances; PR #22 merged V01-009 cancellation.
 PR #23 merged V01-010 granular T20 delegation as `753db53`.
 PR #25 merged V01-012 cross-format analytics as `3846282`.
-Review V01-011 match navigation and V01-013 incremental analytics next.
+PR #24 merged in-session navigation; V01-011 still needs durable recovery across browser sessions. PR #37 reproduces the defect but does not fix it.
+PR #28 merged scorecard exports and PR #30 merged manual career copies.
+Complete V01-011 recovery next, then review #26 incremental analytics, dependent #27 charts and #31 diagnostics.
+Use [the GitHub audit](GITHUB_AUDIT_2026-11-11.md) for the dated branch and check inventory.
 Preserve stable IDs, historical snapshots, existing saves and frozen simulation outcomes.
 Keep new packs versioned and validate all imported references and content.
 
@@ -40,8 +43,7 @@ Resolve demonstrated CI failures and merge only after required checks pass.
 Record the tested head and final merge result without relabelling old evidence as fresh.
 
 Statuses mean READY, PLANNED, IN_PROGRESS, BLOCKED_EXTERNAL, DELIVERED_PENDING_INTEGRATION or DONE.
-Batch 1 reaches DONE after this change passes review and merges.
-A later session can verify the merge before advancing those records.
+Use the committed backlog for individual completion states; this plan does not automatically mark a batch complete.
 The release item depends on every V01 item, including reference-hardware acceptance.
 
 ## Independent evidence track
@@ -62,7 +64,7 @@ The earlier chat list identifies candidate work; the committed backlog records t
 Full charts and broader match controls remain product work.
 Existing match save copies, basic analytics, red-ball delays and T20 opposition remain implemented capabilities.
 Optional prediction and verified DLS remain gated extensions.
-Multiyear management, finances, contracts, youth, online play, DRS and 3D presentation remain deferred.
+Multiyear management and squad economy are outside V0.1 and enter the approved subsequent milestones: persistent world, player lifecycle, then squad economy. Online play, DRS and 3D presentation are not added to that sequence.
 
 ## Continuation
 
