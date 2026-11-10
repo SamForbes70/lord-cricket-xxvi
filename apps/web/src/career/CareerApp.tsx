@@ -32,7 +32,7 @@ function percentageBp(value: number): string {
   return `${(value / 100).toFixed(1)}%`;
 }
 
-export function CareerApp() {
+export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean } = {}) {
   const [, redraw] = useState(0);
   const [screen, setScreen] = useState<Screen>("HOME");
   const [playerId, setPlayerId] = useState<string | null>(null);
@@ -81,9 +81,10 @@ export function CareerApp() {
     let alive = true;
     void (async () => {
       try {
-        await service.boot();
+        if (inspectionOnly) await service.inspectActiveCareer();
+        else await service.boot();
         const pending = sessionStorage.getItem(RESULT_KEY);
-        if (pending) {
+        if (pending && !inspectionOnly) {
           const parsed = JSON.parse(pending) as CareerUserMatchResult;
           await service.completeUserMatch(parsed);
           sessionStorage.removeItem(RESULT_KEY);
@@ -108,6 +109,7 @@ export function CareerApp() {
   }, [scale, density, reducedMotion]);
 
   async function action(work: () => Promise<void>) {
+    if (inspectionOnly) { setUiError("Return to the active match before changing the career."); return; }
     setBusy(true);
     setUiError("");
     try {
@@ -176,9 +178,10 @@ export function CareerApp() {
   if (!state) {
     return (
       <main className={`career-shell density-${density}`} style={{ fontSize: `${Number(scale) / 100}rem` }}>
+        {inspectionOnly && <p role="status">Career inspection only. Return to the active match before changing the career.</p>}
         <header className="career-masthead">
           <div><p className="eyebrow">LORD CRICKET XXVI</p><h1>Start a <span>Career</span></h1></div>
-          <a className="button-link" href="#exhibition" onClick={() => sessionStorage.removeItem(LAUNCH_KEY)}>Exhibition matches</a>
+          <a className="button-link" href="#exhibition" onClick={() => { if (!inspectionOnly) sessionStorage.removeItem(LAUNCH_KEY); }}>{inspectionOnly ? "Return to match" : "Exhibition matches"}</a>
           <a className="button-link" href="#roster-career">Imported roster career</a>
         </header>
         <section className="career-disclosure" aria-label="Product status">
@@ -190,7 +193,7 @@ export function CareerApp() {
             <h2>Continue career</h2>
             <div className="save-list">
               {savedCareers.map((save) => (
-                <button key={save.saveId} disabled={busy} onClick={() => action(async () => { await service.loadCareer(save.saveId); setScreen("HOME"); })}>
+                <button key={save.saveId} disabled={busy || inspectionOnly} onClick={() => action(async () => { await service.loadCareer(save.saveId); setScreen("HOME"); })}>
                   {save.title} · {save.completedFixtures}/56 · {save.phase}
                   <small>{save.currentDate} · revision {save.revision}</small>
                 </button>
@@ -208,7 +211,7 @@ export function CareerApp() {
           {stagedWorld && <p role="status">Edited world ready for a new career. Existing careers remain unchanged.</p>}
           <div className="team-picker">
             {displayWorld.teams.map((candidate) => (
-              <button key={candidate.teamId} className="team-card" disabled={busy || editingWorld} onClick={() => createCareer(candidate.teamId)}>
+              <button key={candidate.teamId} className="team-card" disabled={busy || inspectionOnly || editingWorld} onClick={() => createCareer(candidate.teamId)}>
                 <strong>{candidate.name}</strong>
                 <span>{displayWorld.grounds.find(ground => ground.groundId === candidate.teamId.replace("team", "ground"))?.name}</span>
                 <span className="team-colours" aria-hidden="true">{candidate.colours.map((colour, index) => <i key={index} style={{ backgroundColor: colour }} />)}</span>
@@ -218,7 +221,7 @@ export function CareerApp() {
         </section>
         <section className="career-panel import-panel">
           <h2>Import portable career</h2>
-          <label>Choose .lcxxvi archive<input type="file" accept=".lcxxvi,application/zip" onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)} /></label>
+          <label>Choose .lcxxvi archive<input type="file" accept=".lcxxvi,application/zip" disabled={inspectionOnly} onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)} /></label>
         </section>
       </main>
     );
@@ -230,6 +233,7 @@ export function CareerApp() {
 
   return (
     <main className={`career-shell density-${density} ${reducedMotion ? "reduced-motion" : ""}`} style={{ fontSize: `${Number(scale) / 100}rem` }}>
+      {inspectionOnly && <p role="status">Career inspection only. Return to the active match before changing the career.</p>}
       <header className="career-masthead">
         <div>
           <p className="eyebrow">LORD CRICKET XXVI · MANAGEMENT</p>
@@ -247,8 +251,8 @@ export function CareerApp() {
         {(["HOME", "CAREER", "SQUAD", "FIXTURES", "STATISTICS", "SETTINGS"] as Screen[]).map((item) => (
           <button key={item} aria-current={screen === item ? "page" : undefined} onClick={() => setScreen(item)}>{item[0] + item.slice(1).toLowerCase()}</button>
         ))}
-        <a href="#exhibition" onClick={() => sessionStorage.removeItem(LAUNCH_KEY)}>Exhibition</a>
-        <button disabled={busy} onClick={() => void action(async () => { await service.leaveCareer(); setScreen("HOME"); })}>Choose career</button>
+        <a href="#exhibition" onClick={() => { if (!inspectionOnly) sessionStorage.removeItem(LAUNCH_KEY); }}>{inspectionOnly ? "Return to match" : "Exhibition"}</a>
+        <button disabled={busy || inspectionOnly} onClick={() => void action(async () => { await service.leaveCareer(); setScreen("HOME"); })}>Choose career</button>
       </nav>
 
       <section className="career-disclosure compact" aria-label="Model disclosure">
@@ -276,11 +280,11 @@ export function CareerApp() {
               ) : nextFixture ? (
                 <>
                   {state.careerState.currentDate < nextFixture.matchDayDate ? (
-                    <button className="primary" disabled={busy || service.isReadOnly()} onClick={() => action(async () => { await service.simulateToNextUserFixture(); })}>Advance to match day</button>
+                    <button className="primary" disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => action(async () => { await service.simulateToNextUserFixture(); })}>Advance to match day</button>
                   ) : (
                     <div className="action-row">
-                      <button className="primary" disabled={busy || service.isReadOnly()} onClick={() => action(async () => { await service.simulateManagedFixture(); })}>Simulate match</button>
-                      <button disabled={busy || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
+                      <button className="primary" disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => action(async () => { await service.simulateManagedFixture(); })}>Simulate match</button>
+                      <button disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
                     </div>
                   )}
                   <p className="big-stat">Round {nextFixture.roundNumber}</p>
@@ -334,7 +338,7 @@ export function CareerApp() {
           <p>Training changes affect temporary readiness and daily recovery only. There is no permanent attribute growth in V0.1.</p>
           <div className="table-wrap"><table><thead><tr><th>Player</th><th>Role</th><th>Availability</th><th>Fatigue</th><th>Bat</th><th>Bowl</th><th>Field</th><th>Training</th></tr></thead><tbody>{service.squadView()?.players.map((condition) => {
             const player = displayWorld.players.find((candidate) => candidate.playerId === condition.playerId)!;
-            return <tr key={condition.playerId}><td><button type="button" className="player-link" id={`player-link-SQUAD-${player.playerId}`} aria-label={`View ${player.name}`} onClick={() => openPlayer(player.playerId, "SQUAD")}>{player.name}</button><small>{player.playerId}</small></td><td>{player.role}</td><td>{condition.availability}{condition.availabilityReason ? <small>{condition.availabilityReason}</small> : null}</td><td>{percentageBp(condition.fatigueBp)}</td><td>{condition.battingReadiness > 0 ? "+" : ""}{condition.battingReadiness}</td><td>{condition.bowlingReadiness > 0 ? "+" : ""}{condition.bowlingReadiness}</td><td>{condition.fieldingReadiness > 0 ? "+" : ""}{condition.fieldingReadiness}</td><td><label className="sr-label" htmlFor={`training-${condition.playerId}`}>Training for {player.name}</label><select id={`training-${condition.playerId}`} disabled={busy || service.isReadOnly() || state.phase === "COMPLETE"} value={condition.directive} onChange={(event) => void action(async () => { await service.setTraining(condition.playerId, event.currentTarget.value as TrainingDirective); })}>{directives.map((directive) => <option key={directive} value={directive}>{directive.replaceAll("_", " ")}</option>)}</select></td></tr>;
+            return <tr key={condition.playerId}><td><button type="button" className="player-link" id={`player-link-SQUAD-${player.playerId}`} aria-label={`View ${player.name}`} onClick={() => openPlayer(player.playerId, "SQUAD")}>{player.name}</button><small>{player.playerId}</small></td><td>{player.role}</td><td>{condition.availability}{condition.availabilityReason ? <small>{condition.availabilityReason}</small> : null}</td><td>{percentageBp(condition.fatigueBp)}</td><td>{condition.battingReadiness > 0 ? "+" : ""}{condition.battingReadiness}</td><td>{condition.bowlingReadiness > 0 ? "+" : ""}{condition.bowlingReadiness}</td><td>{condition.fieldingReadiness > 0 ? "+" : ""}{condition.fieldingReadiness}</td><td><label className="sr-label" htmlFor={`training-${condition.playerId}`}>Training for {player.name}</label><select id={`training-${condition.playerId}`} disabled={busy || inspectionOnly || service.isReadOnly() || state.phase === "COMPLETE"} value={condition.directive} onChange={(event) => void action(async () => { await service.setTraining(condition.playerId, event.currentTarget.value as TrainingDirective); })}>{directives.map((directive) => <option key={directive} value={directive}>{directive.replaceAll("_", " ")}</option>)}</select></td></tr>;
           })}</tbody></table></div>
         </section>
       )}
@@ -388,8 +392,8 @@ export function CareerApp() {
           </div>
           <div className="career-panel settings-actions">
             <h3>Career file</h3>
-            <button disabled={busy} onClick={() => void exportCareer()}>Export .lcxxvi</button>
-            <label>Import validated .lcxxvi archive<input type="file" accept=".lcxxvi,application/zip" onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)} /></label>
+            <button disabled={busy || inspectionOnly} onClick={() => void exportCareer()}>Export .lcxxvi</button>
+            <label>Import validated .lcxxvi archive<input type="file" accept=".lcxxvi,application/zip" disabled={inspectionOnly} onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)} /></label>
           </div>
         </section>
       )}
