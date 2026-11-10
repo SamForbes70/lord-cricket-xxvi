@@ -13,3 +13,10 @@ The preview is invalidated by subsequent match actions. The worker also checks t
 - Firefox used `MOZ_DISABLE_CONTENT_SANDBOX=1` on the Linux host. Chromium used the host executable.
 
 This branch depends on scorecard PR #28 and needs hosted checks before integration.
+
+
+## Integration update
+
+Scorecard export merged in PR #28. This branch now targets main.
+Its earlier hosted checks passed against the previous scorecard branch base.
+Run hosted checks again against the current main integration before merging.
