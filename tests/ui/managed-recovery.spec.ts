@@ -234,7 +234,8 @@ test("an edited-world managed match keeps its edited world when recovered and ap
   await expectRestored(fresh, revision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   // The edited names come from the world copy bound to the match, not from the default world.
-  await expect(fresh.getByTestId("scorestrip")).toContainText("Quay Rovers");
+  // The score strip names only the batting team, so check the control that lists both teams, and the ground.
+  await expect(fresh.getByLabel("Tactical captain").locator("option", { hasText: "Quay Rovers" })).toHaveCount(1);
   await expect(fresh.getByTestId("scorestrip")).toContainText("Recovery Park");
   await awaitWritable(fresh);
   await takeManualControl(fresh);
