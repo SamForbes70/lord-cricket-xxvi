@@ -37,6 +37,8 @@ Research promotion, public deployment, purchases and deletion of owner data reta
 5. Commit coherent changes. Separate unpromoted research work from production code and keep all capability flags accurate.
 
 ## Current task boundary
+The active target is the V0.1 synthetic alpha in `docs/V01_DELIVERY_PLAN.md` and `docs/V01_BACKLOG.json`, under the owner's standing brief.
+After V0.1, the owner's sequence is persistent world, then player lifecycle, then squad economy, each accepted before the next begins.
 The baseline recovery task is delivered through merged PR #2. Issue #1 retains the owner-PC automation evidence gap.
 The owner authorised M7K research preparation on 26 October 2026. PR #3 records that research preparation.
 All source-case adjudication flags remain false; a merge does not authorise production ledger integration or model promotion.

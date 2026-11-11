@@ -153,7 +153,12 @@ export class CareerApplicationService {
   private status: SaveStatus = "Idle";
   private error = "";
 
-  constructor(ownerId?: string, repository: CareerSeasonRepository = new IndexedDbSeasonRepository()) {
+  constructor(
+    ownerId?: string,
+    repository: CareerSeasonRepository = new IndexedDbSeasonRepository(),
+    /** Called when a damaged career is continued in a new recovered slot, so its pending match links can follow it. */
+    private readonly onRecovered?: (fromSaveId: string, toSaveId: string) => Promise<void>,
+  ) {
     this.ownerId = ownerId ?? token("career-tab");
     this.repository = repository;
   }
@@ -201,6 +206,14 @@ export class CareerApplicationService {
 
   async listCareers(): Promise<SeasonSaveSummary[]> {
     return this.repository.list();
+  }
+
+  /** Best-effort release of the writer lease when the page goes away. The lease still expires on its own. */
+  async releaseWriter(): Promise<void> {
+    if (this.saveId && !this.readOnly) {
+      await this.repository.releaseLease(this.saveId, this.ownerId);
+      this.readOnly = true;
+    }
   }
 
   async leaveCareer(): Promise<void> {
@@ -341,6 +354,7 @@ export class CareerApplicationService {
         worldCopy: copy,
       });
       await this.repository.releaseLease(saveId, this.ownerId);
+      await this.onRecovered?.(saveId, targetSaveId);
       readOnly = false;
     } else if (!readOnly) {
       await this.repository.commit({

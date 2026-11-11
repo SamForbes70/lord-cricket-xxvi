@@ -6,6 +6,7 @@ import {
   type CareerUserMatchResult,
 } from "./service.js";
 import { PlayerPage, type PlayerFormat } from "./PlayerPage.js";
+import { managedBindings, recordManagedLaunch, settleManagedMatches } from "./managed-match.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { WorldEditor } from "../world/WorldEditor.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
@@ -19,7 +20,30 @@ if (!owner) {
   owner = `career-tab-${crypto.randomUUID()}`;
   sessionStorage.setItem(OWNER_KEY, owner);
 }
-const service = new CareerApplicationService(owner);
+const service = new CareerApplicationService(owner, undefined, async (from, to) => {
+  try { await managedBindings.rekeyCareer(from, to); } catch { /* the pending match is then reported, not applied */ }
+});
+function roundOf(launch: unknown): number | null {
+  const round = (launch as { roundNumber?: unknown } | null)?.roundNumber;
+  return typeof round === "number" ? round : null;
+}
+/** Applies completed pending matches and retires bindings for fixtures completed another way. */
+async function settleStandard() {
+  const saveId = service.getSaveId();
+  if (!saveId || service.isReadOnly()) return null;
+  return settleManagedMatches({
+    careerSaveId: saveId,
+    careerKind: "STANDARD",
+    isFixtureCompleted: (fixtureId) => service.getState()?.completedMatches.some((match) => match.fixtureId === fixtureId) ?? false,
+    apply: async ({ result }) => {
+      if (!result.careerResult) throw new Error("The completed match produced no career result.");
+      await service.completeUserMatch(result.careerResult);
+    },
+  });
+}
+function clearLaunchCache() {
+  try { sessionStorage.removeItem(RESULT_KEY); sessionStorage.removeItem(LAUNCH_KEY); } catch { /* storage unavailable */ }
+}
 
 type Screen = "HOME" | "CAREER" | "SQUAD" | "FIXTURES" | "STATISTICS" | "SETTINGS" | "PLAYER";
 const directives: TrainingDirective[] = ["REST", "BATTING_PRACTICE", "BOWLING_PRACTICE", "FIELDING_PRACTICE"];
@@ -35,6 +59,7 @@ function percentageBp(value: number): string {
 export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean } = {}) {
   const [, redraw] = useState(0);
   const [screen, setScreen] = useState<Screen>("HOME");
+  const [pendingMatch, setPendingMatch] = useState<{ round: number | null } | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [stagedWorld, setStagedWorld] = useState<NewGameWorldCopy | null>(null);
   const [editingWorld, setEditingWorld] = useState(false);
@@ -79,18 +104,47 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   }, [screen, playerOrigin, restorePlayerFocus]);
   useEffect(() => {
     let alive = true;
+    /** Settles durable matches, then the legacy in-session handoff. Safe to repeat. */
+    async function afterBoot(): Promise<void> {
+      if (inspectionOnly) return;
+      // Durable path first: any pending match for this career whose checkpoint is complete is applied
+      // from the saved match and its binding, whether or not the original tab is still around.
+      const settled = await settleStandard();
+      if (settled) {
+        if (settled.applied.length) clearLaunchCache();
+        if (alive) setUiError(settled.errors.join(" "));
+        if (alive) setPendingMatch(settled.pending.length ? { round: roundOf(settled.pending[0]!.launch) } : null);
+      }
+      // Legacy in-session handoff, kept for launches started before bindings existed. An identical
+      // completion is a no-op, so this cannot apply a result twice after the durable path ran.
+      let pending: string | null = null;
+      try { pending = sessionStorage.getItem(RESULT_KEY); } catch { /* storage unavailable */ }
+      if (pending && !service.isReadOnly()) {
+        const parsed = JSON.parse(pending) as CareerUserMatchResult;
+        await service.completeUserMatch(parsed);
+        clearLaunchCache();
+        try { await managedBindings.resolve(`career-match-${parsed.fixtureId}`, "APPLIED", "RESULT_APPLIED"); } catch { /* no binding for legacy launches */ }
+      }
+    }
+    const releaseWriter = () => { void service.releaseWriter(); };
+    window.addEventListener("pagehide", releaseWriter);
     void (async () => {
       try {
         if (inspectionOnly) await service.inspectActiveCareer();
         else await service.boot();
-        const pending = sessionStorage.getItem(RESULT_KEY);
-        if (pending && !inspectionOnly) {
-          const parsed = JSON.parse(pending) as CareerUserMatchResult;
-          await service.completeUserMatch(parsed);
-          sessionStorage.removeItem(RESULT_KEY);
-          sessionStorage.removeItem(LAUNCH_KEY);
+        await afterBoot();
+        if (alive) { setSavedCareers(await service.listCareers()); setBusy(false); }
+        // A career reopened right after its tab closed sees the old tab's lease for up to 12 s. Retry for
+        // a bounded time so a legitimate reopen becomes writable on its own; a live second tab is never taken over.
+        for (let attempt = 0; alive && !inspectionOnly && service.isReadOnly() && attempt < 6; attempt++) {
+          await new Promise((resolve) => setTimeout(resolve, 3_000));
+          if (!alive) break;
+          await service.boot();
+          if (!service.isReadOnly()) {
+            await afterBoot();
+            if (alive) setSavedCareers(await service.listCareers());
+          }
         }
-        if (alive) setSavedCareers(await service.listCareers());
       } catch (error) {
         if (alive) setUiError(error instanceof Error ? error.message : "Career startup failed.");
       } finally {
@@ -99,6 +153,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     })();
     return () => {
       alive = false;
+      window.removeEventListener("pagehide", releaseWriter);
     };
   }, []);
 
@@ -132,7 +187,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
 
   async function playMatch() {
     await action(async () => {
-      const launch = await service.prepareUserMatch();
+      const prepared = await service.prepareUserMatch();
+      // Persist the link before launching so it survives a closed tab or browser.
+      const launch = await recordManagedLaunch(prepared);
       sessionStorage.setItem(LAUNCH_KEY, JSON.stringify(launch));
       window.location.hash = "#exhibition";
     });
@@ -283,10 +340,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                     <button className="primary" disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => action(async () => { await service.simulateToNextUserFixture(); })}>Advance to match day</button>
                   ) : (
                     <div className="action-row">
-                      <button className="primary" disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => action(async () => { await service.simulateManagedFixture(); })}>Simulate match</button>
+                      <button className="primary" disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => action(async () => { await service.simulateManagedFixture(); await settleStandard(); setPendingMatch(null); })}>Simulate match</button>
                       <button disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
                     </div>
                   )}
+                  {pendingMatch && <p role="status" data-testid="pending-career-match">A match for round {pendingMatch.round ?? nextFixture.roundNumber} is already in progress. Play match resumes it.</p>}
                   <p className="big-stat">Round {nextFixture.roundNumber}</p>
                   <p><strong>{service.teamName(nextFixture.homeTeamId)}</strong> v <strong>{service.teamName(nextFixture.awayTeamId)}</strong></p>
                   <p>{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>

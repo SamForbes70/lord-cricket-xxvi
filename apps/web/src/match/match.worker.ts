@@ -4,8 +4,10 @@ import { canonicalJson, delegationForTeam, type DelegationJournal, type NewGameW
 import type { T20Session, ODISession, Red5Session, RosterT20Session, RosterODISession, RosterRed5Session } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
+  createManagedMatchBindings,
   createPortableArchive,
   readPortableArchive,
+  type ManagedBinding,
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
 import { proposeOpponentT20Command } from "./ai-opponent.js";
@@ -15,14 +17,19 @@ import {
   ARCHIVE_PINS,
   ODI_ARCHIVE_PINS,
   RED5_ARCHIVE_PINS,
+  CareerFixtureLaunchSchema,
   RequestSchema,
   UI_VERSION,
+  type CareerFixtureLaunch,
+  type ManagedStatus,
   type Request,
   type Response,
 } from "./protocol.js";
 
 const worldBytes = new TextEncoder().encode(worldText);
 const repository = new IndexedDbSaveRepository();
+const bindings = createManagedMatchBindings(() => new Date().toISOString());
+let recoverSerial = 900_000_000;
 const ownerId = self.name || `tab-${randomHex(16)}`;
 let activeSaveId: string | null = null;
 let activeWorldCopy: NewGameWorldCopy | null = null;
@@ -39,6 +46,8 @@ type MatchController =
   | ReturnType<typeof createRed5MatchController>;
 let controller: MatchController = makeController();
 let initialised = false;
+/** Why the last attempt to re-associate a restored match with its career failed, if it did. */
+let bindNote: string | null = null;
 
 function randomHex(bytesCount: number): string {
   const bytes = crypto.getRandomValues(new Uint8Array(bytesCount));
@@ -155,11 +164,81 @@ async function persistenceState() {
     saves,
   };
 }
+function boundFixture(): CareerFixtureLaunch | null {
+  const bound = (controller as { boundFixture?: () => CareerFixtureLaunch | null }).boundFixture;
+  return bound ? bound() : null;
+}
+async function managedStatusFor(gameId: string): Promise<ManagedStatus | null> {
+  try {
+    return (await bindings.get(gameId))?.status ?? null;
+  } catch {
+    return null;
+  }
+}
 async function decorate(
   base: Response,
   archive: Uint8Array | null = null,
 ): Promise<Response> {
-  return { ...base, persistence: await persistenceState(), archive, delegation };
+  const fixture = boundFixture();
+  return {
+    ...base,
+    persistence: await persistenceState(),
+    archive,
+    delegation,
+    ...(fixture ? { managedStatus: await managedStatusFor(fixture.matchGameId) } : {}),
+  };
+}
+/** The binding applies only to the managed match lineage, never to manual copies or imports. */
+function bindableSave(gameId: string): boolean {
+  return activeSaveId === `auto:${gameId}` || (activeSaveId?.startsWith("recovered-") ?? false);
+}
+/** A pending binding for the restored match, or null. A damaged record is reported, not used. */
+async function pendingBindingFor(gameId: string): Promise<{ binding: ManagedBinding | null; problem: string | null }> {
+  try {
+    const binding = await bindings.get(gameId);
+    return { binding: binding && binding.status === "PENDING" ? binding : null, problem: null };
+  } catch (error) {
+    return { binding: null, problem: error instanceof Error ? error.message : "The career binding could not be read." };
+  }
+}
+/**
+ * Re-associates the restored match with its career fixture using the durable binding.
+ * It validates identity, then reuses the controller's own BOOT binding check; it never resets state.
+ */
+async function rebindManaged(): Promise<string | null> {
+  const session = controller.snapshot();
+  if (!session || boundFixture() || !("boundFixture" in controller)) return null;
+  const gameId = String(session.setup.gameId);
+  if (!bindableSave(gameId)) return null;
+  const { binding, problem } = await pendingBindingFor(gameId);
+  if (problem) return problem;
+  if (!binding) return null;
+  const parsed = CareerFixtureLaunchSchema.safeParse(binding.launch);
+  if (!parsed.success) return "The saved career binding is not a valid launch and was preserved.";
+  const launch = parsed.data;
+  if (
+    launch.matchGameId !== binding.matchGameId || launch.matchId !== binding.matchId || launch.fixtureId !== binding.fixtureId ||
+    launch.saveId !== binding.careerSaveId || launch.seasonId !== binding.seasonId ||
+    launch.scheduleSha256 !== binding.scheduleSha256 || launch.careerStateSha256 !== binding.careerStateSha256
+  ) return "The saved career binding does not match its launch and was preserved.";
+  if (launch.matchGameId !== gameId || launch.matchId !== String(session.setup.matchId)) return "The saved match does not belong to the career fixture.";
+  const requestedCopy = launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? launch.worldCopy : null;
+  const requestedRoster = launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? launch.rosterPack : null;
+  if (canonicalJson(requestedCopy) !== canonicalJson(activeWorldCopy)) return "The saved match belongs to a different world copy.";
+  if (canonicalJson(requestedRoster) !== canonicalJson(activeRosterPack)) return "The saved match belongs to a different roster.";
+  const result = (controller as ReturnType<typeof createMatchController>).handle({
+    version: UI_VERSION,
+    type: "BOOT",
+    requestId: `ui-${++recoverSerial}`,
+    expectedRevision: 0,
+    careerFixture: launch,
+  });
+  return result.error;
+}
+function withLaunch(response: Response): Response {
+  const fixture = boundFixture();
+  if (fixture) return { ...response, careerFixture: fixture };
+  return { ...response, careerFixture: null, error: response.error ?? bindNote };
 }
 async function restoreSave(saveId: string): Promise<void> {
   const loaded = await repository.load(saveId);
@@ -206,6 +285,7 @@ async function restoreSave(saveId: string): Promise<void> {
   else readOnly = false;
   activeSaveId = targetId;
   await repository.setActiveSaveId(targetId);
+  bindNote = await rebindManaged();
 }
 async function initialise(): Promise<void> {
   if (initialised) return;
@@ -254,9 +334,27 @@ async function commitCandidate(
   const session = controller.snapshot();
   if (!session || response.error) return decorate(response);
   if (request.type === "START") {
+    const candidateId = `auto:${session.setup.gameId}`;
+    // Never replace an existing save by starting a new match over it. The controller already holds
+    // the rejected session, so it is discarded; the previous active save and its pointer are untouched.
+    if ((await repository.list()).some((save) => save.saveId === candidateId)) {
+      controller = makeController(request.format);
+      if (activeSaveId) {
+        try {
+          const kept = await repository.load(activeSaveId);
+          if (kept) {
+            controller = makeController(sessionFormat(kept.session));
+            restoreController(controller, kept.session, kept.rosterPack ?? null);
+            applyWorldCopy(controller, kept.worldCopy ?? null);
+            bindNote = await rebindManaged();
+          }
+        } catch { /* keep the empty controller */ }
+      }
+      return decorate(controller.currentResponse(request.requestId, "SAVE_ALREADY_EXISTS: a saved match already exists for this game. Resume it instead of starting it again."));
+    }
     activeWorldCopy = request.careerFixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? request.careerFixture.worldCopy : request.worldCopy ?? null;
     activeRosterPack = request.rosterPack ?? null;
-    activeSaveId = `auto:${session.setup.gameId}`;
+    activeSaveId = candidateId;
     readOnly = !(await repository.acquireLease(activeSaveId, ownerId, nowMs()));
     if (readOnly)
       return rollback(
@@ -327,7 +425,8 @@ async function commitCandidate(
       ...(session.receipts[request.requestId] ? { acknowledgement: session.receipts[request.requestId] } : {}),
     };
   } catch (error) {
-    if (request.type === "START") {
+    const alreadyExisted = error instanceof Error && error.message.startsWith("SAVE_ALREADY_EXISTS");
+    if (request.type === "START" && !alreadyExisted) {
       const failedSaveId = activeSaveId;
       if (failedSaveId) {
         try {
@@ -528,7 +627,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
   return null;
 }
 
-async function handle(raw: unknown): Promise<Response> {
+async function handleInner(raw: unknown): Promise<Response> {
   const parsed = RequestSchema.safeParse(raw);
   if (!parsed.success) {
     await initialise();
@@ -536,6 +635,53 @@ async function handle(raw: unknown): Promise<Response> {
   }
   const request = parsed.data;
   await initialise();
+  if (request.type === "RECOVER_MANAGED") {
+    if (!controller.snapshot()) {
+      // No active match. Resume a pending career match only when there is exactly one to resume.
+      const { bindings: pending } = await bindings.list();
+      const saves = await repository.list();
+      const resumable = pending.filter((b) => b.status === "PENDING" && saves.some((save) => save.saveId === `auto:${b.matchGameId}`));
+      if (resumable.length === 1) {
+        try { await restoreSave(`auto:${resumable[0]!.matchGameId}`); }
+        catch (error) { return decorate(controller.currentResponse(request.requestId, `The saved career match could not be resumed. ${error instanceof Error ? error.message : ""}`.trim())); }
+      } else if (resumable.length > 1) {
+        return decorate(controller.currentResponse(request.requestId, "More than one career match is in progress. Resume the one you want from the career screen."));
+      }
+    } else {
+      bindNote = (await rebindManaged()) ?? bindNote;
+    }
+    return decorate(controller.currentResponse(request.requestId, boundFixture() ? null : bindNote));
+  }
+  if (request.type === "ABANDON_MANAGED") {
+    const session = controller.snapshot();
+    if (!session) return decorate(controller.currentResponse(request.requestId, "There is no active match."));
+    try {
+      const gameId = String(session.setup.gameId);
+      const binding = await bindings.get(gameId);
+      if (binding && binding.status === "PENDING") await bindings.resolve(gameId, "ABANDONED", "ABANDONED_BY_PLAYER");
+    } catch (error) {
+      return decorate(controller.currentResponse(request.requestId, error instanceof Error ? error.message : "The career match could not be abandoned."));
+    }
+    return decorate(controller.currentResponse(request.requestId));
+  }
+  if (request.type === "RETRY_WRITER") {
+    if (!activeSaveId || !readOnly) return decorate(controller.currentResponse(request.requestId));
+    try {
+      // restoreSave takes the lease only when it is free or already ours, so a live lease held by
+      // another tab is never taken over; it then reloads the latest durable checkpoint.
+      await restoreSave(activeSaveId);
+    } catch (error) {
+      return decorate(controller.currentResponse(request.requestId, error instanceof Error ? error.message : "The writer lease could not be retaken."));
+    }
+    return decorate(controller.currentResponse(request.requestId, readOnly ? "Another tab still holds this match. Close it, then try again." : null));
+  }
+  if (request.type === "RELEASE_WRITER") {
+    if (activeSaveId && !readOnly) {
+      try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
+      readOnly = true;
+    }
+    return decorate(controller.currentResponse(request.requestId));
+  }
   if (request.type === "BOOT" && request.careerFixture) {
     const current = controller.snapshot();
     const matchesCareerFixture =
@@ -550,20 +696,46 @@ async function handle(raw: unknown): Promise<Response> {
       return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different roster."));
     }
     if (!matchesCareerFixture) {
+      const existingId = `auto:${request.careerFixture.matchGameId}`;
+      const existing = (await repository.list()).some((save) => save.saveId === existingId);
+      const activePending = current ? (await pendingBindingFor(String(current.setup.gameId))).binding : null;
+      if (activePending && !existing) {
+        return decorate(controller.currentResponse(request.requestId, "Another career match is still in progress. Return to it or abandon it first."));
+      }
       if (activeSaveId && !readOnly) {
         try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
       }
-      activeSaveId = null;
-      activeWorldCopy = null;
-      activeRosterPack = null;
-      delegation = emptyDelegation();
-      readOnly = false;
-      recovered = false;
-      recoveredFromGeneration = null;
-      controller = makeController("T20");
-      await repository.setActiveSaveId(null);
+      if (existing) {
+        // The fixture already has a durable match. Resume it; never start it again over the top.
+        try {
+          await restoreSave(existingId);
+        } catch (error) {
+          activeSaveId = null;
+          activeWorldCopy = null;
+          activeRosterPack = null;
+          controller = makeController("T20");
+          return decorate(controller.currentResponse(request.requestId, `The saved match for this fixture could not be resumed. ${error instanceof Error ? error.message : ""}`.trim()));
+        }
+      } else {
+        activeSaveId = null;
+        activeWorldCopy = null;
+        activeRosterPack = null;
+        delegation = emptyDelegation();
+        readOnly = false;
+        recovered = false;
+        recoveredFromGeneration = null;
+        controller = makeController("T20");
+        await repository.setActiveSaveId(null);
+      }
     }
   } else if (request.type === "BOOT" && request.fresh) {
+    const active = controller.snapshot();
+    if (active) {
+      const { binding } = await pendingBindingFor(String(active.setup.gameId));
+      if (binding) {
+        return decorate(controller.currentResponse(request.requestId, "This match is linked to a career fixture. Finish it, or abandon the career match first."));
+      }
+    }
     if (activeSaveId && !readOnly) {
       try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
     }
@@ -646,6 +818,13 @@ async function handle(raw: unknown): Promise<Response> {
   if (request.type === "START" || request.type === "COMMAND")
     return commitCandidate(request, response);
   return decorate(response);
+}
+
+const LAUNCH_REPLY_TYPES = new Set(["BOOT", "RECOVER_MANAGED", "LOAD_SAVE", "RETRY_WRITER"]);
+async function handle(raw: unknown): Promise<Response> {
+  const response = await handleInner(raw);
+  const type = raw && typeof raw === "object" ? (raw as { type?: unknown }).type : undefined;
+  return typeof type === "string" && LAUNCH_REPLY_TYPES.has(type) ? withLaunch(response) : response;
 }
 
 let queue = Promise.resolve();

@@ -298,7 +298,11 @@ export class IndexedDbSaveRepository {
     const rows = (await req(tx.objectStore("games").getAll())) as GameRecord[];
     await txDone(tx);
     return rows
-      .filter((row) => (row as GameRecord & { recordType?: string }).recordType !== "SEASON")
+      .filter((row) => {
+        const recordType = (row as GameRecord & { recordType?: string }).recordType;
+        // Career rows (standard and imported-roster) share the games store but are not match saves.
+        return recordType !== "SEASON" && recordType !== "ROSTER_SEASON";
+      })
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .map(summaryFromGame);
   }
@@ -563,6 +567,17 @@ export class IndexedDbSaveRepository {
       throw new Error("SAVE_READ_ONLY: writer lease is not held");
     }
     const durableRevision = existing?.revision ?? 0;
+    if (input.expectedRevision === null && existing) {
+      tx.abort();
+      try {
+        await txDone(tx);
+      } catch {
+        /* expected */
+      }
+      throw new Error(
+        `SAVE_ALREADY_EXISTS: ${input.saveId} already holds revision ${durableRevision}; refusing to replace it`,
+      );
+    }
     if (
       input.expectedRevision !== null &&
       durableRevision !== input.expectedRevision
@@ -928,3 +943,4 @@ export class IndexedDbSaveRepository {
 
 export * from "./archive.js";
 export * from "./season.js";
+export * from "./binding.js";

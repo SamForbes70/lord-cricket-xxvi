@@ -48,6 +48,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   })());
   const careerStartIssued = useRef(false);
+  const recoverIssued = useRef(false);
+  // Ids for requests that never commit. Commands use ui-(10000 + revision + 1) so that a reloaded page, which
+  // restarts from the durable revision, cannot reuse a committed id; borrowing from that range would break it.
+  const auxSerial = useRef(800_000_000);
+  const auxId = () => `ui-${++auxSerial.current}`;
+  const abandonRequest = useRef<string | null>(null);
   const [aiTeamId, setAiTeamId] = useState<string | null>(() => {
     const c = careerLaunch.current;
     if (c?.managedTeamId) return c.homeTeamId === c.managedTeamId ? c.awayTeamId : c.homeTeamId;
@@ -158,6 +164,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       inflight.current = null;
       currentRevision.current = r.revision;
       serial.current = Math.max(serial.current, 10000 + r.revision);
+      if (r.careerFixture && !careerLaunch.current) {
+        // The durable binding restored the career link that sessionStorage lost with the old tab.
+        const restored = r.careerFixture as CareerUserMatchLaunch;
+        careerLaunch.current = restored;
+        careerStartIssued.current = true;
+        try { sessionStorage.setItem("lcxxvi-career-match-launch", JSON.stringify(restored)); } catch { /* the durable binding is authoritative */ }
+        if (restored.managedTeamId) setAiTeamId(restored.homeTeamId === restored.managedTeamId ? restored.awayTeamId : restored.homeTeamId);
+      }
       const batch = advanceBatch.current;
       let batchError = "";
       if (batch) {
@@ -187,10 +201,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       setVerification(r.verification);
       if (r.persistence) setPersistence(r.persistence);
       if (r.delegation) setDelegation(r.delegation);
-      if (r.careerResult) {
-        sessionStorage.setItem("lcxxvi-career-match-result", JSON.stringify(r.careerResult));
-      }
-      if (r.rosterCareerSession) sessionStorage.setItem("lcxxvi-roster-career-match-result", JSON.stringify(r.rosterCareerSession));
+      // These are caches only. The career rebuilds the result from the durable match and binding, so a
+      // full or unavailable sessionStorage must not break the message handler.
+      try {
+        if (r.careerResult) sessionStorage.setItem("lcxxvi-career-match-result", JSON.stringify(r.careerResult));
+        if (r.rosterCareerSession) sessionStorage.setItem("lcxxvi-roster-career-match-result", JSON.stringify(r.rosterCareerSession));
+      } catch { /* cache write failed */ }
       if (r.catalog && !r.view && careerLaunch.current && !careerStartIssued.current) {
         careerStartIssued.current = true;
         const requestId = `ui-${++serial.current}`;
@@ -207,6 +223,24 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           careerFixture: careerLaunch.current,
           ...(careerLaunch.current.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? { rosterPack: careerLaunch.current.rosterPack } : {}),
         });
+      }
+      if (r.catalog && !r.view && !careerLaunch.current && !recoverIssued.current && !r.error) {
+        recoverIssued.current = true;
+        const requestId = auxId();
+        inflight.current = requestId;
+        setBusy(true);
+        w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "RECOVER_MANAGED" });
+      }
+      if (abandonRequest.current === r.requestId) {
+        abandonRequest.current = null;
+        if (!r.error) {
+          careerLaunch.current = null;
+          try { sessionStorage.removeItem("lcxxvi-career-match-launch"); } catch { /* ignore */ }
+          const requestId = auxId();
+          inflight.current = requestId;
+          setBusy(true);
+          w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "BOOT", fresh: true });
+        }
       }
       if (r.archive) {
         const archiveBytes = new Uint8Array(r.archive.byteLength);
@@ -233,6 +267,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     };
     w.onerror = failed;
     w.onmessageerror = failed;
+    // Best effort: give the writer lease back when the page goes away so a reopened tab is not read-only
+    // for the rest of the 12 s lease. Correctness does not depend on it; the lease still expires.
+    const releaseLease = () => {
+      if (inflight.current) return;
+      w.postMessage({ version: UI_VERSION, requestId: auxId(), expectedRevision: currentRevision.current, type: "RELEASE_WRITER" });
+    };
+    const reacquire = (event: PageTransitionEvent) => {
+      if (!event.persisted || inflight.current) return;
+      const requestId = auxId();
+      inflight.current = requestId;
+      w.postMessage({ version: UI_VERSION, requestId, expectedRevision: currentRevision.current, type: "RETRY_WRITER" });
+    };
+    window.addEventListener("pagehide", releaseLease);
+    window.addEventListener("pageshow", reacquire);
     const id = `ui-${++serial.current}`;
     inflight.current = id;
     w.postMessage({
@@ -242,8 +290,40 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       type: "BOOT",
       careerFixture: careerLaunch.current,
     });
-    return () => w.terminate();
+    return () => {
+      window.removeEventListener("pagehide", releaseLease);
+      window.removeEventListener("pageshow", reacquire);
+      w.terminate();
+    };
   }, []);
+  // A lease that expired while the owning tab was closing leaves a restored match read-only. Retry for a
+  // bounded time (about 30 s) so a legitimate reopen recovers on its own; a live second tab is never taken over.
+  useEffect(() => {
+    if (!persistence?.readOnly || fatal) return;
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      if (++attempts > 6) { window.clearInterval(timer); return; }
+      retryWriter();
+    }, 5_000);
+    return () => window.clearInterval(timer);
+  }, [persistence?.readOnly, fatal]);
+  function retryWriter() {
+    if (inflight.current || fatal) return;
+    const requestId = auxId();
+    inflight.current = requestId;
+    setBusy(true);
+    worker.current?.postMessage({ version: UI_VERSION, requestId, expectedRevision: currentRevision.current, type: "RETRY_WRITER" });
+  }
+  function abandonCareerMatch() {
+    if (!window.confirm("Abandon this career match? The match is kept as a plain exhibition and the career fixture stays unplayed.")) return;
+    if (inflight.current || fatal) return;
+    const requestId = auxId();
+    abandonRequest.current = requestId;
+    inflight.current = requestId;
+    setBusy(true);
+    setError("");
+    worker.current?.postMessage({ version: UI_VERSION, requestId, expectedRevision: currentRevision.current, type: "ABANDON_MANAGED" });
+  }
   useEffect(() => {
     if (view && lastPhase.current !== `${view.phase}:${view.decisionTeamId}`) {
       lastPhase.current = `${view.phase}:${view.decisionTeamId}`;
@@ -424,7 +504,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         </label>
         <span className="save-status" data-testid="save-status">
           {persistence?.readOnly
-            ? "Read only · another tab owns this save"
+            ? "Read only · another tab owns this save (retrying)"
             : persistence?.savedAt
               ? `Saved · ${new Date(persistence.savedAt).toLocaleTimeString()}`
               : "Local autosave ready"}
@@ -991,6 +1071,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           {view && (
             <>
               {!careerLaunch.current && <button type="button" disabled={busy || fatal} onClick={() => send({ type: "BOOT", fresh: true })}>New exhibition</button>}
+              {careerLaunch.current && view.phase !== "COMPLETE" && <button type="button" disabled={busy || fatal} onClick={abandonCareerMatch}>Abandon career match</button>}
+              {persistence?.readOnly && <button type="button" disabled={busy || fatal} onClick={retryWriter}>Retry write access</button>}
               <button
                 type="button"
                 disabled={busy || fatal || persistence?.readOnly}
