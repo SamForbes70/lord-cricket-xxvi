@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { chromium, expect, test, type Page } from "@playwright/test";
+import { chromium, expect, firefox, test, type Page } from "@playwright/test";
 
 const BANNER = /this result will return to the management career only after the match is complete/i;
 const COMPLETED = "1/14 managed-team fixtures complete.";
@@ -188,14 +188,16 @@ test("an imported-roster managed match is recovered in a fresh tab and applies e
 });
 
 test("a match survives closing the whole browser with a retained profile", async ({ browserName }, testInfo) => {
-  test.skip(browserName !== "chromium", "The retained-profile run launches Chromium directly.");
   test.setTimeout(600_000);
   const baseURL = testInfo.project.use.baseURL ?? "http://127.0.0.1:4180";
   const profile = mkdtempSync(join(tmpdir(), "lcxxvi-profile-"));
-  const launch = () => chromium.launchPersistentContext(profile, {
-    baseURL,
-    ...(process.env.LCXXVI_CHROMIUM_EXECUTABLE ? { executablePath: process.env.LCXXVI_CHROMIUM_EXECUTABLE } : {}),
-  });
+  // The acceptance harness rejects skipped tests, so the same run covers whichever browser this project uses.
+  const launch = () => browserName === "firefox"
+    ? firefox.launchPersistentContext(profile, { baseURL })
+    : chromium.launchPersistentContext(profile, {
+      baseURL,
+      ...(process.env.LCXXVI_CHROMIUM_EXECUTABLE ? { executablePath: process.env.LCXXVI_CHROMIUM_EXECUTABLE } : {}),
+    });
   try {
     const first = await launch();
     const page = await first.newPage();
