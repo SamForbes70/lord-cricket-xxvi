@@ -78,6 +78,16 @@ async function expectRestored(page: Page, savedRevision: string) {
   await expect.poll(async () => Number(await page.locator("#decision").getAttribute("data-revision")), { timeout: 60_000 }).toBeGreaterThanOrEqual(Number(savedRevision));
 }
 
+/**
+ * The recovered tab re-enables the AI opponent, whose decisions leave the human candidate buttons disabled
+ * until it has acted. The original tab played with manual control, so the spec takes it back before stepping.
+ */
+async function takeManualControl(page: Page) {
+  await page.getByLabel("Tactical captain").selectOption("");
+  await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
+  await settledRevision(page);
+}
+
 async function awaitWritable(page: Page) {
   // The closed tab's writer lease lasts up to 12 s. The page retries on its own and must become writable.
   await expect(page.getByTestId("save-status")).not.toContainText("Read only", { timeout: 45_000 });
@@ -108,6 +118,7 @@ test("a standard managed match is recovered in a fresh tab and its result applie
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await expect(fresh.getByRole("button", { name: "New exhibition" })).toHaveCount(0);
   await awaitWritable(fresh);
+  await takeManualControl(fresh);
   await playToEnd(fresh);
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
@@ -165,6 +176,7 @@ test("an imported-roster managed match is recovered in a fresh tab and applies e
   await expectRestored(fresh, revision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await awaitWritable(fresh);
+  await takeManualControl(fresh);
   await playToEnd(fresh);
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(/\d+\/56 fixtures/)).toBeVisible({ timeout: 60_000 });
@@ -198,6 +210,7 @@ test("a match survives closing the whole browser with a retained profile", async
     await expectRestored(reopened, revision);
     await expect(reopened.getByText(BANNER)).toBeVisible();
     await expect(reopened.getByTestId("save-status")).not.toContainText("Read only", { timeout: 45_000 });
+    await takeManualControl(reopened);
     await playToEnd(reopened);
     await reopened.getByRole("button", { name: "Return result to career" }).click();
     await expect(reopened.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });

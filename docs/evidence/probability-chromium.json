@@ -1,7 +1,7 @@
 {
   "status": "PASS",
   "browser": "chromium",
-  "browserVersion": "141.0.7390.37",
+  "browserVersion": "153.0.8010.12",
   "vectors": 15,
   "independentPythonReference": true,
   "mainThreadAndWorker": true,
