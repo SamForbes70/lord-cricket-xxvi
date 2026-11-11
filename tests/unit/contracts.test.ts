@@ -237,7 +237,8 @@ it("every generated schema compiles with strict AJV 2020-12", () => {
   }
   for (const f of files)
     expect(schema(f.replace("Schema.json", ""))).toBeTypeOf("function");
-});
+  // Compiling every schema under strict AJV can exceed the 5 s default on a loaded machine.
+}, 60_000);
 
 it("the delegation change schema rejects duplicate categories", () => {
   const validate = schema("DelegationChange");

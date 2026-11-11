@@ -19,7 +19,8 @@ Dated reports retain the results of their original runs.
 | Tactical captain | Optional deterministic public-view T20 policy; legal controls are browser-tested. Empirical tactical quality is unaccepted. |
 | Granular T20 delegation | PR #23 merged six decision categories. A versioned journal persists choices in checkpoints and portable archives. |
 | Fixture autopilot | Separate deterministic baseline completion policy; it is not the tactical captain. |
-| Local saves | IndexedDB commits, writer lease, revisions, checkpoints and validated recovery. |
+| Local saves | IndexedDB commits, writer lease, revisions, checkpoints and validated recovery of match and career checkpoints. A first commit cannot replace an existing save. |
+| Managed-match recovery | A durable, hash-checked binding links a career fixture to its match before launch. A closed tab or browser leaves a restorable match that reconnects to its career, and a completed match applies its result to the career once. Browser-tested in Chromium for standard and imported-roster careers and one retained-profile restart. Not yet run on hosted CI, Firefox or Windows. See [MANAGED_MATCH_RECOVERY.md](MANAGED_MATCH_RECOVERY.md). |
 | Portable archives | `.lcxxvi` export/import, including browser tests in a fresh context. |
 | Final season | Immutable completion after exactly 56 reconciled fixtures. |
 | Statistics | League table, NRR, player statistics and accepted-event match analytics for T20, ODI and red-ball matches. |
