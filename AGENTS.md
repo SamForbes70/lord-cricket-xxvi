@@ -52,3 +52,7 @@ Use `docs/CURRENT_STATUS.md` and `docs/ACCEPTANCE_RECONCILIATION.md` before sele
 - Deterministic RNG addresses and integer-mass probabilities. No unseeded randomness in game authority.
 - Specific PASS/FAIL/BLOCKED/NOT RUN statuses, commands, counts, output files, reproducible paths and SHA-256 where appropriate.
 - Australian English in project reports. Avoid overstating capability: this is an alpha, not a commercially accepted release.
+
+## Maintained documentation
+
+See the [documentation index](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md), and [AI-only continuation guide](docs/AI_CONTINUATION.md). Read the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) before relying on older queue snapshots.
