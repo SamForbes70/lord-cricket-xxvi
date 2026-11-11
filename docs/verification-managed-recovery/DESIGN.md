@@ -12,4 +12,4 @@ The match and season share the `lord-cricket-xxvi` IndexedDB database, but their
 
 The current worker's `BOOT` branch clears the active pointer when the requested fixture differs from the restored active match. Recovery must distinguish starting a new match from a mismatched recovery and must not use that branch to discard an existing active pointer. Existing `completeUserMatch` already detects duplicate versus conflicting completions, but it depends on receiving a valid result; the binding and result must survive a new browser session for that protection to be useful.
 
-The transitions above are now implemented; see `../MANAGED_MATCH_RECOVERY.md` for the design as built and `README.md` for the evidence. Acceptance is not claimed: only local Chromium has run.
+The transitions above are now implemented; see `../MANAGED_MATCH_RECOVERY.md` for the design as built and `README.md` for the evidence. Acceptance is not claimed: the owner PC has not run it and the owner has not accepted it.
