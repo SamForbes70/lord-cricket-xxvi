@@ -49,6 +49,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   })());
   const careerStartIssued = useRef(false);
   const recoverIssued = useRef(false);
+  // Ids for requests that never commit. Commands use ui-(10000 + revision + 1) so that a reloaded page, which
+  // restarts from the durable revision, cannot reuse a committed id; borrowing from that range would break it.
+  const auxSerial = useRef(800_000_000);
+  const auxId = () => `ui-${++auxSerial.current}`;
   const abandonRequest = useRef<string | null>(null);
   const [aiTeamId, setAiTeamId] = useState<string | null>(() => {
     const c = careerLaunch.current;
@@ -222,7 +226,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
       if (r.catalog && !r.view && !careerLaunch.current && !recoverIssued.current && !r.error) {
         recoverIssued.current = true;
-        const requestId = `ui-${++serial.current}`;
+        const requestId = auxId();
         inflight.current = requestId;
         setBusy(true);
         w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "RECOVER_MANAGED" });
@@ -232,7 +236,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         if (!r.error) {
           careerLaunch.current = null;
           try { sessionStorage.removeItem("lcxxvi-career-match-launch"); } catch { /* ignore */ }
-          const requestId = `ui-${++serial.current}`;
+          const requestId = auxId();
           inflight.current = requestId;
           setBusy(true);
           w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "BOOT", fresh: true });
@@ -267,11 +271,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     // for the rest of the 12 s lease. Correctness does not depend on it; the lease still expires.
     const releaseLease = () => {
       if (inflight.current) return;
-      w.postMessage({ version: UI_VERSION, requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, type: "RELEASE_WRITER" });
+      w.postMessage({ version: UI_VERSION, requestId: auxId(), expectedRevision: currentRevision.current, type: "RELEASE_WRITER" });
     };
     const reacquire = (event: PageTransitionEvent) => {
       if (!event.persisted || inflight.current) return;
-      const requestId = `ui-${++serial.current}`;
+      const requestId = auxId();
       inflight.current = requestId;
       w.postMessage({ version: UI_VERSION, requestId, expectedRevision: currentRevision.current, type: "RETRY_WRITER" });
     };
@@ -299,14 +303,21 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     let attempts = 0;
     const timer = window.setInterval(() => {
       if (++attempts > 6) { window.clearInterval(timer); return; }
-      send({ type: "RETRY_WRITER" });
+      retryWriter();
     }, 5_000);
     return () => window.clearInterval(timer);
   }, [persistence?.readOnly, fatal]);
+  function retryWriter() {
+    if (inflight.current || fatal) return;
+    const requestId = auxId();
+    inflight.current = requestId;
+    setBusy(true);
+    worker.current?.postMessage({ version: UI_VERSION, requestId, expectedRevision: currentRevision.current, type: "RETRY_WRITER" });
+  }
   function abandonCareerMatch() {
     if (!window.confirm("Abandon this career match? The match is kept as a plain exhibition and the career fixture stays unplayed.")) return;
     if (inflight.current || fatal) return;
-    const requestId = `ui-${++serial.current}`;
+    const requestId = auxId();
     abandonRequest.current = requestId;
     inflight.current = requestId;
     setBusy(true);
@@ -1061,7 +1072,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <>
               {!careerLaunch.current && <button type="button" disabled={busy || fatal} onClick={() => send({ type: "BOOT", fresh: true })}>New exhibition</button>}
               {careerLaunch.current && view.phase !== "COMPLETE" && <button type="button" disabled={busy || fatal} onClick={abandonCareerMatch}>Abandon career match</button>}
-              {persistence?.readOnly && <button type="button" disabled={busy || fatal} onClick={() => send({ type: "RETRY_WRITER" })}>Retry write access</button>}
+              {persistence?.readOnly && <button type="button" disabled={busy || fatal} onClick={retryWriter}>Retry write access</button>}
               <button
                 type="button"
                 disabled={busy || fatal || persistence?.readOnly}
