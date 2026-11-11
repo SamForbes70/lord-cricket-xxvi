@@ -12,6 +12,8 @@ The regression is replaced by behavioural specs in `tests/ui/managed-recovery.sp
 - A match completed in a lost tab is applied when the career opens, with no match page.
 - Abandoning a match keeps it as an exhibition; playing the fixture again resumes it at the same revision.
 - The same recovery for an imported-roster career.
+- An edited-world career: the recovered match shows the edited team and ground names from its bound world copy.
+- A career whose newest checkpoint is damaged: the pending match link follows the career into its recovered slot.
 - A retained browser profile closed and reopened (IndexedDB retained, `sessionStorage` lost).
 
 `tests/m4/managed-binding-persistence.spec.ts` covers the first-commit guard, the match list filter and binding storage in a real IndexedDB. `tests/unit/managed-binding.test.ts` covers the binding rules and result regeneration.

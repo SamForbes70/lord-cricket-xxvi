@@ -20,7 +20,9 @@ if (!owner) {
   owner = `career-tab-${crypto.randomUUID()}`;
   sessionStorage.setItem(OWNER_KEY, owner);
 }
-const service = new CareerApplicationService(owner);
+const service = new CareerApplicationService(owner, undefined, async (from, to) => {
+  try { await managedBindings.rekeyCareer(from, to); } catch { /* the pending match is then reported, not applied */ }
+});
 function roundOf(launch: unknown): number | null {
   const round = (launch as { roundNumber?: unknown } | null)?.roundNumber;
   return typeof round === "number" ? round : null;

@@ -153,7 +153,12 @@ export class CareerApplicationService {
   private status: SaveStatus = "Idle";
   private error = "";
 
-  constructor(ownerId?: string, repository: CareerSeasonRepository = new IndexedDbSeasonRepository()) {
+  constructor(
+    ownerId?: string,
+    repository: CareerSeasonRepository = new IndexedDbSeasonRepository(),
+    /** Called when a damaged career is continued in a new recovered slot, so its pending match links can follow it. */
+    private readonly onRecovered?: (fromSaveId: string, toSaveId: string) => Promise<void>,
+  ) {
     this.ownerId = ownerId ?? token("career-tab");
     this.repository = repository;
   }
@@ -349,6 +354,7 @@ export class CareerApplicationService {
         worldCopy: copy,
       });
       await this.repository.releaseLease(saveId, this.ownerId);
+      await this.onRecovered?.(saveId, targetSaveId);
       readOnly = false;
     } else if (!readOnly) {
       await this.repository.commit({

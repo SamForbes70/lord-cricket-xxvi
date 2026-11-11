@@ -181,6 +181,29 @@ export class ManagedMatchBindings {
     return next;
   }
 
+  /**
+   * Moves the pending bindings of a career to the save id it was recovered into. Recovery copies an intact
+   * older checkpoint into a new slot and the original is kept, so a binding naming the old id would
+   * otherwise never match the career that is now open. The state hash is unchanged by the copy, so the
+   * binding still refers to the same career state. Applied or abandoned bindings are history and stay put.
+   */
+  async rekeyCareer(fromSaveId: string, toSaveId: string): Promise<number> {
+    if (fromSaveId === toSaveId) return 0;
+    const { bindings } = await this.list();
+    let moved = 0;
+    for (const prior of bindings.filter((b) => b.careerSaveId === fromSaveId && b.status === "PENDING")) {
+      const launch = prior.launch && typeof prior.launch === "object" && (prior.launch as { saveId?: unknown }).saveId === fromSaveId
+        ? { ...(prior.launch as Record<string, unknown>), saveId: toSaveId }
+        : prior.launch;
+      const content = { ...prior, careerSaveId: toSaveId, launch, updatedAt: this.clock() } as Partial<ManagedBinding>;
+      delete content.sha256;
+      const next: ManagedBinding = { ...(content as Omit<ManagedBinding, "sha256">), sha256: await bindingHash(content as Omit<ManagedBinding, "sha256">) };
+      if (!(await this.kv.compareAndPut(managedBindingKey(prior.matchGameId), prior.sha256, next))) throw new ManagedBindingError("BINDING_RACE", `Binding for ${prior.matchGameId} changed while it was being moved.`);
+      moved++;
+    }
+    return moved;
+  }
+
   async remove(matchGameId: string): Promise<void> {
     await this.kv.delete(managedBindingKey(matchGameId));
   }

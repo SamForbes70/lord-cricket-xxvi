@@ -84,6 +84,19 @@ describe("managed match bindings", () => {
     await expect(store.resolve("career-match-f1", "APPLIED", "x")).rejects.toMatchObject({ code: "BINDING_RACE" });
   });
 
+  test("a recovered career keeps its pending bindings, and applied history stays put", async () => {
+    const { store } = make();
+    await store.create(input({ launch: { launchVersion: "x", saveId: "career-1", fixtureId: "f1" } }));
+    await store.create(input({ matchGameId: "career-match-f0", matchId: "match-f0", fixtureId: "f0", launch: { saveId: "career-1" } }));
+    await store.resolve("career-match-f0", "APPLIED", "RESULT_APPLIED");
+    expect(await store.rekeyCareer("career-1", "recovered-9")).toBe(1);
+    expect(await store.rekeyCareer("career-1", "career-1")).toBe(0);
+    const moved = await store.get("career-match-f1");
+    expect(moved).toMatchObject({ careerSaveId: "recovered-9", status: "PENDING", launch: { saveId: "recovered-9", fixtureId: "f1" } });
+    expect((await store.pendingForCareer("recovered-9")).bindings).toHaveLength(1);
+    expect((await store.get("career-match-f0"))?.careerSaveId).toBe("career-1");
+  });
+
   test("filters pending bindings by career and removes them with the career", async () => {
     const { store } = make();
     await store.create(input());
@@ -172,4 +185,30 @@ describe("regenerating a managed result from a durable match", () => {
     expect(() => regenerateManagedResult({ session: done.session }, { ...launch, matchGameId: "career-match-other" }, worldBytes, manifest)).toThrow();
     expect(() => regenerateManagedResult({ session: done.session, worldCopy: {} as NewGameWorldCopy }, launch, worldBytes, manifest)).toThrow("different world copy");
   }, 120_000);
+});
+
+describe("recovering a career moves its pending match links", () => {
+  test("the service reports the old and new save ids once the recovered slot exists", async () => {
+    class DamagedFirstRepository extends MemorySeasonRepository {
+      damaged = false;
+      override async load(saveId: string) {
+        const loaded = await super.load(saveId);
+        return loaded && this.damaged && !saveId.startsWith("recovered-") ? { ...loaded, recovered: true, recoveredFromGeneration: 1 } : loaded;
+      }
+    }
+    const repo = new DamagedFirstRepository();
+    const first = new CareerApplicationService("owner", repo);
+    await first.createCareer("team-01");
+    const original = first.getSaveId()!;
+    await first.releaseWriter();
+    repo.damaged = true;
+    const moves: [string, string][] = [];
+    const second = new CareerApplicationService("owner", repo, async (from, to) => { moves.push([from, to]); });
+    await second.loadCareer(original);
+    expect(second.wasRecovered()).toBe(true);
+    expect(moves).toHaveLength(1);
+    expect(moves[0]![0]).toBe(original);
+    expect(moves[0]![1]).toMatch(/^recovered-/);
+    expect(second.getSaveId()).toBe(moves[0]![1]);
+  });
 });

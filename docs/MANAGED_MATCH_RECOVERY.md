@@ -39,7 +39,8 @@ The lease lasts 12 s and is renewed every 4 s. The page now releases it on `page
 | Damaged match checkpoint | Existing recovery to a `recovered-*` slot; binding follows the game id | Not run as a managed-match browser case |
 | Live lease in another tab | Existing M4 read-only spec; retry never takes over | Not run as a managed-match browser case |
 | Stale or mismatched binding | Controller identity checks and unit tests on binding validity | Unit only |
-| Standard, edited-world and imported-roster | Standard and roster covered in the browser; edited-world covered by the binding identity checks only | Edited-world browser case not run |
+| Standard, edited-world and imported-roster | Each has a browser spec; the edited-world spec checks the edited team and ground names come back from the bound world copy | Chromium |
+| Career itself recovered into a new slot | Browser spec damages the newest career checkpoint; the pending match link follows the career into the `recovered-*` slot and Play match resumes the same match. Unit tests cover the re-key | Chromium |
 
 ## Evidence boundary
 
@@ -47,5 +48,6 @@ Local runs are Linux with Chromium only (Firefox is not installable on that host
 
 ## Known limits
 
-- A career that is itself recovered into a new `recovered-*` slot keeps bindings under its old save id, so a pending match for it is reported rather than applied. This is deliberate: nothing is applied to a career the binding does not name.
-- Deleting a career does not yet remove its bindings through the interface. `removeForCareer` exists and is unit tested.
+- A career recovered into a new `recovered-*` slot moves its pending bindings with it (`rekeyCareer`). If that move fails, the match is reported and not applied: nothing is applied to a career the binding does not name. Applied and abandoned bindings stay under the original id as history.
+- The interface has no career delete action, so no binding clean-up on delete is needed today. `removeForCareer` exists and is unit tested for when one is added. Deleting a match save from the save list leaves its binding pending; playing the fixture again then starts it fresh, the same as an interruption before the match began.
+- Imported-roster careers are not recovered into a new slot automatically (the page asks for an explicit recovered copy first), so they have no re-key path.
