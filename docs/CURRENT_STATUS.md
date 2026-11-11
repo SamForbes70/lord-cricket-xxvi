@@ -26,7 +26,7 @@ The delegation journal carries selected categories in saves and archives.
 PR #24 merged match continuity across management navigation as `4ef85a7`.
 PR #28 merged scorecard export and print.
 PR #30 merged manual career copies.
-Durable managed-match recovery (V01-011) is implemented on its branch and browser-tested locally in Chromium; it is not yet merged, and hosted checks, Firefox and Windows have not run. See [the recovery notes](MANAGED_MATCH_RECOVERY.md).
+Durable managed-match recovery (V01-011) is implemented on its branch and browser-tested locally in Chromium and on hosted Windows in Chromium and Firefox; it is not yet merged or accepted by the owner, and the owner PC has not run it. See [the recovery notes](MANAGED_MATCH_RECOVERY.md).
 Test counts quoted in these documents are branch-specific and not additive. A count is only meaningful with the revision it was measured on.
 PR #25 merged cross-format match analytics as `3846282`.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.

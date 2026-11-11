@@ -43,7 +43,7 @@ The lease lasts 12 s and is renewed every 4 s. The page now releases it on `page
 
 ## Evidence boundary
 
-These are local Chromium runs. Hosted CI, Firefox, Windows and the owner's PC have not run. V01-011 stays `IN_PROGRESS` until they do and the owner accepts it.
+Local runs are Linux with Chromium only (Firefox is not installable on that host). Hosted GitHub Actions on commit `233f049` also passed: the Linux job, and the Windows job running the browser UI suite and the career suite in Chromium and Firefox, including every recovery spec and the retained-profile restart in both browsers. Hosted Windows is not the owner's PC. The owner-PC checklist, reference hardware and any human observation are not established. V01-011 stays `IN_PROGRESS` until the owner accepts it.
 
 ## Known limits
 
