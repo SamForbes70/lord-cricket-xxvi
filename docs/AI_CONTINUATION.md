@@ -10,7 +10,7 @@ Finish Lord Cricket XXVI as an evidence-based statistical management game. The a
 
 The owner has repeatedly authorised autonomous routine development and is frustrated by agents stopping after a plan, diagnosis or failing regression. Do not ask for the same permission again. A meaningful implementation slice includes working code, appropriate tests, evidence and a reviewed integration path. A draft regression or design note is useful preparation but must never be described as the completed fix.
 
-Durable managed-match recovery is implemented in PR #39 but not merged or accepted: hosted checks, Firefox and Windows have not run. Do not describe it as delivered until the owner accepts it. No unattended or background execution exists in this repository; do not claim it does.
+Durable managed-match recovery is implemented in PR #39 and has passed hosted Linux and Windows (Chromium and Firefox) checks, but it is not merged and the owner has not accepted it; the owner PC has not run it. Do not describe it as delivered until the owner accepts it. No unattended or background execution exists in this repository; do not claim it does.
 
 ## Read in order
 

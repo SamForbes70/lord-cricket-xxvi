@@ -4,7 +4,7 @@ Finish V0.1, then deliver persistent world, player lifecycle and squad economy s
 
 ## Immediate implementation
 
-Durable managed-match recovery is implemented in PR #39, which replaces the failing regression in #37 with behavioural specs. PR #24 already merged in-session navigation. V01-011 remains IN_PROGRESS until hosted checks, Firefox and Windows have run and the owner accepts it. See [the recovery notes](MANAGED_MATCH_RECOVERY.md).
+Durable managed-match recovery is implemented in PR #39, which replaces the failing regression in #37 with behavioural specs. PR #24 already merged in-session navigation. Hosted Linux and Windows (Chromium and Firefox) checks have passed on it. V01-011 remains IN_PROGRESS until the owner accepts it; the owner PC has not run it. See [the recovery notes](MANAGED_MATCH_RECOVERY.md).
 
 ## Integration queue
 
