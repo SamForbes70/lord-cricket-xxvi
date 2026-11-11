@@ -58,6 +58,26 @@ async function playSome(page: Page, steps: number) {
   }
 }
 
+/** The revision once the page has stopped changing, so a command still in flight is never read as final. */
+async function settledRevision(page: Page): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
+    const before = await page.locator("#decision").getAttribute("data-revision");
+    await page.waitForTimeout(800);
+    const after = await page.locator("#decision").getAttribute("data-revision");
+    if (before === after && (await page.locator("#decision").getAttribute("aria-busy")) === "false") return after!;
+  }
+  throw new Error("The match revision did not settle.");
+}
+
+/**
+ * A recovered career tab re-enables the AI opponent, exactly as a fresh launch does, so it may take its
+ * pending decision as soon as the page opens. The restored revision is therefore at least the saved one.
+ */
+async function expectRestored(page: Page, savedRevision: string) {
+  await expect.poll(async () => Number(await page.locator("#decision").getAttribute("data-revision")), { timeout: 60_000 }).toBeGreaterThanOrEqual(Number(savedRevision));
+}
+
 async function awaitWritable(page: Page) {
   // The closed tab's writer lease lasts up to 12 s. The page retries on its own and must become writable.
   await expect(page.getByTestId("save-status")).not.toContainText("Read only", { timeout: 45_000 });
@@ -78,13 +98,13 @@ test("a standard managed match is recovered in a fresh tab and its result applie
   await startStandardMatch(page);
   await playSome(page, 6);
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
-  const revision = await page.locator("#decision").getAttribute("data-revision");
+  const revision = await settledRevision(page);
   expect(await bindingStates(page)).toEqual(["PENDING"]);
   await page.close();
 
   const fresh = await context.newPage();
   await fresh.goto("/#exhibition");
-  await expect(fresh.locator("#decision")).toHaveAttribute("data-revision", revision!, { timeout: 60_000 });
+  await expectRestored(fresh, revision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await expect(fresh.getByRole("button", { name: "New exhibition" })).toHaveCount(0);
   await awaitWritable(fresh);
@@ -114,12 +134,13 @@ test("abandoning a career match keeps it as an exhibition, and playing the fixtu
   test.setTimeout(600_000);
   await startStandardMatch(page);
   await playSome(page, 4);
-  const revision = await page.locator("#decision").getAttribute("data-revision");
+  const revision = await settledRevision(page);
   await page.close();
   const fresh = await context.newPage();
   await fresh.goto("/#exhibition");
-  await expect(fresh.locator("#decision")).toHaveAttribute("data-revision", revision!, { timeout: 60_000 });
+  await expectRestored(fresh, revision);
   await awaitWritable(fresh);
+  const restoredRevision = await settledRevision(fresh);
   fresh.once("dialog", (dialog) => void dialog.accept());
   await fresh.getByRole("button", { name: "Abandon career match" }).click();
   await expect(fresh.getByRole("button", { name: "Confirm XIs and start" })).toBeEnabled({ timeout: 30_000 });
@@ -128,7 +149,7 @@ test("abandoning a career match keeps it as an exhibition, and playing the fixtu
   await expect(fresh.getByText("0/14 managed-team fixtures complete.", { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(fresh.getByRole("button", { name: "Play match" })).toBeEnabled({ timeout: 45_000 });
   await fresh.getByRole("button", { name: "Play match" }).click();
-  await expect(fresh.locator("#decision")).toHaveAttribute("data-revision", revision!, { timeout: 60_000 });
+  await expectRestored(fresh, revision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   expect(await bindingStates(fresh)).toEqual(["PENDING"]);
 });
@@ -137,11 +158,11 @@ test("an imported-roster managed match is recovered in a fresh tab and applies e
   test.setTimeout(600_000);
   await startRosterMatch(page);
   await playSome(page, 6);
-  const revision = await page.locator("#decision").getAttribute("data-revision");
+  const revision = await settledRevision(page);
   await page.close();
   const fresh = await context.newPage();
   await fresh.goto("/#exhibition");
-  await expect(fresh.locator("#decision")).toHaveAttribute("data-revision", revision!, { timeout: 60_000 });
+  await expectRestored(fresh, revision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await awaitWritable(fresh);
   await playToEnd(fresh);
@@ -167,14 +188,14 @@ test("a match survives closing the whole browser with a retained profile", async
     const page = await first.newPage();
     await startStandardMatch(page);
     await playSome(page, 6);
-    const revision = await page.locator("#decision").getAttribute("data-revision");
+    const revision = await settledRevision(page);
     await first.close();
 
     const second = await launch();
     const reopened = await second.newPage();
     await reopened.goto("/#exhibition");
     // The previous browser may still hold the lease for up to 12 s; the page retries instead of staying read-only.
-    await expect(reopened.locator("#decision")).toHaveAttribute("data-revision", revision!, { timeout: 60_000 });
+    await expectRestored(reopened, revision);
     await expect(reopened.getByText(BANNER)).toBeVisible();
     await expect(reopened.getByTestId("save-status")).not.toContainText("Read only", { timeout: 45_000 });
     await playToEnd(reopened);
