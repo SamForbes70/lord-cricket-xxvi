@@ -1,0 +1,22 @@
+[2m[WebServer] [22m(node:4401) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:4425) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m✘ [ERROR] Could not resolve "/workspace/work/lord-cricket-charts/work/apps/web/vite.config.ts"
+[2m[WebServer] [22m
+[2m[WebServer] [22mfailed to load config from /workspace/work/lord-cricket-charts/work/apps/web/vite.config.ts
+[2m[WebServer] [22merror when starting preview server:
+[2m[WebServer] [22mError: Build failed with 1 error:
+[2m[WebServer] [22merror: Could not resolve "/workspace/work/lord-cricket-charts/work/apps/web/vite.config.ts"
+[2m[WebServer] [22m    at failureErrorWithLog (/workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:1467:15)
+[2m[WebServer] [22m    at /workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:926:25
+[2m[WebServer] [22m    at runOnEndCallbacks (/workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:1307:45)
+[2m[WebServer] [22m    at buildResponseToResult (/workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:924:7)
+[2m[WebServer] [22m    at /workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:951:16
+[2m[WebServer] [22m    at responseCallbacks.<computed> (/workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:603:9)
+[2m[WebServer] [22m    at handleIncomingPacket (/workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:658:12)
+[2m[WebServer] [22m    at Socket.readFromStdout (/workspace/work/lord-cricket-charts/node_modules/esbuild/lib/main.js:581:7)
+[2m[WebServer] [22m    at Socket.emit (node:events:514:28)
+[2m[WebServer] [22m    at addChunk (node:internal/streams/readable:569:12)
+Error: Process from config.webServer was not able to start. Exit code: 1
+

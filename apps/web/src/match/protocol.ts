@@ -199,6 +199,7 @@ export type View = {
     colours?: [string, string];
   }[];
   names: Record<string, string>;
+  hands: Record<string, "L" | "R">;
   ground: string;
   innings: InningsLedger[];
   activeIndex: number;

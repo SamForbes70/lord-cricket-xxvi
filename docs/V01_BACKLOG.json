@@ -269,7 +269,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Render a score worm and a shot-sector wagon wheel.",

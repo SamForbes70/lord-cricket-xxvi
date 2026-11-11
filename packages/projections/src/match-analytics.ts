@@ -6,6 +6,7 @@ export type WormPoint = Readonly<{ inningsIndex: number; sequence: number; legal
 export type Partnership = Readonly<{ inningsIndex: number; players: readonly [string, string]; runs: number; legalBalls: number; fromSequence: number; toSequence: number }>;
 export type ShotSector = Readonly<{ inningsIndex: number; batterId: string; sector: number; attempts: number; batRuns: number; fours: number; sixes: number }>;
 export type FallOfWicket = Readonly<{ inningsIndex: number; sequence: number; playerId: string; runs: number; wickets: number; legalBalls: number }>;
+export type PitchLength = Readonly<{ length: "YORKER" | "FULL" | "GOOD" | "SHORT" | "FULL_TOSS"; attempts: number }>;
 export type MatchAnalytics = Readonly<{
   overSummaries: readonly OverSummary[];
   worm: readonly WormPoint[];
@@ -16,6 +17,8 @@ export type MatchAnalytics = Readonly<{
   finalLegalBalls: readonly number[];
   finalWickets: readonly number[];
   fallOfWickets: readonly FallOfWicket[];
+  pitchLengths: readonly PitchLength[];
+  unrecordedLengths: number;
 }>;
 
 type MutableOver = { inningsIndex: number; overNumber: number; runs: number; wickets: number; legalBalls: number; attempts: number };
@@ -54,8 +57,9 @@ export function createMatchAnalyticsAccumulator(inningsCount: number) {
   const shots = new Map<string, MutableSector>();
   const worm: WormPoint[] = [];
   const falls: FallOfWicket[] = [];
+  const lengths = new Map<PitchLength["length"], number>();
   const runs = Array<number>(inningsCount).fill(0), wickets = Array<number>(inningsCount).fill(0), balls = Array<number>(inningsCount).fill(0);
-  let unlocatedShots = 0, priorSequence = 0;
+  let unlocatedShots = 0, unrecordedLengths = 0, priorSequence = 0;
   function append(e: T20MatchEvent | ODIMatchEvent | Red5MatchEvent): void {
     guard(e.sequence === priorSequence + 1, "SEQUENCE_ORDER");
     if (e.type !== "DELIVERY_RECORDED") { priorSequence = e.sequence; return; }
@@ -65,6 +69,7 @@ export function createMatchAnalyticsAccumulator(inningsCount: number) {
     const earned = sumRuns(d);
     guard(Number.isSafeInteger(earned) && earned >= 0, "INVALID_RUNS");
     if (d.shotSector !== null) guard(Number.isInteger(d.shotSector) && d.shotSector >= 0 && d.shotSector < 8, "SHOT_SECTOR");
+    if (d.executedLength !== null) guard(["YORKER", "FULL", "GOOD", "SHORT", "FULL_TOSS"].includes(d.executedLength), "PITCH_LENGTH");
     const overNumber = Math.floor(balls[idx]! / 6) + 1;
     const key = `${idx}:${overNumber}`;
     const over = overs.get(key) ?? { inningsIndex: idx, overNumber, runs: 0, wickets: 0, legalBalls: 0, attempts: 0 };
@@ -98,6 +103,8 @@ export function createMatchAnalyticsAccumulator(inningsCount: number) {
     runs[idx]! += earned;
     wickets[idx]! += Number(d.dismissal !== null);
     balls[idx]! += Number(d.legalBall);
+    if (d.executedLength === null) unrecordedLengths++;
+    else lengths.set(d.executedLength, (lengths.get(d.executedLength) ?? 0) + 1);
     if (d.dismissal) falls.push({ inningsIndex: idx, sequence: e.sequence, playerId: d.dismissal.playerId, runs: runs[idx]!, wickets: wickets[idx]!, legalBalls: balls[idx]! });
     worm.push({ inningsIndex: idx, sequence: e.sequence, legalBalls: balls[idx]!, totalRuns: runs[idx]!, wickets: wickets[idx]! });
     priorSequence = e.sequence;
@@ -124,6 +131,8 @@ export function createMatchAnalyticsAccumulator(inningsCount: number) {
       finalLegalBalls: balls.slice(0, reportedInnings),
       finalWickets: wickets.slice(0, reportedInnings),
       fallOfWickets: falls.map(wicket => ({ ...wicket })),
+      pitchLengths: (["YORKER", "FULL", "GOOD", "SHORT", "FULL_TOSS"] as const).filter(length => lengths.has(length)).map(length => ({ length, attempts: lengths.get(length)! })),
+      unrecordedLengths,
     };
   }
   return { append, snapshot, get appliedSequence() { return priorSequence; } };
