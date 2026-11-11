@@ -20,6 +20,23 @@ async function startStandardMatch(page: Page) {
   await page.getByLabel("Tactical captain").selectOption("");
 }
 
+async function startEditedWorldMatch(page: Page) {
+  await page.goto("/#career");
+  await page.getByRole("button", { name: "Edit names and colours" }).click();
+  await page.getByLabel("Team name", { exact: true }).fill("Quay Rovers");
+  await page.getByLabel("Ground name", { exact: true }).fill("Recovery Park");
+  await page.getByRole("button", { name: "Use for new career" }).click();
+  await page.getByRole("button", { name: /Quay Rovers/i }).click();
+  const advance = page.getByRole("button", { name: "Advance to match day" });
+  if (await advance.isVisible()) {
+    await advance.click();
+    await expect(page.getByRole("button", { name: "Play match" })).toBeEnabled({ timeout: 60_000 });
+  }
+  await page.getByRole("button", { name: "Play match" }).click();
+  await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
+  await page.getByLabel("Tactical captain").selectOption("");
+}
+
 async function startRosterMatch(page: Page) {
   const world = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.json", "utf8"));
   const players = world.players.map((player: Record<string, unknown>) => Object.fromEntries(Object.entries(player).filter(([key]) => key !== "provenance")));
@@ -164,6 +181,70 @@ test("abandoning a career match keeps it as an exhibition, and playing the fixtu
   await expect(fresh.locator("#decision")).toHaveAttribute("data-revision", restoredRevision, { timeout: 60_000 });
   await expect(fresh.getByText(BANNER)).toBeVisible();
   expect(await bindingStates(fresh)).toEqual(["PENDING"]);
+});
+
+test("a pending match follows its career into a recovered slot", async ({ page, context }) => {
+  test.setTimeout(600_000);
+  await startStandardMatch(page);
+  await playSome(page, 4);
+  const revision = await settledRevision(page);
+  // Damage the newest career checkpoint so the next career open must recover an older one into a new slot.
+  await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => { const request = indexedDB.open("lord-cricket-xxvi"); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    const tx = db.transaction(["settings", "games", "snapshots"], "readwrite");
+    const get = <T,>(request: IDBRequest<T>) => new Promise<T>((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    const setting = await get(tx.objectStore("settings").get("activeSeasonSaveId"));
+    const game = await get(tx.objectStore("games").get(setting.value));
+    const snapshots = tx.objectStore("snapshots"), row = await get(snapshots.get([setting.value, game.checkpointGeneration]));
+    snapshots.put({ ...row, payload: `${row.payload} ` });
+    await new Promise<void>((resolve, reject) => { tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); });
+    db.close();
+  });
+  await page.close();
+  const fresh = await context.newPage();
+  await fresh.goto("/#career");
+  await expect(fresh.getByTestId("pending-career-match")).toBeVisible({ timeout: 90_000 });
+  const linked = await fresh.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => { const request = indexedDB.open("lord-cricket-xxvi"); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    const tx = db.transaction("settings", "readonly");
+    const rows = await new Promise<{ value: { careerSaveId: string; status: string; launch: { saveId: string } } }[]>((resolve, reject) => { const request = tx.objectStore("settings").getAll(IDBKeyRange.bound("managed-binding:", "managed-binding:\uffff")); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    db.close();
+    return rows.map((row) => ({ career: row.value.careerSaveId, launch: row.value.launch.saveId, status: row.value.status }));
+  });
+  expect(linked).toHaveLength(1);
+  expect(linked[0]!.status).toBe("PENDING");
+  expect(linked[0]!.career).toMatch(/^recovered-/);
+  expect(linked[0]!.launch).toBe(linked[0]!.career);
+  const advance = fresh.getByRole("button", { name: "Advance to match day" });
+  if (await advance.isVisible()) await advance.click();
+  await expect(fresh.getByRole("button", { name: "Play match" })).toBeEnabled({ timeout: 60_000 });
+  await fresh.getByRole("button", { name: "Play match" }).click();
+  await expectRestored(fresh, revision);
+  await expect(fresh.getByText(BANNER)).toBeVisible();
+});
+
+test("an edited-world managed match keeps its edited world when recovered and applies exactly once", async ({ page, context }) => {
+  test.setTimeout(600_000);
+  await startEditedWorldMatch(page);
+  await playSome(page, 6);
+  const revision = await settledRevision(page);
+  await page.close();
+  const fresh = await context.newPage();
+  await fresh.goto("/#exhibition");
+  await expectRestored(fresh, revision);
+  await expect(fresh.getByText(BANNER)).toBeVisible();
+  // The edited names come from the world copy bound to the match, not from the default world.
+  await expect(fresh.getByTestId("scorestrip")).toContainText("Quay Rovers");
+  await expect(fresh.getByTestId("scorestrip")).toContainText("Recovery Park");
+  await awaitWritable(fresh);
+  await takeManualControl(fresh);
+  await playToEnd(fresh);
+  await fresh.getByRole("button", { name: "Return result to career" }).click();
+  await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
+  await fresh.reload();
+  await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(fresh.getByRole("heading", { name: /Quay Rovers/i }).first()).toBeVisible();
+  expect(await bindingStates(fresh)).toEqual(["APPLIED"]);
 });
 
 test("an imported-roster managed match is recovered in a fresh tab and applies exactly once", async ({ page, context }) => {
