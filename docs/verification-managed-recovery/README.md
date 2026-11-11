@@ -18,4 +18,4 @@ The regression is replaced by behavioural specs in `tests/ui/managed-recovery.sp
 
 `tests/m4/managed-binding-persistence.spec.ts` covers the first-commit guard, the match list filter and binding storage in a real IndexedDB. `tests/unit/managed-binding.test.ts` covers the binding rules and result regeneration.
 
-Local results are Chromium on Linux. Hosted GitHub Actions on commit `233f049` passed the Linux job and the Windows job (UI and career suites in Chromium and Firefox, including all five recovery specs). Hosted Windows is not the owner's PC, which has not run these. The implementation notes are in `../MANAGED_MATCH_RECOVERY.md`.
+Local results are Chromium on Linux. Hosted GitHub Actions on commit `224e3ed` (the last code change) passed the Linux job and the Windows job (UI and career suites in Chromium and Firefox, including all seven recovery specs). Hosted Windows is not the owner's PC, which has not run these. The implementation notes are in `../MANAGED_MATCH_RECOVERY.md`.
