@@ -635,6 +635,13 @@ code {
 
 .roster-file { display: flex; flex-direction: column; min-width: 0; max-width: 100%; }
 .roster-file input { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+.analytics-worm { display: block; width: 100%; max-width: 640px; height: auto; }
+.analytics-worm text { fill: currentColor; font-size: 12px; }
+.analytics-wheel { display: block; width: min(100%, 300px); height: auto; margin: 1rem 0; }
+.analytics-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; list-style: none; padding: 0; }
+.analytics-legend span { display: inline-block; width: 1.25rem; height: 0.3rem; vertical-align: middle; }
+.analytics-pitch { display: block; width: min(100%, 300px); height: auto; }
+.analytics-pitch text { fill: #1c2a20; font-size: 14px; }
 
 .print-scorecard { display: none; }
 .scorecard-export-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }

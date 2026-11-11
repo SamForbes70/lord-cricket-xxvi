@@ -13,6 +13,7 @@ import {
   type Response,
   type Verification,
   type PersistenceView,
+  type AnalyticsProgress,
 } from "./match/protocol.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
@@ -96,6 +97,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
   const [verification, setVerification] = useState<Verification | null>(null);
+  const rebuildRequest = useRef<string | null>(null);
+  const [analyticsRebuild, setAnalyticsRebuild] = useState<{ state: "IDLE" | "RUNNING" | "STOPPING" | "COMPLETE" | "CANCELLED"; applied: number; total: number }>({ state: "IDLE", applied: 0, total: 0 });
+  const [diagnosticSeed, setDiagnosticSeed] = useState(false);
+  const [diagnosticPreview, setDiagnosticPreview] = useState<import("./match/diagnostic-export.js").DiagnosticPreview | null>(null);
   const [persistence, setPersistence] = useState<PersistenceView | null>(null);
   const [scale, setScale] = useState(() => {
       const saved = localStorage.getItem("lcxxvi-match-scale");
@@ -118,8 +123,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   }, [scale, commentary, density]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
-    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(body.type)) { setBatchProgress(null); lastAiChecked.current = {}; }
+    if (body.type !== "PREVIEW_DIAGNOSTIC" && body.type !== "EXPORT_DIAGNOSTIC") setDiagnosticPreview(null);
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
+      setBatchProgress(null);
+      setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
+      lastAiChecked.current = {};
+    }
     const requestId = `ui-${++serial.current}`;
+    if (body.type === "REBUILD_ANALYTICS") { rebuildRequest.current = requestId; setAnalyticsRebuild({ state: "RUNNING", applied: 0, total: 0 }); }
     inflight.current = requestId;
     setBusy(true);
     setError("");
@@ -147,7 +158,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       name: owner,
     });
     worker.current = w;
-    w.onmessage = (e: MessageEvent<Response>) => {
+    w.onmessage = (e: MessageEvent<Response | AnalyticsProgress>) => {
       const r = e.data;
       if (
         r.version !== UI_VERSION ||
@@ -160,10 +171,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         );
         return;
       }
+      if ("type" in r) {
+        if (r.type === "ANALYTICS_PROGRESS" && r.requestId === rebuildRequest.current) setAnalyticsRebuild(current => ({ ...current, applied: r.applied, total: r.total }));
+        return;
+      }
       if (r.requestId !== inflight.current) return;
       inflight.current = null;
       currentRevision.current = r.revision;
-      serial.current = Math.max(serial.current, 10000 + r.revision);
+      serial.current = Math.max(serial.current, 10000 + r.revision, r.commandIdFloor ?? 0);
       if (r.careerFixture && !careerLaunch.current) {
         // The durable binding restored the career link that sessionStorage lost with the old tab.
         const restored = r.careerFixture as CareerUserMatchLaunch;
@@ -199,6 +214,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       if (r.catalog) setCatalog(r.catalog);
       setView(r.view);
       setVerification(r.verification);
+      if (r.requestId === rebuildRequest.current) {
+        rebuildRequest.current = null;
+        setAnalyticsRebuild(r.analyticsRebuild ? { ...r.analyticsRebuild } : { state: "IDLE", applied: 0, total: 0 });
+      }
       if (r.persistence) setPersistence(r.persistence);
       if (r.delegation) setDelegation(r.delegation);
       // These are caches only. The career rebuilds the result from the durable match and binding, so a
@@ -242,6 +261,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "BOOT", fresh: true });
         }
       }
+      if (r.diagnosticPreview) setDiagnosticPreview(r.diagnosticPreview);
+      if (r.diagnosticBytes) {
+        const bytes = new Uint8Array(r.diagnosticBytes);
+        const url = URL.createObjectURL(new Blob([bytes], { type: "application/json" }));
+        const link = document.createElement("a"); link.href = url; link.download = "lord-cricket-diagnostic.json"; link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
       if (r.archive) {
         const archiveBytes = new Uint8Array(r.archive.byteLength);
         archiveBytes.set(r.archive);
@@ -257,6 +283,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
     };
     const failed = () => {
+      rebuildRequest.current = null;
+      setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
       advanceBatch.current = null;
       setBatchState("idle");
       setFatal(true);
@@ -401,6 +429,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   }
   function act(action: Action) {
     if (!view || inflight.current || fatal) return;
+    setDiagnosticPreview(null);
     if (!advanceBatch.current) setBatchProgress(null);
     const i = view.innings[view.activeIndex]?.innings;
     const team =
@@ -434,6 +463,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     setBatchProgress(null);
     setBatchState("running");
     act({ kind: "ADVANCE", payload: { scope: "OVER" } });
+  }
+  function cancelAnalyticsRebuild() {
+    if (!rebuildRequest.current) return;
+    setAnalyticsRebuild(current => ({ ...current, state: "STOPPING" }));
+    worker.current?.postMessage({ version: UI_VERSION, type: "CANCEL_ANALYTICS", requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, targetRequestId: rebuildRequest.current });
   }
   function stopAdvance() {
     if (!advanceBatch.current) return;
@@ -960,7 +994,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </section>
           )}
-          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} />}
+          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} hands={view.hands} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>
@@ -1066,6 +1100,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           </div>
         </>
       )}
+      <section className="panel" aria-label="Match diagnostic export">
+        <h2>Match diagnostic</h2>
+        <p>The file contains match events, identifiers and the most recent rejected command if available. The random seed is included once the match is complete, or if you choose to include it. With the seed, anyone can replay the rest of an unfinished match. Review the file before sharing.</p>
+        {view?.phase !== "COMPLETE" && <label><input type="checkbox" checked={diagnosticSeed} onChange={(event) => setDiagnosticSeed(event.currentTarget.checked)} /> Include the random seed (reveals the rest of this unfinished match)</label>}
+        <button type="button" disabled={busy || fatal} onClick={() => send({ type: "PREVIEW_DIAGNOSTIC", includeSeed: diagnosticSeed })}>Preview diagnostic</button>
+        {diagnosticPreview && <div role="region" aria-label="Diagnostic preview">
+          <p>Format: {diagnosticPreview.format ?? "Unavailable"}. Events: {diagnosticPreview.eventCount}. Revision: {diagnosticPreview.revision ?? "Unavailable"}. Size: {diagnosticPreview.byteCount} bytes.</p>
+          <p>Seed: {diagnosticPreview.includesSeed ? "Included in file" : "Not included"}. Latest failure: {diagnosticPreview.failure ? `${diagnosticPreview.failure.requestType}, sequence ${diagnosticPreview.failure.sequence ?? "unavailable"}, code ${diagnosticPreview.failure.invariantCode ?? "unavailable"}` : "None recorded in this session"}.</p>
+          <p>File version: LC_MATCH_DIAGNOSTIC_V1. Model status: SYNTHETIC_ALPHA. Engine: {diagnosticPreview.engine ?? "Unavailable"}.</p>
+          <p>Rules hash: <code>{diagnosticPreview.rulesHash ?? "Unavailable"}</code>. Model hash: <code>{diagnosticPreview.modelHash ?? "Unavailable"}</code>.</p>
+          <p>SHA-256: <code>{diagnosticPreview.sha256}</code></p>
+          <button type="button" disabled={busy || fatal} onClick={() => send({ type: "EXPORT_DIAGNOSTIC", sha256: diagnosticPreview.sha256 })}>Download diagnostic</button>
+        </div>}
+      </section>
       <section className="save-manager" aria-label="Save files">
         <div className="save-file-actions">
           {view && (

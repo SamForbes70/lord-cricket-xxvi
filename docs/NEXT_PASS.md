@@ -1,27 +1,15 @@
 # Next development slice
 
-The active target is the original V0.1 synthetic alpha under the owner's standing brief.
-[The delivery plan](V01_DELIVERY_PLAN.md) and `V01_BACKLOG.json` supersede the earlier research-only work queue.
-[Current status](CURRENT_STATUS.md) records actual implemented capability and evidence.
+Finish V0.1, then deliver persistent world, player lifecycle and squad economy sequentially, as directed by the owner on 11 November 2026.
 
-## Batch 2: player-facing essentials
+## Immediate implementation
 
-PR #15 merged V01-003 and V01-004.
-PR #16 merged V01-005, names and colours for new careers and exhibitions.
-PR #17 merged V01-006, validated roster import for exhibitions and T20 careers.
-PR #18 added the 115% scale and persistent match preferences.
-PR #20 completed V01-007 acceptance.
-PR #21 merged bounded simulation controls; PR #22 merged safe cancellation.
-PR #23 merged granular T20 delegation as `753db53`.
-PR #25 merged cross-format analytics as `3846282`.
-PR #24 merged match continuity within a session; durable recovery across sessions is the remaining part of V01-011.
-Review incremental analytics in PR #26, then charts in PR #27, then diagnostics in PR #31.
-Check the current merge base and required CI before integration.
-Preserve stable IDs, existing saves, frozen simulation outcomes and historical snapshots.
+Durable managed-match recovery is implemented in PR #39, which replaces the failing regression in #37 with behavioural specs. PR #24 already merged in-session navigation. Hosted Linux and Windows (Chromium and Firefox) checks have passed on it. V01-011 remains IN_PROGRESS until the owner accepts it; the owner PC has not run it. See [the recovery notes](MANAGED_MATCH_RECOVERY.md).
 
-## Parallel research and acceptance
+## Integration queue
 
-[M7K_PLAN.md](M7K_PLAN.md) remains the research plan; its historical and cohort gates stay explicit.
-Historical decisions, sufficient untouched matches and qualifying hardware measurements remain external evidence needs.
-They do not stop unrelated product work.
-Research-model promotion and public deployment require separate approval.
+Read [the current dated audit](GITHUB_AUDIT_2026-11-11.md). Merge #26, then #27, then #31. #27 is not stacked on #26: it carries re-applied copies of #26's commits, so merge #26 first and re-run checks on the rebased #27. #31 conflicts with both in `main.tsx`, `match.worker.ts` and `protocol.ts`. Check live head/base and required checks before merging. Update backlog status only when acceptance and integration are established.
+
+## Continuation
+
+Use [V01_BACKLOG.json](V01_BACKLOG.json) for the remaining acceptance criteria and [AI continuation](AI_CONTINUATION.md) for context. Historical evidence and owner-PC/reference-hardware gaps remain explicit. Missing research evidence does not block independent product work.

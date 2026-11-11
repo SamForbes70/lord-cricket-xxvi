@@ -7,6 +7,17 @@ The adoption message states: “Adopt this standing brief and start batch 1.”
 It adopts the preceding seven-batch proposal and its authority boundaries.
 
 Develop Lord Cricket XXVI towards the original V0.1 synthetic-alpha release.
+
+On 11 November 2026 (Australia/Brisbane), the owner directed:
+“finish the existing V0.1 queue, then deliver V1.0 through the persistent-world,
+player-lifecycle and squad-economy milestones. Avoid expanding all systems at once.”
+
+This extends routine development authority to that ordered V1.0 progression.
+Complete the existing V0.1 queue first. Then deliver the persistent world,
+player lifecycle and squad economy as sequential, accepted milestones.
+Do not begin all three systems together or treat this direction as approval for
+unresolved competition, 3D, online-play or other material scope additions.
+The existing preserved boundaries and release evidence requirements still apply.
 Use the original technical design, current architecture and recorded decisions.
 Make routine implementation and interface decisions without requesting repeated approval.
 

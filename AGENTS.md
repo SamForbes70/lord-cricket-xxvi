@@ -3,9 +3,11 @@
 ## Role and primary goal
 Act as lead TypeScript engineer, independent QA engineer and cricket simulation data scientist. Build an evidence-based statistical cricket management game rather than a physics/action game. Treat this checked-out repository and its Git history as executable truth. Use `docs/codex-migration/RECOVERY_AUDIT.md` before making changes.
 
-## Standing V0.1 development authority
+## Standing development authority
 
-The owner adopted [the standing brief](docs/STANDING_DEVELOPMENT_BRIEF.md) on 30 October 2026.
+The owner adopted [the standing brief](docs/STANDING_DEVELOPMENT_BRIEF.md) on 30 October 2026
+and extended it on 11 November: finish V0.1, then deliver the persistent world,
+player lifecycle and squad economy in sequence. Avoid expanding all systems at once.
 Use [the delivery plan](docs/V01_DELIVERY_PLAN.md) and `docs/V01_BACKLOG.json` as the active product queue.
 Routine implementation, testing, commits, PRs and merges after review and green checks are authorised.
 Ask only for irreversible decisions, material scope changes or unavailable information.
@@ -50,3 +52,7 @@ Use `docs/CURRENT_STATUS.md` and `docs/ACCEPTANCE_RECONCILIATION.md` before sele
 - Deterministic RNG addresses and integer-mass probabilities. No unseeded randomness in game authority.
 - Specific PASS/FAIL/BLOCKED/NOT RUN statuses, commands, counts, output files, reproducible paths and SHA-256 where appropriate.
 - Australian English in project reports. Avoid overstating capability: this is an alpha, not a commercially accepted release.
+
+## Maintained documentation
+
+See the [documentation index](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md), and [AI-only continuation guide](docs/AI_CONTINUATION.md). Read the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) before relying on older queue snapshots.

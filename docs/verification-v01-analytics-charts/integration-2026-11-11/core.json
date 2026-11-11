@@ -1,0 +1,23 @@
+{
+  "testedCommit": "e93d36325d0cd725f5d265adfc4c6ec656280758",
+  "platform": "Linux cloud",
+  "node": "v24.22.1",
+  "npm": "11.9.0",
+  "command": "npm run verify:09:core",
+  "status": "PASS",
+  "schemas": 188,
+  "unitTestsPassed": 692,
+  "coreLogSha256": "c67933588345a32ea88181ce89441ed3a425d5b2916b515f783e13013390e428",
+  "ownerPcAcceptance": "NOT_ESTABLISHED",
+  "referenceHardwareAcceptance": "NOT_ESTABLISHED",
+  "hostedChecks": "PENDING",
+  "browser": {
+    "status": "PASS",
+    "passed": 6,
+    "command": "npx playwright test --config work/analytics-ui.config.ts tests/ui/analytics-formats.spec.ts",
+    "scope": "T20, ODI and RED_BALL in Chromium and Firefox; saved-event comparison, charts, narrow 150% layout, rebuild and replay",
+    "sha256": "35a7efe839fb2979f60b3840e496d0e2cc703207bf723ea0fd8c66f99b41db35",
+    "configuration": "Original UI config with separate port 4181 and explicit repository webServer cwd; retained as analytics-ui.config.txt",
+    "initialAttempt": "BLOCKED by temporary configuration resolving the Vite path relative to work/; corrected cwd before retry"
+  }
+}

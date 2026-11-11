@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { projectRed5MatchAnalytics } from "@lcxxvi/projections";
+import { createMatchAnalyticsAccumulator, projectRed5MatchAnalytics } from "@lcxxvi/projections";
 import {
   createPortableArchive,
   readPortableArchive,
@@ -314,6 +314,9 @@ describe("Pass 11 / M5B red-ball profile", () => {
     expect(s.core.innings.length).toBeLessThanOrEqual(4);
     const card = projectRed5Scorecard(s);
     const analytics = projectRed5MatchAnalytics(s.events, card);
+    const incremental = createMatchAnalyticsAccumulator(card.innings.length);
+    for (const event of s.events) incremental.append(event);
+    expect(incremental.snapshot(card)).toEqual(analytics);
     expect(analytics.finalRuns).toEqual(card.innings.map(innings => innings.runs));
     expect(analytics.finalWickets).toEqual(card.innings.map(innings => innings.wickets));
     expect(analytics.finalLegalBalls).toEqual(card.innings.map(innings => innings.legalBalls));

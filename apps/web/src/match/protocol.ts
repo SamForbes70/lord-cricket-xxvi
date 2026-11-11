@@ -123,6 +123,10 @@ export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128), delegated: z.boolean().optional() }),
   z.strictObject({ ...base, type: z.literal("SET_DELEGATION"), teamId: z.string().min(1).max(128), expectedDelegationRevision: z.number().int().nonnegative(), categories: z.array(DelegationCategorySchema).max(6).refine(values => new Set(values).size === values.length) }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
+  z.strictObject({ ...base, type: z.literal("REBUILD_ANALYTICS") }),
+  z.strictObject({ ...base, type: z.literal("CANCEL_ANALYTICS"), targetRequestId: z.string().regex(/^ui-[0-9]+$/) }),
+  z.strictObject({ ...base, type: z.literal("PREVIEW_DIAGNOSTIC"), includeSeed: z.boolean().optional() }),
+  z.strictObject({ ...base, type: z.literal("EXPORT_DIAGNOSTIC"), sha256: z.string().regex(/^[a-f0-9]{64}$/) }),
   z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
   z.strictObject({
     ...base,
@@ -197,6 +201,7 @@ export type View = {
     colours?: [string, string];
   }[];
   names: Record<string, string>;
+  hands: Record<string, "L" | "R">;
   ground: string;
   innings: InningsLedger[];
   activeIndex: number;
@@ -274,6 +279,12 @@ export type Response = {
   careerFixture?: CareerFixtureLaunch | null;
   /** Status of the durable binding for the active match, when one exists. */
   managedStatus?: ManagedStatus | null;
+  /** On BOOT and restores: the highest committed ui-N id, so the page can start its ids above it. */
+  commandIdFloor?: number;
   acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
+  analyticsRebuild?: { state: "COMPLETE" | "CANCELLED"; applied: number; total: number };
   delegation?: DelegationJournal;
+  diagnosticPreview?: import("./diagnostic-export.js").DiagnosticPreview;
+  diagnosticBytes?: Uint8Array;
 };
+export type AnalyticsProgress = { type: "ANALYTICS_PROGRESS"; version: typeof UI_VERSION; pins: typeof PINS; requestId: string; applied: number; total: number };

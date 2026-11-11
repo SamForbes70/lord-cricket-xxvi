@@ -250,7 +250,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Track applied sequence and reject gaps or duplicate application.",
@@ -269,7 +269,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Render a score worm and a shot-sector wagon wheel.",
@@ -308,7 +308,7 @@
       "dependsOn": [
         "V01-015"
       ],
-      "status": "PLANNED",
+      "status": "DELIVERED_PENDING_INTEGRATION",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Export canonical event data with version and failure metadata.",

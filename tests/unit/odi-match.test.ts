@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { projectODIMatchAnalytics } from "@lcxxvi/projections";
+import { createMatchAnalyticsAccumulator, projectODIMatchAnalytics } from "@lcxxvi/projections";
 import { createPortableArchive, readPortableArchive, type SaveSummary } from "@lcxxvi/persistence";
 import { readFileSync } from "node:fs";
 import {
@@ -299,6 +299,9 @@ describe("Pass 10 / M5A ODI format", () => {
     expect(s.core.phase).toBe("COMPLETE");
     const card = projectODIScorecard(s);
     const analytics = projectODIMatchAnalytics(s.events, card);
+    const incremental = createMatchAnalyticsAccumulator(2);
+    for (const event of s.events) incremental.append(event);
+    expect(incremental.snapshot(card)).toEqual(analytics);
     expect(analytics.finalRuns).toEqual(card.innings.map(innings => innings.runs));
     expect(analytics.finalWickets).toEqual(card.innings.map(innings => innings.wickets));
     expect(analytics.finalLegalBalls).toEqual(card.innings.map(innings => innings.legalBalls));

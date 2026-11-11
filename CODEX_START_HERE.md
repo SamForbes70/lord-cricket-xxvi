@@ -16,7 +16,7 @@ PR #2 is merged. [Current status](docs/CURRENT_STATUS.md) supersedes historical 
 [Acceptance reconciliation](docs/ACCEPTANCE_RECONCILIATION.md) separates hosted tests, owner playthrough and remaining evidence gaps.
 PR #3 merged M7K research preparation on 28 October 2026. Gameplay promotion remains separately gated.
 
-## Open this project
+## Historical migration ZIP instructions
 1. Extract the outer ZIP to a normal Windows folder, e.g. `C:\Projects\Lord_Cricket_XXVI_Codex_Migration_2026-10-21`.
 2. In Codex desktop/app, **open the inner `Lord_Cricket_XXVI` folder**, the one with `.git`, `AGENTS.md`, `apps`, `packages`, `tests`, and `package.json`.
 3. Do not point Codex at only the `ORIGINAL_OWNER_RELEASE` ZIP or the outer migration folder.
@@ -40,15 +40,24 @@ npm run management:acceptance
 ```
 Use the test and browser matrix in `docs/codex-migration/VERIFICATION_AND_GATES.md` for the other suites.
 
-## Push to a private GitHub repository (optional but recommended)
-Create an empty private repo first on GitHub. In this recovered project directory:
+## Current GitHub repository
+
+The private repository is `SamForbes70/lord-cricket-xxvi`. Clone it for current development:
+
+```sh
+git clone https://github.com/SamForbes70/lord-cricket-xxvi.git
+cd lord-cricket-xxvi
+npm ci
+npm run dev
 ```
-git remote add origin https://github.com/YOUR_USERNAME/lord-cricket-xxvi.git
-git push -u origin main
-```
-Replace YOUR_USERNAME and URL with your own new private repo. Do not force-push or publish private saves, API keys or Cricsheet raw data. The recovered Git history is already present, so do not initialise another repository.
+
+Use an authenticated GitHub account with access. Inspect `git remote -v` in an existing checkout before changing remotes. Preserve the recovered history; do not initialise a replacement repository or force-push. Keep personal saves, credentials and licensed raw research data outside tracked files.
 
 ## Play the existing owner build without rebuilding
 Extract `../ORIGINAL_OWNER_RELEASE/Lord_Cricket_XXVI_START_HERE_2026-10-17.zip` and use `PLAY_LORD_CRICKET.cmd` then `OPEN_LORD_CRICKET.url`. This is a localhost browser app, not a native .exe. Browser careers are saved in IndexedDB, not in the game directory; use Settings export to back them up.
 
 **Important:** The empirical research candidates are not part of production gameplay. Real browser match/save tests and formal human acceptance were still outstanding when this release was packed.
+
+## Maintained documentation
+
+See the [documentation index](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md), and [AI-only continuation guide](docs/AI_CONTINUATION.md). Read the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) before relying on older queue snapshots.

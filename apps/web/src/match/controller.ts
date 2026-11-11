@@ -1,4 +1,4 @@
-import { projectT20MatchAnalytics } from "@lcxxvi/projections";
+import { createMatchAnalyticsCache } from "@lcxxvi/projections";
 import {
   type T20Session,
   type RosterT20Session,
@@ -105,12 +105,15 @@ export function createMatchController(
     engineActorId: string;
   }[] = [];
   const hash = (v: unknown) => sha256Hex(canonicalStateBytes(v));
+  const analyticsCache = createMatchAnalyticsCache(2);
   function view(): View | null {
     if (!session) return null;
     const s = session,
       c = s.core,
       l = c.innings[c.activeInningsIndex],
       i = l?.innings;
+    analyticsCache.update(s.events);
+    const scorecard = c.phase === "COMPLETE" ? projectT20Scorecard(s) : null;
     const names = Object.fromEntries(
       s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, displayWorld.players.find(player => player.playerId === p.playerId)?.name ?? p.name])),
     );
@@ -226,6 +229,7 @@ export function createMatchController(
         ...(displayWorld.packId !== world.packId ? { colours: [...displayWorld.teams.find(team => team.teamId === t.teamId)!.colours] as [string, string] } : {}),
       })),
       names,
+      hands: Object.fromEntries(s.setup.teams.flatMap(team => team.xi.map(player => [player.playerId, player.batHand]))),
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
@@ -236,8 +240,8 @@ export function createMatchController(
       positions: FIELD_REGISTRY.positions.map((p) => p.slotId),
       advanceReason,
       commentary,
-      scorecard: c.phase === "COMPLETE" ? projectT20Scorecard(s) : null,
-      analytics: c.phase === "COMPLETE" ? projectT20MatchAnalytics(s.events, projectT20Scorecard(s)) : null,
+      scorecard,
+      analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,

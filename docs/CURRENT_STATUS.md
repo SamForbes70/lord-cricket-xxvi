@@ -1,5 +1,7 @@
 # Current game and acceptance status
 
+For the 11 November 2026 branch/merge reconciliation, read [the GitHub audit](GITHUB_AUDIT_2026-11-11.md) and [next slice](NEXT_PASS.md). The dated records below retain their original scope; earlier PR lists are historical.
+
 Lord Cricket XXVI is a playable single-season management alpha.
 Main includes merged PR #2, capability reconciliation from PR #4 and the scenario harness from PR #5.
 PR #3 merged as `4aa71d9` after integration with `b4aceda`. Historical simulation and save boundaries remain intact.

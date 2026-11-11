@@ -1,7 +1,8 @@
 # Lord Cricket XXVI | Single-season management alpha
 
 Lord Cricket XXVI provides a one-season management game over deterministic match and career systems.
-See [current status](docs/CURRENT_STATUS.md) for capabilities, acceptance evidence and remaining gates.
+Start with the [documentation hub](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md) or [AI continuation guide](docs/AI_CONTINUATION.md).
+See the [GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) for open work and [current status](docs/CURRENT_STATUS.md) for acceptance history.
 
 **Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management are not enabled. Optional T20 tactical opponent AI is available in the match view. Browser tests cover its controls; empirical tactical quality remains unaccepted.
 
@@ -24,7 +25,7 @@ The fixture autopilot remains the transparent deterministic baseline completion 
 
 ## Architecture
 
-There is one cricket truth. React is a projection/controller only. `CareerApplicationService` orchestrates the accepted schedule, career condition/training, shared T20 fixture execution, season projections and Pass 12F persistence. The existing scoring, deterministic random service, probability model, delivery generator, T20 engine, ODI engine, red-ball engine and season persistence primitives remain byte-identical to the Pass 12F baseline.
+There is one cricket truth. React is a projection/controller only. `CareerApplicationService` orchestrates the accepted schedule, career condition/training, shared T20 fixture execution, season projections and Pass 12F persistence. Scoring, deterministic random addressing, probability models, format engines and save dispatch are protected compatibility boundaries. The repository has evolved since Pass 12F; use Git history and revision-specific verification for preservation claims.
 
 Scheduled interactive matches use the existing T20 controller with the immutable fixture seed, ground and XI snapshot. A terminal interactive result is returned through the same canonical `USER_MATCH` season-completion boundary used by the management service.
 
@@ -159,3 +160,7 @@ The developer tool compares existing baseline/tactical policies across all eight
 It preserves accepted event/scorecard hashes and separates first innings from chase endings.
 See [SCENARIO_QUALITY_HARNESS.md](docs/SCENARIO_QUALITY_HARNESS.md) for scope, results and limits.
 This adds a reproducible quality tool; it does not change the playable scoring model.
+
+## Maintained documentation
+
+See the [documentation index](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md), and [AI-only continuation guide](docs/AI_CONTINUATION.md). Read the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) before relying on older queue snapshots.

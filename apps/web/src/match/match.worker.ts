@@ -1,6 +1,7 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
 import { canonicalJson, delegationForTeam, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import { createMatchAnalyticsAccumulator } from "@lcxxvi/projections";
 import type { T20Session, ODISession, Red5Session, RosterT20Session, RosterODISession, RosterRed5Session } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
@@ -10,6 +11,7 @@ import {
   type ManagedBinding,
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
+import { createDiagnostic, type DiagnosticFailure, type DiagnosticPreview } from "./diagnostic-export.js";
 import { proposeOpponentT20Command } from "./ai-opponent.js";
 import { createODIMatchController } from "./controller-odi.js";
 import { createRed5MatchController } from "./controller-red5.js";
@@ -20,6 +22,7 @@ import {
   CareerFixtureLaunchSchema,
   RequestSchema,
   UI_VERSION,
+  PINS,
   type CareerFixtureLaunch,
   type ManagedStatus,
   type Request,
@@ -48,6 +51,9 @@ let controller: MatchController = makeController();
 let initialised = false;
 /** Why the last attempt to re-associate a restored match with its career failed, if it did. */
 let bindNote: string | null = null;
+let activeAnalyticsRebuild: { requestId: string; revision: number; cancelled: boolean } | null = null;
+let lastFailure: DiagnosticFailure | null = null;
+let diagnostic: { preview: DiagnosticPreview; bytes: Uint8Array; gameId: string | null; eventHash: string | null } | null = null;
 
 function randomHex(bytesCount: number): string {
   const bytes = crypto.getRandomValues(new Uint8Array(bytesCount));
@@ -235,10 +241,22 @@ async function rebindManaged(): Promise<string | null> {
   });
   return result.error;
 }
+/** The highest ui-N id already committed, so a reloaded page never reuses one whatever it consumed before. */
+function commandIdFloor(): number {
+  const session = controller.snapshot();
+  if (!session) return 0;
+  let floor = 0;
+  for (const command of session.commands) {
+    const n = Number(/^ui-(\d+)$/.exec(command.commandId)?.[1] ?? 0);
+    if (n < 800_000_000 && n > floor) floor = n;
+  }
+  return floor;
+}
 function withLaunch(response: Response): Response {
   const fixture = boundFixture();
-  if (fixture) return { ...response, careerFixture: fixture };
-  return { ...response, careerFixture: null, error: response.error ?? bindNote };
+  const withFloor = { ...response, commandIdFloor: commandIdFloor() };
+  if (fixture) return { ...withFloor, careerFixture: fixture };
+  return { ...withFloor, careerFixture: null, error: response.error ?? bindNote };
 }
 async function restoreSave(saveId: string): Promise<void> {
   const loaded = await repository.load(saveId);
@@ -294,7 +312,10 @@ async function initialise(): Promise<void> {
   if (!saveId) return;
   try {
     await restoreSave(saveId);
-  } catch {
+  } catch (error) {
+    const code = error instanceof Error && /^[A-Z][A-Z0-9_]{2,80}$/.test(error.message) ? error.message : null;
+    lastFailure = { requestType: "RECOVERY", sequence: null, invariantCode: code, command: null };
+    diagnostic = null;
     // Keep the catalogue usable when the active pointer is stale/corrupt beyond recovery.
     activeSaveId = null;
     activeWorldCopy = null;
@@ -682,6 +703,42 @@ async function handleInner(raw: unknown): Promise<Response> {
     }
     return decorate(controller.currentResponse(request.requestId));
   }
+  if (request.type === "CANCEL_ANALYTICS") return decorate(controller.currentResponse(request.requestId));
+  if (request.type === "REBUILD_ANALYTICS") {
+    const session = controller.snapshot();
+    if (!session || session.core.phase !== "COMPLETE") return decorate(controller.currentResponse(request.requestId, "Complete the match before rebuilding analytics."));
+    if (request.expectedRevision !== session.revision) return decorate(controller.currentResponse(request.requestId, "Stale match revision."));
+    const task = { requestId: request.requestId, revision: session.revision, cancelled: false };
+    activeAnalyticsRebuild = task;
+    const accumulator = createMatchAnalyticsAccumulator(session.setup.format === "RED_BALL" ? 4 : 2);
+    try {
+      // Yield to the event loop by time budget rather than a fixed delay per batch, so a long red-ball match
+      // rebuilds as fast as the machine allows while a cancel message is still seen within one slice.
+      let sliceStart = performance.now();
+      for (let offset = 0; offset < session.events.length; offset += 32) {
+        for (const event of session.events.slice(offset, offset + 32)) accumulator.append(event);
+        if (performance.now() - sliceStart < 12 && offset + 32 < session.events.length) continue;
+        self.postMessage({ type: "ANALYTICS_PROGRESS", version: UI_VERSION, pins: PINS, requestId: request.requestId, applied: accumulator.appliedSequence, total: session.events.length });
+        await new Promise<void>(resolve => setTimeout(resolve, 0));
+        sliceStart = performance.now();
+        if (task.cancelled) return { ...await decorate(controller.currentResponse(request.requestId)), analyticsRebuild: { state: "CANCELLED", applied: accumulator.appliedSequence, total: session.events.length } };
+      }
+      const response = await decorate(controller.currentResponse(request.requestId));
+      if (!response.view?.scorecard || !response.view.analytics || canonicalJson(accumulator.snapshot(response.view.scorecard)) !== canonicalJson(response.view.analytics)) throw new Error("Analytics rebuild does not match the incremental result.");
+      return { ...response, analyticsRebuild: { state: "COMPLETE", applied: accumulator.appliedSequence, total: session.events.length } };
+    } finally { if (activeAnalyticsRebuild === task) activeAnalyticsRebuild = null; }
+  }
+  if (request.type === "PREVIEW_DIAGNOSTIC") {
+    const session = controller.snapshot();
+    const result = await createDiagnostic(session, lastFailure, request.includeSeed ?? false);
+    diagnostic = { ...result, gameId: session?.setup.gameId ?? null, eventHash: session?.lastEventHash ?? null };
+    return { ...await decorate(controller.currentResponse(request.requestId)), diagnosticPreview: result.preview };
+  }
+  if (request.type === "EXPORT_DIAGNOSTIC") {
+    const session = controller.snapshot();
+    if (!diagnostic || request.sha256 !== diagnostic.preview.sha256 || diagnostic.gameId !== (session?.setup.gameId ?? null) || diagnostic.eventHash !== (session?.lastEventHash ?? null) || diagnostic.preview.revision !== (session?.revision ?? null)) return decorate(controller.currentResponse(request.requestId, "Preview the diagnostic again before downloading."));
+    return { ...await decorate(controller.currentResponse(request.requestId)), diagnosticBytes: diagnostic.bytes };
+  }
   if (request.type === "BOOT" && request.careerFixture) {
     const current = controller.snapshot();
     const matchesCareerFixture =
@@ -830,10 +887,32 @@ async function handle(raw: unknown): Promise<Response> {
 let queue = Promise.resolve();
 self.onmessage = (event: MessageEvent<unknown>) => {
   const raw = event.data;
+  const parsed = RequestSchema.safeParse(raw);
+  if (parsed.success && parsed.data.type === "CANCEL_ANALYTICS") {
+    if (activeAnalyticsRebuild?.requestId === parsed.data.targetRequestId && activeAnalyticsRebuild.revision === parsed.data.expectedRevision) activeAnalyticsRebuild.cancelled = true;
+    return;
+  }
   queue = queue.then(async () => {
     try {
-      self.postMessage(await handle(raw));
+      const response = await handle(raw);
+      const parsed = RequestSchema.safeParse(raw);
+      if (response.error && parsed.success && !["PREVIEW_DIAGNOSTIC", "EXPORT_DIAGNOSTIC"].includes(parsed.data.type)) {
+        const session = controller.snapshot();
+        lastFailure = { requestType: parsed.data.type, sequence: session ? session.events.length + 1 : null,
+          invariantCode: /^[A-Z][A-Z0-9_]{2,80}$/.test(response.error) ? response.error : null,
+          command: parsed.data.type === "COMMAND" ? parsed.data.command : null };
+        diagnostic = null;
+      } else if (parsed.success && ["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(parsed.data.type) && !response.error && !(parsed.data.type === "BOOT" && lastFailure?.requestType === "RECOVERY")) { lastFailure = null; diagnostic = null; }
+      self.postMessage(response);
     } catch (e) {
+      const failed = RequestSchema.safeParse(raw);
+      if (failed.success && !["PREVIEW_DIAGNOSTIC", "EXPORT_DIAGNOSTIC"].includes(failed.data.type)) {
+        const session = controller.snapshot();
+        const code = e instanceof Error && /^[A-Z][A-Z0-9_]{2,80}$/.test(e.message) ? e.message : null;
+        lastFailure = { requestType: failed.data.type, sequence: session ? session.events.length + 1 : null,
+          invariantCode: code, command: failed.data.type === "COMMAND" ? failed.data.command : null };
+        diagnostic = null;
+      }
       const requestId =
         raw && typeof raw === "object" && "requestId" in raw
           ? String((raw as Record<string, unknown>).requestId)

@@ -1,7 +1,7 @@
 {
   "status": "PASS",
   "browser": "chromium",
-  "version": "141.0.7390.37",
+  "version": "153.0.8010.12",
   "vectors": 9,
   "mainThreadAndWorker": true,
   "predictionIsolation": true,

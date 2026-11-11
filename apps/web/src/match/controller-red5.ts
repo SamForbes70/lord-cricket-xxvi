@@ -1,4 +1,4 @@
-import { projectRed5MatchAnalytics } from "@lcxxvi/projections";
+import { createMatchAnalyticsCache } from "@lcxxvi/projections";
 import {
   type Red5Session,
   type RosterRed5Session,
@@ -96,12 +96,15 @@ export function createRed5MatchController(
     engineActorId: string;
   }[] = [];
   const hash = (v: unknown) => sha256Hex(canonicalStateBytes(v));
+  const analyticsCache = createMatchAnalyticsCache(4);
   function view(): View | null {
     if (!session) return null;
     const s = session,
       c = s.core,
       l = c.innings[c.activeInningsIndex],
       i = l?.innings;
+    analyticsCache.update(s.events);
+    const scorecard = c.phase === "COMPLETE" ? projectRed5Scorecard(s) : null;
     const names = Object.fromEntries(
       s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, displayWorld.players.find(player => player.playerId === p.playerId)?.name ?? p.name])),
     );
@@ -219,6 +222,7 @@ export function createRed5MatchController(
         ...(displayWorld.packId !== world.packId ? { colours: [...displayWorld.teams.find(team => team.teamId === t.teamId)!.colours] as [string, string] } : {}),
       })),
       names,
+      hands: Object.fromEntries(s.setup.teams.flatMap(team => team.xi.map(player => [player.playerId, player.batHand]))),
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
@@ -229,8 +233,8 @@ export function createRed5MatchController(
       positions: FIELD_REGISTRY.positions.map((p) => p.slotId),
       advanceReason,
       commentary,
-      scorecard: c.phase === "COMPLETE" ? projectRed5Scorecard(s) : null,
-      analytics: c.phase === "COMPLETE" ? projectRed5MatchAnalytics(s.events, projectRed5Scorecard(s)) : null,
+      scorecard,
+      analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,
