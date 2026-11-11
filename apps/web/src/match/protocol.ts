@@ -125,6 +125,8 @@ export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
   z.strictObject({ ...base, type: z.literal("REBUILD_ANALYTICS") }),
   z.strictObject({ ...base, type: z.literal("CANCEL_ANALYTICS"), targetRequestId: z.string().regex(/^ui-[0-9]+$/) }),
+  z.strictObject({ ...base, type: z.literal("PREVIEW_DIAGNOSTIC"), includeSeed: z.boolean().optional() }),
+  z.strictObject({ ...base, type: z.literal("EXPORT_DIAGNOSTIC"), sha256: z.string().regex(/^[a-f0-9]{64}$/) }),
   z.strictObject({ ...base, type: z.literal("LIST_SAVES") }),
   z.strictObject({
     ...base,
@@ -282,5 +284,7 @@ export type Response = {
   acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
   analyticsRebuild?: { state: "COMPLETE" | "CANCELLED"; applied: number; total: number };
   delegation?: DelegationJournal;
+  diagnosticPreview?: import("./diagnostic-export.js").DiagnosticPreview;
+  diagnosticBytes?: Uint8Array;
 };
 export type AnalyticsProgress = { type: "ANALYTICS_PROGRESS"; version: typeof UI_VERSION; pins: typeof PINS; requestId: string; applied: number; total: number };

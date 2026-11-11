@@ -37,7 +37,7 @@ The branch must pass hosted checks against main after PR #28.
 
 Tested integration `b9eb19288a9204fb8a294d2b7842228c1c1f7847` includes
 main `c37f1e0`, including navigation, scorecard exports and the current Windows
-collector timeout. Linux Node 24.22.1 / npm 11.9.0 verification passed:
+collector timeout. Linux Node 24.22.1 / npm 11.9.0 verification passed (the project requires Node 22.12 or later and hosted CI uses Node 22, so a Node 22 run is the better reference; see the integration branch notes):
 
 - `npm run verify:09:core`: 188 schemas, build, typecheck, lint, scoring fixtures,
   independent vectors and all 690 tests in 54 files.
@@ -52,3 +52,7 @@ Logs, tested revision and SHA-256 values are retained in
 Frozen simulation, contracts, world data and the dependency lockfile have no
 diff from main. Hosted checks must pass on the final PR head before merge.
 These runs do not establish owner-PC or reference-hardware acceptance.
+
+## Integration branch note: 11 November 2026
+
+The analytics rebuild now yields to the event loop by time budget instead of a fixed 10 ms wait per 32 events, so a long red-ball rebuild is not slowed by the delay while a cancel message is still seen within one slice. Cancellation is unchanged. Re-run on Node 22.23.4 after the merge; see the integration pull request for the recorded results.
