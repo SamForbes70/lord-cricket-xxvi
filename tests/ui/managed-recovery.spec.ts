@@ -160,7 +160,8 @@ test("abandoning a career match keeps it as an exhibition, and playing the fixtu
   await expect(fresh.getByText("0/14 managed-team fixtures complete.", { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(fresh.getByRole("button", { name: "Play match" })).toBeEnabled({ timeout: 45_000 });
   await fresh.getByRole("button", { name: "Play match" }).click();
-  await expectRestored(fresh, revision);
+  // Resuming returns the kept match at exactly the revision it had when it was abandoned.
+  await expect(fresh.locator("#decision")).toHaveAttribute("data-revision", restoredRevision, { timeout: 60_000 });
   await expect(fresh.getByText(BANNER)).toBeVisible();
   expect(await bindingStates(fresh)).toEqual(["PENDING"]);
 });
