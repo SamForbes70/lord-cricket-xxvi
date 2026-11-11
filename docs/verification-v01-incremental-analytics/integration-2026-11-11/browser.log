@@ -1,0 +1,25 @@
+[2m[WebServer] [22m(node:1605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:1623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:1641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/ui/analytics-formats.spec.ts:2:50 › T20 completed match exposes reconciled event analytics (21.0s)
+  ✓  2 [chromium] › tests/ui/analytics-formats.spec.ts:2:50 › ODI completed match exposes reconciled event analytics (55.8s)
+  ✓  3 [chromium] › tests/ui/analytics-formats.spec.ts:2:50 › RED_BALL completed match exposes reconciled event analytics (2.2m)
+(node:3070) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3070) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [firefox] › tests/ui/analytics-formats.spec.ts:2:50 › T20 completed match exposes reconciled event analytics (1.0m)
+  ✓  5 [firefox] › tests/ui/analytics-formats.spec.ts:2:50 › ODI completed match exposes reconciled event analytics (1.8m)
+  ✓  6 [firefox] › tests/ui/analytics-formats.spec.ts:2:50 › RED_BALL completed match exposes reconciled event analytics (5.8m)
+
+  Slow test file: [firefox] › tests/ui/analytics-formats.spec.ts (8.7m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  6 passed (12.3m)

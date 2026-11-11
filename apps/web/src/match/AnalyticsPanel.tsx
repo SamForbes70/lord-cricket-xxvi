@@ -2,12 +2,15 @@ import React from "react";
 import type { MatchAnalytics } from "@lcxxvi/projections";
 
 /** Visual summaries of recorded events, never additional simulated tracking. */
-export function AnalyticsPanel({ data, names }: { data: MatchAnalytics; names: Readonly<Record<string, string>> }) {
+export function AnalyticsPanel({ data, names, busy, rebuild, onRebuild, onCancel }: { data: MatchAnalytics; names: Readonly<Record<string, string>>; busy: boolean; rebuild: { state: "IDLE" | "RUNNING" | "STOPPING" | "COMPLETE" | "CANCELLED"; applied: number; total: number }; onRebuild: () => void; onCancel: () => void }) {
   const maxOver = Math.max(1, ...data.overSummaries.map(o => o.runs));
   const sectorRuns = Array.from({ length: 8 }, (_, index) => data.shotSectors.filter(s => s.sector === index).reduce((a,s)=>a+s.batRuns,0));
   const maxSector = Math.max(1, ...sectorRuns);
   return <section className="panel" aria-label="Event-derived match analytics">
     <h2>Match analytics</h2>
+    <div className="action-row"><button type="button" disabled={busy} onClick={onRebuild}>Rebuild analytics</button>
+      {(rebuild.state === "RUNNING" || rebuild.state === "STOPPING") && <button type="button" disabled={rebuild.state === "STOPPING"} onClick={onCancel}>Cancel analytics rebuild</button>}</div>
+    {rebuild.state !== "IDLE" && <p role="status">{rebuild.state === "COMPLETE" ? "Analytics rebuild complete" : rebuild.state === "CANCELLED" ? "Analytics rebuild cancelled" : rebuild.state === "STOPPING" ? "Cancelling analytics rebuild" : "Rebuilding analytics"}: {rebuild.applied} / {rebuild.total} events.</p>}
     <p>Derived from accepted deliveries. Sectors show recorded direction only; no measured ball positions or distances.</p>
     <h3>Manhattan: runs by over</h3>
     <div className="analytics-overs" role="group" aria-label="Over-by-over runs">

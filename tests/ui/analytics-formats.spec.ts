@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-for (const format of ["ODI", "RED_BALL"]) test(`${format} completed match exposes reconciled event analytics`, async ({ page }) => {
+for (const format of ["T20", "ODI", "RED_BALL"]) test(`${format} completed match exposes reconciled event analytics`, async ({ page }) => {
   test.setTimeout(600_000);
   await page.goto("/#exhibition");
   await expect(page.getByRole("button", { name: "Confirm XIs and start" })).toBeEnabled({ timeout: 30_000 });
@@ -23,6 +23,16 @@ for (const format of ["ODI", "RED_BALL"]) test(`${format} completed match expose
   await expect(analytics).toBeVisible();
   await expect(analytics.getByRole("heading", { name: "Fall of wickets" })).toBeVisible();
   await expect(analytics.getByRole("group", { name: "Over-by-over runs" })).toBeVisible();
+  const revision = await page.locator("#decision").getAttribute("data-revision");
+  await analytics.getByRole("button", { name: "Rebuild analytics" }).click();
+  await expect(analytics.getByRole("status")).toContainText("Analytics rebuild complete", { timeout: 60_000 });
+  await analytics.getByRole("button", { name: "Rebuild analytics" }).click();
+  const cancel = analytics.getByRole("button", { name: "Cancel analytics rebuild" });
+  if (await cancel.isVisible()) await cancel.click({ timeout: 2_000 }).catch(async () => {
+    await expect(analytics.getByRole("status")).toContainText("Analytics rebuild complete");
+  });
+  await expect(analytics.getByRole("status")).toContainText(/Analytics rebuild (cancelled|complete)/, { timeout: 60_000 });
+  await expect(page.locator("#decision")).toHaveAttribute("data-revision", revision!);
   await page.getByRole("button", { name: "Verify replay and scorecard" }).click();
   await expect(page.getByTestId("verification")).toBeVisible({ timeout: 60_000 });
 });

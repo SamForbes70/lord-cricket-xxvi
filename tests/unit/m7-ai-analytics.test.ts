@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { readFileSync } from "node:fs";
 import { adviseT20Captain } from "@lcxxvi/ai";
 import { runTacticalT20, publicT20CaptainView } from "../../apps/batch/src/tactical-match.js";
-import { projectT20MatchAnalytics } from "@lcxxvi/projections";
+import { createMatchAnalyticsAccumulator, createMatchAnalyticsCache, projectT20MatchAnalytics } from "@lcxxvi/projections";
 import { runFixtureT20, validateT20MatchSetup, projectT20Scorecard } from "@lcxxvi/simulation";
 
 const bowler = (playerId: string, overrides = {}) => ({ playerId, control: 70, movement: 65, variation: 60, stamina: 75, fatigueBp: 500, legalBallsBowled: 6, quotaRemaining: 18, ...overrides });
@@ -34,6 +34,44 @@ describe("M7 public-only tactical captain V1", () => {
 });
 
 describe("M7 canonical T20 match analytics", () => {
+  test("incremental application matches rebuilding and rejects gaps and duplicates", () => {
+    const setup = validateT20MatchSetup(JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json", "utf8")), readFileSync("packages/data/worlds/fictional-eight-01.json"), JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.manifest.json", "utf8")));
+    const session = runFixtureT20(setup), accumulator = createMatchAnalyticsAccumulator(2);
+    accumulator.append(session.events[0]!);
+    const before = accumulator.snapshot();
+    expect(() => accumulator.append(session.events[0]!)).toThrow("SEQUENCE_ORDER");
+    expect(() => accumulator.append(session.events[2]!)).toThrow("SEQUENCE_ORDER");
+    expect(accumulator.appliedSequence).toBe(1);
+    expect(accumulator.snapshot()).toEqual(before);
+    for (const event of session.events.slice(1)) {
+      if (event.type === "DELIVERY_RECORDED" && accumulator.snapshot().worm.length === 0) {
+        const invalid = structuredClone(event);
+        (invalid.payload as { event: { shotSector: number } }).event.shotSector = 99;
+        const prior = accumulator.snapshot();
+        expect(() => accumulator.append(invalid)).toThrow("SHOT_SECTOR");
+        expect(accumulator.snapshot()).toEqual(prior);
+      }
+      accumulator.append(event);
+      if (event.sequence % 100 === 0) expect(accumulator.snapshot()).toEqual(projectT20MatchAnalytics(session.events.slice(0, event.sequence)));
+    }
+    expect(accumulator.snapshot(projectT20Scorecard(session))).toEqual(projectT20MatchAnalytics(session.events, projectT20Scorecard(session)));
+    const cache = createMatchAnalyticsCache(2);
+    cache.update(session.events.slice(0, 100));
+    cache.update(session.events);
+    expect(cache.snapshot(projectT20Scorecard(session))).toEqual(projectT20MatchAnalytics(session.events, projectT20Scorecard(session)));
+    cache.update(session.events.slice(0, 50));
+    expect(cache.appliedSequence).toBe(50);
+    expect(cache.snapshot()).toEqual(projectT20MatchAnalytics(session.events.slice(0, 50)));
+    cache.update(session.events);
+    expect(cache.snapshot()).toEqual(projectT20MatchAnalytics(session.events));
+    const detached = accumulator.snapshot();
+    (detached.finalRuns as number[])[0] = -1;
+    expect(accumulator.snapshot().finalRuns[0]).not.toBe(-1);
+    expect(detached.shotSectors.length).toBeGreaterThan(0);
+    const originalRuns = accumulator.snapshot().shotSectors[0]!.batRuns;
+    (detached.shotSectors[0] as { batRuns: number }).batRuns = -1;
+    expect(accumulator.snapshot().shotSectors[0]!.batRuns).toBe(originalRuns);
+  }, 120000);
   test("does not invent scores or tracking data on an empty event stream", () => {
     const analytics = projectT20MatchAnalytics([]);
     expect(analytics.overSummaries).toEqual([]);

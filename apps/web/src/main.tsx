@@ -13,6 +13,7 @@ import {
   type Response,
   type Verification,
   type PersistenceView,
+  type AnalyticsProgress,
 } from "./match/protocol.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
@@ -96,6 +97,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
   const [verification, setVerification] = useState<Verification | null>(null);
+  const rebuildRequest = useRef<string | null>(null);
+  const [analyticsRebuild, setAnalyticsRebuild] = useState<{ state: "IDLE" | "RUNNING" | "STOPPING" | "COMPLETE" | "CANCELLED"; applied: number; total: number }>({ state: "IDLE", applied: 0, total: 0 });
   const [persistence, setPersistence] = useState<PersistenceView | null>(null);
   const [scale, setScale] = useState(() => {
       const saved = localStorage.getItem("lcxxvi-match-scale");
@@ -118,8 +121,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   }, [scale, commentary, density]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
-    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE"].includes(body.type)) { setBatchProgress(null); lastAiChecked.current = {}; }
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
+      setBatchProgress(null);
+      setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
+      lastAiChecked.current = {};
+    }
     const requestId = `ui-${++serial.current}`;
+    if (body.type === "REBUILD_ANALYTICS") { rebuildRequest.current = requestId; setAnalyticsRebuild({ state: "RUNNING", applied: 0, total: 0 }); }
     inflight.current = requestId;
     setBusy(true);
     setError("");
@@ -147,7 +155,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       name: owner,
     });
     worker.current = w;
-    w.onmessage = (e: MessageEvent<Response>) => {
+    w.onmessage = (e: MessageEvent<Response | AnalyticsProgress>) => {
       const r = e.data;
       if (
         r.version !== UI_VERSION ||
@@ -160,10 +168,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         );
         return;
       }
+      if ("type" in r) {
+        if (r.type === "ANALYTICS_PROGRESS" && r.requestId === rebuildRequest.current) setAnalyticsRebuild(current => ({ ...current, applied: r.applied, total: r.total }));
+        return;
+      }
       if (r.requestId !== inflight.current) return;
       inflight.current = null;
       currentRevision.current = r.revision;
-      serial.current = Math.max(serial.current, 10000 + r.revision);
+      serial.current = Math.max(serial.current, 10000 + r.revision, r.commandIdFloor ?? 0);
       if (r.careerFixture && !careerLaunch.current) {
         // The durable binding restored the career link that sessionStorage lost with the old tab.
         const restored = r.careerFixture as CareerUserMatchLaunch;
@@ -199,6 +211,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       if (r.catalog) setCatalog(r.catalog);
       setView(r.view);
       setVerification(r.verification);
+      if (r.requestId === rebuildRequest.current) {
+        rebuildRequest.current = null;
+        setAnalyticsRebuild(r.analyticsRebuild ? { ...r.analyticsRebuild } : { state: "IDLE", applied: 0, total: 0 });
+      }
       if (r.persistence) setPersistence(r.persistence);
       if (r.delegation) setDelegation(r.delegation);
       // These are caches only. The career rebuilds the result from the durable match and binding, so a
@@ -257,6 +273,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
     };
     const failed = () => {
+      rebuildRequest.current = null;
+      setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
       advanceBatch.current = null;
       setBatchState("idle");
       setFatal(true);
@@ -434,6 +452,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     setBatchProgress(null);
     setBatchState("running");
     act({ kind: "ADVANCE", payload: { scope: "OVER" } });
+  }
+  function cancelAnalyticsRebuild() {
+    if (!rebuildRequest.current) return;
+    setAnalyticsRebuild(current => ({ ...current, state: "STOPPING" }));
+    worker.current?.postMessage({ version: UI_VERSION, type: "CANCEL_ANALYTICS", requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, targetRequestId: rebuildRequest.current });
   }
   function stopAdvance() {
     if (!advanceBatch.current) return;
@@ -960,7 +983,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </section>
           )}
-          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} />}
+          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>

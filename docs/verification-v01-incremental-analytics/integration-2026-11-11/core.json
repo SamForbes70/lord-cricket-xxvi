@@ -1,0 +1,35 @@
+{
+  "testedCommit": "b9eb19288a9204fb8a294d2b7842228c1c1f7847",
+  "platform": "Linux cloud",
+  "node": "v24.22.1",
+  "npm": "11.9.0",
+  "command": "npm run verify:09:core",
+  "status": "PASS",
+  "schemas": 188,
+  "unitTestsPassed": 690,
+  "coreLogSha256": "d00ac754454e2b55145b27a89cba2afb459db7faf8ef26ffbf720ce90ee8d62f",
+  "ownerPcAcceptance": "NOT_ESTABLISHED",
+  "referenceHardwareAcceptance": "NOT_ESTABLISHED",
+  "hostedChecks": "PENDING",
+  "browser": {
+    "status": "PASS",
+    "command": "npx playwright test --config playwright.ui.config.ts tests/ui/analytics-formats.spec.ts --reporter=list",
+    "passed": 6,
+    "scope": "T20, ODI and RED_BALL in Chromium and Firefox; rebuild, cancellation-or-completion race, unchanged revision and replay",
+    "sha256": "bdd5a0971122b2e6ffb8c1ec7b3affad5b7031181dd0ad59af78a7afa32017b5"
+  },
+  "season": {
+    "status": "PASS",
+    "command": "npm run management:acceptance",
+    "fixtures": 56,
+    "portableRoundTrip": true,
+    "deterministicContinuation": true,
+    "sha256": "0298f18b91a2914622a370f85e4365b011744d75183236a732e53749aa98f89c"
+  },
+  "smoke": {
+    "status": "PASS",
+    "command": "npm run smoke -- --workers=1",
+    "passed": 23,
+    "sha256": "fa541f100f201efa444514859c3e8eacbeb009fe1c24fb56f984dae248774d86"
+  }
+}
