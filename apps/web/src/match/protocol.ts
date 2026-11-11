@@ -149,6 +149,14 @@ export const RequestSchema = z.discriminatedUnion("type", [
     type: z.literal("IMPORT_SAVE"),
     archive: z.instanceof(Uint8Array),
   }),
+  /** Re-associates a restored match with its career fixture from the durable binding. Never resets state. */
+  z.strictObject({ ...base, type: z.literal("RECOVER_MANAGED") }),
+  /** Releases a pending career binding so the match is kept as a plain exhibition. */
+  z.strictObject({ ...base, type: z.literal("ABANDON_MANAGED") }),
+  /** Tries to take the writer lease again after it expired, then reloads the durable save. */
+  z.strictObject({ ...base, type: z.literal("RETRY_WRITER") }),
+  /** Best-effort release of the writer lease when the page is hidden for good. Not required for correctness. */
+  z.strictObject({ ...base, type: z.literal("RELEASE_WRITER") }),
 ]);
 export type Request = z.infer<typeof RequestSchema>;
 export type Selection = z.infer<typeof T20TeamSelectionSchema>;
@@ -247,6 +255,8 @@ export type CareerMatchResult = {
   conditionDelta: MatchConditionDelta;
 };
 
+export type CareerFixtureLaunch = z.infer<typeof CareerFixtureLaunchSchema>;
+export type ManagedStatus = "PENDING" | "APPLIED" | "ABANDONED";
 export type Response = {
   version: typeof UI_VERSION;
   requestId: string;
@@ -260,6 +270,10 @@ export type Response = {
   archive?: Uint8Array | null;
   careerResult?: CareerMatchResult | null;
   rosterCareerSession?: unknown;
+  /** Set by RECOVER_MANAGED: the validated launch restored from the durable binding, or null when none applies. */
+  careerFixture?: CareerFixtureLaunch | null;
+  /** Status of the durable binding for the active match, when one exists. */
+  managedStatus?: ManagedStatus | null;
   acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
   delegation?: DelegationJournal;
 };

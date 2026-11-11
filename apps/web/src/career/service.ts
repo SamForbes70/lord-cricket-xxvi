@@ -203,6 +203,14 @@ export class CareerApplicationService {
     return this.repository.list();
   }
 
+  /** Best-effort release of the writer lease when the page goes away. The lease still expires on its own. */
+  async releaseWriter(): Promise<void> {
+    if (this.saveId && !this.readOnly) {
+      await this.repository.releaseLease(this.saveId, this.ownerId);
+      this.readOnly = true;
+    }
+  }
+
   async leaveCareer(): Promise<void> {
     if (this.saveId) {
       if (!this.readOnly) await this.repository.releaseLease(this.saveId, this.ownerId);

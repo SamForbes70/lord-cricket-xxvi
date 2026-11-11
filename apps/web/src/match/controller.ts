@@ -379,6 +379,8 @@ export function createMatchController(
     restore,
     setWorldCopy,
     snapshot,
+    /** The career launch this controller is currently bound to, if any. */
+    boundFixture: () => careerFixture,
     currentResponse,
     handle(raw: unknown): Response {
       let id = "invalid",

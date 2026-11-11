@@ -5,6 +5,7 @@ import { IndexedDbSeasonRepository, createRosterSeasonPortableArchive, readRoste
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { changeRosterSeasonTraining, completeRosterManagedFixture, createRosterSeason, hasAcceptedRosterManagedFixture, prepareRosterManagedFixture, simulateNextRosterSeasonFixture, validateRosterSeasonState } from "./roster-season.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./service.js";
+import { managedBindings, recordManagedLaunch, settleManagedMatches } from "./managed-match.js";
 import "./career.css";
 
 const repo = new IndexedDbSeasonRepository();
@@ -23,6 +24,8 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
   const [saves, setSaves] = useState<SeasonSaveSummary[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pendingRound, setPendingRound] = useState<number | null>(null);
+  const awaitedState = React.useRef<RosterSeasonState | null>(null);
   const [scale, setScale] = useState(() => {
     const saved = localStorage.getItem("lcxxvi-career-scale");
     return saved && ["90", "100", "115", "125", "150"].includes(saved) ? saved : "100";
@@ -38,6 +41,7 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
   async function open(saveId: string): Promise<OpenCareer> {
     const loaded = await repo.loadRoster(saveId);
     if (!loaded) throw new Error("Career save not found.");
+    awaitedState.current = validateRosterSeasonState(loaded.state, loaded.rosterPack);
     return { saveId, state: validateRosterSeasonState(loaded.state, loaded.rosterPack), pack: loaded.rosterPack, recovered: loaded.recovered };
   }
   async function save(current: OpenCareer | null, state: RosterSeasonState, rosterPack: StagedRosterPack, kind: "AUTO" | "IMPORTED" = "AUTO"): Promise<OpenCareer> {
@@ -49,25 +53,54 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
       expectedRevision: current?.state.revision ?? null, state, rosterPack, command, ownerId: owner, now, updatedAt: new Date().toISOString() });
     return { saveId, state, pack: rosterPack, recovered: false };
   }
+  /** Applies a completed roster match to its career. A completion already accepted with the same result is a no-op. */
+  async function applyRosterResult(launch: CareerUserMatchLaunch, result: unknown): Promise<void> {
+    if (launch.launchVersion !== "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER") throw new Error("The pending match is not a roster career fixture.");
+    const current = await open(launch.saveId);
+    if (current.state.stateSha256 !== launch.careerStateSha256) {
+      if (!current.state.outcomes.some(outcome => "version" in outcome && outcome.completion.fixtureId === launch.fixtureId && outcome.completion.matchId === launch.matchId) || !hasAcceptedRosterManagedFixture(current.state, current.pack, result)) throw new Error("The career changed after the match started. Its result has been retained.");
+      setActive(current);
+    } else {
+      const state = completeRosterManagedFixture(current.state, current.pack, result);
+      setActive(await save(current, state, current.pack));
+    }
+  }
+  function clearLaunchCache() {
+    try { sessionStorage.removeItem(resultKey); sessionStorage.removeItem(launchKey); } catch { /* storage unavailable */ }
+  }
   useEffect(() => {
     void run(async () => {
-      const pending = sessionStorage.getItem(resultKey), rawLaunch = sessionStorage.getItem(launchKey);
+      const saveId = await repo.activeRosterSaveId();
+      if (saveId) setActive(await open(saveId));
+      if (!inspectionOnly && saveId) {
+        // Durable path first: a completed pending match is applied from its saved checkpoint and binding.
+        const settle = () => settleManagedMatches({
+          careerSaveId: saveId,
+          careerKind: "ROSTER",
+          isFixtureCompleted: (fixtureId) => { const state = awaitedState.current; return state ? state.outcomes.some(outcome => "version" in outcome && outcome.completion.fixtureId === fixtureId) : false; },
+          apply: async ({ launch, result }) => {
+            if (!result.rosterCareerSession) throw new Error("The completed match produced no roster result.");
+            await applyRosterResult(launch as CareerUserMatchLaunch, result.rosterCareerSession);
+          },
+        });
+        let settled = await settle();
+        // The closed tab's writer lease can last up to 12 s. Retry for a bounded time instead of failing.
+        for (let attempt = 0; attempt < 5 && settled.errors.some(message => /open in another tab/.test(message)); attempt++) {
+          await new Promise(resolve => setTimeout(resolve, 3_000));
+          settled = await settle();
+        }
+        if (settled.applied.length) clearLaunchCache();
+        if (settled.errors.length) setError(settled.errors.join(" "));
+        setPendingRound(settled.pending.length ? ((settled.pending[0]!.launch as { roundNumber?: number }).roundNumber ?? null) : null);
+      }
+      // Legacy in-session handoff for launches that predate bindings. A repeat of an accepted result is a no-op.
+      let pending: string | null = null, rawLaunch: string | null = null;
+      try { pending = sessionStorage.getItem(resultKey); rawLaunch = sessionStorage.getItem(launchKey); } catch { /* storage unavailable */ }
       if (pending && rawLaunch && !inspectionOnly) {
         const launch = JSON.parse(rawLaunch) as CareerUserMatchLaunch;
-        if (launch.launchVersion !== "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER") throw new Error("The pending match is not a roster career fixture.");
-        const current = await open(launch.saveId);
-        const result = JSON.parse(pending);
-        if (current.state.stateSha256 !== launch.careerStateSha256) {
-          if (!current.state.outcomes.some(outcome => "version" in outcome && outcome.completion.fixtureId === launch.fixtureId && outcome.completion.matchId === launch.matchId) || !hasAcceptedRosterManagedFixture(current.state, current.pack, result)) throw new Error("The career changed after the match started. Its result has been retained.");
-          setActive(current);
-        } else {
-          const state = completeRosterManagedFixture(current.state, current.pack, result);
-          setActive(await save(current, state, current.pack));
-        }
-        sessionStorage.removeItem(resultKey); sessionStorage.removeItem(launchKey);
-      } else {
-        const saveId = await repo.activeRosterSaveId();
-        if (saveId) setActive(await open(saveId));
+        await applyRosterResult(launch, JSON.parse(pending));
+        clearLaunchCache();
+        try { await managedBindings.resolve(launch.matchGameId, "APPLIED", "RESULT_APPLIED"); } catch { /* no binding for legacy launches */ }
       }
     }, true);
   }, []);
@@ -102,7 +135,9 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
       homeTeamId: fixture.homeTeamId, awayTeamId: fixture.awayTeamId, groundId: fixture.groundId, matchId: fixture.matchId,
       matchGameId: `career-match-${fixture.fixtureId}`, matchSeed: fixture.matchSeed, selections: [...ready.selections],
       careerStateSha256: current.state.stateSha256, managedTeamId: current.state.controlledTeamId };
-    sessionStorage.setItem(launchKey, JSON.stringify(launch)); window.location.hash = "#exhibition";
+    // Persist the link before launching so it survives a closed tab or browser.
+    const recorded = await recordManagedLaunch(launch) as CareerUserMatchLaunch;
+    sessionStorage.setItem(launchKey, JSON.stringify(recorded)); window.location.hash = "#exhibition";
   }
   return <main className="career-shell" style={{ fontSize: `${Number(scale) / 100}rem` }}>
     {inspectionOnly && <p role="status">Career inspection only. <a href="#exhibition">Return to match</a> before changing the career.</p>}
@@ -122,6 +157,7 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
       {active.recovered && <button disabled={busy || inspectionOnly} onClick={() => void run(async () => setActive(await save(null, active.state, active.pack)))}>Create recovered copy</button>}
       <label>Copy name <input value={copyName} maxLength={120} disabled={inspectionOnly} onChange={event => setCopyName(event.currentTarget.value)} /></label>
       <button disabled={busy || inspectionOnly || active.recovered || !copyName.trim()} onClick={() => void run(copyCareer)}>Save career copy</button>
+      {pendingRound !== null && <p role="status" data-testid="pending-career-match">A match for round {pendingRound} is already in progress. Play next managed match resumes it.</p>}
       <button disabled={busy || inspectionOnly || active.recovered || active.state.phase === "COMPLETE"} onClick={() => void run(play)}>Play next managed match</button>
       <button disabled={busy || inspectionOnly || active.recovered || active.state.phase === "COMPLETE"} onClick={() => void run(async () => setActive(await save(active, simulateNextRosterSeasonFixture(active.state, active.pack), active.pack)))}>Simulate next fixture</button>
       <button disabled={busy || inspectionOnly} onClick={() => void run(async () => { const loaded = await repo.loadRoster(active.saveId); if (!loaded) throw new Error("Career save not found."); const bytes = await createRosterSeasonPortableArchive(active.state, active.pack, loaded.summary, new Date().toISOString()); const blob = new Blob([new Uint8Array(bytes).buffer], { type: "application/zip" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "lord-cricket-roster-career.lcxxvi"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 0); })}>Export career</button>

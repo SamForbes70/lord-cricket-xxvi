@@ -1,0 +1,48 @@
+[2m[WebServer] [22m(node:6948) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:6961) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:6979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/ui/managed-recovery.spec.ts:2:1 › a managed match can be recovered in a fresh browser tab (13.1s)
+
+
+  1) [chromium] › tests/ui/managed-recovery.spec.ts:2:1 › a managed match can be recovered in a fresh browser tab 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/this result will return to the management career only after the match is complete/i)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByText(/this result will return to the management career only after the match is complete/i)[22m
+
+
+      18 |   await fresh.goto("/#exhibition");
+      19 |   await expect(fresh.locator("#decision")).toHaveAttribute("data-revision", revision!, { timeout: 60_000 });
+    > 20 |   await expect(fresh.getByText(/this result will return to the management career only after the match is complete/i)).toBeVisible();
+         |                                                                                                                       ^
+      21 | });
+      22 |
+        at /workspace/work/lord-cricket-recovery/tests/ui/managed-recovery.spec.ts:20:119
+
+    Error Context: test-results-ui/managed-recovery-a-managed-3fa68-ered-in-a-fresh-browser-tab-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-ui/managed-recovery-a-managed-3fa68-ered-in-a-fresh-browser-tab-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-ui/managed-recovery-a-managed-3fa68-ered-in-a-fresh-browser-tab-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/ui/managed-recovery.spec.ts:2:1 › a managed match can be recovered in a fresh browser tab 
