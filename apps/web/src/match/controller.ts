@@ -283,6 +283,7 @@ export function createMatchController(
       finalEventHash: session.lastEventHash,
       sourceCompletionSha256,
       conditionDelta,
+      completedSession: structuredClone(session),
     };
   }
 

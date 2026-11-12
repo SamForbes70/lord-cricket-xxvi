@@ -60,3 +60,17 @@
 .world-editor label { display:flex; flex-direction:column; gap:4px; }
 .world-editor input, .world-editor select { max-width:100%; min-width:0; }
 .world-editor .action-row { margin:16px 0; }
+.save-slot-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px; align-items:stretch; }
+.save-slot-row .save-continue-btn { text-align:left; width:100%; min-width:0; }
+.save-slot-row .save-inspect-btn { white-space:nowrap; }
+.section-bar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.section-bar h3 { margin:0; }
+.checkpoint-inspector, .replay-viewer { margin:16px 0 22px; border-color:#6d8f7d; }
+.recovery-title-field { display:block; margin:12px 0; }
+.recovery-title-field input { max-width:420px; width:100%; margin-top:4px; }
+.replay-meta { font-size:.9em; color:#31473d; margin:12px 0; overflow-wrap:anywhere; }
+.replay-viewer button[aria-pressed="true"] { background:#194b38; color:#fff; border-color:#194b38; }
+.replay-btn { white-space:nowrap; padding:.35em .65em; min-height:34px; }
+.file-import-label { display:block; margin-top:14px; }
+.career-error p { margin:.4em 0; }
+.career-error small { display:block; color:#5a2618; }

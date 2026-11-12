@@ -258,6 +258,7 @@ export type CareerMatchResult = {
   finalEventHash: string;
   sourceCompletionSha256: string;
   conditionDelta: MatchConditionDelta;
+  completedSession?: unknown;
 };
 
 export type CareerFixtureLaunch = z.infer<typeof CareerFixtureLaunchSchema>;

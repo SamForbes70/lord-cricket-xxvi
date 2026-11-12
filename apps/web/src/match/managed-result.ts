@@ -1,4 +1,5 @@
 import { canonicalJson, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import type { T20Session } from "@lcxxvi/simulation";
 import { createMatchController } from "./controller.js";
 import { CareerFixtureLaunchSchema, UI_VERSION, type CareerFixtureLaunch, type CareerMatchResult } from "./protocol.js";
 
@@ -10,7 +11,7 @@ export type SavedManagedMatch = {
 
 export type RegeneratedManagedResult =
   | { complete: false }
-  | { complete: true; careerResult: CareerMatchResult | null; rosterCareerSession: unknown | null };
+  | { complete: true; careerResult: CareerMatchResult | null; rosterCareerSession: unknown | null; t20Session: T20Session | null };
 
 /**
  * Rebuilds the career result from a durable match checkpoint and its validated launch, with no live
@@ -47,5 +48,10 @@ export function regenerateManagedResult(
   if (controller.snapshot()?.core.phase !== "COMPLETE") return { complete: false };
   const response = controller.currentResponse("ui-2");
   if (response.error) throw new Error(response.error);
-  return { complete: true, careerResult: response.careerResult ?? null, rosterCareerSession: response.rosterCareerSession ?? null };
+  return {
+    complete: true,
+    careerResult: response.careerResult ?? null,
+    rosterCareerSession: response.rosterCareerSession ?? null,
+    t20Session: roster ? null : (controller.snapshot() as T20Session | null),
+  };
 }

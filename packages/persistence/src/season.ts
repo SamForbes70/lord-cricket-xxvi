@@ -1,14 +1,26 @@
 import {
   canonicalJson,
+  CompletedCareerMatchEventArchiveSchema,
+  MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
+  MAX_SEASON_EVENT_ARCHIVES_TOTAL_BYTES,
+  SeasonCheckpointGenerationOptionSchema,
+  SeasonCheckpointInspectionSchema,
   SeasonDurableCommandSchema,
   SeasonSaveSummarySchema,
+  T20EventChainManifestSchema,
+  T20MatchEventSchema,
+  T20MatchSetupRequestSchema,
+  T20SeasonMatchCompletionSchema,
   T20SeasonStateCoreSchema,
   T20SeasonStateSchema,
   SeasonArchiveCoreSchema,
   SeasonArchiveSchema,
   NewGameWorldCopySchema,
   RosterSeasonStateSchema, StagedRosterPackSchema,
+  type CompletedCareerMatchEventArchive,
   type RosterSeasonState, type StagedRosterPack,
+  type SeasonCheckpointGenerationOption,
+  type SeasonCheckpointInspection,
   type SeasonDurableCommand,
   type SeasonSaveSummary,
   type T20SeasonState,
@@ -16,6 +28,8 @@ import {
   type SeasonArchive,
   type NewGameWorldCopy,
 } from "@lcxxvi/contracts";
+
+export const CAREER_MATCH_EVENTS_SCOPE = "CAREER_MATCH_EVENTS_V1" as const;
 
 export const SEASON_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V1" as const;
 export const SEASON_PRESENTATION_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V2_PRESENTATION" as const;
@@ -59,6 +73,7 @@ export type SeasonDurableCommit = {
   updatedAt: string;
   setActive?: boolean;
   worldCopy?: NewGameWorldCopy | null;
+  matchEventArchives?: readonly CompletedCareerMatchEventArchive[];
   testAbortAfterWrites?: boolean;
   copySource?: { saveId: string; revision: number; stateSha256: string; now: () => number };
 };
@@ -232,6 +247,253 @@ export async function recoverSeasonCheckpoint(rows: readonly SeasonCheckpoint[],
   throw new Error("SEASON_SAVE_CORRUPT_NO_VALID_CHECKPOINT");
 }
 
+export async function sealCompletedCareerMatchEventArchive(input: {
+  completion: unknown;
+  setupRequest?: unknown;
+  eventChain?: unknown;
+  events: unknown;
+}): Promise<CompletedCareerMatchEventArchive> {
+  const completion = T20SeasonMatchCompletionSchema.parse(input.completion);
+  const events = (Array.isArray(input.events) ? input.events : []).map((ev) => T20MatchEventSchema.parse(ev));
+  assertSeason(events.length > 0 && events.length <= 600, "MATCH_EVENT_ARCHIVE_COUNT");
+  for (let index = 0; index < events.length; index += 1) {
+    const ev = events[index]!;
+    assertSeason(ev.sequence === index + 1, `MATCH_EVENT_ARCHIVE_SEQUENCE:${index}`);
+    if (index > 0) assertSeason(ev.previousHash === events[index - 1]!.eventHash, `MATCH_EVENT_ARCHIVE_CHAIN:${index}`);
+  }
+  const expectedEventHashes = await Promise.all(
+    events.map((ev) =>
+      seasonSha256Text(
+        canonicalJson([ev.version, ev.sequence, ev.commandId, ev.type, ev.payload, ev.previousHash, ev.stateHash]),
+      ),
+    ),
+  );
+  for (let index = 0; index < events.length; index += 1) {
+    assertSeason(events[index]!.eventHash === expectedEventHashes[index], `MATCH_EVENT_ARCHIVE_EVENT_HASH:${index}`);
+  }
+  const setupRequest = T20MatchSetupRequestSchema.parse(input.setupRequest);
+  const eventChain = T20EventChainManifestSchema.parse(input.eventChain);
+  const finalEventHash = events.at(-1)!.eventHash;
+  assertSeason(
+    eventChain.eventCount === events.length && eventChain.finalEventHash === finalEventHash,
+    "MATCH_EVENT_ARCHIVE_CHAIN_MANIFEST",
+  );
+  const eventsSha256 = await seasonSha256Text(canonicalJson(events));
+  const encoder = new TextEncoder();
+  const rawZero = {
+    archiveVersion: "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1" as const,
+    seasonId: completion.seasonId,
+    scheduleSha256: completion.scheduleSha256,
+    fixtureId: completion.fixtureId,
+    matchId: completion.matchId,
+    fixtureOrdinal: completion.fixtureOrdinal,
+    roundNumber: completion.roundNumber,
+    matchDayDate: completion.matchDayDate,
+    source: completion.source,
+    sourceCompletionSha256: completion.sourceCompletionSha256,
+    scorecardSha256: completion.scorecardSha256,
+    setupRequest,
+    eventChain,
+    eventCount: events.length,
+    finalEventHash,
+    eventsSha256,
+    events,
+    byteLength: 0,
+  };
+  const baseLen = encoder.encode(canonicalJson(rawZero)).byteLength;
+  let byteLength = baseLen - 1 + String(baseLen).length;
+  byteLength = baseLen - 1 + String(byteLength).length;
+  const core = { ...rawZero, byteLength };
+  const canonicalCore = canonicalJson(core);
+  assertSeason(
+    encoder.encode(canonicalCore).byteLength === byteLength && byteLength <= MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
+    "MATCH_EVENT_ARCHIVE_SIZE_EXCEEDED",
+  );
+  return CompletedCareerMatchEventArchiveSchema.parse({
+    ...core,
+    archiveSha256: await seasonSha256Text(canonicalCore),
+  });
+}
+
+export async function validateCompletedCareerMatchEventArchive(
+  raw: unknown,
+  completionRaw?: unknown,
+): Promise<CompletedCareerMatchEventArchive> {
+  const archive = CompletedCareerMatchEventArchiveSchema.parse(raw);
+  const { archiveSha256, ...core } = archive;
+  const canonicalCore = canonicalJson(core);
+  const byteLength = new TextEncoder().encode(canonicalCore).byteLength;
+  assertSeason(
+    byteLength === archive.byteLength && byteLength <= MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
+    "MATCH_EVENT_ARCHIVE_BYTE_LENGTH",
+  );
+  assertSeason(archive.events.length === archive.eventCount, "MATCH_EVENT_ARCHIVE_COUNT_MISMATCH");
+  const [coreHash, eventsHash] = await Promise.all([
+    seasonSha256Text(canonicalCore),
+    seasonSha256Text(canonicalJson(archive.events)),
+  ]);
+  assertSeason(coreHash === archiveSha256, "MATCH_EVENT_ARCHIVE_HASH_MISMATCH");
+  assertSeason(eventsHash === archive.eventsSha256, "MATCH_EVENT_ARCHIVE_EVENTS_HASH");
+  for (let index = 0; index < archive.events.length; index += 1) {
+    const ev = archive.events[index]!;
+    assertSeason(ev.sequence === index + 1, `MATCH_EVENT_ARCHIVE_SEQUENCE:${index}`);
+    if (index > 0) assertSeason(ev.previousHash === archive.events[index - 1]!.eventHash, `MATCH_EVENT_ARCHIVE_CHAIN:${index}`);
+  }
+  const expectedEventHashes = await Promise.all(
+    archive.events.map((ev) =>
+      seasonSha256Text(
+        canonicalJson([ev.version, ev.sequence, ev.commandId, ev.type, ev.payload, ev.previousHash, ev.stateHash]),
+      ),
+    ),
+  );
+  for (let index = 0; index < archive.events.length; index += 1) {
+    assertSeason(archive.events[index]!.eventHash === expectedEventHashes[index], `MATCH_EVENT_ARCHIVE_EVENT_HASH:${index}`);
+  }
+  assertSeason(
+    archive.events.at(-1)!.eventHash === archive.finalEventHash &&
+      archive.eventChain.finalEventHash === archive.finalEventHash &&
+      archive.eventChain.eventCount === archive.eventCount,
+    "MATCH_EVENT_ARCHIVE_FINAL_HASH",
+  );
+  if (completionRaw !== undefined) {
+    const completion = T20SeasonMatchCompletionSchema.parse(completionRaw);
+    assertSeason(
+      completion.seasonId === archive.seasonId &&
+        completion.scheduleSha256 === archive.scheduleSha256 &&
+        completion.fixtureId === archive.fixtureId &&
+        completion.matchId === archive.matchId &&
+        completion.fixtureOrdinal === archive.fixtureOrdinal &&
+        completion.roundNumber === archive.roundNumber &&
+        completion.matchDayDate === archive.matchDayDate &&
+        completion.source === archive.source &&
+        completion.sourceCompletionSha256 === archive.sourceCompletionSha256 &&
+        completion.scorecardSha256 === archive.scorecardSha256,
+      `MATCH_EVENT_ARCHIVE_COMPLETION_BINDING:${archive.fixtureId}`,
+    );
+  }
+  return archive;
+}
+
+export async function validateSeasonMatchEventArchiveSet(
+  archivesRaw: readonly unknown[],
+  stateRaw: unknown,
+): Promise<{ archives: CompletedCareerMatchEventArchive[]; totalBytes: number }> {
+  const state = await validateT20SeasonState(stateRaw);
+  const completionByFixture = new Map(state.completedMatches.map((c) => [c.fixtureId, c]));
+  const seenFixtures = new Set<string>();
+  const archives: CompletedCareerMatchEventArchive[] = [];
+  let totalBytes = 0;
+  for (const item of archivesRaw) {
+    const candidateFixtureId =
+      typeof item === "object" && item !== null && typeof (item as { fixtureId?: unknown }).fixtureId === "string"
+        ? (item as { fixtureId: string }).fixtureId
+        : undefined;
+    const completion = candidateFixtureId ? completionByFixture.get(candidateFixtureId) : undefined;
+    const parsed = await validateCompletedCareerMatchEventArchive(item, completion);
+    assertSeason(Boolean(completion), `MATCH_EVENT_ARCHIVE_UNKNOWN_FIXTURE:${parsed.fixtureId}`);
+    assertSeason(!seenFixtures.has(parsed.fixtureId), `MATCH_EVENT_ARCHIVE_DUPLICATE_FIXTURE:${parsed.fixtureId}`);
+    seenFixtures.add(parsed.fixtureId);
+    totalBytes += parsed.byteLength;
+    assertSeason(totalBytes <= MAX_SEASON_EVENT_ARCHIVES_TOTAL_BYTES, "MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED");
+    archives.push(parsed);
+  }
+  archives.sort((a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId));
+  return { archives, totalBytes };
+}
+
+export async function inspectSeasonCheckpoints(input: {
+  saveId: string;
+  title: string;
+  currentSerial: number;
+  currentGeneration: number;
+  rows: readonly SeasonCheckpoint[];
+}): Promise<SeasonCheckpointInspection> {
+  const corruptedGenerations: number[] = [];
+  const validGenerations: SeasonCheckpointGenerationOption[] = [];
+  for (const row of [...input.rows].sort((a, b) => b.checkpointSerial - a.checkpointSerial)) {
+    if (await seasonSha256Text(row.payload) !== row.sha256) {
+      corruptedGenerations.push(row.generation);
+      continue;
+    }
+    try {
+      const state = await validateT20SeasonState(JSON.parse(row.payload));
+      validGenerations.push(
+        SeasonCheckpointGenerationOptionSchema.parse({
+          generation: row.generation,
+          checkpointSerial: row.checkpointSerial,
+          revision: state.revision,
+          completedFixtures: state.completedMatches.length,
+          currentDate: state.careerState.currentDate,
+          phase: state.phase,
+          stateSha256: state.stateSha256,
+          createdAt: row.createdAt,
+        }),
+      );
+    } catch {
+      corruptedGenerations.push(row.generation);
+    }
+  }
+  return SeasonCheckpointInspectionSchema.parse({
+    saveId: input.saveId,
+    title: input.title,
+    currentSerial: input.currentSerial,
+    currentGeneration: input.currentGeneration,
+    corruptedGenerations,
+    validGenerations,
+  });
+}
+
+export type SeasonPersistenceErrorDescription = {
+  code: string;
+  summary: string;
+  guidance: string;
+};
+
+export function describeSeasonPersistenceError(error: unknown): SeasonPersistenceErrorDescription {
+  const raw = error instanceof Error ? error.message : String(error ?? "UNKNOWN_ERROR");
+  const code = raw.split(":")[0]?.trim() || "UNKNOWN_ERROR";
+  if (code === "SEASON_SAVE_READ_ONLY" || /read-only|another tab/i.test(raw)) {
+    return {
+      code: code === "SEASON_SAVE_READ_ONLY" ? code : "SEASON_SAVE_READ_ONLY",
+      summary: "This career is open in another tab. It is currently read-only here.",
+      guidance: "Close or leave the other tab, or save a manual copy once the writer lease expires.",
+    };
+  }
+  if (code === "SEASON_SAVE_CORRUPT_NO_VALID_CHECKPOINT" || code === "ROSTER_SEASON_SAVE_CORRUPT") {
+    return {
+      code,
+      summary: "No valid checkpoint could be verified for this career save.",
+      guidance: "The damaged save was left untouched. Load an earlier manual copy or import a validated .lcxxvi archive.",
+    };
+  }
+  if (code === "SEASON_COPY_SOURCE_CHANGED_OR_LOCKED" || code === "ROSTER_COPY_SOURCE_CHANGED_OR_LOCKED") {
+    return {
+      code,
+      summary: "The source career changed or lost its writer lock before the copy finished.",
+      guidance: "Reload the career so you have the latest revision and try creating the manual copy again.",
+    };
+  }
+  if (code.startsWith("SEASON_ARCHIVE_") || code.startsWith("ROSTER_SEASON_ARCHIVE_") || code === "ARCHIVE_SIZE_INVALID") {
+    return {
+      code,
+      summary: "The portable .lcxxvi archive failed cryptographic or schema verification.",
+      guidance: "Only unmodified .lcxxvi archives exported from a compatible Lord Cricket XXVI build can be imported.",
+    };
+  }
+  if (code.includes("MATCH_EVENT_ARCHIVE")) {
+    return {
+      code,
+      summary: "A completed match replay archive exceeded bounds or failed integrity checks.",
+      guidance: "Career standings and scorecards remain intact; replay is disabled only for affected fixtures.",
+    };
+  }
+  return {
+    code,
+    summary: raw,
+    guidance: "Check whether another tab owns the career or export a backup .lcxxvi archive before retrying.",
+  };
+}
+
 export class IndexedDbSeasonRepository {
   private dbPromise: Promise<IDBDatabase> | null = null;
   constructor(private readonly databaseName = DB_NAME) {}
@@ -307,6 +569,19 @@ export class IndexedDbSeasonRepository {
     const worldCopy = input.worldCopy ? await validateStoredWorldCopy(input.worldCopy) : null;
     const worldCopyPayload = worldCopy ? canonicalJson(worldCopy) : null;
     const suppliedCopyHash = worldCopyPayload ? await seasonSha256Text(worldCopyPayload) : null;
+    const preparedArchives: Array<{ fixtureId: string; payload: string; sha256: string; bytes: number }> = [];
+    if (input.matchEventArchives?.length) {
+      const validatedSet = await validateSeasonMatchEventArchiveSet(input.matchEventArchives, state);
+      for (const archive of validatedSet.archives) {
+        const archivePayload = canonicalJson(archive);
+        preparedArchives.push({
+          fixtureId: archive.fixtureId,
+          payload: archivePayload,
+          sha256: await seasonSha256Text(archivePayload),
+          bytes: archive.byteLength,
+        });
+      }
+    }
     const db = await this.open();
     const tx = db.transaction(["games", "snapshots", "commands", "settings", "projections", "worldPacks"], "readwrite");
     const games = tx.objectStore("games"), snapshots = tx.objectStore("snapshots"), commands = tx.objectStore("commands"), settings = tx.objectStore("settings"), projections = tx.objectStore("projections");
@@ -336,6 +611,39 @@ export class IndexedDbSeasonRepository {
     snapshots.put({ saveId: input.saveId, generation, checkpointSerial: serial, revision: state.revision, payload, sha256: snapshotHash, createdAt: input.updatedAt } satisfies SeasonCheckpoint);
     if (command) commands.put({ saveId: input.saveId, ...command } satisfies CommandRecord);
     projections.put({ saveId: input.saveId, scope: "T20_SEASON", key: state.seasonId, payload: projectionPayload, sha256: projectionHash } satisfies ProjectionRecord);
+    if (input.copySource || preparedArchives.length > 0) {
+      const allProjections = await req(projections.getAll()) as ProjectionRecord[];
+      const mergedByFixture = new Map<string, ProjectionRecord>();
+      if (input.copySource) {
+        for (const row of allProjections) {
+          if (row.saveId === input.copySource.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
+            mergedByFixture.set(row.key, { ...row, saveId: input.saveId });
+          }
+        }
+      }
+      for (const row of allProjections) {
+        if (row.saveId === input.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
+          mergedByFixture.set(row.key, row);
+        }
+      }
+      for (const item of preparedArchives) {
+        mergedByFixture.set(item.fixtureId, {
+          saveId: input.saveId,
+          scope: CAREER_MATCH_EVENTS_SCOPE,
+          key: item.fixtureId,
+          payload: item.payload,
+          sha256: item.sha256,
+        });
+      }
+      const encoder = new TextEncoder();
+      let totalArchiveBytes = 0;
+      for (const row of mergedByFixture.values()) totalArchiveBytes += encoder.encode(row.payload).byteLength;
+      if (totalArchiveBytes > MAX_SEASON_EVENT_ARCHIVES_TOTAL_BYTES) {
+        const done = txDone(tx); tx.abort(); try { await done; } catch { /* expected abort */ }
+        throw new Error("LC_T20_SEASON_STATE_MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED");
+      }
+      for (const row of mergedByFixture.values()) projections.put(row);
+    }
     const summary = summaryFor({ ...input, state });
     const copyHash = existing?.worldCopySha256 ?? suppliedCopyHash;
     if (worldCopyPayload && suppliedCopyHash) {
@@ -485,6 +793,95 @@ export class IndexedDbSeasonRepository {
     await txDone(tx);
   }
 
+  async loadMatchEventArchives(
+    saveId: string,
+    state?: T20SeasonState,
+  ): Promise<{ archives: CompletedCareerMatchEventArchive[]; damagedFixtureIds: string[]; totalBytes: number }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const allRows = await req(tx.objectStore("projections").getAll()) as ProjectionRecord[];
+    await txDone(tx);
+    const rows = allRows.filter((row) => row.saveId === saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE);
+    const completionByFixture = new Map(state?.completedMatches.map((c) => [c.fixtureId, c]) ?? []);
+    const archives: CompletedCareerMatchEventArchive[] = [];
+    const damagedFixtureIds: string[] = [];
+    const encoder = new TextEncoder();
+    let totalBytes = 0;
+    const seenFixtures = new Set<string>();
+    let validatedBytes = 0;
+    for (const row of rows) {
+      totalBytes += encoder.encode(row.payload).byteLength;
+      if (await seasonSha256Text(row.payload) !== row.sha256) {
+        damagedFixtureIds.push(row.key);
+        continue;
+      }
+      try {
+        const completion = state ? completionByFixture.get(row.key) : undefined;
+        if (state && !completion) throw new Error(`UNKNOWN_FIXTURE:${row.key}`);
+        const parsed = await validateCompletedCareerMatchEventArchive(JSON.parse(row.payload), completion);
+        if (seenFixtures.has(parsed.fixtureId)) throw new Error(`DUPLICATE_FIXTURE:${parsed.fixtureId}`);
+        seenFixtures.add(parsed.fixtureId);
+        validatedBytes += parsed.byteLength;
+        assertSeason(validatedBytes <= MAX_SEASON_EVENT_ARCHIVES_TOTAL_BYTES, "MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED");
+        archives.push(parsed);
+      } catch (err) {
+        if (err instanceof Error && err.message.includes("TOTAL_SIZE_EXCEEDED")) throw err;
+        damagedFixtureIds.push(row.key);
+      }
+    }
+    archives.sort((a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId));
+    return { archives, damagedFixtureIds: damagedFixtureIds.sort(), totalBytes };
+  }
+
+  async inspectCheckpoints(saveId: string): Promise<SeasonCheckpointInspection> {
+    const db = await this.open();
+    const tx = db.transaction(["games", "snapshots"], "readonly");
+    const game = await req(tx.objectStore("games").get(saveId)) as SeasonGameRecord | undefined;
+    if (!game || game.recordType !== SEASON_RECORD_TYPE) { await txDone(tx); throw new Error("SEASON_SAVE_NOT_FOUND"); }
+    const rows = await req(tx.objectStore("snapshots").index("saveId").getAll(saveId)) as SeasonCheckpoint[];
+    await txDone(tx);
+    return inspectSeasonCheckpoints({
+      saveId,
+      title: game.title,
+      currentSerial: game.checkpointSerial,
+      currentGeneration: game.checkpointGeneration,
+      rows,
+    });
+  }
+
+  async loadGeneration(saveId: string, generation: number): Promise<SeasonLoadResult> {
+    const db = await this.open();
+    const tx = db.transaction(["games", "snapshots", "worldPacks"], "readonly");
+    const game = await req(tx.objectStore("games").get(saveId)) as SeasonGameRecord | undefined;
+    if (!game || game.recordType !== SEASON_RECORD_TYPE) { await txDone(tx); throw new Error("SEASON_SAVE_NOT_FOUND"); }
+    const row = await req(tx.objectStore("snapshots").get([saveId, generation])) as SeasonCheckpoint | undefined;
+    const worldRow = game.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION && game.worldCopySha256
+      ? await req(tx.objectStore("worldPacks").get(game.worldCopySha256)) as { hash: string; payload: string } | undefined : undefined;
+    await txDone(tx);
+    if (!row) throw new Error("SEASON_CHECKPOINT_NOT_FOUND");
+    let worldCopy: NewGameWorldCopy | null = null;
+    if (game.schemaVersion === SEASON_PRESENTATION_SAVE_SCHEMA_VERSION) {
+      if (!worldRow || !game.worldCopySha256 || await seasonSha256Text(worldRow.payload) !== game.worldCopySha256) throw new Error("SEASON_WORLD_COPY_MISSING_OR_DAMAGED");
+      worldCopy = await validateStoredWorldCopy(JSON.parse(worldRow.payload));
+    }
+    const recoveredCheckpoint = await recoverSeasonCheckpoint([row], row.checkpointSerial);
+    const { state, checkpoint } = recoveredCheckpoint;
+    const summary = SeasonSaveSummarySchema.parse({
+      saveId: game.saveId, kind: game.kind, title: game.title, seasonId: state.seasonId, careerId: state.careerId,
+      controlledTeamId: state.controlledTeamId, currentDate: state.careerState.currentDate, revision: state.revision,
+      completedFixtures: state.completedMatches.length, phase: state.phase, stateSha256: state.stateSha256,
+      updatedAt: checkpoint.createdAt,
+    });
+    return {
+      summary,
+      state,
+      recovered: checkpoint.checkpointSerial !== game.checkpointSerial,
+      recoveredFromGeneration: generation,
+      corruptedGenerations: [],
+      worldCopy,
+    };
+  }
+
   /** Verification-only fault injection: damages the newest checkpoint without replacing it. */
   async corruptCurrentCheckpoint(saveId: string): Promise<void> {
     const db = await this.open(); const tx = db.transaction(["games", "snapshots"], "readwrite");
@@ -494,6 +891,16 @@ export class IndexedDbSeasonRepository {
     const row = await req(tx.objectStore("snapshots").get(key)) as SeasonCheckpoint | undefined;
     if (!row) throw new Error("SEASON_CHECKPOINT_NOT_FOUND");
     tx.objectStore("snapshots").put({ ...row, payload: `${row.payload} ` });
+    await txDone(tx);
+  }
+
+  /** Verification-only fault injection: damages one archived match event projection row. */
+  async corruptMatchEventArchiveForTest(saveId: string, fixtureId: string): Promise<void> {
+    const db = await this.open(); const tx = db.transaction("projections", "readwrite");
+    const store = tx.objectStore("projections");
+    const row = await req(store.get([saveId, CAREER_MATCH_EVENTS_SCOPE, fixtureId])) as ProjectionRecord | undefined;
+    if (!row) { tx.abort(); try { await txDone(tx); } catch { /* expected */ } throw new Error("MATCH_EVENT_ARCHIVE_NOT_FOUND"); }
+    store.put({ ...row, payload: `${row.payload} ` });
     await txDone(tx);
   }
 }

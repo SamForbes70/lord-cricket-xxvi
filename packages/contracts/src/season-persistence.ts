@@ -3,6 +3,12 @@ import { CounterSchema, HashSchema, IDSchema } from "./core.js";
 import { SeasonScheduleSchema } from "./competition.js";
 import { CareerDayStateV2Schema } from "./career.js";
 import { T20SeasonMatchCompletionSchema, T20SeasonProjectionStateSchema, SeasonTeamTableRowSchema, SeasonLeaderboardsSchema } from "./season-projections.js";
+import { T20EventChainManifestSchema, T20MatchEventSchema } from "./t20-match.js";
+import { T20MatchSetupRequestSchema } from "./world.js";
+
+export const MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES = 1_000_000 as const;
+export const MAX_SEASON_EVENT_ARCHIVES_TOTAL_BYTES = 16_000_000 as const;
+export const COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_VERSION = "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1" as const;
 
 const SeasonStateCoreShape = {
   seasonStateVersion: z.literal("LC_T20_SEASON_STATE_V1"),
@@ -89,6 +95,59 @@ export const SeasonPortableManifestV2Schema = SeasonPortableManifestSchema.exten
   worldCopySha256: HashSchema,
 });
 
+export const CompletedCareerMatchEventArchiveCoreSchema = z.strictObject({
+  archiveVersion: z.literal(COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_VERSION),
+  seasonId: IDSchema,
+  scheduleSha256: HashSchema,
+  fixtureId: IDSchema,
+  matchId: IDSchema,
+  fixtureOrdinal: CounterSchema.max(55),
+  roundNumber: z.number().int().min(1).max(14),
+  matchDayDate: z.iso.date(),
+  source: z.enum(["OFFSCREEN", "USER_MATCH"]),
+  sourceCompletionSha256: HashSchema,
+  scorecardSha256: HashSchema,
+  setupRequest: T20MatchSetupRequestSchema,
+  eventChain: T20EventChainManifestSchema,
+  eventCount: CounterSchema.min(1).max(600),
+  finalEventHash: HashSchema,
+  eventsSha256: HashSchema,
+  events: z.array(T20MatchEventSchema).min(1).max(600),
+  byteLength: CounterSchema.min(1).max(MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES),
+});
+
+export const CompletedCareerMatchEventArchiveSchema = z.strictObject({
+  ...CompletedCareerMatchEventArchiveCoreSchema.shape,
+  archiveSha256: HashSchema,
+});
+
+export const SeasonCheckpointGenerationOptionSchema = z.strictObject({
+  generation: z.number().int().min(0).max(2),
+  checkpointSerial: CounterSchema,
+  revision: CounterSchema,
+  completedFixtures: CounterSchema.max(56),
+  currentDate: z.iso.date(),
+  phase: z.enum(["ACTIVE", "COMPLETE"]),
+  stateSha256: HashSchema,
+  createdAt: z.iso.datetime(),
+});
+
+export const SeasonCheckpointInspectionSchema = z.strictObject({
+  saveId: IDSchema,
+  title: z.string().min(1).max(240),
+  currentSerial: CounterSchema,
+  currentGeneration: z.number().int().min(0).max(2),
+  corruptedGenerations: z.array(z.number().int().min(0).max(2)).max(3),
+  validGenerations: z.array(SeasonCheckpointGenerationOptionSchema).max(3),
+});
+
+export const SeasonPortableManifestV3Schema = SeasonPortableManifestSchema.extend({
+  archiveVersion: z.literal("LC_T20_SEASON_PORTABLE_V3_EVENT_ARCHIVES"),
+  saveSchema: z.enum(["LC_SEASON_SAVE_V1", "LC_SEASON_SAVE_V2_PRESENTATION"]),
+  worldCopySha256: HashSchema.optional(),
+  matchEventArchiveCount: CounterSchema.min(1).max(56),
+});
+
 export type T20SeasonStateCore = z.infer<typeof T20SeasonStateCoreSchema>;
 export type T20SeasonState = z.infer<typeof T20SeasonStateSchema>;
 export type SeasonSaveSummary = z.infer<typeof SeasonSaveSummarySchema>;
@@ -98,3 +157,8 @@ export type SeasonArchive = z.infer<typeof SeasonArchiveSchema>;
 export type SeasonRecoveryDiagnostic = z.infer<typeof SeasonRecoveryDiagnosticSchema>;
 export type SeasonPortableManifest = z.infer<typeof SeasonPortableManifestSchema>;
 export type SeasonPortableManifestV2 = z.infer<typeof SeasonPortableManifestV2Schema>;
+export type SeasonPortableManifestV3 = z.infer<typeof SeasonPortableManifestV3Schema>;
+export type CompletedCareerMatchEventArchiveCore = z.infer<typeof CompletedCareerMatchEventArchiveCoreSchema>;
+export type CompletedCareerMatchEventArchive = z.infer<typeof CompletedCareerMatchEventArchiveSchema>;
+export type SeasonCheckpointGenerationOption = z.infer<typeof SeasonCheckpointGenerationOptionSchema>;
+export type SeasonCheckpointInspection = z.infer<typeof SeasonCheckpointInspectionSchema>;

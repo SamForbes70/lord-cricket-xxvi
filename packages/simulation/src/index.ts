@@ -37,3 +37,4 @@ export * from "./roster-red5-match.js";
 export * from "./roster-season-schedule.js";
 export * from "./roster-career-condition.js";
 export * from "./roster-offscreen-fixture.js";
+export * from "./career-replay.js";

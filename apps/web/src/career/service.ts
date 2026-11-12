@@ -3,8 +3,10 @@ import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.m
 import {
   canonicalJson,
   T20SeasonMatchCompletionSchema,
+  type CompletedCareerMatchEventArchive,
   type MatchConditionDelta,
   type SeasonArchive,
+  type SeasonCheckpointInspection,
   type SeasonFixture,
   type SeasonSaveSummary,
   type T20Scorecard,
@@ -25,12 +27,16 @@ import {
   advanceCareerDayV2,
   applyMatchConditionDeltaV2,
   createCareerDayStateV2,
+  createCompletedCareerMatchEventArchive,
   createStateHasher,
   generateSeasonSchedule,
   projectSquadTrainingCondition,
+  rehydrateT20Session,
+  replayCareerMatchEventArchive,
   selectOffscreenFixtureTeams,
   setTrainingDirective,
   simulateOffscreenFixture,
+  type CareerArchivedReplaySummary,
 } from "@lcxxvi/simulation";
 import {
   applyT20SeasonMatchCompletion,
@@ -41,8 +47,10 @@ import {
   IndexedDbSeasonRepository,
   type SeasonDurableCommit,
   type SeasonLoadResult,
+  type SeasonPersistenceErrorDescription,
   createSeasonPortableArchive,
   createT20SeasonArchive,
+  describeSeasonPersistenceError,
   readSeasonPortableArchive,
   sealT20SeasonState,
 } from "@lcxxvi/persistence";
@@ -110,6 +118,7 @@ export type CareerUserMatchResult = {
   finalEventHash: string;
   sourceCompletionSha256: string;
   conditionDelta: MatchConditionDelta;
+  completedSession?: unknown;
 };
 
 export const careerWorld = world;
@@ -132,6 +141,11 @@ function stateCore(state: T20SeasonState) {
   return core;
 }
 
+export type CareerReplayOutcome =
+  | { status: "READY"; archive: CompletedCareerMatchEventArchive; replay: CareerArchivedReplaySummary }
+  | { status: "UNAVAILABLE" }
+  | { status: "DAMAGED"; message: string };
+
 export type CareerSeasonRepository = {
   list(): Promise<SeasonSaveSummary[]>;
   acquireLease(saveId: string, ownerId: string, now: number): Promise<boolean>;
@@ -140,6 +154,13 @@ export type CareerSeasonRepository = {
   load(saveId: string): Promise<SeasonLoadResult | null>;
   activeSaveId(): Promise<string | null>;
   clearActiveSaveId(saveId: string): Promise<void>;
+  loadMatchEventArchives?(saveId: string, state?: T20SeasonState): Promise<{
+    archives: CompletedCareerMatchEventArchive[];
+    damagedFixtureIds: string[];
+    totalBytes: number;
+  }>;
+  inspectCheckpoints?(saveId: string): Promise<SeasonCheckpointInspection>;
+  loadGeneration?(saveId: string, generation: number): Promise<SeasonLoadResult>;
 };
 
 export class CareerApplicationService {
@@ -341,6 +362,9 @@ export class CareerApplicationService {
     if (loaded.recovered && !readOnly) {
       targetSaveId = `recovered-${crypto.randomUUID().replaceAll("-", "")}`;
       if (!(await this.repository.acquireLease(targetSaveId, this.ownerId, Date.now()))) throw new Error("Recovered career slot is locked.");
+      const existingArchives = this.repository.loadMatchEventArchives
+        ? (await this.repository.loadMatchEventArchives(saveId, loaded.state)).archives
+        : [];
       await this.repository.commit({
         saveId: targetSaveId,
         kind: "MANUAL",
@@ -353,6 +377,7 @@ export class CareerApplicationService {
         updatedAt: nowIso(),
         setActive: true,
         worldCopy: copy,
+        ...(existingArchives.length > 0 ? { matchEventArchives: existingArchives } : {}),
       });
       await this.repository.releaseLease(saveId, this.ownerId);
       await this.onRecovered?.(saveId, targetSaveId);
@@ -390,7 +415,9 @@ export class CareerApplicationService {
   private async commitMutation(
     command: string,
     payload: unknown,
-    build: (state: T20SeasonState) => Promise<Omit<T20SeasonState, "stateSha256" | "revision">> | Omit<T20SeasonState, "stateSha256" | "revision">,
+    build: (state: T20SeasonState) =>
+      | Promise<{ core: Omit<T20SeasonState, "stateSha256" | "revision">; matchEventArchives?: readonly CompletedCareerMatchEventArchive[] } | Omit<T20SeasonState, "stateSha256" | "revision">>
+      | ({ core: Omit<T20SeasonState, "stateSha256" | "revision">; matchEventArchives?: readonly CompletedCareerMatchEventArchive[] } | Omit<T20SeasonState, "stateSha256" | "revision">),
   ): Promise<T20SeasonState> {
     const { state: before, saveId } = this.requireWritable();
     const expectedRevision = before.revision;
@@ -401,8 +428,10 @@ export class CareerApplicationService {
         this.readOnly = true;
         throw new Error("Writer lease was lost to another tab.");
       }
-      const built = await build(before);
-      const next = await sealT20SeasonState({ ...built, revision: expectedRevision + 1 });
+      const builtRaw = await build(before);
+      const builtCore = "core" in builtRaw && "seasonStateVersion" in builtRaw.core ? builtRaw.core : (builtRaw as Omit<T20SeasonState, "stateSha256" | "revision">);
+      const matchEventArchives = "core" in builtRaw && "matchEventArchives" in builtRaw ? builtRaw.matchEventArchives : undefined;
+      const next = await sealT20SeasonState({ ...builtCore, revision: expectedRevision + 1 });
       const requestCanonical = canonicalJson({ command, expectedRevision, payload });
       await this.repository.commit({
         saveId,
@@ -421,6 +450,7 @@ export class CareerApplicationService {
         updatedAt: nowIso(),
         setActive: true,
         worldCopy: this.worldCopy,
+        ...(matchEventArchives && matchEventArchives.length > 0 ? { matchEventArchives } : {}),
       });
       this.state = next;
       this.recovered = false;
@@ -460,7 +490,7 @@ export class CareerApplicationService {
   private applyOffscreenCompletion(
     state: T20SeasonState,
     fixtureId: string,
-  ): Omit<T20SeasonState, "stateSha256" | "revision"> {
+  ): { core: Omit<T20SeasonState, "stateSha256" | "revision">; archive: CompletedCareerMatchEventArchive } {
     const simulated = simulateOffscreenFixture({
       schedule: state.schedule,
       careerState: state.careerState,
@@ -469,6 +499,7 @@ export class CareerApplicationService {
       worldManifest,
     });
     const completion = completionFromOffscreenOutcome(state.schedule, simulated.outcome);
+    const archive = createCompletedCareerMatchEventArchive({ completion, session: simulated.session });
     const projection = applyT20SeasonMatchCompletion({
       state: state.projection,
       competition: T20_LEAGUE_COMPETITION,
@@ -479,11 +510,14 @@ export class CareerApplicationService {
       (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
     );
     return {
-      ...stateCore(state),
-      careerState: simulated.careerState,
-      projection,
-      completedMatches,
-      phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
+      core: {
+        ...stateCore(state),
+        careerState: simulated.careerState,
+        projection,
+        completedMatches,
+        phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
+      },
+      archive,
     };
   }
 
@@ -506,13 +540,15 @@ export class CareerApplicationService {
       if (careerState.currentDate !== target.matchDayDate) throw new Error("Career date does not match managed fixture date.");
       working = { ...working, careerState };
       const already = new Set(working.completedMatches.map((match) => match.fixtureId));
+      const archives: CompletedCareerMatchEventArchive[] = [];
       for (const fixture of roundOthers) {
         if (already.has(fixture.fixtureId)) continue;
-        const core = this.applyOffscreenCompletion(working, fixture.fixtureId);
-        working = await sealT20SeasonState({ ...core, revision: working.revision });
+        const applied = this.applyOffscreenCompletion(working, fixture.fixtureId);
+        working = await sealT20SeasonState({ ...applied.core, revision: working.revision });
+        archives.push(applied.archive);
         already.add(fixture.fixtureId);
       }
-      return { ...stateCore(working), phase: "ACTIVE" };
+      return { core: { ...stateCore(working), phase: "ACTIVE" }, matchEventArchives: archives };
     });
     return this.nextManagedFixture(this.state!);
   }
@@ -524,7 +560,8 @@ export class CareerApplicationService {
     if (!fixture) return;
     if (current.careerState.currentDate !== fixture.matchDayDate) throw new Error("Managed fixture is not ready.");
     await this.commitMutation("SIMULATE_MANAGED_FIXTURE", { fixtureId: fixture.fixtureId }, (state) => {
-      return this.applyOffscreenCompletion(state, fixture.fixtureId);
+      const applied = this.applyOffscreenCompletion(state, fixture.fixtureId);
+      return { core: applied.core, matchEventArchives: [applied.archive] };
     });
   }
 
@@ -564,7 +601,7 @@ export class CareerApplicationService {
     };
   }
 
-  async completeUserMatch(result: CareerUserMatchResult): Promise<void> {
+  async completeUserMatch(result: CareerUserMatchResult, session: import("@lcxxvi/simulation").T20Session | null = null): Promise<void> {
     const current = this.requireWritable().state;
     const existing = current.completedMatches.find((match) => match.fixtureId === result.fixtureId);
     if (existing) {
@@ -614,6 +651,15 @@ export class CareerApplicationService {
         scorecard: result.scorecard,
         scorecardSha256: result.scorecardSha256,
       });
+      let resolvedSession = session;
+      if (!resolvedSession && result.completedSession !== undefined) {
+        try {
+          resolvedSession = rehydrateT20Session(result.completedSession, worldBytes, worldManifest);
+        } catch {
+          /* legacy or synthetic test payload without full rehydratable T20Session */
+        }
+      }
+      const maybeArchive = resolvedSession ? [createCompletedCareerMatchEventArchive({ completion, session: resolvedSession })] : [];
       const projection = applyT20SeasonMatchCompletion({
         state: state.projection,
         competition: T20_LEAGUE_COMPETITION,
@@ -624,11 +670,14 @@ export class CareerApplicationService {
         (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
       );
       return {
-        ...stateCore(state),
-        careerState,
-        projection,
-        completedMatches,
-        phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
+        core: {
+          ...stateCore(state),
+          careerState,
+          projection,
+          completedMatches,
+          phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
+        },
+        matchEventArchives: maybeArchive,
       };
     });
   }
@@ -656,7 +705,17 @@ export class CareerApplicationService {
     const loaded = await this.repository.load(saveId);
     if (!loaded) throw new Error("Career save not found.");
     const archive = state.phase === "COMPLETE" ? await createT20SeasonArchive(state, deterministicCompletedAt(state)) : null;
-    return createSeasonPortableArchive(state, loaded.summary, nowIso(), archive, loaded.worldCopy ?? null);
+    const eventArchives = this.repository.loadMatchEventArchives
+      ? (await this.repository.loadMatchEventArchives(saveId, state)).archives
+      : [];
+    return createSeasonPortableArchive(
+      state,
+      loaded.summary,
+      nowIso(),
+      archive,
+      loaded.worldCopy ?? null,
+      eventArchives.length > 0 ? eventArchives : null,
+    );
   }
 
   async importCareer(bytes: Uint8Array): Promise<T20SeasonState> {
@@ -678,6 +737,7 @@ export class CareerApplicationService {
       updatedAt: nowIso(),
       setActive: true,
       worldCopy: copy,
+      ...(imported.matchEventArchives.length > 0 ? { matchEventArchives: imported.matchEventArchives } : {}),
     });
     this.state = imported.state;
     this.worldCopy = copy;
@@ -686,6 +746,78 @@ export class CareerApplicationService {
     this.recovered = false;
     this.setStatus("Saved");
     return imported.state;
+  }
+
+  async replayFixtureArchive(fixtureId: string): Promise<CareerReplayOutcome> {
+    if (!this.state || !this.saveId) throw new Error("No career is loaded.");
+    if (!this.repository.loadMatchEventArchives) return { status: "UNAVAILABLE" };
+    const completion = this.state.completedMatches.find((m) => m.fixtureId === fixtureId);
+    if (!completion) return { status: "UNAVAILABLE" };
+    const loaded = await this.repository.loadMatchEventArchives(this.saveId, this.state);
+    if (loaded.damagedFixtureIds.includes(fixtureId)) {
+      return {
+        status: "DAMAGED",
+        message: "The archived ball-by-ball replay log for this fixture is damaged. The season standings and scorecard remain valid.",
+      };
+    }
+    const archive = loaded.archives.find((a) => a.fixtureId === fixtureId);
+    if (!archive) return { status: "UNAVAILABLE" };
+    try {
+      const replay = replayCareerMatchEventArchive(archive, worldBytes, worldManifest, completion);
+      return { status: "READY", archive, replay };
+    } catch (error) {
+      return {
+        status: "DAMAGED",
+        message: error instanceof Error ? error.message : "Archived match replay failed verification.",
+      };
+    }
+  }
+
+  async inspectCareerCheckpoints(saveId: string): Promise<SeasonCheckpointInspection> {
+    if (!this.repository.inspectCheckpoints) throw new Error("Checkpoint inspection is unavailable.");
+    return this.repository.inspectCheckpoints(saveId);
+  }
+
+  async recoverCareerFromGeneration(saveId: string, generation: number, title?: string): Promise<T20SeasonState> {
+    if (!this.repository.loadGeneration) throw new Error("Checkpoint generation recovery is unavailable.");
+    const loaded = await this.repository.loadGeneration(saveId, generation);
+    const copy = loaded.worldCopy ? immutableWorldCopy(loaded.worldCopy) : null;
+    if (this.saveId && this.saveId !== saveId && !this.readOnly) await this.repository.releaseLease(this.saveId, this.ownerId);
+    const targetSaveId = `recovered-${crypto.randomUUID().replaceAll("-", "")}`;
+    if (!(await this.repository.acquireLease(targetSaveId, this.ownerId, Date.now()))) throw new Error("Recovered career slot is locked.");
+    const cleanLabel = (title ?? `${loaded.summary.title} (Recovered G${generation})`).trim().slice(0, 120);
+    const existingArchives = this.repository.loadMatchEventArchives
+      ? (await this.repository.loadMatchEventArchives(saveId)).archives.filter((a) =>
+          loaded.state.completedMatches.some((c) => c.fixtureId === a.fixtureId && c.sourceCompletionSha256 === a.sourceCompletionSha256),
+        )
+      : [];
+    this.setStatus("Saving");
+    await this.repository.commit({
+      saveId: targetSaveId,
+      kind: "MANUAL",
+      title: cleanLabel || `${loaded.summary.title} (Recovered)`,
+      expectedRevision: null,
+      state: loaded.state,
+      command: null,
+      ownerId: this.ownerId,
+      now: Date.now(),
+      updatedAt: nowIso(),
+      setActive: true,
+      worldCopy: copy,
+      ...(existingArchives.length > 0 ? { matchEventArchives: existingArchives } : {}),
+    });
+    await this.onRecovered?.(saveId, targetSaveId);
+    this.state = loaded.state;
+    this.worldCopy = copy;
+    this.saveId = targetSaveId;
+    this.readOnly = false;
+    this.recovered = true;
+    this.setStatus("Recovered");
+    return loaded.state;
+  }
+
+  describeError(error: unknown): SeasonPersistenceErrorDescription {
+    return describeSeasonPersistenceError(error);
   }
 
   async seasonArchive(): Promise<SeasonArchive | null> {
