@@ -1,5 +1,7 @@
 # Status reconciliation and bounded scoring diagnostic
 
+> **Historical pass snapshot:** This report records an earlier review against base `036c212` and PR #3 head `5baea6a`. See [CURRENT_STATUS.md](CURRENT_STATUS.md) and [AI_CONTINUATION.md](AI_CONTINUATION.md) for current repository state.
+
 The four requested activities are complete as review, capability correction, evidence reconciliation and a fresh diagnostic.
 PR #3 passes all four checks at its reviewed head `5baea6a`; it remains unmerged.
 The fixed baseline still scores slowly: first innings average 89.15 runs over 96 matches.

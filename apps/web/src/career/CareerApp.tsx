@@ -123,7 +123,12 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         const parsed = JSON.parse(pending) as CareerUserMatchResult;
         await service.completeUserMatch(parsed);
         clearLaunchCache();
-        try { await managedBindings.resolve(`career-match-${parsed.fixtureId}`, "APPLIED", "RESULT_APPLIED"); } catch { /* no binding for legacy launches */ }
+        try {
+          const saveId = service.getSaveId();
+          const { bindings } = saveId ? await managedBindings.pendingForCareer(saveId) : { bindings: [] };
+          const matchGameId = bindings.find((b) => b.fixtureId === parsed.fixtureId)?.matchGameId ?? `career-match-${parsed.fixtureId}`;
+          await managedBindings.resolve(matchGameId, "APPLIED", "RESULT_APPLIED");
+        } catch { /* no binding for legacy launches */ }
       }
     }
     const releaseWriter = () => { void service.releaseWriter(); };

@@ -211,4 +211,51 @@ describe("recovering a career moves its pending match links", () => {
     expect(moves[0]![1]).toMatch(/^recovered-/);
     expect(second.getSaveId()).toBe(moves[0]![1]);
   });
+
+  test("a manual career copy gets an isolated matchGameId and does not collide with an applied fixture in the source career", async () => {
+    const repo = new MemorySeasonRepository();
+    const kv = new MemoryManagedBindingKv();
+    let tick = 0;
+    const store = new ManagedMatchBindings(kv, () => `2026-11-11T01:00:${String(tick++).padStart(2, "0")}.000Z`);
+    const first = new CareerApplicationService("owner", repo);
+    await first.createCareer("team-01");
+    const originalId = first.getSaveId()!;
+    await first.createManualCopy("Backup before Round 1");
+    const copyId = (await repo.list()).find((item) => item.saveId !== originalId)!.saveId;
+
+    const originalLaunch = await first.prepareUserMatch();
+    expect(originalLaunch.matchGameId.length).toBeLessThanOrEqual(64);
+    await store.create({
+      careerKind: "STANDARD",
+      careerSaveId: originalLaunch.saveId,
+      matchGameId: originalLaunch.matchGameId,
+      matchId: originalLaunch.matchId,
+      fixtureId: originalLaunch.fixtureId,
+      seasonId: originalLaunch.seasonId,
+      scheduleSha256: originalLaunch.scheduleSha256,
+      careerStateSha256: originalLaunch.careerStateSha256,
+      launch: originalLaunch,
+    });
+    await store.resolve(originalLaunch.matchGameId, "APPLIED", "RESULT_APPLIED");
+    await first.releaseWriter();
+
+    const second = new CareerApplicationService("owner", repo);
+    await second.loadCareer(copyId);
+    const copyLaunch = await second.prepareUserMatch();
+    expect(copyLaunch.fixtureId).toBe(originalLaunch.fixtureId);
+    expect(copyLaunch.matchGameId).not.toBe(originalLaunch.matchGameId);
+    expect(copyLaunch.matchGameId.length).toBeLessThanOrEqual(64);
+    const copyBinding = await store.create({
+      careerKind: "STANDARD",
+      careerSaveId: copyLaunch.saveId,
+      matchGameId: copyLaunch.matchGameId,
+      matchId: copyLaunch.matchId,
+      fixtureId: copyLaunch.fixtureId,
+      seasonId: copyLaunch.seasonId,
+      scheduleSha256: copyLaunch.scheduleSha256,
+      careerStateSha256: copyLaunch.careerStateSha256,
+      launch: copyLaunch,
+    });
+    expect(copyBinding.status).toBe("PENDING");
+  });
 });

@@ -2,7 +2,7 @@
 
 Lord Cricket XXVI provides a one-season management game over deterministic match and career systems.
 Start with the [documentation hub](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md) or [AI continuation guide](docs/AI_CONTINUATION.md).
-See the [GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) for open work and [current status](docs/CURRENT_STATUS.md) for acceptance history.
+See [current status](docs/CURRENT_STATUS.md), [next slice](docs/NEXT_PASS.md) and the [V0.1 backlog](docs/V01_BACKLOG.json) for active work (the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) is a historical snapshot prior to PRs #39 to #41).
 
 **Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management are not enabled. Optional T20 tactical opponent AI is available in the match view. Browser tests cover its controls; empirical tactical quality remains unaccepted.
 
@@ -115,7 +115,7 @@ The offline command regenerates M7G and M7H in `reference/m7g/` and `reference/m
 M7H fits a 5-regime second-innings model using training-match data, wickets lost, phase and pre-delivery required scoring rate. It separately simulates 400 two-innings matches with a target, stops on a successful chase and checks scorer-compatible categories in TypeScript. It reports excluded unusual events and unseen holdout categories rather than mapping them to invented cricket outcomes. The already-reviewed Cricsheet holdout is **development validation, not a pristine final test**. Player-history binary predictors use a fixed 300-attempt prior and Cricsheet stable registry IDs. Even when predictive log-loss improves, those marginals are **not** empirically identified 0–100 skills or captain tactical effects.
 
 The existing playable game **remains SYNTHETIC_ALPHA**. The remaining research gates include full delivery support, player/fielding/tactic identification, score tails and untouched final validation.
-Later browser and human evidence is summarised in [current status](docs/CURRENT_STATUS.md). See `docs/NEXT_PASS.md` and `PASS_20_M7H_REPORT.md`.
+Later browser and human evidence is summarised in [current status](docs/CURRENT_STATUS.md). See `docs/NEXT_PASS.md` and `docs/M7_PROGRESS_AND_GATES.md`.
 
 ### Pass 21 / M7I research audit (not gameplay)
 

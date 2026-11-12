@@ -47,6 +47,7 @@ import {
   sealT20SeasonState,
 } from "@lcxxvi/persistence";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
+import { managedMatchGameId } from "./managed-game-id.js";
 
 const worldBytes = new TextEncoder().encode(worldText);
 const world = validateDefaultWorld(JSON.parse(worldText), worldManifest).world;
@@ -555,7 +556,7 @@ export class CareerApplicationService {
       awayTeamId: fixture.awayTeamId,
       groundId: fixture.groundId,
       matchId: fixture.matchId,
-      matchGameId: `career-match-${fixture.fixtureId}`,
+      matchGameId: managedMatchGameId(saveId, fixture.fixtureId),
       matchSeed: fixture.matchSeed,
       selections: [selections[0], selections[1]],
       careerStateSha256: state.careerState.stateSha256,

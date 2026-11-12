@@ -16,6 +16,7 @@ const steps = [
   ...["schemas:check", "build", "typecheck", "lint", "fixtures:engine"].map(name => ({ name: name.replace(":", "-"), args: ["run", name] })),
   { name: "frozen-world", node: true, args: ["scripts/verify-world.mjs"] },
   { name: "unit", args: ["test", "--", "--maxWorkers=2", "--reporter=default", "--reporter=json", `--outputFile=${directory}/unit.json`], report: "unit.json" },
+  { name: "persistence-m4", args: ["exec", "--", "playwright", "test", "--config=playwright.m4.config.ts", "--reporter=list,json", `--output=${directory}/m4`, "--trace=retain-on-failure"], report: "persistence-m4.json" },
   { name: "match-ui", timeoutMs: 1_800_000, args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
   { name: "career", args: ["exec", "--", "playwright", "test", "--config=playwright.m6g.portable.config.ts", "--reporter=list,json", `--output=${directory}/career`, "--trace=retain-on-failure"], report: "career.json" },
   { name: "research-browser-build", args: ["exec", "--", "vite", "build", "--config=vite.m7k.config.ts"] },

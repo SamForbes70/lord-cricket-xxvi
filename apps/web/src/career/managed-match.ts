@@ -25,7 +25,13 @@ export function launchKind(launch: CareerFixtureLaunch): "STANDARD" | "ROSTER" {
  * returned so the same match is resumed rather than a second, different one being started.
  */
 export async function recordManagedLaunch(rawLaunch: unknown): Promise<CareerFixtureLaunch> {
-  const launch = CareerFixtureLaunchSchema.parse(rawLaunch);
+  const parsed = CareerFixtureLaunchSchema.parse(rawLaunch);
+  const { bindings: existingBindings } = await managedBindings.list();
+  const existing = existingBindings.find(
+    (b) => b.careerSaveId === parsed.saveId && b.fixtureId === parsed.fixtureId && b.status !== "APPLIED",
+  );
+  if (existing?.status === "PENDING") return CareerFixtureLaunchSchema.parse(existing.launch);
+  const launch = existing ? { ...parsed, matchGameId: existing.matchGameId } : parsed;
   const input = {
     careerKind: launchKind(launch),
     careerSaveId: launch.saveId,
@@ -48,13 +54,14 @@ export async function recordManagedLaunch(rawLaunch: unknown): Promise<CareerFix
   }
 }
 
-/** The durable match for a binding: the managed autosave, or a completed recovered copy of it. */
+/** The durable match for a binding: a completed or active recovered copy first, then the managed autosave. */
 async function loadMatchFor(binding: ManagedBinding) {
   const direct = `auto:${binding.matchGameId}`;
   const saves = await matchRepository.list();
   const candidates = [
-    ...saves.filter((save) => save.saveId === direct),
     ...saves.filter((save) => save.saveId.startsWith("recovered-") && save.matchGameId === binding.matchGameId && save.completed),
+    ...saves.filter((save) => save.saveId.startsWith("recovered-") && save.matchGameId === binding.matchGameId && !save.completed),
+    ...saves.filter((save) => save.saveId === direct),
   ];
   for (const candidate of candidates) {
     try {

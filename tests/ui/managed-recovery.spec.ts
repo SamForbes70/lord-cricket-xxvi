@@ -304,3 +304,134 @@ test("a match survives closing the whole browser with a retained profile", async
     rmSync(profile, { recursive: true, force: true });
   }
 });
+
+test("a damaged managed-match checkpoint recovers into a new slot, resumes from career, and applies its completed result once", async ({ page, context }) => {
+  test.setTimeout(600_000);
+  await startStandardMatch(page);
+  await playSome(page, 5);
+  const olderRevision = await settledRevision(page);
+  await playOne(page);
+  await settledRevision(page);
+  // Corrupt the newest checkpoint of the active managed match while leaving the previous generation intact.
+  await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => { const request = indexedDB.open("lord-cricket-xxvi"); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    const tx = db.transaction(["settings", "games", "snapshots"], "readwrite");
+    const get = <T,>(request: IDBRequest<T>) => new Promise<T>((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    const setting = await get(tx.objectStore("settings").get("activeSaveId"));
+    const game = await get(tx.objectStore("games").get(setting.value));
+    const snapshots = tx.objectStore("snapshots"), row = await get(snapshots.get([setting.value, game.checkpointGeneration]));
+    snapshots.put({ ...row, payload: `${row.payload} ` });
+    await new Promise<void>((resolve, reject) => { tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); });
+    db.close();
+  });
+  await page.close();
+
+  const fresh = await context.newPage();
+  await fresh.goto("/#exhibition");
+  await expectRestored(fresh, olderRevision);
+  await expect(fresh.getByText(/Recovered from a valid checkpoint/i)).toBeVisible();
+  await expect(fresh.getByText(BANNER)).toBeVisible();
+  await awaitWritable(fresh);
+  await takeManualControl(fresh);
+  await playSome(fresh, 3);
+  const progressedRevision = await settledRevision(fresh);
+  expect(Number(progressedRevision)).toBeGreaterThan(Number(olderRevision));
+
+  // Navigating via #career and clicking Play match must resume the recovered slot rather than re-reading the damaged autosave.
+  await fresh.goto("/#career");
+  await expect(fresh.getByTestId("pending-career-match")).toBeVisible({ timeout: 60_000 });
+  await expect(fresh.getByRole("button", { name: "Play match" })).toBeEnabled({ timeout: 45_000 });
+  await fresh.getByRole("button", { name: "Play match" }).click();
+  await expectRestored(fresh, progressedRevision);
+  await expect(fresh.getByText(BANNER)).toBeVisible();
+  await awaitWritable(fresh);
+  await takeManualControl(fresh);
+  await playToEnd(fresh);
+  await fresh.close();
+
+  // With the match tab closed, #career must apply the completed result from the recovered-* save, not the older damaged autosave.
+  const careerTab = await context.newPage();
+  await careerTab.goto("/#career");
+  await expect(careerTab.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
+  expect(await bindingStates(careerTab)).toEqual(["APPLIED"]);
+});
+
+test("a live writer lease held in another tab keeps a recovered managed match read-only until released", async ({ page, context }) => {
+  test.setTimeout(300_000);
+  await startStandardMatch(page);
+  await playSome(page, 4);
+  const revision = await settledRevision(page);
+
+  const second = await context.newPage();
+  await second.goto("/#exhibition");
+  await expectRestored(second, revision);
+  await expect(second.getByText(BANNER)).toBeVisible();
+  await expect(second.getByTestId("save-status")).toContainText("Read only");
+  await expect(second.locator("#decision fieldset")).toHaveAttribute("disabled", "");
+  await expect(second.locator("#decision fieldset button").first()).toBeDisabled();
+
+  // The first tab still owns the live writer lease and can advance cleanly.
+  await playOne(page);
+  const nextRevision = await settledRevision(page);
+  expect(Number(nextRevision)).toBeGreaterThan(Number(revision));
+
+  // Closing the first tab releases the lease, allowing the second tab to retake write access and sync the latest revision.
+  await page.close();
+  const retry = second.getByRole("button", { name: "Retry write access" });
+  if (await retry.isVisible()) await retry.click();
+  await awaitWritable(second);
+  await expectRestored(second, nextRevision);
+});
+
+test("a damaged imported-roster career moves its pending match binding when creating a recovered copy", async ({ page, context }) => {
+  test.setTimeout(600_000);
+  const world = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.json", "utf8"));
+  const players = world.players.map((player: Record<string, unknown>) => Object.fromEntries(Object.entries(player).filter(([key]) => key !== "provenance")));
+  const source = JSON.stringify({ version: "LC_ROSTER_IMPORT_V1", sourceId: "recovery-roster-copy", world: { ...world, players } });
+  await page.goto("/#roster-career");
+  await page.getByLabel("Roster JSON").setInputFiles({ name: "roster.json", mimeType: "application/json", buffer: Buffer.from(source) });
+  await page.getByRole("button", { name: "Start roster career" }).click();
+  await expect(page.getByText("0/56 fixtures")).toBeVisible({ timeout: 30_000 });
+  // Create a second durable roster-career checkpoint so corrupting the latest generation falls back cleanly.
+  await page.locator("select[aria-label$=' training']").first().selectOption("BATTING_PRACTICE");
+  await expect(page.getByRole("button", { name: "Play next managed match" })).toBeEnabled({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Play next managed match" }).click();
+  await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
+  await page.getByLabel("Tactical captain").selectOption("");
+  await playSome(page, 4);
+  const revision = await settledRevision(page);
+  // Corrupt the newest roster-career checkpoint while its managed match is still pending.
+  await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => { const request = indexedDB.open("lord-cricket-xxvi"); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    const tx = db.transaction(["settings", "games", "snapshots"], "readwrite");
+    const get = <T,>(request: IDBRequest<T>) => new Promise<T>((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
+    const setting = await get(tx.objectStore("settings").get("activeRosterSeasonSaveId"));
+    const game = await get(tx.objectStore("games").get(setting.value));
+    const snapshots = tx.objectStore("snapshots"), row = await get(snapshots.get([setting.value, game.checkpointGeneration]));
+    snapshots.put({ ...row, payload: `${row.payload} ` });
+    await new Promise<void>((resolve, reject) => { tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); });
+    db.close();
+  });
+  await page.close();
+
+  const fresh = await context.newPage();
+  await fresh.goto("/#roster-career");
+  await expect(fresh.getByText("An older checkpoint was recovered.")).toBeVisible({ timeout: 45_000 });
+  await fresh.getByRole("button", { name: "Create recovered copy" }).click();
+  await expect(fresh.getByTestId("pending-career-match")).toBeVisible({ timeout: 45_000 });
+  const firstTraining = fresh.locator("select[aria-label$=' training']").first();
+  if ((await firstTraining.inputValue()) !== "BATTING_PRACTICE") {
+    await firstTraining.selectOption("BATTING_PRACTICE");
+    await expect(fresh.getByRole("button", { name: "Play next managed match" })).toBeEnabled({ timeout: 30_000 });
+  }
+  await fresh.getByRole("button", { name: "Play next managed match" }).click();
+  await expectRestored(fresh, revision);
+  await expect(fresh.getByText(BANNER)).toBeVisible();
+  await awaitWritable(fresh);
+  await takeManualControl(fresh);
+  await playToEnd(fresh);
+  await fresh.getByRole("button", { name: "Return result to career" }).click();
+  await expect(fresh.getByText(/\d+\/56 fixtures/)).toBeVisible({ timeout: 60_000 });
+  await expect(fresh.getByText("0/56 fixtures")).toHaveCount(0);
+  expect(await bindingStates(fresh)).toEqual(["APPLIED"]);
+});

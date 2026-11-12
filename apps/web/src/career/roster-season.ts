@@ -1,6 +1,7 @@
 import { RosterManagedFixtureOutcomeSchema, RosterSeasonMatchCompletionSchema, RosterSeasonStateSchema, SetTrainingDirectiveRequestSchema, type RosterSeasonState, type StagedRosterPack } from "@lcxxvi/contracts";
 import { applyRosterSeasonCompletion, createRosterSeasonProjection, rosterCompletionFromOffscreen, validateRosterSeasonProjection } from "@lcxxvi/projections";
 import { advanceRosterCareerDay, applyRosterMatchCondition, conditionDeltaFromCompletedT20Session, createRosterCareerDayState, createStateHasher, generateRosterSeasonSchedule, projectT20Scorecard, rehydrateRosterT20Session, selectRosterFixtureTeams, setRosterTrainingDirective, simulateRosterOffscreenFixture, validateRosterCareerDayState, validateRosterOffscreenFixtureOutcome, validateRosterSeasonSchedule, type T20Session } from "@lcxxvi/simulation";
+import { isValidManagedMatchGameId } from "./managed-game-id.js";
 
 const hash = createStateHasher().hash;
 function coreOf(state: RosterSeasonState) {
@@ -74,7 +75,7 @@ export function completeRosterManagedFixture(raw: unknown, pack: StagedRosterPac
   const session = rehydrateRosterT20Session(rawSession, pack);
   const fixture = ready.fixture;
   const selections = session.setup.teams.map(team => ({ teamId: team.teamId, playerIds: [...team.playerIds], captainId: team.captainId, keeperId: team.keeperId }));
-  if (session.core.phase !== "COMPLETE" || session.setup.gameId !== `career-match-${fixture.fixtureId}` || session.setup.matchId !== fixture.matchId || session.setup.seed !== fixture.matchSeed || session.setup.ground.groundId !== fixture.groundId || hash(selections) !== hash(ready.selections)) throw new Error("ROSTER_SEASON_MANAGED_SESSION_MISMATCH");
+  if (session.core.phase !== "COMPLETE" || !isValidManagedMatchGameId(session.setup.gameId, fixture.fixtureId) || session.setup.matchId !== fixture.matchId || session.setup.seed !== fixture.matchSeed || session.setup.ground.groundId !== fixture.groundId || hash(selections) !== hash(ready.selections)) throw new Error("ROSTER_SEASON_MANAGED_SESSION_MISMATCH");
   const baseline = session as unknown as T20Session;
   const scorecard = projectT20Scorecard(baseline);
   const scorecardSha256 = hash(scorecard);

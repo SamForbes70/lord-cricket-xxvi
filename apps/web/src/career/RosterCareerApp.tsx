@@ -5,6 +5,7 @@ import { IndexedDbSeasonRepository, createRosterSeasonPortableArchive, readRoste
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { changeRosterSeasonTraining, completeRosterManagedFixture, createRosterSeason, hasAcceptedRosterManagedFixture, prepareRosterManagedFixture, simulateNextRosterSeasonFixture, validateRosterSeasonState } from "./roster-season.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./service.js";
+import { managedMatchGameId } from "./managed-game-id.js";
 import { managedBindings, recordManagedLaunch, settleManagedMatches } from "./managed-match.js";
 import "./career.css";
 
@@ -51,6 +52,7 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
     const command = current ? { commandId: id("career-command"), requestCanonical: "{}", responseJson: "{}", committedRevision: state.revision } : null;
     await repo.commitRoster({ saveId, kind, title: `Roster career: ${rosterPack.world.teams.find(t => t.teamId === state.controlledTeamId)?.name ?? state.controlledTeamId}`,
       expectedRevision: current?.state.revision ?? null, state, rosterPack, command, ownerId: owner, now, updatedAt: new Date().toISOString() });
+    awaitedState.current = state;
     return { saveId, state, pack: rosterPack, recovered: false };
   }
   /** Applies a completed roster match to its career. A completion already accepted with the same result is a no-op. */
@@ -68,30 +70,33 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
   function clearLaunchCache() {
     try { sessionStorage.removeItem(resultKey); sessionStorage.removeItem(launchKey); } catch { /* storage unavailable */ }
   }
+  async function settleCareer(careerSaveId: string) {
+    const settle = () => settleManagedMatches({
+      careerSaveId,
+      careerKind: "ROSTER",
+      isFixtureCompleted: (fixtureId) => { const state = awaitedState.current; return state ? state.outcomes.some(outcome => "version" in outcome && outcome.completion.fixtureId === fixtureId) : false; },
+      apply: async ({ launch, result }) => {
+        if (!result.rosterCareerSession) throw new Error("The completed match produced no roster result.");
+        await applyRosterResult(launch as CareerUserMatchLaunch, result.rosterCareerSession);
+      },
+    });
+    let settled = await settle();
+    // The closed tab's writer lease can last up to 12 s. Retry for a bounded time instead of failing.
+    for (let attempt = 0; attempt < 5 && settled.errors.some(message => /open in another tab/.test(message)); attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 3_000));
+      settled = await settle();
+    }
+    if (settled.applied.length) clearLaunchCache();
+    if (settled.errors.length) setError(settled.errors.join(" "));
+    setPendingRound(settled.pending.length ? ((settled.pending[0]!.launch as { roundNumber?: number }).roundNumber ?? null) : null);
+  }
   useEffect(() => {
     void run(async () => {
       const saveId = await repo.activeRosterSaveId();
       if (saveId) setActive(await open(saveId));
       if (!inspectionOnly && saveId) {
         // Durable path first: a completed pending match is applied from its saved checkpoint and binding.
-        const settle = () => settleManagedMatches({
-          careerSaveId: saveId,
-          careerKind: "ROSTER",
-          isFixtureCompleted: (fixtureId) => { const state = awaitedState.current; return state ? state.outcomes.some(outcome => "version" in outcome && outcome.completion.fixtureId === fixtureId) : false; },
-          apply: async ({ launch, result }) => {
-            if (!result.rosterCareerSession) throw new Error("The completed match produced no roster result.");
-            await applyRosterResult(launch as CareerUserMatchLaunch, result.rosterCareerSession);
-          },
-        });
-        let settled = await settle();
-        // The closed tab's writer lease can last up to 12 s. Retry for a bounded time instead of failing.
-        for (let attempt = 0; attempt < 5 && settled.errors.some(message => /open in another tab/.test(message)); attempt++) {
-          await new Promise(resolve => setTimeout(resolve, 3_000));
-          settled = await settle();
-        }
-        if (settled.applied.length) clearLaunchCache();
-        if (settled.errors.length) setError(settled.errors.join(" "));
-        setPendingRound(settled.pending.length ? ((settled.pending[0]!.launch as { roundNumber?: number }).roundNumber ?? null) : null);
+        await settleCareer(saveId);
       }
       // Legacy in-session handoff for launches that predate bindings. A repeat of an accepted result is a no-op.
       let pending: string | null = null, rawLaunch: string | null = null;
@@ -104,6 +109,14 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
       }
     }, true);
   }, []);
+  async function recoverCareer() {
+    if (!active || !active.recovered) return;
+    const oldSaveId = active.saveId;
+    const copied = await save(null, active.state, active.pack);
+    await managedBindings.rekeyCareer(oldSaveId, copied.saveId);
+    setActive(copied);
+    await settleCareer(copied.saveId);
+  }
   async function copyCareer() {
     if (!active || active.recovered) throw new Error("Open an intact career before creating a copy.");
     const title = copyName.trim();
@@ -133,7 +146,7 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
       saveId: current.saveId, seasonId: current.state.schedule.request.seasonId, scheduleSha256: current.state.schedule.scheduleSha256,
       fixtureId: fixture.fixtureId, fixtureOrdinal: fixture.ordinal, roundNumber: fixture.roundNumber, matchDayDate: fixture.matchDayDate,
       homeTeamId: fixture.homeTeamId, awayTeamId: fixture.awayTeamId, groundId: fixture.groundId, matchId: fixture.matchId,
-      matchGameId: `career-match-${fixture.fixtureId}`, matchSeed: fixture.matchSeed, selections: [...ready.selections],
+      matchGameId: managedMatchGameId(current.saveId, fixture.fixtureId), matchSeed: fixture.matchSeed, selections: [...ready.selections],
       careerStateSha256: current.state.stateSha256, managedTeamId: current.state.controlledTeamId };
     // Persist the link before launching so it survives a closed tab or browser.
     const recorded = await recordManagedLaunch(launch) as CareerUserMatchLaunch;
@@ -147,14 +160,14 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
     {error && <p role="alert" className="career-error">{error}</p>}
     <section className="career-panel"><h2>Import roster</h2><label>Roster JSON <input type="file" accept=".json,application/json" disabled={busy || inspectionOnly} onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) void run(async () => { const next = createStagedRosterPack(await file.text(), RULE_MANIFESTS.map(rule => rule.rulesId), SYNTHETIC_ALPHA_PACK.manifest.variationIds); setPack(next); setTeamId(next.world.teams[0]?.teamId ?? ""); }); }} /></label>
       <button type="button" onClick={() => { const players = careerWorld.players.map(player => Object.fromEntries(Object.entries(player).filter(([key]) => key !== "provenance"))); const blob = new Blob([JSON.stringify({ version: "LC_ROSTER_IMPORT_V1", sourceId: "my-roster", world: { ...careerWorld, players } }, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "lord-cricket-roster-template.json"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 0); }}>Download roster template</button>
-      {pack && <><label>Team <select value={teamId} onChange={event => setTeamId(event.target.value)}>{pack.world.teams.map(team => <option key={team.teamId} value={team.teamId}>{team.name}</option>)}</select></label><button disabled={busy || inspectionOnly} onClick={() => void run(async () => { const state = createRosterSeason(pack, { careerId: id("career"), controlledTeamId: teamId, seasonId: id("season"), gameId: id("game"), seasonSeed: id("seed"), startDate: new Date().toISOString().slice(0, 10) }); setActive(await save(null, state, pack)); })}>Start roster career</button></>}
+      {pack && <><label>Team <select value={teamId} onChange={event => setTeamId(event.target.value)}>{pack.world.teams.map(team => <option key={team.teamId} value={team.teamId}>{team.name}</option>)}</select></label><button disabled={busy || inspectionOnly} onClick={() => void run(async () => { const state = createRosterSeason(pack, { careerId: id("career"), controlledTeamId: teamId, seasonId: id("season"), gameId: id("game"), seasonSeed: id("seed"), startDate: new Date().toISOString().slice(0, 10) }); setPendingRound(null); setActive(await save(null, state, pack)); })}>Start roster career</button></>}
     </section>
-    <section className="career-panel"><h2>Saved roster careers</h2>{saves.map(item => <button key={item.saveId} disabled={busy || inspectionOnly} onClick={() => void run(async () => setActive(await open(item.saveId)))}>{item.title} · {item.completedFixtures}/56</button>)}
-      <label>Import career archive <input type="file" accept=".lcxxvi,application/zip" disabled={busy || inspectionOnly} onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) void run(async () => { const parsed = await readRosterSeasonPortableArchive(new Uint8Array(await file.arrayBuffer())); const state = validateRosterSeasonState(parsed.state, parsed.rosterPack); setActive(await save(null, state, parsed.rosterPack, "IMPORTED")); }); }} /></label>
+    <section className="career-panel"><h2>Saved roster careers</h2>{saves.map(item => <button key={item.saveId} disabled={busy || inspectionOnly} onClick={() => void run(async () => { const opened = await open(item.saveId); setActive(opened); if (!opened.recovered) await settleCareer(opened.saveId); else setPendingRound(null); })}>{item.title} · {item.completedFixtures}/56</button>)}
+      <label>Import career archive <input type="file" accept=".lcxxvi,application/zip" disabled={busy || inspectionOnly} onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) void run(async () => { const parsed = await readRosterSeasonPortableArchive(new Uint8Array(await file.arrayBuffer())); const state = validateRosterSeasonState(parsed.state, parsed.rosterPack); setPendingRound(null); setActive(await save(null, state, parsed.rosterPack, "IMPORTED")); }); }} /></label>
     </section>
     {active && <section className="career-panel"><h2>{active.pack.world.teams.find(team => team.teamId === active.state.controlledTeamId)?.name}</h2><p>{active.state.outcomes.length}/56 fixtures · {active.state.phase} · {active.state.careerState.currentDate}</p>
       {active.recovered && <p role="status">An older checkpoint was recovered. Create a copy to continue.</p>}
-      {active.recovered && <button disabled={busy || inspectionOnly} onClick={() => void run(async () => setActive(await save(null, active.state, active.pack)))}>Create recovered copy</button>}
+      {active.recovered && <button disabled={busy || inspectionOnly} onClick={() => void run(recoverCareer)}>Create recovered copy</button>}
       <label>Copy name <input value={copyName} maxLength={120} disabled={inspectionOnly} onChange={event => setCopyName(event.currentTarget.value)} /></label>
       <button disabled={busy || inspectionOnly || active.recovered || !copyName.trim()} onClick={() => void run(copyCareer)}>Save career copy</button>
       {pendingRound !== null && <p role="status" data-testid="pending-career-match">A match for round {pendingRound} is already in progress. Play next managed match resumes it.</p>}

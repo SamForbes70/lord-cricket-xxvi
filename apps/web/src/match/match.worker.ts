@@ -81,6 +81,14 @@ function sessionFormat(raw: unknown): "T20" | "ODI" | "RED_BALL" {
   const value = raw as { setup?: { format?: unknown } };
   return value?.setup?.format === "ODI" ? "ODI" : value?.setup?.format === "RED_BALL" ? "RED_BALL" : "T20";
 }
+function resumableSaveFor(saves: Awaited<ReturnType<typeof repository.list>>, matchGameId: string): string | null {
+  const recoveredSave = saves.find(
+    (save) => save.saveId.startsWith("recovered-") && save.matchGameId === matchGameId,
+  );
+  if (recoveredSave) return recoveredSave.saveId;
+  const direct = `auto:${matchGameId}`;
+  return saves.some((save) => save.saveId === direct) ? direct : null;
+}
 function metadata(session: AnySession, copy: NewGameWorldCopy | null = null) {
   const display = copy?.world;
   return {
@@ -531,18 +539,25 @@ async function handlePersistence(request: Request): Promise<Response | null> {
   }
   if (request.type === "DELETE_SAVE") {
     try {
+      const deleted = (await repository.list()).find((save) => save.saveId === request.saveId);
       if (request.saveId === activeSaveId) {
         if (!readOnly) await repository.releaseLease(request.saveId, ownerId);
         await repository.delete(request.saveId);
         activeSaveId = null;
         activeWorldCopy = null;
-      activeRosterPack = null;
+        activeRosterPack = null;
         delegation = emptyDelegation();
         readOnly = false;
         recovered = false;
         recoveredFromGeneration = null;
         controller = makeController();
       } else await repository.delete(request.saveId);
+      if (deleted?.matchGameId && resumableSaveFor(await repository.list(), deleted.matchGameId) === null) {
+        try {
+          const binding = await bindings.get(deleted.matchGameId);
+          if (binding?.status === "PENDING") await bindings.resolve(deleted.matchGameId, "ABANDONED", "MATCH_SAVE_DELETED");
+        } catch { /* damaged or missing binding */ }
+      }
       return decorate(controller.currentResponse(request.requestId));
     } catch (e) {
       return decorate(
@@ -661,9 +676,12 @@ async function handleInner(raw: unknown): Promise<Response> {
       // No active match. Resume a pending career match only when there is exactly one to resume.
       const { bindings: pending } = await bindings.list();
       const saves = await repository.list();
-      const resumable = pending.filter((b) => b.status === "PENDING" && saves.some((save) => save.saveId === `auto:${b.matchGameId}`));
+      const resumable = pending
+        .filter((b) => b.status === "PENDING")
+        .map((b) => ({ binding: b, saveId: resumableSaveFor(saves, b.matchGameId) }))
+        .filter((item): item is { binding: ManagedBinding; saveId: string } => item.saveId !== null);
       if (resumable.length === 1) {
-        try { await restoreSave(`auto:${resumable[0]!.matchGameId}`); }
+        try { await restoreSave(resumable[0]!.saveId); }
         catch (error) { return decorate(controller.currentResponse(request.requestId, `The saved career match could not be resumed. ${error instanceof Error ? error.message : ""}`.trim())); }
       } else if (resumable.length > 1) {
         return decorate(controller.currentResponse(request.requestId, "More than one career match is in progress. Resume the one you want from the career screen."));
@@ -753,17 +771,16 @@ async function handleInner(raw: unknown): Promise<Response> {
       return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different roster."));
     }
     if (!matchesCareerFixture) {
-      const existingId = `auto:${request.careerFixture.matchGameId}`;
-      const existing = (await repository.list()).some((save) => save.saveId === existingId);
+      const existingId = resumableSaveFor(await repository.list(), request.careerFixture.matchGameId);
       const activePending = current ? (await pendingBindingFor(String(current.setup.gameId))).binding : null;
-      if (activePending && !existing) {
+      if (activePending && !existingId) {
         return decorate(controller.currentResponse(request.requestId, "Another career match is still in progress. Return to it or abandon it first."));
       }
       if (activeSaveId && !readOnly) {
         try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
       }
-      if (existing) {
-        // The fixture already has a durable match. Resume it; never start it again over the top.
+      if (existingId) {
+        // The fixture already has a durable match (its autosave or recovered slot). Resume it; never start it again over the top.
         try {
           await restoreSave(existingId);
         } catch (error) {

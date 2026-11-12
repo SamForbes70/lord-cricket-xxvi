@@ -34,6 +34,8 @@ jobs:
         run: |
           npx vite build --config vite.acceptance.config.ts
           npx playwright test --config playwright.acceptance.config.ts --reporter list
+      - name: IndexedDB and managed-binding persistence in Chromium
+        run: npx playwright test --config playwright.m4.config.ts --reporter list --output test-results/m4 --trace retain-on-failure
       - name: Exhibition layout regressions in both browsers
         run: npx playwright test --config playwright.ui.config.ts --grep "desktop essential" --reporter list --output test-results/layout --trace retain-on-failure
         env:

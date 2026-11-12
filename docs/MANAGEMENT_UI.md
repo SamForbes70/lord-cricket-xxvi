@@ -17,7 +17,7 @@ Interactive T20 matches provide optional tactical captain delegation; the fixtur
 
 `Play match` creates a revision-bound launch payload containing the scheduled fixture identity, immutable match seed, scheduled ground and accepted XI snapshot. The existing match worker runs the normal T20 controller. On terminal completion it emits a hash-bound `LC_CAREER_USER_MATCH_RESULT_V1` containing the scorecard, final event hash and the shared engine-derived condition delta. The career service verifies the scorecard and source-completion hashes before applying the result exactly once through the canonical `USER_MATCH` completion boundary.
 
-A reload during the scheduled interactive match can reattach the career fixture context to the inherited persisted match when IDs match.
+Before an interactive career match launches, a hash-checked durable binding record (`managed-binding:<matchGameId>`) is written into the IndexedDB `settings` store (`packages/persistence/src/binding.ts`). Closing and reopening the tab or browser restores the match via `RECOVER_MANAGED` without going through the exhibition reset path, applies completed results to standard, edited-world and imported-roster careers once even when no match page is open, moves pending bindings when a damaged career is copied into a recovered slot, blocks exhibition resets while a career match is pending, and offers an explicit `Abandon career match` control (`docs/MANAGED_MATCH_RECOVERY.md`).
 
 ## Persistence and recovery
 

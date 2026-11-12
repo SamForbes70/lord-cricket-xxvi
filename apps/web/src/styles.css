@@ -609,15 +609,37 @@ code {
   width: 100%;
   min-width: 0;
 }
+.match-shell {
+  padding-block: 14px;
+}
 .match-shell .masthead h1,
 .match-shell .decision-top h2 {
   margin-bottom: 0;
 }
+.match-shell .preferences {
+  padding: 5px 0;
+  margin: 5px 0;
+}
+.match-shell .opponent-control {
+  padding: 6px 10px;
+  margin: 6px 0 8px;
+}
 .match-shell .scorestrip {
-  padding-block: 10px;
+  padding-block: 8px;
+}
+.match-shell .scorestrip p,
+.match-shell .scorestrip h2 {
+  margin-bottom: 0.25em;
 }
 .match-shell .active {
-  padding-block: 8px;
+  padding-block: 6px;
+}
+.match-shell .decision {
+  padding: 12px 18px;
+  margin: 6px 0 12px;
+}
+.match-shell .advance {
+  margin-top: 8px;
 }
 @media (max-width: 800px) {
   .opponent-control {
