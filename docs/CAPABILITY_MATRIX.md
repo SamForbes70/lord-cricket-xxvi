@@ -31,7 +31,7 @@ Dated reports retain the results of their original runs.
 | Empirical research | M7F-J candidates remain offline research. No candidate is selectable in gameplay. |
 | M7K | Source evidence plus isolated research ledger, replay, recovery and evaluation tooling; no new production ledger or promoted model. |
 | Scenario quality harness | Paired baseline/tactical developer tool across all eight teams and grounds; descriptive synthetic results only. |
-| Performance | Reference-hardware browser, season, memory and save/load budgets remain unaccepted. |
+| Performance | Reference-hardware browser, season, memory and save/load budgets remain unaccepted. Seven numeric budgets are confirmed and the memory budget has no figure yet; see [PERFORMANCE_BUDGETS.md](PERFORMANCE_BUDGETS.md). |
 | DLS and limited-overs rain | Disabled. Red-ball delay commands do not establish a calibrated weather scheduler. |
 | Prediction, super overs and DRS | Not enabled. |
 | Multiyear management | Transfers, contracts, finances, youth and international management are not implemented. |
