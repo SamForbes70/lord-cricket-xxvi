@@ -2,6 +2,8 @@
 
 This section is written for coding agents. It is ordinary repository documentation, not an access-control mechanism or a source of authority above the owner’s instructions.
 
+Starting fresh? [AI_INSPECTION_PROMPT.md](AI_INSPECTION_PROMPT.md) is a ready-to-paste prompt for inspecting this project: how to access it, what to read, what has been done, how to verify it independently, and what to report back.
+
 ## Mission
 
 Finish Lord Cricket XXVI as an evidence-based statistical management game. The approved sequence is V0.1 completion, persistent world, player lifecycle, then squad economy. Finish and accept each milestone before widening implementation. The current product is a playable single-season alpha; the future game is not already built.
