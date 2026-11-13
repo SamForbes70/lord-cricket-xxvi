@@ -301,7 +301,11 @@ export class IndexedDbSaveRepository {
       .filter((row) => {
         const recordType = (row as GameRecord & { recordType?: string }).recordType;
         // Career rows (standard and imported-roster) share the games store but are not match saves.
-        return recordType !== "SEASON" && recordType !== "ROSTER_SEASON";
+        return (
+          recordType !== "SEASON" &&
+          recordType !== "ROSTER_SEASON" &&
+          recordType !== "PERSISTENT_WORLD"
+        );
       })
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .map(summaryFromGame);
@@ -943,4 +947,5 @@ export class IndexedDbSaveRepository {
 
 export * from "./archive.js";
 export * from "./season.js";
+export * from "./persistent-world.js";
 export * from "./binding.js";

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "worldIdentityVersion": {
+      "type": "string",
+      "const": "LC_PERSISTENT_WORLD_IDENTITY_V1"
+    },
+    "worldId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "worldPackId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "worldCanonicalSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "baseSeed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "originKind": {
+      "type": "string",
+      "enum": [
+        "NEW_PERSISTENT_CAREER",
+        "COPIED_FROM_SINGLE_SEASON_V1"
+      ]
+    },
+    "sourceSingleSeasonSaveId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sourceSingleSeasonFinalStateSha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "worldIdentityVersion",
+    "worldId",
+    "worldPackId",
+    "worldCanonicalSha256",
+    "baseSeed",
+    "originKind",
+    "sourceSingleSeasonSaveId",
+    "sourceSingleSeasonFinalStateSha256"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PersistentWorldIdentity:1",
+  "title": "PersistentWorldIdentity"
+}

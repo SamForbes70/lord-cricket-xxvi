@@ -29,3 +29,8 @@ Why this figure. An 8 GB laptop must also run the operating system and other app
 - Public deployment remains separately unauthorised.
 - Empirical model promotion remains separately gated (the research items RES-001 to RES-003 stay `BLOCKED_EXTERNAL`: they need historical decisions, an untouched cohort and an approved dataset, none of which exist).
 - The owner has not reviewed the commits pushed directly to `main` on 13 November. They were reviewed by an AI; see [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md).
+
+## Owner decision, 14 November 2026 — Stage 2 (Persistent multi-season world)
+
+- The owner (Sam Forbes) accepted **Stage 2: Persistent multi-season world** (`feat/stage2-persistent-world`, [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)) on 14 November 2026 (Australia/Brisbane), authorised pushing `feat/stage2-persistent-world` and merging it to `main`, and authorised proceeding into **Stage 3: Player lifecycle and youth pathway**.
+- Hosted GitHub Actions (`Linux` and `Windows`) run after push; local Linux core (`736/736` unit tests, `207` JSON Schemas), smoke (`23/23`), and Chromium + Firefox Stage 2 browser checks passed prior to merge.

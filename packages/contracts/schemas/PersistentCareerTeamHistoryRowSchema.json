@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seasonsCompleted": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 200
+    },
+    "titles": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 200
+    },
+    "runnerUpFinishes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 200
+    },
+    "played": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "wins": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "losses": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "ties": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "noResults": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "points": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "runsFor": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "ballsFor": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "runsAgainst": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "ballsAgainst": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "teamId",
+    "seasonsCompleted",
+    "titles",
+    "runnerUpFinishes",
+    "played",
+    "wins",
+    "losses",
+    "ties",
+    "noResults",
+    "points",
+    "runsFor",
+    "ballsFor",
+    "runsAgainst",
+    "ballsAgainst"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PersistentCareerTeamHistoryRow:1",
+  "title": "PersistentCareerTeamHistoryRow"
+}

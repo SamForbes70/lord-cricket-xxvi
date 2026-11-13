@@ -69,7 +69,8 @@
 .recovery-title-field { display:block; margin:12px 0; }
 .recovery-title-field input { max-width:420px; width:100%; margin-top:4px; }
 .replay-meta { font-size:.9em; color:#31473d; margin:12px 0; overflow-wrap:anywhere; }
-.replay-viewer button[aria-pressed="true"] { background:#194b38; color:#fff; border-color:#194b38; }
+.replay-viewer button[aria-pressed="true"], .scope-bar button[aria-pressed="true"] { background:#194b38; color:#fff; border-color:#194b38; }
+.scope-bar { margin:12px 0 18px; }
 .replay-btn { white-space:nowrap; padding:.35em .65em; min-height:34px; }
 .file-import-label { display:block; margin-top:14px; }
 .career-error p { margin:.4em 0; }

@@ -6,15 +6,17 @@ The owner's sequence from here is **persistent world, then player lifecycle, the
 
 Read [HANDOVER.md](HANDOVER.md) first, then [AI_CONTINUATION.md](AI_CONTINUATION.md).
 
-## Next milestone: persistent world (Milestone 2)
+## Stage 2: Persistent multi-season world (`accepted`, 14 November 2026)
 
-Proposed scope and acceptance are in [V01_DELIVERY_PLAN.md](V01_DELIVERY_PLAN.md) ("After V0.1"). They are proposals until the owner accepts them. Before writing code:
+The owner accepted Stage 2 on 14 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). The full 17-stage Master Build Brief reconciliation and slice ledger live in [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), with Stage 2 verification evidence in [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md).
 
-1. Write the acceptance criteria and the save-compatibility plan for the owner to confirm. A multi-season career must keep existing single-season saves openable unchanged, or copy them forward by an explicit action. Never migrate a historical save silently.
-2. Decide the version identifiers for any widened persisted format. The delegation journal widened in place without a new version (see [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)); do not repeat that.
-3. Plan season rollover as one atomic transaction that a crash cannot leave half done.
+1. **Save compatibility preserved**: Existing V0.1 single-season saves (`LC_T20_SEASON_SAVE_V1`) and portable archives (`LC_T20_SEASON_PORTABLE_V1`, `LC_T20_SEASON_PORTABLE_V3_EVENT_ARCHIVES`) open unchanged under their original schemas and `20 MiB` / `50 MiB` caps without silent migration. Completed single-season saves can opt into Season 2 via an explicit non-destructive copy (`Begin Season 2 in a new persistent save`) into a new slot.
+2. **Explicit version boundaries**: Persistent multi-season saves use dedicated schemas (`LC_PERSISTENT_WORLD_V1`, `LC_COMPLETED_SEASON_RECORD_V1`, `LC_PERSISTENT_CAREER_PROJECTION_V1`, `LC_PERSISTENT_WORLD_PORTABLE_V1`, `LC_PERSISTENT_WORLD_ROLLOVER_RECEIPT_V1`) and dedicated IndexedDB stores.
+3. **Crash-safe atomic rollover**: `rolloverPersistentWorldSeason` commits the sealed completed-season record, rotated next-season schedule, checkpoint, and idempotency receipt in a single IndexedDB transaction, with automatic checkpoint fallback recovery.
 
-Do not start player lifecycle or squad economy code before the persistent world is accepted.
+## Active next milestone: Stage 3 — Player lifecycle and youth pathway
+
+With Stage 2 accepted, **Stage 3 (Player lifecycle and youth pathway)** is authorised: versioned ageing, reproducible training development protected from repeated-menu exploits, retirement, preserved retired player pages and records, youth intake, and 20-season balance diagnostics (fictional parameters labelled as such). Keep contracts and squad economy (Stage 4) outside Stage 3 until Stage 3 is accepted.
 
 ## Open items that still need people
 

@@ -12,8 +12,9 @@ Dated reports retain the results of their original runs.
 | Match formats | T20, ODI and five-day red-ball exhibitions under documented custom rules. |
 | Match interface | XIs, captain/keeper, toss, batting/bowling choices, field controls and complete scorecards. |
 | One-season career | Eight teams, 14 rounds and 56 fixtures, with managed interactive or simulated fixtures. |
+| Persistent multi-season world (`Stage 2`, `accepted`) | Standard and edited-world careers support consecutive 14-round, 56-fixture T20 seasons (`LC_PERSISTENT_WORLD_V1`), crash-safe idempotent rollover, immutable Roll of Honour, cross-season ball-by-ball replay archives, all-time club and player career statistics, cross-season player history, `.lcxxvi` `LC_PERSISTENT_WORLD_PORTABLE_V1` archives (`160 MiB` bound), and explicit non-destructive copy-forward of completed V0.1 single-season saves into Season 2 ([verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)). Owner-accepted 14 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). |
 | Management screens | Home, Career, Squad, Fixtures, Statistics, Settings and player pages. |
-| Player pages | Base ratings by format, current T20 career condition and recorded season statistics. Squad and statistics link by stable player ID. |
+| Player pages | Base ratings by format, current T20 career condition, recorded season statistics, and (in persistent worlds) cross-season career totals plus season-by-season breakdowns. Squad and statistics link by stable player ID. |
 | Pitch inspection | The selected exhibition ground and next career fixture show the seam and spin values used by the match model. Unused conditions and unavailable forecasts are labelled. |
 | Training and condition | Rest/practice, availability, fatigue and temporary readiness; no permanent skill growth. |
 | Tactical captain | Optional deterministic public-view policies for T20, ODI and five-day red ball (declarations, follow-on, new ball, workload and fields, with a conservative, balanced or aggressive red-ball profile). Legal controls are tested. Empirical tactical quality is unaccepted, and on first-innings runs the T20 captain is indistinguishable from the neutral baseline ([follow-up](verification-v01-batch7-diagnostics/FOLLOW_UP_2026-11-13.md)). |
@@ -40,7 +41,7 @@ Dated reports retain the results of their original runs.
 | Packaging | `npm run package:game` builds a playable zip (game, local server, launchers) and a source zip. The Windows launcher has not been run on Windows by the packager. |
 | Release record | [release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json) lists capabilities, evidence files, owner declarations, known limits and recovery instructions. A unit test fails if it cites a file that does not exist. |
 | Win prediction, super overs and DRS | Not enabled. The design brief makes win prediction optional. |
-| Multiyear management | Transfers, contracts, finances, youth and international management are not implemented. |
+| Lifecycle and squad economy (`Stages 3–4`) | Ageing, permanent skill development, youth intake, retirement, contracts, transfers, finances and international management are not implemented (Stage 3 active next slice; Stage 4 gated on Stage 3 acceptance). |
 
 Unit totals and commands belong to their dated evidence records, rather than this capability table.
 [Acceptance reconciliation](ACCEPTANCE_RECONCILIATION.md) maps completed and unrecorded gates without inferring missing results.

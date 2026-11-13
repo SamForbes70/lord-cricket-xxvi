@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seasonsPlayed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 200
+    },
+    "matches": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "battingInnings": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "notOuts": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "runs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "dismissals": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "ballsFaced": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "fours": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "sixes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "fifties": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "hundreds": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "ducks": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "highScoreRuns": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "highScoreNotOut": {
+      "type": "boolean"
+    },
+    "battingAverageX100": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "strikeRateX100": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "bowlingInnings": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "bowlingRunsConceded": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "bowlingLegalBalls": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "bowlingWickets": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "maidens": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "bestBowlingWickets": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "bestBowlingRuns": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "bowlingAverageX100": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "economyX100": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "bowlingStrikeRateX100": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "playerId",
+    "teamId",
+    "seasonsPlayed",
+    "matches",
+    "battingInnings",
+    "notOuts",
+    "runs",
+    "dismissals",
+    "ballsFaced",
+    "fours",
+    "sixes",
+    "fifties",
+    "hundreds",
+    "ducks",
+    "highScoreRuns",
+    "highScoreNotOut",
+    "battingAverageX100",
+    "strikeRateX100",
+    "bowlingInnings",
+    "bowlingRunsConceded",
+    "bowlingLegalBalls",
+    "bowlingWickets",
+    "maidens",
+    "bestBowlingWickets",
+    "bestBowlingRuns",
+    "bowlingAverageX100",
+    "economyX100",
+    "bowlingStrikeRateX100"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PersistentCareerPlayerStats:1",
+  "title": "PersistentCareerPlayerStats"
+}

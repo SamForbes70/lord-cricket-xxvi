@@ -13,9 +13,10 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 | Area | State |
 | --- | --- |
 | V0.1 | Closed and owner accepted on 13 November 2026. Every V01 backlog item is `DONE`. |
+| Stage 2 (Persistent world) | `accepted` on 14 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)). |
 | Match formats | T20, ODI and five-day red ball, with hash-chained replay. Tactical captains for all three. Seeded red-ball weather. |
-| Career | One fictional 14-round, 56-fixture T20 season; managed matches, training, condition, table, statistics, final archive. |
-| Saves | IndexedDB with checkpoints and writer leases; durable managed-match recovery across closed tabs; completed-match event archives and replay; career recovery into a new slot; `.lcxxvi` export and import. |
+| Career | Single-season V0.1 careers (`14` rounds, `56` fixtures) plus persistent multi-season world careers (`LC_PERSISTENT_WORLD_V1`: consecutive T20 seasons, Roll of Honour, all-time club & player statistics, cross-season player history). |
+| Saves | IndexedDB with checkpoints and writer leases; crash-safe idempotent season rollover; durable managed-match recovery across closed tabs; completed-match event archives and replay across seasons; non-destructive single-season copy-forward into Season 2; `.lcxxvi` export and import. |
 | Offline and accessibility | Precached offline shell with safe updates; automated keyboard, focus, contrast and 150 percent checks. |
 | Packaging | `npm run package:game` builds a playable zip and a source zip. |
 | Research track | Blocked on data. The model is synthetic and uncalibrated. |
@@ -26,7 +27,7 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 
 ## What is next
 
-1. Persistent world (multi-season), then player lifecycle, then squad economy, each accepted before the next. See [NEXT_PASS.md](NEXT_PASS.md) and "After V0.1" in [V01_DELIVERY_PLAN.md](V01_DELIVERY_PLAN.md).
+1. **Stage 3: Player lifecycle and youth pathway** (unlocked by Stage 2 owner acceptance on 14 November 2026), then Stage 4 (contracts and squad economy). See [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) and [NEXT_PASS.md](NEXT_PASS.md).
 2. The owner applies branch protection ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
 3. Optionally, real measurements for the three declared gates.
 

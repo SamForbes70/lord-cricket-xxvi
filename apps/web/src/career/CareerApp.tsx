@@ -10,8 +10,16 @@ import {
   type CareerReplayOutcome,
   type CareerUserMatchResult,
 } from "./service.js";
-import { PlayerPage, type PlayerFormat } from "./PlayerPage.js";
-import { managedBindings, recordManagedLaunch, settleManagedMatches } from "./managed-match.js";
+import {
+  PlayerPage,
+  type PlayerFormat,
+  type PlayerSeasonBreakdownRow,
+} from "./PlayerPage.js";
+import {
+  managedBindings,
+  recordManagedLaunch,
+  settleManagedMatches,
+} from "./managed-match.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { WorldEditor } from "../world/WorldEditor.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
@@ -27,12 +35,18 @@ if (!owner) {
   sessionStorage.setItem(OWNER_KEY, owner);
 }
 const service = new CareerApplicationService(owner, undefined, async (from, to) => {
-  try { await managedBindings.rekeyCareer(from, to); } catch { /* the pending match is then reported, not applied */ }
+  try {
+    await managedBindings.rekeyCareer(from, to);
+  } catch {
+    /* the pending match is then reported, not applied */
+  }
 });
+
 function roundOf(launch: unknown): number | null {
   const round = (launch as { roundNumber?: unknown } | null)?.roundNumber;
   return typeof round === "number" ? round : null;
 }
+
 /** Applies completed pending matches and retires bindings for fixtures completed another way. */
 async function settleStandard() {
   const saveId = service.getSaveId();
@@ -40,19 +54,34 @@ async function settleStandard() {
   return settleManagedMatches({
     careerSaveId: saveId,
     careerKind: "STANDARD",
-    isFixtureCompleted: (fixtureId) => service.getState()?.completedMatches.some((match) => match.fixtureId === fixtureId) ?? false,
+    isFixtureCompleted: (fixtureId) => Boolean(service.findCompletionByFixtureId(fixtureId)),
     apply: async ({ result }) => {
-      if (!result.careerResult) throw new Error("The completed match produced no career result.");
+      if (!result.careerResult) {
+        throw new Error("The completed match produced no career result.");
+      }
       await service.completeUserMatch(result.careerResult, result.t20Session);
     },
   });
 }
+
 function clearLaunchCache() {
-  try { sessionStorage.removeItem(RESULT_KEY); sessionStorage.removeItem(LAUNCH_KEY); } catch { /* storage unavailable */ }
+  try {
+    sessionStorage.removeItem(RESULT_KEY);
+    sessionStorage.removeItem(LAUNCH_KEY);
+  } catch {
+    /* storage unavailable */
+  }
 }
 
 type Screen = "HOME" | "CAREER" | "SQUAD" | "FIXTURES" | "STATISTICS" | "SETTINGS" | "PLAYER";
-const directives: TrainingDirective[] = ["REST", "BATTING_PRACTICE", "BOWLING_PRACTICE", "FIELDING_PRACTICE"];
+type StatsScope = "ACTIVE" | "ALL_TIME" | number;
+
+const directives: TrainingDirective[] = [
+  "REST",
+  "BATTING_PRACTICE",
+  "BOWLING_PRACTICE",
+  "FIELDING_PRACTICE",
+];
 
 function metric(value: number | null, divisor = 100): string {
   return value === null ? "–" : (value / divisor).toFixed(2);
@@ -73,7 +102,11 @@ function ErrorBanner({ rawError }: { rawError: string }) {
     <div role="alert" tabIndex={-1} className="career-error">
       <strong>{isStructured ? desc.summary : rawError}</strong>
       <p>{desc.guidance}</p>
-      {isStructured && <small>Diagnostic code: <code>{desc.code}</code></small>}
+      {isStructured && (
+        <small>
+          Diagnostic code: <code>{desc.code}</code>
+        </small>
+      )}
     </div>
   );
 }
@@ -93,11 +126,17 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     const stored = localStorage.getItem("lcxxvi-player-format");
     return stored === "ODI" || stored === "RED_BALL" ? stored : "T20";
   });
+  const [statsScope, setStatsScope] = useState<StatsScope>("ACTIVE");
+  const [historySeasonView, setHistorySeasonView] = useState<number | null>(null);
+
   function openPlayer(id: string, origin: "SQUAD" | "STATISTICS") {
-    setPlayerId(id); setPlayerOrigin(origin); setScreen("PLAYER");
+    setPlayerId(id);
+    setPlayerOrigin(origin);
+    setScreen("PLAYER");
   }
   function changePlayerFormat(value: PlayerFormat) {
-    setPlayerFormat(value); localStorage.setItem("lcxxvi-player-format", value);
+    setPlayerFormat(value);
+    localStorage.setItem("lcxxvi-player-format", value);
   }
   const [copyName, setCopyName] = useState("");
   const [busy, setBusy] = useState(true);
@@ -126,6 +165,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   const [density, setDensity] = useState(() => localStorage.getItem("lcxxvi-career-density") ?? "comfortable");
   const [reducedMotion, setReducedMotion] = useState(() => localStorage.getItem("lcxxvi-career-motion") === "reduced");
   const state = service.getState();
+  const persistentWorld = service.getPersistentState();
 
   useEffect(() => service.subscribe(() => redraw((value) => value + 1)), []);
   useEffect(() => {
@@ -148,44 +188,60 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   }, [activeReplay]);
   useEffect(() => {
     let alive = true;
-    /** Settles durable matches, then the legacy in-session handoff. Safe to repeat. */
     async function afterBoot(): Promise<void> {
       if (inspectionOnly) return;
-      // Durable path first: any pending match for this career whose checkpoint is complete is applied
-      // from the saved match and its binding, whether or not the original tab is still around.
       const settled = await settleStandard();
       if (settled) {
         if (settled.applied.length) clearLaunchCache();
         if (alive) setUiError(settled.errors.join(" "));
-        if (alive) setPendingMatch(settled.pending.length ? { round: roundOf(settled.pending[0]!.launch) } : null);
+        if (alive) {
+          setPendingMatch(
+            settled.pending.length ? { round: roundOf(settled.pending[0]!.launch) } : null,
+          );
+        }
       }
-      // Legacy in-session handoff, kept for launches started before bindings existed. An identical
-      // completion is a no-op, so this cannot apply a result twice after the durable path ran.
       let pending: string | null = null;
-      try { pending = sessionStorage.getItem(RESULT_KEY); } catch { /* storage unavailable */ }
+      try {
+        pending = sessionStorage.getItem(RESULT_KEY);
+      } catch {
+        /* storage unavailable */
+      }
       if (pending && !service.isReadOnly()) {
         const parsed = JSON.parse(pending) as CareerUserMatchResult;
         await service.completeUserMatch(parsed);
         clearLaunchCache();
         try {
           const saveId = service.getSaveId();
-          const { bindings } = saveId ? await managedBindings.pendingForCareer(saveId) : { bindings: [] };
-          const matchGameId = bindings.find((b) => b.fixtureId === parsed.fixtureId)?.matchGameId ?? `career-match-${parsed.fixtureId}`;
+          const { bindings } = saveId
+            ? await managedBindings.pendingForCareer(saveId)
+            : { bindings: [] };
+          const matchGameId =
+            bindings.find((b) => b.fixtureId === parsed.fixtureId)?.matchGameId ??
+            `career-match-${parsed.fixtureId}`;
           await managedBindings.resolve(matchGameId, "APPLIED", "RESULT_APPLIED");
-        } catch { /* no binding for legacy launches */ }
+        } catch {
+          /* no binding for legacy launches */
+        }
       }
     }
-    const releaseWriter = () => { void service.releaseWriter(); };
+    const releaseWriter = () => {
+      void service.releaseWriter();
+    };
     window.addEventListener("pagehide", releaseWriter);
     void (async () => {
       try {
         if (inspectionOnly) await service.inspectActiveCareer();
         else await service.boot();
         await afterBoot();
-        if (alive) { setSavedCareers(await service.listCareers()); setBusy(false); }
-        // A career reopened right after its tab closed sees the old tab's lease for up to 12 s. Retry for
-        // a bounded time so a legitimate reopen becomes writable on its own; a live second tab is never taken over.
-        for (let attempt = 0; alive && !inspectionOnly && service.isReadOnly() && attempt < 6; attempt++) {
+        if (alive) {
+          setSavedCareers(await service.listCareers());
+          setBusy(false);
+        }
+        for (
+          let attempt = 0;
+          alive && !inspectionOnly && service.isReadOnly() && attempt < 6;
+          attempt++
+        ) {
           await new Promise((resolve) => setTimeout(resolve, 3_000));
           if (!alive) break;
           await service.boot();
@@ -195,7 +251,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           }
         }
       } catch (error) {
-        if (alive) setUiError(error instanceof Error ? error.message : "Career startup failed.");
+        if (alive) {
+          setUiError(error instanceof Error ? error.message : "Career startup failed.");
+        }
       } finally {
         if (alive) setBusy(false);
       }
@@ -213,7 +271,10 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   }, [scale, density, reducedMotion]);
 
   async function action(work: () => Promise<void>) {
-    if (inspectionOnly) { setUiError("Return to the active match before changing the career."); return; }
+    if (inspectionOnly) {
+      setUiError("Return to the active match before changing the career.");
+      return;
+    }
     setBusy(true);
     setUiError("");
     try {
@@ -232,6 +293,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       setStagedWorld(null);
       setActiveReplay(null);
       setCheckpointView(null);
+      setStatsScope("ACTIVE");
+      setHistorySeasonView(null);
       setScreen("HOME");
     });
   }
@@ -239,7 +302,6 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   async function playMatch() {
     await action(async () => {
       const prepared = await service.prepareUserMatch();
-      // Persist the link before launching so it survives a closed tab or browser.
       const launch = await recordManagedLaunch(prepared);
       sessionStorage.setItem(LAUNCH_KEY, JSON.stringify(launch));
       window.location.hash = "#exhibition";
@@ -255,7 +317,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `lord-cricket-career-${state?.seasonId ?? "season"}.lcxxvi`;
+      a.download = persistentWorld
+        ? `lord-cricket-world-${persistentWorld.worldIdentity.worldId}-s${persistentWorld.currentSeasonNumber}.lcxxvi`
+        : `lord-cricket-career-${state?.seasonId ?? "season"}.lcxxvi`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 0);
     });
@@ -267,6 +331,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       await service.importCareer(new Uint8Array(await file.arrayBuffer()));
       setActiveReplay(null);
       setCheckpointView(null);
+      setStatsScope("ACTIVE");
+      setHistorySeasonView(null);
       setScreen("HOME");
     });
   }
@@ -299,12 +365,14 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       setCheckpointView(null);
       setCheckpointTriggerId(null);
       setActiveReplay(null);
+      setStatsScope("ACTIVE");
+      setHistorySeasonView(null);
       setScreen("HOME");
     });
   }
 
   async function openReplay(fixtureId: string, triggerId: string) {
-    const completion = completionByFixture.get(fixtureId);
+    const completion = service.findCompletionByFixtureId(fixtureId);
     if (!completion) return;
     setBusy(true);
     setUiError("");
@@ -349,21 +417,26 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     >
       <div className="section-bar">
         <h3 id="checkpoint-inspector-heading">Checkpoint recovery · {checkpointView.title}</h3>
-        <button type="button" onClick={closeCheckpointInspector}>Close checkpoint inspector</button>
+        <button type="button" onClick={closeCheckpointInspector}>
+          Close checkpoint inspector
+        </button>
       </div>
       <p>
-        Corrupted checkpoints and damaged original saves are retained untouched. Choosing a verified generation below creates a new recovered career copy.
+        Corrupted checkpoints and damaged original saves are retained untouched. Choosing a verified
+        generation below creates a new recovered career copy.
       </p>
       {checkpointView.corruptedGenerations.length > 0 ? (
         <p role="status" className="career-warning">
-          Corrupted checkpoint generations detected and isolated: {checkpointView.corruptedGenerations.map((g) => `G${g}`).join(", ")}.
+          Corrupted checkpoint generations detected and isolated:{" "}
+          {checkpointView.corruptedGenerations.map((g) => `G${g}`).join(", ")}.
         </p>
       ) : (
         <p role="status">All stored checkpoint generations passed SHA-256 and schema verification.</p>
       )}
       {checkpointView.validGenerations.length === 0 ? (
         <p role="status" className="career-error">
-          No verified checkpoint generation remains on this slot. The damaged save is preserved; load an earlier manual copy or import a validated .lcxxvi archive.
+          No verified checkpoint generation remains on this slot. The damaged save is preserved;
+          load an earlier manual copy or import a validated .lcxxvi archive.
         </p>
       ) : (
         <>
@@ -391,12 +464,23 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               <tbody>
                 {checkpointView.validGenerations.map((gen) => (
                   <tr key={gen.generation}>
-                    <td>G{gen.generation}{gen.checkpointSerial === checkpointView.currentSerial ? <small>Newest</small> : <small>Older</small>}</td>
+                    <td>
+                      G{gen.generation}
+                      {gen.checkpointSerial === checkpointView.currentSerial ? (
+                        <small>Newest</small>
+                      ) : (
+                        <small>Older</small>
+                      )}
+                    </td>
                     <td>{gen.revision}</td>
-                    <td>{gen.completedFixtures}/56 · {gen.phase}</td>
+                    <td>
+                      {gen.completedFixtures}/56 · {gen.phase}
+                    </td>
                     <td>{gen.currentDate}</td>
                     <td>{gen.createdAt}</td>
-                    <td><code>{gen.stateSha256.slice(0, 12)}…</code></td>
+                    <td>
+                      <code>{gen.stateSha256.slice(0, 12)}…</code>
+                    </td>
                     <td>
                       <button
                         type="button"
@@ -427,25 +511,38 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     >
       <div className="section-bar">
         <h3 id="replay-viewer-heading">
-          Archived match replay · Round {activeReplay.completion.roundNumber} · {service.teamName(activeReplay.completion.homeTeamId)} v {service.teamName(activeReplay.completion.awayTeamId)}
+          Archived match replay · Round {activeReplay.completion.roundNumber} ·{" "}
+          {service.teamName(activeReplay.completion.homeTeamId)} v{" "}
+          {service.teamName(activeReplay.completion.awayTeamId)}
         </h3>
-        <button type="button" onClick={closeReplay}>Close replay</button>
+        <button type="button" onClick={closeReplay}>
+          Close replay
+        </button>
       </div>
       <p>
-        <strong>{service.resultText(activeReplay.completion)}</strong> · {activeReplay.completion.matchDayDate} · Source: {activeReplay.completion.source}
+        <strong>{service.resultText(activeReplay.completion)}</strong> ·{" "}
+        {activeReplay.completion.matchDayDate} · Source: {activeReplay.completion.source}
       </p>
       <div className="career-summary-grid">
         {activeReplay.completion.scorecard.innings.map((inn, innIdx) => (
           <div key={innIdx} className="career-panel">
-            <h4>Innings {innIdx + 1} · {service.teamName(inn.battingTeamId)}</h4>
-            <p className="big-stat">{inn.runs}/{inn.wickets} ({oversText(inn.legalBalls)})</p>
-            <small>Scorecard SHA-256: <code>{activeReplay.completion.scorecardSha256.slice(0, 16)}…</code></small>
+            <h4>
+              Innings {innIdx + 1} · {service.teamName(inn.battingTeamId)}
+            </h4>
+            <p className="big-stat">
+              {inn.runs}/{inn.wickets} ({oversText(inn.legalBalls)})
+            </p>
+            <small>
+              Scorecard SHA-256: <code>{activeReplay.completion.scorecardSha256.slice(0, 16)}…</code>
+            </small>
           </div>
         ))}
       </div>
       {activeReplay.outcome.status === "UNAVAILABLE" && (
         <p role="status" className="career-warning">
-          Ball-by-ball replay unavailable: this fixture was completed before event archives were recorded (legacy v1 career). Its verified scorecard is preserved above without recomputing or inventing new historical deliveries.
+          Ball-by-ball replay unavailable: this fixture was completed before event archives were
+          recorded (legacy v1 career). Its verified scorecard is preserved above without
+          recomputing or inventing new historical deliveries.
         </p>
       )}
       {activeReplay.outcome.status === "DAMAGED" && (
@@ -453,77 +550,114 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           {activeReplay.outcome.message}
         </p>
       )}
-      {activeReplay.outcome.status === "READY" && (() => {
-        const { replay, archive } = activeReplay.outcome;
-        const inningsDeliveries = replay.deliveries.filter((d) => d.inningsIndex === replayInningsTab);
-        return (
-          <div>
-            <p className="replay-meta" data-testid="replay-archive-meta">
-              Archive <code>{archive.archiveVersion}</code> · {replay.eventCount} events · {replay.deliveries.length} deliveries · Final event hash <code>{replay.finalEventHash.slice(0, 16)}…</code> · {archive.byteLength.toLocaleString()} bytes
-            </p>
-            <div className="action-row" role="group" aria-label="Replay innings selection">
-              {[0, 1].map((idx) => {
-                const inn = replay.scorecard.innings[idx];
-                if (!inn) return null;
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    aria-pressed={replayInningsTab === idx}
-                    onClick={() => setReplayInningsTab(idx)}
-                  >
-                    Innings {idx + 1}: {service.teamName(inn.battingTeamId)} ({inn.runs}/{inn.wickets})
-                  </button>
-                );
-              })}
-            </div>
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Seq</th>
-                    <th>Ball</th>
-                    <th>Striker</th>
-                    <th>Bowler</th>
-                    <th>Runs</th>
-                    <th>Wicket</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inningsDeliveries.map((d) => (
-                    <tr key={d.sequence}>
-                      <td>{d.sequence}</td>
-                      <td>{d.over}.{d.ballInOver}</td>
-                      <td>{service.playerName(d.strikerId)}</td>
-                      <td>{service.playerName(d.bowlerId)}</td>
-                      <td>{d.totalRuns}</td>
-                      <td>{d.wicketKind ?? "–"}</td>
+      {activeReplay.outcome.status === "READY" &&
+        (() => {
+          const { replay, archive } = activeReplay.outcome;
+          const inningsDeliveries = replay.deliveries.filter(
+            (d) => d.inningsIndex === replayInningsTab,
+          );
+          return (
+            <div>
+              <p className="replay-meta" data-testid="replay-archive-meta">
+                Archive <code>{archive.archiveVersion}</code> · {replay.eventCount} events ·{" "}
+                {replay.deliveries.length} deliveries · Final event hash{" "}
+                <code>{replay.finalEventHash.slice(0, 16)}…</code> ·{" "}
+                {archive.byteLength.toLocaleString()} bytes
+              </p>
+              <div className="action-row" role="group" aria-label="Replay innings selection">
+                {[0, 1].map((idx) => {
+                  const inn = replay.scorecard.innings[idx];
+                  if (!inn) return null;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      aria-pressed={replayInningsTab === idx}
+                      onClick={() => setReplayInningsTab(idx)}
+                    >
+                      Innings {idx + 1}: {service.teamName(inn.battingTeamId)} ({inn.runs}/
+                      {inn.wickets})
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Seq</th>
+                      <th>Ball</th>
+                      <th>Striker</th>
+                      <th>Bowler</th>
+                      <th>Runs</th>
+                      <th>Wicket</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {inningsDeliveries.map((d) => (
+                      <tr key={d.sequence}>
+                        <td>{d.sequence}</td>
+                        <td>
+                          {d.over}.{d.ballInOver}
+                        </td>
+                        <td>{service.playerName(d.strikerId)}</td>
+                        <td>{service.playerName(d.bowlerId)}</td>
+                        <td>{d.totalRuns}</td>
+                        <td>{d.wicketKind ?? "–"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
     </section>
   );
 
   if (busy && !state && savedCareers.length === 0) {
-    return <main className="career-shell"><p>Loading Lord Cricket XXVI…</p></main>;
+    return (
+      <main className="career-shell">
+        <p>Loading Lord Cricket XXVI…</p>
+      </main>
+    );
   }
 
   if (!state) {
     return (
-      <main className={`career-shell density-${density}`} style={{ fontSize: `${Number(scale) / 100}rem` }}>
-        {inspectionOnly && <p role="status">Career inspection only. Return to the active match before changing the career.</p>}
+      <main
+        className={`career-shell density-${density}`}
+        style={{ fontSize: `${Number(scale) / 100}rem` }}
+      >
+        {inspectionOnly && (
+          <p role="status">
+            Career inspection only. Return to the active match before changing the career.
+          </p>
+        )}
         <header className="career-masthead">
-          <div><p className="eyebrow">LORD CRICKET XXVI</p><h1>Start a <span>Career</span></h1></div>
-          <a className="button-link" href="#exhibition" onClick={() => { if (!inspectionOnly) sessionStorage.removeItem(LAUNCH_KEY); }}>{inspectionOnly ? "Return to match" : "Exhibition matches"}</a>
-          <a className="button-link" href="#roster-career">Imported roster career</a>
+          <div>
+            <p className="eyebrow">LORD CRICKET XXVI</p>
+            <h1>
+              Start a <span>Career</span>
+            </h1>
+          </div>
+          <a
+            className="button-link"
+            href="#exhibition"
+            onClick={() => {
+              if (!inspectionOnly) sessionStorage.removeItem(LAUNCH_KEY);
+            }}
+          >
+            {inspectionOnly ? "Return to match" : "Exhibition matches"}
+          </a>
+          <a className="button-link" href="#roster-career">
+            Imported roster career
+          </a>
         </header>
         <section className="career-disclosure" aria-label="Product status">
-          <strong>Playable alpha.</strong> Fictional eight-team dataset · SYNTHETIC_ALPHA model · one T20 season · no transfers, contracts, finances, international management or verified DLS.
+          <strong>Playable alpha.</strong> Fictional eight-team dataset · SYNTHETIC_ALPHA model ·
+          persistent multi-season T20 world · no transfers, contracts, finances, permanent ageing,
+          international management or verified DLS.
         </section>
         {activeError && <ErrorBanner rawError={activeError} />}
         {checkpointInspectorSection}
@@ -533,29 +667,46 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
             <div className="save-list">
               {savedCareers.map((save) => {
                 const inspectBtnId = `inspect-checkpoints-${save.saveId}`;
+                const modeLabel =
+                  save.careerMode === "PERSISTENT_WORLD"
+                    ? `Season ${save.currentSeasonNumber} (${save.currentCalendarYear}) · ${save.completedSeasonCount} closed`
+                    : "Single-season V0.1 save";
                 return (
-                  <div key={save.saveId} className="save-slot-row" role="group" aria-label={save.title}>
+                  <div
+                    key={save.saveId}
+                    className="save-slot-row"
+                    role="group"
+                    aria-label={save.title}
+                  >
                     <button
                       className="save-continue-btn"
                       disabled={busy || inspectionOnly}
-                      onClick={() => action(async () => {
-                        try {
-                          await service.loadCareer(save.saveId);
-                          setCheckpointView(null);
-                          setScreen("HOME");
-                        } catch (err) {
+                      onClick={() =>
+                        action(async () => {
                           try {
-                            const inspection = await service.inspectCareerCheckpoints(save.saveId);
-                            setCheckpointTriggerId(inspectBtnId);
-                            setRecoveryTitle(`${inspection.title} (Recovered)`);
-                            setCheckpointView(inspection);
-                          } catch { /* ignore secondary inspection error */ }
-                          throw err;
-                        }
-                      })}
+                            await service.loadCareer(save.saveId);
+                            setCheckpointView(null);
+                            setStatsScope("ACTIVE");
+                            setHistorySeasonView(null);
+                            setScreen("HOME");
+                          } catch (err) {
+                            try {
+                              const inspection = await service.inspectCareerCheckpoints(save.saveId);
+                              setCheckpointTriggerId(inspectBtnId);
+                              setRecoveryTitle(`${inspection.title} (Recovered)`);
+                              setCheckpointView(inspection);
+                            } catch {
+                              /* ignore secondary inspection error */
+                            }
+                            throw err;
+                          }
+                        })
+                      }
                     >
                       {save.title} · {save.completedFixtures}/56 · {save.phase}
-                      <small>{save.currentDate} · revision {save.revision}</small>
+                      <small>
+                        {modeLabel} · {save.currentDate} · revision {save.revision}
+                      </small>
                     </button>
                     <button
                       id={inspectBtnId}
@@ -574,69 +725,212 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         )}
         <section>
           <h2>New career</h2>
-          <p>Choose the team you will manage for the fixed 14-round, 56-match season.</p>
-          {editingWorld ? <WorldEditor base={careerWorld} initial={stagedWorld} onClose={() => { setEditingWorld(false); setRestoreEditorFocus(true); }} onStage={copy => { setStagedWorld(copy); setEditingWorld(false); setRestoreEditorFocus(true); }} /> : <div className="action-row">
-            <button ref={editWorldButton} type="button" onClick={() => setEditingWorld(true)}>Edit names and colours</button>
-            {stagedWorld && <button type="button" onClick={() => setStagedWorld(null)}>Use original world</button>}
-          </div>}
-          {stagedWorld && <p role="status">Edited world ready for a new career. Existing careers remain unchanged.</p>}
+          <p>
+            Choose the team you will manage across consecutive 14-round, 56-match T20 seasons in a
+            persistent world.
+          </p>
+          {editingWorld ? (
+            <WorldEditor
+              base={careerWorld}
+              initial={stagedWorld}
+              onClose={() => {
+                setEditingWorld(false);
+                setRestoreEditorFocus(true);
+              }}
+              onStage={(copy) => {
+                setStagedWorld(copy);
+                setEditingWorld(false);
+                setRestoreEditorFocus(true);
+              }}
+            />
+          ) : (
+            <div className="action-row">
+              <button
+                ref={editWorldButton}
+                type="button"
+                onClick={() => setEditingWorld(true)}
+              >
+                Edit names and colours
+              </button>
+              {stagedWorld && (
+                <button type="button" onClick={() => setStagedWorld(null)}>
+                  Use original world
+                </button>
+              )}
+            </div>
+          )}
+          {stagedWorld && (
+            <p role="status">
+              Edited world ready for a new career. Existing careers remain unchanged.
+            </p>
+          )}
           <div className="team-picker">
             {displayWorld.teams.map((candidate) => (
-              <button key={candidate.teamId} className="team-card" disabled={busy || inspectionOnly || editingWorld} onClick={() => createCareer(candidate.teamId)}>
+              <button
+                key={candidate.teamId}
+                className="team-card"
+                disabled={busy || inspectionOnly || editingWorld}
+                onClick={() => createCareer(candidate.teamId)}
+              >
                 <strong>{candidate.name}</strong>
-                <span>{displayWorld.grounds.find(ground => ground.groundId === candidate.teamId.replace("team", "ground"))?.name}</span>
-                <span className="team-colours" aria-hidden="true">{candidate.colours.map((colour, index) => <i key={index} style={{ backgroundColor: colour }} />)}</span>
+                <span>
+                  {
+                    displayWorld.grounds.find(
+                      (ground) => ground.groundId === candidate.teamId.replace("team", "ground"),
+                    )?.name
+                  }
+                </span>
+                <span className="team-colours" aria-hidden="true">
+                  {candidate.colours.map((colour, index) => (
+                    <i key={index} style={{ backgroundColor: colour }} />
+                  ))}
+                </span>
               </button>
             ))}
           </div>
         </section>
         <section className="career-panel import-panel">
           <h2>Import portable career</h2>
-          <label>Choose .lcxxvi archive<input type="file" accept=".lcxxvi,application/zip" disabled={inspectionOnly} onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)} /></label>
+          <label>
+            Choose .lcxxvi archive
+            <input
+              type="file"
+              accept=".lcxxvi,application/zip"
+              disabled={inspectionOnly}
+              onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)}
+            />
+          </label>
         </section>
       </main>
     );
   }
 
-  const completedManaged = state.completedMatches.filter((completion) => [completion.homeTeamId, completion.awayTeamId].includes(controlledTeam!));
+  const completedManaged = state.completedMatches.filter((completion) =>
+    [completion.homeTeamId, completion.awayTeamId].includes(controlledTeam!),
+  );
   const currentRound = nextFixture?.roundNumber ?? 14;
   const status = service.getStatus();
   const currentSaveId = service.getSaveId();
+  const activeRevision = persistentWorld ? persistentWorld.revision : state.revision;
+  const inspectedCompletedSeason =
+    persistentWorld && historySeasonView !== null
+      ? persistentWorld.completedSeasons.find((s) => s.seasonNumber === historySeasonView) ?? null
+      : null;
 
   return (
-    <main className={`career-shell density-${density} ${reducedMotion ? "reduced-motion" : ""}`} style={{ fontSize: `${Number(scale) / 100}rem` }}>
-      {inspectionOnly && <p role="status">Career inspection only. Return to the active match before changing the career.</p>}
+    <main
+      className={`career-shell density-${density} ${reducedMotion ? "reduced-motion" : ""}`}
+      style={{ fontSize: `${Number(scale) / 100}rem` }}
+    >
+      {inspectionOnly && (
+        <p role="status">
+          Career inspection only. Return to the active match before changing the career.
+        </p>
+      )}
       <header className="career-masthead">
         <div>
           <p className="eyebrow">LORD CRICKET XXVI · MANAGEMENT</p>
           <h1>{team?.name ?? "Career"}</h1>
-          {team && <div className="team-colours" aria-hidden="true">{team.colours.map((colour, index) => <i key={index} style={{ backgroundColor: colour }} />)}</div>}
-          <p>{state.phase === "COMPLETE" ? "Season complete" : `Round ${currentRound} · ${state.careerState.currentDate}`}</p>
+          {team && (
+            <div className="team-colours" aria-hidden="true">
+              {team.colours.map((colour, index) => (
+                <i key={index} style={{ backgroundColor: colour }} />
+              ))}
+            </div>
+          )}
+          <p data-testid="career-masthead-subtitle">
+            {persistentWorld
+              ? `Season ${persistentWorld.currentSeasonNumber} (${persistentWorld.currentCalendarYear}) · `
+              : "Single-season V0.1 · "}
+            {state.phase === "COMPLETE"
+              ? "Season complete"
+              : `Round ${currentRound} · ${state.careerState.currentDate}`}
+          </p>
         </div>
         <div className="save-badge" data-status={status.toLowerCase()}>
           <strong>{status}</strong>
-          <small>{state.completedMatches.length}/56 fixtures · rev {state.revision}</small>
+          <small>
+            {state.completedMatches.length}/56 fixtures · rev {activeRevision}
+          </small>
         </div>
       </header>
 
       <nav className="career-nav" aria-label="Career navigation">
-        {(["HOME", "CAREER", "SQUAD", "FIXTURES", "STATISTICS", "SETTINGS"] as Screen[]).map((item) => (
-          <button key={item} aria-current={screen === item ? "page" : undefined} onClick={() => { setActiveReplay(null); setScreen(item); }}>{item[0] + item.slice(1).toLowerCase()}</button>
-        ))}
-        <a href="#exhibition" onClick={() => { if (!inspectionOnly) sessionStorage.removeItem(LAUNCH_KEY); }}>{inspectionOnly ? "Return to match" : "Exhibition"}</a>
-        <button disabled={busy || inspectionOnly} onClick={() => void action(async () => { await service.leaveCareer(); setActiveReplay(null); setCheckpointView(null); setScreen("HOME"); })}>Choose career</button>
+        {(["HOME", "CAREER", "SQUAD", "FIXTURES", "STATISTICS", "SETTINGS"] as Screen[]).map(
+          (item) => (
+            <button
+              key={item}
+              aria-current={screen === item ? "page" : undefined}
+              onClick={() => {
+                setActiveReplay(null);
+                setScreen(item);
+              }}
+            >
+              {item[0] + item.slice(1).toLowerCase()}
+            </button>
+          ),
+        )}
+        <a
+          href="#exhibition"
+          onClick={() => {
+            if (!inspectionOnly) sessionStorage.removeItem(LAUNCH_KEY);
+          }}
+        >
+          {inspectionOnly ? "Return to match" : "Exhibition"}
+        </a>
+        <button
+          disabled={busy || inspectionOnly}
+          onClick={() =>
+            void action(async () => {
+              await service.leaveCareer();
+              setActiveReplay(null);
+              setCheckpointView(null);
+              setScreen("HOME");
+            })
+          }
+        >
+          Choose career
+        </button>
       </nav>
 
       <section className="career-disclosure compact" aria-label="Model disclosure">
-        Fictional data · SYNTHETIC_ALPHA · one-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.
+        {persistentWorld
+          ? `Fictional data · SYNTHETIC_ALPHA · persistent world (${persistentWorld.completedSeasons.length} completed seasons) · contracts and permanent ageing deferred · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
+          : "Fictional data · SYNTHETIC_ALPHA · legacy V0.1 single-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI."}
       </section>
       <section className="career-panel" aria-label="Manual career copy">
-        <label>Copy name <input value={copyName} maxLength={120} onChange={event => setCopyName(event.currentTarget.value)} /></label>
-        <button disabled={busy || service.isReadOnly() || !copyName.trim()} onClick={() => void action(async () => { await service.createManualCopy(copyName); setCopyName(""); })}>Save career copy</button>
+        <label>
+          Copy name{" "}
+          <input
+            value={copyName}
+            maxLength={120}
+            onChange={(event) => setCopyName(event.currentTarget.value)}
+          />
+        </label>
+        <button
+          disabled={busy || service.isReadOnly() || !copyName.trim()}
+          onClick={() =>
+            void action(async () => {
+              await service.createManualCopy(copyName);
+              setCopyName("");
+            })
+          }
+        >
+          Save career copy
+        </button>
       </section>
       {activeError && <ErrorBanner rawError={activeError} />}
-      {service.isReadOnly() && <p className="career-warning">This save is read-only because another tab owns its writer lease.</p>}
-      {service.wasRecovered() && <p className="career-warning">Recovered from a verified checkpoint into a new career copy. The damaged source save was preserved untouched.</p>}
+      {service.isReadOnly() && (
+        <p className="career-warning">
+          This save is read-only because another tab owns its writer lease.
+        </p>
+      )}
+      {service.wasRecovered() && (
+        <p className="career-warning">
+          Recovered from a verified checkpoint into a new career copy. The damaged source save was
+          preserved untouched.
+        </p>
+      )}
 
       {screen === "HOME" && (
         <section aria-labelledby="home-heading">
@@ -647,44 +941,164 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               {state.phase === "COMPLETE" ? (
                 <>
                   <p className="big-stat">Season complete</p>
-                  <p>Champion: <strong>{service.teamName(state.projection.table[0]?.teamId)}</strong></p>
+                  <p>
+                    Champion: <strong>{service.teamName(state.projection.table[0]?.teamId)}</strong>
+                  </p>
+                  {persistentWorld ? (
+                    <div className="action-row" style={{ marginTop: "10px" }}>
+                      <button
+                        type="button"
+                        className="primary"
+                        data-testid="rollover-next-season-btn"
+                        disabled={busy || inspectionOnly || service.isReadOnly()}
+                        onClick={() =>
+                          void action(async () => {
+                            const closingId = state.seasonId;
+                            await service.closeSeasonAndAdvance(closingId);
+                            setActiveReplay(null);
+                            setStatsScope("ACTIVE");
+                          })
+                        }
+                      >
+                        Close season &amp; advance to Season{" "}
+                        {persistentWorld.currentSeasonNumber + 1} ({
+                          persistentWorld.currentCalendarYear + 1
+                        })
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: "10px" }}>
+                      <p>
+                        This V0.1 single-season save remains frozen as completed. You can start a
+                        new multi-season copy from this exact outcome without altering the original
+                        slot.
+                      </p>
+                      <button
+                        type="button"
+                        className="primary"
+                        data-testid="copy-to-persistent-world-btn"
+                        disabled={busy || inspectionOnly || service.isReadOnly()}
+                        onClick={() =>
+                          void action(async () => {
+                            await service.copySingleSeasonToPersistentWorld();
+                            setActiveReplay(null);
+                            setStatsScope("ACTIVE");
+                          })
+                        }
+                      >
+                        Copy into multi-season world (Season 2)
+                      </button>
+                    </div>
+                  )}
                 </>
               ) : nextFixture ? (
                 <>
                   {state.careerState.currentDate < nextFixture.matchDayDate ? (
-                    <button className="primary" disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => action(async () => { await service.simulateToNextUserFixture(); })}>Advance to match day</button>
+                    <button
+                      className="primary"
+                      disabled={busy || inspectionOnly || service.isReadOnly()}
+                      onClick={() =>
+                        action(async () => {
+                          await service.simulateToNextUserFixture();
+                        })
+                      }
+                    >
+                      Advance to match day
+                    </button>
                   ) : (
                     <div className="action-row">
-                      <button className="primary" disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => action(async () => { await service.simulateManagedFixture(); await settleStandard(); setPendingMatch(null); })}>Simulate match</button>
-                      <button disabled={busy || inspectionOnly || service.isReadOnly()} onClick={() => void playMatch()}>Play match</button>
+                      <button
+                        className="primary"
+                        disabled={busy || inspectionOnly || service.isReadOnly()}
+                        onClick={() =>
+                          action(async () => {
+                            await service.simulateManagedFixture();
+                            await settleStandard();
+                            setPendingMatch(null);
+                          })
+                        }
+                      >
+                        Simulate match
+                      </button>
+                      <button
+                        disabled={busy || inspectionOnly || service.isReadOnly()}
+                        onClick={() => void playMatch()}
+                      >
+                        Play match
+                      </button>
                     </div>
                   )}
-                  {pendingMatch && <p role="status" data-testid="pending-career-match">A match for round {pendingMatch.round ?? nextFixture.roundNumber} is already in progress. Play match resumes it.</p>}
+                  {pendingMatch && (
+                    <p role="status" data-testid="pending-career-match">
+                      A match for round {pendingMatch.round ?? nextFixture.roundNumber} is already
+                      in progress. Play match resumes it.
+                    </p>
+                  )}
                   <p className="big-stat">Round {nextFixture.roundNumber}</p>
-                  <p><strong>{service.teamName(nextFixture.homeTeamId)}</strong> v <strong>{service.teamName(nextFixture.awayTeamId)}</strong></p>
-                  <p>{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
-                  <PitchInspection ground={displayWorld.grounds.find(ground => ground.groundId === nextFixture.groundId)} format="T20" />
+                  <p>
+                    <strong>{service.teamName(nextFixture.homeTeamId)}</strong> v{" "}
+                    <strong>{service.teamName(nextFixture.awayTeamId)}</strong>
+                  </p>
+                  <p>
+                    {nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}
+                  </p>
+                  <PitchInspection
+                    ground={displayWorld.grounds.find(
+                      (ground) => ground.groundId === nextFixture.groundId,
+                    )}
+                    format="T20"
+                  />
                 </>
-              ) : <p>No remaining managed fixture.</p>}
+              ) : (
+                <p>No remaining managed fixture.</p>
+              )}
             </article>
             <article className="career-panel">
               <h3>League position</h3>
               <p className="big-stat">{tableRow ? `#${tableRow.rank}` : "–"}</p>
-              {tableRow && <p>{tableRow.wins}W · {tableRow.losses}L · {tableRow.ties}T · {tableRow.noResults}NR · {tableRow.points} pts · NRR {tableRow.nrrX1000 === null ? "–" : (tableRow.nrrX1000 / 1000).toFixed(3)}</p>}
+              {tableRow && (
+                <p>
+                  {tableRow.wins}W · {tableRow.losses}L · {tableRow.ties}T · {tableRow.noResults}NR
+                  · {tableRow.points} pts · NRR{" "}
+                  {tableRow.nrrX1000 === null ? "–" : (tableRow.nrrX1000 / 1000).toFixed(3)}
+                </p>
+              )}
             </article>
             <article className="career-panel">
               <h3>Condition</h3>
               {(() => {
                 const squad = service.squadView();
-                const avg = squad ? Math.round(squad.players.reduce((sum, player) => sum + player.fatigueBp, 0) / squad.players.length) : 0;
-                const unavailable = squad?.players.filter((player) => player.availability === "UNAVAILABLE").length ?? 0;
-                return <><p className="big-stat">{percentageBp(avg)} fatigue</p><p>{unavailable} unavailable · {squad?.players.filter((p) => p.directive !== "REST").length ?? 0} in practice</p></>;
+                const avg = squad
+                  ? Math.round(
+                      squad.players.reduce((sum, player) => sum + player.fatigueBp, 0) /
+                        squad.players.length,
+                    )
+                  : 0;
+                const unavailable =
+                  squad?.players.filter((player) => player.availability === "UNAVAILABLE").length ??
+                  0;
+                return (
+                  <>
+                    <p className="big-stat">{percentageBp(avg)} fatigue</p>
+                    <p>
+                      {unavailable} unavailable ·{" "}
+                      {squad?.players.filter((p) => p.directive !== "REST").length ?? 0} in practice
+                    </p>
+                  </>
+                );
               })()}
             </article>
             <article className="career-panel">
               <h3>Progress</h3>
               <p className="big-stat">{state.completedMatches.length}/56</p>
               <p>{completedManaged.length}/14 managed-team fixtures complete.</p>
+              {persistentWorld && (
+                <p data-testid="persistent-world-progress">
+                  Season {persistentWorld.currentSeasonNumber} ({persistentWorld.currentCalendarYear})
+                  · {persistentWorld.completedSeasons.length} completed{" "}
+                  {persistentWorld.completedSeasons.length === 1 ? "season" : "seasons"}
+                </p>
+              )}
             </article>
           </div>
         </section>
@@ -694,48 +1108,327 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         <section aria-labelledby="career-heading">
           <h2 id="career-heading">Career</h2>
           <div className="career-summary-grid">
-            <div className="career-panel"><h3>Season status</h3><p>{state.phase}</p><p>Date {state.careerState.currentDate}</p><p>Round {currentRound} of 14</p></div>
-            <div className="career-panel"><h3>Managed record</h3><p>{tableRow?.wins ?? 0} wins · {tableRow?.losses ?? 0} losses · {tableRow?.ties ?? 0} ties</p><p>{tableRow?.points ?? 0} points</p></div>
+            <div className="career-panel">
+              <h3>Season status</h3>
+              <p>
+                {persistentWorld
+                  ? `Season ${persistentWorld.currentSeasonNumber} (${persistentWorld.currentCalendarYear}) · ${state.phase}`
+                  : state.phase}
+              </p>
+              <p>Date {state.careerState.currentDate}</p>
+              <p>Round {currentRound} of 14</p>
+              {persistentWorld && (
+                <small>
+                  World <code>{persistentWorld.worldIdentity.worldId}</code> ·{" "}
+                  {persistentWorld.completedSeasons.length} sealed{" "}
+                  {persistentWorld.completedSeasons.length === 1 ? "season" : "seasons"}
+                </small>
+              )}
+            </div>
+            <div className="career-panel">
+              <h3>Managed record</h3>
+              <p>
+                {tableRow?.wins ?? 0} wins · {tableRow?.losses ?? 0} losses · {tableRow?.ties ?? 0}{" "}
+                ties
+              </p>
+              <p>{tableRow?.points ?? 0} points (active season)</p>
+              {persistentWorld && (() => {
+                const allTime = persistentWorld.careerProjection.teamHistory.find(
+                  (row) => row.teamId === controlledTeam,
+                );
+                if (!allTime) return null;
+                return (
+                  <p data-testid="managed-all-time-summary">
+                    All-time: {allTime.titles}{" "}
+                    {allTime.titles === 1 ? "title" : "titles"} · {allTime.wins}W · {allTime.losses}L
+                    · {allTime.ties}T ({allTime.played} played)
+                  </p>
+                );
+              })()}
+            </div>
           </div>
           {replayViewerSection}
-          <h3>Managed-team results</h3>
-          <div className="table-wrap"><table><thead><tr><th>Rnd</th><th>Date</th><th>Fixture</th><th>Result</th><th>Replay</th></tr></thead><tbody>{state.schedule.fixtures.filter((fixture) => [fixture.homeTeamId, fixture.awayTeamId].includes(controlledTeam!)).map((fixture) => {
-            const completion = completionByFixture.get(fixture.fixtureId);
-            const replayBtnId = `replay-career-${fixture.fixtureId}`;
-            return (
-              <tr key={fixture.fixtureId}>
-                <td>{fixture.roundNumber}</td>
-                <td>{fixture.matchDayDate}</td>
-                <td>{service.teamName(fixture.homeTeamId)} v {service.teamName(fixture.awayTeamId)}</td>
-                <td>{completion ? service.resultText(completion) : "Scheduled"}</td>
-                <td>
-                  {completion ? (
-                    <button
-                      id={replayBtnId}
-                      type="button"
-                      className="replay-btn"
-                      disabled={busy}
-                      aria-label={`View replay for Round ${fixture.roundNumber} ${service.teamName(fixture.homeTeamId)} v ${service.teamName(fixture.awayTeamId)}`}
-                      onClick={() => void openReplay(fixture.fixtureId, replayBtnId)}
-                    >
-                      View replay
-                    </button>
-                  ) : "–"}
-                </td>
-              </tr>
-            );
-          })}</tbody></table></div>
+          {persistentWorld && persistentWorld.completedSeasons.length > 0 && (
+            <section
+              className="career-panel"
+              aria-labelledby="season-history-heading"
+              data-testid="completed-seasons-history"
+              style={{ marginTop: "18px", marginBottom: "22px" }}
+            >
+              <h3 id="season-history-heading">Season history &amp; roll of honour</h3>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Season</th>
+                      <th>Champion</th>
+                      <th>Runner-up</th>
+                      <th>Managed finish</th>
+                      <th>Leading runs</th>
+                      <th>Leading wickets</th>
+                      <th>Archive</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {persistentWorld.completedSeasons.map((record) => {
+                      const managedRow = record.table.find((r) => r.teamId === controlledTeam);
+                      const topRuns = record.leaders.runs[0] ?? null;
+                      const topWkts = record.leaders.wickets[0] ?? null;
+                      const isInspecting = historySeasonView === record.seasonNumber;
+                      return (
+                        <tr key={record.seasonId}>
+                          <td>
+                            Season {record.seasonNumber} · {record.calendarYear}
+                            <small>
+                              {record.startDate} to {record.endDate}
+                            </small>
+                          </td>
+                          <td>
+                            <strong>{service.teamName(record.championTeamId)}</strong>
+                          </td>
+                          <td>{service.teamName(record.runnerUpTeamId)}</td>
+                          <td>
+                            {managedRow
+                              ? `#${managedRow.rank} (${managedRow.wins}W-${managedRow.losses}L, ${managedRow.points} pts)`
+                              : "–"}
+                          </td>
+                          <td>
+                            {topRuns
+                              ? `${service.playerName(topRuns.playerId)} (${topRuns.value})`
+                              : "–"}
+                          </td>
+                          <td>
+                            {topWkts
+                              ? `${service.playerName(topWkts.playerId)} (${topWkts.value})`
+                              : "–"}
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              aria-pressed={isInspecting}
+                              onClick={() =>
+                                setHistorySeasonView(isInspecting ? null : record.seasonNumber)
+                              }
+                            >
+                              {isInspecting ? "Hide archive" : `Inspect Season ${record.seasonNumber}`}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {inspectedCompletedSeason && (
+                <div data-testid={`archived-season-detail-${inspectedCompletedSeason.seasonNumber}`}>
+                  <h4>
+                    Archived Season {inspectedCompletedSeason.seasonNumber} ({
+                      inspectedCompletedSeason.calendarYear
+                    }) · Managed fixtures &amp; replay
+                  </h4>
+                  <p>
+                    Sealed record SHA-256:{" "}
+                    <code>{inspectedCompletedSeason.recordSha256.slice(0, 16)}…</code> · Final state
+                    SHA-256:{" "}
+                    <code>{inspectedCompletedSeason.finalSeasonStateSha256.slice(0, 16)}…</code>
+                  </p>
+                  <div className="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Rnd</th>
+                          <th>Date</th>
+                          <th>Fixture</th>
+                          <th>Result</th>
+                          <th>Replay</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {inspectedCompletedSeason.completedMatches
+                          .filter((m) =>
+                            [m.homeTeamId, m.awayTeamId].includes(controlledTeam ?? ""),
+                          )
+                          .map((completion) => {
+                            const replayBtnId = `replay-history-${completion.fixtureId}`;
+                            return (
+                              <tr key={completion.fixtureId}>
+                                <td>{completion.roundNumber}</td>
+                                <td>{completion.matchDayDate}</td>
+                                <td>
+                                  {service.teamName(completion.homeTeamId)} v{" "}
+                                  {service.teamName(completion.awayTeamId)}
+                                </td>
+                                <td>{service.resultText(completion)}</td>
+                                <td>
+                                  <button
+                                    id={replayBtnId}
+                                    type="button"
+                                    className="replay-btn"
+                                    disabled={busy}
+                                    onClick={() => void openReplay(completion.fixtureId, replayBtnId)}
+                                  >
+                                    View replay
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+          <h3>Managed-team results (active season)</h3>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rnd</th>
+                  <th>Date</th>
+                  <th>Fixture</th>
+                  <th>Result</th>
+                  <th>Replay</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.schedule.fixtures
+                  .filter((fixture) =>
+                    [fixture.homeTeamId, fixture.awayTeamId].includes(controlledTeam!),
+                  )
+                  .map((fixture) => {
+                    const completion = completionByFixture.get(fixture.fixtureId);
+                    const replayBtnId = `replay-career-${fixture.fixtureId}`;
+                    return (
+                      <tr key={fixture.fixtureId}>
+                        <td>{fixture.roundNumber}</td>
+                        <td>{fixture.matchDayDate}</td>
+                        <td>
+                          {service.teamName(fixture.homeTeamId)} v{" "}
+                          {service.teamName(fixture.awayTeamId)}
+                        </td>
+                        <td>{completion ? service.resultText(completion) : "Scheduled"}</td>
+                        <td>
+                          {completion ? (
+                            <button
+                              id={replayBtnId}
+                              type="button"
+                              className="replay-btn"
+                              disabled={busy}
+                              aria-label={`View replay for Round ${fixture.roundNumber} ${service.teamName(fixture.homeTeamId)} v ${service.teamName(fixture.awayTeamId)}`}
+                              onClick={() => void openReplay(fixture.fixtureId, replayBtnId)}
+                            >
+                              View replay
+                            </button>
+                          ) : (
+                            "–"
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
       {screen === "SQUAD" && (
         <section aria-labelledby="squad-heading">
           <h2 id="squad-heading">Squad</h2>
-          <p>Training changes affect temporary readiness and daily recovery only. There is no permanent attribute growth in V0.1.</p>
-          <div className="table-wrap"><table><thead><tr><th>Player</th><th>Role</th><th>Availability</th><th>Fatigue</th><th>Bat</th><th>Bowl</th><th>Field</th><th>Training</th></tr></thead><tbody>{service.squadView()?.players.map((condition) => {
-            const player = displayWorld.players.find((candidate) => candidate.playerId === condition.playerId)!;
-            return <tr key={condition.playerId}><td><button type="button" className="player-link" id={`player-link-SQUAD-${player.playerId}`} aria-label={`View ${player.name}`} onClick={() => openPlayer(player.playerId, "SQUAD")}>{player.name}</button><small>{player.playerId}</small></td><td>{player.role}</td><td>{condition.availability}{condition.availabilityReason ? <small>{condition.availabilityReason}</small> : null}</td><td>{percentageBp(condition.fatigueBp)}</td><td>{condition.battingReadiness > 0 ? "+" : ""}{condition.battingReadiness}</td><td>{condition.bowlingReadiness > 0 ? "+" : ""}{condition.bowlingReadiness}</td><td>{condition.fieldingReadiness > 0 ? "+" : ""}{condition.fieldingReadiness}</td><td><label className="sr-label" htmlFor={`training-${condition.playerId}`}>Training for {player.name}</label><select id={`training-${condition.playerId}`} disabled={busy || inspectionOnly || service.isReadOnly() || state.phase === "COMPLETE"} value={condition.directive} onChange={(event) => void action(async () => { await service.setTraining(condition.playerId, event.currentTarget.value as TrainingDirective); })}>{directives.map((directive) => <option key={directive} value={directive}>{directive.replaceAll("_", " ")}</option>)}</select></td></tr>;
-          })}</tbody></table></div>
+          <p>
+            Training changes affect temporary readiness and daily recovery only. Permanent ageing
+            and skill progression remain deferred to Stage 3.
+          </p>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Player</th>
+                  <th>Role</th>
+                  <th>Availability</th>
+                  <th>Fatigue</th>
+                  <th>Bat</th>
+                  <th>Bowl</th>
+                  <th>Field</th>
+                  <th>Training</th>
+                </tr>
+              </thead>
+              <tbody>
+                {service.squadView()?.players.map((condition) => {
+                  const player = displayWorld.players.find(
+                    (candidate) => candidate.playerId === condition.playerId,
+                  )!;
+                  return (
+                    <tr key={condition.playerId}>
+                      <td>
+                        <button
+                          type="button"
+                          className="player-link"
+                          id={`player-link-SQUAD-${player.playerId}`}
+                          aria-label={`View ${player.name}`}
+                          onClick={() => openPlayer(player.playerId, "SQUAD")}
+                        >
+                          {player.name}
+                        </button>
+                        <small>{player.playerId}</small>
+                      </td>
+                      <td>{player.role}</td>
+                      <td>
+                        {condition.availability}
+                        {condition.availabilityReason ? (
+                          <small>{condition.availabilityReason}</small>
+                        ) : null}
+                      </td>
+                      <td>{percentageBp(condition.fatigueBp)}</td>
+                      <td>
+                        {condition.battingReadiness > 0 ? "+" : ""}
+                        {condition.battingReadiness}
+                      </td>
+                      <td>
+                        {condition.bowlingReadiness > 0 ? "+" : ""}
+                        {condition.bowlingReadiness}
+                      </td>
+                      <td>
+                        {condition.fieldingReadiness > 0 ? "+" : ""}
+                        {condition.fieldingReadiness}
+                      </td>
+                      <td>
+                        <label className="sr-label" htmlFor={`training-${condition.playerId}`}>
+                          Training for {player.name}
+                        </label>
+                        <select
+                          id={`training-${condition.playerId}`}
+                          disabled={
+                            busy ||
+                            inspectionOnly ||
+                            service.isReadOnly() ||
+                            state.phase === "COMPLETE"
+                          }
+                          value={condition.directive}
+                          onChange={(event) =>
+                            void action(async () => {
+                              await service.setTraining(
+                                condition.playerId,
+                                event.currentTarget.value as TrainingDirective,
+                              );
+                            })
+                          }
+                        >
+                          {directives.map((directive) => (
+                            <option key={directive} value={directive}>
+                              {directive.replaceAll("_", " ")}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
@@ -744,36 +1437,70 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           <h2 id="fixtures-heading">Fixtures</h2>
           {replayViewerSection}
           {state.schedule.rounds.map((round) => (
-            <section className="round-block" key={round.roundNumber} aria-labelledby={`round-${round.roundNumber}`}>
-              <h3 id={`round-${round.roundNumber}`}>Round {round.roundNumber} · {round.matchDayDate}</h3>
-              <div className="table-wrap"><table><thead><tr><th>Home</th><th>Away</th><th>Ground</th><th>Status</th><th>Result</th><th>Replay</th></tr></thead><tbody>{state.schedule.fixtures.filter((fixture) => fixture.roundNumber === round.roundNumber).map((fixture) => {
-                const completion = completionByFixture.get(fixture.fixtureId);
-                const managed = [fixture.homeTeamId, fixture.awayTeamId].includes(controlledTeam!);
-                const replayBtnId = `replay-fixtures-${fixture.fixtureId}`;
-                return (
-                  <tr key={fixture.fixtureId} className={managed ? "managed-fixture" : ""}>
-                    <td>{service.teamName(fixture.homeTeamId)}</td>
-                    <td>{service.teamName(fixture.awayTeamId)}</td>
-                    <td>{service.groundName(fixture.groundId)}</td>
-                    <td>{completion ? "Completed" : "Scheduled"}{managed ? <small>Managed fixture</small> : null}</td>
-                    <td>{completion ? service.resultText(completion) : "–"}</td>
-                    <td>
-                      {completion ? (
-                        <button
-                          id={replayBtnId}
-                          type="button"
-                          className="replay-btn"
-                          disabled={busy}
-                          aria-label={`View replay for ${service.teamName(fixture.homeTeamId)} v ${service.teamName(fixture.awayTeamId)}`}
-                          onClick={() => void openReplay(fixture.fixtureId, replayBtnId)}
-                        >
-                          View replay
-                        </button>
-                      ) : "–"}
-                    </td>
-                  </tr>
-                );
-              })}</tbody></table></div>
+            <section
+              className="round-block"
+              key={round.roundNumber}
+              aria-labelledby={`round-${round.roundNumber}`}
+            >
+              <h3 id={`round-${round.roundNumber}`}>
+                Round {round.roundNumber} · {round.matchDayDate}
+              </h3>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Home</th>
+                      <th>Away</th>
+                      <th>Ground</th>
+                      <th>Status</th>
+                      <th>Result</th>
+                      <th>Replay</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {state.schedule.fixtures
+                      .filter((fixture) => fixture.roundNumber === round.roundNumber)
+                      .map((fixture) => {
+                        const completion = completionByFixture.get(fixture.fixtureId);
+                        const managed = [fixture.homeTeamId, fixture.awayTeamId].includes(
+                          controlledTeam!,
+                        );
+                        const replayBtnId = `replay-fixtures-${fixture.fixtureId}`;
+                        return (
+                          <tr
+                            key={fixture.fixtureId}
+                            className={managed ? "managed-fixture" : ""}
+                          >
+                            <td>{service.teamName(fixture.homeTeamId)}</td>
+                            <td>{service.teamName(fixture.awayTeamId)}</td>
+                            <td>{service.groundName(fixture.groundId)}</td>
+                            <td>
+                              {completion ? "Completed" : "Scheduled"}
+                              {managed ? <small>Managed fixture</small> : null}
+                            </td>
+                            <td>{completion ? service.resultText(completion) : "–"}</td>
+                            <td>
+                              {completion ? (
+                                <button
+                                  id={replayBtnId}
+                                  type="button"
+                                  className="replay-btn"
+                                  disabled={busy}
+                                  aria-label={`View replay for ${service.teamName(fixture.homeTeamId)} v ${service.teamName(fixture.awayTeamId)}`}
+                                  onClick={() => void openReplay(fixture.fixtureId, replayBtnId)}
+                                >
+                                  View replay
+                                </button>
+                              ) : (
+                                "–"
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </section>
           ))}
         </section>
@@ -782,50 +1509,420 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       {screen === "STATISTICS" && (
         <section aria-labelledby="statistics-heading">
           <h2 id="statistics-heading">Statistics</h2>
-          <h3>League table</h3>
-          <div className="table-wrap"><table><thead><tr><th>Pos</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>T</th><th>NR</th><th>Pts</th><th>NRR</th></tr></thead><tbody>{state.projection.table.map((row) => <tr key={row.teamId} className={row.teamId === controlledTeam ? "managed-fixture" : ""}><td>{row.rank}</td><td>{service.teamName(row.teamId)}</td><td>{row.played}</td><td>{row.wins}</td><td>{row.losses}</td><td>{row.ties}</td><td>{row.noResults}</td><td>{row.points}</td><td>{row.nrrX1000 === null ? "–" : (row.nrrX1000 / 1000).toFixed(3)}</td></tr>)}</tbody></table></div>
-          <h3>Player leaders</h3>
-          <div className="stats-grid">
-            <div className="career-panel"><h4>Runs</h4><ol>{state.projection.leaders.runs.map((entry) => <li key={entry.playerId}><span>{service.playerName(entry.playerId)}</span><strong>{entry.value}</strong></li>)}</ol></div>
-            <div className="career-panel"><h4>Wickets</h4><ol>{state.projection.leaders.wickets.map((entry) => <li key={entry.playerId}><span>{service.playerName(entry.playerId)}</span><strong>{entry.value}</strong></li>)}</ol></div>
-          </div>
-          <h3>Full player statistics</h3>
-          <div className="table-wrap"><table><thead><tr><th>Player</th><th>Team</th><th>M</th><th>Runs</th><th>Avg</th><th>SR</th><th>Wkts</th><th>Bowl Avg</th><th>Econ</th><th>Bowl SR</th></tr></thead><tbody>{state.projection.players.map((player) => <tr key={player.playerId}><td><button type="button" className="player-link" id={`player-link-STATISTICS-${player.playerId}`} aria-label={`View ${service.playerName(player.playerId)}`} onClick={() => openPlayer(player.playerId, "STATISTICS")}>{service.playerName(player.playerId)}</button></td><td>{service.teamName(player.teamId)}</td><td>{player.matches}</td><td>{player.runs}</td><td>{metric(player.battingAverageX100)}</td><td>{metric(player.strikeRateX100)}</td><td>{player.bowlingWickets}</td><td>{metric(player.bowlingAverageX100)}</td><td>{metric(player.economyX100)}</td><td>{metric(player.bowlingStrikeRateX100)}</td></tr>)}</tbody></table></div>
+          {persistentWorld && (
+            <div
+              className="action-row scope-bar"
+              role="group"
+              aria-label="Statistics scope"
+              data-testid="statistics-scope-bar"
+            >
+              <button
+                type="button"
+                aria-pressed={statsScope === "ACTIVE"}
+                onClick={() => setStatsScope("ACTIVE")}
+              >
+                Active Season {persistentWorld.currentSeasonNumber} ({
+                  persistentWorld.currentCalendarYear
+                })
+              </button>
+              <button
+                type="button"
+                aria-pressed={statsScope === "ALL_TIME"}
+                onClick={() => setStatsScope("ALL_TIME")}
+              >
+                All-time career ({persistentWorld.careerProjection.totalMatchesApplied} matches)
+              </button>
+              {persistentWorld.completedSeasons.map((record) => (
+                <button
+                  key={record.seasonId}
+                  type="button"
+                  aria-pressed={statsScope === record.seasonNumber}
+                  onClick={() => setStatsScope(record.seasonNumber)}
+                >
+                  Season {record.seasonNumber} ({record.calendarYear})
+                </button>
+              ))}
+            </div>
+          )}
+
+          {persistentWorld && statsScope === "ALL_TIME" ? (
+            <div data-testid="all-time-career-statistics">
+              <h3>All-time club honours &amp; records</h3>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Team</th>
+                      <th>Closed seasons</th>
+                      <th>Titles</th>
+                      <th>Runner-up</th>
+                      <th>P</th>
+                      <th>W</th>
+                      <th>L</th>
+                      <th>T</th>
+                      <th>NR</th>
+                      <th>Pts</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...persistentWorld.careerProjection.teamHistory]
+                      .sort(
+                        (a, b) =>
+                          b.titles - a.titles ||
+                          b.points - a.points ||
+                          b.wins - a.wins ||
+                          a.teamId.localeCompare(b.teamId),
+                      )
+                      .map((row) => (
+                        <tr
+                          key={row.teamId}
+                          className={row.teamId === controlledTeam ? "managed-fixture" : ""}
+                        >
+                          <td>{service.teamName(row.teamId)}</td>
+                          <td>{row.seasonsCompleted}</td>
+                          <td>
+                            <strong>{row.titles}</strong>
+                          </td>
+                          <td>{row.runnerUpFinishes}</td>
+                          <td>{row.played}</td>
+                          <td>{row.wins}</td>
+                          <td>{row.losses}</td>
+                          <td>{row.ties}</td>
+                          <td>{row.noResults}</td>
+                          <td>{row.points}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+              <h3>All-time player leaders</h3>
+              <div className="stats-grid">
+                <div className="career-panel">
+                  <h4>Career runs</h4>
+                  <ol>
+                    {persistentWorld.careerProjection.leaders.runs.map((entry) => (
+                      <li key={entry.playerId}>
+                        <span>{service.playerName(entry.playerId)}</span>
+                        <strong>{entry.value}</strong>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                <div className="career-panel">
+                  <h4>Career wickets</h4>
+                  <ol>
+                    {persistentWorld.careerProjection.leaders.wickets.map((entry) => (
+                      <li key={entry.playerId}>
+                        <span>{service.playerName(entry.playerId)}</span>
+                        <strong>{entry.value}</strong>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+              <h3>All-time player statistics</h3>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Player</th>
+                      <th>Team</th>
+                      <th>Seasons</th>
+                      <th>M</th>
+                      <th>Runs</th>
+                      <th>HS</th>
+                      <th>Avg</th>
+                      <th>SR</th>
+                      <th>Wkts</th>
+                      <th>Bowl Avg</th>
+                      <th>Econ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {persistentWorld.careerProjection.players.map((player) => (
+                      <tr key={player.playerId}>
+                        <td>
+                          <button
+                            type="button"
+                            className="player-link"
+                            id={`player-link-STATISTICS-${player.playerId}`}
+                            aria-label={`View ${service.playerName(player.playerId)}`}
+                            onClick={() => openPlayer(player.playerId, "STATISTICS")}
+                          >
+                            {service.playerName(player.playerId)}
+                          </button>
+                        </td>
+                        <td>{service.teamName(player.teamId)}</td>
+                        <td>{player.seasonsPlayed}</td>
+                        <td>{player.matches}</td>
+                        <td>{player.runs}</td>
+                        <td>
+                          {player.battingInnings > 0
+                            ? `${player.highScoreRuns}${player.highScoreNotOut ? "*" : ""}`
+                            : "–"}
+                        </td>
+                        <td>{metric(player.battingAverageX100)}</td>
+                        <td>{metric(player.strikeRateX100)}</td>
+                        <td>{player.bowlingWickets}</td>
+                        <td>{metric(player.bowlingAverageX100)}</td>
+                        <td>{metric(player.economyX100)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            (() => {
+              const scopedSeason =
+                persistentWorld && typeof statsScope === "number"
+                  ? persistentWorld.completedSeasons.find((s) => s.seasonNumber === statsScope) ??
+                    null
+                  : null;
+              const tableRows = scopedSeason ? scopedSeason.table : state.projection.table;
+              const leaderSets = scopedSeason ? scopedSeason.leaders : state.projection.leaders;
+              const playerRows = scopedSeason ? scopedSeason.players : state.projection.players;
+              return (
+                <div>
+                  <h3>
+                    {scopedSeason
+                      ? `League table · Season ${scopedSeason.seasonNumber} (${scopedSeason.calendarYear})`
+                      : "League table"}
+                  </h3>
+                  <div className="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Pos</th>
+                          <th>Team</th>
+                          <th>P</th>
+                          <th>W</th>
+                          <th>L</th>
+                          <th>T</th>
+                          <th>NR</th>
+                          <th>Pts</th>
+                          <th>NRR</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tableRows.map((row) => (
+                          <tr
+                            key={row.teamId}
+                            className={row.teamId === controlledTeam ? "managed-fixture" : ""}
+                          >
+                            <td>{row.rank}</td>
+                            <td>{service.teamName(row.teamId)}</td>
+                            <td>{row.played}</td>
+                            <td>{row.wins}</td>
+                            <td>{row.losses}</td>
+                            <td>{row.ties}</td>
+                            <td>{row.noResults}</td>
+                            <td>{row.points}</td>
+                            <td>
+                              {row.nrrX1000 === null ? "–" : (row.nrrX1000 / 1000).toFixed(3)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <h3>Player leaders</h3>
+                  <div className="stats-grid">
+                    <div className="career-panel">
+                      <h4>Runs</h4>
+                      <ol>
+                        {leaderSets.runs.map((entry) => (
+                          <li key={entry.playerId}>
+                            <span>{service.playerName(entry.playerId)}</span>
+                            <strong>{entry.value}</strong>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div className="career-panel">
+                      <h4>Wickets</h4>
+                      <ol>
+                        {leaderSets.wickets.map((entry) => (
+                          <li key={entry.playerId}>
+                            <span>{service.playerName(entry.playerId)}</span>
+                            <strong>{entry.value}</strong>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  </div>
+                  <h3>Full player statistics</h3>
+                  <div className="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Player</th>
+                          <th>Team</th>
+                          <th>M</th>
+                          <th>Runs</th>
+                          <th>Avg</th>
+                          <th>SR</th>
+                          <th>Wkts</th>
+                          <th>Bowl Avg</th>
+                          <th>Econ</th>
+                          <th>Bowl SR</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {playerRows.map((player) => (
+                          <tr key={player.playerId}>
+                            <td>
+                              <button
+                                type="button"
+                                className="player-link"
+                                id={`player-link-STATISTICS-${player.playerId}`}
+                                aria-label={`View ${service.playerName(player.playerId)}`}
+                                onClick={() => openPlayer(player.playerId, "STATISTICS")}
+                              >
+                                {service.playerName(player.playerId)}
+                              </button>
+                            </td>
+                            <td>{service.teamName(player.teamId)}</td>
+                            <td>{player.matches}</td>
+                            <td>{player.runs}</td>
+                            <td>{metric(player.battingAverageX100)}</td>
+                            <td>{metric(player.strikeRateX100)}</td>
+                            <td>{player.bowlingWickets}</td>
+                            <td>{metric(player.bowlingAverageX100)}</td>
+                            <td>{metric(player.economyX100)}</td>
+                            <td>{metric(player.bowlingStrikeRateX100)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()
+          )}
         </section>
       )}
 
-      {screen === "PLAYER" && (() => {
-        const player = displayWorld.players.find(candidate => candidate.playerId === playerId);
-        return player ? <PlayerPage player={player} condition={service.playerCondition(player.playerId)}
-          stats={state.projection.players.find(candidate => candidate.playerId === player.playerId) ?? null}
-          format={playerFormat} onFormat={changePlayerFormat} onBack={() => { setRestorePlayerFocus(player.playerId); setScreen(playerOrigin); }}
-          backLabel={playerOrigin === "SQUAD" ? "Back to squad" : "Back to statistics"} /> : null;
-      })()}
+      {screen === "PLAYER" &&
+        (() => {
+          const player = displayWorld.players.find((candidate) => candidate.playerId === playerId);
+          if (!player) return null;
+          const careerStats =
+            persistentWorld?.careerProjection.players.find(
+              (candidate) => candidate.playerId === player.playerId,
+            ) ?? null;
+          const breakdown: PlayerSeasonBreakdownRow[] = persistentWorld
+            ? [
+                ...persistentWorld.completedSeasons
+                  .map((season): PlayerSeasonBreakdownRow | null => {
+                    const row = season.players.find((p) => p.playerId === player.playerId);
+                    return row
+                      ? {
+                          seasonNumber: season.seasonNumber,
+                          calendarYear: season.calendarYear,
+                          phase: "COMPLETE",
+                          stats: row,
+                        }
+                      : null;
+                  })
+                  .filter((row): row is PlayerSeasonBreakdownRow => row !== null),
+                ...(() => {
+                  const activeRow = state.projection.players.find(
+                    (p) => p.playerId === player.playerId,
+                  );
+                  return activeRow
+                    ? [
+                        {
+                          seasonNumber: persistentWorld.currentSeasonNumber,
+                          calendarYear: persistentWorld.currentCalendarYear,
+                          phase: state.phase,
+                          stats: activeRow,
+                        },
+                      ]
+                    : [];
+                })(),
+              ]
+            : [];
+          return (
+            <PlayerPage
+              player={player}
+              condition={service.playerCondition(player.playerId)}
+              stats={
+                state.projection.players.find(
+                  (candidate) => candidate.playerId === player.playerId,
+                ) ?? null
+              }
+              careerStats={careerStats}
+              seasonBreakdown={breakdown}
+              format={playerFormat}
+              onFormat={changePlayerFormat}
+              onBack={() => {
+                setRestorePlayerFocus(player.playerId);
+                setScreen(playerOrigin);
+              }}
+              backLabel={playerOrigin === "SQUAD" ? "Back to squad" : "Back to statistics"}
+            />
+          );
+        })()}
 
       {screen === "SETTINGS" && (
         <section aria-labelledby="settings-heading">
           <h2 id="settings-heading">Settings</h2>
           <div className="settings-grid">
-            <label>Text scale<select value={scale} onChange={(event) => setScale(event.currentTarget.value)}><option value="90">90%</option><option value="100">100%</option><option value="115">115%</option><option value="125">125%</option><option value="150">150%</option></select></label>
-            <label>Layout density<select value={density} onChange={(event) => setDensity(event.currentTarget.value)}><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
-            <label className="check-label"><input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.currentTarget.checked)} /> Reduced motion</label>
+            <label>
+              Text scale
+              <select value={scale} onChange={(event) => setScale(event.currentTarget.value)}>
+                <option value="90">90%</option>
+                <option value="100">100%</option>
+                <option value="115">115%</option>
+                <option value="125">125%</option>
+                <option value="150">150%</option>
+              </select>
+            </label>
+            <label>
+              Layout density
+              <select value={density} onChange={(event) => setDensity(event.currentTarget.value)}>
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+              </select>
+            </label>
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={reducedMotion}
+                onChange={(event) => setReducedMotion(event.currentTarget.checked)}
+              />{" "}
+              Reduced motion
+            </label>
           </div>
           <div className="career-panel settings-actions">
             <h3>Career file &amp; recovery</h3>
             <div className="action-row">
-              <button disabled={busy || inspectionOnly} onClick={() => void exportCareer()}>Export .lcxxvi</button>
+              <button disabled={busy || inspectionOnly} onClick={() => void exportCareer()}>
+                Export .lcxxvi
+              </button>
               {currentSaveId && (
                 <button
                   id="settings-inspect-checkpoints"
                   type="button"
                   disabled={busy || inspectionOnly}
-                  onClick={() => void openCheckpointInspector(currentSaveId, "settings-inspect-checkpoints")}
+                  onClick={() =>
+                    void openCheckpointInspector(currentSaveId, "settings-inspect-checkpoints")
+                  }
                 >
                   Inspect checkpoints
                 </button>
               )}
             </div>
-            <label className="file-import-label">Import validated .lcxxvi archive<input type="file" accept=".lcxxvi,application/zip" disabled={inspectionOnly} onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)} /></label>
+            <label className="file-import-label">
+              Import validated .lcxxvi archive
+              <input
+                type="file"
+                accept=".lcxxvi,application/zip"
+                disabled={inspectionOnly}
+                onChange={(event) => void importCareer(event.currentTarget.files?.[0] ?? null)}
+              />
+            </label>
           </div>
           {checkpointInspectorSection}
         </section>

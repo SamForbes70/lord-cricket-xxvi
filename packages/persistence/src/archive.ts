@@ -1,6 +1,7 @@
-import { RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type RosterSeasonState, StagedRosterPackSchema, type StagedRosterPack, canonicalJson, replayDelegationJournal, type DelegationJournal, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonPortableManifestV3Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, type CompletedCareerMatchEventArchive, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonPortableManifestV3, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type RosterSeasonState, StagedRosterPackSchema, type StagedRosterPack, canonicalJson, replayDelegationJournal, type DelegationJournal, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonPortableManifestV3Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_SCHEMA_VERSION, PersistentWorldPortableManifestSchema, PersistentWorldSaveSummarySchema, type CompletedCareerMatchEventArchive, type PersistentWorldPortableManifest, type PersistentWorldSaveSummary, type PersistentWorldState, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonPortableManifestV3, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
 import { SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
 import { SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SEASON_SAVE_VERSION, validateSeasonMatchEventArchiveSet, validateStoredWorldCopy, validateT20SeasonArchive, validateT20SeasonState } from "./season.js";
+import { validatePersistentWorldMatchEventArchiveSet, validatePersistentWorldState } from "./persistent-world.js";
 
 export const ARCHIVE_EXTENSION = ".lcxxvi";
 export const ARCHIVE_VERSION = "LC_ARCHIVE_V1" as const;
@@ -9,6 +10,8 @@ export const ROSTER_ARCHIVE_VERSION = "LC_ARCHIVE_V3_ROSTER" as const;
 export const DELEGATION_ARCHIVE_VERSION = "LC_ARCHIVE_V4_DELEGATION" as const;
 const MAX_ARCHIVE_BYTES = 20 * 1024 * 1024;
 const MAX_EXPANDED_BYTES = 50 * 1024 * 1024;
+const MAX_PERSISTENT_ARCHIVE_BYTES = 160 * 1024 * 1024;
+const MAX_PERSISTENT_EXPANDED_BYTES = 160 * 1024 * 1024;
 const MAX_FILES = 32;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true });
@@ -121,11 +124,15 @@ function makeZip(entries: readonly Entry[]): Uint8Array {
   return concat([...locals, central, end]);
 }
 
-function parseZip(input: Uint8Array): Map<string, Uint8Array> {
+function parseZip(
+  input: Uint8Array,
+  maxArchiveBytes = MAX_ARCHIVE_BYTES,
+  maxExpandedBytes = MAX_EXPANDED_BYTES,
+): Map<string, Uint8Array> {
   if (
     !(input instanceof Uint8Array) ||
     input.length < 22 ||
-    input.length > MAX_ARCHIVE_BYTES
+    input.length > maxArchiveBytes
   )
     throw new Error("ARCHIVE_SIZE_INVALID");
   const files = new Map<string, Uint8Array>();
@@ -151,7 +158,7 @@ function parseZip(input: Uint8Array): Map<string, Uint8Array> {
     if (!safePath(name) || files.has(name))
       throw new Error("ARCHIVE_PATH_INVALID");
     expanded += size;
-    if (expanded > MAX_EXPANDED_BYTES)
+    if (expanded > maxExpandedBytes)
       throw new Error("ARCHIVE_EXPANDED_SIZE_INVALID");
     const data = input.slice(dataStart, dataEnd);
     if (crc32(data) !== crc) throw new Error("ARCHIVE_CRC_MISMATCH");
@@ -727,4 +734,285 @@ export async function readRosterSeasonPortableArchive(bytes: Uint8Array): Promis
   }
   if (manifest.rosterPackSha256 !== manifest.files["roster-pack.json"]!.sha256) throw new Error("ROSTER_SEASON_ARCHIVE_PACK_MISMATCH");
   return validateRosterArchiveContents(parse("game.json"), parse("roster-pack.json"), manifest.summary);
+}
+
+export async function createPersistentWorldPortableArchive(
+  stateRaw: unknown,
+  summaryRaw: unknown,
+  exportedAt: string,
+  worldCopyRaw: unknown | null = null,
+  matchEventArchivesRaw: readonly unknown[] | null = null,
+): Promise<Uint8Array> {
+  const state = await validatePersistentWorldState(stateRaw);
+  const summary = PersistentWorldSaveSummarySchema.parse(summaryRaw);
+  if (
+    summary.worldId !== state.worldIdentity.worldId ||
+    summary.careerId !== state.careerId ||
+    summary.controlledTeamId !== state.controlledTeamId ||
+    summary.currentSeasonNumber !== state.currentSeasonNumber ||
+    summary.currentCalendarYear !== state.currentCalendarYear ||
+    summary.completedSeasonCount !== state.completedSeasons.length ||
+    summary.seasonId !== state.currentSeason.seasonId ||
+    summary.currentDate !== state.currentSeason.careerState.currentDate ||
+    summary.revision !== state.revision ||
+    summary.completedFixtures !== state.currentSeason.completedMatches.length ||
+    summary.phase !== state.currentSeason.phase ||
+    summary.stateSha256 !== state.stateSha256
+  ) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_SUMMARY_MISMATCH");
+  }
+
+  const validatedEventArchives =
+    matchEventArchivesRaw && matchEventArchivesRaw.length > 0
+      ? (await validatePersistentWorldMatchEventArchiveSet(matchEventArchivesRaw, state)).archives
+      : [];
+  const worldCopy = worldCopyRaw === null ? null : await validateStoredWorldCopy(worldCopyRaw);
+
+  const payloads: Entry[] = [
+    { name: "game.json", data: encoder.encode(canonicalJson(state)) },
+    {
+      name: "completed-seasons.ndjson",
+      data: encoder.encode(
+        state.completedSeasons.map((record) => canonicalJson(record)).join("\n") +
+          (state.completedSeasons.length > 0 ? "\n" : ""),
+      ),
+    },
+    {
+      name: "career-projection.json",
+      data: encoder.encode(canonicalJson(state.careerProjection)),
+    },
+    {
+      name: "active-events.ndjson",
+      data: encoder.encode(
+        state.currentSeason.completedMatches.map((m) => canonicalJson(m)).join("\n") +
+          (state.currentSeason.completedMatches.length > 0 ? "\n" : ""),
+      ),
+    },
+  ];
+  if (worldCopy) {
+    payloads.push({ name: "world-copy.json", data: encoder.encode(canonicalJson(worldCopy)) });
+  }
+  if (validatedEventArchives.length > 0) {
+    payloads.push({
+      name: "match-events.ndjson",
+      data: encoder.encode(
+        validatedEventArchives.map((archive) => canonicalJson(archive)).join("\n") + "\n",
+      ),
+    });
+  }
+
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
+  for (const payload of payloads) {
+    fileMeta[payload.name] = {
+      bytes: payload.data.length,
+      sha256: await sha256Bytes(payload.data),
+    };
+  }
+
+  const manifest = PersistentWorldPortableManifestSchema.parse({
+    archiveVersion: PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION,
+    saveSchema: worldCopy
+      ? PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION
+      : PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
+    ...(worldCopy ? { worldCopySha256: fileMeta["world-copy.json"]!.sha256 } : {}),
+    exportedAt,
+    summary,
+    careerProjectionSha256: state.careerProjection.projectionSha256,
+    matchEventArchiveCount: validatedEventArchives.length,
+    files: fileMeta,
+  });
+  const archive = makeZip([
+    { name: "manifest.json", data: encoder.encode(canonicalJson(manifest)) },
+    ...payloads,
+  ]);
+  if (archive.length > MAX_PERSISTENT_ARCHIVE_BYTES) throw new Error("ARCHIVE_SIZE_INVALID");
+  return archive;
+}
+
+export async function readPersistentWorldPortableArchive(bytes: Uint8Array): Promise<{
+  state: PersistentWorldState;
+  summary: PersistentWorldSaveSummary;
+  manifest: PersistentWorldPortableManifest;
+  worldCopy: NewGameWorldCopy | null;
+  matchEventArchives: CompletedCareerMatchEventArchive[];
+}> {
+  const files = parseZip(bytes, MAX_PERSISTENT_ARCHIVE_BYTES, MAX_PERSISTENT_EXPANDED_BYTES);
+  const allowed = new Set([
+    "manifest.json",
+    "game.json",
+    "completed-seasons.ndjson",
+    "career-projection.json",
+    "active-events.ndjson",
+    "world-copy.json",
+    "match-events.ndjson",
+  ]);
+  for (const name of files.keys()) {
+    if (!allowed.has(name)) throw new Error("PERSISTENT_WORLD_ARCHIVE_FILE_NOT_ALLOWED");
+  }
+  for (const required of [
+    "manifest.json",
+    "game.json",
+    "completed-seasons.ndjson",
+    "career-projection.json",
+    "active-events.ndjson",
+  ]) {
+    if (!files.has(required)) throw new Error(`PERSISTENT_WORLD_ARCHIVE_MISSING_${required}`);
+  }
+
+  let manifestRaw: unknown;
+  try {
+    manifestRaw = JSON.parse(decoder.decode(files.get("manifest.json")!));
+  } catch {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_MANIFEST_JSON_INVALID");
+  }
+  if (
+    (manifestRaw as { archiveVersion?: unknown } | null)?.archiveVersion !==
+    PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION
+  ) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_VERSION_UNSUPPORTED");
+  }
+  const manifest = PersistentWorldPortableManifestSchema.parse(manifestRaw);
+  const expectsWorldCopy =
+    manifest.saveSchema === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION;
+  if (expectsWorldCopy !== files.has("world-copy.json")) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_WORLD_COPY_FILE_MISMATCH");
+  }
+  if ((manifest.matchEventArchiveCount > 0) !== files.has("match-events.ndjson")) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_MATCH_EVENTS_FILE_MISMATCH");
+  }
+  const actualPayloadNames = [...files.keys()].filter((name) => name !== "manifest.json").sort();
+  const declaredNames = Object.keys(manifest.files).sort();
+  if (canonicalJson(actualPayloadNames) !== canonicalJson(declaredNames)) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_FILE_SET_MISMATCH");
+  }
+  for (const name of declaredNames) {
+    const data = files.get(name);
+    if (!data) throw new Error(`PERSISTENT_WORLD_ARCHIVE_MISSING_${name}`);
+    const meta = manifest.files[name]!;
+    if (data.length !== meta.bytes || (await sha256Bytes(data)) !== meta.sha256) {
+      throw new Error(`PERSISTENT_WORLD_ARCHIVE_HASH_MISMATCH_${name}`);
+    }
+  }
+
+  let worldCopy: NewGameWorldCopy | null = null;
+  if (expectsWorldCopy) {
+    const payload = files.get("world-copy.json")!;
+    if (!manifest.worldCopySha256 || (await sha256Bytes(payload)) !== manifest.worldCopySha256) {
+      throw new Error("PERSISTENT_WORLD_ARCHIVE_WORLD_COPY_HASH_MISMATCH");
+    }
+    let raw: unknown;
+    try {
+      raw = JSON.parse(decoder.decode(payload));
+    } catch {
+      throw new Error("PERSISTENT_WORLD_ARCHIVE_WORLD_COPY_JSON_INVALID");
+    }
+    worldCopy = await validateStoredWorldCopy(raw);
+  }
+
+  let stateRaw: unknown;
+  try {
+    stateRaw = JSON.parse(decoder.decode(files.get("game.json")!));
+  } catch {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_GAME_JSON_INVALID");
+  }
+  const state = await validatePersistentWorldState(stateRaw);
+  const summary = PersistentWorldSaveSummarySchema.parse(manifest.summary);
+  if (
+    summary.worldId !== state.worldIdentity.worldId ||
+    summary.careerId !== state.careerId ||
+    summary.controlledTeamId !== state.controlledTeamId ||
+    summary.currentSeasonNumber !== state.currentSeasonNumber ||
+    summary.currentCalendarYear !== state.currentCalendarYear ||
+    summary.completedSeasonCount !== state.completedSeasons.length ||
+    summary.seasonId !== state.currentSeason.seasonId ||
+    summary.currentDate !== state.currentSeason.careerState.currentDate ||
+    summary.revision !== state.revision ||
+    summary.completedFixtures !== state.currentSeason.completedMatches.length ||
+    summary.phase !== state.currentSeason.phase ||
+    summary.stateSha256 !== state.stateSha256 ||
+    manifest.careerProjectionSha256 !== state.careerProjection.projectionSha256
+  ) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_SUMMARY_MISMATCH");
+  }
+
+  const historyText = decoder.decode(files.get("completed-seasons.ndjson")!);
+  const historyLines = historyText.length ? historyText.split("\n").filter(Boolean) : [];
+  if (historyLines.length !== state.completedSeasons.length) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_HISTORY_COUNT_MISMATCH");
+  }
+  for (let i = 0; i < historyLines.length; i += 1) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(historyLines[i]!);
+    } catch {
+      throw new Error("PERSISTENT_WORLD_ARCHIVE_HISTORY_JSON_INVALID");
+    }
+    if (canonicalJson(parsed) !== canonicalJson(state.completedSeasons[i])) {
+      throw new Error(`PERSISTENT_WORLD_ARCHIVE_HISTORY_MISMATCH_${i}`);
+    }
+  }
+
+  let careerProjectionRaw: unknown;
+  try {
+    careerProjectionRaw = JSON.parse(decoder.decode(files.get("career-projection.json")!));
+  } catch {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_CAREER_PROJECTION_JSON_INVALID");
+  }
+  if (canonicalJson(careerProjectionRaw) !== canonicalJson(state.careerProjection)) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_CAREER_PROJECTION_MISMATCH");
+  }
+
+  const activeEventsText = decoder.decode(files.get("active-events.ndjson")!);
+  const activeEventLines = activeEventsText.length
+    ? activeEventsText.split("\n").filter(Boolean)
+    : [];
+  if (activeEventLines.length !== state.currentSeason.completedMatches.length) {
+    throw new Error("PERSISTENT_WORLD_ARCHIVE_ACTIVE_EVENT_COUNT_MISMATCH");
+  }
+  for (let i = 0; i < activeEventLines.length; i += 1) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(activeEventLines[i]!);
+    } catch {
+      throw new Error("PERSISTENT_WORLD_ARCHIVE_ACTIVE_EVENT_JSON_INVALID");
+    }
+    if (canonicalJson(parsed) !== canonicalJson(state.currentSeason.completedMatches[i])) {
+      throw new Error(`PERSISTENT_WORLD_ARCHIVE_ACTIVE_EVENT_MISMATCH_${i}`);
+    }
+  }
+
+  let matchEventArchives: CompletedCareerMatchEventArchive[] = [];
+  if (manifest.matchEventArchiveCount > 0) {
+    const matchEventsText = decoder.decode(files.get("match-events.ndjson")!);
+    const lines = matchEventsText.length ? matchEventsText.split("\n").filter(Boolean) : [];
+    if (lines.length !== manifest.matchEventArchiveCount) {
+      throw new Error("PERSISTENT_WORLD_ARCHIVE_MATCH_EVENT_COUNT_MISMATCH");
+    }
+    const rawArchives = lines.map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        throw new Error("PERSISTENT_WORLD_ARCHIVE_MATCH_EVENT_JSON_INVALID");
+      }
+    });
+    matchEventArchives = (
+      await validatePersistentWorldMatchEventArchiveSet(rawArchives, state)
+    ).archives;
+  }
+
+  return { state, summary, manifest, worldCopy, matchEventArchives };
+}
+
+export function peekPortableArchiveVersion(bytes: Uint8Array): string | null {
+  try {
+    const files = parseZip(bytes, MAX_PERSISTENT_ARCHIVE_BYTES, MAX_PERSISTENT_EXPANDED_BYTES);
+    const manifestBytes = files.get("manifest.json");
+    if (!manifestBytes) return null;
+    const parsed = JSON.parse(decoder.decode(manifestBytes)) as {
+      archiveVersion?: unknown;
+    } | null;
+    return typeof parsed?.archiveVersion === "string" ? parsed.archiveVersion : null;
+  } catch {
+    return null;
+  }
 }

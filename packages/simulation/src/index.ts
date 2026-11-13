@@ -38,5 +38,6 @@ export * from "./roster-season-schedule.js";
 export * from "./roster-career-condition.js";
 export * from "./roster-offscreen-fixture.js";
 export * from "./career-replay.js";
+export * from "./persistent-world.js";
 export * from "./red5-continuation.js";
 export * from "./red5-weather.js";

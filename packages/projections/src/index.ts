@@ -14,3 +14,4 @@ export interface Projector<T> {
 
 export * from "./season.js";
 export * from "./match-analytics.js";
+export * from "./persistent-world.js";

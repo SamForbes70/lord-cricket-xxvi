@@ -25,6 +25,8 @@ export * from "./season-projections.js";
 
 export * from "./season-persistence.js";
 
+export * from "./persistent-world.js";
+
 export * from "./roster-import.js";
 
 export * from "./delegation-journal.js";

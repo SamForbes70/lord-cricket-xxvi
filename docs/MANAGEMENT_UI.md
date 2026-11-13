@@ -8,7 +8,7 @@ The management UI does not own cricket truth. It renders and commands `CareerApp
 
 The default application route is the management career. `#exhibition` opens the inherited exhibition / interactive match application.
 
-Management screens are Home, Career, Squad, Fixtures, Statistics and Settings. The UI exposes the fixed one-season product boundary and labels fictional data, `SYNTHETIC_ALPHA` and disabled DLS.
+Management screens are Home, Career, Squad, Fixtures, Statistics and Settings. Careers support both V0.1 single-season saves (`LC_T20_SEASON_SAVE_V1`) and Stage 2 persistent multi-season worlds (`LC_PERSISTENT_WORLD_V1`), labelling fictional data, `SYNTHETIC_ALPHA`, disabled DLS, and Stage 2's pre-lifecycle/pre-economy boundary.
 Interactive T20 matches provide optional tactical captain delegation; the fixture autopilot remains a separate baseline policy.
 
 ## Managed fixture integration
@@ -24,6 +24,8 @@ Before an interactive career match launches, a hash-checked durable binding reco
 Career creation is not shown as Saved until the first Pass 12F repository commit succeeds. Later management mutations acquire/renew the writer lease, require the durable revision, seal a new canonical season state and commit through the existing repository transaction. UI save states distinguish Saving, Saved, Read-only, Recovered and Error.
 
 Completed career fixtures seal versioned ball-by-ball event logs (`LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1`, bounded to 1 MiB per fixture and 16 MiB per season) in the IndexedDB `projections` store (`CAREER_MATCH_EVENTS_V1`) and portable `.lcxxvi` archives (`LC_T20_SEASON_PORTABLE_V3_EVENT_ARCHIVES`). The `Career` and `Fixtures` screens expose `View replay` to reconstruct innings and delivery history from the preserved event chain without recomputing random outcomes. Earlier v1 saves without stored event logs remain playable without silent migration and report replay unavailability explicitly; damaged fixture event logs are isolated per fixture without invalidating career standings.
+
+In Stage 2 persistent multi-season worlds (`LC_PERSISTENT_WORLD_V1`), completing all 56 fixtures unlocks `Advance to Season N+1`, sealing an immutable `LC_COMPLETED_SEASON_RECORD_V1` entry into the Roll of Honour, rotating home/away parity and derived season seeds for the next 56-fixture schedule, and storing cross-season event archives under `${seasonNumber}:${fixtureId}` keys (`LC_PERSISTENT_WORLD_PORTABLE_V1` `.lcxxvi`, bounded to 160 MiB). Completed single-season V0.1 saves remain unchanged and expose an explicit `Begin Season 2 in a new persistent save` copy action.
 
 Recovered saves are continued into a fresh recovered slot while the damaged source is preserved. Players can inspect all three checkpoint generations (`Checkpoints` / `Inspect checkpoints`), see any corrupted generations isolated explicitly, and recover a chosen validated older generation into a named new career slot. Save and archive failures present plain-English explanations, recovery guidance and diagnostic codes. Manual copies, `.lcxxvi` export/import and checkpoint recovery remain keyboard reachable. Portable import is validated before the imported career becomes active.
 

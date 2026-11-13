@@ -2,7 +2,9 @@
 
 ## Current state, 13 November 2026
 
-**V0.1 is closed.** The owner accepted it; every V01 backlog item is `DONE` and RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. The performance, owner-PC and screen-reader gates are **owner declared with no measurement or observation stored in this repository** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). Five commits that reached `main` without review were reviewed afterwards ([REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)). The model stays `synthetic-alpha-01` / `SYNTHETIC_ALPHA`. The next milestone is the persistent world ([NEXT_PASS.md](NEXT_PASS.md), [HANDOVER.md](HANDOVER.md)). The sections below are history and keep their original scope; where they say something is incomplete or pending, this section supersedes them.
+**V0.1 is closed (`main` `f7ee054`).** The owner accepted it; every V01 backlog item is `DONE` and RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. The performance, owner-PC and screen-reader gates are **owner declared with no measurement or observation stored in this repository** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). Five commits that reached `main` without review were reviewed afterwards ([REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)). The model stays `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
+
+**Stage 2 (Persistent multi-season world) is `accepted` on `main` (14 November 2026)** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md), [NEXT_PASS.md](NEXT_PASS.md), [HANDOVER.md](HANDOVER.md)), unlocking Stage 3 (Player lifecycle and youth pathway). The sections below are history and keep their original scope; where they say something is incomplete or pending, this section supersedes them.
 
 For the release record and owner gates, read [NEXT_PASS.md](NEXT_PASS.md) and [RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json). [The 11 November 2026 GitHub audit](GITHUB_AUDIT_2026-11-11.md) is retained as a historical snapshot; earlier PR lists below retain their original scope.
 
