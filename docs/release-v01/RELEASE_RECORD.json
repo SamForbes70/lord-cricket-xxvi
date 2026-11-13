@@ -1,14 +1,14 @@
 {
   "schema": "LC_V01_RELEASE_RECORD_V1",
-  "generatedAtUtc": "2026-11-13T03:52:40.970Z",
+  "generatedAtUtc": "2026-11-13T03:53:35.288Z",
   "modelStatus": "SYNTHETIC_ALPHA",
   "empiricallyCalibrated": false,
   "publicDeploymentAuthorised": false,
   "publicDeploymentNote": "Public deployment requires separate explicit owner authorisation after V0.1 acceptance.",
   "testedRevision": {
-    "commit": "4dfc483d338204dbc5e512ac8f4a67121eb0062d",
+    "commit": "f07eea8384cb4857a7ba01ab48d5dfab226e2eea",
     "branch": "codex/v01-closure",
-    "workingTreeClean": false
+    "workingTreeClean": true
   },
   "manifests": {
     "packageLockSha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884",
