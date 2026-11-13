@@ -1,23 +1,28 @@
 # Next development slice
 
-Finish V0.1, then deliver persistent world, player lifecycle and squad economy sequentially, as directed by the owner on 11 November 2026.
+**V0.1 is closed.** The owner accepted it on 13 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)): every V01 backlog item is `DONE`, and RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. "Done" for the performance, owner-PC and screen-reader gates means the owner declared them complete; no measurement or observation for them is stored in this repository.
 
-## Integrated baseline on `main`
+The owner's sequence from here is **persistent world, then player lifecycle, then squad economy**, each accepted before the next begins. A separate research track (a licensed, well-characterised calibration dataset) is the brief's next priority for model quality and is blocked on data, not on routine development.
 
-PR #39 (`2c742fb`) delivered durable managed-match recovery across closed tabs and browser restarts. PR #40 (`877ead2`) integrated incremental analytics (#26), complete analytical charts (#27), previewable diagnostic event exports (#31), delivery-sequence documentation (#36) and project documentation (#38). PR #41 (`77e1160`) recorded the seven confirmed reference-hardware performance budgets in [PERFORMANCE_BUDGETS.md](PERFORMANCE_BUDGETS.md).
+Read [HANDOVER.md](HANDOVER.md) first, then [AI_CONTINUATION.md](AI_CONTINUATION.md).
 
-Treat [GITHUB_AUDIT_2026-11-11.md](GITHUB_AUDIT_2026-11-11.md) as a historical snapshot taken before PRs #39 to #41 merged. Use [CURRENT_STATUS.md](CURRENT_STATUS.md) and [AI_CONTINUATION.md](AI_CONTINUATION.md) for current repository context.
+## Next milestone: persistent world (Milestone 2)
 
-## V0.1 engineering closure on branch `codex/v01-closure`
+Proposed scope and acceptance are in [V01_DELIVERY_PLAN.md](V01_DELIVERY_PLAN.md) ("After V0.1"). They are proposals until the owner accepts them. Before writing code:
 
-- **V01-011 hardening**: `150%` text-scale vertical budget headroom in Firefox and Chromium, slot-scoped `matchGameId` isolation across career copies/multiple careers with legacy fallback, `rekeyCareer` on imported-roster `Create recovered copy`, dangling-binding abandonment on match `DELETE_SAVE`, `playwright.m4.config.ts` wired into CI and owner acceptance, and two new browser recovery specs (damaged match checkpoint and live writer lease in another tab).
-- **Batch 5 (`V01-018`, `V01-019`)**: completed career match event-archive retention, ball-by-ball replay without recomputation, V3 `.lcxxvi` portable round-trip, and checkpoint generation recovery usability.
-- **Batch 6 (`V01-020` to `V01-023`)**: ODI and five-day red-ball tactical captains, declaration and follow-on rollout evaluation on an isolated planning seed, and seeded red-ball weather interruptions with uncertain pre-day forecasts (DLS and limited-overs rain remain disabled).
-- **Batch 7 (`V01-024` to `V01-029`)**: synthetic quality and exploitation gates (`V01-024`), `300`-match cross-format replay plus `30,000`-innings Monte Carlo diagnostics (`V01-025`, [REPORT.md](verification-v01-batch7-diagnostics/REPORT.md)), automated browser accessibility audit (`V01-026`, [ACCESSIBILITY_RELEASE_AUDIT.md](ACCESSIBILITY_RELEASE_AUDIT.md)), precached offline shell with transaction-deferred updates (`V01-027`, [OFFLINE_SAFE_UPDATES.md](OFFLINE_SAFE_UPDATES.md)), automated 8-budget measurement harness with OS browser/worker/native memory probing (`V01-028`, [PERFORMANCE_BUDGETS.md](PERFORMANCE_BUDGETS.md)), and deterministic release-candidate manifest packaging (`V01-029`, [RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json)).
-- Backlog statuses in [V01_BACKLOG.json](V01_BACKLOG.json) remain unchanged until owner review.
+1. Write the acceptance criteria and the save-compatibility plan for the owner to confirm. A multi-season career must keep existing single-season saves openable unchanged, or copy them forward by an explicit action. Never migrate a historical save silently.
+2. Decide the version identifiers for any widened persisted format. The delegation journal widened in place without a new version (see [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)); do not repeat that.
+3. Plan season rollover as one atomic transaction that a crash cannot leave half done.
 
-## Active Stop-Gate 1 before multi-season gameplay code
+Do not start player lifecycle or squad economy code before the persistent world is accepted.
 
-1. Owner confirms the numeric threshold for Budget 8 (`LCXXVI_MEMORY_BUDGET_MB`, total application memory including workers and native allocations).
-2. Owner runs `node scripts/owner-acceptance.mjs --owner-pc` on the owner Windows PC and designated four-core, 8 GB reference hardware, plus completes the remaining human playthrough and screen-reader observations.
-3. Explicit owner sign-off marks `V01-011`, `V01-028` and V0.1 accepted before starting Persistent World (Milestone 2), Player Lifecycle (Milestone 3), and Squad Economy (Milestone 4).
+## Open items that still need people
+
+- **Branch protection on `main`** is not applied. The AI could not apply it; the owner must ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
+- **Delegation journal versioning:** older builds reject journals that use the widened values. Decide whether to introduce `LC_DELEGATION_JOURNAL_V2` with a migration.
+- **Real measurements,** if the owner wants them: a reference-laptop run (`LCXXVI_ACCEPTANCE_DIR=... npx playwright test --config playwright.acceptance.config.ts`), the owner-PC collector (`node scripts/owner-acceptance.mjs --owner-pc`) and a screen-reader walkthrough. Store results under `docs/verification-*` and link them from the owner decisions record.
+- **The empirical research items** need historical incident decisions, an untouched cohort and an approved dataset.
+
+## How to work
+
+Branch from `main`, open a draft pull request, wait for hosted CI (the Windows job takes 25 to 30 minutes), and merge only on green. Run `npx tsc -b` before the tests after any pull: stale compiled packages cause confusing unit failures. See [AGENTS.md](../AGENTS.md) and [VERIFICATION_GUIDE.md](VERIFICATION_GUIDE.md).

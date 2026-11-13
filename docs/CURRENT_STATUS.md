@@ -1,6 +1,10 @@
 # Current game and acceptance status
 
-For current V0.1 handover and remaining owner gates, read [NEXT_PASS.md](NEXT_PASS.md) and [RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json). [The 11 November 2026 GitHub audit](GITHUB_AUDIT_2026-11-11.md) is retained as a historical snapshot; earlier PR lists below retain their original scope.
+## Current state, 13 November 2026
+
+**V0.1 is closed.** The owner accepted it; every V01 backlog item is `DONE` and RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. The performance, owner-PC and screen-reader gates are **owner declared with no measurement or observation stored in this repository** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). Five commits that reached `main` without review were reviewed afterwards ([REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)). The model stays `synthetic-alpha-01` / `SYNTHETIC_ALPHA`. The next milestone is the persistent world ([NEXT_PASS.md](NEXT_PASS.md), [HANDOVER.md](HANDOVER.md)). The sections below are history and keep their original scope; where they say something is incomplete or pending, this section supersedes them.
+
+For the release record and owner gates, read [NEXT_PASS.md](NEXT_PASS.md) and [RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json). [The 11 November 2026 GitHub audit](GITHUB_AUDIT_2026-11-11.md) is retained as a historical snapshot; earlier PR lists below retain their original scope.
 
 Lord Cricket XXVI is a playable single-season management alpha.
 Main includes merged PR #2, capability reconciliation from PR #4 and the scenario harness from PR #5.

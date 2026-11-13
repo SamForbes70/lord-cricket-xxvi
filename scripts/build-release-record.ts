@@ -80,7 +80,7 @@ export function generateReleaseRecord(rootDir = process.cwd()): V01ReleaseRecord
     {
       capabilityId: 'CAP-T20-CAREER-AND-RECOVERY',
       advertised: 'Single-season 8-team 56-fixture T20 management career with durable IndexedDB managed-match recovery and slot-scoped bindings',
-      status: 'VERIFIED_ENGINEERING_AWAITING_OWNER_ACCEPTANCE',
+      status: 'VERIFIED_ENGINEERING_OWNER_ACCEPTED',
       evidence: [
         'npm run management:acceptance',
         'tests/ui/managed-recovery.spec.ts',
@@ -103,15 +103,34 @@ export function generateReleaseRecord(rootDir = process.cwd()): V01ReleaseRecord
       advertised: 'Cross-format T20/ODI/red-ball tactical AI profiles, reversible delegation, and deterministic red-ball weather/forecast interruptions',
       status: 'VERIFIED_SYNTHETIC_ALPHA',
       evidence: [
-        'tests/unit/v01-odi-tactical-ai.test.ts',
-        'tests/unit/v01-red-ball-weather.test.ts',
-        'tests/unit/red-ball-ai.test.ts',
+        'tests/unit/tactical-captains-v01.test.ts',
+        'tests/unit/red5-rollout-weather.test.ts',
+        'tests/ui/tactical-formats.spec.ts',
+      ],
+    },
+    {
+      capabilityId: 'CAP-CAREER-ARCHIVES-AND-REPLAY',
+      advertised: 'Completed career match event archives, replay without recomputing outcomes, and checkpoint inspection and recovery, in portable career archives',
+      status: 'VERIFIED_SYNTHETIC_ALPHA',
+      evidence: [
+        'tests/unit/v01-career-event-archive-recovery.test.ts',
+        'tests/ui/career-replay-and-recovery.spec.ts',
+      ],
+    },
+    {
+      capabilityId: 'CAP-SYNTHETIC-DIAGNOSTICS',
+      advertised: 'Fixed-seed cross-format replay (100 matches per format) and release-scale synthetic diagnostics, with synthetic claims only',
+      status: 'VERIFIED_SYNTHETIC_ALPHA',
+      evidence: [
+        'tests/unit/v01-batch7-diagnostics.test.ts',
+        'docs/verification-v01-batch7-diagnostics/results.json',
+        'docs/verification-v01-batch7-diagnostics/FOLLOW_UP_2026-11-13.md',
       ],
     },
     {
       capabilityId: 'CAP-OFFLINE-AND-ACCESSIBILITY',
       advertised: 'Precached offline shell, transaction-deferred safe updates, retained engine assets (/engineering.html recovery), keyboard/contrast/150%/200%-zoom accessibility',
-      status: 'VERIFIED_BROWSER_AUTOMATION_HUMAN_AT_PENDING',
+      status: 'VERIFIED_BROWSER_AUTOMATION_HUMAN_AT_OWNER_DECLARED',
       evidence: [
         'tests/unit/offline-safe-updates.test.ts',
         'tests/ui/offline-assets.spec.ts',
@@ -126,7 +145,10 @@ export function generateReleaseRecord(rootDir = process.cwd()): V01ReleaseRecord
     'Playable career scope in V0.1 is a single-season 8-team T20 league; multi-season persistent world, player lifecycle, and squad economy remain gated behind explicit V0.1 owner acceptance.',
     'Duckworth-Lewis-Stern (DLS) and limited-overs rain targets remain disabled in V0.1; weather interruptions apply to five-day red-ball matches only.',
     'Career saves can be exported, imported, switched, and recovered into new slots, while direct UI deletion of career slots is omitted in V0.1.',
-    'Total application memory numeric budget (Budget 8 in docs/PERFORMANCE_BUDGETS.md) awaits owner threshold confirmation via LCXXVI_MEMORY_BUDGET_MB and qualifying reference-hardware execution.',
+    'The eight performance budgets are confirmed (docs/PERFORMANCE_BUDGETS.md, memory budget 768 MiB). The reference-laptop run, owner-PC run and human screen-reader walkthrough are owner-declared complete on 13 November 2026 with no measurements or observations stored in this repository; the only recorded observations are from a Linux container and hosted CI.',
+    'The delegation journal kept its version identifier (LC_DELEGATION_JOURNAL_V1) while its schema widened (FIELD, DECLARATION, FOLLOW_ON, NEW_BALL and an optional red-ball profile). Older journals still validate, but a build that predates the widening will reject a journal that uses the new values.',
+    'testedRevision is the commit the record was generated on, which is the commit before the record itself: a file cannot contain its own commit hash.',
+    'Match and career recovery were verified in Chromium and Firefox on hosted Windows and in Chromium on Linux; no run exists on Safari or on macOS.',
   ];
 
   const recoveryInstructions = [
@@ -151,10 +173,11 @@ export function generateReleaseRecord(rootDir = process.cwd()): V01ReleaseRecord
     },
     manifests,
     externalAndOwnerGates: {
-      v01_011_managedMatchRecoveryOwnerAcceptance: 'AWAITING_OWNER_ACCEPTANCE',
-      v01_028_referenceHardwarePerformance: 'BLOCKED_EXTERNAL_AWAITING_MEMORY_THRESHOLD_AND_REFERENCE_HOST_RUN',
-      ownerWindowsPcAcceptanceRun: 'NOT_ESTABLISHED_IN_CONTAINER_REQUIRES_OWNER_PC',
-      humanAssistiveTechnologyWalkthrough: 'PENDING_OWNER_OR_HUMAN_SCREEN_READER_OBSERVATION',
+      v01_011_managedMatchRecoveryOwnerAcceptance: 'OWNER_ACCEPTED_2026_11_13',
+      v01_028_referenceHardwarePerformance: 'OWNER_DECLARED_COMPLETE_2026_11_13_NO_REFERENCE_HOST_MEASUREMENTS_IN_REPOSITORY',
+      ownerWindowsPcAcceptanceRun: 'OWNER_DECLARED_COMPLETE_2026_11_13_NO_COLLECTOR_OUTPUT_IN_REPOSITORY',
+      humanAssistiveTechnologyWalkthrough: 'OWNER_DECLARED_COMPLETE_2026_11_13_NO_OBSERVATIONS_IN_REPOSITORY',
+      reviewOwnersRulesDataModel: 'OWNER_HOLDS_ALL_THREE_ROLES_2026_11_13',
       researchTrack_RES_001_002_003: 'BLOCKED_EXTERNAL_DATA_AND_SEPARATE_PROMOTION_GATE',
     },
     capabilities,

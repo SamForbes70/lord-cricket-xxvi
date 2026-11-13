@@ -16,8 +16,17 @@ export interface TotalApplicationMemoryObservation {
   readonly withinConfirmedThreshold: boolean | null;
 }
 
+/**
+ * Owner-confirmed total application memory budget (13 November 2026), in MiB: 768.
+ * It is compared with process-tree PSS on Linux and private bytes on Windows, so shared pages are counted once.
+ * The figure was chosen for a four-core, 8 GB reference laptop. It is a target, not a measurement: a Linux
+ * container observation (headless Chromium, 17 processes) measured about 596 MiB PSS, which is not reference hardware.
+ * LCXXVI_MEMORY_BUDGET_MB overrides it for experiments.
+ */
+export const CONFIRMED_MEMORY_BUDGET_MB = 768;
+
 export function parseConfiguredMemoryBudgetBytes(envValue = process.env.LCXXVI_MEMORY_BUDGET_MB): number | null {
-  if (!envValue || envValue.trim() === "") return null;
+  if (envValue === undefined || envValue.trim() === "") return CONFIRMED_MEMORY_BUDGET_MB * 1024 * 1024;
   const mb = Number(envValue);
   if (!Number.isFinite(mb) || mb <= 0) {
     throw new Error(`INVALID_LCXXVI_MEMORY_BUDGET_MB: ${envValue}`);

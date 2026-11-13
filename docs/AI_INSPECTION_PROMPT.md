@@ -1,6 +1,6 @@
 # Prompt for an AI inspecting this project
 
-Paste everything below the line into another AI, or point it at this file. It is written to be checked against the repository, not trusted. The commit numbers and counts in it are a snapshot taken when it was written; run `git log` to see whether main has moved.
+Paste everything below the line into another AI, or point it at this file. It is written to be checked against the repository, not trusted. The commit numbers and counts in it are a snapshot taken on 13 November 2026; run `git log` to see whether main has moved, and trust the repository over this text.
 
 ---
 
@@ -11,7 +11,7 @@ You are an independent engineer and reviewer taking over a software project. You
 Lord Cricket XXVI is a browser-based cricket management game: a TypeScript monorepo with a Vite and React web app, deterministic simulation engines, IndexedDB saves and portable ".lcxxvi" archive files. It is a fictional, single-season, synthetic alpha ("synthetic-alpha-01"). It makes no empirical-realism claim. It is not a finished product.
 
 Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi
-Default branch: main. When this prompt was written, main was at commit 77e1160 ("Merge pull request #41"). Run `git log -5` to see whether it has moved since.
+Default branch: main. Run `git log -10` for its current state. If `docs/HANDOVER.md` exists, it is the best one-page summary; read it before anything else.
 
 ## 2. How to get access
 
@@ -33,43 +33,44 @@ Requirements: Node 22.12 or later (the project was verified on 22.23.4 with npm 
 
 ## 3. Read these first, in this order
 
-1. AGENTS.md: the project rules and the architecture invariants you must not break.
-2. docs/AI_CONTINUATION.md: the guide written for AIs, covering what is and is not delivered.
-3. docs/CURRENT_STATUS.md, docs/V01_DELIVERY_PLAN.md and docs/V01_BACKLOG.json: what is done and what is next.
-4. docs/ENGINEERING_GUIDE.md and docs/VERIFICATION_GUIDE.md: how to build and verify.
-5. docs/MANAGED_MATCH_RECOVERY.md: the recovery feature (section 4 below).
-6. docs/PERFORMANCE_BUDGETS.md: the confirmed performance budgets.
-7. docs/GITHUB_AUDIT_2026-11-11.md: a dated snapshot, older than the work described here. Read it as history.
+1. docs/HANDOVER.md: one page on where the project stands, how to run and verify it, what is next and the traps.
+2. AGENTS.md: the project rules, architecture invariants and working agreements you must not break.
+3. docs/AI_CONTINUATION.md: the guide written for AIs, including the working agreements.
+4. docs/OWNER_DECISIONS_2026-11-13.md and docs/REVIEW_2026-11-13.md: what the owner decided, and the review of five commits that reached main without a pull request.
+5. docs/CURRENT_STATUS.md, docs/CAPABILITY_MATRIX.md, docs/V01_DELIVERY_PLAN.md and docs/V01_BACKLOG.json: what is done and what is next.
+6. docs/ENGINEERING_GUIDE.md, docs/VERIFICATION_GUIDE.md and packages/persistence/README.md: how to build, verify and what the storage layer guarantees.
+7. docs/MANAGED_MATCH_RECOVERY.md, docs/PERFORMANCE_BUDGETS.md and docs/release-v01/RELEASE_RECORD.json: the recovery feature, the performance budgets and the release record.
+8. docs/BRANCH_PROTECTION.md: how `main` is meant to be protected, and whether it is.
 
 Dated reports in docs/verification-* are historical evidence, not current results. Test counts quoted in documents are branch-specific and not additive. A count means something only with the revision it was measured on.
 
 ## 4. What has been done (verify each point)
 
-Work was done in four pull requests, all merged into main:
+- **PR 39** (merge commit 2c742fb): durable managed-match recovery plus fixes for review findings.
+- **PR 40** (877ead2): integration of earlier open branches (incremental analytics, charts, diagnostic export, documentation) with fixes.
+- **PR 41** (77e1160): the confirmed reference-hardware performance budgets.
+- **PR 42** (8a7c164): the first version of this prompt.
+- **Five commits pushed directly to main on 13 November 2026** (38a9cd4 to 6aaabd7) by an author named "Lord Cricket Engineer": ODI and red-ball tactical captains, declaration and follow-on evaluation, seeded red-ball weather, completed career event archives and replay, offline assets with safe updates, an accessibility audit, a release record and a diagnostics gate. They had no pull request. They were reviewed afterwards; read docs/REVIEW_2026-11-13.md for what was verified and what was found.
+- **A reconciliation pull request** after that review: corrected the release record, reconciled backlog statuses from evidence, recorded the owner's decisions, added a V01-024 follow-up with corrected conclusions, a packaging script (`npm run package:game`), the confirmed 768 MiB memory budget, and the AI-facing documentation. Check whether it has merged with `git log`.
+- PR 35 and PR 37 were closed as superseded; PR 27 was closed manually although its head commit f03c164 is in main (verify with `git merge-base --is-ancestor f03c164 origin/main`).
 
-- PR 39 (merge commit 2c742fb): durable managed-match recovery plus fixes for review findings.
-- PR 40 (merge commit 877ead2): integration of earlier open branches, with fixes. It brought in PR 26 (incremental analytics), PR 27 (charts), PR 31 (match diagnostic export), PR 36 (delivery-sequence documentation) and PR 38 (project documentation).
-- PR 41 (merge commit 77e1160): records the confirmed reference-hardware performance budgets. Documentation only.
-- PR 35 and PR 37 were closed as superseded. PR 27 was closed manually because GitHub did not mark it merged, although its head commit f03c164 is an ancestor of main. Verify that with `git merge-base --is-ancestor f03c164 origin/main`.
+### The central problem that was fixed earlier
 
-### The central problem that was fixed
+A "managed match" is a match played from a career fixture. The match checkpoint and the career are separate saved records. Before PR 39 the link between them lived only in sessionStorage, so closing the tab or browser left a restorable match that could never return its result to the career. The fix:
 
-A "managed match" is a match played from a career fixture. The match checkpoint and the career are separate saved records. Before this work, the link between them lived only in sessionStorage, so closing the tab or browser left a restorable match that could never return its result to the career. The fix:
-
-- A hash-checked "binding" record is written before the match launches. It lives in the existing IndexedDB "settings" store under the key managed-binding:<matchGameId>, with no database version change. See packages/persistence/src/binding.ts.
-- A restored match is re-associated with its career through that binding via a dedicated request (RECOVER_MANAGED), never through the BOOT reset path. See apps/web/src/match/match.worker.ts, protocol.ts and controller.ts.
-- A completed match applies its result to the career from the saved checkpoint, exactly once, even with no match page open. See apps/web/src/match/managed-result.ts and apps/web/src/career/managed-match.ts. This works for standard careers, edited-world careers and imported-roster careers.
-- A career recovered into a new save slot takes its pending match links with it (rekeyCareer).
-- A first commit can no longer replace an existing save (error SAVE_ALREADY_EXISTS). "New exhibition" is refused while a career match is pending, and there is an explicit "Abandon career match" action.
-- The writer lease is released on tab close (best effort) and a read-only restore retries for about 30 seconds. A live lease held by another tab is never taken over.
-- Smaller fixes: roster career rows no longer appear in the match save list, the diagnostic export omits the seed of an unfinished match unless the player opts in, the analytics rebuild yields by time budget, a reload-safe request id scheme, and stale documents corrected.
+- A hash-checked "binding" record is written before the match launches, in the existing IndexedDB "settings" store under managed-binding:<matchGameId>, with no database version change. See packages/persistence/src/binding.ts.
+- A restored match is re-associated with its career through that binding via a dedicated request (RECOVER_MANAGED), never through the BOOT reset path. See apps/web/src/match/match.worker.ts.
+- A completed match applies its result to the career from the saved checkpoint, exactly once, even with no match page open, for standard, edited-world and imported-roster careers.
+- A career recovered into a new slot takes its pending links with it. A first commit never replaces an existing save. "New exhibition" is refused while a career match is pending; there is an explicit "Abandon career match".
 
 ### Status you must treat as unverified until you check it yourself
 
-- Backlog item V01-011 (recovery) is still IN_PROGRESS by design. The owner has not accepted it.
-- V01-028 (reference-hardware performance) is BLOCKED_EXTERNAL. The reference hardware is only defined as "a four-core, 8 GB laptop with a supported browser". Seven numeric budgets are confirmed (docs/PERFORMANCE_BUDGETS.md). The eighth, total application memory including workers and native allocations, has no threshold and is an open owner decision.
-- Not run by anyone, as far as is known: the owner-PC checklist and reference-hardware measurements. Hosted Windows is not the owner's PC.
-- Many V0.1 items are still planned. Persistent world, player lifecycle and squad economy have no code.
+- V0.1 is closed and every V01 backlog item is DONE as of the owner's acceptance on 13 November 2026.
+- **The reference-hardware run, the owner-PC run and the human screen-reader walkthrough are owner declared. No measurement or observation for them is stored in the repository.** A Linux container observation exists (docs/PERFORMANCE_BUDGETS.md). Do not report any of the three as measured.
+- All eight performance budgets are confirmed, including 768 MiB for total application memory.
+- RES-001 to RES-003 (the research track) are BLOCKED_EXTERNAL.
+- The model is synthetic-alpha-01 and makes no empirical claim. In the T20 sweeps, the tactical captain scores the same as the neutral baseline (see the follow-up in docs/verification-v01-batch7-diagnostics).
+- Persistent world, player lifecycle and squad economy have no code.
 
 ## 5. How to verify it independently (do this before trusting any claim)
 
@@ -80,7 +81,7 @@ Record the exact command, the revision and PASS, FAIL, BLOCKED or NOT RUN for ea
     npm run lint
     npm run verify:09:core
 
-The last reported result for verify:09:core was 57 files and 706 tests passing on the main lineage. Do not assume your count matches; report what you get.
+The last reported result for verify:09:core on commit 8a7c164 was 63 files and 731 tests passing. Do not assume your count matches; report what you get.
 
 IMPORTANT: the compiled "dist" folders go stale after a pull or restart, and many unit tests then fail with errors such as "createMatchAnalyticsAccumulator is not a function". Run `npx tsc -b` (or `npm run build`) first. Do not treat that as a product bug.
 
@@ -91,8 +92,9 @@ Browser tests (Chromium; Firefox if available):
     npx playwright test --config playwright.ui.config.ts
     npm run smoke
     npm run management:acceptance
+    npm run package:game          # builds the playable and source zips into release-packages/
 
-If you use a pre-installed Chromium, set LCXXVI_CHROMIUM_EXECUTABLE to its path. The M4 persistence specs use a different config (playwright.m4.config.ts, project chromium-m4) and read LCXXVI_CHROMIUM_PATH. When last run, the full UI suite had 51 specs passing in Chromium, including seven managed-match recovery specs in tests/ui/managed-recovery.spec.ts. Verify that rather than assuming it.
+If you use a pre-installed Chromium, set LCXXVI_CHROMIUM_EXECUTABLE to its path. The M4 persistence specs use a different config (playwright.m4.config.ts, project chromium-m4) and read LCXXVI_CHROMIUM_PATH. When last run on 8a7c164, the full UI suite had 60 specs passing in Chromium, including the managed-match recovery specs in tests/ui/managed-recovery.spec.ts. Verify that rather than assuming it.
 
 Hosted CI runs on every pull request: a Linux job and a Windows job running the UI and career suites in Chromium and Firefox. The Windows job takes roughly 25 to 30 minutes and records any skipped browser test as a failure (INCOMPLETE_BROWSER_EVIDENCE). Do not add skipped tests.
 
@@ -105,16 +107,21 @@ Manual check of the headline feature: start a career, press Play match, play a f
 - Run lint and typecheck and check their exit codes, not only their output. A lint error once reached CI because an output was misread.
 - The persistence packages hold no ambient clock (the boundary check enforces it). Pass time in.
 - Never skip, disable or quarantine a test to get green. Never push an empty commit to re-trigger CI.
-- Do not close or merge anyone else's pull request, change backlog statuses, or claim a milestone is accepted without the owner's explicit say.
+- Never push directly to main. Branch, open a draft pull request, wait for hosted CI, and merge only when the owner has asked and CI is green.
+- Do not close or merge anyone else's pull request, change repository settings, change backlog statuses, or claim a milestone or owner gate is accepted without the owner's explicit say. If a permission is denied, stop and tell the owner; do not route around it.
+- A document must not cite a file that does not exist, and a failing check in a results file must be reported, not omitted.
+- Do not widen a persisted format without a new version identifier, and do not change the frozen scoring kernel, engines, generator, random stream or probability tables.
 - Do not put secrets, personal details or the owner's identity into pull requests or external services.
 
 ## 7. Known limits to check and, if you agree, report
 
-- An imported-roster career is not recovered into a new slot automatically, so it has no re-key path.
-- Deleting a match save from the save list leaves its binding pending. Playing the fixture again then starts it fresh.
-- No career delete action exists in the interface. removeForCareer exists and is unit tested.
-- The damaged-match-checkpoint and live-lease-in-another-tab cases are not covered as managed-match browser specs (only by older, general persistence specs).
-- Firefox could not be run in the container used for the original work, so Firefox evidence comes from hosted CI only.
+- The delegation journal widened in place under the same version identifier (LC_DELEGATION_JOURNAL_V1); a build that predates the change rejects a journal that uses the new values.
+- Branch protection on main may not be enabled (docs/BRANCH_PROTECTION.md); the AI that wrote it could not apply it.
+- An imported-roster career is not recovered into a new slot automatically; deleting a match save from the save list leaves its binding pending; no career delete action exists in the interface.
+- The damaged-match-checkpoint and live-lease-in-another-tab cases are not covered as managed-match browser specs.
+- Pitch effects in the synthetic model are small, and the seam and turn sweeps cannot be told apart because they share one function.
+- Firefox could not be run in the container used for most of the work, so Firefox evidence comes from hosted CI. There is no Safari or macOS run, and the packaged Windows launcher has not been run on Windows by the packager.
+- The five direct commits to main were reviewed only partly (docs/REVIEW_2026-11-13.md lists what was not read in full).
 
 ## 8. What I want back from you
 

@@ -13,7 +13,8 @@ Lord Cricket XXVI is a browser-based statistical cricket management game built a
 | Persistence maintainer | [Storage and archive reference](../packages/persistence/README.md) |
 | Test author | [Verification and evidence guide](VERIFICATION_GUIDE.md) |
 | Performance acceptance | [Reference-hardware budgets](PERFORMANCE_BUDGETS.md) |
-| Reviewer or AI taking over | [Prompt for an AI inspecting this project](AI_INSPECTION_PROMPT.md) |
+| Reviewer or AI taking over | [Handover](HANDOVER.md), [prompt for an AI inspecting this project](AI_INSPECTION_PROMPT.md) |
+| Owner | [Owner decisions](OWNER_DECISIONS_2026-11-13.md), [review of the unreviewed commits](REVIEW_2026-11-13.md), [branch protection](BRANCH_PROTECTION.md) |
 | Research contributor | [Research gates](M7G_RESEARCH_AND_PROMOTION_GATES.md), [M7K plan](M7K_PLAN.md) |
 | Release operator | [Local acceptance collector](LOCAL_ACCEPTANCE_COLLECTOR.md), [Windows handoff](codex-migration/WINDOWS_ACCEPTANCE_HANDOFF.md) |
 

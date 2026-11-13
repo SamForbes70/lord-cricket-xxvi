@@ -1,5 +1,8 @@
 # V0.1 Synthetic Quality Gates and Release-Scale Diagnostics (V01-024 and V01-025)
 
+> **Correction, 13 November 2026.** Two statements in this report are not supported by its own data, and the red-ball bowling monotonicity check recorded as `false` in `results.json` is not mentioned below. The follow-up at larger sample sizes is in [FOLLOW_UP_2026-11-13.md](FOLLOW_UP_2026-11-13.md): the failed check was sample noise, and the tactical captain does not raise scoring, so the explanation of the low-scoring baseline given below is unsupported. The recorded numbers themselves are unchanged.
+
+
 Generated via `node scripts/run-v01-batch7-gates.mjs` with structured output in `docs/verification-v01-batch7-diagnostics/results.json`.
 
 Model status: **`SYNTHETIC_ALPHA` (`synthetic-alpha-01`)**. `empiricallyCalibrated: false`. Zero frozen scoring coefficients were modified and zero empirical-realism claims are made.
