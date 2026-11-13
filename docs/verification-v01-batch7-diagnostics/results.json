@@ -1,0 +1,616 @@
+{
+  "schema": "LC_V01_BATCH7_DIAGNOSTICS_EVIDENCE_V1",
+  "startedAtUtc": "2026-11-13T02:35:11.654Z",
+  "completedAtUtc": "2026-11-13T03:19:11.596Z",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "empiricallyCalibrated": false,
+  "v01_024": {
+    "sweeps": [
+      {
+        "format": "T20",
+        "sampleCount": 600,
+        "skills": {
+          "highBat": {
+            "tag": "skill_bat_82_vs_bowl_50",
+            "samples": 600,
+            "runsPer100Deliveries": 105.83,
+            "dismissalsPer100Deliveries": 4.67,
+            "boundaryPct": 13.5,
+            "dotPct": 52.5
+          },
+          "lowBat": {
+            "tag": "skill_bat_38_vs_bowl_50",
+            "samples": 600,
+            "runsPer100Deliveries": 69.33,
+            "dismissalsPer100Deliveries": 6.17,
+            "boundaryPct": 7.17,
+            "dotPct": 65.33
+          },
+          "highBowl": {
+            "tag": "skill_bat_55_vs_bowl_82",
+            "samples": 600,
+            "runsPer100Deliveries": 78.83,
+            "dismissalsPer100Deliveries": 5.83,
+            "boundaryPct": 9.5,
+            "dotPct": 63
+          },
+          "lowBowl": {
+            "tag": "skill_bat_55_vs_bowl_38",
+            "samples": 600,
+            "runsPer100Deliveries": 83,
+            "dismissalsPer100Deliveries": 5.17,
+            "boundaryPct": 9.67,
+            "dotPct": 60.17
+          }
+        },
+        "pitches": {
+          "seamGreen": {
+            "tag": "pitch_green_seam_8200",
+            "samples": 600,
+            "runsPer100Deliveries": 82,
+            "dismissalsPer100Deliveries": 5.5,
+            "boundaryPct": 9.33,
+            "dotPct": 61.17
+          },
+          "flatDeck": {
+            "tag": "pitch_flat_seam_2800",
+            "samples": 600,
+            "runsPer100Deliveries": 83.67,
+            "dismissalsPer100Deliveries": 5.33,
+            "boundaryPct": 9.67,
+            "dotPct": 60.5
+          },
+          "dryTurn": {
+            "tag": "pitch_dry_turn_8200",
+            "samples": 600,
+            "runsPer100Deliveries": 82,
+            "dismissalsPer100Deliveries": 5.5,
+            "boundaryPct": 9.33,
+            "dotPct": 61.17
+          },
+          "lowTurn": {
+            "tag": "pitch_low_turn_2800",
+            "samples": 600,
+            "runsPer100Deliveries": 83.67,
+            "dismissalsPer100Deliveries": 5.33,
+            "boundaryPct": 9.67,
+            "dotPct": 60.5
+          }
+        },
+        "fields": {
+          "attackingField": {
+            "tag": "field_close_attacking",
+            "samples": 600,
+            "runsPer100Deliveries": 113.17,
+            "dismissalsPer100Deliveries": 4,
+            "boundaryPct": 16.17,
+            "dotPct": 56.83
+          },
+          "boundaryField": {
+            "tag": "field_boundary_defensive",
+            "samples": 600,
+            "runsPer100Deliveries": 100.17,
+            "dismissalsPer100Deliveries": 6.17,
+            "boundaryPct": 13.33,
+            "dotPct": 59.33
+          }
+        },
+        "monotonicityChecks": {
+          "higherBatScoresMore": true,
+          "higherBatDismissedLessOrEqual": true,
+          "higherBowlConcedesLess": true,
+          "higherSeamRaisesDismissalsOrCutsScoring": true,
+          "higherTurnRaisesDismissalsOrCutsScoring": true,
+          "boundaryProtectionCutsBoundaries": true
+        }
+      },
+      {
+        "format": "ODI",
+        "sampleCount": 600,
+        "skills": {
+          "highBat": {
+            "tag": "skill_bat_82_vs_bowl_50",
+            "samples": 600,
+            "runsPer100Deliveries": 92.67,
+            "dismissalsPer100Deliveries": 4,
+            "boundaryPct": 11.67,
+            "dotPct": 56.5
+          },
+          "lowBat": {
+            "tag": "skill_bat_38_vs_bowl_50",
+            "samples": 600,
+            "runsPer100Deliveries": 56.5,
+            "dismissalsPer100Deliveries": 5.5,
+            "boundaryPct": 5.17,
+            "dotPct": 69.5
+          },
+          "highBowl": {
+            "tag": "skill_bat_55_vs_bowl_82",
+            "samples": 600,
+            "runsPer100Deliveries": 68,
+            "dismissalsPer100Deliveries": 5,
+            "boundaryPct": 7.17,
+            "dotPct": 66.83
+          },
+          "lowBowl": {
+            "tag": "skill_bat_55_vs_bowl_38",
+            "samples": 600,
+            "runsPer100Deliveries": 69.67,
+            "dismissalsPer100Deliveries": 4.67,
+            "boundaryPct": 7,
+            "dotPct": 65.17
+          }
+        },
+        "pitches": {
+          "seamGreen": {
+            "tag": "pitch_green_seam_8200",
+            "samples": 600,
+            "runsPer100Deliveries": 69.83,
+            "dismissalsPer100Deliveries": 4.83,
+            "boundaryPct": 7.17,
+            "dotPct": 65.17
+          },
+          "flatDeck": {
+            "tag": "pitch_flat_seam_2800",
+            "samples": 600,
+            "runsPer100Deliveries": 69.5,
+            "dismissalsPer100Deliveries": 4.83,
+            "boundaryPct": 7,
+            "dotPct": 65
+          },
+          "dryTurn": {
+            "tag": "pitch_dry_turn_8200",
+            "samples": 600,
+            "runsPer100Deliveries": 69.83,
+            "dismissalsPer100Deliveries": 4.83,
+            "boundaryPct": 7.17,
+            "dotPct": 65.17
+          },
+          "lowTurn": {
+            "tag": "pitch_low_turn_2800",
+            "samples": 600,
+            "runsPer100Deliveries": 69.5,
+            "dismissalsPer100Deliveries": 4.83,
+            "boundaryPct": 7,
+            "dotPct": 65
+          }
+        },
+        "fields": {
+          "attackingField": {
+            "tag": "field_close_attacking",
+            "samples": 600,
+            "runsPer100Deliveries": 92.83,
+            "dismissalsPer100Deliveries": 3.83,
+            "boundaryPct": 11.5,
+            "dotPct": 62.83
+          },
+          "boundaryField": {
+            "tag": "field_boundary_defensive",
+            "samples": 600,
+            "runsPer100Deliveries": 82.33,
+            "dismissalsPer100Deliveries": 5.5,
+            "boundaryPct": 9.33,
+            "dotPct": 64.67
+          }
+        },
+        "monotonicityChecks": {
+          "higherBatScoresMore": true,
+          "higherBatDismissedLessOrEqual": true,
+          "higherBowlConcedesLess": true,
+          "higherSeamRaisesDismissalsOrCutsScoring": true,
+          "higherTurnRaisesDismissalsOrCutsScoring": true,
+          "boundaryProtectionCutsBoundaries": true
+        }
+      },
+      {
+        "format": "RED_BALL",
+        "sampleCount": 600,
+        "skills": {
+          "highBat": {
+            "tag": "skill_bat_82_vs_bowl_50",
+            "samples": 600,
+            "runsPer100Deliveries": 79.17,
+            "dismissalsPer100Deliveries": 2.33,
+            "boundaryPct": 9.17,
+            "dotPct": 58.67
+          },
+          "lowBat": {
+            "tag": "skill_bat_38_vs_bowl_50",
+            "samples": 600,
+            "runsPer100Deliveries": 46,
+            "dismissalsPer100Deliveries": 5.33,
+            "boundaryPct": 4,
+            "dotPct": 73
+          },
+          "highBowl": {
+            "tag": "skill_bat_55_vs_bowl_82",
+            "samples": 600,
+            "runsPer100Deliveries": 58,
+            "dismissalsPer100Deliveries": 4.67,
+            "boundaryPct": 6.5,
+            "dotPct": 69.67
+          },
+          "lowBowl": {
+            "tag": "skill_bat_55_vs_bowl_38",
+            "samples": 600,
+            "runsPer100Deliveries": 57.83,
+            "dismissalsPer100Deliveries": 4,
+            "boundaryPct": 5.83,
+            "dotPct": 67.17
+          }
+        },
+        "pitches": {
+          "seamGreen": {
+            "tag": "pitch_green_seam_8200",
+            "samples": 600,
+            "runsPer100Deliveries": 58.67,
+            "dismissalsPer100Deliveries": 4.5,
+            "boundaryPct": 6.33,
+            "dotPct": 68.33
+          },
+          "flatDeck": {
+            "tag": "pitch_flat_seam_2800",
+            "samples": 600,
+            "runsPer100Deliveries": 61.17,
+            "dismissalsPer100Deliveries": 4.5,
+            "boundaryPct": 6.67,
+            "dotPct": 67.17
+          },
+          "dryTurn": {
+            "tag": "pitch_dry_turn_8200",
+            "samples": 600,
+            "runsPer100Deliveries": 58.67,
+            "dismissalsPer100Deliveries": 4.5,
+            "boundaryPct": 6.33,
+            "dotPct": 68.33
+          },
+          "lowTurn": {
+            "tag": "pitch_low_turn_2800",
+            "samples": 600,
+            "runsPer100Deliveries": 61.17,
+            "dismissalsPer100Deliveries": 4.5,
+            "boundaryPct": 6.67,
+            "dotPct": 67.17
+          }
+        },
+        "fields": {
+          "attackingField": {
+            "tag": "field_close_attacking",
+            "samples": 600,
+            "runsPer100Deliveries": 67.33,
+            "dismissalsPer100Deliveries": 4.83,
+            "boundaryPct": 7.83,
+            "dotPct": 69.5
+          },
+          "boundaryField": {
+            "tag": "field_boundary_defensive",
+            "samples": 600,
+            "runsPer100Deliveries": 61.83,
+            "dismissalsPer100Deliveries": 5.67,
+            "boundaryPct": 7.17,
+            "dotPct": 71.17
+          }
+        },
+        "monotonicityChecks": {
+          "higherBatScoresMore": true,
+          "higherBatDismissedLessOrEqual": true,
+          "higherBowlConcedesLess": false,
+          "higherSeamRaisesDismissalsOrCutsScoring": true,
+          "higherTurnRaisesDismissalsOrCutsScoring": true,
+          "boundaryProtectionCutsBoundaries": true
+        }
+      }
+    ],
+    "policies": {
+      "version": "LC_SYNTHETIC_EXPLOITATION_GATES_V1",
+      "modelId": "synthetic-alpha-01",
+      "coefficientsChanged": false,
+      "empiricallyValidated": false,
+      "policies": {
+        "BASELINE_NEUTRAL": {
+          "matches": 12,
+          "meanFirstInningsRuns": 92.83,
+          "meanFirstInningsWickets": 7.83,
+          "allOutCount": 3
+        },
+        "TACTICAL_CAPTAIN": {
+          "matches": 12,
+          "meanFirstInningsRuns": 91.17,
+          "meanFirstInningsWickets": 7.92,
+          "allOutCount": 3
+        },
+        "EXPLOIT_ALWAYS_SLOG_4": {
+          "matches": 12,
+          "meanFirstInningsRuns": 85.83,
+          "meanFirstInningsWickets": 9.5,
+          "allOutCount": 8
+        },
+        "EXPLOIT_ALWAYS_DEFEND_0": {
+          "matches": 12,
+          "meanFirstInningsRuns": 74.08,
+          "meanFirstInningsWickets": 5.25,
+          "allOutCount": 1
+        },
+        "EXPLOIT_ALWAYS_YORKER_EFFORT": {
+          "matches": 12,
+          "meanFirstInningsRuns": 88.67,
+          "meanFirstInningsWickets": 7.58,
+          "allOutCount": 2
+        },
+        "EXPLOIT_ALWAYS_SHORT_EFFORT": {
+          "matches": 12,
+          "meanFirstInningsRuns": 94.83,
+          "meanFirstInningsWickets": 8.17,
+          "allOutCount": 4
+        }
+      },
+      "nonDominanceFindings": {
+        "blindSlogIncreasesWicketsVsBaseline": true,
+        "blindDefendScoresLessThanTactical": true,
+        "lowScoringBaselineExplained": "LC_FIXTURE_CAPTAIN_V1 holds static neutral aggression=2 and GOOD/STANDARD plans throughout all 20 overs without death-overs acceleration, whereas tactical policies raise death-overs aggression and trade wicket risk for higher scoring."
+      },
+      "supportedWorldDimensions": {
+        "teams": 8,
+        "grounds": 8
+      }
+    }
+  },
+  "v01_025": {
+    "replay100PerFormat": [
+      {
+        "format": "T20",
+        "matches": 100,
+        "replayPassed": 100,
+        "resimulationPassed": 100,
+        "totalEvents": 32798,
+        "stoppingReasons": {
+          "WIN": 97,
+          "TIE": 3
+        },
+        "chunkDigests": [
+          "b0e559b4192b927467fa8f80d13aa51f4642b7a5f5a188f52bbe69222cc8e633",
+          "89e151857a2c1c78db75cefb2411df9a78522f4ef5d7075459810eb91af99029",
+          "ef1fb9e8fd3f47b7ec771c7075f86c7c5f5b9f1b02bca94f01bee5d1f16f77f3",
+          "60433422a5016d61f6520a8926b153568b159f84a02ccd2374d64e3c679f5e1e",
+          "02acb72cafa8c5531c9dca26ba459f5151c37c27f6b53ee06d9860b259e4f11b"
+        ]
+      },
+      {
+        "format": "ODI",
+        "matches": 100,
+        "replayPassed": 100,
+        "resimulationPassed": 100,
+        "totalEvents": 49962,
+        "stoppingReasons": {
+          "WIN": 100
+        },
+        "chunkDigests": [
+          "b140a82832e23f7ee06cfe4c576a1f64c95a49e3f56e23a70bc3c5078f9ffbfc",
+          "05b1dd800212e7ebf12f2e1931509080caa4eb09e4b21adf80d56b427e765420",
+          "e7505e5831a98a22e1481ab834755811354c836ba14cb69e9718ea37b7477a21",
+          "71e4d876bcdbfbea59bee173eb3ccb01b240995f64afd9b1ad484ab113ac2bd2",
+          "168d10ca505596df8e39830a1a3d6fa8637d6e86d5492acd0ae542e316783363"
+        ]
+      },
+      {
+        "format": "RED_BALL",
+        "matches": 100,
+        "replayPassed": 100,
+        "resimulationPassed": 100,
+        "totalEvents": 109410,
+        "stoppingReasons": {
+          "WIN:TARGET_REACHED": 46,
+          "WIN:CHASE_COMPLETE_SHORT": 52,
+          "WIN:INNINGS_VICTORY": 2
+        },
+        "chunkDigests": [
+          "416b7c73e83a7dcd7a069a87b059a47d374d7d04313ffd26f9845be22fcd2b7e",
+          "2928bc2d9d65ce08126924474ba09a17cdeb61972c0f85990bc43173d90510c6",
+          "f006b4a77d6deec1547a4a7effa769f2afb65221ec5bc129969b2ccc60084405",
+          "426570fc3775c8eb96584b922b08a18c3bacd982d64f3f4c1b79deeed2416da6",
+          "69d48eb37b4c1d526237cf6aa7895efbff4024dcd5d522d36bcbda4639eb6d00"
+        ]
+      }
+    ],
+    "simulations10000PerFormat": [
+      {
+        "version": "LC_CROSS_FORMAT_DIAGNOSTICS_V1",
+        "format": "T20",
+        "simulationCount": 10000,
+        "seedPrefix": "LC_V01_025_MC10K",
+        "modelStatus": "SYNTHETIC_ALPHA",
+        "empiricallyCalibrated": false,
+        "inningsRuns": {
+          "mean": 99.53,
+          "se": 0.225,
+          "ci95": [
+            99.09,
+            99.97
+          ]
+        },
+        "inningsWickets": {
+          "mean": 7.6,
+          "se": 0.021,
+          "ci95": [
+            7.56,
+            7.64
+          ]
+        },
+        "phases": {
+          "earlyRuns": {
+            "mean": 32.06,
+            "se": 0.091,
+            "ci95": [
+              31.88,
+              32.24
+            ]
+          },
+          "middleRuns": {
+            "mean": 43.73,
+            "se": 0.117,
+            "ci95": [
+              43.5,
+              43.96
+            ]
+          },
+          "lateRuns": {
+            "mean": 23.74,
+            "se": 0.127,
+            "ci95": [
+              23.49,
+              23.99
+            ]
+          }
+        },
+        "tails": {
+          "min": 13,
+          "p01": 42,
+          "p05": 60,
+          "p10": 70,
+          "p50": 101,
+          "p90": 127,
+          "p95": 135,
+          "p99": 149,
+          "max": 174
+        },
+        "stoppingConditions": {
+          "ALL_OUT": 2706,
+          "ALLOCATION_OR_CAP_REACHED": 7294
+        },
+        "summaryDigestSha256": "492dbfd61475314c8fd2161008f73c88a8d167683a9d3d99f86716c829724b35"
+      },
+      {
+        "version": "LC_CROSS_FORMAT_DIAGNOSTICS_V1",
+        "format": "ODI",
+        "simulationCount": 10000,
+        "seedPrefix": "LC_V01_025_MC10K",
+        "modelStatus": "SYNTHETIC_ALPHA",
+        "empiricallyCalibrated": false,
+        "inningsRuns": {
+          "mean": 136.76,
+          "se": 0.471,
+          "ci95": [
+            135.84,
+            137.68
+          ]
+        },
+        "inningsWickets": {
+          "mean": 9.94,
+          "se": 0.004,
+          "ci95": [
+            9.93,
+            9.94
+          ]
+        },
+        "phases": {
+          "earlyRuns": {
+            "mean": 43.92,
+            "se": 0.104,
+            "ci95": [
+              43.72,
+              44.13
+            ]
+          },
+          "middleRuns": {
+            "mean": 87,
+            "se": 0.359,
+            "ci95": [
+              86.29,
+              87.7
+            ]
+          },
+          "lateRuns": {
+            "mean": 5.84,
+            "se": 0.136,
+            "ci95": [
+              5.58,
+              6.11
+            ]
+          }
+        },
+        "tails": {
+          "min": 20,
+          "p01": 47,
+          "p05": 66,
+          "p10": 78,
+          "p50": 133,
+          "p90": 201,
+          "p95": 221,
+          "p99": 255,
+          "max": 303
+        },
+        "stoppingConditions": {
+          "ALL_OUT": 9650,
+          "ALLOCATION_OR_CAP_REACHED": 350
+        },
+        "summaryDigestSha256": "942769106c7a2c4d0b2adf70ed3136d6f959aad0be78d779000dd4f8cb0e3a86"
+      },
+      {
+        "version": "LC_CROSS_FORMAT_DIAGNOSTICS_V1",
+        "format": "RED_BALL",
+        "simulationCount": 10000,
+        "seedPrefix": "LC_V01_025_MC10K",
+        "modelStatus": "SYNTHETIC_ALPHA",
+        "empiricallyCalibrated": false,
+        "inningsRuns": {
+          "mean": 166.65,
+          "se": 0.581,
+          "ci95": [
+            165.51,
+            167.79
+          ]
+        },
+        "inningsWickets": {
+          "mean": 9.96,
+          "se": 0.003,
+          "ci95": [
+            9.95,
+            9.97
+          ]
+        },
+        "phases": {
+          "earlyRuns": {
+            "mean": 91.95,
+            "se": 0.153,
+            "ci95": [
+              91.65,
+              92.25
+            ]
+          },
+          "middleRuns": {
+            "mean": 67.46,
+            "se": 0.39,
+            "ci95": [
+              66.7,
+              68.23
+            ]
+          },
+          "lateRuns": {
+            "mean": 7.23,
+            "se": 0.189,
+            "ci95": [
+              6.86,
+              7.6
+            ]
+          }
+        },
+        "tails": {
+          "min": 18,
+          "p01": 61,
+          "p05": 82,
+          "p10": 97,
+          "p50": 160,
+          "p90": 245,
+          "p95": 273,
+          "p99": 326,
+          "max": 425
+        },
+        "stoppingConditions": {
+          "ALL_OUT": 9822,
+          "ALLOCATION_OR_CAP_REACHED": 178
+        },
+        "summaryDigestSha256": "46545bc173740b7fc3afeada37f5d5ee8dbf249baf8a49a571cca6b22d212224"
+      }
+    ]
+  }
+}

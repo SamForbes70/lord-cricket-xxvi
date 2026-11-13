@@ -1,0 +1,97 @@
+{
+  "schema": "LC_V01_RELEASE_RECORD_V1",
+  "generatedAtUtc": "2026-11-13T03:52:40.970Z",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "empiricallyCalibrated": false,
+  "publicDeploymentAuthorised": false,
+  "publicDeploymentNote": "Public deployment requires separate explicit owner authorisation after V0.1 acceptance.",
+  "testedRevision": {
+    "commit": "4dfc483d338204dbc5e512ac8f4a67121eb0062d",
+    "branch": "codex/v01-closure",
+    "workingTreeClean": false
+  },
+  "manifests": {
+    "packageLockSha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884",
+    "scoringKernelSha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+    "defaultWorldSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+    "defaultWorldManifestSha256": "03bb21d0520237a7afed6ec99b9e4bdfc8491987e28c632114377f8ea820811a",
+    "v01BacklogSha256": "ac8a3fc6e9bece92dc9f2a789f3e956bb13d5bc4f30d909a633f240aa6afb760",
+    "offlineAssetManifestSha256": "7c384c98f34ee1f7542586fdab5aae1c3dc956f14fe402401119a299967a1e97",
+    "batch7DiagnosticsSha256": "cd076eb1bd29d5596ab3dbd5d58b5b530574f9ca09a859a246e69b9ca9b7258d"
+  },
+  "externalAndOwnerGates": {
+    "v01_011_managedMatchRecoveryOwnerAcceptance": "AWAITING_OWNER_ACCEPTANCE",
+    "v01_028_referenceHardwarePerformance": "BLOCKED_EXTERNAL_AWAITING_MEMORY_THRESHOLD_AND_REFERENCE_HOST_RUN",
+    "ownerWindowsPcAcceptanceRun": "NOT_ESTABLISHED_IN_CONTAINER_REQUIRES_OWNER_PC",
+    "humanAssistiveTechnologyWalkthrough": "PENDING_OWNER_OR_HUMAN_SCREEN_READER_OBSERVATION",
+    "researchTrack_RES_001_002_003": "BLOCKED_EXTERNAL_DATA_AND_SEPARATE_PROMOTION_GATE"
+  },
+  "capabilities": [
+    {
+      "capabilityId": "CAP-MATCH-ENGINES",
+      "advertised": "Deterministic T20, ODI, and five-day red-ball match engines with hash-chained replay",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "npm run verify:09:core",
+        "npm run smoke",
+        "docs/verification-v01-batch7-diagnostics/results.json"
+      ]
+    },
+    {
+      "capabilityId": "CAP-T20-CAREER-AND-RECOVERY",
+      "advertised": "Single-season 8-team 56-fixture T20 management career with durable IndexedDB managed-match recovery and slot-scoped bindings",
+      "status": "VERIFIED_ENGINEERING_AWAITING_OWNER_ACCEPTANCE",
+      "evidence": [
+        "npm run management:acceptance",
+        "tests/ui/managed-recovery.spec.ts",
+        "tests/m4/managed-binding-persistence.spec.ts",
+        "tests/unit/managed-binding.test.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-WORLD-EDITING-AND-ROSTER-IMPORT",
+      "advertised": "Pre-game world editing and JSON roster pack import across exhibition and T20 career play",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/ui/roster-import.spec.ts",
+        "tests/ui/roster-career.spec.ts",
+        "docs/verification-v01-world-editing/REPORT.md"
+      ]
+    },
+    {
+      "capabilityId": "CAP-TACTICAL-AI-AND-RAIN",
+      "advertised": "Cross-format T20/ODI/red-ball tactical AI profiles, reversible delegation, and deterministic red-ball weather/forecast interruptions",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/v01-odi-tactical-ai.test.ts",
+        "tests/unit/v01-red-ball-weather.test.ts",
+        "tests/unit/red-ball-ai.test.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-OFFLINE-AND-ACCESSIBILITY",
+      "advertised": "Precached offline shell, transaction-deferred safe updates, retained engine assets (/engineering.html recovery), keyboard/contrast/150%/200%-zoom accessibility",
+      "status": "VERIFIED_BROWSER_AUTOMATION_HUMAN_AT_PENDING",
+      "evidence": [
+        "tests/unit/offline-safe-updates.test.ts",
+        "tests/ui/offline-assets.spec.ts",
+        "tests/ui/accessibility-release-audit.spec.ts",
+        "tests/ui/match.spec.ts"
+      ]
+    }
+  ],
+  "knownLimits": [
+    "Model calibration status is SYNTHETIC_ALPHA (synthetic-alpha-01); zero empirical realism or ICC certification claims are made.",
+    "Playable career scope in V0.1 is a single-season 8-team T20 league; multi-season persistent world, player lifecycle, and squad economy remain gated behind explicit V0.1 owner acceptance.",
+    "Duckworth-Lewis-Stern (DLS) and limited-overs rain targets remain disabled in V0.1; weather interruptions apply to five-day red-ball matches only.",
+    "Career saves can be exported, imported, switched, and recovered into new slots, while direct UI deletion of career slots is omitted in V0.1.",
+    "Total application memory numeric budget (Budget 8 in docs/PERFORMANCE_BUDGETS.md) awaits owner threshold confirmation via LCXXVI_MEMORY_BUDGET_MB and qualifying reference-hardware execution."
+  ],
+  "recoveryInstructions": [
+    "Interrupted career fixture match: reopen #career, #roster-career, or #exhibition in the same browser profile; durable managed-binding:<matchGameId> records re-associate or settle completed results automatically.",
+    "Unwanted or stuck pending career match: open #exhibition and click \"Abandon career match\" to release the binding without corrupting the career save.",
+    "Damaged newest match or career checkpoint: open the affected save or click \"Create recovered copy\" to roll back deterministically to the newest valid hash-verified checkpoint in a fresh slot while preserving pending match bindings.",
+    "Cross-device backup or browser reset: export portable .lcxxvi archives from #exhibition, #career, or #roster-career and re-import them with full event-chain hash verification.",
+    "Staged offline update or asset trouble: updates wait until active match/save transactions finish; /engineering.html remains precached as an explicit diagnostic and recovery surface."
+  ]
+}

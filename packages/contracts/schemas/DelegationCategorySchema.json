@@ -7,7 +7,11 @@
     "BATTER",
     "BOWLER",
     "BATTING_PLAN",
-    "BOWLING_PLAN"
+    "BOWLING_PLAN",
+    "FIELD",
+    "DECLARATION",
+    "FOLLOW_ON",
+    "NEW_BALL"
   ],
   "$id": "urn:lcxxvi:DelegationCategory:1",
   "title": "DelegationCategory"

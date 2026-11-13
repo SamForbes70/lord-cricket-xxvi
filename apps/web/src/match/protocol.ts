@@ -3,13 +3,16 @@ import type { MatchAnalytics } from "@lcxxvi/projections";
 import type { SaveSummary } from "@lcxxvi/persistence";
 import {
   T20CommandSchema,
+  ODICommandSchema,
   Red5CommandSchema,
   T20TeamSelectionSchema,
   NewGameWorldCopySchema,
   StagedRosterPackSchema,
   DelegationCategorySchema,
+  RedBallTacticalProfileSchema,
   type DelegationJournal,
   type T20Command,
+  type ODICommand,
   type T20Scorecard,
   type ODIScorecard,
   type Red5Scorecard,
@@ -118,11 +121,12 @@ export const RequestSchema = z.discriminatedUnion("type", [
     ...base,
     type: z.literal("COMMAND"),
     origin: z.enum(["HUMAN", "AI"]),
-    command: z.union([T20CommandSchema, Red5CommandSchema]),
+    command: z.union([T20CommandSchema, ODICommandSchema, Red5CommandSchema]),
   }),
-  z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128), delegated: z.boolean().optional() }),
-  z.strictObject({ ...base, type: z.literal("SET_DELEGATION"), teamId: z.string().min(1).max(128), expectedDelegationRevision: z.number().int().nonnegative(), categories: z.array(DelegationCategorySchema).max(6).refine(values => new Set(values).size === values.length) }),
+  z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128), delegated: z.boolean().optional(), redBallProfile: RedBallTacticalProfileSchema.optional() }),
+  z.strictObject({ ...base, type: z.literal("SET_DELEGATION"), teamId: z.string().min(1).max(128), expectedDelegationRevision: z.number().int().nonnegative(), categories: z.array(DelegationCategorySchema).max(10).refine(values => new Set(values).size === values.length), redBallProfile: RedBallTacticalProfileSchema.optional() }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
+  z.strictObject({ ...base, type: z.literal("CHECK_SEEDED_WEATHER") }),
   z.strictObject({ ...base, type: z.literal("REBUILD_ANALYTICS") }),
   z.strictObject({ ...base, type: z.literal("CANCEL_ANALYTICS"), targetRequestId: z.string().regex(/^ui-[0-9]+$/) }),
   z.strictObject({ ...base, type: z.literal("PREVIEW_DIAGNOSTIC"), includeSeed: z.boolean().optional() }),
@@ -164,8 +168,8 @@ export const RequestSchema = z.discriminatedUnion("type", [
 ]);
 export type Request = z.infer<typeof RequestSchema>;
 export type Selection = z.infer<typeof T20TeamSelectionSchema>;
-export type Action = (T20Command | Red5Command) extends infer C
-  ? C extends T20Command | Red5Command
+export type Action = (T20Command | ODICommand | Red5Command) extends infer C
+  ? C extends T20Command | ODICommand | Red5Command
     ? Pick<C, "kind" | "payload">
     : never
   : never;
@@ -220,7 +224,27 @@ export type View = {
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;
-  redBall?: { day:number; localSeconds:number; finalHourActive:boolean; finalHourBallsRemaining:number; followOnEnforced:boolean; newBallAvailable:boolean; declared:boolean[] } | null;
+  redBall?: {
+    day: number;
+    localSeconds: number;
+    clockPhase?: string;
+    delaySecondsToday?: number;
+    finalHourActive: boolean;
+    finalHourBallsRemaining: number;
+    followOnEnforced: boolean;
+    newBallAvailable: boolean;
+    declared: boolean[];
+    pitchWearPoints?: number;
+    seamBp?: number;
+    turnBp?: number;
+    atSafeWeatherBoundary?: boolean;
+    forecast?: {
+      outlook: "CLEAR" | "UNSETTLED" | "WET";
+      rainRiskBand: "LOW" | "MODERATE" | "HIGH";
+      estimatedRainChanceRangePct: readonly [number, number];
+      summaryText: string;
+    } | null;
+  } | null;
 };
 export type Verification = {
   revision: number;

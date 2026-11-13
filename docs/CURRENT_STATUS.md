@@ -1,6 +1,6 @@
 # Current game and acceptance status
 
-For the 11 November 2026 branch/merge reconciliation, read [the GitHub audit](GITHUB_AUDIT_2026-11-11.md) and [next slice](NEXT_PASS.md). The dated records below retain their original scope; earlier PR lists are historical.
+For current V0.1 handover and remaining owner gates, read [NEXT_PASS.md](NEXT_PASS.md) and [RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json). [The 11 November 2026 GitHub audit](GITHUB_AUDIT_2026-11-11.md) is retained as a historical snapshot; earlier PR lists below retain their original scope.
 
 Lord Cricket XXVI is a playable single-season management alpha.
 Main includes merged PR #2, capability reconciliation from PR #4 and the scenario harness from PR #5.
@@ -28,7 +28,8 @@ The delegation journal carries selected categories in saves and archives.
 PR #24 merged match continuity across management navigation as `4ef85a7`.
 PR #28 merged scorecard export and print.
 PR #30 merged manual career copies.
-Durable managed-match recovery (V01-011) is implemented on its branch and browser-tested locally in Chromium and on hosted Windows in Chromium and Firefox; it is not yet merged or accepted by the owner, and the owner PC has not run it. See [the recovery notes](MANAGED_MATCH_RECOVERY.md).
+PR #39 (`2c742fb`) merged durable managed-match recovery (`V01-011`), PR #40 (`877ead2`) integrated incremental analytics, charts, diagnostic export and delivery-sequence docs, and PR #41 (`77e1160`) recorded confirmed reference-hardware budgets 1 to 7.
+On branch `codex/v01-closure`, remaining V0.1 engineering slices (`V01-021` to `V01-027`, `V01-029`, plus the automated 8-budget harness for `V01-028`, `150%` Firefox/Chromium vertical layout headroom, and slot-scoped managed-binding isolation) are implemented and verified; `V01-011`, `V01-028`, owner-PC execution and V0.1 milestone acceptance remain gated on explicit owner sign-off. See [MANAGED_MATCH_RECOVERY.md](MANAGED_MATCH_RECOVERY.md), [verification-v01-batch7-diagnostics/REPORT.md](verification-v01-batch7-diagnostics/REPORT.md) and [release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json).
 Test counts quoted in these documents are branch-specific and not additive. A count is only meaningful with the revision it was measured on.
 PR #25 merged cross-format match analytics as `3846282`.
 The [batch 2 report](verification-v01-batch2/REPORT.md) records the previous slice.

@@ -10,7 +10,7 @@ Finish Lord Cricket XXVI as an evidence-based statistical management game. The a
 
 The owner has repeatedly authorised autonomous routine development and is frustrated by agents stopping after a plan, diagnosis or failing regression. Do not ask for the same permission again. A meaningful implementation slice includes working code, appropriate tests, evidence and a reviewed integration path. A draft regression or design note is useful preparation but must never be described as the completed fix.
 
-Durable managed-match recovery is implemented in PR #39 and has passed hosted Linux and Windows (Chromium and Firefox) checks, but it is not merged and the owner has not accepted it; the owner PC has not run it. Do not describe it as delivered until the owner accepts it. No unattended or background execution exists in this repository; do not claim it does.
+Durable managed-match recovery merged in PR #39 (`2c742fb`), PR #40 (`877ead2`) integrated earlier open branches, and PR #41 (`77e1160`) recorded confirmed performance budgets 1 to 7 on `main`. Remaining V0.1 engineering slices (`V01-021` to `V01-029`, `150%` Firefox/Chromium vertical layout margin, and slot-scoped managed-binding isolation) are implemented on branch `codex/v01-closure`, while `V01-011`, `V01-028`, owner-PC execution and V0.1 milestone acceptance remain gated on explicit owner sign-off. Do not describe V0.1 as accepted or start multi-season Persistent World implementation until the owner accepts V0.1. No unattended or background execution exists in this repository; do not claim it does.
 
 ## Read in order
 

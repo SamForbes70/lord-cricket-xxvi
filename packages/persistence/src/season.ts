@@ -315,10 +315,37 @@ export async function sealCompletedCareerMatchEventArchive(input: {
   });
 }
 
+const verifiedArchiveDigests = new WeakMap<object, string>();
+
+function assertArchiveCompletionBinding(archive: CompletedCareerMatchEventArchive, completionRaw: unknown): void {
+  const completion = T20SeasonMatchCompletionSchema.parse(completionRaw);
+  assertSeason(
+    completion.seasonId === archive.seasonId &&
+      completion.scheduleSha256 === archive.scheduleSha256 &&
+      completion.fixtureId === archive.fixtureId &&
+      completion.matchId === archive.matchId &&
+      completion.fixtureOrdinal === archive.fixtureOrdinal &&
+      completion.roundNumber === archive.roundNumber &&
+      completion.matchDayDate === archive.matchDayDate &&
+      completion.source === archive.source &&
+      completion.sourceCompletionSha256 === archive.sourceCompletionSha256 &&
+      completion.scorecardSha256 === archive.scorecardSha256,
+    `MATCH_EVENT_ARCHIVE_COMPLETION_BINDING:${archive.fixtureId}`,
+  );
+}
+
 export async function validateCompletedCareerMatchEventArchive(
   raw: unknown,
   completionRaw?: unknown,
 ): Promise<CompletedCareerMatchEventArchive> {
+  if (typeof raw === "object" && raw !== null) {
+    const priorDigest = verifiedArchiveDigests.get(raw);
+    if (priorDigest && (await seasonSha256Text(canonicalJson(raw))) === priorDigest) {
+      const verified = raw as CompletedCareerMatchEventArchive;
+      if (completionRaw !== undefined) assertArchiveCompletionBinding(verified, completionRaw);
+      return verified;
+    }
+  }
   const archive = CompletedCareerMatchEventArchiveSchema.parse(raw);
   const { archiveSha256, ...core } = archive;
   const canonicalCore = canonicalJson(core);
@@ -328,9 +355,16 @@ export async function validateCompletedCareerMatchEventArchive(
     "MATCH_EVENT_ARCHIVE_BYTE_LENGTH",
   );
   assertSeason(archive.events.length === archive.eventCount, "MATCH_EVENT_ARCHIVE_COUNT_MISMATCH");
-  const [coreHash, eventsHash] = await Promise.all([
+  const [coreHash, eventsHash, expectedEventHashes] = await Promise.all([
     seasonSha256Text(canonicalCore),
     seasonSha256Text(canonicalJson(archive.events)),
+    Promise.all(
+      archive.events.map((ev) =>
+        seasonSha256Text(
+          canonicalJson([ev.version, ev.sequence, ev.commandId, ev.type, ev.payload, ev.previousHash, ev.stateHash]),
+        ),
+      ),
+    ),
   ]);
   assertSeason(coreHash === archiveSha256, "MATCH_EVENT_ARCHIVE_HASH_MISMATCH");
   assertSeason(eventsHash === archive.eventsSha256, "MATCH_EVENT_ARCHIVE_EVENTS_HASH");
@@ -338,16 +372,7 @@ export async function validateCompletedCareerMatchEventArchive(
     const ev = archive.events[index]!;
     assertSeason(ev.sequence === index + 1, `MATCH_EVENT_ARCHIVE_SEQUENCE:${index}`);
     if (index > 0) assertSeason(ev.previousHash === archive.events[index - 1]!.eventHash, `MATCH_EVENT_ARCHIVE_CHAIN:${index}`);
-  }
-  const expectedEventHashes = await Promise.all(
-    archive.events.map((ev) =>
-      seasonSha256Text(
-        canonicalJson([ev.version, ev.sequence, ev.commandId, ev.type, ev.payload, ev.previousHash, ev.stateHash]),
-      ),
-    ),
-  );
-  for (let index = 0; index < archive.events.length; index += 1) {
-    assertSeason(archive.events[index]!.eventHash === expectedEventHashes[index], `MATCH_EVENT_ARCHIVE_EVENT_HASH:${index}`);
+    assertSeason(ev.eventHash === expectedEventHashes[index], `MATCH_EVENT_ARCHIVE_EVENT_HASH:${index}`);
   }
   assertSeason(
     archive.events.at(-1)!.eventHash === archive.finalEventHash &&
@@ -355,22 +380,8 @@ export async function validateCompletedCareerMatchEventArchive(
       archive.eventChain.eventCount === archive.eventCount,
     "MATCH_EVENT_ARCHIVE_FINAL_HASH",
   );
-  if (completionRaw !== undefined) {
-    const completion = T20SeasonMatchCompletionSchema.parse(completionRaw);
-    assertSeason(
-      completion.seasonId === archive.seasonId &&
-        completion.scheduleSha256 === archive.scheduleSha256 &&
-        completion.fixtureId === archive.fixtureId &&
-        completion.matchId === archive.matchId &&
-        completion.fixtureOrdinal === archive.fixtureOrdinal &&
-        completion.roundNumber === archive.roundNumber &&
-        completion.matchDayDate === archive.matchDayDate &&
-        completion.source === archive.source &&
-        completion.sourceCompletionSha256 === archive.sourceCompletionSha256 &&
-        completion.scorecardSha256 === archive.scorecardSha256,
-      `MATCH_EVENT_ARCHIVE_COMPLETION_BINDING:${archive.fixtureId}`,
-    );
-  }
+  if (completionRaw !== undefined) assertArchiveCompletionBinding(archive, completionRaw);
+  verifiedArchiveDigests.set(archive, await seasonSha256Text(canonicalJson(archive)));
   return archive;
 }
 
@@ -380,16 +391,21 @@ export async function validateSeasonMatchEventArchiveSet(
 ): Promise<{ archives: CompletedCareerMatchEventArchive[]; totalBytes: number }> {
   const state = await validateT20SeasonState(stateRaw);
   const completionByFixture = new Map(state.completedMatches.map((c) => [c.fixtureId, c]));
+  const parsedList = await Promise.all(
+    archivesRaw.map((item) => {
+      const candidateFixtureId =
+        typeof item === "object" && item !== null && typeof (item as { fixtureId?: unknown }).fixtureId === "string"
+          ? (item as { fixtureId: string }).fixtureId
+          : undefined;
+      const completion = candidateFixtureId ? completionByFixture.get(candidateFixtureId) : undefined;
+      return validateCompletedCareerMatchEventArchive(item, completion);
+    }),
+  );
   const seenFixtures = new Set<string>();
   const archives: CompletedCareerMatchEventArchive[] = [];
   let totalBytes = 0;
-  for (const item of archivesRaw) {
-    const candidateFixtureId =
-      typeof item === "object" && item !== null && typeof (item as { fixtureId?: unknown }).fixtureId === "string"
-        ? (item as { fixtureId: string }).fixtureId
-        : undefined;
-    const completion = candidateFixtureId ? completionByFixture.get(candidateFixtureId) : undefined;
-    const parsed = await validateCompletedCareerMatchEventArchive(item, completion);
+  for (const parsed of parsedList) {
+    const completion = completionByFixture.get(parsed.fixtureId);
     assertSeason(Boolean(completion), `MATCH_EVENT_ARCHIVE_UNKNOWN_FIXTURE:${parsed.fixtureId}`);
     assertSeason(!seenFixtures.has(parsed.fixtureId), `MATCH_EVENT_ARCHIVE_DUPLICATE_FIXTURE:${parsed.fixtureId}`);
     seenFixtures.add(parsed.fixtureId);

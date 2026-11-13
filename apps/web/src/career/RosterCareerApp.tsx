@@ -7,6 +7,7 @@ import { changeRosterSeasonTraining, completeRosterManagedFixture, createRosterS
 import { careerWorld, type CareerUserMatchLaunch } from "./service.js";
 import { managedMatchGameId } from "./managed-game-id.js";
 import { managedBindings, recordManagedLaunch, settleManagedMatches } from "./managed-match.js";
+import { offlineUpdateCoordinator } from "../offline-update.js";
 import "./career.css";
 
 const repo = new IndexedDbSeasonRepository();
@@ -25,6 +26,10 @@ export function RosterCareerApp({ inspectionOnly = false }: { inspectionOnly?: b
   const [saves, setSaves] = useState<SeasonSaveSummary[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    offlineUpdateCoordinator.setBusySource("roster-career", busy);
+    return () => offlineUpdateCoordinator.setBusySource("roster-career", false);
+  }, [busy]);
   const [pendingRound, setPendingRound] = useState<number | null>(null);
   const awaitedState = React.useRef<RosterSeasonState | null>(null);
   const [scale, setScale] = useState(() => {

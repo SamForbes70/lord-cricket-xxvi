@@ -91,7 +91,7 @@ export function createODIMatchController(
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
     requestId: string;
-    origin: "HUMAN";
+    origin: "HUMAN" | "AI";
     commandKind: string;
     engineActorId: string;
   }[] = [];
@@ -256,13 +256,13 @@ export function createODIMatchController(
       eventCount: session.events.length,
       replay: true,
       resimulation: true,
-      humanRequests: audit.length,
-      systemAutopilotRequests: 0,
+      humanRequests: audit.filter((a) => a.origin === "HUMAN").length,
+      systemAutopilotRequests: audit.filter((a) => a.origin === "AI").length,
     };
   }
   function execute(request: Extract<Request, { type: "COMMAND" }>) {
     if (!session) throw new Error("Start a match first.");
-    const cmd = request.command;
+    const cmd = request.command as ODICommand;
     if (cmd.kind === "CONFIRM_TEAMS")
       throw new Error(
         "Team confirmation is only available through match setup.",
@@ -279,15 +279,22 @@ export function createODIMatchController(
         : cmd.kind === "SET_BATTING_PLAN"
           ? l?.innings.battingTeamId
           : l?.innings.bowlingTeamId;
-    const expectedActor = cmd.kind === "ADVANCE" ? "SYSTEM" : `USER:${teamId}`;
+    const expectedActor =
+      request.origin === "AI"
+        ? cmd.kind === "ADVANCE"
+          ? "SYSTEM"
+          : `AI:${teamId}`
+        : cmd.kind === "ADVANCE"
+          ? "SYSTEM"
+          : `USER:${teamId}`;
     if (cmd.actorId !== expectedActor)
       throw new Error(
-        "Only human commands are accepted by this match interface.",
+        "Only valid human or tactical-captain commands are accepted by this match interface.",
       );
     session = rosterPack ? executeRosterODICommand(session as unknown as RosterODISession, cmd).session as unknown as ODISession : executeODICommand(session, cmd).session;
     audit.push({
       requestId: request.requestId,
-      origin: "HUMAN",
+      origin: request.origin,
       commandKind: cmd.kind,
       engineActorId: cmd.actorId,
     });
@@ -302,7 +309,7 @@ export function createODIMatchController(
       audit.length,
       ...session.commands.map((cmd) => ({
         requestId: cmd.commandId,
-        origin: "HUMAN" as const,
+        origin: (cmd.actorId.startsWith("AI:") ? "AI" : "HUMAN") as "HUMAN" | "AI",
         commandKind: cmd.kind,
         engineActorId: cmd.actorId,
       })),

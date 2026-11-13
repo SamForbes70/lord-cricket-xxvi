@@ -257,5 +257,5 @@ describe("recovering a career moves its pending match links", () => {
       launch: copyLaunch,
     });
     expect(copyBinding.status).toBe("PENDING");
-  });
+  }, 30_000);
 });

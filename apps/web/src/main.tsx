@@ -21,7 +21,9 @@ import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
 import { PitchInspection } from "./match/PitchInspection.js";
 import { WorldEditor } from "./world/WorldEditor.js";
-import { delegationForTeam, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack, type WorldPack } from "@lcxxvi/contracts";
+import { offlineUpdateCoordinator } from "./offline-update.js";
+import { delegationForTeam, redBallProfileForTeam, type DelegationJournal, type NewGameWorldCopy, type RedBallTacticalProfile, type StagedRosterPack, type WorldPack } from "@lcxxvi/contracts";
+import { RED_BALL_PROFILE_DESCRIPTIONS } from "@lcxxvi/ai";
 import type { DelegationCategory } from "./match/ai-opponent.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
@@ -96,6 +98,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const [busy, setBusy] = useState(true),
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
+  useEffect(() => {
+    offlineUpdateCoordinator.setBusySource("match", busy || batchState !== "idle");
+    return () => offlineUpdateCoordinator.setBusySource("match", false);
+  }, [busy, batchState]);
   const [verification, setVerification] = useState<Verification | null>(null);
   const rebuildRequest = useRef<string | null>(null);
   const [analyticsRebuild, setAnalyticsRebuild] = useState<{ state: "IDLE" | "RUNNING" | "STOPPING" | "COMPLETE" | "CANCELLED"; applied: number; total: number }>({ state: "IDLE", applied: 0, total: 0 });
@@ -368,7 +374,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.
   useEffect(() => {
-    if (!view || view.format !== "T20" || busy || fatal || error || persistence?.readOnly) return;
+    if (!view || busy || fatal || error || persistence?.readOnly) return;
     if (view.phase === "COMPLETE") return;
     const candidates = [
       ...(aiTeamId && view.teams.some(team => team.id === aiTeamId) ? [{ teamId: aiTeamId, delegated: false }] : []),
@@ -453,7 +459,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         ...action,
         commandId: requestId,
         expectedRevision: view.revision,
-        actorId: action.kind === "ADVANCE" ? "SYSTEM" : `USER:${team}`,
+        actorId: action.kind === "ADVANCE" || action.kind === "ADD_RAIN_DELAY" ? "SYSTEM" : `USER:${team}`,
       },
     });
   }
@@ -570,8 +576,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <h2>Take the captain’s chair.</h2>
             <p>
               Select your side and an opponent. You make decisions for{" "}
-              <strong>both teams</strong> initially. After starting a T20, you can optionally
-              delegate either team to the deterministic tactical captain.
+              <strong>both teams</strong> initially. After starting a match, you can optionally
+              delegate either team or individual decisions to the deterministic tactical captain.
             </p>
           </section>
           {displayCatalog ? (
@@ -604,7 +610,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           )}
         </>
       )}
-      {view && view.format === "T20" && (
+      {view && (
         <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
           <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
           <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
@@ -929,24 +935,76 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </div>
             </fieldset>
           </section>
-          {view.format === "T20" && (() => {
+          {(() => {
             const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
             const selected = delegationForTeam(delegation, selectedTeam.id);
-            const choices: [DelegationCategory, string][] = [["TOSS", "Toss call"], ["INNINGS", "Bat or bowl"], ["BATTER", "Batter selection"], ["BOWLER", "Bowler selection"], ["BATTING_PLAN", "Batting plan"], ["BOWLING_PLAN", "Bowling plan"]];
+            const currentProfile = redBallProfileForTeam(delegation, selectedTeam.id);
+            const choices: [DelegationCategory, string][] = [
+              ["TOSS", "Toss call"],
+              ["INNINGS", "Bat or bowl"],
+              ["BATTER", "Batter selection"],
+              ["BOWLER", "Bowler selection"],
+              ["BATTING_PLAN", "Batting plan"],
+              ["BOWLING_PLAN", "Bowling plan"],
+              ...(view.format !== "T20" ? [["FIELD", "Field placement"]] as [DelegationCategory, string][] : []),
+              ...(view.format === "RED_BALL" ? [["DECLARATION", "Declaration"], ["FOLLOW_ON", "Follow-on"], ["NEW_BALL", "New ball"]] as [DelegationCategory, string][] : []),
+            ];
             return <details className="career-panel">
               <summary>Delegate individual decisions</summary>
               <p>Choose which decisions the tactical captain may make. These choices are saved with the match.</p>
               <label>Delegation team <select value={selectedTeam.id} disabled={busy || fatal} onChange={event => setDelegationTeam(event.currentTarget.value)}>{view.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
+              {view.format === "RED_BALL" && (
+                <div>
+                  <label>Red-ball tactical profile <select aria-label="Red-ball tactical profile" value={currentProfile} disabled={busy || fatal || Boolean(persistence?.readOnly)} onChange={event => {
+                    const redBallProfile = event.currentTarget.value as RedBallTacticalProfile;
+                    send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories: [...selected], redBallProfile });
+                  }}>
+                    <option value="CONSERVATIVE">Conservative</option>
+                    <option value="BALANCED">Balanced</option>
+                    <option value="AGGRESSIVE">Aggressive</option>
+                  </select></label>
+                  <p data-testid="redball-profile-posture">{RED_BALL_PROFILE_DESCRIPTIONS[currentProfile]}</p>
+                </div>
+              )}
               {aiTeamId === selectedTeam.id && <p>The tactical captain controls this team until you change the opponent setting.</p>}
               <fieldset disabled={busy || fatal || Boolean(persistence?.readOnly) || aiTeamId === selectedTeam.id}>
                 <legend>Delegated decisions</legend>
                 {choices.map(([category, label]) => <label key={category}><input type="checkbox" checked={selected.includes(category)} onChange={event => {
                   const categories = event.currentTarget.checked ? [...selected, category] : selected.filter(value => value !== category);
-                  send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories });
+                  send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories, ...(view.format === "RED_BALL" ? { redBallProfile: currentProfile } : {}) });
                 }} /> {label}</label>)}
               </fieldset>
             </details>;
           })()}
+          {view.format === "RED_BALL" && view.redBall && (
+            <details className="career-panel" data-testid="redball-conditions-panel">
+              <summary>Red-ball pitch wear and weather controls</summary>
+              <p data-testid="redball-conditions-summary">
+                Day {view.redBall.day} · Phase: {view.redBall.clockPhase ?? "PLAY"} · Weather delay today: {Math.round((view.redBall.delaySecondsToday ?? 0) / 60)} min · Pitch wear: {view.redBall.pitchWearPoints ?? 0} pts · Seam: {((view.redBall.seamBp ?? 5000) / 100).toFixed(1)}% · Turn: {((view.redBall.turnBp ?? 5000) / 100).toFixed(1)}%
+              </p>
+              {view.redBall.forecast && (
+                <p data-testid="redball-uncertain-forecast">
+                  {view.redBall.forecast.summaryText}
+                </p>
+              )}
+              <p>
+                Seeded weather segments use an independent random domain; forecasts show coarse uncertainty bands without revealing the hidden segment schedule, and weather checks apply only at safe over boundaries.
+              </p>
+              {view.phase !== "COMPLETE" && view.innings.length > 0 && (
+                <div className="actions">
+                  <button
+                    type="button"
+                    disabled={busy || fatal || Boolean(persistence?.readOnly) || !view.redBall.atSafeWeatherBoundary}
+                    onClick={() => send({ type: "CHECK_SEEDED_WEATHER" })}
+                  >
+                    Check weather at boundary
+                  </button>
+                  <button type="button" disabled={busy || fatal || Boolean(persistence?.readOnly)} onClick={() => act({ kind: "ADD_RAIN_DELAY", payload: { seconds: 1800 } })}>Rain delay (30m)</button>
+                  <button type="button" disabled={busy || fatal || Boolean(persistence?.readOnly)} onClick={() => act({ kind: "ADD_RAIN_DELAY", payload: { seconds: 3600 } })}>Rain delay (60m)</button>
+                </div>
+              )}
+            </details>
+          )}
           {view.phase === "READY" && (
             <Tactics
               key={`${view.revision}`}
@@ -1210,8 +1268,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         <p>
           Original world: 160 fictional players, 8 squads. T20, ODI and five-day
           red-ball exhibitions use custom game rules; no certified ICC
-          compliance or empirical realism. A one-season T20 career and optional
-          T20 tactical captain are available. DLS remains disabled.
+          compliance or empirical realism. A one-season T20 career, optional
+          T20/ODI/red-ball tactical captaincy, and explicit deterministic
+          red-ball weather delays are available. DLS remains disabled.
         </p>
       </footer>
     </main>
@@ -1591,14 +1650,41 @@ function Tactics({
 function RootApp() {
   const [hash, setHash] = useState(window.location.hash || "#career");
   const [retainedMatch, setRetainedMatch] = useState(() => sessionStorage.getItem("lcxxvi-inspecting-match") === "1");
+  const [offlineState, setOfflineState] = useState(() => offlineUpdateCoordinator.getState());
   useEffect(() => {
     const onHash = () => setHash(window.location.hash || "#career");
     window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const unsub = offlineUpdateCoordinator.subscribe(setOfflineState);
+    void offlineUpdateCoordinator.register();
+    return () => {
+      window.removeEventListener("hashchange", onHash);
+      unsub();
+    };
   }, []);
   const inspect = (roster: boolean) => { sessionStorage.setItem("lcxxvi-inspecting-match", "1"); setRetainedMatch(true); window.location.hash = roster ? "#roster-career" : "#career"; };
   const finish = (roster: boolean) => { sessionStorage.removeItem("lcxxvi-inspecting-match"); setRetainedMatch(false); window.location.hash = roster ? "#roster-career" : "#career"; };
   return <>
+    {offlineState.waitingWorkerPresent && (
+      <section role="status" aria-live="polite" className="panel" data-testid="safe-update-banner">
+        <strong>Application update staged.</strong>{" "}
+        {offlineState.deferredByActiveTransaction
+          ? "Waiting for the current match or save transaction to finish before applying."
+          : "All saves and transactions are idle. Current supported engines remain retained."}{" "}
+        <button
+          type="button"
+          disabled={!offlineState.canApplyNow}
+          onClick={() => {
+            const res = offlineUpdateCoordinator.applySafeUpdate();
+            if (res.applied && navigator.serviceWorker?.controller) {
+              navigator.serviceWorker.addEventListener("controllerchange", () => window.location.reload(), { once: true });
+            }
+          }}
+        >
+          Apply update safely
+        </button>{" "}
+        <a href={offlineState.recoveryBuildPath}>Recovery build</a>
+      </section>
+    )}
     {(hash === "#exhibition" || retainedMatch) && <div hidden={hash !== "#exhibition"}><MatchApp onInspectCareer={inspect} onReturnCareer={finish} /></div>}
     {hash !== "#exhibition" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
   </>;

@@ -15,6 +15,7 @@ import { managedBindings, recordManagedLaunch, settleManagedMatches } from "./ma
 import { PitchInspection } from "../match/PitchInspection.js";
 import { WorldEditor } from "../world/WorldEditor.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
+import { offlineUpdateCoordinator } from "../offline-update.js";
 import "./career.css";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
@@ -101,6 +102,10 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   const [copyName, setCopyName] = useState("");
   const [busy, setBusy] = useState(true);
   const [uiError, setUiError] = useState("");
+  useEffect(() => {
+    offlineUpdateCoordinator.setBusySource("career", busy);
+    return () => offlineUpdateCoordinator.setBusySource("career", false);
+  }, [busy]);
   const [savedCareers, setSavedCareers] = useState<Awaited<ReturnType<typeof service.listCareers>>>([]);
   const [checkpointView, setCheckpointView] = useState<SeasonCheckpointInspection | null>(null);
   const [recoveryTitle, setRecoveryTitle] = useState("");

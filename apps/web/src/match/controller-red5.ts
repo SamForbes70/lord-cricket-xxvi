@@ -15,6 +15,8 @@ import {
   sha256Hex,
   validateRed5Field,
   rehydrateRed5Session,
+  computeUncertainRed5Forecast,
+  nextSafeBoundaryWeatherInterruption,
 } from "@lcxxvi/simulation";
 import {
   FIELD_REGISTRY,
@@ -91,7 +93,7 @@ export function createRed5MatchController(
   const seen = new Map<string, { request: string; response: Response }>();
   const audit: {
     requestId: string;
-    origin: "HUMAN";
+    origin: "HUMAN" | "AI";
     commandKind: string;
     engineActorId: string;
   }[] = [];
@@ -196,6 +198,21 @@ export function createRed5MatchController(
       } else if (e.type === "BOWLER_SELECTED") {
         text = `${names[(e.payload as { playerId: string }).playerId]} will bowl.`;
         short = text;
+      } else if (e.type === "RAIN_DELAY") {
+        const secs = (e.payload as { seconds: number }).seconds;
+        const mins = Math.round(secs / 60);
+        text = `Weather delay: ${mins} minute${mins === 1 ? "" : "s"} lost to rain.`;
+        short = `Rain (${mins}m)`;
+      } else if (e.type === "DECLARED") {
+        text = `${tn((e.payload as { teamId: string }).teamId)} declared the innings.`;
+        short = "Declared";
+      } else if (e.type === "FOLLOW_ON_CHOSEN") {
+        const enforced = !!(e.payload as { enforce: boolean }).enforce;
+        text = enforced ? "Follow-on enforced." : "Follow-on declined.";
+        short = text;
+      } else if (e.type === "NEW_BALL_TAKEN") {
+        text = "New ball taken.";
+        short = text;
       }
       return { sequence: e.sequence, text, short };
     });
@@ -239,9 +256,26 @@ export function createRed5MatchController(
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,
       redBall: {
-        day: c.clock.day, localSeconds: c.clock.localSeconds, finalHourActive: c.clock.finalHourActive,
-        finalHourBallsRemaining: c.clock.finalHourBallsRemaining, followOnEnforced: c.followOnEnforced,
-        newBallAvailable: !!l && l.innings.ballAgeLegalBalls >= 480 && l.innings.legalBalls % 6 === 0, declared: [...c.declared],
+        day: c.clock.day,
+        localSeconds: c.clock.localSeconds,
+        clockPhase: c.clock.phase,
+        delaySecondsToday: c.clock.delaySecondsToday,
+        finalHourActive: c.clock.finalHourActive,
+        finalHourBallsRemaining: c.clock.finalHourBallsRemaining,
+        followOnEnforced: c.followOnEnforced,
+        newBallAvailable: !!l && l.innings.ballAgeLegalBalls >= 480 && l.innings.legalBalls % 6 === 0,
+        declared: [...c.declared],
+        pitchWearPoints: c.pitch.wearPoints,
+        seamBp: c.pitch.seamBp,
+        turnBp: c.pitch.turnBp,
+        atSafeWeatherBoundary:
+          c.phase === "READY" && c.clock.phase === "PLAY" && !!l && l.innings.legalBalls % 6 === 0,
+        forecast: computeUncertainRed5Forecast({
+          seed: s.setup.seed,
+          matchId: s.setup.matchId,
+          day: c.clock.day,
+          localSeconds: c.clock.localSeconds,
+        }),
       },
     };
   }
@@ -263,13 +297,13 @@ export function createRed5MatchController(
       eventCount: session.events.length,
       replay: true,
       resimulation: true,
-      humanRequests: audit.length,
-      systemAutopilotRequests: 0,
+      humanRequests: audit.filter((a) => a.origin === "HUMAN").length,
+      systemAutopilotRequests: audit.filter((a) => a.origin === "AI").length,
     };
   }
   function execute(request: Extract<Request, { type: "COMMAND" }>) {
     if (!session) throw new Error("Start a match first.");
-    const cmd = request.command;
+    const cmd = request.command as Red5Command;
     if (cmd.kind === "CONFIRM_TEAMS")
       throw new Error(
         "Team confirmation is only available through match setup.",
@@ -286,15 +320,22 @@ export function createRed5MatchController(
         : cmd.kind === "SET_BATTING_PLAN"
           ? l?.innings.battingTeamId
           : l?.innings.bowlingTeamId;
-    const expectedActor = cmd.kind === "ADVANCE" || cmd.kind === "ADD_RAIN_DELAY" ? "SYSTEM" : `USER:${teamId}`;
+    const expectedActor =
+      request.origin === "AI"
+        ? cmd.kind === "ADVANCE" || cmd.kind === "ADD_RAIN_DELAY"
+          ? "SYSTEM"
+          : `AI:${teamId}`
+        : cmd.kind === "ADVANCE" || cmd.kind === "ADD_RAIN_DELAY"
+          ? "SYSTEM"
+          : `USER:${teamId}`;
     if (cmd.actorId !== expectedActor)
       throw new Error(
-        "Only human commands are accepted by this match interface.",
+        "Only valid human or tactical-captain commands are accepted by this match interface.",
       );
     session = rosterPack ? executeRosterRed5Command(session as unknown as RosterRed5Session, cmd).session as unknown as Red5Session : executeRed5Command(session, cmd).session;
     audit.push({
       requestId: request.requestId,
-      origin: "HUMAN",
+      origin: request.origin,
       commandKind: cmd.kind,
       engineActorId: cmd.actorId,
     });
@@ -309,7 +350,7 @@ export function createRed5MatchController(
       audit.length,
       ...session.commands.map((cmd) => ({
         requestId: cmd.commandId,
-        origin: "HUMAN" as const,
+        origin: (cmd.actorId.startsWith("AI:") ? "AI" : "HUMAN") as "HUMAN" | "AI",
         commandKind: cmd.kind,
         engineActorId: cmd.actorId,
       })),
@@ -429,7 +470,34 @@ export function createRed5MatchController(
           });
           }
         } else if (request.type === "COMMAND") execute(request);
-        else if (request.type === "VERIFY") verification = verify();
+        else if (request.type === "CHECK_SEEDED_WEATHER") {
+          if (!session || session.core.phase === "COMPLETE") {
+            throw new Error("Start an active red-ball match before checking boundary weather.");
+          }
+          const appliedSegmentKeys = new Set<string>();
+          for (const ev of session.events) {
+            const m = /^weather-(d[1-5]-s\d+)-r\d+$/.exec(ev.commandId);
+            if (m?.[1]) appliedSegmentKeys.add(m[1]);
+          }
+          const interruption = nextSafeBoundaryWeatherInterruption({
+            session,
+            appliedSegmentKeys,
+          });
+          if (interruption) {
+            session = rosterPack
+              ? (executeRosterRed5Command(
+                  session as unknown as RosterRed5Session,
+                  interruption.command,
+                ).session as unknown as Red5Session)
+              : executeRed5Command(session, interruption.command).session;
+            audit.push({
+              requestId: id,
+              origin: "HUMAN",
+              commandKind: "ADD_RAIN_DELAY",
+              engineActorId: "SYSTEM",
+            });
+          }
+        } else if (request.type === "VERIFY") verification = verify();
       } catch (e) {
         // Do not serialise private requests, Zod input values, stacks or setup state.
         error =

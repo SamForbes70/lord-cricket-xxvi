@@ -23,7 +23,9 @@ Before an interactive career match launches, a hash-checked durable binding reco
 
 Career creation is not shown as Saved until the first Pass 12F repository commit succeeds. Later management mutations acquire/renew the writer lease, require the durable revision, seal a new canonical season state and commit through the existing repository transaction. UI save states distinguish Saving, Saved, Read-only, Recovered and Error.
 
-Recovered saves are continued into a fresh recovered slot while the damaged source is preserved. Portable import is validated before the imported career becomes active.
+Completed career fixtures seal versioned ball-by-ball event logs (`LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1`, bounded to 1 MiB per fixture and 16 MiB per season) in the IndexedDB `projections` store (`CAREER_MATCH_EVENTS_V1`) and portable `.lcxxvi` archives (`LC_T20_SEASON_PORTABLE_V3_EVENT_ARCHIVES`). The `Career` and `Fixtures` screens expose `View replay` to reconstruct innings and delivery history from the preserved event chain without recomputing random outcomes. Earlier v1 saves without stored event logs remain playable without silent migration and report replay unavailability explicitly; damaged fixture event logs are isolated per fixture without invalidating career standings.
+
+Recovered saves are continued into a fresh recovered slot while the damaged source is preserved. Players can inspect all three checkpoint generations (`Checkpoints` / `Inspect checkpoints`), see any corrupted generations isolated explicitly, and recover a chosen validated older generation into a named new career slot. Save and archive failures present plain-English explanations, recovery guidance and diagnostic codes. Manual copies, `.lcxxvi` export/import and checkpoint recovery remain keyboard reachable. Portable import is validated before the imported career becomes active.
 
 ## Accessibility target
 

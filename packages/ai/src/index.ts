@@ -23,3 +23,6 @@ export interface CaptainPolicy {
   choose(view: CaptainPublicView, legalCommands: readonly Command[]): Command;
 }
 export * from "./t20-captain.js";
+export * from "./odi-captain.js";
+export * from "./red5-captain.js";
+export * from "./red5-utility.js";

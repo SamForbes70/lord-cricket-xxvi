@@ -1,8 +1,16 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson, delegationForTeam, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import { canonicalJson, delegationForTeam, redBallProfileForTeam, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
 import { createMatchAnalyticsAccumulator } from "@lcxxvi/projections";
-import type { T20Session, ODISession, Red5Session, RosterT20Session, RosterODISession, RosterRed5Session } from "@lcxxvi/simulation";
+import {
+  nextSafeBoundaryWeatherInterruption,
+  type T20Session,
+  type ODISession,
+  type Red5Session,
+  type RosterT20Session,
+  type RosterODISession,
+  type RosterRed5Session,
+} from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
   createManagedMatchBindings,
@@ -12,7 +20,7 @@ import {
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
 import { createDiagnostic, type DiagnosticFailure, type DiagnosticPreview } from "./diagnostic-export.js";
-import { proposeOpponentT20Command } from "./ai-opponent.js";
+import { proposeOpponentODICommand, proposeOpponentRed5Command, proposeOpponentT20Command } from "./ai-opponent.js";
 import { createODIMatchController } from "./controller-odi.js";
 import { createRed5MatchController } from "./controller-red5.js";
 import {
@@ -827,22 +835,36 @@ async function handleInner(raw: unknown): Promise<Response> {
   if (persistenceResponse) return persistenceResponse;
   if (request.type === "SET_DELEGATION") {
     const session = controller.snapshot();
-    if (!session || session.setup.format !== "T20") return decorate(controller.currentResponse(request.requestId, "Delegation requires an active T20 match."));
+    if (!session) return decorate(controller.currentResponse(request.requestId, "Delegation requires an active match."));
     if (!session.setup.teams.some(team => team.teamId === request.teamId)) return decorate(controller.currentResponse(request.requestId, "Unknown delegation team."));
     if (request.expectedRevision !== session.revision) return decorate(controller.currentResponse(request.requestId, "Stale match revision."));
     if (readOnly || !activeSaveId || !(await repository.renewLease(activeSaveId, ownerId, nowMs()))) return decorate(controller.currentResponse(request.requestId, "Delegation requires a writable durable save."));
-    delegation = await repository.appendDelegation(activeSaveId, ownerId, nowMs(), { commandId: request.requestId, expectedRevision: request.expectedDelegationRevision, matchRevision: session.revision, teamId: request.teamId, categories: request.categories });
+    delegation = await repository.appendDelegation(activeSaveId, ownerId, nowMs(), {
+      commandId: request.requestId,
+      expectedRevision: request.expectedDelegationRevision,
+      matchRevision: session.revision,
+      teamId: request.teamId,
+      categories: request.categories,
+      ...(request.redBallProfile ? { redBallProfile: request.redBallProfile } : {}),
+    });
     return decorate(controller.currentResponse(request.requestId));
   }
   if (request.type === "AI_STEP") {
     const session = controller.snapshot();
-    if (!session || session.setup.format !== "T20")
-      return decorate(controller.currentResponse(request.requestId, "AI decisions require an active T20 match."));
+    if (!session)
+      return decorate(controller.currentResponse(request.requestId, "AI decisions require an active match."));
     if (request.expectedRevision !== session.revision)
       return decorate(controller.currentResponse(request.requestId, "Stale AI decision revision."));
     if (readOnly || !activeSaveId)
       return decorate(controller.currentResponse(request.requestId, "AI decision requires a writable durable save."));
-    const command = proposeOpponentT20Command(session as T20Session, request.teamId, request.delegated ? delegationForTeam(delegation, request.teamId) : undefined);
+    const delegatedCategories = request.delegated ? delegationForTeam(delegation, request.teamId) : undefined;
+    const profile = request.redBallProfile ?? redBallProfileForTeam(delegation, request.teamId);
+    const command =
+      session.setup.format === "T20"
+        ? proposeOpponentT20Command(session as T20Session, request.teamId, delegatedCategories)
+        : session.setup.format === "ODI"
+          ? proposeOpponentODICommand(session as ODISession, request.teamId, delegatedCategories)
+          : proposeOpponentRed5Command(session as Red5Session, request.teamId, profile, delegatedCategories);
     if (!command) return decorate(controller.currentResponse(request.requestId));
     // AI chooses a legal *engine* command through a public view. It receives no seed/future draws.
     // Every AI command is individually committed through the same atomic path as a human command.
@@ -855,6 +877,39 @@ async function handleInner(raw: unknown): Promise<Response> {
     if (prior) return decorate(controller.currentResponse(request.requestId));
     const response = controller.handle(aiRequest);
     return commitCandidate(aiRequest, response);
+  }
+  if (request.type === "CHECK_SEEDED_WEATHER") {
+    const session = controller.snapshot();
+    if (!session)
+      return decorate(controller.currentResponse(request.requestId, "Start an active match before checking weather."));
+    if (session.setup.format !== "RED_BALL")
+      return decorate(controller.currentResponse(request.requestId, "Seeded weather interruptions are enabled only for five-day red-ball matches; limited-overs rain remains disabled."));
+    if (request.expectedRevision !== session.revision)
+      return decorate(controller.currentResponse(request.requestId, "Stale weather check revision."));
+    if (readOnly || !activeSaveId)
+      return decorate(controller.currentResponse(request.requestId, "Weather checks require a writable durable save."));
+    const appliedSegmentKeys = new Set<string>();
+    for (const ev of session.events) {
+      const m = /^weather-(d[1-5]-s\d+)-r\d+$/.exec(ev.commandId);
+      if (m?.[1]) appliedSegmentKeys.add(m[1]);
+    }
+    const interruption = nextSafeBoundaryWeatherInterruption({
+      session: session as Red5Session,
+      appliedSegmentKeys,
+    });
+    if (!interruption) return decorate(controller.currentResponse(request.requestId));
+    const prior = await repository.command(activeSaveId, interruption.command.commandId);
+    if (prior) return decorate(controller.currentResponse(request.requestId));
+    const weatherRequest: Extract<Request, { type: "COMMAND" }> = {
+      version: UI_VERSION,
+      type: "COMMAND",
+      origin: "HUMAN",
+      requestId: request.requestId,
+      expectedRevision: request.expectedRevision,
+      command: { ...interruption.command, expectedRevision: request.expectedRevision },
+    };
+    const response = controller.handle(weatherRequest);
+    return commitCandidate(weatherRequest, response);
   }
   // UI-originated COMMANDs cannot masquerade as the AI decision authority.
   if (request.type === "COMMAND" && request.origin !== "HUMAN")
