@@ -39,13 +39,22 @@ Research promotion, public deployment, purchases and deletion of owner data reta
 5. Commit coherent changes. Separate unpromoted research work from production code and keep all capability flags accurate.
 
 ## Current task boundary
-The active target is the V0.1 synthetic alpha in `docs/V01_DELIVERY_PLAN.md` and `docs/V01_BACKLOG.json`, under the owner's standing brief.
-After V0.1, the owner's sequence is persistent world, then player lifecycle, then squad economy, each accepted before the next begins.
+V0.1 is closed and owner accepted (13 November 2026; see `docs/OWNER_DECISIONS_2026-11-13.md`). The performance, owner-PC and screen-reader gates are owner declared with no measurement stored in the repository: never describe them as measured or observed.
+The owner's sequence is persistent world, then player lifecycle, then squad economy, each accepted before the next begins. Start with `docs/HANDOVER.md` and `docs/NEXT_PASS.md`.
 The baseline recovery task is delivered through merged PR #2. Issue #1 retains the owner-PC automation evidence gap.
 The owner authorised M7K research preparation on 26 October 2026. PR #3 records that research preparation.
 All source-case adjudication flags remain false; a merge does not authorise production ledger integration or model promotion.
 Research-model promotion still requires explicit approval.
 Use `docs/CURRENT_STATUS.md` and `docs/ACCEPTANCE_RECONCILIATION.md` before selecting further work.
+
+## Working agreements (read before you change anything)
+- All changes go through a pull request: branch from `main`, open a draft PR, wait for hosted CI (Linux, and Windows which takes 25 to 30 minutes), merge only on green. Never push directly to `main`; five unreviewed direct pushes had to be reviewed after the fact (`docs/REVIEW_2026-11-13.md`).
+- After every pull run `npx tsc -b` before the tests; stale compiled packages cause confusing unit failures. Check exit codes, not only output.
+- Do not add skipped browser tests (hosted Windows CI fails them). Never skip or disable a test to get green.
+- Do not widen a persisted format without a new version identifier. Do not change the frozen scoring kernel, engines, generator, random stream or probability tables.
+- A document must not cite a file that does not exist, and a failing check in a results file must be reported.
+- Do not close or merge the owner's pull requests, change repository settings, or mark an owner gate passed without the owner's explicit say. If a permission is denied, stop and tell the owner.
+- See `docs/AI_CONTINUATION.md` for the full list and `docs/AI_INSPECTION_PROMPT.md` for a prompt that briefs a new AI.
 
 ## Engineering and reporting standards
 - Strict TypeScript, Zod/JSON Schema contracts and stable versioned commands/events.

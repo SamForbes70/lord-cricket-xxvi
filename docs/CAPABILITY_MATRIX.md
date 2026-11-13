@@ -16,7 +16,7 @@ Dated reports retain the results of their original runs.
 | Player pages | Base ratings by format, current T20 career condition and recorded season statistics. Squad and statistics link by stable player ID. |
 | Pitch inspection | The selected exhibition ground and next career fixture show the seam and spin values used by the match model. Unused conditions and unavailable forecasts are labelled. |
 | Training and condition | Rest/practice, availability, fatigue and temporary readiness; no permanent skill growth. |
-| Tactical captain | Optional deterministic public-view T20 policy; legal controls are browser-tested. Empirical tactical quality is unaccepted. |
+| Tactical captain | Optional deterministic public-view policies for T20, ODI and five-day red ball (declarations, follow-on, new ball, workload and fields, with a conservative, balanced or aggressive red-ball profile). Legal controls are tested. Empirical tactical quality is unaccepted, and on first-innings runs the T20 captain is indistinguishable from the neutral baseline ([follow-up](verification-v01-batch7-diagnostics/FOLLOW_UP_2026-11-13.md)). |
 | Granular T20 delegation | PR #23 merged six decision categories. A versioned journal persists choices in checkpoints and portable archives. |
 | Fixture autopilot | Separate deterministic baseline completion policy; it is not the tactical captain. |
 | Local saves | IndexedDB commits, writer lease, revisions, checkpoints and validated recovery of match and career checkpoints. A first commit cannot replace an existing save. |
@@ -31,9 +31,15 @@ Dated reports retain the results of their original runs.
 | Empirical research | M7F-J candidates remain offline research. No candidate is selectable in gameplay. |
 | M7K | Source evidence plus isolated research ledger, replay, recovery and evaluation tooling; no new production ledger or promoted model. |
 | Scenario quality harness | Paired baseline/tactical developer tool across all eight teams and grounds; descriptive synthetic results only. |
-| Performance | Reference-hardware browser, season, memory and save/load budgets remain unaccepted. Seven numeric budgets are confirmed and the memory budget has no figure yet; see [PERFORMANCE_BUDGETS.md](PERFORMANCE_BUDGETS.md). |
-| DLS and limited-overs rain | Disabled. Red-ball delay commands do not establish a calibrated weather scheduler. |
-| Prediction, super overs and DRS | Not enabled. |
+| Performance | All eight budgets are confirmed, including 768 MiB total application memory ([PERFORMANCE_BUDGETS.md](PERFORMANCE_BUDGETS.md)). The owner declared the gate complete; a Linux container observation meets every budget, and **no reference-laptop measurement is stored in this repository**. |
+| Red-ball weather | Seeded, versioned 30-minute weather segments in an independent random domain, with uncertain pre-day forecasts and interruptions applied only at safe over boundaries. Synthetic, not calibrated. |
+| DLS and limited-overs rain | Disabled. |
+| Career event archives and replay | Completed career matches keep a versioned event archive that replays without recomputing outcomes; career archives use `LC_T20_SEASON_PORTABLE_V3_EVENT_ARCHIVES` when they carry event archives, and older archives still read. Checkpoint generations can be inspected and recovered into a new slot. |
+| Offline use and safe updates | A precached offline shell; updates wait until no match or save transaction is active; `/engineering.html` stays available as a recovery surface. |
+| Accessibility | Automated keyboard, focus, contrast, 150 percent and narrow-layout checks pass ([ACCESSIBILITY_RELEASE_AUDIT.md](ACCESSIBILITY_RELEASE_AUDIT.md)). The human screen-reader walkthrough is owner declared; no observation is stored here. |
+| Packaging | `npm run package:game` builds a playable zip (game, local server, launchers) and a source zip. The Windows launcher has not been run on Windows by the packager. |
+| Release record | [release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json) lists capabilities, evidence files, owner declarations, known limits and recovery instructions. A unit test fails if it cites a file that does not exist. |
+| Win prediction, super overs and DRS | Not enabled. The design brief makes win prediction optional. |
 | Multiyear management | Transfers, contracts, finances, youth and international management are not implemented. |
 
 Unit totals and commands belong to their dated evidence records, rather than this capability table.

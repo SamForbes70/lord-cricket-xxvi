@@ -1,6 +1,7 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { generateReleaseRecord } from '../../scripts/build-release-record.js';
-import { parseConfiguredMemoryBudgetBytes } from '../acceptance/memory-probe.js';
+import { CONFIRMED_MEMORY_BUDGET_MB, parseConfiguredMemoryBudgetBytes } from '../acceptance/memory-probe.js';
 
 describe('V01-029 & V01-028: release record and memory budget parser', () => {
   it('packages tested revision, SHA-256 manifests, honest external gates, and keeps public deployment un-authorised', () => {
@@ -17,9 +18,16 @@ describe('V01-029 & V01-028: release record and memory budget parser', () => {
     expect(record.recoveryInstructions.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('parses configured LCXXVI_MEMORY_BUDGET_MB or returns null when unconfirmed by owner', () => {
-    expect(parseConfiguredMemoryBudgetBytes(undefined)).toBeNull();
-    expect(parseConfiguredMemoryBudgetBytes('')).toBeNull();
+  it('every evidence file a capability cites exists, so the record cannot cite a test that is not there', () => {
+    const record = generateReleaseRecord(process.cwd());
+    const missing = record.capabilities.flatMap(c => c.evidence.filter(e => !e.startsWith('npm run') && !existsSync(e)).map(e => `${c.capabilityId}: ${e}`));
+    expect(missing).toEqual([]);
+  });
+
+  it('uses the owner-confirmed memory budget by default and lets LCXXVI_MEMORY_BUDGET_MB override it', () => {
+    expect(CONFIRMED_MEMORY_BUDGET_MB).toBe(768);
+    expect(parseConfiguredMemoryBudgetBytes(undefined)).toBe(768 * 1024 * 1024);
+    expect(parseConfiguredMemoryBudgetBytes('')).toBe(768 * 1024 * 1024);
     expect(parseConfiguredMemoryBudgetBytes('1024')).toBe(1024 * 1024 * 1024);
     expect(() => parseConfiguredMemoryBudgetBytes('0')).toThrow(/INVALID_LCXXVI_MEMORY_BUDGET_MB/);
     expect(() => parseConfiguredMemoryBudgetBytes('abc')).toThrow(/INVALID_LCXXVI_MEMORY_BUDGET_MB/);

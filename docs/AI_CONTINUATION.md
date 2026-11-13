@@ -12,7 +12,20 @@ Finish Lord Cricket XXVI as an evidence-based statistical management game. The a
 
 The owner has repeatedly authorised autonomous routine development and is frustrated by agents stopping after a plan, diagnosis or failing regression. Do not ask for the same permission again. A meaningful implementation slice includes working code, appropriate tests, evidence and a reviewed integration path. A draft regression or design note is useful preparation but must never be described as the completed fix.
 
-Durable managed-match recovery merged in PR #39 (`2c742fb`), PR #40 (`877ead2`) integrated earlier open branches, and PR #41 (`77e1160`) recorded confirmed performance budgets 1 to 7 on `main`. Remaining V0.1 engineering slices (`V01-021` to `V01-029`, `150%` Firefox/Chromium vertical layout margin, and slot-scoped managed-binding isolation) are implemented on branch `codex/v01-closure`, while `V01-011`, `V01-028`, owner-PC execution and V0.1 milestone acceptance remain gated on explicit owner sign-off. Do not describe V0.1 as accepted or start multi-season Persistent World implementation until the owner accepts V0.1. No unattended or background execution exists in this repository; do not claim it does.
+**Where the project stands (13 November 2026).** V0.1 is closed: the owner accepted it and every V01 backlog item is `DONE` ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). Three of those closures are the owner's declaration with **no measurement stored in the repository**: the reference-hardware run, the owner-PC run and the screen-reader walkthrough. Never describe them as measured or observed. The research items RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. The model is `synthetic-alpha-01` / `SYNTHETIC_ALPHA` and makes no empirical claim.
+
+The next milestone is the persistent world, then player lifecycle, then squad economy, each accepted before the next begins. Read [HANDOVER.md](HANDOVER.md) for the one-page summary and [NEXT_PASS.md](NEXT_PASS.md) for what to do first. No unattended or background execution exists in this repository; do not claim it does.
+
+## Working agreements for any AI or engineer
+
+1. **Everything goes through a pull request.** Branch from `main`, open a draft pull request, wait for hosted CI (the Linux job, and the Windows job which takes 25 to 30 minutes), and merge only on green. On 13 November 2026 five commits reached `main` directly with no review; they had to be reviewed afterwards ([REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)). Do not repeat that. Branch protection is meant to prevent it ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)) but may not be enabled; behave as if it were.
+2. **Verify before you trust.** Run `npx tsc -b` after every pull: stale compiled packages make unit tests fail with errors like `createMatchAnalyticsAccumulator is not a function`. Then `npm run lint` and `npm run verify:09:core`. Check exit codes, not only output: a lint error once reached CI because an empty output was misread.
+3. **Record evidence honestly.** Use PASS, FAIL, BLOCKED or NOT RUN with the exact command and revision. A claim in a document must point at a file that exists; a unit test now enforces that for the release record. A failing check in a results file must be reported, not omitted.
+4. **Do not widen a persisted format without a new version identifier,** and never migrate a historical save silently. The delegation journal widened in place and is a known limit.
+5. **Do not change the frozen engines, scoring kernel, generator, random stream or probability tables.** A result-generating change needs a new model version.
+6. **Hosted Windows CI rejects any skipped browser test** (`INCOMPLETE_BROWSER_EVIDENCE`). Do not add `test.skip`.
+7. **Do not close, merge or delete the owner's pull requests, change repository settings, or mark an owner gate passed** without the owner's explicit say. If a permission is denied, stop and tell the owner; do not route around it.
+8. Use Australian spelling and no en or em dashes in prose you write for this project.
 
 ## Read in order
 

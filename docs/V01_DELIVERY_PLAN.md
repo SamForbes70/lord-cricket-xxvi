@@ -28,9 +28,9 @@ PR #20 completed V01-007 keyboard and settings acceptance.
 PR #21 merged V01-008 bounded advances; PR #22 merged V01-009 cancellation.
 PR #23 merged V01-010 granular T20 delegation as `753db53`.
 PR #25 merged V01-012 cross-format analytics as `3846282`.
-PR #24 merged in-session navigation. Durable recovery across browser sessions is implemented in PR #39 (replacing the failing regression in #37) and has passed hosted Linux and Windows (Chromium and Firefox) checks; it awaits owner acceptance, and V01-011 stays IN_PROGRESS.
+PR #24 merged in-session navigation and PR #39 delivered durable recovery across browser sessions (replacing the failing regression in #37).
 PR #28 merged scorecard exports and PR #30 merged manual career copies.
-Accept V01-011 recovery next, then merge #26 incremental analytics, #27 charts (which carries copies of #26's commits) and #31 diagnostics in that order.
+PR #40 merged #26, #27 and #31. **V0.1 was accepted by the owner on 13 November 2026 and every V01 item is `DONE`** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)). The performance, owner-PC and screen-reader gates are owner declared with no measurements stored here. The next work is the persistent world milestone below.
 Use [the GitHub audit](GITHUB_AUDIT_2026-11-11.md) for the dated branch and check inventory.
 Preserve stable IDs, historical snapshots, existing saves and frozen simulation outcomes.
 Keep new packs versioned and validate all imported references and content.

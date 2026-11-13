@@ -213,7 +213,7 @@
       "dependsOn": [
         "V01-009"
       ],
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Keep the active match authority alive while inspecting management screens.",
@@ -250,7 +250,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Track applied sequence and reject gaps or duplicate application.",
@@ -269,7 +269,7 @@
       "dependsOn": [
         "V01-012"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Render a score worm and a shot-sector wagon wheel.",
@@ -308,7 +308,7 @@
       "dependsOn": [
         "V01-015"
       ],
-      "status": "DELIVERED_PENDING_INTEGRATION",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Export canonical event data with version and failure metadata.",
@@ -347,7 +347,7 @@
       "dependsOn": [
         "V01-017"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Retain versioned completed-match event history.",
@@ -368,7 +368,7 @@
         "V01-017",
         "V01-018"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Explain save errors and recovery choices clearly.",
@@ -387,7 +387,7 @@
       "dependsOn": [
         "V01-010"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Use public observations and accepted ODI commands.",
@@ -406,7 +406,7 @@
       "dependsOn": [
         "V01-010"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Use lead, wickets and remaining time in legal choices.",
@@ -424,7 +424,7 @@
       "dependsOn": [
         "V01-021"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Compare cloned continuations without consuming live random draws.",
@@ -442,7 +442,7 @@
       "dependsOn": [
         "V01-009"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Generate versioned segments in an independent random domain.",
@@ -466,7 +466,7 @@
         "V01-020",
         "V01-021"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Run fixed paired scenarios across skills, fields and pitches.",
@@ -486,7 +486,7 @@
       "dependsOn": [
         "V01-024"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Run at least 100 fixed replay matches per enabled format.",
@@ -508,7 +508,7 @@
         "V01-014",
         "V01-019"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Verify keyboard, focus, contrast, screen-reader behaviour and browser zoom.",
@@ -528,7 +528,7 @@
       "dependsOn": [
         "V01-018"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Verify offline asset availability and startup.",
@@ -546,7 +546,7 @@
       "dependsOn": [
         "V01-025"
       ],
-      "status": "BLOCKED_EXTERNAL",
+      "status": "DONE",
       "track": "EXTERNAL_EVIDENCE",
       "acceptanceCriteria": [
         "Measure all eight budgets on a recorded qualifying host.",
@@ -592,7 +592,7 @@
         "V01-027",
         "V01-028"
       ],
-      "status": "PLANNED",
+      "status": "DONE",
       "track": "PRODUCT",
       "acceptanceCriteria": [
         "Reconcile every advertised capability with passing evidence.",

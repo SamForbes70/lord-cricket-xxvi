@@ -1,0 +1,347 @@
+{
+  "schema": "LC_V01_024_FOLLOW_UP_V1",
+  "startedAtUtc": "2026-11-13T06:02:30.493Z",
+  "completedAtUtc": "2026-11-13T06:06:13.964Z",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "empiricallyCalibrated": false,
+  "coefficientsChanged": false,
+  "parameters": {
+    "deliveriesPerCell": 3000,
+    "matchesPerPolicy": 80,
+    "seedPrefixes": "defaults (LC_V01_024_SWEEP for the sweeps)"
+  },
+  "sweeps": [
+    {
+      "format": "T20",
+      "deliveriesPerCell": 3000,
+      "monotonicityChecks": {
+        "higherBatScoresMore": true,
+        "higherBatDismissedLessOrEqual": true,
+        "higherBowlConcedesLess": true,
+        "higherSeamRaisesDismissalsOrCutsScoring": true,
+        "higherTurnRaisesDismissalsOrCutsScoring": true,
+        "boundaryProtectionCutsBoundaries": true
+      },
+      "skills": {
+        "highBat": {
+          "tag": "skill_bat_82_vs_bowl_50",
+          "samples": 3000,
+          "runsPer100Deliveries": 110.8,
+          "dismissalsPer100Deliveries": 5.37,
+          "boundaryPct": 14.73,
+          "dotPct": 51.77
+        },
+        "lowBat": {
+          "tag": "skill_bat_38_vs_bowl_50",
+          "samples": 3000,
+          "runsPer100Deliveries": 70.17,
+          "dismissalsPer100Deliveries": 7.87,
+          "boundaryPct": 7.83,
+          "dotPct": 65.13
+        },
+        "highBowl": {
+          "tag": "skill_bat_55_vs_bowl_82",
+          "samples": 3000,
+          "runsPer100Deliveries": 82.6,
+          "dismissalsPer100Deliveries": 7.47,
+          "boundaryPct": 9.97,
+          "dotPct": 61.37
+        },
+        "lowBowl": {
+          "tag": "skill_bat_55_vs_bowl_38",
+          "samples": 3000,
+          "runsPer100Deliveries": 86.87,
+          "dismissalsPer100Deliveries": 6.7,
+          "boundaryPct": 10.53,
+          "dotPct": 59.33
+        }
+      },
+      "pitches": {
+        "seamGreen": {
+          "tag": "pitch_green_seam_8200",
+          "samples": 3000,
+          "runsPer100Deliveries": 87.17,
+          "dismissalsPer100Deliveries": 6.9,
+          "boundaryPct": 10.83,
+          "dotPct": 60.13
+        },
+        "flatDeck": {
+          "tag": "pitch_flat_seam_2800",
+          "samples": 3000,
+          "runsPer100Deliveries": 88.23,
+          "dismissalsPer100Deliveries": 6.8,
+          "boundaryPct": 10.97,
+          "dotPct": 59.6
+        },
+        "dryTurn": {
+          "tag": "pitch_dry_turn_8200",
+          "samples": 3000,
+          "runsPer100Deliveries": 87.17,
+          "dismissalsPer100Deliveries": 6.9,
+          "boundaryPct": 10.83,
+          "dotPct": 60.13
+        },
+        "lowTurn": {
+          "tag": "pitch_low_turn_2800",
+          "samples": 3000,
+          "runsPer100Deliveries": 88.23,
+          "dismissalsPer100Deliveries": 6.8,
+          "boundaryPct": 10.97,
+          "dotPct": 59.6
+        }
+      },
+      "fields": {
+        "attackingField": {
+          "tag": "field_close_attacking",
+          "samples": 3000,
+          "runsPer100Deliveries": 117.83,
+          "dismissalsPer100Deliveries": 5.5,
+          "boundaryPct": 17.17,
+          "dotPct": 55.03
+        },
+        "boundaryField": {
+          "tag": "field_boundary_defensive",
+          "samples": 3000,
+          "runsPer100Deliveries": 104.33,
+          "dismissalsPer100Deliveries": 7.67,
+          "boundaryPct": 14.6,
+          "dotPct": 57.9
+        }
+      }
+    },
+    {
+      "format": "ODI",
+      "deliveriesPerCell": 3000,
+      "monotonicityChecks": {
+        "higherBatScoresMore": true,
+        "higherBatDismissedLessOrEqual": true,
+        "higherBowlConcedesLess": true,
+        "higherSeamRaisesDismissalsOrCutsScoring": true,
+        "higherTurnRaisesDismissalsOrCutsScoring": true,
+        "boundaryProtectionCutsBoundaries": true
+      },
+      "skills": {
+        "highBat": {
+          "tag": "skill_bat_82_vs_bowl_50",
+          "samples": 3000,
+          "runsPer100Deliveries": 100.87,
+          "dismissalsPer100Deliveries": 4.43,
+          "boundaryPct": 12.93,
+          "dotPct": 53.03
+        },
+        "lowBat": {
+          "tag": "skill_bat_38_vs_bowl_50",
+          "samples": 3000,
+          "runsPer100Deliveries": 60.67,
+          "dismissalsPer100Deliveries": 6.2,
+          "boundaryPct": 5.73,
+          "dotPct": 67.13
+        },
+        "highBowl": {
+          "tag": "skill_bat_55_vs_bowl_82",
+          "samples": 3000,
+          "runsPer100Deliveries": 72,
+          "dismissalsPer100Deliveries": 5.87,
+          "boundaryPct": 8.23,
+          "dotPct": 64.07
+        },
+        "lowBowl": {
+          "tag": "skill_bat_55_vs_bowl_38",
+          "samples": 3000,
+          "runsPer100Deliveries": 75.57,
+          "dismissalsPer100Deliveries": 5.37,
+          "boundaryPct": 8.43,
+          "dotPct": 61.53
+        }
+      },
+      "pitches": {
+        "seamGreen": {
+          "tag": "pitch_green_seam_8200",
+          "samples": 3000,
+          "runsPer100Deliveries": 74.4,
+          "dismissalsPer100Deliveries": 5.5,
+          "boundaryPct": 8.53,
+          "dotPct": 62.73
+        },
+        "flatDeck": {
+          "tag": "pitch_flat_seam_2800",
+          "samples": 3000,
+          "runsPer100Deliveries": 75.4,
+          "dismissalsPer100Deliveries": 5.43,
+          "boundaryPct": 8.6,
+          "dotPct": 62.2
+        },
+        "dryTurn": {
+          "tag": "pitch_dry_turn_8200",
+          "samples": 3000,
+          "runsPer100Deliveries": 74.4,
+          "dismissalsPer100Deliveries": 5.5,
+          "boundaryPct": 8.53,
+          "dotPct": 62.73
+        },
+        "lowTurn": {
+          "tag": "pitch_low_turn_2800",
+          "samples": 3000,
+          "runsPer100Deliveries": 75.4,
+          "dismissalsPer100Deliveries": 5.43,
+          "boundaryPct": 8.6,
+          "dotPct": 62.2
+        }
+      },
+      "fields": {
+        "attackingField": {
+          "tag": "field_close_attacking",
+          "samples": 3000,
+          "runsPer100Deliveries": 98.43,
+          "dismissalsPer100Deliveries": 4.67,
+          "boundaryPct": 13.5,
+          "dotPct": 59.67
+        },
+        "boundaryField": {
+          "tag": "field_boundary_defensive",
+          "samples": 3000,
+          "runsPer100Deliveries": 87.27,
+          "dismissalsPer100Deliveries": 6.43,
+          "boundaryPct": 11.23,
+          "dotPct": 61.87
+        }
+      }
+    },
+    {
+      "format": "RED_BALL",
+      "deliveriesPerCell": 3000,
+      "monotonicityChecks": {
+        "higherBatScoresMore": true,
+        "higherBatDismissedLessOrEqual": true,
+        "higherBowlConcedesLess": true,
+        "higherSeamRaisesDismissalsOrCutsScoring": true,
+        "higherTurnRaisesDismissalsOrCutsScoring": true,
+        "boundaryProtectionCutsBoundaries": true
+      },
+      "skills": {
+        "highBat": {
+          "tag": "skill_bat_82_vs_bowl_50",
+          "samples": 3000,
+          "runsPer100Deliveries": 76.4,
+          "dismissalsPer100Deliveries": 3.4,
+          "boundaryPct": 8.63,
+          "dotPct": 59.93
+        },
+        "lowBat": {
+          "tag": "skill_bat_38_vs_bowl_50",
+          "samples": 3000,
+          "runsPer100Deliveries": 44.8,
+          "dismissalsPer100Deliveries": 5.37,
+          "boundaryPct": 3.9,
+          "dotPct": 73.23
+        },
+        "highBowl": {
+          "tag": "skill_bat_55_vs_bowl_82",
+          "samples": 3000,
+          "runsPer100Deliveries": 51.47,
+          "dismissalsPer100Deliveries": 5.1,
+          "boundaryPct": 4.87,
+          "dotPct": 70.1
+        },
+        "lowBowl": {
+          "tag": "skill_bat_55_vs_bowl_38",
+          "samples": 3000,
+          "runsPer100Deliveries": 55.4,
+          "dismissalsPer100Deliveries": 4.63,
+          "boundaryPct": 5.17,
+          "dotPct": 67.83
+        }
+      },
+      "pitches": {
+        "seamGreen": {
+          "tag": "pitch_green_seam_8200",
+          "samples": 3000,
+          "runsPer100Deliveries": 53.97,
+          "dismissalsPer100Deliveries": 4.97,
+          "boundaryPct": 5.2,
+          "dotPct": 68.93
+        },
+        "flatDeck": {
+          "tag": "pitch_flat_seam_2800",
+          "samples": 3000,
+          "runsPer100Deliveries": 55.23,
+          "dismissalsPer100Deliveries": 4.8,
+          "boundaryPct": 5.3,
+          "dotPct": 68.33
+        },
+        "dryTurn": {
+          "tag": "pitch_dry_turn_8200",
+          "samples": 3000,
+          "runsPer100Deliveries": 53.97,
+          "dismissalsPer100Deliveries": 4.97,
+          "boundaryPct": 5.2,
+          "dotPct": 68.93
+        },
+        "lowTurn": {
+          "tag": "pitch_low_turn_2800",
+          "samples": 3000,
+          "runsPer100Deliveries": 55.23,
+          "dismissalsPer100Deliveries": 4.8,
+          "boundaryPct": 5.3,
+          "dotPct": 68.33
+        }
+      },
+      "fields": {
+        "attackingField": {
+          "tag": "field_close_attacking",
+          "samples": 3000,
+          "runsPer100Deliveries": 61.07,
+          "dismissalsPer100Deliveries": 4.7,
+          "boundaryPct": 6.8,
+          "dotPct": 69
+        },
+        "boundaryField": {
+          "tag": "field_boundary_defensive",
+          "samples": 3000,
+          "runsPer100Deliveries": 57.07,
+          "dismissalsPer100Deliveries": 5.43,
+          "boundaryPct": 6.17,
+          "dotPct": 69.8
+        }
+      }
+    }
+  ],
+  "policies": {
+    "BASELINE_NEUTRAL": {
+      "matches": 80,
+      "meanFirstInningsRuns": 90.8,
+      "meanFirstInningsWickets": 7.63,
+      "allOutCount": 21
+    },
+    "TACTICAL_CAPTAIN": {
+      "matches": 80,
+      "meanFirstInningsRuns": 92.85,
+      "meanFirstInningsWickets": 7.91,
+      "allOutCount": 22
+    },
+    "EXPLOIT_ALWAYS_SLOG_4": {
+      "matches": 80,
+      "meanFirstInningsRuns": 92.72,
+      "meanFirstInningsWickets": 9.6,
+      "allOutCount": 65
+    },
+    "EXPLOIT_ALWAYS_DEFEND_0": {
+      "matches": 80,
+      "meanFirstInningsRuns": 76.67,
+      "meanFirstInningsWickets": 4.69,
+      "allOutCount": 0
+    },
+    "EXPLOIT_ALWAYS_YORKER_EFFORT": {
+      "matches": 80,
+      "meanFirstInningsRuns": 88.2,
+      "meanFirstInningsWickets": 7.59,
+      "allOutCount": 20
+    },
+    "EXPLOIT_ALWAYS_SHORT_EFFORT": {
+      "matches": 80,
+      "meanFirstInningsRuns": 93.29,
+      "meanFirstInningsWickets": 7.89,
+      "allOutCount": 23
+    }
+  }
+}

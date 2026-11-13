@@ -1,5 +1,9 @@
 # Lord Cricket XXVI | Single-season management alpha
 
+## Status in one paragraph
+
+V0.1 (a fictional, single-season synthetic alpha) is closed and owner accepted as of 13 November 2026. The model is `synthetic-alpha-01` and makes no empirical claim. Three gates (reference-hardware run, owner-PC run, screen-reader walkthrough) are owner declared with no measurement stored in the repository. Next: the persistent world, then player lifecycle, then squad economy. Read [docs/HANDOVER.md](docs/HANDOVER.md) first. To run it: `npm ci`, `npm run build`, then serve `apps/web/dist` over http (`node start.mjs`) and open http://127.0.0.1:4180/. To make shareable zips: `npm run package:game`. To brief another AI, paste [docs/AI_INSPECTION_PROMPT.md](docs/AI_INSPECTION_PROMPT.md).
+
 Lord Cricket XXVI provides a one-season management game over deterministic match and career systems.
 Start with the [documentation hub](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md) or [AI continuation guide](docs/AI_CONTINUATION.md).
 See [current status](docs/CURRENT_STATUS.md), [next slice](docs/NEXT_PASS.md) and the [V0.1 backlog](docs/V01_BACKLOG.json) for active work (the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) is a historical snapshot prior to PRs #39 to #41).

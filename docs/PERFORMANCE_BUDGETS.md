@@ -19,11 +19,32 @@ A four-core, 8 GB laptop running a supported browser. The repository defines not
 | 5 | 56-match league, elapsed | 60,000 ms | Full default-world league in a worker |
 | 6 | IndexedDB save, p95 | 500 ms | 20 commits of a completed 56-fixture season |
 | 7 | Active-game load, p95 | 2000 ms | 20 validated loads of the completed season |
-| 8 | Total application memory, including workers and native allocations | pending owner confirmation (`LCXXVI_MEMORY_BUDGET_MB`) | OS browser process-tree PSS/RSS (Linux `/proc/<pid>/smaps_rollup` + `ps`) or PrivatePageCount/WorkingSetSize (Windows `Get-CimInstance Win32_Process`) plus `measureUserAgentSpecificMemory` and main-thread JS heap |
+| 8 | Total application memory, including workers and native allocations | 768 MiB (confirmed 13 November 2026) | OS browser process-tree PSS/RSS (Linux `/proc/<pid>/smaps_rollup` + `ps`) or PrivatePageCount/WorkingSetSize (Windows `Get-CimInstance Win32_Process`) plus `measureUserAgentSpecificMemory` and main-thread JS heap |
 
-## Open decision: the memory budget threshold
+## Memory budget (Budget 8), confirmed
 
-Budget 8 is now measured end-to-end across all active browser, renderer, Web Worker and native processes (`totalApplicationMemory` in `<browser>-performance.json` and `<browser>-engine-performance.json`), while its pass/fail numeric threshold remains unconfirmed until the owner sets it (for example via `LCXXVI_MEMORY_BUDGET_MB=<megabytes>`). When `LCXXVI_MEMORY_BUDGET_MB` is unset, the harness records `thresholdConfirmedByOwner: false` and `withinConfirmedThreshold: null` without guessing a threshold.
+The owner set this at **768 MiB** on 13 November 2026 (see [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)), measured as process-tree PSS on Linux and private bytes on Windows, including workers and native allocations. It is the default in `tests/acceptance/memory-probe.ts`; `LCXXVI_MEMORY_BUDGET_MB` overrides it.
+
+## Observation on a Linux container (not reference hardware)
+
+Chromium 1243 headless on Linux, 13 November 2026, `tests/acceptance/performance.spec.ts`. These show the budgets are not obviously unreachable; they do not accept V01-028.
+
+| Budget | Budget value | Observed |
+| --- | --- | --- |
+| Command acknowledgement p95 | under 100 ms | 21 ms |
+| Longest task overlapping a measured command | 50 ms | none recorded (page-lifetime maximum 99 ms) |
+| T20 engine-only match p95 | 1000 ms | 372 ms |
+| Five-day match p95 | 5000 ms | 1746 ms |
+| 56-match league | 60,000 ms | 20,866 ms |
+| IndexedDB save p95 | 500 ms | 38 ms |
+| Active-game load p95 | 2000 ms | 36 ms |
+| Total application memory (PSS, 17 processes) | 768 MiB | about 596 MiB |
+
+The page-lifetime long task of 99 ms is outside any measured command, so it is not counted against budget 2; it is worth watching on a slower machine.
+
+## Status
+
+The owner declared V01-028 complete on 13 November 2026. No reference-laptop measurement is stored in this repository. If one is taken, record it under `docs/verification-*` and link it here; a miss reopens the item.
 
 ## Evidence rules
 
