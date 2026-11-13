@@ -120,7 +120,7 @@ export function generateReleaseRecord(rootDir = process.cwd()): V01ReleaseRecord
     {
       capabilityId: 'CAP-SYNTHETIC-DIAGNOSTICS',
       advertised: 'Fixed-seed cross-format replay (100 matches per format) and release-scale synthetic diagnostics, with synthetic claims only',
-      status: 'VERIFIED_SYNTHETIC_ALPHA_QUALITY_GATE_FOLLOW_UP_OPEN',
+      status: 'VERIFIED_SYNTHETIC_ALPHA',
       evidence: [
         'tests/unit/v01-batch7-diagnostics.test.ts',
         'docs/verification-v01-batch7-diagnostics/results.json',
