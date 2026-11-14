@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "ACADEMY_GRADUATE",
+    "FIRST_TEAM_PROSPECT",
+    "HIGH_CEILING_PROSPECT"
+  ],
+  "$id": "urn:lcxxvi:YouthCeilingTier:1",
+  "title": "YouthCeilingTier"
+}

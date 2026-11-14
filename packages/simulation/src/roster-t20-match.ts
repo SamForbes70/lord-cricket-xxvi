@@ -13,6 +13,25 @@ const hash = createStateHasher().hash;
 const verifiedSessions = new WeakMap<object, string>();
 const fail = (message: string): never => { throw new Error(`LC_ROSTER_T20_${message}`); };
 
+function sessionIntegrityDigest(session: RosterT20Session): string {
+  const lastEv = session.events.at(-1);
+  const firstEv = session.events[0];
+  return hash({
+    setupVersion: session.setup.setupVersion,
+    rosterPackHash: session.setup.rosterPackHash,
+    manifestEngine: session.executionManifest.engine,
+    manifestSetupHash: session.executionManifest.setupHash,
+    revision: session.revision,
+    genesisHash: session.genesisHash,
+    lastEventHash: session.lastEventHash,
+    eventCount: session.events.length,
+    firstEventHash: firstEv ? firstEv.eventHash : null,
+    tailEventHash: lastEv ? lastEv.eventHash : null,
+    commandCount: session.commands.length,
+    core: session.core,
+  });
+}
+
 type Prepared = ReturnType<typeof prepareRosterMatch>;
 export type RosterT20Setup = Omit<FrozenT20Setup, "setupVersion"> & {
   readonly setupVersion: "LC_T20_ROSTER_SETUP_V2";
@@ -57,17 +76,17 @@ export function createRosterT20Session(pack: StagedRosterPack, request: unknown)
   const genesisHash = hash([T20_EVENT_CHAIN_VERSION, setupHash, hash(executionManifest)]);
   const session: RosterT20Session = { setup, executionManifest, core, revision: 0,
     events: [], receipts: {}, commands: [], genesisHash, lastEventHash: genesisHash };
-  verifiedSessions.set(session, hash(session));
+  verifiedSessions.set(session, sessionIntegrityDigest(session));
   return session;
 }
 
 export function executeRosterT20Command(input: RosterT20Session, command: unknown): { session: RosterT20Session; receipt: T20CommandReceipt } {
   const expectedHash = verifiedSessions.get(input);
   if (!expectedHash) fail("SESSION_UNVERIFIED");
-  if (hash(input) !== expectedHash) fail("SESSION_TAMPERED");
+  if (sessionIntegrityDigest(input) !== expectedHash) fail("SESSION_TAMPERED");
   const result = executeT20Command(input as unknown as T20Session, command);
   const session = result.session as unknown as RosterT20Session;
-  verifiedSessions.set(session, hash(session));
+  verifiedSessions.set(session, sessionIntegrityDigest(session));
   return { session, receipt: result.receipt };
 }
 

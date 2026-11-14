@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "command": {
+      "type": "string",
+      "const": "SET_ACADEMY_PROSPECT_QUEUE"
+    },
+    "prospectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "queuedForPromotion": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "command",
+    "prospectId",
+    "queuedForPromotion"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SetAcademyProspectQueueRequest:1",
+  "title": "SetAcademyProspectQueueRequest"
+}

@@ -244,8 +244,17 @@ async function rebindManaged(): Promise<string | null> {
     launch.scheduleSha256 !== binding.scheduleSha256 || launch.careerStateSha256 !== binding.careerStateSha256
   ) return "The saved career binding does not match its launch and was preserved.";
   if (launch.matchGameId !== gameId || launch.matchId !== String(session.setup.matchId)) return "The saved match does not belong to the career fixture.";
-  const requestedCopy = launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? launch.worldCopy : null;
-  const requestedRoster = launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? launch.rosterPack : null;
+  const requestedCopy =
+    launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2"
+      ? launch.worldCopy
+      : launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+        ? (launch.worldCopy ?? null)
+        : null;
+  const requestedRoster =
+    launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ||
+    launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+      ? launch.rosterPack
+      : null;
   if (canonicalJson(requestedCopy) !== canonicalJson(activeWorldCopy)) return "The saved match belongs to a different world copy.";
   if (canonicalJson(requestedRoster) !== canonicalJson(activeRosterPack)) return "The saved match belongs to a different roster.";
   const result = (controller as ReturnType<typeof createMatchController>).handle({
@@ -389,7 +398,12 @@ async function commitCandidate(
       }
       return decorate(controller.currentResponse(request.requestId, "SAVE_ALREADY_EXISTS: a saved match already exists for this game. Resume it instead of starting it again."));
     }
-    activeWorldCopy = request.careerFixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? request.careerFixture.worldCopy : request.worldCopy ?? null;
+    activeWorldCopy =
+      request.careerFixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2"
+        ? request.careerFixture.worldCopy
+        : request.careerFixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+          ? (request.careerFixture.worldCopy ?? null)
+          : (request.worldCopy ?? null);
     activeRosterPack = request.rosterPack ?? null;
     activeSaveId = candidateId;
     readOnly = !(await repository.acquireLease(activeSaveId, ownerId, nowMs()));
@@ -770,8 +784,17 @@ async function handleInner(raw: unknown): Promise<Response> {
     const matchesCareerFixture =
       current?.setup.gameId === request.careerFixture.matchGameId &&
       current?.setup.matchId === request.careerFixture.matchId;
-    const requestedCopy = request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? request.careerFixture.worldCopy : null;
-    const requestedRoster = request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? request.careerFixture.rosterPack : null;
+    const requestedCopy =
+      request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2"
+        ? request.careerFixture.worldCopy
+        : request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+          ? (request.careerFixture.worldCopy ?? null)
+          : null;
+    const requestedRoster =
+      request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ||
+      request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+        ? request.careerFixture.rosterPack
+        : null;
     if (matchesCareerFixture && canonicalJson(requestedCopy) !== canonicalJson(activeWorldCopy)) {
       return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different world copy."));
     }

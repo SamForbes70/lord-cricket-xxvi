@@ -8,7 +8,7 @@ The management UI does not own cricket truth. It renders and commands `CareerApp
 
 The default application route is the management career. `#exhibition` opens the inherited exhibition / interactive match application.
 
-Management screens are Home, Career, Squad, Fixtures, Statistics and Settings. Careers support both V0.1 single-season saves (`LC_T20_SEASON_SAVE_V1`) and Stage 2 persistent multi-season worlds (`LC_PERSISTENT_WORLD_V1`), labelling fictional data, `SYNTHETIC_ALPHA`, disabled DLS, and Stage 2's pre-lifecycle/pre-economy boundary.
+Management screens are Home, Career, Squad, Fixtures, Statistics and Settings. Careers support V0.1 single-season saves (`LC_T20_SEASON_SAVE_V1`), Stage 2 persistent multi-season worlds (`LC_PERSISTENT_WORLD_V1`), and Stage 3 player-lifecycle persistent worlds (`LC_PERSISTENT_WORLD_V2_LIFECYCLE`), labelling fictional data, `SYNTHETIC_ALPHA`, `LC_PLAYER_LIFECYCLE_MODEL_FICTIONAL_V1` (`FICTIONAL_GAMEPLAY_PLACEHOLDER`), disabled DLS, and deferred Stage 4 contracts/finances.
 Interactive T20 matches provide optional tactical captain delegation; the fixture autopilot remains a separate baseline policy.
 
 ## Managed fixture integration

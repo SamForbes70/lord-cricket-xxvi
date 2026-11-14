@@ -50,7 +50,7 @@ export const CompletedSeasonRecordCoreSchema = z.strictObject({
   runnerUpTeamId: IDSchema,
   seasonArchive: SeasonArchiveSchema,
   table: z.array(SeasonTeamTableRowSchema).length(8),
-  players: z.array(SeasonPlayerStatsSchema).max(160),
+  players: z.array(SeasonPlayerStatsSchema).max(10000),
   leaders: SeasonLeaderboardsSchema,
   completedMatches: z.array(T20SeasonMatchCompletionSchema).length(56),
 });
@@ -128,7 +128,7 @@ export const PersistentCareerProjectionCoreSchema = z.strictObject({
   totalMatchesApplied: CounterSchema,
   rollOfHonour: z.array(SeasonRollOfHonourEntrySchema).max(MAX_PERSISTENT_SEASONS),
   teamHistory: z.array(PersistentCareerTeamHistoryRowSchema).length(8),
-  players: z.array(PersistentCareerPlayerStatsSchema).max(160),
+  players: z.array(PersistentCareerPlayerStatsSchema).max(10000),
   leaders: SeasonLeaderboardsSchema,
 });
 

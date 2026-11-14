@@ -52,20 +52,41 @@ export function stageRosterImport(text: string, allowedRules: readonly string[],
   return { world, sourceHash, priorFields };
 }
 
+const verifiedRosterPacks = new WeakMap<object, Set<string>>();
+const cachedPackDigests = new WeakMap<object, { worldHash: string; rosterPackHash: string }>();
+const cachedRuleDigests = new Map<string, string>();
+function rosterPackScopeKey(allowedRules: readonly string[], allowedVariations: readonly string[]): string {
+  return `${allowedRules.join(",")}|${allowedVariations.join(",")}`;
+}
+function rememberVerifiedRosterPack(pack: StagedRosterPack, scopeKey: string): StagedRosterPack {
+  freezeCopy(pack);
+  let scopes = verifiedRosterPacks.get(pack);
+  if (!scopes) {
+    scopes = new Set<string>();
+    verifiedRosterPacks.set(pack, scopes);
+  }
+  scopes.add(scopeKey);
+  return pack;
+}
+
 function buildStagedRosterPack(sourceText: string, allowedRules: readonly string[], allowedVariations: readonly string[]): StagedRosterPack {
   return StagedRosterPackSchema.parse({ version: "LC_STAGED_ROSTER_PACK_V1", sourceText, ...stageRosterImport(sourceText, allowedRules, allowedVariations) });
 }
 export function createStagedRosterPack(sourceText: string, allowedRules: readonly string[], allowedVariations: readonly string[]): StagedRosterPack {
   const pack = buildStagedRosterPack(sourceText, allowedRules, allowedVariations);
   if (new TextEncoder().encode(canonicalJson(pack)).byteLength > ROSTER_NEW_PACK_MAX_BYTES) throw new Error("Roster pack exceeds the 8 MiB limit for new games.");
-  return pack;
+  return rememberVerifiedRosterPack(pack, rosterPackScopeKey(allowedRules, allowedVariations));
 }
 
 export function validateStagedRosterPack(raw: unknown, allowedRules: readonly string[], allowedVariations: readonly string[]): StagedRosterPack {
+  const scopeKey = rosterPackScopeKey(allowedRules, allowedVariations);
+  if (raw !== null && typeof raw === "object" && Object.isFrozen(raw) && verifiedRosterPacks.get(raw)?.has(scopeKey)) {
+    return raw as StagedRosterPack;
+  }
   const pack = StagedRosterPackSchema.parse(raw);
   const rebuilt = buildStagedRosterPack(pack.sourceText, allowedRules, allowedVariations);
   if (canonicalJson(pack) !== canonicalJson(rebuilt)) throw new Error("Roster pack contents do not match the staged source and priors.");
-  return pack;
+  return rememberVerifiedRosterPack(pack, scopeKey);
 }
 
 export function validateRosterMatchSelection(rawPack: unknown, rawSelection: unknown, allowedRules: readonly string[], allowedVariations: readonly string[]) {
@@ -106,11 +127,22 @@ export function prepareRosterMatch(rawPack: unknown, rawRequest: unknown) {
     const team = pack.world.teams.find(item => item.teamId === selected.teamId)!;
     return { teamId: team.teamId, name: team.name, colours: team.colours, playerIds: selected.playerIds, xi: selected.playerIds.map(id => byId.get(id)!), captainId: selected.captainId, keeperId: selected.keeperId };
   });
+  let digests = cachedPackDigests.get(pack);
+  if (!digests) {
+    const h = createStateHasher().hash;
+    digests = { worldHash: h(pack.world), rosterPackHash: h(pack) };
+    if (Object.isFrozen(pack)) cachedPackDigests.set(pack, digests);
+  }
+  let rulesHash = cachedRuleDigests.get(rule.rulesId);
+  if (!rulesHash) {
+    rulesHash = createStateHasher().hash(rule);
+    cachedRuleDigests.set(rule.rulesId, rulesHash);
+  }
   const setup = structuredClone({
     version: "LC_ROSTER_MATCH_PREPARATION_V1" as const,
     gameId: request.gameId, matchId: request.matchId, seed: request.seed, format: request.format,
-    worldHash: createStateHasher().hash(pack.world), rosterPackHash: createStateHasher().hash(pack),
-    rulesId: rule.rulesId, rulesHash: createStateHasher().hash(rule), modelHash: MODEL_PACK_SHA256, stagePackHash: DELIVERY_STAGE_PACK_SHA256,
+    worldHash: digests.worldHash, rosterPackHash: digests.rosterPackHash,
+    rulesId: rule.rulesId, rulesHash, modelHash: MODEL_PACK_SHA256, stagePackHash: DELIVERY_STAGE_PACK_SHA256,
     ground: pack.world.grounds.find(item => item.groundId === selection.groundId)!, teams,
   });
   return freezeCopy(setup);

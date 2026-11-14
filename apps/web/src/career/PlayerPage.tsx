@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import type {
   PersistentCareerPlayerStats,
+  PlayerLifecycleSkillLedgerEntry,
+  RetiredPlayerRecord,
   SeasonPlayerStats,
   SquadPlayerTrainingConditionView,
   WorldPack,
@@ -44,6 +46,10 @@ export function PlayerPage({
   stats,
   careerStats = null,
   seasonBreakdown = [],
+  age = null,
+  retiredRecord = null,
+  skillLedgerEntry = null,
+  lastTeamName = null,
   format,
   onFormat,
   onBack,
@@ -54,6 +60,10 @@ export function PlayerPage({
   stats: SeasonPlayerStats | null;
   careerStats?: PersistentCareerPlayerStats | null;
   seasonBreakdown?: readonly PlayerSeasonBreakdownRow[];
+  age?: number | null;
+  retiredRecord?: RetiredPlayerRecord | null;
+  skillLedgerEntry?: PlayerLifecycleSkillLedgerEntry | null;
+  lastTeamName?: string | null;
   format: Format;
   onFormat: (value: Format) => void;
   onBack: () => void;
@@ -72,10 +82,28 @@ export function PlayerPage({
       <h2 id="player-heading" ref={heading} tabIndex={-1}>
         Player: {player.name}
       </h2>
-      <p>
+      <p data-testid="player-bio-line">
         {player.playerId} · {player.role.replaceAll("_", " ")} ·{" "}
         {player.batHand === "L" ? "Left" : "Right"}-hand batting
+        {age !== null ? ` · Age ${age}` : ""}
+        {skillLedgerEntry ? ` · Debut Season ${skillLedgerEntry.debutSeasonNumber}` : ""}
       </p>
+      {retiredRecord && (
+        <div
+          className="career-panel retired-banner"
+          role="status"
+          data-testid="retired-player-banner"
+          style={{ marginBottom: "14px" }}
+        >
+          <strong>Retired alumni record</strong>
+          <p>
+            Retired at age {retiredRecord.ageAtRetirement} after Season{" "}
+            {retiredRecord.retiredAfterSeasonNumber} ({retiredRecord.retiredCalendarYear})
+            {lastTeamName ? ` · Final club: ${lastTeamName}` : ""} · Reason:{" "}
+            {retiredRecord.retirementReason.replaceAll("_", " ").toLowerCase()}.
+          </p>
+        </div>
+      )}
       <label>
         Player format{" "}
         <select
@@ -91,21 +119,51 @@ export function PlayerPage({
         </select>
       </label>
       <div className="player-detail-grid">
-        <section className="career-panel" aria-labelledby="player-skills">
+        <section className="career-panel" aria-labelledby="player-skills" data-testid="player-skill-ledger">
           <h3 id="player-skills">Base skills</h3>
-          <p>Fictional {labels[format]} ratings, from 0 to 100.</p>
+          <p>
+            Fictional {labels[format]} ratings, from 0 to 100.
+            {skillLedgerEntry && format === "T20"
+              ? " Permanent off-season progression uses fictional lifecycle parameters (separate from temporary readiness)."
+              : ""}
+          </p>
           <dl className="player-details">
-            {skillNames.map(([key, label]) => (
-              <React.Fragment key={key}>
-                <dt>{label}</dt>
-                <dd>{player.skills[format][key]}</dd>
-              </React.Fragment>
-            ))}
+            {skillNames.map(([key, label]) => {
+              const currentRating = player.skills[format][key];
+              const careerDelta =
+                format === "T20" && skillLedgerEntry
+                  ? currentRating - skillLedgerEntry.careerEntryT20Skills[key]
+                  : 0;
+              const seasonDelta =
+                format === "T20" && skillLedgerEntry
+                  ? currentRating - skillLedgerEntry.priorSeasonT20Skills[key]
+                  : 0;
+              return (
+                <React.Fragment key={key}>
+                  <dt>{label}</dt>
+                  <dd>
+                    {currentRating}
+                    {seasonDelta !== 0 && (
+                      <small style={{ marginLeft: "6px" }}>
+                        ({seasonDelta > 0 ? `+${seasonDelta}` : seasonDelta} last off-season)
+                      </small>
+                    )}
+                    {seasonDelta === 0 && careerDelta !== 0 && (
+                      <small style={{ marginLeft: "6px" }}>
+                        ({careerDelta > 0 ? `+${careerDelta}` : careerDelta} career)
+                      </small>
+                    )}
+                  </dd>
+                </React.Fragment>
+              );
+            })}
           </dl>
         </section>
         <section className="career-panel" aria-labelledby="player-condition">
           <h3 id="player-condition">Current condition</h3>
-          {condition ? (
+          {retiredRecord ? (
+            <p>Player is retired from active squad duty. Historical skills and career records remain preserved.</p>
+          ) : condition ? (
             <dl className="player-details">
               <dt>Availability</dt>
               <dd>

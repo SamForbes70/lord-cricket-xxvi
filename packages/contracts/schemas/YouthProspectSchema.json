@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "prospectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "generatedInSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "generatedCalendarYear": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 9999
+    },
+    "intakeRank": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "fictionalCeilingTier": {
+      "type": "string",
+      "enum": [
+        "ACADEMY_GRADUATE",
+        "FIRST_TEAM_PROSPECT",
+        "HIGH_CEILING_PROSPECT"
+      ]
+    },
+    "academyFocus": {
+      "type": "string",
+      "enum": [
+        "BALANCED",
+        "BATTING_PRACTICE",
+        "BOWLING_PRACTICE",
+        "FIELDING_PRACTICE"
+      ]
+    },
+    "queuedForPromotion": {
+      "type": "boolean"
+    },
+    "promotedInSeasonNumber": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "player": {
+      "type": "object",
+      "properties": {
+        "playerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[\\s\\S]{1,80}$"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+        },
+        "batHand": {
+          "type": "string",
+          "enum": [
+            "R",
+            "L"
+          ]
+        },
+        "bowlHand": {
+          "type": "string",
+          "enum": [
+            "R",
+            "L"
+          ]
+        },
+        "bowlingStyle": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "FAST",
+                "MEDIUM",
+                "OFF_SPIN",
+                "LEG_SPIN",
+                "SLOW_LEFT_ARM",
+                "LEFT_ARM_WRIST"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "BATTER",
+            "BOWLER",
+            "ALLROUNDER",
+            "KEEPER"
+          ]
+        },
+        "skills": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "enum": [
+              "T20",
+              "ODI",
+              "RED_BALL"
+            ]
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "defence": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "timing": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "power": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "rotation": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "vsPace": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "vsSpin": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "control": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "movement": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "variation": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "stamina": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "catching": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "groundFielding": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "throwing": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "keeping": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "defence",
+              "timing",
+              "power",
+              "rotation",
+              "vsPace",
+              "vsSpin",
+              "control",
+              "movement",
+              "variation",
+              "stamina",
+              "catching",
+              "groundFielding",
+              "throwing",
+              "keeping"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "variations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "shotSectorWeights": {
+          "minItems": 8,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "exposureBalls": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "enum": [
+              "T20",
+              "ODI",
+              "RED_BALL"
+            ]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "FICTIONAL",
+                "LICENSED",
+                "USER_SUPPLIED"
+              ]
+            },
+            "sourceId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "sourceHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "confidenceBp": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            }
+          },
+          "required": [
+            "kind",
+            "sourceId",
+            "sourceHash",
+            "confidenceBp"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "playerId",
+        "name",
+        "birthDate",
+        "batHand",
+        "bowlHand",
+        "bowlingStyle",
+        "role",
+        "skills",
+        "variations",
+        "shotSectorWeights",
+        "exposureBalls",
+        "provenance"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "prospectId",
+    "teamId",
+    "generatedInSeasonNumber",
+    "generatedCalendarYear",
+    "intakeRank",
+    "fictionalCeilingTier",
+    "academyFocus",
+    "queuedForPromotion",
+    "promotedInSeasonNumber",
+    "player"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:YouthProspect:1",
+  "title": "YouthProspect"
+}

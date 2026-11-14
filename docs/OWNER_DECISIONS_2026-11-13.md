@@ -34,3 +34,8 @@ Why this figure. An 8 GB laptop must also run the operating system and other app
 
 - The owner (Sam Forbes) accepted **Stage 2: Persistent multi-season world** (`feat/stage2-persistent-world`, [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)) on 14 November 2026 (Australia/Brisbane), authorised pushing `feat/stage2-persistent-world` and merging it to `main`, and authorised proceeding into **Stage 3: Player lifecycle and youth pathway**.
 - Hosted GitHub Actions (`Linux` and `Windows`) run after push; local Linux core (`736/736` unit tests, `207` JSON Schemas), smoke (`23/23`), and Chromium + Firefox Stage 2 browser checks passed prior to merge.
+
+## Owner decision, 14 November 2026 — Stage 3 (Player lifecycle and youth pathway)
+
+- The owner (Sam Forbes) accepted **Stage 3: Player lifecycle and youth pathway** (`feat/stage3-player-lifecycle`, [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md)) on 14 November 2026 (Australia/Brisbane), authorised committing and pushing `feat/stage3-player-lifecycle` and merging it to `main`, and authorised proceeding into **Stage 4: Contracts, budgets and recruitment**.
+- Local Linux core (`740/740` unit tests across `65/65` files, `235` JSON Schemas), 20-season diagnostic horizon (`0` role shortages across all 20 seasons), and Chromium + Firefox Stage 3 + Stage 2 + regression browser checks passed prior to merge; hosted GitHub Actions (`Linux` and `Windows`) run after push.

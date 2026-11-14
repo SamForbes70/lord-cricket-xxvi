@@ -103,6 +103,12 @@ export const CareerFixtureLaunchSchema = z.discriminatedUnion("launchVersion", [
   z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V1") }),
   z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V2"), worldCopy: NewGameWorldCopySchema }),
   z.strictObject({ ...careerFixtureShape, launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER"), rosterPack: StagedRosterPackSchema }),
+  z.strictObject({
+    ...careerFixtureShape,
+    launchVersion: z.literal("LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"),
+    rosterPack: StagedRosterPackSchema,
+    worldCopy: NewGameWorldCopySchema.optional(),
+  }),
 ]);
 
 export const RequestSchema = z.discriminatedUnion("type", [

@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "fromSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 199
+    },
+    "toSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "calendarYear": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 9999
+    },
+    "agedPlayerCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "developedPlayers": {
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "ageBefore": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 60
+          },
+          "ageAfter": {
+            "type": "integer",
+            "minimum": 16,
+            "maximum": 61
+          },
+          "matchesPlayed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 56
+          },
+          "ballsFaced": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ballsBowled": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "battingPracticeDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 366
+          },
+          "bowlingPracticeDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 366
+          },
+          "fieldingPracticeDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 366
+          },
+          "restDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 366
+          },
+          "deltas": {
+            "type": "object",
+            "properties": {
+              "battingDelta": {
+                "type": "integer",
+                "minimum": -25,
+                "maximum": 25
+              },
+              "bowlingDelta": {
+                "type": "integer",
+                "minimum": -25,
+                "maximum": 25
+              },
+              "fieldingDelta": {
+                "type": "integer",
+                "minimum": -25,
+                "maximum": 25
+              },
+              "keepingDelta": {
+                "type": "integer",
+                "minimum": -25,
+                "maximum": 25
+              },
+              "staminaDelta": {
+                "type": "integer",
+                "minimum": -25,
+                "maximum": 25
+              }
+            },
+            "required": [
+              "battingDelta",
+              "bowlingDelta",
+              "fieldingDelta",
+              "keepingDelta",
+              "staminaDelta"
+            ],
+            "additionalProperties": false
+          },
+          "phaseLabel": {
+            "type": "string",
+            "enum": [
+              "YOUTH_GROWTH",
+              "EARLY_DEVELOPMENT",
+              "PRIME_MAINTENANCE",
+              "VETERAN_DECLINE"
+            ]
+          }
+        },
+        "required": [
+          "playerId",
+          "teamId",
+          "ageBefore",
+          "ageAfter",
+          "matchesPlayed",
+          "ballsFaced",
+          "ballsBowled",
+          "battingPracticeDays",
+          "bowlingPracticeDays",
+          "fieldingPracticeDays",
+          "restDays",
+          "deltas",
+          "phaseLabel"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "retiredPlayerIds": {
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "promotedYouthIds": {
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "generatedYouthIds": {
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "transitionSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "fromSeasonNumber",
+    "toSeasonNumber",
+    "calendarYear",
+    "agedPlayerCount",
+    "developedPlayers",
+    "retiredPlayerIds",
+    "promotedYouthIds",
+    "generatedYouthIds",
+    "transitionSha256"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SeasonLifecycleTransitionRecord:1",
+  "title": "SeasonLifecycleTransitionRecord"
+}

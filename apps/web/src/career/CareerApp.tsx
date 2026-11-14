@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
+  AcademyTrainingFocus,
   SeasonCheckpointInspection,
   T20SeasonMatchCompletion,
   TrainingDirective,
@@ -78,6 +79,13 @@ type StatsScope = "ACTIVE" | "ALL_TIME" | number;
 
 const directives: TrainingDirective[] = [
   "REST",
+  "BATTING_PRACTICE",
+  "BOWLING_PRACTICE",
+  "FIELDING_PRACTICE",
+];
+
+const academyFocusOptions: AcademyTrainingFocus[] = [
+  "BALANCED",
   "BATTING_PRACTICE",
   "BOWLING_PRACTICE",
   "FIELDING_PRACTICE",
@@ -166,6 +174,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   const [reducedMotion, setReducedMotion] = useState(() => localStorage.getItem("lcxxvi-career-motion") === "reduced");
   const state = service.getState();
   const persistentWorld = service.getPersistentState();
+  const lifecycleState = service.getLifecycleState();
+  const latestTransition = service.latestLifecycleTransition();
 
   useEffect(() => service.subscribe(() => redraw((value) => value + 1)), []);
   useEffect(() => {
@@ -561,8 +571,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               <p className="replay-meta" data-testid="replay-archive-meta">
                 Archive <code>{archive.archiveVersion}</code> · {replay.eventCount} events ·{" "}
                 {replay.deliveries.length} deliveries · Final event hash{" "}
-                <code>{replay.finalEventHash.slice(0, 16)}…</code> ·{" "}
-                {archive.byteLength.toLocaleString()} bytes
+                <code>{replay.finalEventHash.slice(0, 16)}…</code>
+                {"byteLength" in archive ? ` · ${archive.byteLength.toLocaleString()} bytes` : ""}
               </p>
               <div className="action-row" role="group" aria-label="Replay innings selection">
                 {[0, 1].map((idx) => {
@@ -656,8 +666,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         </header>
         <section className="career-disclosure" aria-label="Product status">
           <strong>Playable alpha.</strong> Fictional eight-team dataset · SYNTHETIC_ALPHA model ·
-          persistent multi-season T20 world · no transfers, contracts, finances, permanent ageing,
-          international management or verified DLS.
+          persistent multi-season T20 world with fictional player lifecycle &amp; youth pathway · no
+          transfers, contracts, finances, international management or verified DLS.
         </section>
         {activeError && <ErrorBanner rawError={activeError} />}
         {checkpointInspectorSection}
@@ -895,9 +905,34 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
 
       <section className="career-disclosure compact" aria-label="Model disclosure">
         {persistentWorld
-          ? `Fictional data · SYNTHETIC_ALPHA · persistent world (${persistentWorld.completedSeasons.length} completed seasons) · contracts and permanent ageing deferred · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
+          ? lifecycleState
+            ? `Fictional data · SYNTHETIC_ALPHA · persistent world V2 (${persistentWorld.completedSeasons.length} completed seasons) · fictional player lifecycle (${lifecycleState.model.modelVersion}) · contracts and finances deferred · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
+            : `Fictional data · SYNTHETIC_ALPHA · Stage 2 V1 persistent world (${persistentWorld.completedSeasons.length} completed seasons) · permanent ageing and contracts deferred in V1 · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
           : "Fictional data · SYNTHETIC_ALPHA · legacy V0.1 single-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI."}
       </section>
+      {persistentWorld && !lifecycleState && (
+        <section className="career-panel" aria-label="Player lifecycle upgrade">
+          <p>
+            This save uses Stage 2 <code>LC_PERSISTENT_WORLD_V1</code> (no permanent ageing or youth
+            intake). You can create a Stage 3 <code>LC_PERSISTENT_WORLD_V2_LIFECYCLE</code> copy in
+            a new slot while keeping this V1 save untouched.
+          </p>
+          <button
+            type="button"
+            data-testid="upgrade-v1-to-lifecycle-btn"
+            disabled={busy || inspectionOnly || service.isReadOnly()}
+            onClick={() =>
+              void action(async () => {
+                await service.upgradeStage2V1ToStage3V2();
+                setActiveReplay(null);
+                setStatsScope("ACTIVE");
+              })
+            }
+          >
+            Create V2 player lifecycle copy
+          </button>
+        </section>
+      )}
       <section className="career-panel" aria-label="Manual career copy">
         <label>
           Copy name{" "}
@@ -1148,6 +1183,38 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
             </div>
           </div>
           {replayViewerSection}
+          {latestTransition && (
+            <section
+              className="career-panel"
+              aria-labelledby="lifecycle-transition-heading"
+              data-testid="offseason-lifecycle-report"
+              style={{ marginTop: "18px", marginBottom: "18px" }}
+            >
+              <h3 id="lifecycle-transition-heading">
+                Off-season lifecycle report · Season {latestTransition.fromSeasonNumber} to Season{" "}
+                {latestTransition.toSeasonNumber} ({latestTransition.calendarYear})
+              </h3>
+              <p>
+                Fictional lifecycle parameters (<code>{lifecycleState?.model.modelVersion}</code>) —
+                permanent off-season ageing, training progression, retirements, and youth intake.
+              </p>
+              <p>
+                <strong>{latestTransition.agedPlayerCount}</strong> aged ·{" "}
+                <strong>{latestTransition.developedPlayers.length}</strong> developed ·{" "}
+                <strong>{latestTransition.retiredPlayerIds.length}</strong> retired ·{" "}
+                <strong>{latestTransition.promotedYouthIds.length}</strong> youth promoted ·{" "}
+                <strong>{latestTransition.generatedYouthIds.length}</strong> new academy prospects
+              </p>
+              {latestTransition.retiredPlayerIds.length > 0 && (
+                <p>
+                  Retirements:{" "}
+                  {latestTransition.retiredPlayerIds
+                    .map((id) => service.playerName(id))
+                    .join(", ")}
+                </p>
+              )}
+            </section>
+          )}
           {persistentWorld && persistentWorld.completedSeasons.length > 0 && (
             <section
               className="career-panel"
@@ -1338,14 +1405,16 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         <section aria-labelledby="squad-heading">
           <h2 id="squad-heading">Squad</h2>
           <p>
-            Training changes affect temporary readiness and daily recovery only. Permanent ageing
-            and skill progression remain deferred to Stage 3.
+            {lifecycleState
+              ? "Daily training directives affect temporary readiness, daily fatigue recovery, and accumulated season exposure used for off-season fictional skill progression."
+              : "Training changes affect temporary readiness and daily recovery only."}
           </p>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Player</th>
+                  {lifecycleState && <th>Age</th>}
                   <th>Role</th>
                   <th>Availability</th>
                   <th>Fatigue</th>
@@ -1360,6 +1429,14 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                   const player = displayWorld.players.find(
                     (candidate) => candidate.playerId === condition.playerId,
                   )!;
+                  const age = service.playerAge(player.birthDate);
+                  const ledger = service.playerLifecycleLedgerEntry(player.playerId);
+                  const lastNetDelta =
+                    ledger
+                      ? ledger.lastSeasonDelta.battingDelta +
+                        ledger.lastSeasonDelta.bowlingDelta +
+                        ledger.lastSeasonDelta.fieldingDelta
+                      : 0;
                   return (
                     <tr key={condition.playerId}>
                       <td>
@@ -1372,8 +1449,14 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                         >
                           {player.name}
                         </button>
-                        <small>{player.playerId}</small>
+                        <small>
+                          {player.playerId}
+                          {lastNetDelta !== 0
+                            ? ` · Off-season ${lastNetDelta > 0 ? `+${lastNetDelta}` : lastNetDelta}`
+                            : ""}
+                        </small>
                       </td>
+                      {lifecycleState && <td>{age ?? "–"}</td>}
                       <td>{player.role}</td>
                       <td>
                         {condition.availability}
@@ -1429,6 +1512,182 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               </tbody>
             </table>
           </div>
+          {lifecycleState && (
+            <section
+              className="career-panel"
+              aria-labelledby="youth-academy-heading"
+              data-testid="youth-academy-panel"
+              style={{ marginTop: "18px" }}
+            >
+              <h3 id="youth-academy-heading">Youth academy pathway</h3>
+              <p>
+                Academy prospects use fictional ceiling tiers (
+                <code>{lifecycleState.model.modelVersion}</code>). Set training focus, queue
+                prospects for automatic off-season promotion, or promote directly before Round 1.
+              </p>
+              {service.managedYouthAcademyProspects().length === 0 ? (
+                <p>No active academy prospects remain for {service.teamName(controlledTeam)} this season.</p>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Prospect</th>
+                        <th>Age</th>
+                        <th>Role</th>
+                        <th>Ceiling tier</th>
+                        <th>Key T20 skills</th>
+                        <th>Academy focus</th>
+                        <th>Off-season queue</th>
+                        <th>Pre-season</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {service.managedYouthAcademyProspects().map((prospect) => {
+                        const t20 = prospect.player.skills.T20;
+                        const prospectAge = persistentWorld
+                          ? Math.max(
+                              16,
+                              persistentWorld.currentCalendarYear -
+                                Number.parseInt(prospect.player.birthDate.slice(0, 4), 10),
+                            )
+                          : 18;
+                        const canPromoteNow =
+                          state.phase === "ACTIVE" &&
+                          state.completedMatches.length === 0 &&
+                          !busy &&
+                          !inspectionOnly &&
+                          !service.isReadOnly();
+                        return (
+                          <tr key={prospect.prospectId} data-testid={`youth-row-${prospect.prospectId}`}>
+                            <td>
+                              <strong>{prospect.player.name}</strong>
+                              <small>{prospect.prospectId}</small>
+                            </td>
+                            <td>{prospectAge}</td>
+                            <td>{prospect.player.role.replaceAll("_", " ")}</td>
+                            <td>{prospect.fictionalCeilingTier.replaceAll("_", " ")}</td>
+                            <td>
+                              Tim {t20.timing} · Pow {t20.power} · Ctl {t20.control} · Cat{" "}
+                              {t20.catching}
+                            </td>
+                            <td>
+                              <label
+                                className="sr-label"
+                                htmlFor={`academy-focus-${prospect.prospectId}`}
+                              >
+                                Academy focus for {prospect.player.name}
+                              </label>
+                              <select
+                                id={`academy-focus-${prospect.prospectId}`}
+                                disabled={busy || inspectionOnly || service.isReadOnly()}
+                                value={prospect.academyFocus}
+                                onChange={(event) =>
+                                  void action(async () => {
+                                    await service.setYouthProspectFocus(
+                                      prospect.prospectId,
+                                      event.currentTarget.value as AcademyTrainingFocus,
+                                    );
+                                  })
+                                }
+                              >
+                                {academyFocusOptions.map((opt) => (
+                                  <option key={opt} value={opt}>
+                                    {opt.replaceAll("_", " ")}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td>
+                              <label className="check-label">
+                                <input
+                                  type="checkbox"
+                                  aria-label={`Queue ${prospect.player.name} for off-season promotion`}
+                                  disabled={busy || inspectionOnly || service.isReadOnly()}
+                                  checked={prospect.queuedForPromotion}
+                                  onChange={(event) =>
+                                    void action(async () => {
+                                      await service.setYouthProspectQueue(
+                                        prospect.prospectId,
+                                        event.currentTarget.checked,
+                                      );
+                                    })
+                                  }
+                                />{" "}
+                                Queue
+                              </label>
+                            </td>
+                            <td>
+                              <button
+                                type="button"
+                                disabled={!canPromoteNow}
+                                aria-label={`Promote ${prospect.player.name} now`}
+                                onClick={() =>
+                                  void action(async () => {
+                                    await service.promoteYouthProspectNow(prospect.prospectId);
+                                  })
+                                }
+                              >
+                                Promote now
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
+          {lifecycleState && lifecycleState.retiredPlayers.length > 0 && (
+            <section
+              className="career-panel"
+              aria-labelledby="retired-alumni-heading"
+              data-testid="retired-players-panel"
+              style={{ marginTop: "18px" }}
+            >
+              <h3 id="retired-alumni-heading">Retired alumni directory</h3>
+              <p>Retired players keep permanent player pages, skill histories, and career statistics.</p>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Player</th>
+                      <th>Last club</th>
+                      <th>Retired after</th>
+                      <th>Age at retirement</th>
+                      <th>Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lifecycleState.retiredPlayers.map((retired) => (
+                      <tr key={retired.playerId}>
+                        <td>
+                          <button
+                            type="button"
+                            className="player-link"
+                            id={`player-link-SQUAD-${retired.playerId}`}
+                            aria-label={`View retired player ${retired.player.name}`}
+                            onClick={() => openPlayer(retired.playerId, "SQUAD")}
+                          >
+                            {retired.player.name}
+                          </button>
+                          <small>{retired.playerId}</small>
+                        </td>
+                        <td>{service.teamName(retired.lastTeamId)}</td>
+                        <td>
+                          Season {retired.retiredAfterSeasonNumber} ({retired.retiredCalendarYear})
+                        </td>
+                        <td>{retired.ageAtRetirement}</td>
+                        <td>{retired.retirementReason.replaceAll("_", " ").toLowerCase()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
         </section>
       )}
 
@@ -1805,8 +2064,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
 
       {screen === "PLAYER" &&
         (() => {
-          const player = displayWorld.players.find((candidate) => candidate.playerId === playerId);
-          if (!player) return null;
+          const resolved = playerId ? service.findPlayerIncludingRetired(playerId) : null;
+          if (!resolved) return null;
+          const { player, retired } = resolved;
           const careerStats =
             persistentWorld?.careerProjection.players.find(
               (candidate) => candidate.playerId === player.playerId,
@@ -1826,27 +2086,60 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                       : null;
                   })
                   .filter((row): row is PlayerSeasonBreakdownRow => row !== null),
-                ...(() => {
+                ...((): PlayerSeasonBreakdownRow[] => {
                   const activeRow = state.projection.players.find(
                     (p) => p.playerId === player.playerId,
                   );
-                  return activeRow
-                    ? [
-                        {
-                          seasonNumber: persistentWorld.currentSeasonNumber,
-                          calendarYear: persistentWorld.currentCalendarYear,
-                          phase: state.phase,
-                          stats: activeRow,
+                  if (activeRow) {
+                    return [
+                      {
+                        seasonNumber: persistentWorld.currentSeasonNumber,
+                        calendarYear: persistentWorld.currentCalendarYear,
+                        phase: state.phase,
+                        stats: activeRow,
+                      },
+                    ];
+                  }
+                  if (!retired) {
+                    const activeTeamId: string =
+                      displayWorld.teams.find((t) => t.squadIds.includes(player.playerId))?.teamId ??
+                      persistentWorld.controlledTeamId ??
+                      "team01";
+                    return [
+                      {
+                        seasonNumber: persistentWorld.currentSeasonNumber,
+                        calendarYear: persistentWorld.currentCalendarYear,
+                        phase: state.phase,
+                        stats: {
+                          playerId: player.playerId,
+                          teamId: activeTeamId,
+                          matches: 0,
+                          runs: 0,
+                          dismissals: 0,
+                          ballsFaced: 0,
+                          fours: 0,
+                          sixes: 0,
+                          battingAverageX100: null,
+                          strikeRateX100: null,
+                          bowlingRunsConceded: 0,
+                          bowlingLegalBalls: 0,
+                          bowlingWickets: 0,
+                          maidens: 0,
+                          bowlingAverageX100: null,
+                          economyX100: null,
+                          bowlingStrikeRateX100: null,
                         },
-                      ]
-                    : [];
+                      },
+                    ];
+                  }
+                  return [];
                 })(),
               ]
             : [];
           return (
             <PlayerPage
               player={player}
-              condition={service.playerCondition(player.playerId)}
+              condition={retired ? null : service.playerCondition(player.playerId)}
               stats={
                 state.projection.players.find(
                   (candidate) => candidate.playerId === player.playerId,
@@ -1854,6 +2147,10 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               }
               careerStats={careerStats}
               seasonBreakdown={breakdown}
+              age={service.playerAge(player.birthDate)}
+              retiredRecord={retired}
+              skillLedgerEntry={service.playerLifecycleLedgerEntry(player.playerId)}
+              lastTeamName={retired ? service.teamName(retired.lastTeamId) : null}
               format={playerFormat}
               onFormat={changePlayerFormat}
               onBack={() => {

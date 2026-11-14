@@ -27,11 +27,23 @@ export function regenerateManagedResult(
 ): RegeneratedManagedResult {
   const launch: CareerFixtureLaunch = CareerFixtureLaunchSchema.parse(rawLaunch);
   const roster = saved.rosterPack ?? null;
-  if (launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER") {
-    if (!roster || canonicalJson(roster) !== canonicalJson(launch.rosterPack)) throw new Error("The saved match belongs to a different roster.");
-  } else if (roster) throw new Error("The saved match belongs to an imported roster, not this career.");
+  if (
+    launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ||
+    launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+  ) {
+    if (!roster || canonicalJson(roster) !== canonicalJson(launch.rosterPack)) {
+      throw new Error("The saved match belongs to a different roster.");
+    }
+  } else if (roster) {
+    throw new Error("The saved match belongs to an imported roster, not this career.");
+  }
   const copy = saved.worldCopy ?? null;
-  const expectedCopy = launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? launch.worldCopy : null;
+  const expectedCopy =
+    launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2"
+      ? launch.worldCopy
+      : launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+        ? (launch.worldCopy ?? null)
+        : null;
   if (canonicalJson(copy) !== canonicalJson(expectedCopy)) throw new Error("The saved match belongs to a different world copy.");
 
   const controller = createMatchController(worldBytes, manifest, () => "regeneration-never-draws");

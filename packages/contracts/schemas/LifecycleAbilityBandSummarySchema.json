@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "min": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "p10": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "median": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "meanX10": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "p90": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "max": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    }
+  },
+  "required": [
+    "min",
+    "p10",
+    "median",
+    "meanX10",
+    "p90",
+    "max"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:LifecycleAbilityBandSummary:1",
+  "title": "LifecycleAbilityBandSummary"
+}

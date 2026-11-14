@@ -41,7 +41,9 @@ Dated reports retain the results of their original runs.
 | Packaging | `npm run package:game` builds a playable zip (game, local server, launchers) and a source zip. The Windows launcher has not been run on Windows by the packager. |
 | Release record | [release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json) lists capabilities, evidence files, owner declarations, known limits and recovery instructions. A unit test fails if it cites a file that does not exist. |
 | Win prediction, super overs and DRS | Not enabled. The design brief makes win prediction optional. |
-| Lifecycle and squad economy (`Stages 3–4`) | Ageing, permanent skill development, youth intake, retirement, contracts, transfers, finances and international management are not implemented (Stage 3 active next slice; Stage 4 gated on Stage 3 acceptance). |
+| Persistent world (`Stage 2`) | Multi-season T20 worlds (`LC_PERSISTENT_WORLD_V1`), crash-safe rollover, Roll of Honour, all-time club & player statistics, cross-season replay, and non-destructive V0.1 copy-forward (`accepted` on `main` `161e781`). |
+| Player lifecycle and youth pathway (`Stage 3`) | Fictional ageing, exploit-proof off-season skill development (`LC_PLAYER_LIFECYCLE_MODEL_FICTIONAL_V1`), retirement with club role-floor guarantees, preserved retired alumni pages, youth academy intake/promotion, per-season roster-snapshotted replay (`LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE`), and 20-season diagnostics (`accepted` on `main`). |
+| Squad economy (`Stage 4`) | Domestic contracts, wages, club budgets, free agents, and recruitment are active in Stage 4; auctions and international release rules remain deferred. |
 
 Unit totals and commands belong to their dated evidence records, rather than this capability table.
 [Acceptance reconciliation](ACCEPTANCE_RECONCILIATION.md) maps completed and unrecorded gates without inferring missing results.

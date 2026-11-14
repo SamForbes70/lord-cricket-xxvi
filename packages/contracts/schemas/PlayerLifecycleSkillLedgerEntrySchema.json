@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "debutSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "careerEntryT20Skills": {
+      "type": "object",
+      "properties": {
+        "defence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "timing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "power": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "rotation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "vsPace": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "vsSpin": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "control": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "movement": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "variation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "stamina": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "catching": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "groundFielding": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "throwing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "keeping": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "defence",
+        "timing",
+        "power",
+        "rotation",
+        "vsPace",
+        "vsSpin",
+        "control",
+        "movement",
+        "variation",
+        "stamina",
+        "catching",
+        "groundFielding",
+        "throwing",
+        "keeping"
+      ],
+      "additionalProperties": false
+    },
+    "priorSeasonT20Skills": {
+      "type": "object",
+      "properties": {
+        "defence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "timing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "power": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "rotation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "vsPace": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "vsSpin": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "control": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "movement": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "variation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "stamina": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "catching": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "groundFielding": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "throwing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "keeping": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "defence",
+        "timing",
+        "power",
+        "rotation",
+        "vsPace",
+        "vsSpin",
+        "control",
+        "movement",
+        "variation",
+        "stamina",
+        "catching",
+        "groundFielding",
+        "throwing",
+        "keeping"
+      ],
+      "additionalProperties": false
+    },
+    "lastSeasonDelta": {
+      "type": "object",
+      "properties": {
+        "battingDelta": {
+          "type": "integer",
+          "minimum": -25,
+          "maximum": 25
+        },
+        "bowlingDelta": {
+          "type": "integer",
+          "minimum": -25,
+          "maximum": 25
+        },
+        "fieldingDelta": {
+          "type": "integer",
+          "minimum": -25,
+          "maximum": 25
+        },
+        "keepingDelta": {
+          "type": "integer",
+          "minimum": -25,
+          "maximum": 25
+        },
+        "staminaDelta": {
+          "type": "integer",
+          "minimum": -25,
+          "maximum": 25
+        }
+      },
+      "required": [
+        "battingDelta",
+        "bowlingDelta",
+        "fieldingDelta",
+        "keepingDelta",
+        "staminaDelta"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "playerId",
+    "debutSeasonNumber",
+    "careerEntryT20Skills",
+    "priorSeasonT20Skills",
+    "lastSeasonDelta"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PlayerLifecycleSkillLedgerEntry:1",
+  "title": "PlayerLifecycleSkillLedgerEntry"
+}

@@ -2,17 +2,25 @@ import {
   canonicalJson,
   CompletedSeasonRecordCoreSchema,
   CompletedSeasonRecordSchema,
+  LIFECYCLE_SEASON_STATE_VERSION,
   MAX_PERSISTENT_WORLD_EVENT_ARCHIVES_TOTAL_BYTES,
   PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION,
+  PERSISTENT_WORLD_STATE_V2_VERSION,
   PersistentCareerProjectionCoreSchema,
   PersistentCareerProjectionSchema,
   PersistentWorldSaveSummarySchema,
   PersistentWorldStateCoreSchema,
   PersistentWorldStateSchema,
+  PersistentWorldStateV2CoreSchema,
+  PersistentWorldStateV2Schema,
+  PlayerLifecycleStateCoreSchema,
+  PlayerLifecycleStateSchema,
   SeasonCheckpointInspectionSchema,
   SeasonDurableCommandSchema,
-  type CompletedCareerMatchEventArchive,
+  StagedRosterPackSchema,
   type CompletedSeasonRecord,
   type NewGameWorldCopy,
   type PersistentCareerProjection,
@@ -20,36 +28,71 @@ import {
   type PersistentWorldSaveSummary,
   type PersistentWorldState,
   type PersistentWorldStateCore,
+  type PersistentWorldStateV2,
+  type PersistentWorldStateV2Core,
   type SeasonCheckpointGenerationOption,
+  type ActivePersistentSeasonState,
   type SeasonCheckpointInspection,
   type SeasonDurableCommand,
+  type StagedRosterPack,
   type T20SeasonMatchCompletion,
 } from "@lcxxvi/contracts";
 import { DB_NAME, DB_VERSION } from "./index.js";
 import {
   CAREER_MATCH_EVENTS_SCOPE,
+  careerMatchEventArchiveByteLength,
   createT20SeasonArchive,
   SEASON_PRESENTATION_SAVE_SCHEMA_VERSION,
   SEASON_RECORD_TYPE,
   SEASON_SAVE_SCHEMA_VERSION,
   SEASON_WRITER_LEASE_MS,
   seasonSha256Text,
-  validateCompletedCareerMatchEventArchive,
+  validateActivePersistentSeasonState,
+  validateAnyCareerMatchEventArchive,
   validateStoredWorldCopy,
   validateT20SeasonArchive,
   validateT20SeasonState,
+  type AnyCareerMatchEventArchive,
   type SeasonCheckpoint,
 } from "./season.js";
 
 export const PERSISTENT_WORLD_RECORD_TYPE = "PERSISTENT_WORLD" as const;
 export const PERSISTENT_CAREER_PROJECTION_SCOPE = "PERSISTENT_CAREER_V1" as const;
 export const COMPLETED_SEASON_RECORD_SCOPE = "COMPLETED_SEASON_RECORD_V1" as const;
+export const PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE = "PERSISTENT_LIFECYCLE_ROSTER_PACK_V1" as const;
+
+export type AnyPersistentWorldState = PersistentWorldState | PersistentWorldStateV2;
+
+type PersistentWorldSchemaVersion =
+  | typeof PERSISTENT_WORLD_SAVE_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION;
+
+const ALLOWED_PERSISTENT_WORLD_SCHEMAS: readonly PersistentWorldSchemaVersion[] = [
+  PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION,
+];
+
+function isPresentationPersistentSchema(schemaVersion: string): boolean {
+  return (
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
+  );
+}
+
+function isV2PersistentSchema(schemaVersion: string): boolean {
+  return (
+    schemaVersion === PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
+  );
+}
 
 type PersistentWorldGameRecord = PersistentWorldSaveSummary & {
   recordType: typeof PERSISTENT_WORLD_RECORD_TYPE;
-  schemaVersion:
-    | typeof PERSISTENT_WORLD_SAVE_SCHEMA_VERSION
-    | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION;
+  schemaVersion: PersistentWorldSchemaVersion;
   worldCopySha256?: string;
   checkpointSerial: number;
   checkpointGeneration: number;
@@ -80,7 +123,7 @@ export type PersistentWorldDurableCommit = {
   kind: "AUTO" | "MANUAL" | "IMPORTED";
   title: string;
   expectedRevision: number | null;
-  state: PersistentWorldState;
+  state: AnyPersistentWorldState;
   command: SeasonDurableCommand | null;
   idempotentCommandReplay?: boolean;
   ownerId: string;
@@ -88,7 +131,8 @@ export type PersistentWorldDurableCommit = {
   updatedAt: string;
   setActive?: boolean;
   worldCopy?: NewGameWorldCopy | null;
-  matchEventArchives?: readonly CompletedCareerMatchEventArchive[];
+  matchEventArchives?: readonly AnyCareerMatchEventArchive[];
+  seasonRosterPacks?: readonly StagedRosterPack[];
   testAbortAfterWrites?: boolean;
   copySource?: {
     saveId: string;
@@ -101,7 +145,7 @@ export type PersistentWorldDurableCommit = {
 
 export type PersistentWorldLoadResult = {
   summary: PersistentWorldSaveSummary;
-  state: PersistentWorldState;
+  state: AnyPersistentWorldState;
   recovered: boolean;
   recoveredFromGeneration: number | null;
   corruptedGenerations: readonly number[];
@@ -135,13 +179,19 @@ function assertPersistent(condition: unknown, code: string): asserts condition {
   if (!condition) throw new Error(`LC_PERSISTENT_WORLD_${code}`);
 }
 
+function seasonStartDateOf(state: ActivePersistentSeasonState): string {
+  return state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION
+    ? state.schedule.request.startDate
+    : state.schedule.startDate;
+}
+
 export async function sealCompletedSeasonRecord(input: {
   seasonNumber: number;
   calendarYear: number;
   completedSeasonState: unknown;
   completedAt: string;
 }): Promise<CompletedSeasonRecord> {
-  const state = await validateT20SeasonState(input.completedSeasonState);
+  const state = await validateActivePersistentSeasonState(input.completedSeasonState);
   assertPersistent(state.phase === "COMPLETE", "COMPLETED_RECORD_REQUIRES_COMPLETE_SEASON");
   const seasonArchive = await createT20SeasonArchive(state, input.completedAt);
   const champion = state.projection.table.find((row) => row.rank === 1);
@@ -154,7 +204,7 @@ export async function sealCompletedSeasonRecord(input: {
     seasonId: state.seasonId,
     gameId: state.gameId,
     competitionId: "LC_T20_LEAGUE_01",
-    startDate: state.schedule.startDate,
+    startDate: seasonStartDateOf(state),
     endDate: state.careerState.finalScheduledDate,
     scheduleSha256: state.schedule.scheduleSha256,
     finalSeasonStateSha256: state.stateSha256,
@@ -414,8 +464,218 @@ export async function validatePersistentWorldState(raw: unknown): Promise<Persis
   return state;
 }
 
+function persistentStateV2Core(state: PersistentWorldStateV2): PersistentWorldStateV2Core {
+  const { stateSha256, ...core } = state;
+  void stateSha256;
+  return PersistentWorldStateV2CoreSchema.parse(core);
+}
+
+export async function sealPersistentWorldStateV2(
+  raw: PersistentWorldStateV2Core,
+): Promise<PersistentWorldStateV2> {
+  const core = PersistentWorldStateV2CoreSchema.parse(raw);
+  const stateSha256 = await seasonSha256Text(canonicalJson(core));
+  const state = PersistentWorldStateV2Schema.parse({ ...core, stateSha256 });
+  return validatePersistentWorldStateV2(state);
+}
+
+export async function validatePersistentWorldStateV2(raw: unknown): Promise<PersistentWorldStateV2> {
+  const state = PersistentWorldStateV2Schema.parse(raw);
+  const expectedHash = await seasonSha256Text(canonicalJson(persistentStateV2Core(state)));
+  assertPersistent(state.stateSha256 === expectedHash, "STATE_V2_HASH_MISMATCH");
+
+  const lifecycle = PlayerLifecycleStateSchema.parse(state.lifecycle);
+  const { lifecycleSha256, ...lifecycleCore } = lifecycle;
+  const expectedLifecycleHash = await seasonSha256Text(
+    canonicalJson(PlayerLifecycleStateCoreSchema.parse(lifecycleCore)),
+  );
+  assertPersistent(lifecycleSha256 === expectedLifecycleHash, "LIFECYCLE_HASH_MISMATCH");
+
+  if (state.worldIdentity.originKind === "COPIED_FROM_SINGLE_SEASON_V1") {
+    assertPersistent(
+      Boolean(state.worldIdentity.sourceSingleSeasonSaveId) &&
+        Boolean(state.worldIdentity.sourceSingleSeasonFinalStateSha256),
+      "COPY_ORIGIN_MISSING_SOURCE_METADATA",
+    );
+  } else {
+    assertPersistent(
+      state.worldIdentity.sourceSingleSeasonSaveId === null &&
+        state.worldIdentity.sourceSingleSeasonFinalStateSha256 === null,
+      "NEW_ORIGIN_UNEXPECTED_SOURCE_METADATA",
+    );
+  }
+
+  const currentSeason = await validateActivePersistentSeasonState(state.currentSeason);
+  assertPersistent(
+    currentSeason.careerId === state.careerId &&
+      currentSeason.controlledTeamId === state.controlledTeamId,
+    "CURRENT_SEASON_CAREER_BINDING_MISMATCH",
+  );
+  if (currentSeason.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+    assertPersistent(Boolean(lifecycle.activeRosterPack), "LIFECYCLE_ROSTER_PACK_REQUIRED");
+    const activeRosterPackSha = await seasonSha256Text(
+      canonicalJson(lifecycle.activeRosterPack!),
+    );
+    assertPersistent(
+      activeRosterPackSha === currentSeason.rosterPackSha256 &&
+        canonicalJson(lifecycle.activeRosterPack!.world) === canonicalJson(lifecycle.activeWorld),
+      "LIFECYCLE_ROSTER_PACK_BINDING_MISMATCH",
+    );
+  } else {
+    assertPersistent(
+      currentSeason.schedule.worldPackId === state.worldIdentity.worldPackId &&
+        currentSeason.schedule.worldCanonicalSha256 === state.worldIdentity.worldCanonicalSha256,
+      "CURRENT_SEASON_WORLD_IDENTITY_MISMATCH",
+    );
+  }
+  assertPersistent(
+    state.currentSeasonNumber === state.completedSeasons.length + 1,
+    "CURRENT_SEASON_NUMBER_MISMATCH",
+  );
+  const currentStartDate = seasonStartDateOf(currentSeason);
+  assertPersistent(
+    currentStartDate.startsWith(
+      `${String(state.currentCalendarYear).padStart(4, "0")}-`,
+    ),
+    "CURRENT_CALENDAR_YEAR_MISMATCH",
+  );
+
+  const validatedHistory = await Promise.all(
+    state.completedSeasons.map((record) => validateCompletedSeasonRecord(record)),
+  );
+
+  const seenSeasonIds = new Set<string>();
+  const seenGameIds = new Set<string>();
+  const seenScheduleHashes = new Set<string>();
+  const seenFixtureIds = new Set<string>();
+  const seenMatchIds = new Set<string>();
+  const seenCompletionSources = new Set<string>();
+  const seenCompletionKeys = new Set<string>();
+
+  for (let i = 0; i < validatedHistory.length; i += 1) {
+    const record = validatedHistory[i]!;
+    assertPersistent(record.seasonNumber === i + 1, `HISTORY_SEASON_NUMBER_GAP:${i}`);
+    if (i > 0) {
+      const prev = validatedHistory[i - 1]!;
+      assertPersistent(
+        record.calendarYear > prev.calendarYear && record.startDate > prev.endDate,
+        `HISTORY_CALENDAR_REGRESSION:${record.seasonId}`,
+      );
+    }
+    assertPersistent(
+      !seenSeasonIds.has(record.seasonId) &&
+        !seenGameIds.has(record.gameId) &&
+        !seenScheduleHashes.has(record.scheduleSha256),
+      `HISTORY_DUPLICATE_SEASON_IDENTITY:${record.seasonId}`,
+    );
+    seenSeasonIds.add(record.seasonId);
+    seenGameIds.add(record.gameId);
+    seenScheduleHashes.add(record.scheduleSha256);
+    for (const key of record.seasonArchive.completionKeys) {
+      assertPersistent(!seenCompletionKeys.has(key), `HISTORY_DUPLICATE_COMPLETION_KEY:${key}`);
+      seenCompletionKeys.add(key);
+    }
+    for (const match of record.completedMatches) {
+      assertPersistent(
+        !seenFixtureIds.has(match.fixtureId) &&
+          !seenMatchIds.has(match.matchId) &&
+          !seenCompletionSources.has(match.sourceCompletionSha256),
+        `HISTORY_DUPLICATE_MATCH:${match.fixtureId}`,
+      );
+      seenFixtureIds.add(match.fixtureId);
+      seenMatchIds.add(match.matchId);
+      seenCompletionSources.add(match.sourceCompletionSha256);
+    }
+  }
+
+  if (validatedHistory.length > 0) {
+    const lastCompleted = validatedHistory.at(-1)!;
+    assertPersistent(
+      state.currentCalendarYear > lastCompleted.calendarYear &&
+        currentStartDate > lastCompleted.endDate,
+      "ACTIVE_SEASON_CALENDAR_REGRESSION",
+    );
+    assertPersistent(Boolean(state.lastRolloverReceipt), "MISSING_ROLLOVER_RECEIPT");
+    const receipt = state.lastRolloverReceipt!;
+    assertPersistent(
+      receipt.fromSeasonNumber === lastCompleted.seasonNumber &&
+        receipt.toSeasonNumber === state.currentSeasonNumber &&
+        receipt.closedSeasonId === lastCompleted.seasonId &&
+        receipt.closedSeasonStateSha256 === lastCompleted.finalSeasonStateSha256 &&
+        receipt.closedSeasonRecordSha256 === lastCompleted.recordSha256 &&
+        receipt.nextSeasonId === currentSeason.seasonId &&
+        receipt.nextStartDate === currentStartDate &&
+        receipt.nextScheduleSha256 === currentSeason.schedule.scheduleSha256,
+      "ROLLOVER_RECEIPT_MISMATCH",
+    );
+  } else {
+    assertPersistent(state.lastRolloverReceipt === null, "UNEXPECTED_ROLLOVER_RECEIPT");
+  }
+
+  assertPersistent(
+    !seenSeasonIds.has(currentSeason.seasonId) &&
+      !seenGameIds.has(currentSeason.gameId) &&
+      !seenScheduleHashes.has(currentSeason.schedule.scheduleSha256),
+    "ACTIVE_SEASON_IDENTITY_COLLISION",
+  );
+  for (const cond of currentSeason.careerState.appliedMatchConditions) {
+    assertPersistent(
+      !seenCompletionKeys.has(cond.matchCompletionKey),
+      `ACTIVE_DUPLICATE_COMPLETION_KEY:${cond.matchCompletionKey}`,
+    );
+  }
+  for (const match of currentSeason.completedMatches) {
+    assertPersistent(
+      !seenFixtureIds.has(match.fixtureId) &&
+        !seenMatchIds.has(match.matchId) &&
+        !seenCompletionSources.has(match.sourceCompletionSha256),
+      `ACTIVE_MATCH_COLLIDES_WITH_HISTORY:${match.fixtureId}`,
+    );
+  }
+
+  const projection = await validatePersistentCareerProjection(state.careerProjection);
+  assertPersistent(
+    projection.worldId === state.worldIdentity.worldId &&
+      projection.completedSeasonCount === validatedHistory.length &&
+      projection.activeSeasonNumber === state.currentSeasonNumber &&
+      projection.activeSeasonMatchesApplied === currentSeason.completedMatches.length &&
+      projection.totalMatchesApplied ===
+        validatedHistory.length * 56 + currentSeason.completedMatches.length &&
+      projection.rollOfHonour.length === validatedHistory.length,
+    "CAREER_PROJECTION_COUNTS_MISMATCH",
+  );
+  for (let i = 0; i < validatedHistory.length; i += 1) {
+    const honour = projection.rollOfHonour[i]!;
+    const record = validatedHistory[i]!;
+    assertPersistent(
+      honour.seasonNumber === record.seasonNumber &&
+        honour.calendarYear === record.calendarYear &&
+        honour.seasonId === record.seasonId &&
+        honour.championTeamId === record.championTeamId &&
+        honour.runnerUpTeamId === record.runnerUpTeamId &&
+        honour.finalSeasonStateSha256 === record.finalSeasonStateSha256,
+      `ROLL_OF_HONOUR_MISMATCH:${record.seasonId}`,
+    );
+  }
+
+  return state;
+}
+
+export async function validateAnyPersistentWorldState(
+  raw: unknown,
+): Promise<AnyPersistentWorldState> {
+  const version =
+    typeof raw === "object" && raw !== null
+      ? (raw as { worldStateVersion?: unknown }).worldStateVersion
+      : undefined;
+  if (version === PERSISTENT_WORLD_STATE_V2_VERSION) {
+    return validatePersistentWorldStateV2(raw);
+  }
+  return validatePersistentWorldState(raw);
+}
+
 export function collectPersistentWorldCompletions(
-  state: PersistentWorldState,
+  state: AnyPersistentWorldState,
 ): Map<string, T20SeasonMatchCompletion> {
   const byFixture = new Map<string, T20SeasonMatchCompletion>();
   for (const season of state.completedSeasons) {
@@ -432,8 +692,8 @@ export function collectPersistentWorldCompletions(
 export async function validatePersistentWorldMatchEventArchiveSet(
   archivesRaw: readonly unknown[],
   worldStateRaw: unknown,
-): Promise<{ archives: CompletedCareerMatchEventArchive[]; totalBytes: number }> {
-  const worldState = await validatePersistentWorldState(worldStateRaw);
+): Promise<{ archives: AnyCareerMatchEventArchive[]; totalBytes: number }> {
+  const worldState = await validateAnyPersistentWorldState(worldStateRaw);
   const completionByFixture = collectPersistentWorldCompletions(worldState);
   const parsedList = await Promise.all(
     archivesRaw.map((item) => {
@@ -444,11 +704,11 @@ export async function validatePersistentWorldMatchEventArchiveSet(
           ? (item as { fixtureId: string }).fixtureId
           : undefined;
       const completion = candidateFixtureId ? completionByFixture.get(candidateFixtureId) : undefined;
-      return validateCompletedCareerMatchEventArchive(item, completion);
+      return validateAnyCareerMatchEventArchive(item, completion);
     }),
   );
   const seenFixtures = new Set<string>();
-  const archives: CompletedCareerMatchEventArchive[] = [];
+  const archives: AnyCareerMatchEventArchive[] = [];
   let totalBytes = 0;
   for (const parsed of parsedList) {
     const completion = completionByFixture.get(parsed.fixtureId);
@@ -458,7 +718,7 @@ export async function validatePersistentWorldMatchEventArchiveSet(
       `MATCH_EVENT_ARCHIVE_DUPLICATE_FIXTURE:${parsed.fixtureId}`,
     );
     seenFixtures.add(parsed.fixtureId);
-    totalBytes += parsed.byteLength;
+    totalBytes += careerMatchEventArchiveByteLength(parsed);
     assertPersistent(
       totalBytes <= MAX_PERSISTENT_WORLD_EVENT_ARCHIVES_TOTAL_BYTES,
       "MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED",
@@ -499,7 +759,7 @@ export async function recoverPersistentWorldCheckpoint(
   rows: readonly SeasonCheckpoint[],
   currentSerial: number,
 ): Promise<{
-  state: PersistentWorldState;
+  state: AnyPersistentWorldState;
   checkpoint: SeasonCheckpoint;
   recovered: boolean;
   corruptedGenerations: number[];
@@ -511,7 +771,7 @@ export async function recoverPersistentWorldCheckpoint(
       continue;
     }
     try {
-      const state = await validatePersistentWorldState(JSON.parse(row.payload));
+      const state = await validateAnyPersistentWorldState(JSON.parse(row.payload));
       return {
         state,
         checkpoint: row,
@@ -540,7 +800,7 @@ export async function inspectPersistentWorldCheckpoints(input: {
       continue;
     }
     try {
-      const state = await validatePersistentWorldState(JSON.parse(row.payload));
+      const state = await validateAnyPersistentWorldState(JSON.parse(row.payload));
       validGenerations.push({
         generation: row.generation,
         checkpointSerial: row.checkpointSerial,
@@ -695,7 +955,8 @@ export class IndexedDbPersistentWorldRepository {
   async commit(
     input: PersistentWorldDurableCommit,
   ): Promise<{ summary: PersistentWorldSaveSummary; idempotentReplay: boolean }> {
-    const state = await validatePersistentWorldState(input.state);
+    const state = await validateAnyPersistentWorldState(input.state);
+    const isStateV2 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION;
     const command = input.command ? SeasonDurableCommandSchema.parse(input.command) : null;
     assertPersistent(
       input.updatedAt.length > 0 && !Number.isNaN(Date.parse(input.updatedAt)),
@@ -722,6 +983,29 @@ export class IndexedDbPersistentWorldRepository {
       }),
     );
 
+    const candidateRosterPacks: StagedRosterPack[] = [];
+    if (input.seasonRosterPacks?.length) {
+      for (const pack of input.seasonRosterPacks) {
+        candidateRosterPacks.push(StagedRosterPackSchema.parse(pack));
+      }
+    }
+    let preparedActivePack: { hash: string; payload: string } | null = null;
+    if (isStateV2 && state.lifecycle.activeRosterPack) {
+      const parsedActivePack = StagedRosterPackSchema.parse(state.lifecycle.activeRosterPack);
+      candidateRosterPacks.push(parsedActivePack);
+      const activePackPayload = canonicalJson(parsedActivePack);
+      preparedActivePack = {
+        hash: await seasonSha256Text(activePackPayload),
+        payload: activePackPayload,
+      };
+    }
+    const preparedRosterPacks = new Map<string, { hash: string; payload: string }>();
+    for (const pack of candidateRosterPacks) {
+      const packPayload = canonicalJson(pack);
+      const packHash = await seasonSha256Text(packPayload);
+      preparedRosterPacks.set(packHash, { hash: packHash, payload: packPayload });
+    }
+
     const preparedArchives: Array<{
       fixtureId: string;
       payload: string;
@@ -739,7 +1023,7 @@ export class IndexedDbPersistentWorldRepository {
           fixtureId: archive.fixtureId,
           payload: archivePayload,
           sha256: await seasonSha256Text(archivePayload),
-          bytes: archive.byteLength,
+          bytes: careerMatchEventArchiveByteLength(archive),
         });
       }
     }
@@ -772,34 +1056,22 @@ export class IndexedDbPersistentWorldRepository {
     if (existing && existing.recordType !== PERSISTENT_WORLD_RECORD_TYPE) {
       return abortWith("SEASON_SAVE_ID_CONFLICT");
     }
-    if (
-      existing &&
-      ![
-        PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
-        PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION,
-      ].includes(existing.schemaVersion)
-    ) {
+    if (existing && !ALLOWED_PERSISTENT_WORLD_SCHEMAS.includes(existing.schemaVersion)) {
       return abortWith("SEASON_SAVE_SCHEMA_UNSUPPORTED");
+    }
+    if (existing && isV2PersistentSchema(existing.schemaVersion) && !isStateV2) {
+      return abortWith("SEASON_SAVE_SCHEMA_DOWNGRADE_FORBIDDEN");
     }
     if (existing && suppliedCopyHash && suppliedCopyHash !== existing.worldCopySha256) {
       return abortWith("SEASON_WORLD_COPY_IMMUTABLE");
     }
-    if (
-      existing?.schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION &&
-      !existing.worldCopySha256
-    ) {
+    if (existing && isPresentationPersistentSchema(existing.schemaVersion) && !existing.worldCopySha256) {
       return abortWith("SEASON_WORLD_COPY_MISSING");
     }
-    if (
-      existing?.schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION &&
-      !suppliedCopyHash
-    ) {
+    if (existing && isPresentationPersistentSchema(existing.schemaVersion) && !suppliedCopyHash) {
       return abortWith("SEASON_WORLD_COPY_REQUIRED");
     }
-    if (
-      existing?.schemaVersion === PERSISTENT_WORLD_SAVE_SCHEMA_VERSION &&
-      existing.worldCopySha256
-    ) {
+    if (existing && !isPresentationPersistentSchema(existing.schemaVersion) && existing.worldCopySha256) {
       return abortWith("SEASON_WORLD_COPY_VERSION_MISMATCH");
     }
 
@@ -856,7 +1128,7 @@ export class IndexedDbPersistentWorldRepository {
       const allowedSchemas: readonly string[] =
         input.copySource.sourceRecordType === SEASON_RECORD_TYPE
           ? [SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION]
-          : [PERSISTENT_WORLD_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION];
+          : ALLOWED_PERSISTENT_WORLD_SCHEMAS;
       if (
         existing ||
         input.copySource.saveId === input.saveId ||
@@ -931,39 +1203,60 @@ export class IndexedDbPersistentWorldRepository {
       } satisfies ProjectionRecord);
     }
 
-    if (input.copySource || preparedArchives.length > 0) {
+    if (input.copySource || preparedArchives.length > 0 || preparedRosterPacks.size > 0) {
       const allProjections = (await req(projections.getAll())) as ProjectionRecord[];
-      const mergedByFixture = new Map<string, ProjectionRecord>();
       if (input.copySource) {
         for (const row of allProjections) {
-          if (row.saveId === input.copySource.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
-            mergedByFixture.set(row.key, { ...row, saveId: input.saveId });
+          if (
+            row.saveId === input.copySource.saveId &&
+            row.scope === PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE
+          ) {
+            projections.put({ ...row, saveId: input.saveId });
           }
         }
       }
-      for (const row of allProjections) {
-        if (row.saveId === input.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
-          mergedByFixture.set(row.key, row);
-        }
-      }
-      for (const item of preparedArchives) {
-        mergedByFixture.set(item.fixtureId, {
+      for (const packItem of preparedRosterPacks.values()) {
+        projections.put({
           saveId: input.saveId,
-          scope: CAREER_MATCH_EVENTS_SCOPE,
-          key: item.fixtureId,
-          payload: item.payload,
-          sha256: item.sha256,
-        });
+          scope: PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE,
+          key: packItem.hash,
+          payload: packItem.payload,
+          sha256: packItem.hash,
+        } satisfies ProjectionRecord);
       }
-      const enc = new TextEncoder();
-      let totalArchiveBytes = 0;
-      for (const row of mergedByFixture.values()) {
-        totalArchiveBytes += enc.encode(row.payload).byteLength;
+      if (input.copySource || preparedArchives.length > 0) {
+        const mergedByFixture = new Map<string, ProjectionRecord>();
+        if (input.copySource) {
+          for (const row of allProjections) {
+            if (row.saveId === input.copySource.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
+              mergedByFixture.set(row.key, { ...row, saveId: input.saveId });
+            }
+          }
+        }
+        for (const row of allProjections) {
+          if (row.saveId === input.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
+            mergedByFixture.set(row.key, row);
+          }
+        }
+        for (const item of preparedArchives) {
+          mergedByFixture.set(item.fixtureId, {
+            saveId: input.saveId,
+            scope: CAREER_MATCH_EVENTS_SCOPE,
+            key: item.fixtureId,
+            payload: item.payload,
+            sha256: item.sha256,
+          });
+        }
+        const enc = new TextEncoder();
+        let totalArchiveBytes = 0;
+        for (const row of mergedByFixture.values()) {
+          totalArchiveBytes += enc.encode(row.payload).byteLength;
+        }
+        if (totalArchiveBytes > MAX_PERSISTENT_WORLD_EVENT_ARCHIVES_TOTAL_BYTES) {
+          return abortWith("LC_PERSISTENT_WORLD_MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED");
+        }
+        for (const row of mergedByFixture.values()) projections.put(row);
       }
-      if (totalArchiveBytes > MAX_PERSISTENT_WORLD_EVENT_ARCHIVES_TOTAL_BYTES) {
-        return abortWith("LC_PERSISTENT_WORLD_MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED");
-      }
-      for (const row of mergedByFixture.values()) projections.put(row);
     }
 
     const summary = persistentSummaryFor({ ...input, state });
@@ -980,12 +1273,28 @@ export class IndexedDbPersistentWorldRepository {
       if (!previous) packs.add({ hash: suppliedCopyHash, payload: worldCopyPayload });
     }
 
+    if (preparedActivePack) {
+      const packs = tx.objectStore("worldPacks");
+      const existingPack = (await req(packs.get(preparedActivePack.hash))) as
+        | { hash: string; payload: string }
+        | undefined;
+      if (!existingPack) {
+        packs.add({ hash: preparedActivePack.hash, payload: preparedActivePack.payload });
+      }
+    }
+
+    const nextSchemaVersion: PersistentWorldSchemaVersion = isStateV2
+      ? copyHash
+        ? PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
+        : PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION
+      : copyHash
+        ? PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION
+        : PERSISTENT_WORLD_SAVE_SCHEMA_VERSION;
+
     games.put({
       ...summary,
       recordType: PERSISTENT_WORLD_RECORD_TYPE,
-      schemaVersion: copyHash
-        ? PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION
-        : PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
+      schemaVersion: nextSchemaVersion,
       ...(copyHash ? { worldCopySha256: copyHash } : {}),
       checkpointSerial: serial,
       checkpointGeneration: generation,
@@ -1014,15 +1323,13 @@ export class IndexedDbPersistentWorldRepository {
     }
     if (
       game.recordType !== PERSISTENT_WORLD_RECORD_TYPE ||
-      ![
-        PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
-        PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION,
-      ].includes(game.schemaVersion)
+      !ALLOWED_PERSISTENT_WORLD_SCHEMAS.includes(game.schemaVersion)
     ) {
       await txDone(tx);
       throw new Error("SEASON_SAVE_SCHEMA_UNSUPPORTED");
     }
-    if (game.schemaVersion === PERSISTENT_WORLD_SAVE_SCHEMA_VERSION && game.worldCopySha256) {
+    const expectsCopy = isPresentationPersistentSchema(game.schemaVersion);
+    if (!expectsCopy && game.worldCopySha256) {
       await txDone(tx);
       throw new Error("SEASON_WORLD_COPY_VERSION_MISMATCH");
     }
@@ -1030,8 +1337,7 @@ export class IndexedDbPersistentWorldRepository {
       tx.objectStore("snapshots").index("saveId").getAll(saveId),
     )) as SeasonCheckpoint[];
     const worldRow =
-      game.schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION &&
-      game.worldCopySha256
+      expectsCopy && game.worldCopySha256
         ? ((await req(tx.objectStore("worldPacks").get(game.worldCopySha256))) as
             | { hash: string; payload: string }
             | undefined)
@@ -1039,7 +1345,7 @@ export class IndexedDbPersistentWorldRepository {
     await txDone(tx);
 
     let worldCopy: NewGameWorldCopy | null = null;
-    if (game.schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION) {
+    if (expectsCopy) {
       if (
         !worldRow ||
         !game.worldCopySha256 ||
@@ -1113,12 +1419,12 @@ export class IndexedDbPersistentWorldRepository {
       await txDone(tx);
       throw new Error("SEASON_SAVE_NOT_FOUND");
     }
+    const expectsCopy = isPresentationPersistentSchema(game.schemaVersion);
     const row = (await req(
       tx.objectStore("snapshots").get([saveId, generation]),
     )) as SeasonCheckpoint | undefined;
     const worldRow =
-      game.schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION &&
-      game.worldCopySha256
+      expectsCopy && game.worldCopySha256
         ? ((await req(tx.objectStore("worldPacks").get(game.worldCopySha256))) as
             | { hash: string; payload: string }
             | undefined)
@@ -1126,7 +1432,7 @@ export class IndexedDbPersistentWorldRepository {
     await txDone(tx);
     if (!row) throw new Error("SEASON_CHECKPOINT_NOT_FOUND");
     let worldCopy: NewGameWorldCopy | null = null;
-    if (game.schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION) {
+    if (expectsCopy) {
       if (
         !worldRow ||
         !game.worldCopySha256 ||
@@ -1166,11 +1472,29 @@ export class IndexedDbPersistentWorldRepository {
     };
   }
 
+  async loadLifecycleRosterPacks(
+    saveId: string,
+  ): Promise<Map<string, StagedRosterPack>> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const allRows = (await req(tx.objectStore("projections").getAll())) as ProjectionRecord[];
+    await txDone(tx);
+    const result = new Map<string, StagedRosterPack>();
+    for (const row of allRows) {
+      if (row.saveId !== saveId || row.scope !== PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE) continue;
+      if ((await seasonSha256Text(row.payload)) !== row.sha256 || row.sha256 !== row.key) {
+        throw new Error(`LIFECYCLE_ROSTER_PACK_DAMAGED:${row.key}`);
+      }
+      result.set(row.key, StagedRosterPackSchema.parse(JSON.parse(row.payload)));
+    }
+    return result;
+  }
+
   async loadMatchEventArchives(
     saveId: string,
-    worldState?: PersistentWorldState,
+    worldState?: AnyPersistentWorldState,
   ): Promise<{
-    archives: CompletedCareerMatchEventArchive[];
+    archives: AnyCareerMatchEventArchive[];
     damagedFixtureIds: string[];
     totalBytes: number;
   }> {
@@ -1184,7 +1508,7 @@ export class IndexedDbPersistentWorldRepository {
     const completionByFixture = worldState
       ? collectPersistentWorldCompletions(worldState)
       : new Map<string, T20SeasonMatchCompletion>();
-    const archives: CompletedCareerMatchEventArchive[] = [];
+    const archives: AnyCareerMatchEventArchive[] = [];
     const damagedFixtureIds: string[] = [];
     const enc = new TextEncoder();
     let totalBytes = 0;
@@ -1199,7 +1523,7 @@ export class IndexedDbPersistentWorldRepository {
       try {
         const completion = worldState ? completionByFixture.get(row.key) : undefined;
         if (worldState && !completion) throw new Error(`UNKNOWN_FIXTURE:${row.key}`);
-        const parsed = await validateCompletedCareerMatchEventArchive(
+        const parsed = await validateAnyCareerMatchEventArchive(
           JSON.parse(row.payload),
           completion,
         );
@@ -1207,7 +1531,7 @@ export class IndexedDbPersistentWorldRepository {
           throw new Error(`DUPLICATE_FIXTURE:${parsed.fixtureId}`);
         }
         seenFixtures.add(parsed.fixtureId);
-        validatedBytes += parsed.byteLength;
+        validatedBytes += careerMatchEventArchiveByteLength(parsed);
         assertPersistent(
           validatedBytes <= MAX_PERSISTENT_WORLD_EVENT_ARCHIVES_TOTAL_BYTES,
           "MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED",

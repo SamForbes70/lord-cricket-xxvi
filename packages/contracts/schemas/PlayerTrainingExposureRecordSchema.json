@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "battingPracticeDays": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 366
+    },
+    "bowlingPracticeDays": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 366
+    },
+    "fieldingPracticeDays": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 366
+    },
+    "restDays": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 366
+    }
+  },
+  "required": [
+    "playerId",
+    "battingPracticeDays",
+    "bowlingPracticeDays",
+    "fieldingPracticeDays",
+    "restDays"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PlayerTrainingExposureRecord:1",
+  "title": "PlayerTrainingExposureRecord"
+}

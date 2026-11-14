@@ -21,10 +21,13 @@ import {
   SEASON_EVENT_ARCHIVES_PORTABLE_VERSION,
   SEASON_PORTABLE_ARCHIVE_VERSION,
   seasonSha256Text,
+  validateAnyCareerMatchEventArchive,
+  validateAnyPersistentWorldState,
   validateCompletedCareerMatchEventArchive,
   validatePersistentWorldState,
   validateStoredWorldCopy,
   validateT20SeasonState,
+  type AnyCareerMatchEventArchive,
   type PersistentWorldDurableCommit,
   type PersistentWorldLoadResult,
   type SeasonDurableCommit,
@@ -239,7 +242,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
         revision: number;
         createdAt: string;
       }>;
-      archives: Map<string, CompletedCareerMatchEventArchive>;
+      archives: Map<string, AnyCareerMatchEventArchive>;
     }
   >();
 
@@ -282,7 +285,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
       }
       return { summary: existing.summary, idempotentReplay: true };
     }
-    const state = await validatePersistentWorldState(input.state);
+    const state = await validateAnyPersistentWorldState(input.state);
     if (input.expectedRevision === null && existing) {
       throw new Error("LC_PERSISTENT_WORLD_SAVE_EXISTS");
     }
@@ -328,7 +331,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
       }
     }
     for (const raw of input.matchEventArchives ?? []) {
-      const parsed = await validateCompletedCareerMatchEventArchive(raw);
+      const parsed = await validateAnyCareerMatchEventArchive(raw);
       archives.set(parsed.fixtureId, parsed);
     }
     const commands = new Map(existing?.commands ?? []);
@@ -369,7 +372,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
         continue;
       }
       try {
-        const state = await validatePersistentWorldState(JSON.parse(gen.stateJson));
+        const state = await validateAnyPersistentWorldState(JSON.parse(gen.stateJson));
         const recovered = gen.serial !== slot.currentSerial;
         return {
           summary: recovered
@@ -401,7 +404,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
   async loadMatchEventArchives(
     saveId: string,
   ): Promise<{
-    archives: CompletedCareerMatchEventArchive[];
+    archives: AnyCareerMatchEventArchive[];
     damagedFixtureIds: string[];
     totalBytes: number;
   }> {
@@ -424,7 +427,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
         corruptedGenerations.push(gen.generation);
         continue;
       }
-      const state = await validatePersistentWorldState(JSON.parse(gen.stateJson));
+      const state = await validateAnyPersistentWorldState(JSON.parse(gen.stateJson));
       validGenerations.push({
         generation: gen.generation,
         checkpointSerial: gen.serial,
@@ -451,7 +454,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
     if (!slot || !gen || (await seasonSha256Text(gen.stateJson)) !== gen.sha256) {
       throw new Error("LC_PERSISTENT_WORLD_CHECKPOINT_GENERATION_CORRUPT");
     }
-    const state = await validatePersistentWorldState(JSON.parse(gen.stateJson));
+    const state = await validateAnyPersistentWorldState(JSON.parse(gen.stateJson));
     return {
       summary: {
         ...slot.summary,
@@ -493,7 +496,10 @@ async function simulateFullSeason(service: CareerApplicationService): Promise<T2
   const completed = service.getState();
   expect(completed?.phase).toBe("COMPLETE");
   expect(completed?.completedMatches).toHaveLength(56);
-  return completed!;
+  if (!completed || completed.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+    throw new Error("Expected V1 season state in Stage 2 V1 test");
+  }
+  return completed;
 }
 
 describe("Stage 2 persistent multi-season world", () => {
@@ -515,6 +521,7 @@ describe("Stage 2 persistent multi-season world", () => {
         worldId: "world-stage2-01",
         seed: "seed-stage2-alpha",
         startDate: "2026-04-04",
+        worldStateVersion: PERSISTENT_WORLD_STATE_VERSION,
       });
 
       const initialWorld = service.getPersistentState()!;
@@ -536,6 +543,9 @@ describe("Stage 2 persistent multi-season world", () => {
       expect(afterRollover1.completedSeasons).toHaveLength(1);
       expect(afterRollover1.currentSeason.phase).toBe("ACTIVE");
       expect(afterRollover1.currentSeason.completedMatches).toHaveLength(0);
+      if (afterRollover1.currentSeason.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+        throw new Error("Expected V1 season after Stage 2 V1 rollover");
+      }
       expect(afterRollover1.currentSeason.schedule.startDate).toBe("2027-04-04");
       expect(afterRollover1.currentSeason.schedule.scheduleSha256).not.toBe(
         season1Done.schedule.scheduleSha256,
@@ -644,6 +654,7 @@ describe("Stage 2 persistent multi-season world", () => {
         worldId: "world-edited-01",
         seed: "seed-edited-01",
         startDate: "2026-04-04",
+        worldStateVersion: PERSISTENT_WORLD_STATE_VERSION,
       });
 
       const completedS1 = await simulateFullSeason(service);

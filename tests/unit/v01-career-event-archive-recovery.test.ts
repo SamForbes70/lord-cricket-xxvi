@@ -232,6 +232,9 @@ describe("V01-018 completed career event archives and replay", () => {
     expect(replayed.status).toBe("READY");
     if (replayed.status !== "READY") throw new Error("Expected READY replay");
     expect(replayed.archive.archiveVersion).toBe("LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1");
+    if (replayed.archive.archiveVersion !== "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1") {
+      throw new Error("Expected V1 archive");
+    }
     expect(replayed.archive.fixtureId).toBe(firstCompletion.fixtureId);
     expect(replayed.replay.scorecard).toEqual(firstCompletion.scorecard);
     expect(replayed.replay.eventCount).toBe(replayed.archive.eventCount);
@@ -269,6 +272,9 @@ describe("V01-018 completed career event archives and replay", () => {
     await service.simulateToNextUserFixture();
     await service.simulateManagedFixture();
     const afterMatch = service.getState()!;
+    if (afterMatch.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+      throw new Error("Expected single-season V1 state");
+    }
     const completion = afterMatch.completedMatches[0]!;
     const loadedArchives = await repo.loadMatchEventArchives(saveId, afterMatch);
     expect(loadedArchives.archives.length).toBeGreaterThanOrEqual(1);

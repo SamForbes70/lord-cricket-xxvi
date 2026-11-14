@@ -14,9 +14,16 @@ The owner accepted Stage 2 on 14 November 2026 ([OWNER_DECISIONS_2026-11-13.md](
 2. **Explicit version boundaries**: Persistent multi-season saves use dedicated schemas (`LC_PERSISTENT_WORLD_V1`, `LC_COMPLETED_SEASON_RECORD_V1`, `LC_PERSISTENT_CAREER_PROJECTION_V1`, `LC_PERSISTENT_WORLD_PORTABLE_V1`, `LC_PERSISTENT_WORLD_ROLLOVER_RECEIPT_V1`) and dedicated IndexedDB stores.
 3. **Crash-safe atomic rollover**: `rolloverPersistentWorldSeason` commits the sealed completed-season record, rotated next-season schedule, checkpoint, and idempotency receipt in a single IndexedDB transaction, with automatic checkpoint fallback recovery.
 
-## Active next milestone: Stage 3 — Player lifecycle and youth pathway
+## Stage 3: Player lifecycle and youth pathway (`accepted`, 14 November 2026)
 
-With Stage 2 accepted, **Stage 3 (Player lifecycle and youth pathway)** is authorised: versioned ageing, reproducible training development protected from repeated-menu exploits, retirement, preserved retired player pages and records, youth intake, and 20-season balance diagnostics (fictional parameters labelled as such). Keep contracts and squad economy (Stage 4) outside Stage 3 until Stage 3 is accepted.
+The owner accepted Stage 3 (`S03-01`) on 14 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)):
+
+1. **Explicit version & fictional-parameter boundaries**: Uses `LC_PERSISTENT_WORLD_V2_LIFECYCLE`, `LC_PLAYER_LIFECYCLE_STATE_V1`, `LC_PLAYER_LIFECYCLE_MODEL_FICTIONAL_V1` (`parameterProvenance: "FICTIONAL_GAMEPLAY_PLACEHOLDER"`), `LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE`, and `LC_PERSISTENT_WORLD_PORTABLE_V2_LIFECYCLE` (`235` strict JSON Schemas). Stage 2 `LC_PERSISTENT_WORLD_V1` and V0.1 single-season saves remain untouched unless explicitly copied into a new V2 slot.
+2. **Exploit-proof progression, ageing, retirement & youth pathway**: Daily training menu edits change only temporary daily readiness; permanent off-season progression applies once per season close from elapsed calendar training days and match appearances. Players age `+1` per season, retire with club floor guarantees (`18..22` squad size, `>= 1` keeper, `>= 5` bowling-capable), remain inspectable in **Retired Alumni** and **PlayerPage**, and are replenished by deterministic youth academy classes (`0` role shortages across a 20-season diagnostic horizon).
+
+## Active next milestone: Stage 4 — Contracts, budgets and recruitment
+
+With Stage 3 accepted, **Stage 4 (Contracts, budgets and recruitment)** is authorised: one domestic contract system with wages, team budgets, expiry, offers, acceptance, free agents, an auditable transaction ledger, persistent negotiation rounds, symmetrical AI club recruitment by squad needs and available information (never hidden future ability), reload/duplicate-acceptance/overspending/simultaneous-offer protection, and multi-season economy diagnostics. Defer auctions and international release rules to later competition packs.
 
 ## Open items that still need people
 

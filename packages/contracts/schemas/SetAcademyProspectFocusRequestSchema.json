@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "command": {
+      "type": "string",
+      "const": "SET_ACADEMY_PROSPECT_FOCUS"
+    },
+    "prospectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "academyFocus": {
+      "type": "string",
+      "enum": [
+        "BALANCED",
+        "BATTING_PRACTICE",
+        "BOWLING_PRACTICE",
+        "FIELDING_PRACTICE"
+      ]
+    }
+  },
+  "required": [
+    "command",
+    "prospectId",
+    "academyFocus"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SetAcademyProspectFocusRequest:1",
+  "title": "SetAcademyProspectFocusRequest"
+}

@@ -2,27 +2,50 @@ import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?
 import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
 import {
   canonicalJson,
+  LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION,
+  LIFECYCLE_SEASON_STATE_VERSION,
+  LifecycleSquadTrainingConditionViewSchema,
+  type LifecycleSquadTrainingConditionView,
   PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION,
   PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
+  PERSISTENT_WORLD_STATE_V2_VERSION,
   PERSISTENT_WORLD_STATE_VERSION,
   PersistentWorldRolloverReceiptSchema,
+  RosterSeasonMatchCompletionSchema,
   T20SeasonMatchCompletionSchema,
+  type AcademyTrainingFocus,
+  type ActivePersistentSeasonState,
   type CompletedCareerMatchEventArchive,
+  type CompletedLifecycleMatchEventArchive,
   type CompletedSeasonRecord,
+  type LifecycleSeasonState,
   type MatchConditionDelta,
   type NewGameWorldCopy,
+  type PersistentWorldIdentity,
   type PersistentWorldSaveSummary,
   type PersistentWorldState,
+  type PersistentWorldStateV2,
+  type Player,
+  type PlayerLifecycleSkillLedgerEntry,
+  type PlayerLifecycleState,
+  type PlayerTrainingAssignment,
+  type RetiredPlayerRecord,
+  type RosterCareerDayState,
   type SeasonArchive,
   type SeasonCheckpointInspection,
   type SeasonFixture,
+  type SeasonLifecycleTransitionRecord,
   type SeasonSaveSummary,
+  type SquadTrainingConditionView,
+  type StagedRosterPack,
   type T20Scorecard,
   type T20SeasonMatchCompletion,
   type T20SeasonState,
   type T20TeamSelection,
   type TrainingDirective,
   type WorldPack,
+  type YouthProspect,
 } from "@lcxxvi/contracts";
 import {
   DEFAULT_CAREER_AVAILABILITY_PACK,
@@ -33,32 +56,56 @@ import {
 import {
   advanceCareerDayV2,
   advancePersistentSeasonCalendar,
+  advancePlayerLifecycleAtSeasonClose,
+  advanceRosterCareerDay,
   applyMatchConditionDeltaV2,
+  applyRosterMatchCondition,
   createCareerDayStateV2,
   createCompletedCareerMatchEventArchive,
+  createCompletedLifecycleMatchEventArchive,
+  createInitialPlayerLifecycleState,
+  createPersistentLifecycleSeasonScheduleAndDayState,
   createPersistentSeasonScheduleAndDayState,
   createStateHasher,
   derivePersistentWorldIdentity,
+  findLifecycleRosterPackBySha256,
   generateSeasonSchedule,
   INITIAL_PERSISTENT_CALENDAR_YEAR,
   INITIAL_PERSISTENT_START_DATE,
+  playerAgeInSeason,
   projectSquadTrainingCondition,
+  promoteYouthProspectPreSeason,
+  recordElapsedTrainingExposure,
+  rehydrateRosterT20Session,
   rehydrateT20Session,
   replayCareerMatchEventArchive,
+  replayCompletedLifecycleMatchEventArchive,
+  sealLifecycleSeasonState,
+  seasonStartDateOf,
   selectOffscreenFixtureTeams,
+  selectRosterFixtureTeams,
+  setAcademyProspectFocus as applySetAcademyProspectFocus,
+  setAcademyProspectPromotionQueue,
+  setRosterTrainingDirective,
   setTrainingDirective,
   simulateOffscreenFixture,
+  simulateRosterOffscreenFixture,
   type CareerArchivedReplaySummary,
+  type RosterT20Session,
 } from "@lcxxvi/simulation";
 import {
+  applyRosterSeasonCompletion,
   applyT20SeasonMatchCompletion,
   completionFromOffscreenOutcome,
+  createRosterSeasonProjection,
   createT20SeasonProjection,
   rebuildPersistentCareerProjectionCore,
+  rosterCompletionFromOffscreen,
 } from "@lcxxvi/projections";
 import {
   collectPersistentWorldCompletions,
   createPersistentWorldPortableArchive,
+  createPersistentWorldPortableArchiveV2,
   createSeasonPortableArchive,
   createT20SeasonArchive,
   describeSeasonPersistenceError,
@@ -67,12 +114,16 @@ import {
   peekPortableArchiveVersion,
   PERSISTENT_WORLD_RECORD_TYPE,
   readPersistentWorldPortableArchive,
+  readPersistentWorldPortableArchiveV2,
   readSeasonPortableArchive,
   sealCompletedSeasonRecord,
   sealPersistentCareerProjection,
   sealPersistentWorldState,
+  sealPersistentWorldStateV2,
   sealT20SeasonState,
   SEASON_RECORD_TYPE,
+  type AnyCareerMatchEventArchive,
+  type AnyPersistentWorldState,
   type PersistentWorldDurableCommit,
   type PersistentWorldLoadResult,
   type SeasonDurableCommit,
@@ -134,9 +185,16 @@ export type CareerUserMatchLaunch = CareerUserMatchLaunchCore & (
   | { launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V2"; worldCopy: NewGameWorldCopy }
   | {
       launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER";
-      rosterPack: import("@lcxxvi/contracts").StagedRosterPack;
+      rosterPack: StagedRosterPack;
+    }
+  | {
+      launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE";
+      rosterPack: StagedRosterPack;
+      worldCopy?: NewGameWorldCopy;
     }
 );
+
+export type CareerActiveSeasonState = ActivePersistentSeasonState;
 
 export type CareerUserMatchResult = {
   resultVersion: "LC_CAREER_USER_MATCH_RESULT_V1";
@@ -168,14 +226,19 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-export function deterministicSeasonCompletedAt(state: T20SeasonState): string {
+function dateDiffDays(startIso: string, endIso: string): number {
+  const ms = Date.parse(`${endIso}T00:00:00Z`) - Date.parse(`${startIso}T00:00:00Z`);
+  return Math.max(0, Math.round(ms / 86_400_000));
+}
+
+export function deterministicSeasonCompletedAt(state: ActivePersistentSeasonState): string {
   return `${state.schedule.rounds.at(-1)!.matchDayDate}${FINAL_COMPLETED_AT_SUFFIX}`;
 }
 
-function stateCore(state: T20SeasonState) {
+function stateCore<T extends ActivePersistentSeasonState>(state: T): Omit<T, "stateSha256"> {
   const { stateSha256: _hash, ...core } = state;
   void _hash;
-  return core;
+  return core as Omit<T, "stateSha256">;
 }
 
 export type CreateCareerOptions = {
@@ -187,6 +250,9 @@ export type CreateCareerOptions = {
   seed?: string;
   startDate?: string;
   calendarYear?: number;
+  worldStateVersion?:
+    | typeof PERSISTENT_WORLD_STATE_VERSION
+    | typeof PERSISTENT_WORLD_STATE_V2_VERSION;
 };
 
 export async function createInitialSeasonState(input: {
@@ -494,10 +560,350 @@ export async function copyCompletedSingleSeasonToPersistentWorldState(input: {
   });
 }
 
+export async function createLifecycleSeasonStateForWorld(input: {
+  worldIdentity: PersistentWorldIdentity;
+  rosterPack: StagedRosterPack;
+  careerId: string;
+  controlledTeamId: string | null;
+  seasonNumber: number;
+  calendarYear: number;
+  startDate: string;
+  priorSeasonFinalStateSha256: string | null;
+  carryForwardDirectives?: readonly PlayerTrainingAssignment[];
+}): Promise<LifecycleSeasonState> {
+  const built = createPersistentLifecycleSeasonScheduleAndDayState({
+    worldIdentity: input.worldIdentity,
+    rosterPack: input.rosterPack,
+    careerId: input.careerId,
+    seasonNumber: input.seasonNumber,
+    calendarYear: input.calendarYear,
+    startDate: input.startDate,
+    priorSeasonFinalStateSha256: input.priorSeasonFinalStateSha256,
+    ...(input.carryForwardDirectives ? { carryForwardDirectives: input.carryForwardDirectives } : {}),
+  });
+  const projection = createRosterSeasonProjection(built.schedule);
+  return sealLifecycleSeasonState({
+    seasonStateVersion: LIFECYCLE_SEASON_STATE_VERSION,
+    seasonId: built.seasonId,
+    gameId: built.gameId,
+    careerId: input.careerId,
+    controlledTeamId: input.controlledTeamId,
+    rosterPackSha256: hasher.hash(input.rosterPack),
+    schedule: built.schedule,
+    careerState: built.careerState,
+    projection,
+    completedMatches: [],
+    revision: 0,
+    phase: "ACTIVE",
+  });
+}
+
+export async function createInitialPersistentWorldCareerStateV2(input: {
+  worldId: string;
+  careerId: string;
+  baseSeed: string;
+  controlledTeamId: string | null;
+  calendarYear?: number;
+  startDate?: string;
+  worldCopy?: NewGameWorldCopy | null;
+}): Promise<PersistentWorldStateV2> {
+  const startDate = input.startDate ?? INITIAL_PERSISTENT_START_DATE;
+  const calendarYear =
+    input.calendarYear ??
+    (Number.parseInt(startDate.slice(0, 4), 10) || INITIAL_PERSISTENT_CALENDAR_YEAR);
+  const worldIdentity = derivePersistentWorldIdentity({
+    worldId: input.worldId,
+    baseSeed: input.baseSeed,
+    originKind: "NEW_PERSISTENT_CAREER",
+  });
+  const built = createPersistentSeasonScheduleAndDayState({
+    worldIdentity,
+    careerId: input.careerId,
+    seasonNumber: 1,
+    calendarYear,
+    startDate,
+    priorSeasonFinalStateSha256: null,
+  });
+  const projection = createT20SeasonProjection({
+    competition: T20_LEAGUE_COMPETITION,
+    schedule: built.schedule,
+  });
+  const currentSeason = await sealT20SeasonState({
+    seasonStateVersion: "LC_T20_SEASON_STATE_V1",
+    seasonId: built.seasonId,
+    gameId: built.gameId,
+    careerId: input.careerId,
+    controlledTeamId: input.controlledTeamId,
+    schedule: built.schedule,
+    careerState: built.careerState,
+    projection,
+    completedMatches: [],
+    revision: 0,
+    phase: "ACTIVE",
+  });
+  const lifecycle = createInitialPlayerLifecycleState({
+    worldIdentity,
+    baseWorld: world,
+    worldCopy: input.worldCopy ?? null,
+    seasonNumber: 1,
+    calendarYear,
+    useRosterPackImmediately: false,
+  });
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons: [],
+      activeSeason: currentSeason,
+    }),
+  );
+  return sealPersistentWorldStateV2({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V2_VERSION,
+    worldIdentity,
+    careerId: input.careerId,
+    controlledTeamId: input.controlledTeamId,
+    currentSeasonNumber: 1,
+    currentCalendarYear: calendarYear,
+    currentSeason,
+    completedSeasons: [],
+    careerProjection,
+    lifecycle,
+    lastRolloverReceipt: null,
+    revision: 0,
+  });
+}
+
+export async function rebuildPersistentWorldStateV2(
+  worldState: PersistentWorldStateV2,
+  nextSeason: ActivePersistentSeasonState,
+  nextLifecycle: PlayerLifecycleState,
+  nextRevision: number,
+): Promise<PersistentWorldStateV2> {
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldState.worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons: worldState.completedSeasons,
+      activeSeason: nextSeason,
+    }),
+  );
+  return sealPersistentWorldStateV2({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V2_VERSION,
+    worldIdentity: worldState.worldIdentity,
+    careerId: worldState.careerId,
+    controlledTeamId: worldState.controlledTeamId,
+    currentSeasonNumber: worldState.currentSeasonNumber,
+    currentCalendarYear: worldState.currentCalendarYear,
+    currentSeason: nextSeason,
+    completedSeasons: worldState.completedSeasons,
+    careerProjection,
+    lifecycle: nextLifecycle,
+    lastRolloverReceipt: worldState.lastRolloverReceipt,
+    revision: nextRevision,
+  });
+}
+
+export async function rolloverPersistentWorldCareerSeasonV2(
+  worldState: PersistentWorldStateV2,
+  nextRevision = worldState.revision + 1,
+): Promise<{ nextState: PersistentWorldStateV2; closedRecord: CompletedSeasonRecord }> {
+  if (worldState.currentSeason.phase !== "COMPLETE") {
+    throw new Error("Complete all 56 fixtures before closing the season.");
+  }
+  const closedRecord = await sealCompletedSeasonRecord({
+    seasonNumber: worldState.currentSeasonNumber,
+    calendarYear: worldState.currentCalendarYear,
+    completedSeasonState: worldState.currentSeason,
+    completedAt: deterministicSeasonCompletedAt(worldState.currentSeason),
+  });
+  const completedSeasons = [...worldState.completedSeasons, closedRecord];
+  const nextSeasonNumber = worldState.currentSeasonNumber + 1;
+  const { nextCalendarYear, nextStartDate } = advancePersistentSeasonCalendar({
+    closedCalendarYear: worldState.currentCalendarYear,
+    closedEndDate: worldState.currentSeason.careerState.finalScheduledDate,
+    seasonStartMonthDay: seasonStartDateOf(worldState.currentSeason).slice(5, 10),
+  });
+  const seasonPlayerStats = worldState.currentSeason.projection.players.map((p) => ({
+    playerId: p.playerId,
+    matches: p.matches,
+    ballsFaced: p.ballsFaced,
+    bowlingLegalBalls: p.bowlingLegalBalls,
+  }));
+  const nextLifecycle = advancePlayerLifecycleAtSeasonClose({
+    lifecycle: worldState.lifecycle,
+    worldIdentity: worldState.worldIdentity,
+    fromSeasonNumber: worldState.currentSeasonNumber,
+    toSeasonNumber: nextSeasonNumber,
+    closedCalendarYear: worldState.currentCalendarYear,
+    nextCalendarYear,
+    seasonPlayerStats,
+    controlledTeamId: worldState.controlledTeamId,
+  });
+  const nextCurrentSeason = await createLifecycleSeasonStateForWorld({
+    worldIdentity: worldState.worldIdentity,
+    rosterPack: nextLifecycle.activeRosterPack!,
+    careerId: worldState.careerId,
+    controlledTeamId: worldState.controlledTeamId,
+    seasonNumber: nextSeasonNumber,
+    calendarYear: nextCalendarYear,
+    startDate: nextStartDate,
+    priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
+    carryForwardDirectives: worldState.currentSeason.careerState.trainingAssignments,
+  });
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldState.worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons,
+      activeSeason: nextCurrentSeason,
+    }),
+  );
+  const receipt = PersistentWorldRolloverReceiptSchema.parse({
+    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
+    fromSeasonNumber: worldState.currentSeasonNumber,
+    toSeasonNumber: nextSeasonNumber,
+    closedSeasonId: closedRecord.seasonId,
+    closedSeasonStateSha256: closedRecord.finalSeasonStateSha256,
+    closedSeasonRecordSha256: closedRecord.recordSha256,
+    nextSeasonId: nextCurrentSeason.seasonId,
+    nextStartDate: seasonStartDateOf(nextCurrentSeason),
+    nextScheduleSha256: nextCurrentSeason.schedule.scheduleSha256,
+  });
+  const nextState = await sealPersistentWorldStateV2({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V2_VERSION,
+    worldIdentity: worldState.worldIdentity,
+    careerId: worldState.careerId,
+    controlledTeamId: worldState.controlledTeamId,
+    currentSeasonNumber: nextSeasonNumber,
+    currentCalendarYear: nextCalendarYear,
+    currentSeason: nextCurrentSeason,
+    completedSeasons,
+    careerProjection,
+    lifecycle: nextLifecycle,
+    lastRolloverReceipt: receipt,
+    revision: nextRevision,
+  });
+  return { nextState, closedRecord };
+}
+
+export async function copyCompletedSingleSeasonToPersistentWorldStateV2(input: {
+  sourceSaveId: string;
+  sourceState: T20SeasonState;
+  worldId: string;
+  newCareerId: string;
+  baseSeed: string;
+  worldCopy?: NewGameWorldCopy | null;
+}): Promise<PersistentWorldStateV2> {
+  const { sourceState } = input;
+  if (sourceState.phase !== "COMPLETE") {
+    throw new Error(
+      "Complete all 56 fixtures in the single-season career before copying into a multi-season world.",
+    );
+  }
+  const closedCalendarYear =
+    Number.parseInt(sourceState.schedule.startDate.slice(0, 4), 10) ||
+    INITIAL_PERSISTENT_CALENDAR_YEAR;
+  const worldIdentity = derivePersistentWorldIdentity({
+    worldId: input.worldId,
+    baseSeed: input.baseSeed,
+    originKind: "COPIED_FROM_SINGLE_SEASON_V1",
+    sourceSingleSeasonSaveId: input.sourceSaveId,
+    sourceSingleSeasonFinalStateSha256: sourceState.stateSha256,
+  });
+  const closedRecord = await sealCompletedSeasonRecord({
+    seasonNumber: 1,
+    calendarYear: closedCalendarYear,
+    completedSeasonState: sourceState,
+    completedAt: deterministicSeasonCompletedAt(sourceState),
+  });
+  const completedSeasons = [closedRecord];
+  const { nextCalendarYear, nextStartDate } = advancePersistentSeasonCalendar({
+    closedCalendarYear,
+    closedEndDate: sourceState.careerState.finalScheduledDate,
+    seasonStartMonthDay: sourceState.schedule.startDate.slice(5, 10),
+  });
+  let initialLifecycle = createInitialPlayerLifecycleState({
+    worldIdentity,
+    baseWorld: world,
+    worldCopy: input.worldCopy ?? null,
+    seasonNumber: 1,
+    calendarYear: closedCalendarYear,
+    useRosterPackImmediately: false,
+  });
+  const elapsedDays = dateDiffDays(
+    sourceState.schedule.startDate,
+    sourceState.careerState.currentDate,
+  );
+  initialLifecycle = recordElapsedTrainingExposure(
+    initialLifecycle,
+    sourceState.careerState.trainingAssignments,
+    elapsedDays,
+  );
+  const nextLifecycle = advancePlayerLifecycleAtSeasonClose({
+    lifecycle: initialLifecycle,
+    worldIdentity,
+    fromSeasonNumber: 1,
+    toSeasonNumber: 2,
+    closedCalendarYear,
+    nextCalendarYear,
+    seasonPlayerStats: sourceState.projection.players.map((p) => ({
+      playerId: p.playerId,
+      matches: p.matches,
+      ballsFaced: p.ballsFaced,
+      bowlingLegalBalls: p.bowlingLegalBalls,
+    })),
+    controlledTeamId: sourceState.controlledTeamId,
+  });
+  const currentSeason = await createLifecycleSeasonStateForWorld({
+    worldIdentity,
+    rosterPack: nextLifecycle.activeRosterPack!,
+    careerId: input.newCareerId,
+    controlledTeamId: sourceState.controlledTeamId,
+    seasonNumber: 2,
+    calendarYear: nextCalendarYear,
+    startDate: nextStartDate,
+    priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
+    carryForwardDirectives: sourceState.careerState.trainingAssignments,
+  });
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons,
+      activeSeason: currentSeason,
+    }),
+  );
+  const receipt = PersistentWorldRolloverReceiptSchema.parse({
+    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
+    fromSeasonNumber: 1,
+    toSeasonNumber: 2,
+    closedSeasonId: closedRecord.seasonId,
+    closedSeasonStateSha256: closedRecord.finalSeasonStateSha256,
+    closedSeasonRecordSha256: closedRecord.recordSha256,
+    nextSeasonId: currentSeason.seasonId,
+    nextStartDate: seasonStartDateOf(currentSeason),
+    nextScheduleSha256: currentSeason.schedule.scheduleSha256,
+  });
+  return sealPersistentWorldStateV2({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V2_VERSION,
+    worldIdentity,
+    careerId: input.newCareerId,
+    controlledTeamId: sourceState.controlledTeamId,
+    currentSeasonNumber: 2,
+    currentCalendarYear: nextCalendarYear,
+    currentSeason,
+    completedSeasons,
+    careerProjection,
+    lifecycle: nextLifecycle,
+    lastRolloverReceipt: receipt,
+    revision: 0,
+  });
+}
+
 export type CareerReplayOutcome =
   | {
       status: "READY";
-      archive: CompletedCareerMatchEventArchive;
+      archive: AnyCareerMatchEventArchive;
       replay: CareerArchivedReplaySummary;
     }
   | { status: "UNAVAILABLE" }
@@ -536,9 +942,9 @@ export type CareerPersistentWorldRepository = {
   clearActiveSaveId(saveId: string): Promise<void>;
   loadMatchEventArchives?(
     saveId: string,
-    worldState?: PersistentWorldState,
+    worldState?: AnyPersistentWorldState,
   ): Promise<{
-    archives: CompletedCareerMatchEventArchive[];
+    archives: AnyCareerMatchEventArchive[];
     damagedFixtureIds: string[];
     totalBytes: number;
   }>;
@@ -580,12 +986,23 @@ function toSlotSummaryFromPersistent(summary: PersistentWorldSaveSummary): Caree
   };
 }
 
+type AnyCareerMutationResult =
+  | {
+      core:
+        | Omit<T20SeasonState, "stateSha256" | "revision">
+        | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
+      matchEventArchives?: readonly AnyCareerMatchEventArchive[];
+      nextLifecycle?: PlayerLifecycleState;
+    }
+  | Omit<T20SeasonState, "stateSha256" | "revision">
+  | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
+
 export class CareerApplicationService {
   private readonly repository: CareerSeasonRepository;
   private readonly persistentRepository: CareerPersistentWorldRepository | null;
   private readonly listeners = new Set<() => void>();
-  private state: T20SeasonState | null = null;
-  private persistentState: PersistentWorldState | null = null;
+  private state: ActivePersistentSeasonState | null = null;
+  private persistentState: AnyPersistentWorldState | null = null;
   private saveTitle: string | null = null;
   private worldCopy: NewGameWorldCopy | null = null;
   private saveId: string | null = null;
@@ -621,24 +1038,81 @@ export class CareerApplicationService {
     for (const listener of this.listeners) listener();
   }
 
-  getState(): T20SeasonState | null {
+  getState(): ActivePersistentSeasonState | null {
     return this.state;
   }
 
-  getPersistentState(): PersistentWorldState | null {
+  getPersistentState(): AnyPersistentWorldState | null {
     return this.persistentState;
+  }
+
+  getLifecycleState(): PlayerLifecycleState | null {
+    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+      ? this.persistentState.lifecycle
+      : null;
   }
 
   isPersistentWorld(): boolean {
     return this.persistentState !== null;
   }
 
+  hasLifecycleEnabled(): boolean {
+    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION;
+  }
+
   getWorld(): WorldPack {
+    if (this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION) {
+      return this.persistentState.lifecycle.activeWorld;
+    }
     return this.worldCopy?.world ?? world;
   }
 
   getWorldCopy(): NewGameWorldCopy | null {
     return this.worldCopy ? structuredClone(this.worldCopy) : null;
+  }
+
+  currentCalendarYear(): number {
+    if (this.persistentState) return this.persistentState.currentCalendarYear;
+    if (this.state) {
+      return (
+        Number.parseInt(seasonStartDateOf(this.state).slice(0, 4), 10) ||
+        INITIAL_PERSISTENT_CALENDAR_YEAR
+      );
+    }
+    return INITIAL_PERSISTENT_CALENDAR_YEAR;
+  }
+
+  playerAge(birthDate: string, calendarYear = this.currentCalendarYear()): number {
+    return playerAgeInSeason(birthDate, calendarYear);
+  }
+
+  findPlayerIncludingRetired(
+    playerId: string,
+  ): { player: Player; retired: RetiredPlayerRecord | null } | null {
+    const active = this.getWorld().players.find((p) => p.playerId === playerId);
+    if (active) return { player: active, retired: null };
+    const retired = this.getLifecycleState()?.retiredPlayers.find((r) => r.playerId === playerId);
+    if (retired) return { player: retired.player, retired };
+    return null;
+  }
+
+  playerLifecycleLedgerEntry(playerId: string): PlayerLifecycleSkillLedgerEntry | null {
+    return (
+      this.getLifecycleState()?.skillLedger.find((entry) => entry.playerId === playerId) ?? null
+    );
+  }
+
+  latestLifecycleTransition(): SeasonLifecycleTransitionRecord | null {
+    return this.getLifecycleState()?.transitions.at(-1) ?? null;
+  }
+
+  managedYouthAcademyProspects(): YouthProspect[] {
+    const lifecycle = this.getLifecycleState();
+    const teamId = this.persistentState?.controlledTeamId ?? this.state?.controlledTeamId ?? null;
+    if (!lifecycle || !teamId) return [];
+    return lifecycle.youthAcademy.filter(
+      (prospect) => prospect.teamId === teamId && prospect.promotedInSeasonNumber === null,
+    );
   }
 
   getSaveId(): string | null {
@@ -776,7 +1250,7 @@ export class CareerApplicationService {
     teamId: string,
     copyRaw: NewGameWorldCopy | null = null,
     options?: CreateCareerOptions,
-  ): Promise<T20SeasonState> {
+  ): Promise<ActivePersistentSeasonState> {
     if (!T20_LEAGUE_COMPETITION.teamIds.includes(teamId)) throw new Error("Unknown managed team.");
     const copy = copyRaw ? immutableWorldCopy(copyRaw) : null;
     await this.releaseCurrentLease();
@@ -786,14 +1260,19 @@ export class CareerApplicationService {
     if (this.persistentRepository) {
       const worldId = options?.worldId ?? `world-${key}`;
       const careerId = options?.careerId ?? `career-${key}`;
-      const worldState = await createInitialPersistentWorldCareerState({
+      const createWorldArgs = {
         worldId,
         careerId,
         baseSeed: options?.seed ?? `seed-${key}`,
         controlledTeamId: teamId,
+        worldCopy: copy,
         ...(options?.calendarYear !== undefined ? { calendarYear: options.calendarYear } : {}),
         ...(options?.startDate !== undefined ? { startDate: options.startDate } : {}),
-      });
+      };
+      const worldState =
+        options?.worldStateVersion === PERSISTENT_WORLD_STATE_VERSION
+          ? await createInitialPersistentWorldCareerState(createWorldArgs)
+          : await createInitialPersistentWorldCareerStateV2(createWorldArgs);
       const saveId = options?.saveId ?? `pworld:${worldId}`;
       if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
         throw new Error("New career save is locked.");
@@ -867,7 +1346,7 @@ export class CareerApplicationService {
     return state;
   }
 
-  async loadCareer(saveId: string): Promise<T20SeasonState> {
+  async loadCareer(saveId: string): Promise<ActivePersistentSeasonState> {
     if (await this.isPersistentSlot(saveId)) {
       const repo = this.persistentRepository!;
       const loaded = await repo.load(saveId);
@@ -992,7 +1471,7 @@ export class CareerApplicationService {
     return loaded.state;
   }
 
-  private requireWritable(): { state: T20SeasonState; saveId: string } {
+  private requireWritable(): { state: ActivePersistentSeasonState; saveId: string } {
     if (!this.state || !this.saveId) throw new Error("Create or load a career first.");
     if (this.readOnly) {
       throw new Error("This career is read-only because another tab owns the writer lease.");
@@ -1000,34 +1479,41 @@ export class CareerApplicationService {
     return { state: this.state, saveId: this.saveId };
   }
 
-  private defaultCareerTitle(nextWorld: PersistentWorldState): string {
+  private defaultCareerTitle(nextWorld: AnyPersistentWorldState): string {
     const base = this.teamName(nextWorld.controlledTeamId);
     return nextWorld.currentSeasonNumber > 1
       ? `${base} ${nextWorld.currentCalendarYear} (Season ${nextWorld.currentSeasonNumber})`
       : `${base} ${nextWorld.currentCalendarYear}`;
   }
 
+  private requireActiveRosterPack(): StagedRosterPack {
+    const pack = this.getLifecycleState()?.activeRosterPack ?? null;
+    if (!pack) {
+      throw new Error("Lifecycle roster pack is missing for an evolved season.");
+    }
+    return pack;
+  }
+
+  private async sealActiveSeasonCore(
+    builtCore:
+      | Omit<T20SeasonState, "stateSha256" | "revision">
+      | Omit<LifecycleSeasonState, "stateSha256" | "revision">,
+    revision: number,
+  ): Promise<ActivePersistentSeasonState> {
+    if (builtCore.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      return sealLifecycleSeasonState({ ...builtCore, revision });
+    }
+    return sealT20SeasonState({ ...builtCore, revision });
+  }
+
   private async commitMutation(
     command: string,
     payload: unknown,
     build: (
-      state: T20SeasonState,
-    ) =>
-      | Promise<
-          | {
-              core: Omit<T20SeasonState, "stateSha256" | "revision">;
-              matchEventArchives?: readonly CompletedCareerMatchEventArchive[];
-            }
-          | Omit<T20SeasonState, "stateSha256" | "revision">
-        >
-      | (
-          | {
-              core: Omit<T20SeasonState, "stateSha256" | "revision">;
-              matchEventArchives?: readonly CompletedCareerMatchEventArchive[];
-            }
-          | Omit<T20SeasonState, "stateSha256" | "revision">
-        ),
-  ): Promise<T20SeasonState> {
+      state: ActivePersistentSeasonState,
+      lifecycle: PlayerLifecycleState | null,
+    ) => Promise<AnyCareerMutationResult> | AnyCareerMutationResult,
+  ): Promise<ActivePersistentSeasonState> {
     const { state: before, saveId } = this.requireWritable();
     const commandId = token("career-cmd");
     this.setStatus("Saving");
@@ -1039,24 +1525,39 @@ export class CareerApplicationService {
           this.readOnly = true;
           throw new Error("Writer lease was lost to another tab.");
         }
-        const builtRaw = await build(before);
+        const currentLifecycle =
+          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+            ? beforeWorld.lifecycle
+            : null;
+        const builtRaw = await build(before, currentLifecycle);
         const builtCore =
           "core" in builtRaw && "seasonStateVersion" in builtRaw.core
             ? builtRaw.core
-            : (builtRaw as Omit<T20SeasonState, "stateSha256" | "revision">);
+            : (builtRaw as
+                | Omit<T20SeasonState, "stateSha256" | "revision">
+                | Omit<LifecycleSeasonState, "stateSha256" | "revision">);
         const matchEventArchives =
           "core" in builtRaw && "matchEventArchives" in builtRaw
             ? builtRaw.matchEventArchives
             : undefined;
-        const nextSeason = await sealT20SeasonState({
-          ...builtCore,
-          revision: before.revision + 1,
-        });
-        const nextWorld = await rebuildPersistentWorldStateWithActiveSeason(
-          beforeWorld,
-          nextSeason,
-          expectedRevision + 1,
-        );
+        const updatedLifecycle =
+          "core" in builtRaw && "nextLifecycle" in builtRaw && builtRaw.nextLifecycle
+            ? builtRaw.nextLifecycle
+            : currentLifecycle;
+        const nextSeason = await this.sealActiveSeasonCore(builtCore, before.revision + 1);
+        const nextWorld: AnyPersistentWorldState =
+          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+            ? await rebuildPersistentWorldStateV2(
+                beforeWorld,
+                nextSeason,
+                updatedLifecycle!,
+                expectedRevision + 1,
+              )
+            : await rebuildPersistentWorldStateWithActiveSeason(
+                beforeWorld,
+                nextSeason as T20SeasonState,
+                expectedRevision + 1,
+              );
         const requestCanonical = canonicalJson({ command, expectedRevision, payload });
         const title = this.saveTitle ?? this.defaultCareerTitle(nextWorld);
         await this.persistentRepository.commit({
@@ -1089,19 +1590,22 @@ export class CareerApplicationService {
         return nextSeason;
       }
 
+      if (before.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+        throw new Error("Single-season slot cannot store a lifecycle season state.");
+      }
       const expectedRevision = before.revision;
       if (!(await this.repository.acquireLease(saveId, this.ownerId, Date.now()))) {
         this.readOnly = true;
         throw new Error("Writer lease was lost to another tab.");
       }
-      const builtRaw = await build(before);
+      const builtRaw = await build(before, null);
       const builtCore =
         "core" in builtRaw && "seasonStateVersion" in builtRaw.core
-          ? builtRaw.core
+          ? (builtRaw.core as Omit<T20SeasonState, "stateSha256" | "revision">)
           : (builtRaw as Omit<T20SeasonState, "stateSha256" | "revision">);
       const matchEventArchives =
         "core" in builtRaw && "matchEventArchives" in builtRaw
-          ? builtRaw.matchEventArchives
+          ? (builtRaw.matchEventArchives as readonly CompletedCareerMatchEventArchive[] | undefined)
           : undefined;
       const next = await sealT20SeasonState({ ...builtCore, revision: expectedRevision + 1 });
       const requestCanonical = canonicalJson({ command, expectedRevision, payload });
@@ -1142,14 +1646,208 @@ export class CareerApplicationService {
     }
   }
 
+  private async commitLifecycleOnlyMutation(
+    command: string,
+    payload: unknown,
+    buildLifecycle: (lifecycle: PlayerLifecycleState) => PlayerLifecycleState,
+  ): Promise<PlayerLifecycleState> {
+    const { saveId } = this.requireWritable();
+    if (
+      !this.persistentState ||
+      this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION ||
+      !this.persistentRepository
+    ) {
+      throw new Error("Player lifecycle controls require a Stage 3 persistent world career.");
+    }
+    const beforeWorld = this.persistentState;
+    const expectedRevision = beforeWorld.revision;
+    const commandId = token("career-lifecycle-cmd");
+    this.setStatus("Saving");
+    try {
+      if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
+        this.readOnly = true;
+        throw new Error("Writer lease was lost to another tab.");
+      }
+      const nextLifecycle = buildLifecycle(beforeWorld.lifecycle);
+      const nextWorld = await rebuildPersistentWorldStateV2(
+        beforeWorld,
+        beforeWorld.currentSeason,
+        nextLifecycle,
+        expectedRevision + 1,
+      );
+      const requestCanonical = canonicalJson({ command, expectedRevision, payload });
+      const title = this.saveTitle ?? this.defaultCareerTitle(nextWorld);
+      await this.persistentRepository.commit({
+        saveId,
+        kind: "AUTO",
+        title,
+        expectedRevision,
+        state: nextWorld,
+        command: {
+          commandId,
+          requestCanonical,
+          responseJson: canonicalJson({
+            revision: nextWorld.revision,
+            stateSha256: nextWorld.stateSha256,
+          }),
+          committedRevision: nextWorld.revision,
+        },
+        ownerId: this.ownerId,
+        now: Date.now(),
+        updatedAt: nowIso(),
+        setActive: true,
+        worldCopy: this.worldCopy,
+      });
+      this.persistentState = nextWorld;
+      this.state = nextWorld.currentSeason;
+      this.saveTitle = title;
+      this.recovered = false;
+      this.setStatus("Saved");
+      return nextLifecycle;
+    } catch (error) {
+      this.setStatus(
+        this.readOnly ? "Read-only" : "Error",
+        error instanceof Error ? error.message : "Lifecycle update failed.",
+      );
+      throw error;
+    }
+  }
+
+  async setYouthProspectFocus(prospectId: string, academyFocus: AcademyTrainingFocus): Promise<void> {
+    const controlledTeamId = this.persistentState?.controlledTeamId ?? null;
+    await this.commitLifecycleOnlyMutation(
+      "SET_ACADEMY_PROSPECT_FOCUS",
+      { prospectId, academyFocus },
+      (lifecycle) =>
+        applySetAcademyProspectFocus(
+          lifecycle,
+          { command: "SET_ACADEMY_PROSPECT_FOCUS", prospectId, academyFocus },
+          controlledTeamId,
+        ),
+    );
+  }
+
+  async setYouthProspectQueue(prospectId: string, queuedForPromotion: boolean): Promise<void> {
+    const controlledTeamId = this.persistentState?.controlledTeamId ?? null;
+    await this.commitLifecycleOnlyMutation(
+      "SET_ACADEMY_PROSPECT_QUEUE",
+      { prospectId, queuedForPromotion },
+      (lifecycle) =>
+        setAcademyProspectPromotionQueue(
+          lifecycle,
+          { command: "SET_ACADEMY_PROSPECT_QUEUE", prospectId, queuedForPromotion },
+          controlledTeamId,
+        ),
+    );
+  }
+
+  async promoteYouthProspectNow(
+    prospectId: string,
+    releasePlayerId?: string,
+  ): Promise<Player> {
+    const { state: beforeSeason, saveId } = this.requireWritable();
+    if (
+      !this.persistentState ||
+      this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION ||
+      !this.persistentRepository
+    ) {
+      throw new Error("Youth promotion requires a Stage 3 persistent world career.");
+    }
+    if (beforeSeason.phase !== "ACTIVE" || beforeSeason.completedMatches.length > 0) {
+      throw new Error(
+        "Direct youth promotion is only open before the first fixture of the season. Queue the prospect for next season instead.",
+      );
+    }
+    const beforeWorld = this.persistentState;
+    const expectedRevision = beforeWorld.revision;
+    const commandId = token("career-promote-youth");
+    this.setStatus("Saving");
+    try {
+      if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
+        this.readOnly = true;
+        throw new Error("Writer lease was lost to another tab.");
+      }
+      const promoted = promoteYouthProspectPreSeason({
+        lifecycle: beforeWorld.lifecycle,
+        worldId: beforeWorld.worldIdentity.worldId,
+        rawRequest: {
+          command: "PROMOTE_YOUTH_PROSPECT",
+          prospectId,
+          seasonNumber: beforeWorld.currentSeasonNumber,
+        },
+        controlledTeamId: beforeWorld.controlledTeamId,
+      });
+      const priorSeasonSha =
+        beforeWorld.completedSeasons.at(-1)?.finalSeasonStateSha256 ?? null;
+      const nextSeason = await createLifecycleSeasonStateForWorld({
+        worldIdentity: beforeWorld.worldIdentity,
+        rosterPack: promoted.lifecycle.activeRosterPack!,
+        careerId: beforeWorld.careerId,
+        controlledTeamId: beforeWorld.controlledTeamId,
+        seasonNumber: beforeWorld.currentSeasonNumber,
+        calendarYear: beforeWorld.currentCalendarYear,
+        startDate: seasonStartDateOf(beforeSeason),
+        priorSeasonFinalStateSha256: priorSeasonSha,
+        carryForwardDirectives: beforeSeason.careerState.trainingAssignments,
+      });
+      const nextWorld = await rebuildPersistentWorldStateV2(
+        beforeWorld,
+        nextSeason,
+        promoted.lifecycle,
+        expectedRevision + 1,
+      );
+      const requestCanonical = canonicalJson({
+        command: "PROMOTE_YOUTH_PROSPECT_PRESEASON",
+        expectedRevision,
+        prospectId,
+        releasePlayerId: releasePlayerId ?? null,
+      });
+      const title = this.saveTitle ?? this.defaultCareerTitle(nextWorld);
+      await this.persistentRepository.commit({
+        saveId,
+        kind: "AUTO",
+        title,
+        expectedRevision,
+        state: nextWorld,
+        command: {
+          commandId,
+          requestCanonical,
+          responseJson: canonicalJson({
+            revision: nextWorld.revision,
+            stateSha256: nextWorld.stateSha256,
+            promotedPlayerId: promoted.promotedPlayer.playerId,
+          }),
+          committedRevision: nextWorld.revision,
+        },
+        ownerId: this.ownerId,
+        now: Date.now(),
+        updatedAt: nowIso(),
+        setActive: true,
+        worldCopy: this.worldCopy,
+      });
+      this.persistentState = nextWorld;
+      this.state = nextSeason;
+      this.saveTitle = title;
+      this.recovered = false;
+      this.setStatus("Saved");
+      return promoted.promotedPlayer;
+    } catch (error) {
+      this.setStatus(
+        this.readOnly ? "Read-only" : "Error",
+        error instanceof Error ? error.message : "Youth promotion failed.",
+      );
+      throw error;
+    }
+  }
+
   /**
    * Closes a completed persistent-world season once, seals its CompletedSeasonRecord,
-   * advances the calendar, generates the next season's 56-fixture schedule, and updates
-   * cumulative career projections. Idempotent if called repeatedly with the same closedSeasonId.
+   * advances the calendar, evolves player lifecycle (for V2 worlds), generates the next
+   * season's 56-fixture schedule, and updates cumulative career projections.
    */
   async closeSeasonAndAdvance(
     expectedClosedSeasonId?: string,
-  ): Promise<{ state: PersistentWorldState; idempotentReplay: boolean }> {
+  ): Promise<{ state: AnyPersistentWorldState; idempotentReplay: boolean }> {
     const { saveId } = this.requireWritable();
     if (!this.persistentState || !this.persistentRepository) {
       throw new Error(
@@ -1178,10 +1876,12 @@ export class CareerApplicationService {
         this.readOnly = true;
         throw new Error("Writer lease was lost to another tab.");
       }
-      const { nextState } = await rolloverPersistentWorldCareerSeason(
-        beforeWorld,
-        expectedRevision + 1,
-      );
+      const { nextState }:
+        | { nextState: PersistentWorldState }
+        | { nextState: PersistentWorldStateV2 } =
+        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+          ? await rolloverPersistentWorldCareerSeasonV2(beforeWorld, expectedRevision + 1)
+          : await rolloverPersistentWorldCareerSeason(beforeWorld, expectedRevision + 1);
       const requestCanonical = canonicalJson({
         command: "ROLLOVER_SEASON",
         closedSeasonId: closingSeasonId,
@@ -1241,7 +1941,7 @@ export class CareerApplicationService {
    * Explicit copy-forward from a completed V0.1 single-season career into a new
    * multi-season persistent world starting at Season 2, preserving the V0.1 slot untouched.
    */
-  async copySingleSeasonToPersistentWorld(customTitle?: string): Promise<PersistentWorldState> {
+  async copySingleSeasonToPersistentWorld(customTitle?: string): Promise<PersistentWorldStateV2> {
     const { state: sourceState, saveId: sourceSaveId } = this.requireWritable();
     if (this.persistentState) {
       throw new Error("This career is already a persistent multi-season world.");
@@ -1249,7 +1949,10 @@ export class CareerApplicationService {
     if (!this.persistentRepository) {
       throw new Error("Persistent world storage is unavailable.");
     }
-    if (sourceState.phase !== "COMPLETE") {
+    if (
+      sourceState.seasonStateVersion !== "LC_T20_SEASON_STATE_V1" ||
+      sourceState.phase !== "COMPLETE"
+    ) {
       throw new Error(
         "Complete all 56 fixtures in this single-season career before copying into a multi-season world.",
       );
@@ -1258,12 +1961,13 @@ export class CareerApplicationService {
     const worldId = `world-${key}`;
     const newCareerId = `career-${key}`;
     const targetSaveId = `pworld:${worldId}`;
-    const nextWorld = await copyCompletedSingleSeasonToPersistentWorldState({
+    const nextWorld = await copyCompletedSingleSeasonToPersistentWorldStateV2({
       sourceSaveId,
       sourceState,
       worldId,
       newCareerId,
       baseSeed: `seed-${key}`,
+      worldCopy: this.worldCopy,
     });
     const now = Date.now();
     if (!(await this.repository.acquireLease(sourceSaveId, this.ownerId, now))) {
@@ -1312,9 +2016,128 @@ export class CareerApplicationService {
     }
   }
 
+  /**
+   * Explicit copy-upgrade from a Stage 2 V1 persistent world into a new Stage 3 V2
+   * persistent world slot with player lifecycle & youth academy, keeping the V1 slot untouched.
+   */
+  async upgradeStage2V1ToStage3V2(customTitle?: string): Promise<PersistentWorldStateV2> {
+    const { saveId: sourceSaveId } = this.requireWritable();
+    if (
+      !this.persistentState ||
+      this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_VERSION
+    ) {
+      throw new Error("Only Stage 2 V1 persistent worlds need a Stage 3 lifecycle upgrade.");
+    }
+    if (!this.persistentRepository) {
+      throw new Error("Persistent world storage is unavailable.");
+    }
+    const sourceWorld = this.persistentState;
+    const key = crypto.randomUUID().replaceAll("-", "").slice(0, 20);
+    const worldId = `world-${key}`;
+    const targetSaveId = `pworld:${worldId}`;
+    const worldIdentity = derivePersistentWorldIdentity({
+      worldId,
+      baseSeed: sourceWorld.worldIdentity.baseSeed,
+      originKind: sourceWorld.worldIdentity.originKind,
+      sourceSingleSeasonSaveId: sourceWorld.worldIdentity.sourceSingleSeasonSaveId,
+      sourceSingleSeasonFinalStateSha256:
+        sourceWorld.worldIdentity.sourceSingleSeasonFinalStateSha256,
+    });
+    const lifecycle = createInitialPlayerLifecycleState({
+      worldIdentity,
+      baseWorld: careerWorld,
+      worldCopy: this.worldCopy,
+      calendarYear: sourceWorld.currentCalendarYear,
+      seasonNumber: sourceWorld.currentSeasonNumber,
+    });
+    const careerProjection = await sealPersistentCareerProjection(
+      rebuildPersistentCareerProjectionCore({
+        worldId,
+        teamIds: T20_LEAGUE_COMPETITION.teamIds,
+        completedSeasons: sourceWorld.completedSeasons,
+        activeSeason: sourceWorld.currentSeason,
+      }),
+    );
+    const nextWorld = await sealPersistentWorldStateV2({
+      worldStateVersion: PERSISTENT_WORLD_STATE_V2_VERSION,
+      worldIdentity,
+      careerId: sourceWorld.careerId,
+      controlledTeamId: sourceWorld.controlledTeamId,
+      currentSeasonNumber: sourceWorld.currentSeasonNumber,
+      currentCalendarYear: sourceWorld.currentCalendarYear,
+      completedSeasons: sourceWorld.completedSeasons,
+      lifecycle,
+      currentSeason: sourceWorld.currentSeason,
+      careerProjection,
+      lastRolloverReceipt: sourceWorld.lastRolloverReceipt,
+      revision: 1,
+    });
+    const now = Date.now();
+    if (!(await this.persistentRepository.acquireLease(sourceSaveId, this.ownerId, now))) {
+      throw new Error("This career is open in another tab.");
+    }
+    if (!(await this.persistentRepository.acquireLease(targetSaveId, this.ownerId, now))) {
+      throw new Error("New Stage 3 persistent world slot is locked.");
+    }
+    const title =
+      (customTitle ?? "").trim().slice(0, 120) || this.defaultCareerTitle(nextWorld);
+    this.setStatus("Saving");
+    try {
+      await this.persistentRepository.commit({
+        saveId: targetSaveId,
+        kind: "MANUAL",
+        title,
+        expectedRevision: null,
+        state: nextWorld,
+        command: null,
+        ownerId: this.ownerId,
+        now,
+        updatedAt: nowIso(),
+        setActive: true,
+        worldCopy: this.worldCopy,
+        copySource: {
+          saveId: sourceSaveId,
+          sourceRecordType: PERSISTENT_WORLD_RECORD_TYPE,
+          revision: sourceWorld.revision,
+          stateSha256: sourceWorld.stateSha256,
+          now: () => Date.now(),
+        },
+      });
+      await this.persistentRepository.releaseLease(sourceSaveId, this.ownerId);
+      this.persistentState = nextWorld;
+      this.state = nextWorld.currentSeason;
+      this.saveTitle = title;
+      this.saveId = targetSaveId;
+      this.readOnly = false;
+      this.recovered = false;
+      this.setStatus("Saved");
+      return nextWorld;
+    } catch (error) {
+      await this.persistentRepository.releaseLease(targetSaveId, this.ownerId);
+      this.setStatus("Error", error instanceof Error ? error.message : "Stage 3 upgrade failed.");
+      throw error;
+    }
+  }
+
   async setTraining(playerId: string, directive: TrainingDirective): Promise<void> {
     await this.commitMutation("SET_TRAINING", { playerId, directive }, (state) => {
       if (state.phase !== "ACTIVE") throw new Error("Completed seasons are immutable.");
+      if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+        const pack = this.requireActiveRosterPack();
+        const changed = setRosterTrainingDirective(
+          state.careerState,
+          {
+            command: "SET_TRAINING_DIRECTIVE",
+            playerId,
+            directive,
+            effectiveDate: state.careerState.currentDate,
+            expectedRevision: state.careerState.revision,
+          },
+          state.schedule,
+          pack,
+        );
+        return { ...stateCore(state), careerState: changed };
+      }
       const changed = setTrainingDirective(state.careerState, {
         command: "SET_TRAINING_DIRECTIVE",
         playerId,
@@ -1327,27 +2150,89 @@ export class CareerApplicationService {
   }
 
   async advanceDay(): Promise<void> {
-    await this.commitMutation("ADVANCE_DAY", {}, (state) => {
+    await this.commitMutation("ADVANCE_DAY", {}, (state, lifecycle) => {
       if (state.phase !== "ACTIVE") throw new Error("Completed seasons are immutable.");
       const nextFixture = this.nextManagedFixture(state);
       if (nextFixture && state.careerState.currentDate >= nextFixture.matchDayDate) {
         throw new Error("Resolve the managed fixture before advancing the career date.");
       }
+      const nextLifecycle = lifecycle
+        ? recordElapsedTrainingExposure(lifecycle, state.careerState.trainingAssignments, 1)
+        : undefined;
+      if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+        const pack = this.requireActiveRosterPack();
+        const careerState = advanceRosterCareerDay(
+          state.careerState,
+          state.schedule,
+          pack,
+        );
+        if (nextFixture && careerState.currentDate > nextFixture.matchDayDate) {
+          throw new Error("Career date cannot pass the next managed fixture.");
+        }
+        return {
+          core: { ...stateCore(state), careerState },
+          ...(nextLifecycle ? { nextLifecycle } : {}),
+        };
+      }
       const careerState = advanceCareerDayV2(state.careerState).state;
       if (nextFixture && careerState.currentDate > nextFixture.matchDayDate) {
         throw new Error("Career date cannot pass the next managed fixture.");
       }
-      return { ...stateCore(state), careerState };
+      return {
+        core: { ...stateCore(state), careerState },
+        ...(nextLifecycle ? { nextLifecycle } : {}),
+      };
     });
   }
 
   private applyOffscreenCompletion(
-    state: T20SeasonState,
+    state: ActivePersistentSeasonState,
     fixtureId: string,
   ): {
-    core: Omit<T20SeasonState, "stateSha256" | "revision">;
-    archive: CompletedCareerMatchEventArchive;
+    core:
+      | Omit<T20SeasonState, "stateSha256" | "revision">
+      | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
+    archive: AnyCareerMatchEventArchive;
   } {
+    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      const pack = this.requireActiveRosterPack();
+      const simulated = simulateRosterOffscreenFixture(
+        pack,
+        state.schedule,
+        state.careerState,
+        fixtureId,
+      );
+      const rosterCompletion = rosterCompletionFromOffscreen(state.schedule, simulated.outcome);
+      const completion = T20SeasonMatchCompletionSchema.parse({
+        ...rosterCompletion,
+        completionVersion: "LC_T20_SEASON_MATCH_COMPLETION_V1",
+      });
+      const archive: CompletedLifecycleMatchEventArchive =
+        createCompletedLifecycleMatchEventArchive({
+          completion,
+          rosterPackSha256: state.rosterPackSha256,
+          session: simulated.session,
+        });
+      const projection = applyRosterSeasonCompletion(
+        state.projection,
+        state.schedule,
+        rosterCompletion,
+      );
+      const completedMatches = [...state.completedMatches, completion].sort(
+        (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+      );
+      return {
+        core: {
+          ...stateCore(state),
+          careerState: simulated.careerState,
+          projection,
+          completedMatches,
+          phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
+        },
+        archive,
+      };
+    }
+
     const simulated = simulateOffscreenFixture({
       schedule: state.schedule,
       careerState: state.careerState,
@@ -1399,26 +2284,63 @@ export class CareerApplicationService {
     await this.commitMutation(
       "SIMULATE_TO_NEXT_USER_FIXTURE",
       { fixtureId: target.fixtureId },
-      async (state) => {
-        let working: T20SeasonState = state;
-        let careerState = working.careerState;
-        while (careerState.currentDate < target.matchDayDate) {
-          careerState = advanceCareerDayV2(careerState).state;
+      async (state, lifecycle) => {
+        let daysAdvanced = 0;
+        let working: ActivePersistentSeasonState = state;
+        if (working.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+          const pack = this.requireActiveRosterPack();
+          let careerState = working.careerState;
+          while (careerState.currentDate < target.matchDayDate) {
+            careerState = advanceRosterCareerDay(
+              careerState,
+              working.schedule,
+              pack,
+            );
+            daysAdvanced += 1;
+          }
+          if (careerState.currentDate !== target.matchDayDate) {
+            throw new Error("Career date does not match managed fixture date.");
+          }
+          working = { ...working, careerState };
+        } else {
+          let careerState = working.careerState;
+          while (careerState.currentDate < target.matchDayDate) {
+            careerState = advanceCareerDayV2(careerState).state;
+            daysAdvanced += 1;
+          }
+          if (careerState.currentDate !== target.matchDayDate) {
+            throw new Error("Career date does not match managed fixture date.");
+          }
+          working = { ...working, careerState };
         }
-        if (careerState.currentDate !== target.matchDayDate) {
-          throw new Error("Career date does not match managed fixture date.");
-        }
-        working = { ...working, careerState };
+        const nextLifecycle =
+          lifecycle && daysAdvanced > 0
+            ? recordElapsedTrainingExposure(
+                lifecycle,
+                state.careerState.trainingAssignments,
+                daysAdvanced,
+              )
+            : lifecycle ?? undefined;
         const already = new Set(working.completedMatches.map((match) => match.fixtureId));
-        const archives: CompletedCareerMatchEventArchive[] = [];
+        const archives: AnyCareerMatchEventArchive[] = [];
         for (const fixture of roundOthers) {
           if (already.has(fixture.fixtureId)) continue;
           const applied = this.applyOffscreenCompletion(working, fixture.fixtureId);
-          working = await sealT20SeasonState({ ...applied.core, revision: working.revision });
+          working = await this.sealActiveSeasonCore(applied.core, working.revision);
           archives.push(applied.archive);
           already.add(fixture.fixtureId);
         }
-        return { core: { ...stateCore(working), phase: "ACTIVE" }, matchEventArchives: archives };
+        const activeCore:
+          | Omit<T20SeasonState, "stateSha256" | "revision">
+          | Omit<LifecycleSeasonState, "stateSha256" | "revision"> =
+          working.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION
+            ? { ...stateCore(working), phase: "ACTIVE" }
+            : { ...stateCore(working), phase: "ACTIVE" };
+        return {
+          core: activeCore,
+          matchEventArchives: archives,
+          ...(nextLifecycle ? { nextLifecycle } : {}),
+        };
       },
     );
     return this.nextManagedFixture(this.state!);
@@ -1449,6 +2371,36 @@ export class CareerApplicationService {
     if (!fixture) throw new Error("Season is complete.");
     if (state.careerState.currentDate !== fixture.matchDayDate) {
       throw new Error("Managed fixture is not ready.");
+    }
+    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      const pack = this.requireActiveRosterPack();
+      const selections = selectRosterFixtureTeams(
+        pack,
+        state.schedule,
+        state.careerState,
+        fixture.fixtureId,
+      );
+      return {
+        launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE" as const,
+        rosterPack: structuredClone(pack),
+        ...(this.worldCopy ? { worldCopy: structuredClone(this.worldCopy) } : {}),
+        saveId,
+        seasonId: state.seasonId,
+        scheduleSha256: state.schedule.scheduleSha256,
+        fixtureId: fixture.fixtureId,
+        fixtureOrdinal: fixture.ordinal,
+        roundNumber: fixture.roundNumber,
+        matchDayDate: fixture.matchDayDate,
+        homeTeamId: fixture.homeTeamId,
+        awayTeamId: fixture.awayTeamId,
+        groundId: fixture.groundId,
+        matchId: fixture.matchId,
+        matchGameId: managedMatchGameId(saveId, fixture.fixtureId),
+        matchSeed: fixture.matchSeed,
+        selections: [selections[0], selections[1]],
+        careerStateSha256: state.careerState.stateSha256,
+        ...(state.controlledTeamId ? { managedTeamId: state.controlledTeamId } : {}),
+      };
     }
     const selections = selectOffscreenFixtureTeams({
       schedule: state.schedule,
@@ -1533,11 +2485,6 @@ export class CareerApplicationService {
       "COMPLETE_USER_FIXTURE",
       { fixtureId: fixture.fixtureId, sourceCompletionSha256: result.sourceCompletionSha256 },
       (state) => {
-        const careerState = applyMatchConditionDeltaV2(
-          state.careerState,
-          result.conditionDelta,
-          state.schedule,
-        );
         const completion: T20SeasonMatchCompletion = T20SeasonMatchCompletionSchema.parse({
           completionVersion: "LC_T20_SEASON_MATCH_COMPLETION_V1",
           seasonId: state.seasonId,
@@ -1555,6 +2502,75 @@ export class CareerApplicationService {
           scorecard: result.scorecard,
           scorecardSha256: result.scorecardSha256,
         });
+        if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+          const pack = this.requireActiveRosterPack();
+          const careerState = applyRosterMatchCondition(
+            state.careerState,
+            result.conditionDelta,
+            state.schedule,
+            pack,
+          );
+          let resolvedRosterSession: RosterT20Session | undefined = session
+            ? (session as unknown as RosterT20Session)
+            : undefined;
+          if (!resolvedRosterSession && result.completedSession !== undefined) {
+            try {
+              resolvedRosterSession = rehydrateRosterT20Session(result.completedSession, pack);
+            } catch {
+              /* legacy or synthetic test payload without full rehydratable RosterT20Session */
+            }
+          }
+          const maybeArchive: AnyCareerMatchEventArchive[] = resolvedRosterSession
+            ? [
+                createCompletedLifecycleMatchEventArchive({
+                  completion,
+                  rosterPackSha256: state.rosterPackSha256,
+                  session: resolvedRosterSession,
+                }),
+              ]
+            : [];
+          const rosterCompletion = RosterSeasonMatchCompletionSchema.parse({
+            completionVersion: "LC_T20_ROSTER_SEASON_COMPLETION_V2",
+            seasonId: state.seasonId,
+            scheduleSha256: state.schedule.scheduleSha256,
+            fixtureId: fixture.fixtureId,
+            matchId: fixture.matchId,
+            fixtureOrdinal: fixture.ordinal,
+            roundNumber: fixture.roundNumber,
+            matchDayDate: fixture.matchDayDate,
+            homeTeamId: fixture.homeTeamId,
+            awayTeamId: fixture.awayTeamId,
+            source: "USER_MATCH",
+            sourceCompletionSha256: result.sourceCompletionSha256,
+            selectedTeams: result.selectedTeams,
+            scorecard: result.scorecard,
+            scorecardSha256: result.scorecardSha256,
+          });
+          const projection = applyRosterSeasonCompletion(
+            state.projection,
+            state.schedule,
+            rosterCompletion,
+          );
+          const completedMatches = [...state.completedMatches, completion].sort(
+            (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+          );
+          return {
+            core: {
+              ...stateCore(state),
+              careerState,
+              projection,
+              completedMatches,
+              phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
+            },
+            matchEventArchives: maybeArchive,
+          };
+        }
+
+        const careerState = applyMatchConditionDeltaV2(
+          state.careerState,
+          result.conditionDelta,
+          state.schedule,
+        );
         let resolvedSession = session;
         if (!resolvedSession && result.completedSession !== undefined) {
           try {
@@ -1638,6 +2654,9 @@ export class CareerApplicationService {
       return;
     }
 
+    if (state.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+      throw new Error("Lifecycle season state requires persistent world storage.");
+    }
     if (!(await this.repository.acquireLease(saveId, this.ownerId, now))) {
       throw new Error("This career is open in another tab.");
     }
@@ -1680,16 +2699,32 @@ export class CareerApplicationService {
       const eventArchives = this.persistentRepository.loadMatchEventArchives
         ? (await this.persistentRepository.loadMatchEventArchives(saveId, loaded.state)).archives
         : [];
+      if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION) {
+        return createPersistentWorldPortableArchiveV2(
+          loaded.state,
+          loaded.summary,
+          nowIso(),
+          loaded.worldCopy ?? null,
+          eventArchives.length > 0 ? eventArchives : null,
+        );
+      }
+      const v1EventArchives = eventArchives.filter(
+        (archive): archive is CompletedCareerMatchEventArchive =>
+          archive.archiveVersion === "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1",
+      );
       return createPersistentWorldPortableArchive(
         loaded.state,
         loaded.summary,
         nowIso(),
         loaded.worldCopy ?? null,
-        eventArchives.length > 0 ? eventArchives : null,
+        v1EventArchives.length > 0 ? v1EventArchives : null,
       );
     }
 
     const state = this.state;
+    if (state.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+      throw new Error("Lifecycle season state requires persistent world export.");
+    }
     const loaded = await this.repository.load(saveId);
     if (!loaded) throw new Error("Career save not found.");
     const archive =
@@ -1709,13 +2744,19 @@ export class CareerApplicationService {
     );
   }
 
-  async importCareer(bytes: Uint8Array): Promise<T20SeasonState> {
+  async importCareer(bytes: Uint8Array): Promise<ActivePersistentSeasonState> {
     const version = peekPortableArchiveVersion(bytes);
-    if (version === PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION) {
+    if (
+      version === PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION ||
+      version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION
+    ) {
       if (!this.persistentRepository) {
         throw new Error("Persistent world storage is unavailable.");
       }
-      const imported = await readPersistentWorldPortableArchive(bytes);
+      const imported =
+        version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION
+          ? await readPersistentWorldPortableArchiveV2(bytes)
+          : await readPersistentWorldPortableArchive(bytes);
       const copy = imported.worldCopy ? immutableWorldCopy(imported.worldCopy) : null;
       await this.releaseCurrentLease();
       const saveId = `import-${crypto.randomUUID().replaceAll("-", "")}`;
@@ -1794,6 +2835,12 @@ export class CareerApplicationService {
     return this.state?.completedMatches.find((m) => m.fixtureId === fixtureId) ?? null;
   }
 
+  private findRosterPackBySha(sha256: string): StagedRosterPack | null {
+    const lifecycle = this.getLifecycleState();
+    if (!lifecycle) return null;
+    return findLifecycleRosterPackBySha256(lifecycle, sha256);
+  }
+
   async replayFixtureArchive(fixtureId: string): Promise<CareerReplayOutcome> {
     if (!this.state || !this.saveId) throw new Error("No career is loaded.");
     const completion = this.findCompletionByFixtureId(fixtureId);
@@ -1815,6 +2862,17 @@ export class CareerApplicationService {
       const archive = loaded.archives.find((a) => a.fixtureId === fixtureId);
       if (!archive) return { status: "UNAVAILABLE" };
       try {
+        if (archive.archiveVersion === LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION) {
+          const pack = this.findRosterPackBySha(archive.rosterPackSha256);
+          if (!pack) {
+            return {
+              status: "DAMAGED",
+              message: "Historical roster snapshot for this evolved season fixture is missing.",
+            };
+          }
+          const replay = replayCompletedLifecycleMatchEventArchive(archive, pack, completion);
+          return { status: "READY", archive, replay };
+        }
         const replay = replayCareerMatchEventArchive(
           archive,
           worldBytes,
@@ -1831,6 +2889,9 @@ export class CareerApplicationService {
       }
     }
 
+    if (this.state.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+      return { status: "UNAVAILABLE" };
+    }
     if (!this.repository.loadMatchEventArchives) return { status: "UNAVAILABLE" };
     const loaded = await this.repository.loadMatchEventArchives(this.saveId, this.state);
     if (loaded.damagedFixtureIds.includes(fixtureId)) {
@@ -1871,7 +2932,7 @@ export class CareerApplicationService {
     saveId: string,
     generation: number,
     title?: string,
-  ): Promise<T20SeasonState> {
+  ): Promise<ActivePersistentSeasonState> {
     if (await this.isPersistentSlot(saveId)) {
       const repo = this.persistentRepository!;
       if (!repo.loadGeneration) throw new Error("Checkpoint generation recovery is unavailable.");
@@ -1997,8 +3058,56 @@ export class CareerApplicationService {
     );
   }
 
-  squadView(state = this.state) {
+  private projectLifecycleSquadView(
+    careerState: RosterCareerDayState,
+    teamId: string,
+  ): LifecycleSquadTrainingConditionView {
+    const activeWorld = this.getWorld();
+    const team = activeWorld.teams.find((candidate) => candidate.teamId === teamId);
+    if (!team) throw new Error(`Unknown team: ${teamId}`);
+    const conditionById = new Map(careerState.playerConditions.map((entry) => [entry.playerId, entry]));
+    const readinessById = new Map(careerState.playerReadiness.map((entry) => [entry.playerId, entry]));
+    const directiveById = new Map(
+      careerState.trainingAssignments.map((entry) => [entry.playerId, entry.directive]),
+    );
+    return LifecycleSquadTrainingConditionViewSchema.parse({
+      teamId,
+      date: careerState.currentDate,
+      players: team.squadIds.map((playerId) => {
+        const condition = conditionById.get(playerId);
+        const readiness = readinessById.get(playerId);
+        const directive = directiveById.get(playerId);
+        if (!condition || !readiness || !directive) {
+          throw new Error(`Missing lifecycle condition entry for ${playerId}`);
+        }
+        const unavailable = DEFAULT_CAREER_AVAILABILITY_PACK.entries.find(
+          (entry) =>
+            entry.playerId === playerId &&
+            entry.startDate <= careerState.currentDate &&
+            careerState.currentDate <= entry.endDate,
+        );
+        return {
+          playerId,
+          fatigueBp: condition.fatigueBp,
+          availability: unavailable ? "UNAVAILABLE" : "AVAILABLE",
+          availabilityReason: unavailable?.reason ?? null,
+          unavailableThrough: unavailable?.endDate ?? null,
+          directive,
+          battingReadiness: readiness.batting,
+          bowlingReadiness: readiness.bowling,
+          fieldingReadiness: readiness.fielding,
+        };
+      }),
+    });
+  }
+
+  squadView(
+    state = this.state,
+  ): SquadTrainingConditionView | LifecycleSquadTrainingConditionView | null {
     if (!state?.controlledTeamId) return null;
+    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      return this.projectLifecycleSquadView(state.careerState, state.controlledTeamId);
+    }
     return projectSquadTrainingCondition(
       state.careerState,
       state.controlledTeamId,
@@ -2008,8 +3117,16 @@ export class CareerApplicationService {
 
   playerCondition(playerId: string) {
     if (!this.state) return null;
-    const team = world.teams.find((candidate) => candidate.squadIds.includes(playerId));
+    const activeWorld = this.getWorld();
+    const team = activeWorld.teams.find((candidate) => candidate.squadIds.includes(playerId));
     if (!team) return null;
+    if (this.state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      return (
+        this.projectLifecycleSquadView(this.state.careerState, team.teamId).players.find(
+          (player) => player.playerId === playerId,
+        ) ?? null
+      );
+    }
     return (
       projectSquadTrainingCondition(
         this.state.careerState,
@@ -2028,9 +3145,7 @@ export class CareerApplicationService {
   }
 
   playerName(playerId: string): string {
-    return (
-      this.getWorld().players.find((player) => player.playerId === playerId)?.name ?? playerId
-    );
+    return this.findPlayerIncludingRetired(playerId)?.player.name ?? playerId;
   }
 
   groundName(groundId: string): string {

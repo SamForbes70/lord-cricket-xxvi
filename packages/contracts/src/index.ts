@@ -27,6 +27,8 @@ export * from "./season-persistence.js";
 
 export * from "./persistent-world.js";
 
+export * from "./player-lifecycle.js";
+
 export * from "./roster-import.js";
 
 export * from "./delegation-journal.js";

@@ -13,10 +13,11 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 | Area | State |
 | --- | --- |
 | V0.1 | Closed and owner accepted on 13 November 2026. Every V01 backlog item is `DONE`. |
-| Stage 2 (Persistent world) | `accepted` on 14 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)). |
+| Stage 2 (Persistent world) | `accepted` on `main` (`161e781`, 14 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)). |
+| Stage 3 (Player lifecycle & youth pathway) | `accepted` on `main` (14 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): fictional ageing, exploit-proof off-season skill progression, retirement, preserved alumni pages, youth academy intake/promotion, and 20-season diagnostics (`0` role shortages). |
 | Match formats | T20, ODI and five-day red ball, with hash-chained replay. Tactical captains for all three. Seeded red-ball weather. |
-| Career | Single-season V0.1 careers (`14` rounds, `56` fixtures) plus persistent multi-season world careers (`LC_PERSISTENT_WORLD_V1`: consecutive T20 seasons, Roll of Honour, all-time club & player statistics, cross-season player history). |
-| Saves | IndexedDB with checkpoints and writer leases; crash-safe idempotent season rollover; durable managed-match recovery across closed tabs; completed-match event archives and replay across seasons; non-destructive single-season copy-forward into Season 2; `.lcxxvi` export and import. |
+| Career | Single-season V0.1 careers (`14` rounds, `56` fixtures), Stage 2 persistent multi-season worlds (`LC_PERSISTENT_WORLD_V1`), and Stage 3 lifecycle persistent worlds (`LC_PERSISTENT_WORLD_V2_LIFECYCLE`). |
+| Saves | IndexedDB with checkpoints and writer leases; crash-safe idempotent season rollover; durable managed-match recovery across closed tabs; per-season roster-snapshotted completed-match event archives (`V2`) and replay across seasons; non-destructive single-season copy-forward and Stage 2 -> Stage 3 slot upgrade; `.lcxxvi` export and import. |
 | Offline and accessibility | Precached offline shell with safe updates; automated keyboard, focus, contrast and 150 percent checks. |
 | Packaging | `npm run package:game` builds a playable zip and a source zip. |
 | Research track | Blocked on data. The model is synthetic and uncalibrated. |
@@ -27,7 +28,7 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 
 ## What is next
 
-1. **Stage 3: Player lifecycle and youth pathway** (unlocked by Stage 2 owner acceptance on 14 November 2026), then Stage 4 (contracts and squad economy). See [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) and [NEXT_PASS.md](NEXT_PASS.md).
+1. **Stage 4: Contracts, budgets and recruitment** (unlocked by Stage 3 owner acceptance on 14 November 2026), plus **Stage 5: Tactical briefings and feedback**. See [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) and [NEXT_PASS.md](NEXT_PASS.md).
 2. The owner applies branch protection ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
 3. Optionally, real measurements for the three declared gates.
 

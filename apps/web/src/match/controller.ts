@@ -91,10 +91,38 @@ export function createMatchController(
   let careerFixture: Extract<Request, { type: "START" }>["careerFixture"] | null = null;
   let displayWorld = world;
   function setWorldCopy(copy: NewGameWorldCopy | null) {
+    if (rosterPack && copy) {
+      const validatedCopy = validateNewGameWorldCopy(copy, world).world;
+      const teamNames = new Map(validatedCopy.teams.map((t) => [t.teamId, t.name]));
+      const groundNames = new Map(validatedCopy.grounds.map((g) => [g.groundId, g.name]));
+      const playerNames = new Map(validatedCopy.players.map((p) => [p.playerId, p.name]));
+      displayWorld = {
+        ...rosterPack.world,
+        teams: rosterPack.world.teams.map((t) => {
+          const ov = teamNames.get(t.teamId);
+          return ov ? { ...t, name: ov } : t;
+        }),
+        grounds: rosterPack.world.grounds.map((g) => {
+          const ov = groundNames.get(g.groundId);
+          return ov ? { ...g, name: ov } : g;
+        }),
+        players: rosterPack.world.players.map((p) => {
+          const ov = playerNames.get(p.playerId);
+          return ov ? { ...p, name: ov } : p;
+        }),
+      };
+      return;
+    }
     displayWorld = rosterPack?.world ?? (copy ? validateNewGameWorldCopy(copy, world).world : world);
   }
   function bindCareerFixture(fixture: typeof careerFixture) {
-    setWorldCopy(fixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? fixture.worldCopy : null);
+    const copy =
+      fixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2"
+        ? fixture.worldCopy
+        : fixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
+          ? (fixture.worldCopy ?? null)
+          : null;
+    setWorldCopy(copy);
     careerFixture = fixture;
   }
   const seen = new Map<string, { request: string; response: Response }>();
@@ -418,8 +446,18 @@ export function createMatchController(
             throw new Error("T20 controller received a non-T20 start.");
           if (session) throw new Error("A match is already in progress.");
           if (request.careerFixture && request.worldCopy) throw new Error("A career match cannot replace its world copy.");
-          if (request.rosterPack && (request.worldCopy || (request.careerFixture && request.careerFixture.launchVersion !== "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER"))) throw new Error("An imported roster cannot replace a career or edited world.");
-          if (request.careerFixture?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" && JSON.stringify(request.rosterPack) !== JSON.stringify(request.careerFixture.rosterPack)) throw new Error("Career roster binding mismatch.");
+          const careerRosterFixture =
+            request.careerFixture &&
+            (request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ||
+              request.careerFixture.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE")
+              ? request.careerFixture
+              : null;
+          if (request.rosterPack && (request.worldCopy || (request.careerFixture && !careerRosterFixture))) {
+            throw new Error("An imported roster cannot replace a career or edited world.");
+          }
+          if (careerRosterFixture && JSON.stringify(request.rosterPack) !== JSON.stringify(careerRosterFixture.rosterPack)) {
+            throw new Error("Career roster binding mismatch.");
+          }
           rosterPack = request.rosterPack ?? null;
           bindCareerFixture(request.careerFixture ?? null);
           if (!request.careerFixture) setWorldCopy(request.worldCopy ?? null);
@@ -438,7 +476,8 @@ export function createMatchController(
             const draft = createRosterT20Session(rosterPack, { ...identity, seed: careerFixture ? careerFixture.matchSeed : privateSeed(), format: "T20", selection: { groundId: request.groundId, teams: request.selections } });
             const cmd: T20Command = { kind: "CONFIRM_TEAMS", payload: {}, actorId: "SYSTEM", commandId: id, expectedRevision: 0 };
             session = executeRosterT20Command(draft, cmd).session as unknown as T20Session;
-            displayWorld = rosterPack.world;
+            bindCareerFixture(request.careerFixture ?? null);
+            if (!request.careerFixture) displayWorld = rosterPack.world;
             audit.push({ requestId: id, origin: "HUMAN", commandKind: "CONFIRM_TEAMS", engineActorId: "SYSTEM" });
           } else {
           const setup = validateT20MatchSetup(

@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "seasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "calendarYear": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 9999
+    },
+    "activePlayerCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "cumulativeRetiredCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "cumulativeYouthPromotedCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "minClubSquadSize": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "maxClubSquadSize": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "minClubKeepers": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "minClubBowlingCapable": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "clubsWithRoleShortage": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "meanAgeX10": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "battingAbility": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "p10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "median": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "meanX10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "p90": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "min",
+        "p10",
+        "median",
+        "meanX10",
+        "p90",
+        "max"
+      ],
+      "additionalProperties": false
+    },
+    "bowlingAbility": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "p10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "median": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "meanX10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "p90": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "min",
+        "p10",
+        "median",
+        "meanX10",
+        "p90",
+        "max"
+      ],
+      "additionalProperties": false
+    },
+    "fieldingAbility": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "p10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "median": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "meanX10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "p90": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "min",
+        "p10",
+        "median",
+        "meanX10",
+        "p90",
+        "max"
+      ],
+      "additionalProperties": false
+    },
+    "keepingAbility": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "p10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "median": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "meanX10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "p90": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "min",
+        "p10",
+        "median",
+        "meanX10",
+        "p90",
+        "max"
+      ],
+      "additionalProperties": false
+    },
+    "roleCounts": {
+      "type": "object",
+      "properties": {
+        "BATTER": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "BOWLER": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "ALLROUNDER": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "KEEPER": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "BATTER",
+        "BOWLER",
+        "ALLROUNDER",
+        "KEEPER"
+      ],
+      "additionalProperties": false
+    },
+    "directiveSampleCheck": {
+      "type": "string",
+      "enum": [
+        "REST",
+        "BATTING_PRACTICE",
+        "BOWLING_PRACTICE",
+        "FIELDING_PRACTICE"
+      ]
+    }
+  },
+  "required": [
+    "seasonNumber",
+    "calendarYear",
+    "activePlayerCount",
+    "cumulativeRetiredCount",
+    "cumulativeYouthPromotedCount",
+    "minClubSquadSize",
+    "maxClubSquadSize",
+    "minClubKeepers",
+    "minClubBowlingCapable",
+    "clubsWithRoleShortage",
+    "meanAgeX10",
+    "battingAbility",
+    "bowlingAbility",
+    "fieldingAbility",
+    "keepingAbility",
+    "roleCounts"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:LifecycleDiagnosticSeasonSnapshot:1",
+  "title": "LifecycleDiagnosticSeasonSnapshot"
+}

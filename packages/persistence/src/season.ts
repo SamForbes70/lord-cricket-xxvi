@@ -1,6 +1,12 @@
 import {
   canonicalJson,
   CompletedCareerMatchEventArchiveSchema,
+  CompletedLifecycleMatchEventArchiveCoreSchema,
+  CompletedLifecycleMatchEventArchiveSchema,
+  LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION,
+  LIFECYCLE_SEASON_STATE_VERSION,
+  LifecycleSeasonStateCoreSchema,
+  LifecycleSeasonStateSchema,
   MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
   MAX_SEASON_EVENT_ARCHIVES_TOTAL_BYTES,
   SeasonCheckpointGenerationOptionSchema,
@@ -17,7 +23,11 @@ import {
   SeasonArchiveSchema,
   NewGameWorldCopySchema,
   RosterSeasonStateSchema, StagedRosterPackSchema,
+  type ActivePersistentSeasonState,
   type CompletedCareerMatchEventArchive,
+  type CompletedLifecycleMatchEventArchive,
+  type LifecycleSeasonState,
+  type LifecycleSeasonStateCore,
   type RosterSeasonState, type StagedRosterPack,
   type SeasonCheckpointGenerationOption,
   type SeasonCheckpointInspection,
@@ -28,6 +38,10 @@ import {
   type SeasonArchive,
   type NewGameWorldCopy,
 } from "@lcxxvi/contracts";
+
+export type AnyCareerMatchEventArchive =
+  | CompletedCareerMatchEventArchive
+  | CompletedLifecycleMatchEventArchive;
 
 export const CAREER_MATCH_EVENTS_SCOPE = "CAREER_MATCH_EVENTS_V1" as const;
 
@@ -179,8 +193,64 @@ export async function validateT20SeasonArchive(raw: unknown): Promise<SeasonArch
   return archive;
 }
 
+function lifecycleSeasonCore(state: LifecycleSeasonState): LifecycleSeasonStateCore {
+  const { stateSha256, ...core } = state;
+  void stateSha256;
+  return LifecycleSeasonStateCoreSchema.parse(core);
+}
+
+export async function validateLifecycleSeasonState(raw: unknown): Promise<LifecycleSeasonState> {
+  const state = LifecycleSeasonStateSchema.parse(raw);
+  const expectedHash = await seasonSha256Text(canonicalJson(lifecycleSeasonCore(state)));
+  assertSeason(state.stateSha256 === expectedHash, "LIFECYCLE_SEASON_HASH_MISMATCH");
+  const { scheduleSha256, ...scheduleCore } = state.schedule;
+  assertSeason(scheduleSha256 === await seasonSha256Text(canonicalJson(scheduleCore)), "LIFECYCLE_SCHEDULE_HASH_MISMATCH");
+  const { stateSha256: careerSha256, ...careerCore } = state.careerState;
+  assertSeason(careerSha256 === await seasonSha256Text(canonicalJson(careerCore)), "LIFECYCLE_CAREER_HASH_MISMATCH");
+  assertSeason(state.seasonId === state.schedule.request.seasonId, "LIFECYCLE_SCHEDULE_SEASON_MISMATCH");
+  assertSeason(state.gameId === state.schedule.request.gameId, "LIFECYCLE_SCHEDULE_GAME_MISMATCH");
+  assertSeason(state.careerId === state.careerState.careerId, "LIFECYCLE_CAREER_ID_MISMATCH");
+  assertSeason(state.schedule.request.startDate === state.careerState.startDate, "LIFECYCLE_CAREER_START_DATE_MISMATCH");
+  assertSeason(state.schedule.scheduleSha256 === state.careerState.scheduleSha256, "LIFECYCLE_CAREER_SCHEDULE_MISMATCH");
+  assertSeason(state.schedule.rosterPackHash === state.rosterPackSha256, "LIFECYCLE_ROSTER_PACK_SCHEDULE_MISMATCH");
+  assertSeason(state.careerState.rosterPackHash === state.rosterPackSha256, "LIFECYCLE_ROSTER_PACK_CAREER_MISMATCH");
+  assertSeason(state.projection.seasonId === state.seasonId, "LIFECYCLE_PROJECTION_SEASON_MISMATCH");
+  assertSeason(state.projection.scheduleSha256 === state.schedule.scheduleSha256, "LIFECYCLE_PROJECTION_SCHEDULE_MISMATCH");
+  assertSeason(state.completedMatches.length === state.projection.appliedMatches.length, "LIFECYCLE_COMPLETION_PROJECTION_COUNT_MISMATCH");
+  assertSeason(state.completedMatches.length === state.careerState.appliedMatchConditions.length, "LIFECYCLE_COMPLETION_CONDITION_COUNT_MISMATCH");
+  const completed = [...state.completedMatches].sort((a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId));
+  assertSeason(completed.every((value, index) => value === state.completedMatches[index]), "LIFECYCLE_COMPLETIONS_NOT_SORTED");
+  const fixtureIds = new Set<string>(), matchIds = new Set<string>(), sourceHashes = new Set<string>();
+  for (const completion of state.completedMatches) {
+    assertSeason(completion.seasonId === state.seasonId && completion.scheduleSha256 === state.schedule.scheduleSha256, `LIFECYCLE_COMPLETION_BINDING:${completion.fixtureId}`);
+    assertSeason(!fixtureIds.has(completion.fixtureId), `LIFECYCLE_DUPLICATE_FIXTURE:${completion.fixtureId}`);
+    assertSeason(!matchIds.has(completion.matchId), `LIFECYCLE_DUPLICATE_MATCH:${completion.fixtureId}`);
+    assertSeason(!sourceHashes.has(completion.sourceCompletionSha256), `LIFECYCLE_DUPLICATE_SOURCE:${completion.fixtureId}`);
+    fixtureIds.add(completion.fixtureId); matchIds.add(completion.matchId); sourceHashes.add(completion.sourceCompletionSha256);
+    const applied = state.projection.appliedMatches.find((entry) => entry.fixtureId === completion.fixtureId);
+    assertSeason(Boolean(applied) && applied!.matchId === completion.matchId && applied!.sourceCompletionSha256 === completion.sourceCompletionSha256, `LIFECYCLE_PROJECTION_COMPLETION_MISMATCH:${completion.fixtureId}`);
+    assertSeason(state.careerState.appliedMatchConditions.some((entry) => entry.matchId === completion.matchId), `LIFECYCLE_CONDITION_COMPLETION_MISMATCH:${completion.fixtureId}`);
+  }
+  const complete = state.completedMatches.length === 56 && state.projection.revision === 56 && state.projection.cursor.missingFixtureOrdinals.length === 0;
+  assertSeason(state.phase === (complete ? "COMPLETE" : "ACTIVE"), "LIFECYCLE_PHASE_MISMATCH");
+  return state;
+}
+
+export async function validateActivePersistentSeasonState(
+  raw: unknown,
+): Promise<ActivePersistentSeasonState> {
+  const version =
+    typeof raw === "object" && raw !== null
+      ? (raw as { seasonStateVersion?: unknown }).seasonStateVersion
+      : undefined;
+  if (version === LIFECYCLE_SEASON_STATE_VERSION) {
+    return validateLifecycleSeasonState(raw);
+  }
+  return validateT20SeasonState(raw);
+}
+
 export async function createT20SeasonArchive(stateRaw: unknown, completedAt: string): Promise<SeasonArchive> {
-  const state = await validateT20SeasonState(stateRaw);
+  const state = await validateActivePersistentSeasonState(stateRaw);
   assertSeason(state.phase === "COMPLETE", "ARCHIVE_REQUIRES_COMPLETE_SEASON");
   assertSeason(!Number.isNaN(Date.parse(completedAt)), "ARCHIVE_COMPLETED_AT_INVALID");
   const champion = state.projection.table.find((row) => row.rank === 1);
@@ -383,6 +453,111 @@ export async function validateCompletedCareerMatchEventArchive(
   if (completionRaw !== undefined) assertArchiveCompletionBinding(archive, completionRaw);
   verifiedArchiveDigests.set(archive, await seasonSha256Text(canonicalJson(archive)));
   return archive;
+}
+
+function assertLifecycleArchiveCompletionBinding(
+  archive: CompletedLifecycleMatchEventArchive,
+  completionRaw: unknown,
+): void {
+  const completion = T20SeasonMatchCompletionSchema.parse(completionRaw);
+  assertSeason(
+    completion.seasonId === archive.seasonId &&
+      completion.scheduleSha256 === archive.scheduleSha256 &&
+      completion.fixtureId === archive.fixtureId &&
+      completion.matchId === archive.matchId &&
+      completion.fixtureOrdinal === archive.fixtureOrdinal &&
+      completion.roundNumber === archive.roundNumber &&
+      completion.matchDayDate === archive.matchDayDate &&
+      completion.source === archive.source &&
+      completion.sourceCompletionSha256 === archive.sourceCompletionSha256 &&
+      completion.scorecardSha256 === archive.scorecardSha256,
+    `LIFECYCLE_MATCH_EVENT_ARCHIVE_COMPLETION_BINDING:${archive.fixtureId}`,
+  );
+}
+
+export async function validateCompletedLifecycleMatchEventArchive(
+  raw: unknown,
+  completionRaw?: unknown,
+): Promise<CompletedLifecycleMatchEventArchive> {
+  if (typeof raw === "object" && raw !== null) {
+    const priorDigest = verifiedArchiveDigests.get(raw);
+    if (priorDigest && (await seasonSha256Text(canonicalJson(raw))) === priorDigest) {
+      const verified = raw as CompletedLifecycleMatchEventArchive;
+      if (completionRaw !== undefined) assertLifecycleArchiveCompletionBinding(verified, completionRaw);
+      return verified;
+    }
+  }
+  const archive = CompletedLifecycleMatchEventArchiveSchema.parse(raw);
+  const { archiveSha256, ...coreRaw } = archive;
+  const core = CompletedLifecycleMatchEventArchiveCoreSchema.parse(coreRaw);
+  const canonicalCore = canonicalJson(core);
+  const byteLength = new TextEncoder().encode(canonicalJson(archive)).byteLength;
+  assertSeason(
+    byteLength <= MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
+    "LIFECYCLE_MATCH_EVENT_ARCHIVE_BYTE_LENGTH",
+  );
+  const [coreHash, expectedEventHashes] = await Promise.all([
+    seasonSha256Text(canonicalCore),
+    Promise.all(
+      archive.events.map((ev) =>
+        seasonSha256Text(
+          canonicalJson([
+            ev.version,
+            ev.sequence,
+            ev.commandId,
+            ev.type,
+            ev.payload,
+            ev.previousHash,
+            ev.stateHash,
+          ]),
+        ),
+      ),
+    ),
+  ]);
+  assertSeason(coreHash === archiveSha256, "LIFECYCLE_MATCH_EVENT_ARCHIVE_HASH_MISMATCH");
+  for (let index = 0; index < archive.events.length; index += 1) {
+    const ev = archive.events[index]!;
+    assertSeason(ev.sequence === index + 1, `LIFECYCLE_MATCH_EVENT_ARCHIVE_SEQUENCE:${index}`);
+    if (index > 0) {
+      assertSeason(
+        ev.previousHash === archive.events[index - 1]!.eventHash,
+        `LIFECYCLE_MATCH_EVENT_ARCHIVE_CHAIN:${index}`,
+      );
+    }
+    assertSeason(
+      ev.eventHash === expectedEventHashes[index],
+      `LIFECYCLE_MATCH_EVENT_ARCHIVE_EVENT_HASH:${index}`,
+    );
+  }
+  assertSeason(
+    archive.eventChain.eventCount === archive.events.length &&
+      archive.eventChain.finalEventHash === archive.events.at(-1)!.eventHash,
+    "LIFECYCLE_MATCH_EVENT_ARCHIVE_FINAL_HASH",
+  );
+  if (completionRaw !== undefined) assertLifecycleArchiveCompletionBinding(archive, completionRaw);
+  verifiedArchiveDigests.set(archive, await seasonSha256Text(canonicalJson(archive)));
+  return archive;
+}
+
+export async function validateAnyCareerMatchEventArchive(
+  raw: unknown,
+  completionRaw?: unknown,
+): Promise<AnyCareerMatchEventArchive> {
+  const version =
+    typeof raw === "object" && raw !== null
+      ? (raw as { archiveVersion?: unknown }).archiveVersion
+      : undefined;
+  if (version === LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION) {
+    return validateCompletedLifecycleMatchEventArchive(raw, completionRaw);
+  }
+  return validateCompletedCareerMatchEventArchive(raw, completionRaw);
+}
+
+export function careerMatchEventArchiveByteLength(archive: AnyCareerMatchEventArchive): number {
+  if (archive.archiveVersion === "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1") {
+    return archive.byteLength;
+  }
+  return new TextEncoder().encode(canonicalJson(archive)).byteLength;
 }
 
 export async function validateSeasonMatchEventArchiveSet(

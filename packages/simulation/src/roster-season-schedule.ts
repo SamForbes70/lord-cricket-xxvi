@@ -8,6 +8,14 @@ import { validateStagedRosterPack } from "./roster-import.js";
 import { addCalendarDays, firstHalfPairings } from "./season-scheduler.js";
 
 const hash = createStateHasher().hash;
+const verifiedRosterSchedules = new WeakMap<object, StagedRosterPack>();
+function deepFreeze<T>(value: T): T {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.values(value).forEach(deepFreeze);
+    Object.freeze(value);
+  }
+  return value;
+}
 
 export function generateRosterSeasonSchedule(rawPack: StagedRosterPack, rawRequest: unknown): RosterSeasonSchedule {
   const request = RosterSeasonScheduleRequestSchema.parse(rawRequest);
@@ -35,12 +43,20 @@ export function generateRosterSeasonSchedule(rawPack: StagedRosterPack, rawReque
     matchDayDate: addCalendarDays(request.startDate, index * 3),
     fixtureIds: fixtures.slice(index * 4, index * 4 + 4).map(fixture => fixture.fixtureId) }));
   const core = { version: "LC_T20_ROSTER_SCHEDULE_V2" as const, request, rosterPackHash, worldHash, teamIds, groundIds, homeGroundIds, rounds, fixtures };
-  return RosterSeasonScheduleSchema.parse({ ...core, scheduleSha256: hash(core) });
+  const parsed = deepFreeze(RosterSeasonScheduleSchema.parse({ ...core, scheduleSha256: hash(core) }));
+  verifiedRosterSchedules.set(parsed, pack);
+  return parsed;
 }
 
 export function validateRosterSeasonSchedule(raw: unknown, pack: StagedRosterPack): RosterSeasonSchedule {
+  const validatedPack = validateStagedRosterPack(pack, RULE_MANIFESTS.map(rule => rule.rulesId), SYNTHETIC_ALPHA_PACK.manifest.variationIds);
+  if (raw !== null && typeof raw === "object" && Object.isFrozen(raw) && verifiedRosterSchedules.get(raw) === validatedPack) {
+    return raw as RosterSeasonSchedule;
+  }
   const schedule = RosterSeasonScheduleSchema.parse(raw);
-  const rebuilt = generateRosterSeasonSchedule(pack, schedule.request);
+  const rebuilt = generateRosterSeasonSchedule(validatedPack, schedule.request);
   if (hash(schedule) !== hash(rebuilt)) throw new Error("ROSTER_SEASON_SCHEDULE_MISMATCH");
+  deepFreeze(schedule);
+  verifiedRosterSchedules.set(schedule, validatedPack);
   return schedule;
 }

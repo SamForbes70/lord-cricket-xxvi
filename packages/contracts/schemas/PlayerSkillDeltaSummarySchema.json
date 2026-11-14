@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "battingDelta": {
+      "type": "integer",
+      "minimum": -25,
+      "maximum": 25
+    },
+    "bowlingDelta": {
+      "type": "integer",
+      "minimum": -25,
+      "maximum": 25
+    },
+    "fieldingDelta": {
+      "type": "integer",
+      "minimum": -25,
+      "maximum": 25
+    },
+    "keepingDelta": {
+      "type": "integer",
+      "minimum": -25,
+      "maximum": 25
+    },
+    "staminaDelta": {
+      "type": "integer",
+      "minimum": -25,
+      "maximum": 25
+    }
+  },
+  "required": [
+    "battingDelta",
+    "bowlingDelta",
+    "fieldingDelta",
+    "keepingDelta",
+    "staminaDelta"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PlayerSkillDeltaSummary:1",
+  "title": "PlayerSkillDeltaSummary"
+}

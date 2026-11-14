@@ -8,8 +8,16 @@ import { addCalendarDays } from "./season-scheduler.js";
 import { validateRosterSeasonSchedule } from "./roster-season-schedule.js";
 
 const hash = createStateHasher().hash;
+const verifiedRosterDayStates = new WeakMap<object, { scheduleSha256: string; packHash: string }>();
+function deepFreeze<T>(value: T): T {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.values(value).forEach(deepFreeze);
+    Object.freeze(value);
+  }
+  return value;
+}
 function seal(core: Omit<RosterCareerDayState, "stateSha256">): RosterCareerDayState {
-  return RosterCareerDayStateSchema.parse({ ...core, stateSha256: hash(core) });
+  return deepFreeze(RosterCareerDayStateSchema.parse({ ...core, stateSha256: hash(core) }));
 }
 function coreOf(state: RosterCareerDayState) {
   const { stateSha256, ...core } = state;
@@ -17,8 +25,14 @@ function coreOf(state: RosterCareerDayState) {
   return core;
 }
 export function validateRosterCareerDayState(raw: unknown, rawSchedule: unknown, pack: StagedRosterPack): RosterCareerDayState {
-  const state = RosterCareerDayStateSchema.parse(raw);
   const schedule = validateRosterSeasonSchedule(rawSchedule, pack);
+  if (raw !== null && typeof raw === "object" && Object.isFrozen(raw)) {
+    const cached = verifiedRosterDayStates.get(raw);
+    if (cached && cached.scheduleSha256 === schedule.scheduleSha256 && cached.packHash === schedule.rosterPackHash) {
+      return raw as RosterCareerDayState;
+    }
+  }
+  const state = RosterCareerDayStateSchema.parse(raw);
   const ids = pack.world.players.map(player => player.playerId).sort();
   if (hash(coreOf(state)) !== state.stateSha256 || state.scheduleSha256 !== schedule.scheduleSha256 || state.rosterPackHash !== schedule.rosterPackHash || state.worldHash !== schedule.worldHash || state.startDate !== schedule.request.startDate || state.finalScheduledDate !== schedule.rounds[13]!.matchDayDate || state.currentDate < state.startDate || state.currentDate > state.finalScheduledDate) throw new Error("ROSTER_CAREER_STATE_MISMATCH");
   for (const entries of [state.playerConditions, state.playerReadiness, state.trainingAssignments]) {
@@ -27,6 +41,8 @@ export function validateRosterCareerDayState(raw: unknown, rawSchedule: unknown,
   if (state.playerConditions.some(entry => entry.lastUpdatedDate !== state.currentDate) || state.playerReadiness.some(entry => entry.lastUpdatedDate !== state.currentDate)) throw new Error("ROSTER_CAREER_STALE_PLAYER_DATE");
   if (new Set(state.appliedMatchConditions.map(entry => entry.matchCompletionKey)).size !== state.appliedMatchConditions.length || new Set(state.appliedMatchConditions.map(entry => entry.matchId)).size !== state.appliedMatchConditions.length) throw new Error("ROSTER_CAREER_DUPLICATE_MATCH");
   if (state.appliedMatchConditions.some(entry => { const fixture = schedule.fixtures.find(item => item.matchId === entry.matchId); return !fixture || fixture.matchDayDate !== entry.matchDayDate || entry.matchDayDate > state.currentDate; })) throw new Error("ROSTER_CAREER_APPLIED_FIXTURE_MISMATCH");
+  deepFreeze(state);
+  verifiedRosterDayStates.set(state, { scheduleSha256: schedule.scheduleSha256, packHash: schedule.rosterPackHash });
   return state;
 }
 export function createRosterCareerDayState(careerId: string, rawSchedule: unknown, pack: StagedRosterPack): RosterCareerDayState {

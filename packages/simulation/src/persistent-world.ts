@@ -4,12 +4,17 @@ import {
   PersistentWorldIdentitySchema,
   type CareerDayStateV2,
   type PersistentWorldIdentity,
+  type RosterCareerDayState,
+  type RosterSeasonSchedule,
   type SeasonSchedule,
   type PlayerTrainingAssignment,
+  type StagedRosterPack,
 } from "@lcxxvi/contracts";
 import { FROZEN_WORLD_PINS, T20_LEAGUE_COMPETITION } from "@lcxxvi/data";
 import { createCareerDayStateV2, setTrainingDirective, validateCareerDayStateV2 } from "./career-condition.js";
 import { createStateHasher } from "./determinism.js";
+import { createRosterCareerDayState, setRosterTrainingDirective } from "./roster-career-condition.js";
+import { generateRosterSeasonSchedule } from "./roster-season-schedule.js";
 import { generateSeasonSchedule } from "./season-scheduler.js";
 
 const hasher = createStateHasher();
@@ -180,5 +185,74 @@ export function createPersistentSeasonScheduleAndDayState(input: {
     seasonSeed,
     schedule,
     careerState: validateCareerDayStateV2(careerState),
+  };
+}
+
+export function createPersistentLifecycleSeasonScheduleAndDayState(input: {
+  worldIdentity: PersistentWorldIdentity;
+  rosterPack: StagedRosterPack;
+  careerId: string;
+  seasonNumber: number;
+  calendarYear: number;
+  startDate: string;
+  priorSeasonFinalStateSha256: string | null;
+  carryForwardDirectives?: readonly PlayerTrainingAssignment[];
+}): {
+  seasonId: string;
+  gameId: string;
+  seasonSeed: string;
+  schedule: RosterSeasonSchedule;
+  careerState: RosterCareerDayState;
+} {
+  const identity = PersistentWorldIdentitySchema.parse(input.worldIdentity);
+  assertPersistentSim(
+    Number.isInteger(input.seasonNumber) &&
+      input.seasonNumber >= 1 &&
+      input.seasonNumber <= MAX_PERSISTENT_SEASONS,
+    "SEASON_NUMBER_OUT_OF_RANGE",
+  );
+  assertPersistentSim(
+    input.startDate.startsWith(`${String(input.calendarYear).padStart(4, "0")}-`),
+    "START_DATE_YEAR_MISMATCH",
+  );
+  const suffix = `s${String(input.seasonNumber).padStart(3, "0")}`;
+  const seasonId = `${identity.worldId}-${suffix}`;
+  const gameId = `${input.careerId}-game-${suffix}`;
+  const seasonSeed = derivePersistentSeasonSeed({
+    worldIdentity: identity,
+    seasonNumber: input.seasonNumber,
+    priorSeasonFinalStateSha256: input.priorSeasonFinalStateSha256,
+  });
+  const schedule = generateRosterSeasonSchedule(input.rosterPack, {
+    seasonId,
+    gameId,
+    seasonSeed,
+    startDate: input.startDate,
+  });
+  let careerState = createRosterCareerDayState(input.careerId, schedule, input.rosterPack);
+  if (input.carryForwardDirectives?.length) {
+    const activePlayerIds = new Set(input.rosterPack.world.players.map((p) => p.playerId));
+    for (const assignment of input.carryForwardDirectives) {
+      if (assignment.directive === "REST" || !activePlayerIds.has(assignment.playerId)) continue;
+      careerState = setRosterTrainingDirective(
+        careerState,
+        {
+          command: "SET_TRAINING_DIRECTIVE",
+          playerId: assignment.playerId,
+          directive: assignment.directive,
+          effectiveDate: careerState.currentDate,
+          expectedRevision: careerState.revision,
+        },
+        schedule,
+        input.rosterPack,
+      );
+    }
+  }
+  return {
+    seasonId,
+    gameId,
+    seasonSeed,
+    schedule,
+    careerState,
   };
 }

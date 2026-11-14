@@ -246,7 +246,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           selections: careerLaunch.current.selections,
           groundId: careerLaunch.current.groundId,
           careerFixture: careerLaunch.current,
-          ...(careerLaunch.current.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" ? { rosterPack: careerLaunch.current.rosterPack } : {}),
+          ...(careerLaunch.current.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" || careerLaunch.current.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE" ? { rosterPack: careerLaunch.current.rosterPack } : {}),
         });
       }
       if (r.catalog && !r.view && !careerLaunch.current && !recoverIssued.current && !r.error) {

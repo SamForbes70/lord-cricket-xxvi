@@ -1,9 +1,10 @@
 import {
+  ActivePersistentSeasonStateSchema,
   CompletedSeasonRecordSchema,
   PERSISTENT_CAREER_PROJECTION_VERSION,
   PersistentCareerProjectionCoreSchema,
   T20SeasonMatchCompletionSchema,
-  T20SeasonStateSchema,
+  type ActivePersistentSeasonState,
   type CompletedSeasonRecord,
   type PersistentCareerPlayerStats,
   type PersistentCareerProjectionCore,
@@ -12,7 +13,6 @@ import {
   type SeasonLeaderboards,
   type SeasonRollOfHonourEntry,
   type T20SeasonMatchCompletion,
-  type T20SeasonState,
 } from "@lcxxvi/contracts";
 
 function assertPersistentProjection(condition: unknown, code: string): asserts condition {
@@ -351,7 +351,9 @@ export function rebuildPersistentCareerProjectionCore(input: {
   const completedSeasons: CompletedSeasonRecord[] = input.completedSeasons.map((item) =>
     CompletedSeasonRecordSchema.parse(item),
   );
-  const activeSeason: T20SeasonState = T20SeasonStateSchema.parse(input.activeSeason);
+  const activeSeason: ActivePersistentSeasonState = ActivePersistentSeasonStateSchema.parse(
+    input.activeSeason,
+  );
 
   const expectedActiveSeasonNumber = completedSeasons.length + 1;
   const seenSeasonIds = new Set<string>();
