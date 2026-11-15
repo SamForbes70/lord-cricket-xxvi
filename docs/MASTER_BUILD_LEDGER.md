@@ -1,6 +1,6 @@
 # AI Master Build Brief — 17-Stage Reconciliation & Delivery Ledger
 
-Reconciled against `main` (Stages 2–7 merged & owner-accepted) on 15 November 2026 (Australia/Brisbane).
+Reconciled against `main` (Stages 2–8 merged & owner-accepted) on 16 November 2026 (Australia/Brisbane).
 
 Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepted`, and `deployed`. Earlier status words from `8a7c164` in the brief are reconciled below against `161e781` and [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md).
 
@@ -15,7 +15,7 @@ Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepte
 | 5 | Tactical briefings and feedback | **accepted** (`main` `4fa82d8`, 15 Nov 2026) | Implemented, verified (`750/750` unit tests across `67/67` files, `281` JSON Schemas, Chromium + Firefox Stage 5 UI + tactical/accessibility regression suites, and observed playtest protocol [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)), and **owner-accepted on 15 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage05-tactical-briefings/REPORT.md](verification-stage05-tactical-briefings/REPORT.md)). Multi-participant observed playtest sessions remain unrecorded in-repo. |
 | 6 | Live field and highlight pacing | **accepted** (`main` `031abd3`, 15 Nov 2026) | Implemented, verified (`755/755` unit tests across `68/68` files, `292` JSON Schemas, Chromium + Firefox Stage 6 UI + tactical/accessibility regression suites), and **owner-accepted on 15 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage06-live-field-highlights/REPORT.md](verification-stage06-live-field-highlights/REPORT.md)): responsive 2D SVG named-position field with RHB/LHB mirroring, powerplay legal-placement feedback, keyboard preset controls, illustrative highlight trajectories (`EVERY_BALL`, `KEY_MOMENTS`, `FAST`), `reducedMotion` suppression, and identical final state/event hashes across modes. |
 | 7 | Contextual text commentary | **accepted** (`main`, 15 Nov 2026) | Implemented, verified (`759/759` unit tests across `69/69` files, `299` JSON Schemas, `6/6` Chromium + Firefox Stage 7/6/accessibility UI suites), and **owner-accepted on 15 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage07-contextual-commentary/REPORT.md](verification-stage07-contextual-commentary/REPORT.md)): shared fact-checked `LC_COMMENTARY_ADAPTER_V1` (`packages/projections/src/commentary.ts`) across `T20`/`ODI`/`RED_BALL` with FNV-1a presentation seed, repetition cooldowns, `BRIEF`/`STANDARD`/`DETAILED`/`OFF` modes, milestone badges, and zero network calls. |
-| 8 | Optional sound and narration | **missing** | No audio manager or sound assets exist yet. |
+| 8 | Optional sound and narration | **accepted** (`main`, 16 Nov 2026) | Implemented, verified (`765/765` unit tests across `70/70` files, `309` JSON Schemas, `6/6` Chromium + Firefox Stage 8/7/accessibility UI suites), and **owner-accepted on 16 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage08-optional-sound/REPORT.md](verification-stage08-optional-sound/REPORT.md)): `LC_AUDIO_PRESENTATION_V1` + `LC_AUDIO_PROVENANCE_V1` original MIT synth assets, `CricketAudioManager`, 4-channel mixer + mute + narration + live ARIA captions, gesture gate, reload deduplication, fast-forward expiry, background-tab suppression, missing/decode fallback, and byte-identical simulation hashes. |
 | 9 | Historical statistics and leaderboards | **partial** | Single-season tables/stats plus Stage 2 all-time career T20 club/player totals and season breakdowns exist; qualified rate leaderboards, multi-dimensional filters (opponent, venue, batting position), and retired-player record links remain open. |
 | 10 | Match and season awards | **missing** | No Player of the Match or season awards model exists yet. |
 | 11 | Player and manager stories | **missing** (depends on Stages 4, 9, 10) | Unstarted. |
@@ -117,6 +117,18 @@ Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepte
   - Shared pure commentary adapter (`packages/projections/src/commentary.ts`): `projectMatchCommentary` and `selectCommentaryTextForMode` replacing inline controller strings across `T20`, `ODI`, and `RED_BALL` (`controller.ts`, `controller-odi.ts`, `controller-red5.ts`); FNV-1a presentation seed variation + sliding repetition cooldowns (`DEFAULT_REPETITION_COOLDOWN_WINDOW = 3`); format-specific free-hit eligibility (`T20`/`ODI` only, never `RED_BALL`); `factSlots` tracing every claim to committed events/projections; milestone tags (`BATTER_FIFTY`, `BATTER_CENTURY`, `BATTER_150`, `BATTER_DOUBLE_CENTURY`, `PARTNERSHIP_FIFTY`, `PARTNERSHIP_CENTURY`, `PARTNERSHIP_150`, `BOWLER_THREE_FOR`, `BOWLER_FIVE_FOR`, `MAIDEN_OVER`, `ALL_OUT`, `WINNING_DELIVERY`); zero network calls (`fetchCount === 0`).
   - Match Header & Career Settings verbosity controls (`Standard`, `Detailed`, `Brief`, `Off`) persisted in `lcxxvi-match-commentary` (`apps/web/src/main.tsx`, `CareerApp.tsx`, `styles.css`).
 - **Evidence**: [verification-stage07-contextual-commentary/REPORT.md](verification-stage07-contextual-commentary/REPORT.md).
-- **Next eligible slices**:
-  - **Stage 8 (Optional sound and narration)** — optional event-driven audio manager with provenance manifest, volume/mute controls, user-gesture gate, cue deduplication, and complete silent/caption parity.
-  - **Stage 9 (Historical statistics and leaderboards)** — qualified rate leaderboards, multi-dimensional filters, and contributing-match record links.
+---
+
+### Slice `S08-01` — Stage 8: Optional Sound & Narration
+
+- **Status**: `accepted` (owner-accepted 16 November 2026; merged to `main`).
+- **Base revision**: `3762ed3` (`main` — Stage 7 merged & owner-accepted on 15 November 2026).
+- **Branch**: `feat/stage8-sound-narration`.
+- **Dependencies satisfied**: V0.1 + Stages 2–7 accepted on `main`.
+- **Scope**:
+  - Versioned audio presentation & provenance contracts (`LC_AUDIO_PRESENTATION_V1`, `LC_AUDIO_PROVENANCE_V1`) in `packages/contracts/src/audio.ts` + browser CSP-safe Zod adapter (`packages/contracts/src/zod-browser-csp.ts`) + 10 strict AJV 2020-12 JSON Schemas (`309` total).
+  - Pure cue projection & original MIT procedural synthesis manifest (`packages/projections/src/audio-cues.ts`): 10 original synthesis profiles with deterministic `pureSha256Hex` hashes, zero network calls (`networkCallsAllowed: false`), cue prioritization, `cueId` deduplication, and fast-forward burst expiry.
+  - `CricketAudioManager` & `AudioControlsPanel` (`apps/web/src/match/audio-manager.ts`, `AudioControlsPanel.tsx`, `main.tsx`, `CareerApp.tsx`, `controller.ts`, `controller-odi.ts`, `controller-red5.ts`, `styles.css`): user-gesture gating, 4-channel volume sliders (`CROWD`, `EFFECTS`, `COMMENTARY`, `INTERFACE`), mute, optional spoken narration, live ARIA captions, Career Settings sync, background-tab suppression, and silent fallback on missing/failed decodes.
+- **Evidence**: [verification-stage08-optional-sound/REPORT.md](verification-stage08-optional-sound/REPORT.md).
+- **Next eligible slice**:
+  - **Stage 9 (Historical statistics and leaderboards)** — qualified rate leaderboards, multi-dimensional filters, retired-player record views, and contributing-match record links.

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "PLAYED",
+    "QUEUED_AWAITING_GESTURE",
+    "DEDUP_SKIPPED",
+    "EXPIRED_FAST_FORWARD",
+    "MUTED_OR_ZERO_VOLUME",
+    "BACKGROUND_TAB_SUPPRESSED",
+    "MISSING_ASSET_FALLBACK",
+    "DECODE_FAILED_FALLBACK"
+  ],
+  "$id": "urn:lcxxvi:AudioPlaybackDecisionStatus:1",
+  "title": "AudioPlaybackDecisionStatus"
+}

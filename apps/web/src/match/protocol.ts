@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { MatchAnalytics } from "@lcxxvi/projections";
 import type {
+  AudioCue,
   CommentaryEntry,
   InMatchTacticalAssistantView,
   LiveFieldPresentation,
@@ -229,8 +230,10 @@ export type View = {
   >;
   fieldSlots: { slotId: string; playerId: string }[];
   positions: string[];
+  matchId?: string;
   advanceReason: string;
   commentary: CommentaryEntry[];
+  audioCues?: AudioCue[];
   scorecard: T20Scorecard | ODIScorecard | Red5Scorecard | null;
   analytics?: MatchAnalytics | null;
   tacticalAssistant?: InMatchTacticalAssistantView | null;

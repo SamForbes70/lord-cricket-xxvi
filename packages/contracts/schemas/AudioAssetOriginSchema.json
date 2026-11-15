@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "ORIGINAL_PROCEDURAL_SYNTH",
+    "ORIGINAL_IN_REPO_PCM"
+  ],
+  "$id": "urn:lcxxvi:AudioAssetOrigin:1",
+  "title": "AudioAssetOrigin"
+}

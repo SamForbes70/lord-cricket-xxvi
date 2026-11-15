@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "CROWD",
+    "EFFECTS",
+    "COMMENTARY",
+    "INTERFACE"
+  ],
+  "$id": "urn:lcxxvi:AudioChannel:1",
+  "title": "AudioChannel"
+}

@@ -2,6 +2,7 @@ import {
   createMatchAnalyticsCache,
   projectInMatchTacticalAssistant,
   projectLiveFieldPresentation,
+  projectMatchAudioCues,
   projectMatchCommentary,
 } from "@lcxxvi/projections";
 import {
@@ -32,6 +33,7 @@ import {
 } from "@lcxxvi/data";
 import {
   type Red5Command,
+  type AudioCue,
   type CommentaryEntry,
   type NewGameWorldCopy,
   type StagedRosterPack,
@@ -118,6 +120,7 @@ export function createRed5MatchController(
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
   let cachedFieldPresentation: LiveFieldPresentation | null = null;
   let cachedCommentary: CommentaryEntry[] = [];
+  let cachedAudioCues: AudioCue[] = [];
   function view(): View | null {
     if (!session) return null;
     const s = session,
@@ -216,6 +219,11 @@ export function createRed5MatchController(
         groundName: groundDisplayName,
         presentationKey: `lcxxvi-commentary:RED_BALL:${s.setup.matchId}`,
       }).entries;
+      cachedAudioCues = projectMatchAudioCues({
+        format: "RED_BALL",
+        matchId: s.setup.matchId,
+        commentaryEntries: cachedCommentary,
+      }).cues;
       cachedAssistant = projectInMatchTacticalAssistant({
         format: "RED_BALL",
         phase: c.phase,
@@ -281,8 +289,10 @@ export function createRed5MatchController(
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),
       positions: FIELD_REGISTRY.positions.map((p) => p.slotId),
+      matchId: s.setup.matchId,
       advanceReason,
       commentary,
+      audioCues: cachedAudioCues,
       scorecard,
       analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
       tacticalAssistant: cachedAssistant,

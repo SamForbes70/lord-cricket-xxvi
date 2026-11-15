@@ -30,9 +30,11 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 
 **Known limits:** [release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json) (`knownLimits`), and [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md) for the review of the unreviewed commits.
 
+| Stage 8 (Optional sound & narration) | `accepted` on `main` (16 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage08-optional-sound/REPORT.md](verification-stage08-optional-sound/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): `LC_AUDIO_PRESENTATION_V1` + `LC_AUDIO_PROVENANCE_V1` original MIT procedural synthesis cues, 4-channel mixer + mute + narration + live ARIA captions, user-gesture gate, reload deduplication, fast-forward expiry, background-tab suppression, missing/decode fallback, and byte-identical simulation hashes. |
+
 ## What is next
 
-1. **Stage 8: Optional sound and narration** and **Stage 9: Historical statistics and leaderboards** (plus optional multi-participant sessions using [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)). See [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) and [NEXT_PASS.md](NEXT_PASS.md).
+1. **Stage 9: Historical statistics and leaderboards** (plus optional multi-participant sessions using [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)). See [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) and [NEXT_PASS.md](NEXT_PASS.md).
 2. The owner applies branch protection ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
 3. Optionally, real measurements for the three declared gates.
 

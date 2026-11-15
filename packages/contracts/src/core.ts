@@ -1,3 +1,4 @@
+import "./zod-browser-csp.js";
 import { z } from "zod";
 export const CounterSchema = z
   .number()

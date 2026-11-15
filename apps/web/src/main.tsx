@@ -12,6 +12,14 @@ import {
   LiveFieldPanel,
   type CommittedSequenceWindow,
 } from "./match/LiveFieldPanel.js";
+import { AudioControlsPanel } from "./match/AudioControlsPanel.js";
+import {
+  AUDIO_PREFERENCES_STORAGE_KEY,
+  CricketAudioManager,
+  loadStoredAudioPreferences,
+  saveStoredAudioPreferences,
+  type AudioManagerSnapshot,
+} from "./match/audio-manager.js";
 import { ScorecardExport } from "./match/ScorecardExport.js";
 import { createRoot } from "react-dom/client";
 import {
@@ -37,6 +45,7 @@ import { offlineUpdateCoordinator } from "./offline-update.js";
 import {
   delegationForTeam,
   redBallProfileForTeam,
+  type AudioPreferences,
   type DelegationJournal,
   type HighlightMotionMode,
   type HighlightPacingMode,
@@ -161,6 +170,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }),
     [committedWindow, setCommittedWindow] = useState<CommittedSequenceWindow | null>(null),
     [cancelSignal, setCancelSignal] = useState(0);
+  const [audioPrefs, setAudioPrefs] = useState<AudioPreferences>(() => loadStoredAudioPreferences());
+  const audioManagerRef = useRef<CricketAudioManager | null>(null);
+  if (!audioManagerRef.current) {
+    audioManagerRef.current = new CricketAudioManager(audioPrefs);
+  }
+  const [audioSnapshot, setAudioSnapshot] = useState<AudioManagerSnapshot>(() =>
+    audioManagerRef.current!.getSnapshot(),
+  );
+  const audioBootSyncRef = useRef(true);
   const windowTokenRef = useRef(0);
   const decisionRef = useRef<HTMLHeadingElement>(null),
     lastPhase = useRef("");
@@ -172,9 +190,55 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     localStorage.setItem("lcxxvi-highlight-pacing", highlightPacing);
     localStorage.setItem("lcxxvi-highlight-motion", highlightMotion);
   }, [scale, commentary, density, briefingsPref, highlightPacing, highlightMotion]);
+  useEffect(() => {
+    const manager = audioManagerRef.current;
+    if (!manager) return;
+    const unsubscribe = manager.subscribe(() => {
+      setAudioSnapshot(manager.getSnapshot());
+    });
+    const onVisibility = () => manager.handleVisibilityChange();
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === AUDIO_PREFERENCES_STORAGE_KEY) {
+        setAudioPrefs(loadStoredAudioPreferences());
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      unsubscribe();
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("storage", onStorage);
+      manager.dispose();
+    };
+  }, []);
+  useEffect(() => {
+    saveStoredAudioPreferences(audioPrefs);
+    audioManagerRef.current?.setPreferences(audioPrefs);
+  }, [audioPrefs]);
+  useEffect(() => {
+    const manager = audioManagerRef.current;
+    if (!manager || !view?.matchId || !view.audioCues) return;
+    if (audioBootSyncRef.current) {
+      audioBootSyncRef.current = false;
+      manager.seedCommittedHistory(view.matchId, view.audioCues);
+      return;
+    }
+    void manager.processCueQueue({
+      matchId: view.matchId,
+      cues: view.audioCues,
+      ...(highlightPacing === "FAST" ? { fastForwardThreshold: 1 } : {}),
+    });
+  }, [view?.matchId, view?.audioCues, view?.revision, highlightPacing]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
     if (body.type !== "PREVIEW_DIAGNOSTIC" && body.type !== "EXPORT_DIAGNOSTIC") setDiagnosticPreview(null);
+    if (["BOOT", "LOAD_SAVE", "IMPORT_SAVE"].includes(body.type)) {
+      audioBootSyncRef.current = true;
+    }
+    if (body.type === "START") {
+      audioBootSyncRef.current = false;
+      audioManagerRef.current?.unlockFromUserGesture();
+    }
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -494,6 +558,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   }
   function act(action: Action) {
     if (!view || inflight.current || fatal) return;
+    audioBootSyncRef.current = false;
+    audioManagerRef.current?.unlockFromUserGesture();
     setDiagnosticPreview(null);
     if (!advanceBatch.current) setBatchProgress(null);
     const i = view.innings[view.activeIndex]?.innings;
@@ -624,6 +690,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               : "Local autosave ready"}
         </span>
       </div>
+      <AudioControlsPanel
+        preferences={audioPrefs}
+        snapshot={audioSnapshot}
+        onChangePreferences={setAudioPrefs}
+        onUnlockAudio={() => audioManagerRef.current?.unlockFromUserGesture()}
+        onUiInteract={(caption) => void audioManagerRef.current?.playUiFeedback(caption)}
+      />
       {careerLaunch.current && (
         <div className="career-match-banner">
           <strong>Scheduled career match</strong>

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "LC_AUDIO_PRESENTATION_V1"
+    },
+    "muted": {
+      "type": "boolean"
+    },
+    "crowdVolume": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "effectsVolume": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "commentaryVolume": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "interfaceVolume": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "narrationEnabled": {
+      "type": "boolean"
+    },
+    "captionsEnabled": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "version",
+    "muted",
+    "crowdVolume",
+    "effectsVolume",
+    "commentaryVolume",
+    "interfaceVolume",
+    "narrationEnabled",
+    "captionsEnabled"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:AudioPreferences:1",
+  "title": "AudioPreferences"
+}

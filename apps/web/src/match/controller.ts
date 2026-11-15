@@ -2,6 +2,7 @@ import {
   createMatchAnalyticsCache,
   projectInMatchTacticalAssistant,
   projectLiveFieldPresentation,
+  projectMatchAudioCues,
   projectMatchCommentary,
 } from "@lcxxvi/projections";
 import {
@@ -36,6 +37,7 @@ import {
   type T20Command,
   type NewGameWorldCopy,
   type StagedRosterPack,
+  type AudioCue,
   type CommentaryEntry,
   type InMatchTacticalAssistantView,
   type LiveFieldPresentation,
@@ -153,6 +155,7 @@ export function createMatchController(
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
   let cachedFieldPresentation: LiveFieldPresentation | null = null;
   let cachedCommentary: CommentaryEntry[] = [];
+  let cachedAudioCues: AudioCue[] = [];
   function view(): View | null {
     if (!session) return null;
     const s = session,
@@ -250,6 +253,11 @@ export function createMatchController(
         groundName: groundDisplayName,
         presentationKey: `lcxxvi-commentary:T20:${s.setup.matchId}`,
       }).entries;
+      cachedAudioCues = projectMatchAudioCues({
+        format: "T20",
+        matchId: s.setup.matchId,
+        commentaryEntries: cachedCommentary,
+      }).cues;
       cachedAssistant = projectInMatchTacticalAssistant({
         format: "T20",
         phase: c.phase,
@@ -313,8 +321,10 @@ export function createMatchController(
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),
       positions: FIELD_REGISTRY.positions.map((p) => p.slotId),
+      matchId: s.setup.matchId,
       advanceReason,
       commentary,
+      audioCues: cachedAudioCues,
       scorecard,
       analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
       tacticalAssistant: cachedAssistant,

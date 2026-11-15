@@ -46,7 +46,13 @@ The owner accepted Stage 7 (`S07-01`) on 15 November 2026 ([OWNER_DECISIONS_2026
 
 1. **Shared fact-checked commentary adapter (`LC_COMMENTARY_ADAPTER_V1`, `299` strict JSON Schemas)**: `projectMatchCommentary` (`packages/projections/src/commentary.ts`) replaces repetitive inline strings across `T20`, `ODI`, and `RED_BALL` with format-eligible templates (`freeHitNext`/`isFreeHit` in `T20`/`ODI` only, never `RED_BALL`), FNV-1a presentation-seeded variation, sliding repetition cooldowns, milestone tags, `factSlots` tracing every claim to committed events/projections, and zero network calls.
 2. **Verbosity modes**: `Standard` (`full`), `Detailed` (`detailed`), `Brief` (`brief`), and `Off` (`off`) persist across Match Header and Career Settings without affecting simulation RNG or hashes.
-3. **Next eligible slices**: **Stage 8 (Optional sound and narration)** and **Stage 9 (Historical statistics and leaderboards)** (plus human playtest review of Stages 5–7).
+## Stage 8: Optional sound and narration (`accepted`, 16 November 2026)
+
+The owner accepted Stage 8 (`S08-01`) on 16 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage08-optional-sound/REPORT.md](verification-stage08-optional-sound/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)):
+
+1. **Original provenance & zero-network cues (`LC_AUDIO_PRESENTATION_V1`, `LC_AUDIO_PROVENANCE_V1`, `309` strict JSON Schemas)**: 10 original MIT procedural synthesis profiles (`packages/projections/src/audio-cues.ts`) with deterministic `pureSha256Hex` hashes and full UI attribution drawer (`AudioControlsPanel.tsx`).
+2. **Resilient playback & complete silent/caption parity**: User-gesture gating, 4-channel volume mixer (`Crowd`, `Effects`, `Commentary`, `Interface`), mute toggle, optional spoken narration, live ARIA captions, reload cue deduplication, fast-forward expiry, background-tab suppression, graceful decode/missing-asset fallback, Career Settings sync, and verified byte-identical `eventsSha256`/`scorecardSha256`/`lastEventHash` across audio modes.
+3. **Next eligible slice**: **Stage 9 (Historical statistics and leaderboards)** (plus human playtest review of Stages 5–8).
 
 ## Open items that still need people
 

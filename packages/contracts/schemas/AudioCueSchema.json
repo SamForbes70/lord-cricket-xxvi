@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "cueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "CROWD",
+        "EFFECTS",
+        "COMMENTARY",
+        "INTERFACE"
+      ]
+    },
+    "cueKind": {
+      "type": "string",
+      "enum": [
+        "BAT_BALL_DOT",
+        "BAT_BALL_SINGLE",
+        "BOUNDARY_FOUR",
+        "BOUNDARY_SIX",
+        "WICKET_FALL",
+        "MILESTONE_CHIME",
+        "OVER_BELL",
+        "INNINGS_CHANGE",
+        "MATCH_COMPLETE",
+        "UI_CLICK"
+      ]
+    },
+    "assetId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "caption": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    },
+    "narrationText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 360
+    },
+    "ttlMs": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30000
+    }
+  },
+  "required": [
+    "cueId",
+    "sequence",
+    "channel",
+    "cueKind",
+    "assetId",
+    "priority",
+    "caption",
+    "ttlMs"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:AudioCue:1",
+  "title": "AudioCue"
+}

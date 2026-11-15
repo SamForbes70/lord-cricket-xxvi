@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
   AcademyTrainingFocus,
+  AudioPreferences,
   HighlightMotionMode,
   HighlightPacingMode,
   SeasonCheckpointInspection,
@@ -26,6 +27,11 @@ import {
 } from "./managed-match.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
+import {
+  AUDIO_PREFERENCES_STORAGE_KEY,
+  loadStoredAudioPreferences,
+  saveStoredAudioPreferences,
+} from "../match/audio-manager.js";
 import { WorldEditor } from "../world/WorldEditor.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
 import { offlineUpdateCoordinator } from "../offline-update.js";
@@ -226,6 +232,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     if (saved === "standard") return "full";
     return saved && ["full", "detailed", "brief", "off"].includes(saved) ? saved : "full";
   });
+  const [audioPrefs, setAudioPrefs] = useState<AudioPreferences>(() => loadStoredAudioPreferences());
   const state = service.getState();
   const persistentWorld = service.getPersistentState();
   const lifecycleState = service.getLifecycleState();
@@ -340,6 +347,18 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     localStorage.setItem("lcxxvi-highlight-motion", highlightMotion);
     localStorage.setItem("lcxxvi-match-commentary", matchCommentary);
   }, [scale, density, reducedMotion, showTacticalBriefings, highlightPacing, highlightMotion, matchCommentary]);
+  useEffect(() => {
+    saveStoredAudioPreferences(audioPrefs);
+  }, [audioPrefs]);
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === AUDIO_PREFERENCES_STORAGE_KEY) {
+        setAudioPrefs(loadStoredAudioPreferences());
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   async function action(work: () => Promise<void>) {
     if (inspectionOnly) {
@@ -3025,6 +3044,129 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 <option value="detailed">Detailed</option>
                 <option value="brief">Brief</option>
                 <option value="off">Off</option>
+              </select>
+            </label>
+            <label>
+              Match sound
+              <select
+                aria-label="Match sound"
+                value={audioPrefs.muted ? "muted" : "on"}
+                onChange={(event) => {
+                  const muted = event.currentTarget.value === "muted";
+                  setAudioPrefs((prev) => ({
+                    ...prev,
+                    muted,
+                  }));
+                }}
+              >
+                <option value="on">On</option>
+                <option value="muted">Muted (silent)</option>
+              </select>
+            </label>
+            <label>
+              Crowd volume ({audioPrefs.crowdVolume}%)
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                aria-label="Career crowd volume"
+                value={audioPrefs.crowdVolume}
+                onChange={(event) => {
+                  const crowdVolume = Number(event.currentTarget.value);
+                  setAudioPrefs((prev) => ({
+                    ...prev,
+                    crowdVolume,
+                  }));
+                }}
+              />
+            </label>
+            <label>
+              Effects volume ({audioPrefs.effectsVolume}%)
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                aria-label="Career effects volume"
+                value={audioPrefs.effectsVolume}
+                onChange={(event) => {
+                  const effectsVolume = Number(event.currentTarget.value);
+                  setAudioPrefs((prev) => ({
+                    ...prev,
+                    effectsVolume,
+                  }));
+                }}
+              />
+            </label>
+            <label>
+              Commentary narration volume ({audioPrefs.commentaryVolume}%)
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                aria-label="Career commentary narration volume"
+                value={audioPrefs.commentaryVolume}
+                onChange={(event) => {
+                  const commentaryVolume = Number(event.currentTarget.value);
+                  setAudioPrefs((prev) => ({
+                    ...prev,
+                    commentaryVolume,
+                  }));
+                }}
+              />
+            </label>
+            <label>
+              Interface volume ({audioPrefs.interfaceVolume}%)
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                aria-label="Career interface volume"
+                value={audioPrefs.interfaceVolume}
+                onChange={(event) => {
+                  const interfaceVolume = Number(event.currentTarget.value);
+                  setAudioPrefs((prev) => ({
+                    ...prev,
+                    interfaceVolume,
+                  }));
+                }}
+              />
+            </label>
+            <label>
+              Spoken narration
+              <select
+                aria-label="Spoken narration"
+                value={audioPrefs.narrationEnabled ? "on" : "off"}
+                onChange={(event) => {
+                  const narrationEnabled = event.currentTarget.value === "on";
+                  setAudioPrefs((prev) => ({
+                    ...prev,
+                    narrationEnabled,
+                  }));
+                }}
+              >
+                <option value="off">Off</option>
+                <option value="on">On (browser speech)</option>
+              </select>
+            </label>
+            <label>
+              Audio captions
+              <select
+                aria-label="Audio captions"
+                value={audioPrefs.captionsEnabled ? "shown" : "hidden"}
+                onChange={(event) => {
+                  const captionsEnabled = event.currentTarget.value === "shown";
+                  setAudioPrefs((prev) => ({
+                    ...prev,
+                    captionsEnabled,
+                  }));
+                }}
+              >
+                <option value="shown">Shown</option>
+                <option value="hidden">Hidden</option>
               </select>
             </label>
           </div>

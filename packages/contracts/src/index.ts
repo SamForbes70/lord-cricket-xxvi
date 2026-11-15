@@ -1,3 +1,4 @@
+import "./zod-browser-csp.js";
 export * from "./core.js";
 export * from "./configuration.js";
 export * from "./new-game-world.js";
@@ -39,3 +40,4 @@ export * from "./tactical-briefing.js";
 
 export * from "./field-presentation.js";
 export * from "./commentary.js";
+export * from "./audio.js";

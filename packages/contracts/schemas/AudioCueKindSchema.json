@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "BAT_BALL_DOT",
+    "BAT_BALL_SINGLE",
+    "BOUNDARY_FOUR",
+    "BOUNDARY_SIX",
+    "WICKET_FALL",
+    "MILESTONE_CHIME",
+    "OVER_BELL",
+    "INNINGS_CHANGE",
+    "MATCH_COMPLETE",
+    "UI_CLICK"
+  ],
+  "$id": "urn:lcxxvi:AudioCueKind:1",
+  "title": "AudioCueKind"
+}

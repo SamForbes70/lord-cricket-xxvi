@@ -59,3 +59,8 @@ Why this figure. An 8 GB laptop must also run the operating system and other app
 
 - The owner (Sam Forbes) accepted **Stage 7: Contextual text commentary** (`feat/stage7-contextual-commentary`, [verification-stage07-contextual-commentary/REPORT.md](verification-stage07-contextual-commentary/REPORT.md)) on 15 November 2026 (Australia/Brisbane), authorised committing and pushing `feat/stage7-contextual-commentary` and merging it to `main`, and authorised proceeding into **Stage 8: Optional sound and narration**.
 - Local Linux core (`759/759` unit tests across `69/69` files, `299` JSON Schemas) and Chromium + Firefox Stage 7 + Stage 6 + accessibility regression browser checks (`6/6`) passed prior to merge; hosted GitHub Actions (`Linux` and `Windows`) run after push. Note: milestone acceptance is owner-declared; multi-participant observed human playtest sessions remain unrecorded in-repo.
+
+## Owner decision, 16 November 2026 — Stage 8 (Optional sound and narration)
+
+- The owner (Sam Forbes) accepted **Stage 8: Optional sound and narration** (`feat/stage8-sound-narration`, [verification-stage08-optional-sound/REPORT.md](verification-stage08-optional-sound/REPORT.md)) on 16 November 2026 (Australia/Brisbane), authorised committing and pushing `feat/stage8-sound-narration` and merging it to `main`, and authorised proceeding into **Stage 9: Historical statistics and leaderboards**.
+- Local Linux core (`765/765` unit tests across `70/70` files, `309` JSON Schemas) and Chromium + Firefox Stage 8 + Stage 7 + accessibility regression browser checks (`6/6`) passed prior to merge; hosted GitHub Actions (`Linux` and `Windows`) run after push. Note: milestone acceptance is owner-declared; subjective multi-user listening tests remain unrecorded in-repo.
