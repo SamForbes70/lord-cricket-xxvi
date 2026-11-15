@@ -1,4 +1,8 @@
-import { createMatchAnalyticsCache, projectInMatchTacticalAssistant } from "@lcxxvi/projections";
+import {
+  createMatchAnalyticsCache,
+  projectInMatchTacticalAssistant,
+  projectLiveFieldPresentation,
+} from "@lcxxvi/projections";
 import {
   type Red5Session,
   type RosterRed5Session,
@@ -25,7 +29,14 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type Red5Command, type DeliveryRecorded, type NewGameWorldCopy, type StagedRosterPack, type InMatchTacticalAssistantView } from "@lcxxvi/contracts";
+import {
+  type Red5Command,
+  type DeliveryRecorded,
+  type NewGameWorldCopy,
+  type StagedRosterPack,
+  type InMatchTacticalAssistantView,
+  type LiveFieldPresentation,
+} from "@lcxxvi/contracts";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
@@ -103,6 +114,7 @@ export function createRed5MatchController(
   let cachedAssistantSession: Red5Session | null = null;
   let cachedAssistantRevision = -1;
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
+  let cachedFieldPresentation: LiveFieldPresentation | null = null;
   function view(): View | null {
     if (!session) return null;
     const s = session,
@@ -244,6 +256,16 @@ export function createRed5MatchController(
         ),
         redBallDay: c.clock.day,
       });
+      cachedFieldPresentation = projectLiveFieldPresentation({
+        format: "RED_BALL",
+        phase: c.phase,
+        innings: c.innings,
+        activeIndex: c.activeInningsIndex,
+        fieldSlots: c.fieldSlots,
+        events: s.events,
+        names,
+        hands,
+      });
       cachedAssistantSession = s;
       cachedAssistantRevision = s.revision;
     }
@@ -283,6 +305,7 @@ export function createRed5MatchController(
       scorecard,
       analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
       tacticalAssistant: cachedAssistant,
+      fieldPresentation: cachedFieldPresentation,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,

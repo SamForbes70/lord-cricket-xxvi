@@ -1,6 +1,9 @@
 import { z } from "zod";
 import type { MatchAnalytics } from "@lcxxvi/projections";
-import type { InMatchTacticalAssistantView } from "@lcxxvi/contracts";
+import type {
+  InMatchTacticalAssistantView,
+  LiveFieldPresentation,
+} from "@lcxxvi/contracts";
 import type { SaveSummary } from "@lcxxvi/persistence";
 import {
   T20CommandSchema,
@@ -230,6 +233,7 @@ export type View = {
   scorecard: T20Scorecard | ODIScorecard | Red5Scorecard | null;
   analytics?: MatchAnalytics | null;
   tacticalAssistant?: InMatchTacticalAssistantView | null;
+  fieldPresentation?: LiveFieldPresentation | null;
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;

@@ -1,0 +1,1164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "LC_FIELD_PRESENTATION_V1"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "T20",
+        "ODI",
+        "RED_BALL"
+      ]
+    },
+    "phase": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "activeInningsIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "strikerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "strikerName": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[\\s\\S]{1,80}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "strikerHand": {
+      "type": "string",
+      "enum": [
+        "R",
+        "L"
+      ]
+    },
+    "nonStrikerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nonStrikerName": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[\\s\\S]{1,80}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "bowlerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "bowlerName": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[\\s\\S]{1,80}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "keeperId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "keeperName": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[\\s\\S]{1,80}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "keeperPoint": {
+      "type": "object",
+      "properties": {
+        "x10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "y10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "x10",
+        "y10"
+      ],
+      "additionalProperties": false
+    },
+    "bowlerReleasePoint": {
+      "type": "object",
+      "properties": {
+        "x10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "y10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "x10",
+        "y10"
+      ],
+      "additionalProperties": false
+    },
+    "strikerPoint": {
+      "type": "object",
+      "properties": {
+        "x10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "y10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "x10",
+        "y10"
+      ],
+      "additionalProperties": false
+    },
+    "nonStrikerPoint": {
+      "type": "object",
+      "properties": {
+        "x10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "y10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "x10",
+        "y10"
+      ],
+      "additionalProperties": false
+    },
+    "boundaryRadiusX10": {
+      "type": "number",
+      "const": 840
+    },
+    "circleRadiusX10": {
+      "type": "number",
+      "const": 480
+    },
+    "positions": {
+      "minItems": 11,
+      "maxItems": 12,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "label": {
+            "type": "string",
+            "pattern": "^[\\s\\S]{1,80}$"
+          },
+          "sector": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7
+          },
+          "displaySector": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7
+          },
+          "depth": {
+            "type": "string",
+            "enum": [
+              "INNER",
+              "MIDDLE",
+              "DEEP"
+            ]
+          },
+          "insideCircle": {
+            "type": "boolean"
+          },
+          "legSideForStriker": {
+            "type": "boolean"
+          },
+          "behindSquare": {
+            "type": "boolean"
+          },
+          "point": {
+            "type": "object",
+            "properties": {
+              "x10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              },
+              "y10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              }
+            },
+            "required": [
+              "x10",
+              "y10"
+            ],
+            "additionalProperties": false
+          },
+          "occupiedByPlayerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "occupiedByName": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[\\s\\S]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "slotId",
+          "label",
+          "sector",
+          "displaySector",
+          "depth",
+          "insideCircle",
+          "legSideForStriker",
+          "behindSquare",
+          "point",
+          "occupiedByPlayerId",
+          "occupiedByName"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "legality": {
+      "type": "object",
+      "properties": {
+        "isLegal": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "T20",
+            "ODI",
+            "RED_BALL"
+          ]
+        },
+        "strikerHand": {
+          "type": "string",
+          "enum": [
+            "R",
+            "L"
+          ]
+        },
+        "phaseLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "outsideCircleCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        },
+        "maxOutsideCircle": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        },
+        "legSideCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        },
+        "maxLegSide": {
+          "type": "number",
+          "const": 5
+        },
+        "behindSquareLegCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        },
+        "maxBehindSquareLeg": {
+          "type": "number",
+          "const": 2
+        },
+        "duplicateSlotIds": {
+          "maxItems": 9,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "violations": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "SLOT_COUNT",
+                  "UNIQUE_PLAYERS",
+                  "DUPLICATE_POSITION",
+                  "UNSUPPORTED_POSITION",
+                  "CIRCLE_RESTRICTION",
+                  "LEG_SIDE_LIMIT",
+                  "BEHIND_SQUARE_LEG_LIMIT"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "affectedSlotIds": {
+                "maxItems": 9,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "affectedSlotIds"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "summaryText": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320
+        }
+      },
+      "required": [
+        "isLegal",
+        "format",
+        "strikerHand",
+        "phaseLabel",
+        "outsideCircleCount",
+        "maxOutsideCircle",
+        "legSideCount",
+        "maxLegSide",
+        "behindSquareLegCount",
+        "maxBehindSquareLeg",
+        "duplicateSlotIds",
+        "violations",
+        "summaryText"
+      ],
+      "additionalProperties": false
+    },
+    "recentHighlights": {
+      "maxItems": 24,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "eventHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "inningsIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "deliveryIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "overBallLabel": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 24
+          },
+          "strikerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "strikerName": {
+            "type": "string",
+            "pattern": "^[\\s\\S]{1,80}$"
+          },
+          "strikerHand": {
+            "type": "string",
+            "enum": [
+              "R",
+              "L"
+            ]
+          },
+          "bowlerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "bowlerName": {
+            "type": "string",
+            "pattern": "^[\\s\\S]{1,80}$"
+          },
+          "momentKind": {
+            "type": "string",
+            "enum": [
+              "WICKET",
+              "SIX",
+              "FOUR",
+              "FREE_HIT",
+              "EXTRA",
+              "RUNS",
+              "DOT"
+            ]
+          },
+          "isKeyMoment": {
+            "type": "boolean"
+          },
+          "runsScored": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "batRuns": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "boundary": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "FOUR",
+              "SIX"
+            ]
+          },
+          "legality": {
+            "type": "string",
+            "enum": [
+              "LEGAL",
+              "WIDE",
+              "NO_BALL",
+              "DEAD"
+            ]
+          },
+          "dismissalKind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "BOWLED",
+                  "LBW",
+                  "CAUGHT",
+                  "RUN_OUT",
+                  "STUMPED",
+                  "HIT_WICKET"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dismissedPlayerName": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[\\s\\S]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fieldOutcome": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "STOP",
+              "DROP",
+              "CATCH",
+              "MISS",
+              "RUN_OUT"
+            ]
+          },
+          "executedLength": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "YORKER",
+                  "FULL",
+                  "GOOD",
+                  "SHORT",
+                  "FULL_TOSS"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trajectory": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "GROUND",
+                  "AERIAL",
+                  "EDGE"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recordedSector": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "displaySector": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sectorStatus": {
+            "type": "string",
+            "enum": [
+              "RECORDED_SECTOR",
+              "PITCH_CHANNEL_ONLY"
+            ]
+          },
+          "releasePoint": {
+            "type": "object",
+            "properties": {
+              "x10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              },
+              "y10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              }
+            },
+            "required": [
+              "x10",
+              "y10"
+            ],
+            "additionalProperties": false
+          },
+          "pitchBouncePoint": {
+            "type": "object",
+            "properties": {
+              "x10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              },
+              "y10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              }
+            },
+            "required": [
+              "x10",
+              "y10"
+            ],
+            "additionalProperties": false
+          },
+          "strikerCreasePoint": {
+            "type": "object",
+            "properties": {
+              "x10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              },
+              "y10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              }
+            },
+            "required": [
+              "x10",
+              "y10"
+            ],
+            "additionalProperties": false
+          },
+          "targetPoint": {
+            "type": "object",
+            "properties": {
+              "x10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              },
+              "y10": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2000
+              }
+            },
+            "required": [
+              "x10",
+              "y10"
+            ],
+            "additionalProperties": false
+          },
+          "headline": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "detailText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 280
+          },
+          "trackingDisclaimer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 220
+          }
+        },
+        "required": [
+          "sequence",
+          "eventHash",
+          "inningsIndex",
+          "deliveryIndex",
+          "overBallLabel",
+          "strikerId",
+          "strikerName",
+          "strikerHand",
+          "bowlerId",
+          "bowlerName",
+          "momentKind",
+          "isKeyMoment",
+          "runsScored",
+          "batRuns",
+          "boundary",
+          "legality",
+          "dismissalKind",
+          "dismissedPlayerName",
+          "fieldOutcome",
+          "executedLength",
+          "trajectory",
+          "recordedSector",
+          "displaySector",
+          "sectorStatus",
+          "releasePoint",
+          "pitchBouncePoint",
+          "strikerCreasePoint",
+          "targetPoint",
+          "headline",
+          "detailText",
+          "trackingDisclaimer"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "latestHighlight": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "sequence": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "eventHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "inningsIndex": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "deliveryIndex": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "overBallLabel": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 24
+            },
+            "strikerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "strikerName": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{1,80}$"
+            },
+            "strikerHand": {
+              "type": "string",
+              "enum": [
+                "R",
+                "L"
+              ]
+            },
+            "bowlerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "bowlerName": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{1,80}$"
+            },
+            "momentKind": {
+              "type": "string",
+              "enum": [
+                "WICKET",
+                "SIX",
+                "FOUR",
+                "FREE_HIT",
+                "EXTRA",
+                "RUNS",
+                "DOT"
+              ]
+            },
+            "isKeyMoment": {
+              "type": "boolean"
+            },
+            "runsScored": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "batRuns": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "boundary": {
+              "type": "string",
+              "enum": [
+                "NONE",
+                "FOUR",
+                "SIX"
+              ]
+            },
+            "legality": {
+              "type": "string",
+              "enum": [
+                "LEGAL",
+                "WIDE",
+                "NO_BALL",
+                "DEAD"
+              ]
+            },
+            "dismissalKind": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "BOWLED",
+                    "LBW",
+                    "CAUGHT",
+                    "RUN_OUT",
+                    "STUMPED",
+                    "HIT_WICKET"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "dismissedPlayerName": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[\\s\\S]{1,80}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "fieldOutcome": {
+              "type": "string",
+              "enum": [
+                "NONE",
+                "STOP",
+                "DROP",
+                "CATCH",
+                "MISS",
+                "RUN_OUT"
+              ]
+            },
+            "executedLength": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "YORKER",
+                    "FULL",
+                    "GOOD",
+                    "SHORT",
+                    "FULL_TOSS"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "trajectory": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "GROUND",
+                    "AERIAL",
+                    "EDGE"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "recordedSector": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 7
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "displaySector": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 7
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sectorStatus": {
+              "type": "string",
+              "enum": [
+                "RECORDED_SECTOR",
+                "PITCH_CHANNEL_ONLY"
+              ]
+            },
+            "releasePoint": {
+              "type": "object",
+              "properties": {
+                "x10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                },
+                "y10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                }
+              },
+              "required": [
+                "x10",
+                "y10"
+              ],
+              "additionalProperties": false
+            },
+            "pitchBouncePoint": {
+              "type": "object",
+              "properties": {
+                "x10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                },
+                "y10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                }
+              },
+              "required": [
+                "x10",
+                "y10"
+              ],
+              "additionalProperties": false
+            },
+            "strikerCreasePoint": {
+              "type": "object",
+              "properties": {
+                "x10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                },
+                "y10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                }
+              },
+              "required": [
+                "x10",
+                "y10"
+              ],
+              "additionalProperties": false
+            },
+            "targetPoint": {
+              "type": "object",
+              "properties": {
+                "x10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                },
+                "y10": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2000
+                }
+              },
+              "required": [
+                "x10",
+                "y10"
+              ],
+              "additionalProperties": false
+            },
+            "headline": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "detailText": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 280
+            },
+            "trackingDisclaimer": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 220
+            }
+          },
+          "required": [
+            "sequence",
+            "eventHash",
+            "inningsIndex",
+            "deliveryIndex",
+            "overBallLabel",
+            "strikerId",
+            "strikerName",
+            "strikerHand",
+            "bowlerId",
+            "bowlerName",
+            "momentKind",
+            "isKeyMoment",
+            "runsScored",
+            "batRuns",
+            "boundary",
+            "legality",
+            "dismissalKind",
+            "dismissedPlayerName",
+            "fieldOutcome",
+            "executedLength",
+            "trajectory",
+            "recordedSector",
+            "displaySector",
+            "sectorStatus",
+            "releasePoint",
+            "pitchBouncePoint",
+            "strikerCreasePoint",
+            "targetPoint",
+            "headline",
+            "detailText",
+            "trackingDisclaimer"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "orientationNote": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "trackingDisclaimer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 220
+    }
+  },
+  "required": [
+    "version",
+    "format",
+    "phase",
+    "activeInningsIndex",
+    "strikerId",
+    "strikerName",
+    "strikerHand",
+    "nonStrikerId",
+    "nonStrikerName",
+    "bowlerId",
+    "bowlerName",
+    "keeperId",
+    "keeperName",
+    "keeperPoint",
+    "bowlerReleasePoint",
+    "strikerPoint",
+    "nonStrikerPoint",
+    "boundaryRadiusX10",
+    "circleRadiusX10",
+    "positions",
+    "legality",
+    "recentHighlights",
+    "latestHighlight",
+    "orientationNote",
+    "trackingDisclaimer"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:LiveFieldPresentation:1",
+  "title": "LiveFieldPresentation"
+}

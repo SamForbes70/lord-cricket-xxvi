@@ -5,6 +5,10 @@ import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
 } from "./match/TacticalBriefingPanels.js";
+import {
+  LiveFieldPanel,
+  type CommittedSequenceWindow,
+} from "./match/LiveFieldPanel.js";
 import { ScorecardExport } from "./match/ScorecardExport.js";
 import { createRoot } from "react-dom/client";
 import {
@@ -27,7 +31,17 @@ import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
 import { PitchInspection } from "./match/PitchInspection.js";
 import { WorldEditor } from "./world/WorldEditor.js";
 import { offlineUpdateCoordinator } from "./offline-update.js";
-import { delegationForTeam, redBallProfileForTeam, type DelegationJournal, type NewGameWorldCopy, type RedBallTacticalProfile, type StagedRosterPack, type WorldPack } from "@lcxxvi/contracts";
+import {
+  delegationForTeam,
+  redBallProfileForTeam,
+  type DelegationJournal,
+  type HighlightMotionMode,
+  type HighlightPacingMode,
+  type NewGameWorldCopy,
+  type RedBallTacticalProfile,
+  type StagedRosterPack,
+  type WorldPack,
+} from "@lcxxvi/contracts";
 import { RED_BALL_PROFILE_DESCRIPTIONS } from "@lcxxvi/ai";
 import type { DelegationCategory } from "./match/ai-opponent.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
@@ -128,7 +142,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     [briefingsPref, setBriefingsPref] = useState(() => {
       const saved = localStorage.getItem("lcxxvi-tactical-briefings");
       return saved === "hidden" ? "hidden" : "shown";
-    });
+    }),
+    [highlightPacing, setHighlightPacing] = useState<HighlightPacingMode>(() => {
+      const saved = localStorage.getItem("lcxxvi-highlight-pacing");
+      return saved === "EVERY_BALL" || saved === "KEY_MOMENT" || saved === "FAST"
+        ? saved
+        : "KEY_MOMENT";
+    }),
+    [highlightMotion, setHighlightMotion] = useState<HighlightMotionMode>(() => {
+      const saved = localStorage.getItem("lcxxvi-highlight-motion");
+      return saved === "REDUCED" ? "REDUCED" : "AUTO";
+    }),
+    [committedWindow, setCommittedWindow] = useState<CommittedSequenceWindow | null>(null),
+    [cancelSignal, setCancelSignal] = useState(0);
+  const windowTokenRef = useRef(0);
   const decisionRef = useRef<HTMLHeadingElement>(null),
     lastPhase = useRef("");
   useEffect(() => {
@@ -136,12 +163,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     localStorage.setItem("lcxxvi-match-commentary", commentary);
     localStorage.setItem("lcxxvi-match-density", density);
     localStorage.setItem("lcxxvi-tactical-briefings", briefingsPref);
-  }, [scale, commentary, density, briefingsPref]);
+    localStorage.setItem("lcxxvi-highlight-pacing", highlightPacing);
+    localStorage.setItem("lcxxvi-highlight-motion", highlightMotion);
+  }, [scale, commentary, density, briefingsPref, highlightPacing, highlightMotion]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
     if (body.type !== "PREVIEW_DIAGNOSTIC" && body.type !== "EXPORT_DIAGNOSTIC") setDiagnosticPreview(null);
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
+      setCommittedWindow(null);
+      setCancelSignal(current => current + 1);
       setAnalyticsRebuild({ state: "IDLE", applied: 0, total: 0 });
       lastAiChecked.current = {};
     }
@@ -228,6 +259,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       setBusy(inflight.current !== null);
       setError(r.error ?? batchError);
       if (r.catalog) setCatalog(r.catalog);
+      if (
+        r.acknowledgement &&
+        r.acknowledgement.commandId === r.requestId &&
+        r.acknowledgement.committedRevision === r.revision &&
+        r.acknowledgement.toSequence >= r.acknowledgement.fromSequence
+      ) {
+        setCommittedWindow({
+          token: ++windowTokenRef.current,
+          fromSequence: r.acknowledgement.fromSequence,
+          toSequence: r.acknowledgement.toSequence,
+        });
+      }
       setView(r.view);
       setVerification(r.verification);
       if (r.requestId === rebuildRequest.current) {
@@ -486,6 +529,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     worker.current?.postMessage({ version: UI_VERSION, type: "CANCEL_ANALYTICS", requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, targetRequestId: rebuildRequest.current });
   }
   function stopAdvance() {
+    setCancelSignal(current => current + 1);
     if (!advanceBatch.current) return;
     advanceBatch.current.cancel = true;
     setBatchState("stopping");
@@ -1033,6 +1077,24 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               view={view}
               disabled={busy || fatal}
               act={act}
+            />
+          )}
+          {view.fieldPresentation && view.innings.length > 0 && (
+            <LiveFieldPanel
+              presentation={view.fieldPresentation}
+              committedFieldSlots={view.fieldSlots}
+              outfieldIds={ledger?.outfieldIds ?? []}
+              bowlingTeamId={i?.bowlingTeamId ?? null}
+              legalBalls={i?.legalBalls ?? 0}
+              names={view.names}
+              busy={busy || fatal || Boolean(persistence?.readOnly)}
+              pacingMode={highlightPacing}
+              onChangePacingMode={setHighlightPacing}
+              motionMode={highlightMotion}
+              onChangeMotionMode={setHighlightMotion}
+              committedWindow={committedWindow}
+              cancelSignal={cancelSignal}
+              onApplyField={act}
             />
           )}
           {briefingsPref === "shown" && view.tacticalAssistant && (

@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
   AcademyTrainingFocus,
+  HighlightMotionMode,
+  HighlightPacingMode,
   SeasonCheckpointInspection,
   T20SeasonMatchCompletion,
   TrainingDirective,
@@ -209,6 +211,16 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   const [showTacticalBriefings, setShowTacticalBriefings] = useState(
     () => localStorage.getItem("lcxxvi-tactical-briefings") !== "hidden",
   );
+  const [highlightPacing, setHighlightPacing] = useState<HighlightPacingMode>(() => {
+    const saved = localStorage.getItem("lcxxvi-highlight-pacing");
+    return saved === "EVERY_BALL" || saved === "KEY_MOMENT" || saved === "FAST"
+      ? saved
+      : "KEY_MOMENT";
+  });
+  const [highlightMotion, setHighlightMotion] = useState<HighlightMotionMode>(() => {
+    const saved = localStorage.getItem("lcxxvi-highlight-motion");
+    return saved === "AUTO" || saved === "REDUCED" ? saved : "AUTO";
+  });
   const state = service.getState();
   const persistentWorld = service.getPersistentState();
   const lifecycleState = service.getLifecycleState();
@@ -319,7 +331,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     localStorage.setItem("lcxxvi-career-density", density);
     localStorage.setItem("lcxxvi-career-motion", reducedMotion ? "reduced" : "full");
     localStorage.setItem("lcxxvi-tactical-briefings", showTacticalBriefings ? "shown" : "hidden");
-  }, [scale, density, reducedMotion, showTacticalBriefings]);
+    localStorage.setItem("lcxxvi-highlight-pacing", highlightPacing);
+    localStorage.setItem("lcxxvi-highlight-motion", highlightMotion);
+  }, [scale, density, reducedMotion, showTacticalBriefings, highlightPacing, highlightMotion]);
 
   async function action(work: () => Promise<void>) {
     if (inspectionOnly) {
@@ -2966,6 +2980,33 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 onChange={(event) => setShowTacticalBriefings(event.currentTarget.checked)}
               />{" "}
               Show tactical briefings &amp; assistant
+            </label>
+            <label>
+              Highlight pacing
+              <select
+                aria-label="Highlight pacing"
+                value={highlightPacing}
+                onChange={(event) =>
+                  setHighlightPacing(event.currentTarget.value as HighlightPacingMode)
+                }
+              >
+                <option value="EVERY_BALL">Every ball</option>
+                <option value="KEY_MOMENT">Key moments</option>
+                <option value="FAST">Fast</option>
+              </select>
+            </label>
+            <label>
+              Highlight motion
+              <select
+                aria-label="Highlight motion"
+                value={highlightMotion}
+                onChange={(event) =>
+                  setHighlightMotion(event.currentTarget.value as HighlightMotionMode)
+                }
+              >
+                <option value="AUTO">System default</option>
+                <option value="REDUCED">Reduced motion</option>
+              </select>
             </label>
           </div>
           <div className="career-panel settings-actions">

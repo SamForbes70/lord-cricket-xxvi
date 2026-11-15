@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "slotId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "label": {
+      "type": "string",
+      "pattern": "^[\\s\\S]{1,80}$"
+    },
+    "sector": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7
+    },
+    "displaySector": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7
+    },
+    "depth": {
+      "type": "string",
+      "enum": [
+        "INNER",
+        "MIDDLE",
+        "DEEP"
+      ]
+    },
+    "insideCircle": {
+      "type": "boolean"
+    },
+    "legSideForStriker": {
+      "type": "boolean"
+    },
+    "behindSquare": {
+      "type": "boolean"
+    },
+    "point": {
+      "type": "object",
+      "properties": {
+        "x10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "y10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "x10",
+        "y10"
+      ],
+      "additionalProperties": false
+    },
+    "occupiedByPlayerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "occupiedByName": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[\\s\\S]{1,80}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "slotId",
+    "label",
+    "sector",
+    "displaySector",
+    "depth",
+    "insideCircle",
+    "legSideForStriker",
+    "behindSquare",
+    "point",
+    "occupiedByPlayerId",
+    "occupiedByName"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:FieldPositionView:1",
+  "title": "FieldPositionView"
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "EVERY_BALL",
+    "KEY_MOMENT",
+    "FAST"
+  ],
+  "$id": "urn:lcxxvi:HighlightPacingMode:1",
+  "title": "HighlightPacingMode"
+}

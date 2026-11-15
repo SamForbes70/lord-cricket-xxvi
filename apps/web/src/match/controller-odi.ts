@@ -1,4 +1,8 @@
-import { createMatchAnalyticsCache, projectInMatchTacticalAssistant } from "@lcxxvi/projections";
+import {
+  createMatchAnalyticsCache,
+  projectInMatchTacticalAssistant,
+  projectLiveFieldPresentation,
+} from "@lcxxvi/projections";
 import {
   type ODISession,
   type RosterODISession,
@@ -23,7 +27,14 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type ODICommand, type DeliveryRecorded, type NewGameWorldCopy, type StagedRosterPack, type InMatchTacticalAssistantView } from "@lcxxvi/contracts";
+import {
+  type ODICommand,
+  type DeliveryRecorded,
+  type NewGameWorldCopy,
+  type StagedRosterPack,
+  type InMatchTacticalAssistantView,
+  type LiveFieldPresentation,
+} from "@lcxxvi/contracts";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
@@ -101,6 +112,7 @@ export function createODIMatchController(
   let cachedAssistantSession: ODISession | null = null;
   let cachedAssistantRevision = -1;
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
+  let cachedFieldPresentation: LiveFieldPresentation | null = null;
   function view(): View | null {
     if (!session) return null;
     const s = session,
@@ -225,6 +237,16 @@ export function createODIMatchController(
           s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, p.variations])),
         ),
       });
+      cachedFieldPresentation = projectLiveFieldPresentation({
+        format: "ODI",
+        phase: c.phase,
+        innings: c.innings,
+        activeIndex: c.activeInningsIndex,
+        fieldSlots: c.fieldSlots,
+        events: s.events,
+        names,
+        hands,
+      });
       cachedAssistantSession = s;
       cachedAssistantRevision = s.revision;
     }
@@ -263,6 +285,7 @@ export function createODIMatchController(
       scorecard,
       analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
       tacticalAssistant: cachedAssistant,
+      fieldPresentation: cachedFieldPresentation,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,

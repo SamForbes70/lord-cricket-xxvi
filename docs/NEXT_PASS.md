@@ -34,7 +34,13 @@ The owner accepted Stage 5 (`S05-01`) on 15 November 2026 ([OWNER_DECISIONS_2026
 
 1. **Pure public-data briefings & trade-off guidance**: `LC_TACTICAL_BRIEFING_V1` (`281` strict JSON Schemas total) builds pre-match pitch/readiness/opponent briefings, plain-language upside/trade-off explanations for all 7 tactical controls, contextual legal presets across `T20` / `ODI` / `RED_BALL`, and incremental + rebuildable post-spell and batting-stint outcome summaries without reading hidden player ratings, youth ceilings, or seeds.
 2. **Presentation-only visibility toggle**: `showTacticalBriefings` (`Shown` / `Hidden`) persists in UI preferences and never mutates worker `revision` or random draws.
-3. **Next eligible slices**: **Stage 6 (Live field and highlight pacing)**, **Stage 7 (Contextual text commentary)**, and **Stage 9 (Historical statistics and leaderboards)** (plus optional multi-participant observed human playtest sessions using [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)).
+## Stage 6: Live field and highlight pacing (`accepted`, 15 November 2026)
+
+The owner accepted Stage 6 (`S06-01`) on 15 November 2026 ([verification-stage06-live-field-highlights/REPORT.md](verification-stage06-live-field-highlights/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)):
+
+1. **Committed-event presentation adapter (`LC_FIELD_PRESENTATION_V1`, `292` strict JSON Schemas)**: Responsive 2D SVG named-position field across `T20` / `ODI` / `RED_BALL`, mirroring `RHB` and `LHB` striker geometry, showing powerplay infield/outfield legality diagnostics, and providing keyboard-accessible field preset controls.
+2. **Illustrative highlights & identical state hashes**: Highlight modes (`EVERY_BALL`, `KEY_MOMENTS`, `FAST`) and `reducedMotion` use an isolated presentation seed (`ILLUSTRATIVE_SECTOR_AND_LENGTH`), fall back cleanly when sector data is absent, preserve decision stops and immediate cancellation, and leave final state and event hashes byte-identical across modes.
+3. **Next eligible slices**: **Stage 7 (Contextual text commentary)**, **Stage 8 (Optional sound and narration)**, and **Stage 9 (Historical statistics and leaderboards)** (plus human playtest review of Stages 5–6).
 
 ## Open items that still need people
 

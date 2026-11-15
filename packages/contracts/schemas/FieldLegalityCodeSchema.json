@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "SLOT_COUNT",
+    "UNIQUE_PLAYERS",
+    "DUPLICATE_POSITION",
+    "UNSUPPORTED_POSITION",
+    "CIRCLE_RESTRICTION",
+    "LEG_SIDE_LIMIT",
+    "BEHIND_SQUARE_LEG_LIMIT"
+  ],
+  "$id": "urn:lcxxvi:FieldLegalityCode:1",
+  "title": "FieldLegalityCode"
+}

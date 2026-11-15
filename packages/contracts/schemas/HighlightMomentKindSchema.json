@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "WICKET",
+    "SIX",
+    "FOUR",
+    "FREE_HIT",
+    "EXTRA",
+    "RUNS",
+    "DOT"
+  ],
+  "$id": "urn:lcxxvi:HighlightMomentKind:1",
+  "title": "HighlightMomentKind"
+}

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "RECORDED_SECTOR",
+    "PITCH_CHANNEL_ONLY"
+  ],
+  "$id": "urn:lcxxvi:HighlightSectorStatus:1",
+  "title": "HighlightSectorStatus"
+}

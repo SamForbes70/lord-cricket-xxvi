@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "enum": [
+        "SLOT_COUNT",
+        "UNIQUE_PLAYERS",
+        "DUPLICATE_POSITION",
+        "UNSUPPORTED_POSITION",
+        "CIRCLE_RESTRICTION",
+        "LEG_SIDE_LIMIT",
+        "BEHIND_SQUARE_LEG_LIMIT"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "affectedSlotIds": {
+      "maxItems": 9,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    }
+  },
+  "required": [
+    "code",
+    "message",
+    "affectedSlotIds"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:FieldLegalityViolation:1",
+  "title": "FieldLegalityViolation"
+}
