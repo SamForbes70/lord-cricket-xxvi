@@ -980,3 +980,21 @@ code {
     grid-template-columns: 1fr;
   }
 }
+.commentary-milestones {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: 0.45rem;
+  vertical-align: middle;
+}
+.commentary-milestone-badge {
+  display: inline-block;
+  padding: 0.1rem 0.42rem;
+  border-radius: 4px;
+  border: 1px solid #194b38;
+  background: #edf7f1;
+  color: #143d2d;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}

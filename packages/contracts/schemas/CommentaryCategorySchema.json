@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "DELIVERY",
+    "OVER",
+    "PARTNERSHIP",
+    "MILESTONE",
+    "DISMISSAL",
+    "TACTICAL",
+    "CONDITIONS",
+    "INNINGS",
+    "RESULT",
+    "SELECTION"
+  ],
+  "$id": "urn:lcxxvi:CommentaryCategory:1",
+  "title": "CommentaryCategory"
+}

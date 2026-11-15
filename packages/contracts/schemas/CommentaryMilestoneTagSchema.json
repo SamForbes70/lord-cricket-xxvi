@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "BATTER_FIFTY",
+    "BATTER_CENTURY",
+    "BATTER_150",
+    "BATTER_DOUBLE_CENTURY",
+    "PARTNERSHIP_FIFTY",
+    "PARTNERSHIP_CENTURY",
+    "PARTNERSHIP_150",
+    "BOWLER_THREE_FOR",
+    "BOWLER_FIVE_FOR",
+    "MAIDEN_OVER",
+    "ALL_OUT",
+    "WINNING_DELIVERY"
+  ],
+  "$id": "urn:lcxxvi:CommentaryMilestoneTag:1",
+  "title": "CommentaryMilestoneTag"
+}

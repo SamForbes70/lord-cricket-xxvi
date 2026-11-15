@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { MatchAnalytics } from "@lcxxvi/projections";
 import type {
+  CommentaryEntry,
   InMatchTacticalAssistantView,
   LiveFieldPresentation,
 } from "@lcxxvi/contracts";
@@ -229,7 +230,7 @@ export type View = {
   fieldSlots: { slotId: string; playerId: string }[];
   positions: string[];
   advanceReason: string;
-  commentary: { sequence: number; text: string; short: string }[];
+  commentary: CommentaryEntry[];
   scorecard: T20Scorecard | ODIScorecard | Red5Scorecard | null;
   analytics?: MatchAnalytics | null;
   tacticalAssistant?: InMatchTacticalAssistantView | null;

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "slot": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "value": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "sourceKind": {
+      "type": "string",
+      "enum": [
+        "EVENT_FIELD",
+        "INNINGS_PROJECTION",
+        "BATTER_PROJECTION",
+        "BOWLER_PROJECTION",
+        "PARTNERSHIP_PROJECTION",
+        "CHASE_PROJECTION",
+        "MATCH_RESULT",
+        "FORMAT_RULE"
+      ]
+    },
+    "sourceRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    }
+  },
+  "required": [
+    "slot",
+    "value",
+    "sourceKind",
+    "sourceRef"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:CommentaryFactSlot:1",
+  "title": "CommentaryFactSlot"
+}

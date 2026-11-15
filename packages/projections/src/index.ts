@@ -17,3 +17,4 @@ export * from "./match-analytics.js";
 export * from "./persistent-world.js";
 export * from "./tactical-briefing.js";
 export * from "./field-presentation.js";
+export * from "./commentary.js";

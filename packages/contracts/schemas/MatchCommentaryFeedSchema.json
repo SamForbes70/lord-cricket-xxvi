@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "adapterVersion": {
+      "type": "string",
+      "const": "LC_COMMENTARY_ADAPTER_V1"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "T20",
+        "ODI",
+        "RED_BALL"
+      ]
+    },
+    "presentationKeyDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}$"
+    },
+    "repetitionCooldownWindow": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "adapterVersion": {
+            "type": "string",
+            "const": "LC_COMMENTARY_ADAPTER_V1"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "eventType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "DELIVERY",
+              "OVER",
+              "PARTNERSHIP",
+              "MILESTONE",
+              "DISMISSAL",
+              "TACTICAL",
+              "CONDITIONS",
+              "INNINGS",
+              "RESULT",
+              "SELECTION"
+            ]
+          },
+          "templateId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "templateFamily": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "cooldownApplied": {
+            "type": "boolean"
+          },
+          "presentationDigest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{8}$"
+          },
+          "milestoneTags": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BATTER_FIFTY",
+                "BATTER_CENTURY",
+                "BATTER_150",
+                "BATTER_DOUBLE_CENTURY",
+                "PARTNERSHIP_FIFTY",
+                "PARTNERSHIP_CENTURY",
+                "PARTNERSHIP_150",
+                "BOWLER_THREE_FOR",
+                "BOWLER_FIVE_FOR",
+                "MAIDEN_OVER",
+                "ALL_OUT",
+                "WINNING_DELIVERY"
+              ]
+            }
+          },
+          "short": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 640
+          },
+          "detailed": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 960
+          },
+          "factSlots": {
+            "minItems": 1,
+            "maxItems": 24,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slot": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "sourceKind": {
+                  "type": "string",
+                  "enum": [
+                    "EVENT_FIELD",
+                    "INNINGS_PROJECTION",
+                    "BATTER_PROJECTION",
+                    "BOWLER_PROJECTION",
+                    "PARTNERSHIP_PROJECTION",
+                    "CHASE_PROJECTION",
+                    "MATCH_RESULT",
+                    "FORMAT_RULE"
+                  ]
+                },
+                "sourceRef": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              },
+              "required": [
+                "slot",
+                "value",
+                "sourceKind",
+                "sourceRef"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "adapterVersion",
+          "sequence",
+          "eventType",
+          "category",
+          "templateId",
+          "templateFamily",
+          "cooldownApplied",
+          "presentationDigest",
+          "milestoneTags",
+          "short",
+          "text",
+          "detailed",
+          "factSlots"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "adapterVersion",
+    "format",
+    "presentationKeyDigest",
+    "repetitionCooldownWindow",
+    "entries"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:MatchCommentaryFeed:1",
+  "title": "MatchCommentaryFeed"
+}

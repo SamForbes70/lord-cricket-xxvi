@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
-import { projectPreMatchBriefing } from "@lcxxvi/projections";
+import {
+  projectPreMatchBriefing,
+  selectCommentaryTextForMode,
+} from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -131,9 +134,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       const saved = localStorage.getItem("lcxxvi-match-scale");
       return saved && ["100", "115", "125", "150"].includes(saved) ? saved : "100";
     }),
-    [commentary, setCommentary] = useState(() => {
+    [commentary, setCommentary] = useState<"full" | "detailed" | "brief" | "off">(() => {
       const saved = localStorage.getItem("lcxxvi-match-commentary");
-      return saved && ["full", "brief", "off"].includes(saved) ? saved : "full";
+      if (saved === "standard") return "full";
+      return saved === "full" || saved === "detailed" || saved === "brief" || saved === "off"
+        ? saved
+        : "full";
     }),
     [density, setDensity] = useState(() => {
       const saved = localStorage.getItem("lcxxvi-match-density");
@@ -578,9 +584,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           <select
             aria-label="Commentary"
             value={commentary}
-            onChange={(e) => setCommentary(e.target.value)}
+            onChange={(e) =>
+              setCommentary(e.target.value as "full" | "detailed" | "brief" | "off")
+            }
           >
-            <option value="full">Full</option>
+            <option value="full">Standard</option>
+            <option value="detailed">Detailed</option>
             <option value="brief">Brief</option>
             <option value="off">Off</option>
           </select>
@@ -1232,7 +1241,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 </article>
               ))}
             </section>
-            <section className="panel commentary">
+            <section className="panel commentary" data-testid="match-commentary-panel">
               <h2>Commentary</h2>
               <p>From accepted match events only. Latest first.</p>
               {commentary === "off" ? (
@@ -1243,8 +1252,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     .slice()
                     .reverse()
                     .map((e) => (
-                      <li key={e.sequence} value={e.sequence}>
-                        {commentary === "brief" ? e.short : e.text}
+                      <li key={e.sequence} value={e.sequence} data-category={e.category}>
+                        <span>{selectCommentaryTextForMode(e, commentary)}</span>
+                        {commentary !== "brief" && e.milestoneTags && e.milestoneTags.length > 0 && (
+                          <span className="commentary-milestones" aria-label="Milestones">
+                            {e.milestoneTags.map((tag) => (
+                              <span key={tag} className="commentary-milestone-badge">
+                                {tag.replaceAll("_", " ")}
+                              </span>
+                            ))}
+                          </span>
+                        )}
                       </li>
                     ))}
                 </ol>

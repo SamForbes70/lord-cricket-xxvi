@@ -221,6 +221,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     const saved = localStorage.getItem("lcxxvi-highlight-motion");
     return saved === "AUTO" || saved === "REDUCED" ? saved : "AUTO";
   });
+  const [matchCommentary, setMatchCommentary] = useState(() => {
+    const saved = localStorage.getItem("lcxxvi-match-commentary");
+    if (saved === "standard") return "full";
+    return saved && ["full", "detailed", "brief", "off"].includes(saved) ? saved : "full";
+  });
   const state = service.getState();
   const persistentWorld = service.getPersistentState();
   const lifecycleState = service.getLifecycleState();
@@ -333,7 +338,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     localStorage.setItem("lcxxvi-tactical-briefings", showTacticalBriefings ? "shown" : "hidden");
     localStorage.setItem("lcxxvi-highlight-pacing", highlightPacing);
     localStorage.setItem("lcxxvi-highlight-motion", highlightMotion);
-  }, [scale, density, reducedMotion, showTacticalBriefings, highlightPacing, highlightMotion]);
+    localStorage.setItem("lcxxvi-match-commentary", matchCommentary);
+  }, [scale, density, reducedMotion, showTacticalBriefings, highlightPacing, highlightMotion, matchCommentary]);
 
   async function action(work: () => Promise<void>) {
     if (inspectionOnly) {
@@ -3006,6 +3012,19 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               >
                 <option value="AUTO">System default</option>
                 <option value="REDUCED">Reduced motion</option>
+              </select>
+            </label>
+            <label>
+              Match commentary
+              <select
+                aria-label="Match commentary"
+                value={matchCommentary}
+                onChange={(event) => setMatchCommentary(event.currentTarget.value)}
+              >
+                <option value="full">Standard</option>
+                <option value="detailed">Detailed</option>
+                <option value="brief">Brief</option>
+                <option value="off">Off</option>
               </select>
             </label>
           </div>

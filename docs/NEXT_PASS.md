@@ -40,7 +40,13 @@ The owner accepted Stage 6 (`S06-01`) on 15 November 2026 ([verification-stage06
 
 1. **Committed-event presentation adapter (`LC_FIELD_PRESENTATION_V1`, `292` strict JSON Schemas)**: Responsive 2D SVG named-position field across `T20` / `ODI` / `RED_BALL`, mirroring `RHB` and `LHB` striker geometry, showing powerplay infield/outfield legality diagnostics, and providing keyboard-accessible field preset controls.
 2. **Illustrative highlights & identical state hashes**: Highlight modes (`EVERY_BALL`, `KEY_MOMENTS`, `FAST`) and `reducedMotion` use an isolated presentation seed (`ILLUSTRATIVE_SECTOR_AND_LENGTH`), fall back cleanly when sector data is absent, preserve decision stops and immediate cancellation, and leave final state and event hashes byte-identical across modes.
-3. **Next eligible slices**: **Stage 7 (Contextual text commentary)**, **Stage 8 (Optional sound and narration)**, and **Stage 9 (Historical statistics and leaderboards)** (plus human playtest review of Stages 5–6).
+## Stage 7: Contextual text commentary (`accepted`, 15 November 2026)
+
+The owner accepted Stage 7 (`S07-01`) on 15 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage07-contextual-commentary/REPORT.md](verification-stage07-contextual-commentary/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)):
+
+1. **Shared fact-checked commentary adapter (`LC_COMMENTARY_ADAPTER_V1`, `299` strict JSON Schemas)**: `projectMatchCommentary` (`packages/projections/src/commentary.ts`) replaces repetitive inline strings across `T20`, `ODI`, and `RED_BALL` with format-eligible templates (`freeHitNext`/`isFreeHit` in `T20`/`ODI` only, never `RED_BALL`), FNV-1a presentation-seeded variation, sliding repetition cooldowns, milestone tags, `factSlots` tracing every claim to committed events/projections, and zero network calls.
+2. **Verbosity modes**: `Standard` (`full`), `Detailed` (`detailed`), `Brief` (`brief`), and `Off` (`off`) persist across Match Header and Career Settings without affecting simulation RNG or hashes.
+3. **Next eligible slices**: **Stage 8 (Optional sound and narration)** and **Stage 9 (Historical statistics and leaderboards)** (plus human playtest review of Stages 5–7).
 
 ## Open items that still need people
 

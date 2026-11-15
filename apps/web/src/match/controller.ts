@@ -2,6 +2,7 @@ import {
   createMatchAnalyticsCache,
   projectInMatchTacticalAssistant,
   projectLiveFieldPresentation,
+  projectMatchCommentary,
 } from "@lcxxvi/projections";
 import {
   type T20Session,
@@ -33,9 +34,9 @@ import {
 } from "@lcxxvi/data";
 import {
   type T20Command,
-  type DeliveryRecorded,
   type NewGameWorldCopy,
   type StagedRosterPack,
+  type CommentaryEntry,
   type InMatchTacticalAssistantView,
   type LiveFieldPresentation,
 } from "@lcxxvi/contracts";
@@ -148,8 +149,10 @@ export function createMatchController(
   const analyticsCache = createMatchAnalyticsCache(2);
   let cachedAssistantSession: T20Session | null = null;
   let cachedAssistantRevision = -1;
+  let cachedDisplayWorld: typeof displayWorld | null = null;
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
   let cachedFieldPresentation: LiveFieldPresentation | null = null;
+  let cachedCommentary: CommentaryEntry[] = [];
   function view(): View | null {
     if (!session) return null;
     const s = session,
@@ -223,39 +226,30 @@ export function createMatchController(
           "Field is invalid for this striker. Apply a legal named field before advancing.";
       }
     }
-    const commentary = s.events.map((e) => {
-      let text = e.type.replaceAll("_", " ").toLowerCase(),
-        short = text;
-      if (e.type === "DELIVERY_RECORDED") {
-        const d = (e.payload as { event: DeliveryRecorded }).event;
-        const runs =
-          d.batRuns + Object.values(d.extras).reduce((a, b) => a + b, 0);
-        short = d.dismissal
-          ? "W"
-          : d.legality === "WIDE"
-            ? `${runs}wd`
-            : d.legality === "NO_BALL"
-              ? `${runs}nb`
-              : String(runs);
-        text = `Innings ${d.inningsIndex + 1}, delivery ${d.deliveryIndex + 1}: ${names[d.bowlerId]} to ${names[d.strikerId]}. ${runs} run${runs === 1 ? "" : "s"}${d.legality === "LEGAL" ? "" : ` (${d.legality.toLowerCase()})`}.${d.dismissal ? ` ${names[d.dismissal.playerId]} out, ${d.dismissal.kind.toLowerCase().replaceAll("_", " ")}.` : ""}`;
-      } else if (e.type === "TOSS_RESOLVED") {
-        const p = e.payload as { winnerId: string; coin: string };
-        text = `Toss: ${p.coin.toLowerCase()}. ${tn(p.winnerId)} won.`;
-        short = text;
-      } else if (e.type === "BATTER_SELECTED") {
-        text = `${names[(e.payload as { playerId: string }).playerId]} comes in to bat.`;
-        short = text;
-      } else if (e.type === "BOWLER_SELECTED") {
-        text = `${names[(e.payload as { playerId: string }).playerId]} will bowl.`;
-        short = text;
-      }
-      return { sequence: e.sequence, text, short };
-    });
     const r = c.result;
     const hands = Object.fromEntries(
       s.setup.teams.flatMap((team) => team.xi.map((player) => [player.playerId, player.batHand])),
     );
-    if (cachedAssistantSession !== s || cachedAssistantRevision !== s.revision) {
+    const groundDisplayName =
+      displayWorld.grounds.find((ground) => ground.groundId === s.setup.ground.groundId)?.name ??
+      s.setup.ground.name;
+    if (
+      cachedAssistantSession !== s ||
+      cachedAssistantRevision !== s.revision ||
+      cachedDisplayWorld !== displayWorld
+    ) {
+      const teamNames = Object.fromEntries(
+        s.setup.teams.map((t) => [t.teamId, tn(t.teamId)]),
+      );
+      cachedCommentary = projectMatchCommentary({
+        format: "T20",
+        events: s.events,
+        playerNames: names,
+        teamNames,
+        teamIds: [s.setup.teams[0].teamId, s.setup.teams[1].teamId],
+        groundName: groundDisplayName,
+        presentationKey: `lcxxvi-commentary:T20:${s.setup.matchId}`,
+      }).entries;
       cachedAssistant = projectInMatchTacticalAssistant({
         format: "T20",
         phase: c.phase,
@@ -286,7 +280,9 @@ export function createMatchController(
       });
       cachedAssistantSession = s;
       cachedAssistantRevision = s.revision;
+      cachedDisplayWorld = displayWorld;
     }
+    const commentary = cachedCommentary;
     const resultText =
       c.phase === "COMPLETE" && r
         ? r.kind === "TIE"

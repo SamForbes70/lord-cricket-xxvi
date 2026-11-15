@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "EVENT_FIELD",
+    "INNINGS_PROJECTION",
+    "BATTER_PROJECTION",
+    "BOWLER_PROJECTION",
+    "PARTNERSHIP_PROJECTION",
+    "CHASE_PROJECTION",
+    "MATCH_RESULT",
+    "FORMAT_RULE"
+  ],
+  "$id": "urn:lcxxvi:CommentaryFactSourceKind:1",
+  "title": "CommentaryFactSourceKind"
+}
