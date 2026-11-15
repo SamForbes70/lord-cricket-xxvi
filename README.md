@@ -1,21 +1,21 @@
-# Lord Cricket XXVI | Single-season management alpha
+# Lord Cricket XXVI | Cricket management alpha
 
 ## Status in one paragraph
 
-V0.1 (a fictional, single-season synthetic alpha) is closed and owner accepted as of 13 November 2026. The model is `synthetic-alpha-01` and makes no empirical claim. Three gates (reference-hardware run, owner-PC run, screen-reader walkthrough) are owner declared with no measurement stored in the repository. Next: the persistent world, then player lifecycle, then squad economy. Read [docs/HANDOVER.md](docs/HANDOVER.md) first. To run it: `npm ci`, `npm run build`, then serve `apps/web/dist` over http (`node start.mjs`) and open http://127.0.0.1:4180/. To make shareable zips: `npm run package:game`. To brief another AI, paste [docs/AI_INSPECTION_PROMPT.md](docs/AI_INSPECTION_PROMPT.md).
+V0.1 (a fictional, single-season synthetic alpha) is closed and owner accepted as of 13 November 2026. The product has since added owner-accepted persistent-world Stages 2 to 5: multi-season careers, fictional player lifecycle and youth, domestic contracts and recruitment, and tactical briefings. These additions use explicit save versions; V0.1 and earlier persistent-world saves are not silently upgraded. The model is `synthetic-alpha-01` and makes no empirical claim. Three gates (reference-hardware run, owner-PC run, screen-reader walkthrough) are owner declared with no measurement stored in the repository. Next eligible slices are live field/highlight pacing, contextual commentary and historical statistics/leaderboards. Read [docs/HANDOVER.md](docs/HANDOVER.md) first. To run it: `npm ci`, `npm run build`, then serve `apps/web/dist` over http (`node start.mjs`) and open http://127.0.0.1:4180/. To make shareable zips: `npm run package:game`. To brief another AI, paste [docs/AI_INSPECTION_PROMPT.md](docs/AI_INSPECTION_PROMPT.md).
 
-Lord Cricket XXVI provides a one-season management game over deterministic match and career systems.
+Lord Cricket XXVI provides single-season and persistent-world management over deterministic match and career systems.
 Start with the [documentation hub](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md) or [AI continuation guide](docs/AI_CONTINUATION.md).
 See [current status](docs/CURRENT_STATUS.md), [next slice](docs/NEXT_PASS.md) and the [V0.1 backlog](docs/V01_BACKLOG.json) for active work (the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) is a historical snapshot prior to PRs #39 to #41).
 
-**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management are not enabled. Optional T20 tactical opponent AI is available in the match view. Browser tests cover its controls; empirical tactical quality remains unaccepted.
+**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. Legacy V0.1 careers are one fixed T20 season; persistent-world careers can continue across seasons, with lifecycle and youth features in Stage 3 and fictional domestic contracts, budgets and recruitment in Stage 4. Those economy features require a V3 persistent-world save. Limited-overs DLS and international management are not enabled. Optional T20 tactical opponent AI is available in the match view. Tactical briefings and legal contextual presets are available across T20, ODI and red-ball matches; empirical tactical quality remains unaccepted.
 
 ## Player-facing management loop
 
 The default web route opens the management career. A player can:
 
 - choose one of the eight frozen fictional teams;
-- use Home, Career, Squad, Fixtures, Statistics and Settings screens;
+- use Home, Career, Squad, Fixtures, Statistics and Settings screens, plus Contracts & Recruitment in Stage 4 V3 careers;
 - inspect availability, fatigue and temporary readiness;
 - set REST, batting, bowling or fielding practice;
 - advance to the next managed fixture without silently passing it;
@@ -23,7 +23,9 @@ The default web route opens the management career. A player can:
 - follow the authoritative Pass 12E table, exact NRR and player statistics;
 - persist locally through the existing Pass 12F IndexedDB repository;
 - export/import the existing portable `.lcxxvi` season archive;
-- finish all 14 rounds / 56 fixtures and create the immutable final season archive.
+- finish all 14 rounds / 56 fixtures in a season and create its immutable archive.
+
+Persistent-world careers additionally support season rollover, player ageing and retirement, a youth pathway, all-time statistics and (in Stage 4 V3 saves) domestic contracts, wage budgets and free-agent recruitment. Tactical briefings explain public observations and control trade-offs; they do not disclose hidden ratings or claim predictive accuracy.
 
 The fixture autopilot remains the transparent deterministic baseline completion policy. It is not presented as tactical captain AI. In interactive T20 matches, the captain dropdown optionally delegates one team to public-information-only, deterministic AI decisions. The user still advances balls; AI commands are persisted in the original match event/command stream.
 

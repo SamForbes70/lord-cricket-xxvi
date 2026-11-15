@@ -6,7 +6,7 @@ Starting fresh? [AI_INSPECTION_PROMPT.md](AI_INSPECTION_PROMPT.md) is a ready-to
 
 ## Mission
 
-Finish Lord Cricket XXVI as an evidence-based statistical management game. The approved sequence is V0.1 completion, persistent world, player lifecycle, then squad economy. Finish and accept each milestone before widening implementation. The current product is a playable single-season alpha; the future game is not already built.
+Finish Lord Cricket XXVI as an evidence-based statistical management game. V0.1 and Stages 2 to 5 (persistent world, player lifecycle, squad economy, and tactical briefings) are accepted. Do not treat the original Stage 2 to 4 sequence as current work: consult [NEXT_PASS.md](NEXT_PASS.md) and [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) for eligible next slices. The product includes legacy single-season careers and versioned persistent-world careers; keep their save compatibility boundaries explicit.
 
 ## Owner context
 
@@ -14,7 +14,7 @@ The owner has repeatedly authorised autonomous routine development and is frustr
 
 **Where the project stands (13 November 2026).** V0.1 is closed: the owner accepted it and every V01 backlog item is `DONE` ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). Three of those closures are the owner's declaration with **no measurement stored in the repository**: the reference-hardware run, the owner-PC run and the screen-reader walkthrough. Never describe them as measured or observed. The research items RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. The model is `synthetic-alpha-01` / `SYNTHETIC_ALPHA` and makes no empirical claim.
 
-The next milestone is the persistent world, then player lifecycle, then squad economy, each accepted before the next begins. Read [HANDOVER.md](HANDOVER.md) for the one-page summary and [NEXT_PASS.md](NEXT_PASS.md) for what to do first. No unattended or background execution exists in this repository; do not claim it does.
+V0.1 and Stages 2 to 5 are accepted as of 15 November 2026. The next eligible product slices are Stage 6 (live field and highlight pacing), Stage 7 (contextual text commentary), and Stage 9 (historical statistics and leaderboards); Stage 6 is the immediate next slice in the delivery ledger. Multi-participant observed playtest sessions remain unrecorded. Read [HANDOVER.md](HANDOVER.md) for the current summary and [NEXT_PASS.md](NEXT_PASS.md) for acceptance details and open owner/evidence gates. No unattended or background execution exists in this repository; do not claim it does.
 
 ## Working agreements for any AI or engineer
 
@@ -43,9 +43,7 @@ Never turn PLANNED into DONE solely because an implementation branch exists. Pas
 
 ## Current handover
 
-At the 11 November audit, main was `c37f1e0`. PRs #26 and #27 contain integrated analytics and charts with retained local evidence. #31 contains diagnostics. #35 describes broader V1.0 gates. #36 records the owner-approved ordered delivery authority. #37 contains only a recovery regression and design notes. Requery GitHub; this list is a snapshot.
-
-Start the recovery implementation from the correct current base. Keep the failing test meaningful. Add interrupted result-handoff, duplicate/conflicting completion, standard/edited/imported worlds, live/expired leases and damaged/stale binding coverage. A new tab test proves loss of session storage; add a true fresh browser session using retained IndexedDB when establishing full release acceptance.
+The 11 November GitHub audit and earlier PR lists are historical snapshots, not the current delivery queue. V0.1 and Stages 2 to 5 are accepted; durable managed-match recovery is already implemented. Do not restart that work from the old recovery checklist. Recheck the current revision and use [HANDOVER.md](HANDOVER.md), [NEXT_PASS.md](NEXT_PASS.md), and [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) to select the next eligible slice. The next immediate product slice is Stage 6; Stages 7 and 9 are also eligible. The Stage 5 playtest protocol and any unrecorded owner evidence remain separate from code acceptance.
 
 ## Practical workflow
 
@@ -54,7 +52,7 @@ Start the recovery implementation from the correct current base. Keep the failin
 - Keep simulation authority out of React. Persist a validated binding before launching the match.
 - Respect current leases and revisions; never fix recovery by indiscriminately clearing IndexedDB.
 - Preserve corrupted originals and historical model dispatch.
-- Run focused regressions, then required core and browser checks.
+- Run focused regressions, then required core and browser checks. For a selected delivery slice, use its current acceptance criteria rather than the obsolete recovery checklist.
 - Inspect the final diff and actual checks. Update PR description to reflect the final implementation.
 - Record the next eligible task and continue authorised work; external evidence blocks only dependent tasks.
 

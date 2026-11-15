@@ -70,7 +70,7 @@ A "managed match" is a match played from a career fixture. The match checkpoint 
 - All eight performance budgets are confirmed, including 768 MiB for total application memory.
 - RES-001 to RES-003 (the research track) are BLOCKED_EXTERNAL.
 - The model is synthetic-alpha-01 and makes no empirical claim. In the T20 sweeps, the tactical captain scores the same as the neutral baseline (see the follow-up in docs/verification-v01-batch7-diagnostics).
-- Persistent world, player lifecycle and squad economy have no code.
+- **This prompt's status snapshot is stale:** Stages 2 to 4 (persistent world, player lifecycle and squad economy) and Stage 5 (tactical briefings and feedback) have since been implemented and owner-accepted. Verify current scope and acceptance in `docs/HANDOVER.md`, `docs/NEXT_PASS.md` and `docs/MASTER_BUILD_LEDGER.md`, then inspect the source and stage reports; do not rely on the 13 November status below.
 
 ## 5. How to verify it independently (do this before trusting any claim)
 
