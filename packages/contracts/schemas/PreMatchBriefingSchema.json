@@ -1,0 +1,621 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "LC_TACTICAL_BRIEFING_V1"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "T20",
+        "ODI",
+        "RED_BALL"
+      ]
+    },
+    "ground": {
+      "type": "object",
+      "properties": {
+        "groundId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "groundName": {
+          "type": "string",
+          "pattern": "^[\\s\\S]{1,80}$"
+        },
+        "seamBp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "turnBp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "pitchTendency": {
+          "type": "string",
+          "enum": [
+            "SEAM_FRIENDLY",
+            "SPIN_FRIENDLY",
+            "LIVE_BOTH",
+            "BALANCED",
+            "FLAT"
+          ]
+        },
+        "pitchSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320
+        },
+        "formatRulesSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320
+        },
+        "modelLimitsDisclosure": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320
+        }
+      },
+      "required": [
+        "groundId",
+        "groundName",
+        "seamBp",
+        "turnBp",
+        "pitchTendency",
+        "pitchSummary",
+        "formatRulesSummary",
+        "modelLimitsDisclosure"
+      ],
+      "additionalProperties": false
+    },
+    "teams": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "teamName": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{1,80}$"
+            },
+            "squadSize": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "selectedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedKeepers": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedBowlingOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedPaceOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedSpinOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedLeftHandBatters": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "freshInXI": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "tiredInXI": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "balanceSummary": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 320
+            },
+            "players": {
+              "minItems": 11,
+              "maxItems": 30,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,80}$"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "BATTER",
+                      "BOWLER",
+                      "ALLROUNDER",
+                      "KEEPER"
+                    ]
+                  },
+                  "batHand": {
+                    "type": "string",
+                    "enum": [
+                      "R",
+                      "L"
+                    ]
+                  },
+                  "bowlingStyle": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "FAST",
+                          "MEDIUM",
+                          "OFF_SPIN",
+                          "LEG_SPIN",
+                          "SLOW_LEFT_ARM",
+                          "LEFT_ARM_WRIST"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "canBowl": {
+                    "type": "boolean"
+                  },
+                  "selectedInXI": {
+                    "type": "boolean"
+                  },
+                  "fatigueBp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "readinessDelta": {
+                    "type": "integer",
+                    "minimum": -20,
+                    "maximum": 20
+                  },
+                  "conditionBand": {
+                    "type": "string",
+                    "enum": [
+                      "FRESH",
+                      "READY",
+                      "WORKED",
+                      "TIRED"
+                    ]
+                  }
+                },
+                "required": [
+                  "playerId",
+                  "name",
+                  "role",
+                  "batHand",
+                  "bowlingStyle",
+                  "canBowl",
+                  "selectedInXI",
+                  "fatigueBp",
+                  "readinessDelta",
+                  "conditionBand"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "teamId",
+            "teamName",
+            "squadSize",
+            "selectedCount",
+            "selectedKeepers",
+            "selectedBowlingOptions",
+            "selectedPaceOptions",
+            "selectedSpinOptions",
+            "selectedLeftHandBatters",
+            "freshInXI",
+            "tiredInXI",
+            "balanceSummary",
+            "players"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "teamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "teamName": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{1,80}$"
+            },
+            "squadSize": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "selectedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedKeepers": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedBowlingOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedPaceOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedSpinOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "selectedLeftHandBatters": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "freshInXI": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "tiredInXI": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 11
+            },
+            "balanceSummary": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 320
+            },
+            "players": {
+              "minItems": 11,
+              "maxItems": 30,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,80}$"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "BATTER",
+                      "BOWLER",
+                      "ALLROUNDER",
+                      "KEEPER"
+                    ]
+                  },
+                  "batHand": {
+                    "type": "string",
+                    "enum": [
+                      "R",
+                      "L"
+                    ]
+                  },
+                  "bowlingStyle": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "FAST",
+                          "MEDIUM",
+                          "OFF_SPIN",
+                          "LEG_SPIN",
+                          "SLOW_LEFT_ARM",
+                          "LEFT_ARM_WRIST"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "canBowl": {
+                    "type": "boolean"
+                  },
+                  "selectedInXI": {
+                    "type": "boolean"
+                  },
+                  "fatigueBp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "readinessDelta": {
+                    "type": "integer",
+                    "minimum": -20,
+                    "maximum": 20
+                  },
+                  "conditionBand": {
+                    "type": "string",
+                    "enum": [
+                      "FRESH",
+                      "READY",
+                      "WORKED",
+                      "TIRED"
+                    ]
+                  }
+                },
+                "required": [
+                  "playerId",
+                  "name",
+                  "role",
+                  "batHand",
+                  "bowlingStyle",
+                  "canBowl",
+                  "selectedInXI",
+                  "fatigueBp",
+                  "readinessDelta",
+                  "conditionBand"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "teamId",
+            "teamName",
+            "squadSize",
+            "selectedCount",
+            "selectedKeepers",
+            "selectedBowlingOptions",
+            "selectedPaceOptions",
+            "selectedSpinOptions",
+            "selectedLeftHandBatters",
+            "freshInXI",
+            "tiredInXI",
+            "balanceSummary",
+            "players"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    },
+    "opponentObservations": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "opponentTeamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "opponentTeamName": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{1,80}$"
+            },
+            "poolLabel": {
+              "type": "string",
+              "enum": [
+                "SELECTED_XI",
+                "AVAILABLE_SQUAD"
+              ]
+            },
+            "leftHandBatters": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "rightHandBatters": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "keepers": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "paceOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "spinOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "bowlingStyles": {
+              "maxItems": 6,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "FAST",
+                  "MEDIUM",
+                  "OFF_SPIN",
+                  "LEG_SPIN",
+                  "SLOW_LEFT_ARM",
+                  "LEFT_ARM_WRIST"
+                ]
+              }
+            },
+            "observations": {
+              "minItems": 1,
+              "maxItems": 6,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 280
+              }
+            }
+          },
+          "required": [
+            "opponentTeamId",
+            "opponentTeamName",
+            "poolLabel",
+            "leftHandBatters",
+            "rightHandBatters",
+            "keepers",
+            "paceOptions",
+            "spinOptions",
+            "bowlingStyles",
+            "observations"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "opponentTeamId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            },
+            "opponentTeamName": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{1,80}$"
+            },
+            "poolLabel": {
+              "type": "string",
+              "enum": [
+                "SELECTED_XI",
+                "AVAILABLE_SQUAD"
+              ]
+            },
+            "leftHandBatters": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "rightHandBatters": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "keepers": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "paceOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "spinOptions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "bowlingStyles": {
+              "maxItems": 6,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "FAST",
+                  "MEDIUM",
+                  "OFF_SPIN",
+                  "LEG_SPIN",
+                  "SLOW_LEFT_ARM",
+                  "LEFT_ARM_WRIST"
+                ]
+              }
+            },
+            "observations": {
+              "minItems": 1,
+              "maxItems": 6,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 280
+              }
+            }
+          },
+          "required": [
+            "opponentTeamId",
+            "opponentTeamName",
+            "poolLabel",
+            "leftHandBatters",
+            "rightHandBatters",
+            "keepers",
+            "paceOptions",
+            "spinOptions",
+            "bowlingStyles",
+            "observations"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    }
+  },
+  "required": [
+    "version",
+    "format",
+    "ground",
+    "teams",
+    "opponentObservations"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PreMatchBriefing:1",
+  "title": "PreMatchBriefing"
+}

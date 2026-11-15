@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "YORKER": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "FULL": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "GOOD": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "SHORT": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "FULL_TOSS": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "YORKER",
+    "FULL",
+    "GOOD",
+    "SHORT",
+    "FULL_TOSS"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SpellExecutedLengths:1",
+  "title": "SpellExecutedLengths"
+}

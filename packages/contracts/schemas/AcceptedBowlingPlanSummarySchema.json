@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "primaryLine": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "STUMPS",
+        "LEG"
+      ]
+    },
+    "primaryLength": {
+      "type": "string",
+      "enum": [
+        "YORKER",
+        "FULL",
+        "GOOD",
+        "SHORT"
+      ]
+    },
+    "primaryEffort": {
+      "type": "string",
+      "enum": [
+        "CONSERVE",
+        "NORMAL",
+        "MAXIMUM"
+      ]
+    },
+    "primaryVariationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "latestRingFielders": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9
+    },
+    "latestBoundaryFielders": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9
+    },
+    "latestCloseCatchers": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9
+    },
+    "planChangesCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "fieldChangesCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "primaryLine",
+    "primaryLength",
+    "primaryEffort",
+    "primaryVariationId",
+    "latestRingFielders",
+    "latestBoundaryFielders",
+    "latestCloseCatchers",
+    "planChangesCount",
+    "fieldChangesCount"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:AcceptedBowlingPlanSummary:1",
+  "title": "AcceptedBowlingPlanSummary"
+}

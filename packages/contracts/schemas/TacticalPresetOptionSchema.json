@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "presetId": {
+      "type": "string",
+      "enum": [
+        "BAT_CONSOLIDATE",
+        "BAT_ROTATE_STRIKE",
+        "BAT_BALANCED_TEMPO",
+        "BAT_BOUNDARY_PUSH",
+        "BOWL_DISCIPLINED_CHANNEL",
+        "BOWL_ATTACK_STUMPS",
+        "BOWL_CONSERVE_SPELL",
+        "BOWL_YORKER_CLOSE",
+        "BOWL_SHORT_TEST",
+        "FIELD_SLIP_ATTACK",
+        "FIELD_BALANCED_RING",
+        "FIELD_BOUNDARY_PROTECT"
+      ]
+    },
+    "commandKind": {
+      "type": "string",
+      "enum": [
+        "SET_BATTING_PLAN",
+        "SET_BOWLING_PLAN",
+        "SET_FIELD"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "whenToUse": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "tradeOff": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "contextualMatch": {
+      "type": "boolean"
+    },
+    "contextualReason": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "activeNow": {
+      "type": "boolean"
+    },
+    "battingPatch": {
+      "type": "object",
+      "properties": {
+        "aggression": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "intent": {
+          "type": "string",
+          "enum": [
+            "NORMAL",
+            "ROTATE",
+            "PROTECT"
+          ]
+        }
+      },
+      "required": [
+        "aggression",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "bowlingPatch": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "string",
+          "enum": [
+            "OFF",
+            "STUMPS",
+            "LEG"
+          ]
+        },
+        "length": {
+          "type": "string",
+          "enum": [
+            "YORKER",
+            "FULL",
+            "GOOD",
+            "SHORT"
+          ]
+        },
+        "effort": {
+          "type": "string",
+          "enum": [
+            "CONSERVE",
+            "NORMAL",
+            "MAXIMUM"
+          ]
+        },
+        "variationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      },
+      "required": [
+        "line",
+        "length",
+        "effort",
+        "variationId"
+      ],
+      "additionalProperties": false
+    },
+    "fieldSlots": {
+      "minItems": 9,
+      "maxItems": 9,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "required": [
+          "slotId",
+          "playerId"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "presetId",
+    "commandKind",
+    "label",
+    "whenToUse",
+    "tradeOff",
+    "contextualMatch",
+    "contextualReason",
+    "activeNow"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:TacticalPresetOption:1",
+  "title": "TacticalPresetOption"
+}

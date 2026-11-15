@@ -1,4 +1,4 @@
-import { createMatchAnalyticsCache } from "@lcxxvi/projections";
+import { createMatchAnalyticsCache, projectInMatchTacticalAssistant } from "@lcxxvi/projections";
 import {
   type T20Session,
   type RosterT20Session,
@@ -27,7 +27,7 @@ import {
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
-import { type T20Command, type DeliveryRecorded, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import { type T20Command, type DeliveryRecorded, type NewGameWorldCopy, type StagedRosterPack, type InMatchTacticalAssistantView } from "@lcxxvi/contracts";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
   PINS,
@@ -75,6 +75,7 @@ export function createMatchController(
           role: p.role,
           style: p.bowlingStyle,
           canBowl: isBowlingCapable(p),
+          batHand: p.batHand,
         })),
         suggested: {
           teamId: t.teamId,
@@ -84,7 +85,7 @@ export function createMatchController(
         },
       };
     }),
-    grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name })),
+    grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name, seamBp: g.pitchPrior.seamBp, turnBp: g.pitchPrior.turnBp })),
   };
   let session: T20Session | null = null;
   let rosterPack: StagedRosterPack | null = null;
@@ -134,6 +135,9 @@ export function createMatchController(
   }[] = [];
   const hash = (v: unknown) => sha256Hex(canonicalStateBytes(v));
   const analyticsCache = createMatchAnalyticsCache(2);
+  let cachedAssistantSession: T20Session | null = null;
+  let cachedAssistantRevision = -1;
+  let cachedAssistant: InMatchTacticalAssistantView | null = null;
   function view(): View | null {
     if (!session) return null;
     const s = session,
@@ -236,6 +240,31 @@ export function createMatchController(
       return { sequence: e.sequence, text, short };
     });
     const r = c.result;
+    const hands = Object.fromEntries(
+      s.setup.teams.flatMap((team) => team.xi.map((player) => [player.playerId, player.batHand])),
+    );
+    if (cachedAssistantSession !== s || cachedAssistantRevision !== s.revision) {
+      cachedAssistant = projectInMatchTacticalAssistant({
+        format: "T20",
+        phase: c.phase,
+        innings: c.innings,
+        activeIndex: c.activeInningsIndex,
+        events: s.events,
+        names,
+        hands,
+        pitch: c.pitch,
+        fatigueBpByPlayerId: c.fatigueBp,
+        activeBattingPlans: c.battingPlans,
+        activeBowlingPlan: c.bowlingPlan,
+        activeFieldSlots: c.fieldSlots,
+        outfieldIds: l?.outfieldIds ?? [],
+        bowlerVariationsByPlayerId: Object.fromEntries(
+          s.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, p.variations])),
+        ),
+      });
+      cachedAssistantSession = s;
+      cachedAssistantRevision = s.revision;
+    }
     const resultText =
       c.phase === "COMPLETE" && r
         ? r.kind === "TIE"
@@ -257,7 +286,7 @@ export function createMatchController(
         ...(displayWorld.packId !== world.packId ? { colours: [...displayWorld.teams.find(team => team.teamId === t.teamId)!.colours] as [string, string] } : {}),
       })),
       names,
-      hands: Object.fromEntries(s.setup.teams.flatMap(team => team.xi.map(player => [player.playerId, player.batHand]))),
+      hands,
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
@@ -270,6 +299,7 @@ export function createMatchController(
       commentary,
       scorecard,
       analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
+      tacticalAssistant: cachedAssistant,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,

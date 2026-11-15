@@ -673,3 +673,134 @@ code {
   .print-scorecard table { width: 100%; border-collapse: collapse; }
   .print-scorecard td { padding: 0.2rem; border: 1px solid #777; }
 }
+
+/* Stage 5 tactical briefings, presets, trade-offs, and spell plan-vs-outcome reviews */
+.tactical-disclosure,
+.tactical-subdisclosure {
+  border: 1px solid #b5c3ba;
+  border-radius: 6px;
+  background: #fbfaf5;
+  margin: 0.65rem 0;
+  max-width: 100%;
+}
+.tactical-disclosure > summary,
+.tactical-subdisclosure > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.55rem 0.85rem;
+  color: #163b2d;
+}
+.tactical-disclosure-body {
+  padding: 0.65rem 0.85rem 0.85rem;
+  border-top: 1px solid #d6dfd8;
+}
+.tactical-briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap: 0.75rem;
+}
+.tactical-card {
+  border: 1px solid #cdd8d0;
+  border-radius: 6px;
+  padding: 0.7rem 0.8rem;
+  background: #ffffff;
+  min-width: 0;
+}
+.tactical-card h3 {
+  margin-top: 0;
+}
+.tactical-bullet-list {
+  margin: 0.35rem 0 0.6rem;
+  padding-left: 1.15rem;
+}
+.tactical-assistant {
+  margin: 0.85rem 0;
+  max-width: 100%;
+}
+.tactical-situation-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 0.45rem 0.9rem;
+  background: #edf3ee;
+  border: 1px solid #c3d2c8;
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.93em;
+}
+.tactical-preset-group {
+  margin-top: 0.7rem;
+}
+.tactical-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+  gap: 0.65rem;
+}
+.tactical-preset-card {
+  border: 1px solid #c7d4cc;
+  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.tactical-preset-card.contextual {
+  border-color: #2f6b52;
+  background: #f5faf7;
+}
+.tactical-preset-card.active {
+  border-color: #8b5a19;
+}
+.tactical-preset-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+.tactical-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.tactical-badge {
+  display: inline-block;
+  font-size: 0.76em;
+  font-weight: 700;
+  padding: 0.12rem 0.42rem;
+  border-radius: 4px;
+}
+.tactical-badge.fit {
+  background: #194b38;
+  color: #ffffff;
+}
+.tactical-badge.active {
+  background: #f2e4cb;
+  color: #4a2e05;
+  border: 1px solid #a87b34;
+}
+.tactical-context-reason {
+  color: #194b38;
+  font-weight: 600;
+}
+.tactical-spell-section {
+  margin-top: 0.75rem;
+}
+.tactical-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+.tactical-table th,
+.tactical-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #dde4de;
+}
+.tactical-empty {
+  color: #485a4e;
+  font-size: 0.93em;
+}

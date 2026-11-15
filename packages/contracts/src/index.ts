@@ -34,3 +34,5 @@ export * from "./squad-economy.js";
 export * from "./roster-import.js";
 
 export * from "./delegation-journal.js";
+
+export * from "./tactical-briefing.js";

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "BATTING_AGGRESSION",
+    "BATTING_INTENT",
+    "BOWLING_LINE",
+    "BOWLING_LENGTH",
+    "BOWLING_EFFORT",
+    "BOWLING_VARIATION",
+    "FIELD_PLACEMENT"
+  ],
+  "$id": "urn:lcxxvi:TacticalControlId:1",
+  "title": "TacticalControlId"
+}

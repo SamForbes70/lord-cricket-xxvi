@@ -230,7 +230,7 @@ it("every generated schema compiles with strict AJV 2020-12", () => {
   const files = readdirSync("packages/contracts/schemas").filter((f) =>
     f.endsWith("Schema.json"),
   );
-  expect(files.length).toBe(261);
+  expect(files.length).toBe(281);
   for (const name of ["DelegationCategorySchema.json", "DelegationChangeSchema.json", "DelegationJournalSchema.json", "PersistentWorldStateSchema.json", "PersistentCareerProjectionSchema.json", "CompletedSeasonRecordSchema.json"]) expect(files).toContain(name);
   for (const added of [
     "M7JAdjudicationRequest",
@@ -253,6 +253,11 @@ it("every generated schema compiles with strict AJV 2020-12", () => {
     "SquadEconomyState",
     "PersistentWorldStateV3",
     "PersistentWorldPortableV3Manifest",
+    "PreMatchBriefing",
+    "InMatchTacticalAssistantView",
+    "BowlingSpellReview",
+    "BattingStintReview",
+    "TacticalPresetOption",
   ]) {
     expect(files).toContain(`${added}Schema.json`);
   }

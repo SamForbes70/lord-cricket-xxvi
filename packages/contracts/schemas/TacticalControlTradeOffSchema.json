@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "controlId": {
+      "type": "string",
+      "enum": [
+        "BATTING_AGGRESSION",
+        "BATTING_INTENT",
+        "BOWLING_LINE",
+        "BOWLING_LENGTH",
+        "BOWLING_EFFORT",
+        "BOWLING_VARIATION",
+        "FIELD_PLACEMENT"
+      ]
+    },
+    "side": {
+      "type": "string",
+      "enum": [
+        "BATTING",
+        "BOWLING",
+        "FIELDING"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "currentSetting": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "upside": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    },
+    "tradeOff": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    }
+  },
+  "required": [
+    "controlId",
+    "side",
+    "label",
+    "currentSetting",
+    "upside",
+    "tradeOff"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:TacticalControlTradeOff:1",
+  "title": "TacticalControlTradeOff"
+}

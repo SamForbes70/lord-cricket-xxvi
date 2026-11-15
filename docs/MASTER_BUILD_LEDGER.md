@@ -1,6 +1,6 @@
 # AI Master Build Brief — 17-Stage Reconciliation & Delivery Ledger
 
-Reconciled against `main` (`1fc2175` — Stages 2 & 3 merged & owner-accepted) and active branch `feat/stage4-contracts-recruitment` on 15 November 2026 (Australia/Brisbane).
+Reconciled against `main` (`3e6a026` — Stages 2, 3 & 4 merged & owner-accepted) and active branch `feat/stage5-tactical-briefings` on 15 November 2026 (Australia/Brisbane).
 
 Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepted`, and `deployed`. Earlier status words from `8a7c164` in the brief are reconciled below against `161e781` and [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md).
 
@@ -12,7 +12,7 @@ Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepte
 | 2 | Persistent multi-season world | **accepted** (`main` `161e781`, 14 Nov 2026) | Implemented, verified (`736/736` unit tests, `207` JSON Schemas, Chromium + Firefox Stage 2 UI + `23/23` smoke), merged to `main`, and **owner-accepted on 14 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)). |
 | 3 | Player lifecycle and youth pathway | **accepted** (`main` `1fc2175`, 14 Nov 2026) | Implemented, verified (`740/740` unit tests across `65/65` files, `235` JSON Schemas, Chromium + Firefox Stage 3 UI + Stage 2/regression suites, 20-season diagnostic horizon with `0` role shortages), and **owner-accepted on 14 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md)). |
 | 4 | Contracts, budgets and recruitment | **accepted** (`main`, 15 Nov 2026) | Implemented, verified (`746/746` unit tests across `66/66` files, `261` JSON Schemas, Chromium + Firefox Stage 4 UI + Stage 2/3/regression suites, 12-season economy diagnostic horizon with `0` overspent clubs, `0` role shortages, and `0` hidden future-ability reads), and **owner-accepted on 15 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage04-squad-economy/REPORT.md](verification-stage04-squad-economy/REPORT.md)). |
-| 5 | Tactical briefings and feedback | **partial** | Pitch seam/spin inspection, red-ball weather forecasts, squad readiness, and tactical captains/delegation exist in V0.1; plain-language trade-off explanations, contextual presets, post-spell plan-vs-outcome review, and observed playtest script remain open (eligible independently of Stage 3). |
+| 5 | Tactical briefings and feedback | **accepted** (`main`, 15 Nov 2026) | Implemented, verified (`750/750` unit tests across `67/67` files, `281` JSON Schemas, Chromium + Firefox Stage 5 UI + tactical/accessibility regression suites, and observed playtest protocol [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)), and **owner-accepted on 15 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage05-tactical-briefings/REPORT.md](verification-stage05-tactical-briefings/REPORT.md)). Multi-participant observed playtest sessions remain unrecorded in-repo. |
 | 6 | Live field and highlight pacing | **partial** | Analytical charts (Manhattan, worm, partnerships, FOW, sector wheel, length bars) and bounded match progression exist; live 2D SVG/Canvas named-position field view and illustrative highlight modes (`every-ball`, `key-moment`, `fast`) are missing. |
 | 7 | Contextual text commentary | **partial** | Format-specific delivery/state strings and `brief`/`off` preferences exist; shared fact-checked template adapter with presentation seed, repetition cooldowns, and `brief`/`standard`/`detailed` modes is missing. |
 | 8 | Optional sound and narration | **missing** | No audio manager or sound assets exist yet. |
@@ -74,6 +74,21 @@ Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepte
   - Cross-season club-transfer career projection fix in `packages/projections/src/persistent-world.ts`, crash-safe V3 persistence + `WeakSet`/`WeakMap` digest fast-path + non-destructive V2 -> V3 slot upgrade in `packages/persistence/src/persistent-world.ts` and `packages/persistence/src/archive.ts`, and **Contracts & Recruitment** workspace in `apps/web/src/career/service.ts`, `CareerApp.tsx`, and `PlayerPage.tsx`.
   - 12-season domestic economy diagnostic horizon (`runSquadEconomyDiagnosticHorizon`, `0` overspent clubs, `0` role shortages, `0` hidden future-ability reads across all 12 seasons).
 - **Evidence**: [verification-stage04-squad-economy/REPORT.md](verification-stage04-squad-economy/REPORT.md).
+
+---
+
+### Slice `S05-01` — Stage 5: Tactical Briefings, Control Trade-Offs, Contextual Legal Presets & Post-Spell Reviews
+
+- **Status**: `accepted` (owner-accepted 15 November 2026; merged to `main`; multi-participant observed human playtest sessions remain unrecorded in-repo).
+- **Base revision**: `3e6a026` (`main` — Stage 4 merged & owner-accepted on 15 November 2026).
+- **Branch**: `feat/stage5-tactical-briefings`.
+- **Dependencies satisfied**: V0.1 + Stages 2–4 accepted on `main`.
+- **Scope**:
+  - Versioned tactical briefing & review contracts (`LC_TACTICAL_BRIEFING_V1`) in `packages/contracts/src/tactical-briefing.ts` + 20 strict AJV 2020-12 JSON Schemas (`281` total).
+  - Pure public-data projections (`packages/projections/src/tactical-briefing.ts`): `buildPreMatchBriefing` (pitch tendency + explicit `SYNTHETIC_ALPHA` model limits disclosure, XI balance, career fatigue/readiness, public opponent observations with zero hidden rating/ceiling/seed reads), `projectTacticalAssistant` (plain-language upside/trade-off cards for all 7 tactical controls, contextual legal presets across `T20` / `ODI` / `RED_BALL` fielding rules), and incremental + rebuildable factual post-spell (`SpellOutcomeReview`) and batting-stint (`BattingStintReview`) summaries.
+  - Authoritative match & career UI integration (`apps/web/src/match/TacticalBriefingPanels.tsx`, `main.tsx`, `controller.ts`, `controller-odi.ts`, `controller-red5.ts`, `roster-controller.ts`, `CareerApp.tsx`, `RosterCareerApp.tsx`, `ui-preferences.ts`): collapsible pre-match briefings on Exhibition Setup, Career Home/Fixtures, and Imported Roster Career; collapsible in-match Tactical Assistant & Spell Reviews panel; persistent `showTacticalBriefings` (`Shown`/`Hidden`) preference that never mutates worker `revision` or RNG draws.
+  - Observed playtest protocol in [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md).
+- **Evidence**: [verification-stage05-tactical-briefings/REPORT.md](verification-stage05-tactical-briefings/REPORT.md).
 - **Next eligible slices**:
-  - **Stage 5 (Tactical briefings and feedback)** — immediately eligible without waiting on Stage 4 acceptance.
-  - Stages 9 / 11 / 15 depend on Stage 4 acceptance where economy/transfer integration applies.
+  - **Stage 6 (Live field and highlight pacing)** — immediately eligible over committed delivery events.
+  - **Stage 7 (Contextual text commentary)** or **Stage 9 (Historical statistics and leaderboards)** — also eligible (`Stage 4` is accepted).

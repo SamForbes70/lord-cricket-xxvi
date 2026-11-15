@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { MatchAnalytics } from "@lcxxvi/projections";
+import type { InMatchTacticalAssistantView } from "@lcxxvi/contracts";
 import type { SaveSummary } from "@lcxxvi/persistence";
 import {
   T20CommandSchema,
@@ -185,6 +186,7 @@ export type PublicPlayer = {
   role: string;
   style: string | null;
   canBowl: boolean;
+  batHand?: "L" | "R";
 };
 export type Catalog = {
   teams: {
@@ -193,7 +195,7 @@ export type Catalog = {
     players: PublicPlayer[];
     suggested: Selection;
   }[];
-  grounds: { id: string; name: string }[];
+  grounds: { id: string; name: string; seamBp?: number; turnBp?: number }[];
 };
 export type Candidate = { id: string; name: string; reason: string };
 export type View = {
@@ -227,6 +229,7 @@ export type View = {
   commentary: { sequence: number; text: string; short: string }[];
   scorecard: T20Scorecard | ODIScorecard | Red5Scorecard | null;
   analytics?: MatchAnalytics | null;
+  tacticalAssistant?: InMatchTacticalAssistantView | null;
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;

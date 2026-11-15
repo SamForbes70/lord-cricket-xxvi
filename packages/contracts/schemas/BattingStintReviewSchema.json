@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "stintId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "inningsIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "playerName": {
+      "type": "string",
+      "pattern": "^[\\s\\S]{1,80}$"
+    },
+    "dismissed": {
+      "type": "boolean"
+    },
+    "acceptedPlan": {
+      "type": "object",
+      "properties": {
+        "primaryAggression": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "primaryIntent": {
+          "type": "string",
+          "enum": [
+            "NORMAL",
+            "ROTATE",
+            "PROTECT"
+          ]
+        },
+        "planChangesCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "primaryAggression",
+        "primaryIntent",
+        "planChangesCount"
+      ],
+      "additionalProperties": false
+    },
+    "outcomes": {
+      "type": "object",
+      "properties": {
+        "ballsFaced": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "runs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "dots": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "singles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "boundaries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "strikeRateX100": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ballsFaced",
+        "runs",
+        "dots",
+        "singles",
+        "boundaries",
+        "strikeRateX100"
+      ],
+      "additionalProperties": false
+    },
+    "factualSummary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 360
+    }
+  },
+  "required": [
+    "stintId",
+    "inningsIndex",
+    "playerId",
+    "playerName",
+    "dismissed",
+    "acceptedPlan",
+    "outcomes",
+    "factualSummary"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:BattingStintReview:1",
+  "title": "BattingStintReview"
+}

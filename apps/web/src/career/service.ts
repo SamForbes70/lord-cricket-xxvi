@@ -37,6 +37,7 @@ import {
   type PlayerLifecycleSkillLedgerEntry,
   type PlayerLifecycleState,
   type PlayerTrainingAssignment,
+  type PreMatchBriefing,
   type RetiredPlayerRecord,
   type RosterCareerDayState,
   type SeasonArchive,
@@ -59,6 +60,7 @@ import {
 import {
   DEFAULT_CAREER_AVAILABILITY_PACK,
   FROZEN_WORLD_PINS,
+  isBowlingCapable,
   T20_LEAGUE_COMPETITION,
   validateDefaultWorld,
 } from "@lcxxvi/data";
@@ -118,6 +120,7 @@ import {
   completionFromOffscreenOutcome,
   createRosterSeasonProjection,
   createT20SeasonProjection,
+  projectPreMatchBriefing,
   rebuildPersistentCareerProjectionCore,
   rosterCompletionFromOffscreen,
 } from "@lcxxvi/projections";
@@ -4182,6 +4185,118 @@ export class CareerApplicationService {
     return (
       this.getWorld().grounds.find((ground) => ground.groundId === groundId)?.name ?? groundId
     );
+  }
+
+  fixtureBriefing(fixtureId?: string): PreMatchBriefing | null {
+    const state = this.state;
+    if (!state) return null;
+    const fixture = fixtureId
+      ? state.schedule.fixtures.find((candidate) => candidate.fixtureId === fixtureId) ?? null
+      : this.nextManagedFixture(state);
+    if (!fixture) return null;
+    const activeWorld = this.getWorld();
+    const ground =
+      activeWorld.grounds.find((candidate) => candidate.groundId === fixture.groundId) ??
+      activeWorld.grounds[0]!;
+
+    const fallbackSelection = (teamId: string): T20TeamSelection => {
+      const team = activeWorld.teams.find((candidate) => candidate.teamId === teamId)!;
+      const players = team.squadIds
+        .map((id) => activeWorld.players.find((candidate) => candidate.playerId === id))
+        .filter((candidate): candidate is Player => Boolean(candidate));
+      const keeper = players.find((p) => p.role === "KEEPER") ?? players[0]!;
+      const bowlers = players
+        .filter((p) => p.playerId !== keeper.playerId && isBowlingCapable(p))
+        .slice(0, 5);
+      const xi = [
+        keeper,
+        ...bowlers,
+        ...players.filter((p) => p.playerId !== keeper.playerId && !bowlers.includes(p)),
+      ].slice(0, 11);
+      return {
+        teamId,
+        playerIds: xi.map((p) => p.playerId),
+        captainId: xi[0]!.playerId,
+        keeperId: keeper.playerId,
+      };
+    };
+
+    let selections: [T20TeamSelection, T20TeamSelection];
+    try {
+      if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+        const pack = this.requireActiveRosterPack();
+        const picked = selectRosterFixtureTeams(
+          pack,
+          state.schedule,
+          state.careerState,
+          fixture.fixtureId,
+        );
+        selections = [picked[0], picked[1]];
+      } else {
+        const picked = selectOffscreenFixtureTeams({
+          schedule: state.schedule,
+          careerState: state.careerState,
+          fixtureId: fixture.fixtureId,
+          worldBytes,
+          worldManifest,
+        });
+        selections = [picked[0], picked[1]];
+      }
+    } catch {
+      selections = [
+        fallbackSelection(fixture.homeTeamId),
+        fallbackSelection(fixture.awayTeamId),
+      ];
+    }
+
+    const conditionsByPlayerId: Record<string, { fatigueBp: number; readinessDelta: number }> = {};
+    const buildSide = (teamId: string) => {
+      const team = activeWorld.teams.find((candidate) => candidate.teamId === teamId)!;
+      const condView =
+        state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION
+          ? this.projectLifecycleSquadView(state.careerState, teamId)
+          : projectSquadTrainingCondition(
+              state.careerState,
+              teamId,
+              DEFAULT_CAREER_AVAILABILITY_PACK,
+            );
+      for (const cond of condView.players) {
+        conditionsByPlayerId[cond.playerId] = {
+          fatigueBp: cond.fatigueBp,
+          readinessDelta: cond.battingReadiness,
+        };
+      }
+      const players = team.squadIds
+        .map((id) => activeWorld.players.find((candidate) => candidate.playerId === id))
+        .filter((candidate): candidate is Player => Boolean(candidate))
+        .map((player) => ({
+          playerId: player.playerId,
+          name: player.name,
+          role: player.role,
+          batHand: player.batHand,
+          bowlingStyle: player.bowlingStyle,
+        }));
+      return {
+        teamId,
+        teamName: team.name,
+        players,
+      };
+    };
+
+    return projectPreMatchBriefing({
+      format: "T20",
+      ground: {
+        groundId: ground.groundId,
+        name: ground.name,
+        pitchPrior: {
+          seamBp: ground.pitchPrior.seamBp,
+          turnBp: ground.pitchPrior.turnBp,
+        },
+      },
+      teams: [buildSide(fixture.homeTeamId), buildSide(fixture.awayTeamId)],
+      selections,
+      conditionsByPlayerId,
+    });
   }
 
   resultText(completion: T20SeasonMatchCompletion): string {

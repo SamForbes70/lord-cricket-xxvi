@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "opponentTeamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "opponentTeamName": {
+      "type": "string",
+      "pattern": "^[\\s\\S]{1,80}$"
+    },
+    "poolLabel": {
+      "type": "string",
+      "enum": [
+        "SELECTED_XI",
+        "AVAILABLE_SQUAD"
+      ]
+    },
+    "leftHandBatters": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 30
+    },
+    "rightHandBatters": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 30
+    },
+    "keepers": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 30
+    },
+    "paceOptions": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 30
+    },
+    "spinOptions": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 30
+    },
+    "bowlingStyles": {
+      "maxItems": 6,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "FAST",
+          "MEDIUM",
+          "OFF_SPIN",
+          "LEG_SPIN",
+          "SLOW_LEFT_ARM",
+          "LEFT_ARM_WRIST"
+        ]
+      }
+    },
+    "observations": {
+      "minItems": 1,
+      "maxItems": 6,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 280
+      }
+    }
+  },
+  "required": [
+    "opponentTeamId",
+    "opponentTeamName",
+    "poolLabel",
+    "leftHandBatters",
+    "rightHandBatters",
+    "keepers",
+    "paceOptions",
+    "spinOptions",
+    "bowlingStyles",
+    "observations"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:OpponentObservationSummary:1",
+  "title": "OpponentObservationSummary"
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "FRESH",
+    "READY",
+    "WORKED",
+    "TIRED"
+  ],
+  "$id": "urn:lcxxvi:PlayerConditionBand:1",
+  "title": "PlayerConditionBand"
+}

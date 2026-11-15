@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "groundId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "groundName": {
+      "type": "string",
+      "pattern": "^[\\s\\S]{1,80}$"
+    },
+    "seamBp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "turnBp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "pitchTendency": {
+      "type": "string",
+      "enum": [
+        "SEAM_FRIENDLY",
+        "SPIN_FRIENDLY",
+        "LIVE_BOTH",
+        "BALANCED",
+        "FLAT"
+      ]
+    },
+    "pitchSummary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320
+    },
+    "formatRulesSummary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320
+    },
+    "modelLimitsDisclosure": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320
+    }
+  },
+  "required": [
+    "groundId",
+    "groundName",
+    "seamBp",
+    "turnBp",
+    "pitchTendency",
+    "pitchSummary",
+    "formatRulesSummary",
+    "modelLimitsDisclosure"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PreMatchGroundBriefing:1",
+  "title": "PreMatchGroundBriefing"
+}

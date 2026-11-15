@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
+import { projectPreMatchBriefing } from "@lcxxvi/projections";
+import {
+  InMatchTacticalAssistantPanel,
+  PreMatchBriefingPanel,
+} from "./match/TacticalBriefingPanels.js";
 import { ScorecardExport } from "./match/ScorecardExport.js";
 import { createRoot } from "react-dom/client";
 import {
@@ -119,6 +124,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     [density, setDensity] = useState(() => {
       const saved = localStorage.getItem("lcxxvi-match-density");
       return saved && ["comfortable", "compact"].includes(saved) ? saved : "comfortable";
+    }),
+    [briefingsPref, setBriefingsPref] = useState(() => {
+      const saved = localStorage.getItem("lcxxvi-tactical-briefings");
+      return saved === "hidden" ? "hidden" : "shown";
     });
   const decisionRef = useRef<HTMLHeadingElement>(null),
     lastPhase = useRef("");
@@ -126,7 +135,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     localStorage.setItem("lcxxvi-match-scale", scale);
     localStorage.setItem("lcxxvi-match-commentary", commentary);
     localStorage.setItem("lcxxvi-match-density", density);
-  }, [scale, commentary, density]);
+    localStorage.setItem("lcxxvi-tactical-briefings", briefingsPref);
+  }, [scale, commentary, density, briefingsPref]);
   function send(body: Body) {
     if (inflight.current || fatal) return;
     if (body.type !== "PREVIEW_DIAGNOSTIC" && body.type !== "EXPORT_DIAGNOSTIC") setDiagnosticPreview(null);
@@ -542,6 +552,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <option value="compact">Compact</option>
           </select>
         </label>
+        <label>
+          Tactical briefings{" "}
+          <select
+            aria-label="Tactical briefings"
+            value={briefingsPref}
+            onChange={(e) => setBriefingsPref(e.target.value === "hidden" ? "hidden" : "shown")}
+          >
+            <option value="shown">Shown</option>
+            <option value="hidden">Hidden</option>
+          </select>
+        </label>
         <span className="save-status" data-testid="save-status">
           {persistence?.readOnly
             ? "Read only · another tab owns this save (retrying)"
@@ -600,6 +621,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 catalog={displayCatalog}
                 world={stagedRoster?.world ?? stagedWorld?.world ?? careerWorld}
                 busy={busy || fatal || editingWorld}
+                showBriefings={briefingsPref === "shown"}
                 start={(format, selections, groundId) =>
                   send({ type: "START", format, selections, groundId, ...(stagedWorld ? { worldCopy: stagedWorld } : {}), ...(stagedRoster ? { rosterPack: stagedRoster } : {}) })
                 }
@@ -1013,6 +1035,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               act={act}
             />
           )}
+          {briefingsPref === "shown" && view.tacticalAssistant && (
+            <InMatchTacticalAssistantPanel
+              assistant={view.tacticalAssistant}
+              phase={view.phase}
+              busy={busy || fatal || Boolean(persistence?.readOnly)}
+              strikerId={striker ?? null}
+              activeBowlerId={i?.bowlerId ?? null}
+              bowlingTeamId={i?.bowlingTeamId ?? null}
+              onApplyAction={act}
+            />
+          )}
           {view.resultText && (
             <section className="result">
               <h2>{view.resultText}</h2>
@@ -1280,11 +1313,13 @@ function Setup({
   catalog,
   world,
   busy,
+  showBriefings,
   start,
 }: {
   catalog: Catalog;
   world: WorldPack;
   busy: boolean;
+  showBriefings: boolean;
   start: (
     format: "T20" | "ODI" | "RED_BALL",
     teams: [Selection, Selection],
@@ -1315,6 +1350,41 @@ function Setup({
     .filter(Boolean);
   if (teams[0].teamId === teams[1].teamId)
     reasons.push("Choose two different teams.");
+  const selectedGround =
+    world.grounds.find((item) => item.groundId === ground) ?? world.grounds[0]!;
+  const preMatchBriefing = useMemo(() => {
+    if (teams[0].teamId === teams[1].teamId) return null;
+    const buildSide = (sel: Selection) => {
+      const team = catalog.teams.find((candidate) => candidate.id === sel.teamId)!;
+      return {
+        teamId: team.id,
+        teamName: team.name,
+        players: team.players.map((p) => {
+          const wp = world.players.find((candidate) => candidate.playerId === p.id);
+          return {
+            playerId: p.id,
+            name: p.name,
+            role: (wp?.role ?? p.role) as "BATTER" | "BOWLER" | "ALLROUNDER" | "KEEPER",
+            batHand: p.batHand ?? wp?.batHand ?? ("R" as const),
+            bowlingStyle: wp?.bowlingStyle ?? null,
+          };
+        }),
+      };
+    };
+    return projectPreMatchBriefing({
+      format,
+      ground: {
+        groundId: selectedGround.groundId,
+        name: selectedGround.name,
+        pitchPrior: {
+          seamBp: selectedGround.pitchPrior.seamBp,
+          turnBp: selectedGround.pitchPrior.turnBp,
+        },
+      },
+      teams: [buildSide(teams[0]), buildSide(teams[1])],
+      selections: teams,
+    });
+  }, [catalog, format, selectedGround, teams, world]);
   function update(index: number, s: Selection) {
     setTeams(
       (prev) =>
@@ -1354,6 +1424,12 @@ function Setup({
           </select>
         </label>
         <PitchInspection ground={world.grounds.find((item) => item.groundId === ground)} format={format} />
+        {showBriefings && preMatchBriefing && (
+          <PreMatchBriefingPanel
+            briefing={preMatchBriefing}
+            focusTeamId={teams[0].teamId}
+          />
+        )}
         <div className="team-grid">
           {teams.map((s, index) => {
             const t = catalog.teams.find((t) => t.id === s.teamId)!;

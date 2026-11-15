@@ -23,6 +23,7 @@ import {
   settleManagedMatches,
 } from "./managed-match.js";
 import { PitchInspection } from "../match/PitchInspection.js";
+import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { WorldEditor } from "../world/WorldEditor.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
 import { offlineUpdateCoordinator } from "../offline-update.js";
@@ -205,6 +206,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   });
   const [density, setDensity] = useState(() => localStorage.getItem("lcxxvi-career-density") ?? "comfortable");
   const [reducedMotion, setReducedMotion] = useState(() => localStorage.getItem("lcxxvi-career-motion") === "reduced");
+  const [showTacticalBriefings, setShowTacticalBriefings] = useState(
+    () => localStorage.getItem("lcxxvi-tactical-briefings") !== "hidden",
+  );
   const state = service.getState();
   const persistentWorld = service.getPersistentState();
   const lifecycleState = service.getLifecycleState();
@@ -314,7 +318,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     localStorage.setItem("lcxxvi-career-scale", scale);
     localStorage.setItem("lcxxvi-career-density", density);
     localStorage.setItem("lcxxvi-career-motion", reducedMotion ? "reduced" : "full");
-  }, [scale, density, reducedMotion]);
+    localStorage.setItem("lcxxvi-tactical-briefings", showTacticalBriefings ? "shown" : "hidden");
+  }, [scale, density, reducedMotion, showTacticalBriefings]);
 
   async function action(work: () => Promise<void>) {
     if (inspectionOnly) {
@@ -1158,6 +1163,15 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                     )}
                     format="T20"
                   />
+                  {showTacticalBriefings && (() => {
+                    const briefing = service.fixtureBriefing(nextFixture.fixtureId);
+                    return briefing ? (
+                      <PreMatchBriefingPanel
+                        briefing={briefing}
+                        focusTeamId={controlledTeam}
+                      />
+                    ) : null;
+                  })()}
                 </>
               ) : (
                 <p>No remaining managed fixture.</p>
@@ -1815,6 +1829,19 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         <section aria-labelledby="fixtures-heading">
           <h2 id="fixtures-heading">Fixtures</h2>
           {replayViewerSection}
+          {nextFixture &&
+            showTacticalBriefings &&
+            (() => {
+              const briefing = service.fixtureBriefing(nextFixture.fixtureId);
+              return briefing ? (
+                <div style={{ marginBottom: "14px" }}>
+                  <PreMatchBriefingPanel
+                    briefing={briefing}
+                    focusTeamId={controlledTeam}
+                  />
+                </div>
+              ) : null;
+            })()}
           {state.schedule.rounds.map((round) => (
             <section
               className="round-block"
@@ -2931,6 +2958,14 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 onChange={(event) => setReducedMotion(event.currentTarget.checked)}
               />{" "}
               Reduced motion
+            </label>
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={showTacticalBriefings}
+                onChange={(event) => setShowTacticalBriefings(event.currentTarget.checked)}
+              />{" "}
+              Show tactical briefings &amp; assistant
             </label>
           </div>
           <div className="career-panel settings-actions">

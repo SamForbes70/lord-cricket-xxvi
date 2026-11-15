@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[\\s\\S]{1,80}$"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "BATTER",
+        "BOWLER",
+        "ALLROUNDER",
+        "KEEPER"
+      ]
+    },
+    "batHand": {
+      "type": "string",
+      "enum": [
+        "R",
+        "L"
+      ]
+    },
+    "bowlingStyle": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "FAST",
+            "MEDIUM",
+            "OFF_SPIN",
+            "LEG_SPIN",
+            "SLOW_LEFT_ARM",
+            "LEFT_ARM_WRIST"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "canBowl": {
+      "type": "boolean"
+    },
+    "selectedInXI": {
+      "type": "boolean"
+    },
+    "fatigueBp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "readinessDelta": {
+      "type": "integer",
+      "minimum": -20,
+      "maximum": 20
+    },
+    "conditionBand": {
+      "type": "string",
+      "enum": [
+        "FRESH",
+        "READY",
+        "WORKED",
+        "TIRED"
+      ]
+    }
+  },
+  "required": [
+    "playerId",
+    "name",
+    "role",
+    "batHand",
+    "bowlingStyle",
+    "canBowl",
+    "selectedInXI",
+    "fatigueBp",
+    "readinessDelta",
+    "conditionBand"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PreMatchPlayerAvailability:1",
+  "title": "PreMatchPlayerAvailability"
+}

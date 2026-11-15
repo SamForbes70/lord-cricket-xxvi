@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "BAT_CONSOLIDATE",
+    "BAT_ROTATE_STRIKE",
+    "BAT_BALANCED_TEMPO",
+    "BAT_BOUNDARY_PUSH",
+    "BOWL_DISCIPLINED_CHANNEL",
+    "BOWL_ATTACK_STUMPS",
+    "BOWL_CONSERVE_SPELL",
+    "BOWL_YORKER_CLOSE",
+    "BOWL_SHORT_TEST",
+    "FIELD_SLIP_ATTACK",
+    "FIELD_BALANCED_RING",
+    "FIELD_BOUNDARY_PROTECT"
+  ],
+  "$id": "urn:lcxxvi:TacticalPresetId:1",
+  "title": "TacticalPresetId"
+}

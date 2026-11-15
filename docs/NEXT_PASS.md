@@ -28,9 +28,13 @@ The owner accepted Stage 4 (`S04-01`) on 15 November 2026 ([OWNER_DECISIONS_2026
 1. **Explicit version & fictional-economy boundaries**: Uses `LC_PERSISTENT_WORLD_V3_ECONOMY`, `LC_SQUAD_ECONOMY_STATE_V1`, `LC_SQUAD_ECONOMY_MODEL_FICTIONAL_V1` (`parameterProvenance: "FICTIONAL_GAMEPLAY_PLACEHOLDER"`), and `LC_PERSISTENT_WORLD_PORTABLE_V3_ECONOMY` (`261` strict JSON Schemas). V0.1, Stage 2 (`V1`), and Stage 3 (`V2`) saves open unchanged unless explicitly copied into a new V3 slot.
 2. **Symmetrical budgets, auditable ledger & exploit resistance**: All 8 clubs operate under symmetrical `$2,500k` annual wage caps, 3-round pre-season negotiation windows, cap reservations for pending bids, `50%` buyout cap charges against release-and-sign circumvention, `commandId` idempotency, SHA-256 hash-chained transaction ledgers, and public-only AI club recruitment (`0` hidden future-ability reads, `0` overspent clubs, and `0` role shortages across a 12-season diagnostic horizon).
 
-## Active next milestone: Stage 5 — Tactical briefings and feedback
+## Stage 5: Tactical briefings and feedback (`accepted`, 15 November 2026)
 
-With the core persistent-world, player-lifecycle, and squad-economy foundation complete and accepted (`Stages 1–4`), **Stage 5 (Tactical briefings and feedback)** is active: optional pre-match briefing and assistant panel using existing pitch/fatigue/availability/opponent data, plain-language trade-off explanations for tactical controls, contextual presets submitting legal commands, post-spell plan-vs-outcome factual feedback, and an observed playtest script.
+The owner accepted Stage 5 (`S05-01`) on 15 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage05-tactical-briefings/REPORT.md](verification-stage05-tactical-briefings/REPORT.md), [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)):
+
+1. **Pure public-data briefings & trade-off guidance**: `LC_TACTICAL_BRIEFING_V1` (`281` strict JSON Schemas total) builds pre-match pitch/readiness/opponent briefings, plain-language upside/trade-off explanations for all 7 tactical controls, contextual legal presets across `T20` / `ODI` / `RED_BALL`, and incremental + rebuildable post-spell and batting-stint outcome summaries without reading hidden player ratings, youth ceilings, or seeds.
+2. **Presentation-only visibility toggle**: `showTacticalBriefings` (`Shown` / `Hidden`) persists in UI preferences and never mutates worker `revision` or random draws.
+3. **Next eligible slices**: **Stage 6 (Live field and highlight pacing)**, **Stage 7 (Contextual text commentary)**, and **Stage 9 (Historical statistics and leaderboards)** (plus optional multi-participant observed human playtest sessions using [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)).
 
 ## Open items that still need people
 

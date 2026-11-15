@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "phaseLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "fieldRestrictionLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "scoreContextLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "pitchSummaryLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "activeBowlerWorkloadLabel": {
+      "type": "string",
+      "maxLength": 200
+    }
+  },
+  "required": [
+    "phaseLabel",
+    "fieldRestrictionLabel",
+    "scoreContextLabel",
+    "pitchSummaryLabel",
+    "activeBowlerWorkloadLabel"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:InMatchTacticalSituation:1",
+  "title": "InMatchTacticalSituation"
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "GROUND": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "AERIAL": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "EDGE": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "NO_CONTACT": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "GROUND",
+    "AERIAL",
+    "EDGE",
+    "NO_CONTACT"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SpellTrajectoryCounts:1",
+  "title": "SpellTrajectoryCounts"
+}

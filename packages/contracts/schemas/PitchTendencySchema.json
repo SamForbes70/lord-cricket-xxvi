@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "SEAM_FRIENDLY",
+    "SPIN_FRIENDLY",
+    "LIVE_BOTH",
+    "BALANCED",
+    "FLAT"
+  ],
+  "$id": "urn:lcxxvi:PitchTendency:1",
+  "title": "PitchTendency"
+}
