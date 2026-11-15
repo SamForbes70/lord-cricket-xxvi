@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "AWAITING_ROUND_RESOLUTION",
+    "PLAYER_ACCEPTED_BEST_OFFER",
+    "PLAYER_COUNTERED_TERMS",
+    "WAGE_BELOW_RESERVATION",
+    "SIGNED_WITH_COMPETING_CLUB",
+    "CLUB_WITHDREW_OFFER",
+    "PLAYER_NO_LONGER_ELIGIBLE",
+    "CAP_OR_ROSTER_LIMIT"
+  ],
+  "$id": "urn:lcxxvi:ContractOfferResolutionReason:1",
+  "title": "ContractOfferResolutionReason"
+}

@@ -29,6 +29,8 @@ export * from "./persistent-world.js";
 
 export * from "./player-lifecycle.js";
 
+export * from "./squad-economy.js";
+
 export * from "./roster-import.js";
 
 export * from "./delegation-journal.js";

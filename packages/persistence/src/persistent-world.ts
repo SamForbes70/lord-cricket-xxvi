@@ -9,6 +9,9 @@ import {
   PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION,
+  PERSISTENT_WORLD_STATE_V3_VERSION,
   PersistentCareerProjectionCoreSchema,
   PersistentCareerProjectionSchema,
   PersistentWorldSaveSummarySchema,
@@ -16,8 +19,10 @@ import {
   PersistentWorldStateSchema,
   PersistentWorldStateV2CoreSchema,
   PersistentWorldStateV2Schema,
-  PlayerLifecycleStateCoreSchema,
+  PersistentWorldStateV3CoreSchema,
+  PersistentWorldStateV3Schema,
   PlayerLifecycleStateSchema,
+  SquadEconomyStateSchema,
   SeasonCheckpointInspectionSchema,
   SeasonDurableCommandSchema,
   StagedRosterPackSchema,
@@ -30,6 +35,8 @@ import {
   type PersistentWorldStateCore,
   type PersistentWorldStateV2,
   type PersistentWorldStateV2Core,
+  type PersistentWorldStateV3,
+  type PersistentWorldStateV3Core,
   type SeasonCheckpointGenerationOption,
   type ActivePersistentSeasonState,
   type SeasonCheckpointInspection,
@@ -61,33 +68,50 @@ export const PERSISTENT_CAREER_PROJECTION_SCOPE = "PERSISTENT_CAREER_V1" as cons
 export const COMPLETED_SEASON_RECORD_SCOPE = "COMPLETED_SEASON_RECORD_V1" as const;
 export const PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE = "PERSISTENT_LIFECYCLE_ROSTER_PACK_V1" as const;
 
-export type AnyPersistentWorldState = PersistentWorldState | PersistentWorldStateV2;
+export type AnyPersistentWorldState =
+  | PersistentWorldState
+  | PersistentWorldStateV2
+  | PersistentWorldStateV3;
 
 type PersistentWorldSchemaVersion =
   | typeof PERSISTENT_WORLD_SAVE_SCHEMA_VERSION
   | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION
   | typeof PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION
-  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION;
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION;
 
 const ALLOWED_PERSISTENT_WORLD_SCHEMAS: readonly PersistentWorldSchemaVersion[] = [
   PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
   PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION,
   PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION,
 ];
 
 function isPresentationPersistentSchema(schemaVersion: string): boolean {
   return (
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION ||
-    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
   );
 }
 
-function isV2PersistentSchema(schemaVersion: string): boolean {
-  return (
+function persistentSchemaTier(schemaVersion: string): 1 | 2 | 3 {
+  if (
+    schemaVersion === PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
+  ) {
+    return 3;
+  }
+  if (
     schemaVersion === PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION ||
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
-  );
+  ) {
+    return 2;
+  }
+  return 1;
 }
 
 type PersistentWorldGameRecord = PersistentWorldSaveSummary & {
@@ -139,6 +163,7 @@ export type PersistentWorldDurableCommit = {
     sourceRecordType: typeof SEASON_RECORD_TYPE | typeof PERSISTENT_WORLD_RECORD_TYPE;
     revision: number;
     stateSha256: string;
+    isUpgrade?: boolean;
     now: () => number;
   };
 };
@@ -470,26 +495,27 @@ function persistentStateV2Core(state: PersistentWorldStateV2): PersistentWorldSt
   return PersistentWorldStateV2CoreSchema.parse(core);
 }
 
-export async function sealPersistentWorldStateV2(
-  raw: PersistentWorldStateV2Core,
-): Promise<PersistentWorldStateV2> {
-  const core = PersistentWorldStateV2CoreSchema.parse(raw);
-  const stateSha256 = await seasonSha256Text(canonicalJson(core));
-  const state = PersistentWorldStateV2Schema.parse({ ...core, stateSha256 });
-  return validatePersistentWorldStateV2(state);
-}
+const VERIFIED_STATE_V2_OBJECTS = new WeakSet<object>();
+const VERIFIED_STATE_V3_OBJECTS = new WeakSet<object>();
+const VERIFIED_LIFECYCLE_OBJECTS = new WeakMap<object, string>();
+const VERIFIED_ECONOMY_OBJECTS = new WeakMap<object, string>();
+const VERIFIED_LEDGER_ENTRY_OBJECTS = new WeakMap<object, string>();
+const VERIFIED_ROSTER_PACK_OBJECTS = new WeakMap<object, { packSha: string; worldJson: string }>();
 
-export async function validatePersistentWorldStateV2(raw: unknown): Promise<PersistentWorldStateV2> {
-  const state = PersistentWorldStateV2Schema.parse(raw);
-  const expectedHash = await seasonSha256Text(canonicalJson(persistentStateV2Core(state)));
-  assertPersistent(state.stateSha256 === expectedHash, "STATE_V2_HASH_MISMATCH");
-
-  const lifecycle = PlayerLifecycleStateSchema.parse(state.lifecycle);
-  const { lifecycleSha256, ...lifecycleCore } = lifecycle;
-  const expectedLifecycleHash = await seasonSha256Text(
-    canonicalJson(PlayerLifecycleStateCoreSchema.parse(lifecycleCore)),
-  );
-  assertPersistent(lifecycleSha256 === expectedLifecycleHash, "LIFECYCLE_HASH_MISMATCH");
+async function validateSharedLifecycleWorldInvariants(
+  state: PersistentWorldStateV2 | PersistentWorldStateV3,
+): Promise<void> {
+  const cachedLifecycleSha = VERIFIED_LIFECYCLE_OBJECTS.get(state.lifecycle as object);
+  const lifecycle =
+    cachedLifecycleSha === state.lifecycle.lifecycleSha256
+      ? state.lifecycle
+      : PlayerLifecycleStateSchema.parse(state.lifecycle);
+  if (cachedLifecycleSha !== lifecycle.lifecycleSha256) {
+    const { lifecycleSha256, ...lifecycleCore } = lifecycle;
+    const expectedLifecycleHash = await seasonSha256Text(canonicalJson(lifecycleCore));
+    assertPersistent(lifecycleSha256 === expectedLifecycleHash, "LIFECYCLE_HASH_MISMATCH");
+    VERIFIED_LIFECYCLE_OBJECTS.set(state.lifecycle as object, lifecycleSha256);
+  }
 
   if (state.worldIdentity.originKind === "COPIED_FROM_SINGLE_SEASON_V1") {
     assertPersistent(
@@ -513,12 +539,18 @@ export async function validatePersistentWorldStateV2(raw: unknown): Promise<Pers
   );
   if (currentSeason.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
     assertPersistent(Boolean(lifecycle.activeRosterPack), "LIFECYCLE_ROSTER_PACK_REQUIRED");
-    const activeRosterPackSha = await seasonSha256Text(
-      canonicalJson(lifecycle.activeRosterPack!),
-    );
+    const packObj = lifecycle.activeRosterPack as object;
+    let cachedPack = VERIFIED_ROSTER_PACK_OBJECTS.get(packObj);
+    if (!cachedPack) {
+      const packSha = await seasonSha256Text(canonicalJson(lifecycle.activeRosterPack!));
+      cachedPack = { packSha, worldJson: canonicalJson(lifecycle.activeRosterPack!.world) };
+      VERIFIED_ROSTER_PACK_OBJECTS.set(packObj, cachedPack);
+    }
+    const activeWorldMatches =
+      lifecycle.activeRosterPack!.world === lifecycle.activeWorld ||
+      cachedPack.worldJson === canonicalJson(lifecycle.activeWorld);
     assertPersistent(
-      activeRosterPackSha === currentSeason.rosterPackSha256 &&
-        canonicalJson(lifecycle.activeRosterPack!.world) === canonicalJson(lifecycle.activeWorld),
+      cachedPack.packSha === currentSeason.rosterPackSha256 && activeWorldMatches,
       "LIFECYCLE_ROSTER_PACK_BINDING_MISMATCH",
     );
   } else {
@@ -657,7 +689,138 @@ export async function validatePersistentWorldStateV2(raw: unknown): Promise<Pers
       `ROLL_OF_HONOUR_MISMATCH:${record.seasonId}`,
     );
   }
+}
 
+export async function sealPersistentWorldStateV2(
+  raw: PersistentWorldStateV2Core,
+): Promise<PersistentWorldStateV2> {
+  const core = PersistentWorldStateV2CoreSchema.parse(raw);
+  const stateSha256 = await seasonSha256Text(canonicalJson(core));
+  const state: PersistentWorldStateV2 = { ...core, stateSha256 };
+  await validateSharedLifecycleWorldInvariants(state);
+  VERIFIED_STATE_V2_OBJECTS.add(state);
+  return state;
+}
+
+export async function validatePersistentWorldStateV2(raw: unknown): Promise<PersistentWorldStateV2> {
+  if (typeof raw === "object" && raw !== null && VERIFIED_STATE_V2_OBJECTS.has(raw)) {
+    return raw as PersistentWorldStateV2;
+  }
+  const state = PersistentWorldStateV2Schema.parse(raw);
+  const { stateSha256, ...core } = state;
+  const expectedHash = await seasonSha256Text(canonicalJson(core));
+  assertPersistent(stateSha256 === expectedHash, "STATE_V2_HASH_MISMATCH");
+  await validateSharedLifecycleWorldInvariants(state);
+  if (typeof raw === "object" && raw !== null && raw === state) {
+    VERIFIED_STATE_V2_OBJECTS.add(state);
+  }
+  return state;
+}
+
+function persistentStateV3Core(state: PersistentWorldStateV3): PersistentWorldStateV3Core {
+  const { stateSha256, ...core } = state;
+  void stateSha256;
+  return PersistentWorldStateV3CoreSchema.parse(core);
+}
+
+async function validatePersistentEconomyInvariants(state: PersistentWorldStateV3): Promise<void> {
+  const cachedEconomySha = VERIFIED_ECONOMY_OBJECTS.get(state.economy as object);
+  const economy =
+    cachedEconomySha === state.economy.economySha256
+      ? state.economy
+      : SquadEconomyStateSchema.parse(state.economy);
+  if (cachedEconomySha !== economy.economySha256) {
+    const { economySha256, ...economyCore } = economy;
+    const expectedEconomyHash = await seasonSha256Text(canonicalJson(economyCore));
+    assertPersistent(economySha256 === expectedEconomyHash, "ECONOMY_HASH_MISMATCH");
+
+    let prevEntrySha: string | null = null;
+    const unverifiedIndices: number[] = [];
+    for (let i = 0; i < economy.ledger.length; i += 1) {
+      const entry = economy.ledger[i]!;
+      assertPersistent(
+        entry.sequence === i + 1 && entry.prevEntrySha256 === prevEntrySha,
+        `ECONOMY_LEDGER_CHAIN_BROKEN:${i}`,
+      );
+      if (VERIFIED_LEDGER_ENTRY_OBJECTS.get(entry as object) !== entry.entrySha256) {
+        unverifiedIndices.push(i);
+      }
+      prevEntrySha = entry.entrySha256;
+    }
+    if (unverifiedIndices.length > 0) {
+      await Promise.all(
+        unverifiedIndices.map(async (idx) => {
+          const entry = economy.ledger[idx]!;
+          const { entrySha256, ...entryCore } = entry;
+          const expectedEntrySha = await seasonSha256Text(canonicalJson(entryCore));
+          assertPersistent(
+            entrySha256 === expectedEntrySha,
+            `ECONOMY_LEDGER_HASH_MISMATCH:${idx}`,
+          );
+          VERIFIED_LEDGER_ENTRY_OBJECTS.set(entry as object, entrySha256);
+        }),
+      );
+    }
+    VERIFIED_ECONOMY_OBJECTS.set(state.economy as object, economySha256);
+  }
+
+  assertPersistent(
+    economy.negotiationWindow.seasonNumber === state.currentSeasonNumber,
+    "ECONOMY_SEASON_BINDING_MISMATCH",
+  );
+  for (const clubBudget of economy.clubBudgets) {
+    assertPersistent(
+      clubBudget.seasonNumber === state.currentSeasonNumber &&
+        clubBudget.committedWagesK +
+          clubBudget.deadCapWagesK +
+          clubBudget.pendingOfferReservedWagesK <=
+          clubBudget.annualWageBudgetK &&
+        clubBudget.availableWageSpaceK ===
+          clubBudget.annualWageBudgetK -
+            clubBudget.committedWagesK -
+            clubBudget.deadCapWagesK -
+            clubBudget.pendingOfferReservedWagesK,
+      `ECONOMY_CLUB_BUDGET_INVARIANT:${clubBudget.teamId}`,
+    );
+  }
+  const activePlayerIds = new Set(state.lifecycle.activeWorld.players.map((p) => p.playerId));
+  assertPersistent(
+    economy.contracts.length === activePlayerIds.size,
+    "ECONOMY_CONTRACT_COUNT_MISMATCH",
+  );
+  for (const contract of economy.contracts) {
+    assertPersistent(
+      activePlayerIds.has(contract.playerId),
+      `ECONOMY_ORPHAN_CONTRACT:${contract.playerId}`,
+    );
+  }
+}
+
+export async function sealPersistentWorldStateV3(
+  raw: PersistentWorldStateV3Core,
+): Promise<PersistentWorldStateV3> {
+  void persistentStateV2Core;
+  void persistentStateV3Core;
+  const core = PersistentWorldStateV3CoreSchema.parse(raw);
+  const stateSha256 = await seasonSha256Text(canonicalJson(core));
+  const state: PersistentWorldStateV3 = { ...core, stateSha256 };
+  await validatePersistentEconomyInvariants(state);
+  await validateSharedLifecycleWorldInvariants(state);
+  VERIFIED_STATE_V3_OBJECTS.add(state);
+  return state;
+}
+
+export async function validatePersistentWorldStateV3(raw: unknown): Promise<PersistentWorldStateV3> {
+  if (typeof raw === "object" && raw !== null && VERIFIED_STATE_V3_OBJECTS.has(raw)) {
+    return raw as PersistentWorldStateV3;
+  }
+  const state = PersistentWorldStateV3Schema.parse(raw);
+  const { stateSha256, ...core } = state;
+  const expectedHash = await seasonSha256Text(canonicalJson(core));
+  assertPersistent(stateSha256 === expectedHash, "STATE_V3_HASH_MISMATCH");
+  await validatePersistentEconomyInvariants(state);
+  await validateSharedLifecycleWorldInvariants(state);
+  VERIFIED_STATE_V3_OBJECTS.add(state);
   return state;
 }
 
@@ -668,6 +831,9 @@ export async function validateAnyPersistentWorldState(
     typeof raw === "object" && raw !== null
       ? (raw as { worldStateVersion?: unknown }).worldStateVersion
       : undefined;
+  if (version === PERSISTENT_WORLD_STATE_V3_VERSION) {
+    return validatePersistentWorldStateV3(raw);
+  }
   if (version === PERSISTENT_WORLD_STATE_V2_VERSION) {
     return validatePersistentWorldStateV2(raw);
   }
@@ -957,6 +1123,8 @@ export class IndexedDbPersistentWorldRepository {
   ): Promise<{ summary: PersistentWorldSaveSummary; idempotentReplay: boolean }> {
     const state = await validateAnyPersistentWorldState(input.state);
     const isStateV2 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION;
+    const isStateV3 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION;
+    const stateTier: 1 | 2 | 3 = isStateV3 ? 3 : isStateV2 ? 2 : 1;
     const command = input.command ? SeasonDurableCommandSchema.parse(input.command) : null;
     assertPersistent(
       input.updatedAt.length > 0 && !Number.isNaN(Date.parse(input.updatedAt)),
@@ -990,7 +1158,7 @@ export class IndexedDbPersistentWorldRepository {
       }
     }
     let preparedActivePack: { hash: string; payload: string } | null = null;
-    if (isStateV2 && state.lifecycle.activeRosterPack) {
+    if ((isStateV2 || isStateV3) && state.lifecycle.activeRosterPack) {
       const parsedActivePack = StagedRosterPackSchema.parse(state.lifecycle.activeRosterPack);
       candidateRosterPacks.push(parsedActivePack);
       const activePackPayload = canonicalJson(parsedActivePack);
@@ -1059,7 +1227,7 @@ export class IndexedDbPersistentWorldRepository {
     if (existing && !ALLOWED_PERSISTENT_WORLD_SCHEMAS.includes(existing.schemaVersion)) {
       return abortWith("SEASON_SAVE_SCHEMA_UNSUPPORTED");
     }
-    if (existing && isV2PersistentSchema(existing.schemaVersion) && !isStateV2) {
+    if (existing && stateTier < persistentSchemaTier(existing.schemaVersion)) {
       return abortWith("SEASON_SAVE_SCHEMA_DOWNGRADE_FORBIDDEN");
     }
     if (existing && suppliedCopyHash && suppliedCopyHash !== existing.worldCopySha256) {
@@ -1146,6 +1314,7 @@ export class IndexedDbPersistentWorldRepository {
       }
       if (
         input.copySource.sourceRecordType === PERSISTENT_WORLD_RECORD_TYPE &&
+        !input.copySource.isUpgrade &&
         state.stateSha256 !== input.copySource.stateSha256
       ) {
         return abortWith("SEASON_COPY_SOURCE_CHANGED_OR_LOCKED");
@@ -1283,13 +1452,17 @@ export class IndexedDbPersistentWorldRepository {
       }
     }
 
-    const nextSchemaVersion: PersistentWorldSchemaVersion = isStateV2
+    const nextSchemaVersion: PersistentWorldSchemaVersion = isStateV3
       ? copyHash
-        ? PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
-        : PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION
-      : copyHash
-        ? PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION
-        : PERSISTENT_WORLD_SAVE_SCHEMA_VERSION;
+        ? PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
+        : PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION
+      : isStateV2
+        ? copyHash
+          ? PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
+          : PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION
+        : copyHash
+          ? PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION
+          : PERSISTENT_WORLD_SAVE_SCHEMA_VERSION;
 
     games.put({
       ...summary,

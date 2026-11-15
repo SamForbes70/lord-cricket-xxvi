@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import type {
   PersistentCareerPlayerStats,
+  PlayerContract,
   PlayerLifecycleSkillLedgerEntry,
   RetiredPlayerRecord,
   SeasonPlayerStats,
@@ -50,6 +51,10 @@ export function PlayerPage({
   retiredRecord = null,
   skillLedgerEntry = null,
   lastTeamName = null,
+  activeContract = null,
+  contractTeamName = null,
+  isFreeAgent = false,
+  careerClubNames = [],
   format,
   onFormat,
   onBack,
@@ -64,6 +69,10 @@ export function PlayerPage({
   retiredRecord?: RetiredPlayerRecord | null;
   skillLedgerEntry?: PlayerLifecycleSkillLedgerEntry | null;
   lastTeamName?: string | null;
+  activeContract?: PlayerContract | null;
+  contractTeamName?: string | null;
+  isFreeAgent?: boolean;
+  careerClubNames?: readonly string[];
   format: Format;
   onFormat: (value: Format) => void;
   onBack: () => void;
@@ -102,6 +111,26 @@ export function PlayerPage({
             {lastTeamName ? ` · Final club: ${lastTeamName}` : ""} · Reason:{" "}
             {retiredRecord.retirementReason.replaceAll("_", " ").toLowerCase()}.
           </p>
+        </div>
+      )}
+      {(activeContract || isFreeAgent) && !retiredRecord && (
+        <div
+          className="career-panel"
+          data-testid="player-contract-summary"
+          style={{ marginBottom: "14px" }}
+        >
+          <strong>Domestic contract status</strong>
+          {activeContract ? (
+            <p>
+              Contracted to <strong>{contractTeamName ?? activeContract.teamId}</strong> · $
+              {activeContract.annualWageK}k/yr · Expires after Season{" "}
+              {activeContract.expiresAfterSeasonNumber} · Origin:{" "}
+              {activeContract.origin.replaceAll("_", " ").toLowerCase()}
+              {careerClubNames.length > 0 ? ` · Clubs: ${careerClubNames.join(" → ")}` : ""}
+            </p>
+          ) : (
+            <p>Uncontracted free agent — eligible for domestic contract offers.</p>
+          )}
         </div>
       )}
       <label>

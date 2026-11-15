@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "command": {
+      "type": "string",
+      "const": "RESOLVE_NEGOTIATION_ROUND"
+    },
+    "commandId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "expectedRound": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    }
+  },
+  "required": [
+    "command",
+    "commandId",
+    "seasonNumber",
+    "expectedRound"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ResolveNegotiationRoundRequest:1",
+  "title": "ResolveNegotiationRoundRequest"
+}

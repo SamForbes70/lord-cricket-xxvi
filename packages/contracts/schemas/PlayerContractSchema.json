@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "contractId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "signedSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "startsSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 201
+    },
+    "expiresAfterSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 205
+    },
+    "annualWageK": {
+      "type": "integer",
+      "minimum": 20,
+      "maximum": 1000
+    },
+    "origin": {
+      "type": "string",
+      "enum": [
+        "INITIAL_SQUAD",
+        "RENEWAL",
+        "FREE_AGENT_SIGNING",
+        "YOUTH_GRADUATE",
+        "EMERGENCY_MINIMUM"
+      ]
+    },
+    "careerTeamIds": {
+      "minItems": 1,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    }
+  },
+  "required": [
+    "contractId",
+    "playerId",
+    "teamId",
+    "signedSeasonNumber",
+    "startsSeasonNumber",
+    "expiresAfterSeasonNumber",
+    "annualWageK",
+    "origin",
+    "careerTeamIds"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:PlayerContract:1",
+  "title": "PlayerContract"
+}

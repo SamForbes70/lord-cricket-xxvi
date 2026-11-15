@@ -412,6 +412,7 @@ describe("Stage 3 player lifecycle and youth pathway", () => {
         worldId: "world-stage3-main",
         seed: "seed-stage3-main",
         startDate: "2027-04-03",
+        worldStateVersion: PERSISTENT_WORLD_STATE_V2_VERSION,
       });
 
       const veteranDob = careerWorld.players.find((p) => p.playerId === veteranId)!.birthDate;

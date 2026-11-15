@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "FREE_AGENT",
+    "RENEWAL"
+  ],
+  "$id": "urn:lcxxvi:ContractOfferKind:1",
+  "title": "ContractOfferKind"
+}

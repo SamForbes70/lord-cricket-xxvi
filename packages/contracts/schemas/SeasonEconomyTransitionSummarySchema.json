@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "fromSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 199
+    },
+    "toSeasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "calendarYear": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 9999
+    },
+    "humanRenewedCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "aiRenewedCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "expiredToFreeAgencyIds": {
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "retiredContractClosedIds": {
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "youthContractsSignedIds": {
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "aiOffseasonFreeAgentSigningsIds": {
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "minimumTopupSignedIds": {
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    }
+  },
+  "required": [
+    "fromSeasonNumber",
+    "toSeasonNumber",
+    "calendarYear",
+    "humanRenewedCount",
+    "aiRenewedCount",
+    "expiredToFreeAgencyIds",
+    "retiredContractClosedIds",
+    "youthContractsSignedIds",
+    "aiOffseasonFreeAgentSigningsIds",
+    "minimumTopupSignedIds"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SeasonEconomyTransitionSummary:1",
+  "title": "SeasonEconomyTransitionSummary"
+}

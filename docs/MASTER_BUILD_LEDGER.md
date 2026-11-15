@@ -1,6 +1,6 @@
 # AI Master Build Brief — 17-Stage Reconciliation & Delivery Ledger
 
-Reconciled against `main` (`161e781` — Stage 2 merged & owner-accepted) and active branch `feat/stage3-player-lifecycle` on 14 November 2026 (Australia/Brisbane).
+Reconciled against `main` (`1fc2175` — Stages 2 & 3 merged & owner-accepted) and active branch `feat/stage4-contracts-recruitment` on 15 November 2026 (Australia/Brisbane).
 
 Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepted`, and `deployed`. Earlier status words from `8a7c164` in the brief are reconciled below against `161e781` and [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md).
 
@@ -10,8 +10,8 @@ Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepte
 | --- | --- | --- | --- |
 | 1 | Reconciled baseline and acceptance preparation | **accepted** (`main` `f7ee054`) | Completed in PR #43 (`a577d41`..`f7ee054`): V0.1 closed by owner decision ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)); unreviewed commits audited ([REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)); release record sealed ([release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json)). Note: reference-laptop, owner-PC collector, and human screen-reader gates are **owner declared**, not measured in-repo. |
 | 2 | Persistent multi-season world | **accepted** (`main` `161e781`, 14 Nov 2026) | Implemented, verified (`736/736` unit tests, `207` JSON Schemas, Chromium + Firefox Stage 2 UI + `23/23` smoke), merged to `main`, and **owner-accepted on 14 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)). |
-| 3 | Player lifecycle and youth pathway | **accepted** (`main`, 14 Nov 2026) | Implemented, verified (`740/740` unit tests across `65/65` files, `235` JSON Schemas, Chromium + Firefox Stage 3 UI + Stage 2/regression suites, 20-season diagnostic horizon with `0` role shortages), and **owner-accepted on 14 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md)). |
-| 4 | Contracts, budgets and recruitment | **proposed -> active next slice** | Unlocked by Stage 3 owner acceptance on 14 November 2026: domestic contract system with wages, team budgets, expiry, offers, acceptance, free agents, auditable transaction ledger, persistent negotiation rounds, symmetrical AI club recruitment, and multi-season economy diagnostics. |
+| 3 | Player lifecycle and youth pathway | **accepted** (`main` `1fc2175`, 14 Nov 2026) | Implemented, verified (`740/740` unit tests across `65/65` files, `235` JSON Schemas, Chromium + Firefox Stage 3 UI + Stage 2/regression suites, 20-season diagnostic horizon with `0` role shortages), and **owner-accepted on 14 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md)). |
+| 4 | Contracts, budgets and recruitment | **accepted** (`main`, 15 Nov 2026) | Implemented, verified (`746/746` unit tests across `66/66` files, `261` JSON Schemas, Chromium + Firefox Stage 4 UI + Stage 2/3/regression suites, 12-season economy diagnostic horizon with `0` overspent clubs, `0` role shortages, and `0` hidden future-ability reads), and **owner-accepted on 15 November 2026** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage04-squad-economy/REPORT.md](verification-stage04-squad-economy/REPORT.md)). |
 | 5 | Tactical briefings and feedback | **partial** | Pitch seam/spin inspection, red-ball weather forecasts, squad readiness, and tactical captains/delegation exist in V0.1; plain-language trade-off explanations, contextual presets, post-spell plan-vs-outcome review, and observed playtest script remain open (eligible independently of Stage 3). |
 | 6 | Live field and highlight pacing | **partial** | Analytical charts (Manhattan, worm, partnerships, FOW, sector wheel, length bars) and bounded match progression exist; live 2D SVG/Canvas named-position field view and illustrative highlight modes (`every-ball`, `key-moment`, `fast`) are missing. |
 | 7 | Contextual text commentary | **partial** | Format-specific delivery/state strings and `brief`/`off` preferences exist; shared fact-checked template adapter with presentation seed, repetition cooldowns, and `brief`/`standard`/`detailed` modes is missing. |
@@ -59,6 +59,21 @@ Status terms follow Part A (`A8`): `proposed`, `implemented`, `tested`, `accepte
   - Crash-safe V2 persistence, explicit non-destructive Stage 2 V1 -> Stage 3 V2 upgrade in a new save slot, per-season roster snapshot replay (`LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE`), and V2 `.lcxxvi` portable archive export/import (`packages/persistence/src/persistent-world.ts`, `packages/persistence/src/archive.ts`).
   - Youth Academy management table, Retired Alumni directory, off-season lifecycle transition summary, and retired/active career history views in `apps/web/src/career/service.ts`, `CareerApp.tsx`, and `PlayerPage.tsx`.
 - **Evidence**: [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md).
+
+---
+
+### Slice `S04-01` — Stage 4: Contracts, Budgets & Recruitment
+
+- **Status**: `accepted` (owner-accepted 15 November 2026; merged to `main`).
+- **Base revision**: `1fc2175` (`main` — Stage 3 merged & owner-accepted on 14 November 2026).
+- **Branch**: `feat/stage4-contracts-recruitment`.
+- **Dependencies satisfied**: Stage 3 owner acceptance recorded in [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md).
+- **Scope**:
+  - Versioned domestic squad-economy contracts (`LC_SQUAD_ECONOMY_STATE_V1`, `LC_SQUAD_ECONOMY_MODEL_FICTIONAL_V1`, `LC_PERSISTENT_WORLD_V3_ECONOMY`, `LC_PERSISTENT_WORLD_PORTABLE_V3_ECONOMY`) in `packages/contracts/src/squad-economy.ts` + 26 strict AJV 2020-12 JSON Schemas (`261` total).
+  - Symmetrical `$2,500k` annual club wage caps across all 8 clubs, persistent 3-round pre-season negotiation windows, renewal/free-agent offers, counter-offer acceptance, `50%` buyout cap charges against release-and-sign circumvention, `commandId` idempotency, SHA-256 hash-chained transaction ledger (`verifyEconomyLedgerChain`), and public-only AI recruitment (`aiHiddenFutureAbilityReads === 0`) in `packages/simulation/src/squad-economy.ts`.
+  - Cross-season club-transfer career projection fix in `packages/projections/src/persistent-world.ts`, crash-safe V3 persistence + `WeakSet`/`WeakMap` digest fast-path + non-destructive V2 -> V3 slot upgrade in `packages/persistence/src/persistent-world.ts` and `packages/persistence/src/archive.ts`, and **Contracts & Recruitment** workspace in `apps/web/src/career/service.ts`, `CareerApp.tsx`, and `PlayerPage.tsx`.
+  - 12-season domestic economy diagnostic horizon (`runSquadEconomyDiagnosticHorizon`, `0` overspent clubs, `0` role shortages, `0` hidden future-ability reads across all 12 seasons).
+- **Evidence**: [verification-stage04-squad-economy/REPORT.md](verification-stage04-squad-economy/REPORT.md).
 - **Next eligible slices**:
-  - If owner records Stage 3 acceptance: **Stage 4 (Contracts, budgets and recruitment)**.
-  - Independently eligible without waiting on Stage 3 acceptance: **Stage 5 (Tactical briefings and feedback)**.
+  - **Stage 5 (Tactical briefings and feedback)** — immediately eligible without waiting on Stage 4 acceptance.
+  - Stages 9 / 11 / 15 depend on Stage 4 acceptance where economy/transfer integration applies.

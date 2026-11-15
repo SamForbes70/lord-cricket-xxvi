@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "annualWageBudgetK": {
+      "type": "integer",
+      "minimum": 500,
+      "maximum": 20000
+    },
+    "committedWagesK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20000
+    },
+    "deadCapWagesK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20000
+    },
+    "pendingOfferReservedWagesK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20000
+    },
+    "availableWageSpaceK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20000
+    }
+  },
+  "required": [
+    "teamId",
+    "seasonNumber",
+    "annualWageBudgetK",
+    "committedWagesK",
+    "deadCapWagesK",
+    "pendingOfferReservedWagesK",
+    "availableWageSpaceK"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ClubBudgetState:1",
+  "title": "ClubBudgetState"
+}

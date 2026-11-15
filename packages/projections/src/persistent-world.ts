@@ -145,18 +145,26 @@ function applyCompletionToPlayerMap(
     for (const playerId of team.playerIds) {
       assertPersistentProjection(!selected.has(playerId), `PLAYER_SELECTED_TWICE:${playerId}`);
       selected.set(playerId, team.teamId);
-      const existing = players.get(playerId);
-      if (existing) {
-        assertPersistentProjection(existing.teamId === team.teamId, `PLAYER_TEAM_MISMATCH:${playerId}`);
-      } else {
-        players.set(playerId, emptyCareerPlayer(playerId, team.teamId));
-      }
       let seenSeasons = seasonsSeenByPlayer.get(playerId);
       if (!seenSeasons) {
         seenSeasons = new Set<string>();
         seasonsSeenByPlayer.set(playerId, seenSeasons);
       }
-      if (!seenSeasons.has(completion.seasonId)) {
+      const alreadyPlayedThisSeason = seenSeasons.has(completion.seasonId);
+      const existing = players.get(playerId);
+      if (existing) {
+        if (alreadyPlayedThisSeason) {
+          assertPersistentProjection(
+            existing.teamId === team.teamId,
+            `PLAYER_TEAM_MISMATCH:${playerId}`,
+          );
+        } else {
+          existing.teamId = team.teamId;
+        }
+      } else {
+        players.set(playerId, emptyCareerPlayer(playerId, team.teamId));
+      }
+      if (!alreadyPlayedThisSeason) {
         seenSeasons.add(completion.seasonId);
         players.get(playerId)!.seasonsPlayed += 1;
       }

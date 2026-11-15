@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "command": {
+      "type": "string",
+      "const": "SUBMIT_CONTRACT_OFFER"
+    },
+    "commandId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "offeringTeamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "offerKind": {
+      "type": "string",
+      "enum": [
+        "FREE_AGENT",
+        "RENEWAL"
+      ]
+    },
+    "annualWageK": {
+      "type": "integer",
+      "minimum": 20,
+      "maximum": 1000
+    },
+    "termSeasons": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    }
+  },
+  "required": [
+    "command",
+    "commandId",
+    "offeringTeamId",
+    "playerId",
+    "offerKind",
+    "annualWageK",
+    "termSeasons"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SubmitContractOfferRequest:1",
+  "title": "SubmitContractOfferRequest"
+}

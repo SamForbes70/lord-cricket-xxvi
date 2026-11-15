@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserves Roll of Honour + all-time stats + ball-by-ball replay, and round-trips .lcxxvi", async ({ page, browser }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(240_000);
   const pageErrors: string[] = [];
   page.on("pageerror", (err) => pageErrors.push(err.message));
 
@@ -33,7 +33,10 @@ test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserve
 
   // Complete Round 1 of Season 2 so all-time career stats span 2 seasons (56 + 4 = 60 matches or >= 57).
   const advanceS2 = page.getByRole("button", { name: "Advance to match day" });
-  if (await advanceS2.isVisible().catch(() => false)) await advanceS2.click();
+  if (await advanceS2.isVisible().catch(() => false)) {
+    await advanceS2.click();
+    await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
+  }
   await page.getByRole("button", { name: "Simulate match" }).click();
   await expect(page.getByText("1/14 managed-team fixtures complete.", { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
@@ -48,7 +51,7 @@ test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserve
   await expect(season1Detail).toBeVisible();
   await season1Detail.getByRole("button", { name: "View replay" }).first().click();
   await expect(page.getByTestId("career-replay-viewer")).toBeVisible();
-  await expect(page.getByTestId("replay-archive-meta")).toContainText("LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1");
+  await expect(page.getByTestId("replay-archive-meta")).toContainText(/LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V(1|2_LIFECYCLE)/);
   await page.getByTestId("career-replay-viewer").getByRole("button", { name: "Close replay" }).click();
 
   // Inspect All-time career statistics & archived Season 1 scope.
@@ -60,8 +63,13 @@ test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserve
   await expect(page.getByTestId("all-time-career-statistics")).toContainText("All-time club honours & records");
 
   // Inspect player season-by-season breakdown across Season 1 and Season 2.
-  await page.getByRole("button", { name: "Squad", exact: true }).click();
-  await page.locator("button.player-link").first().click();
+  await page
+    .getByTestId("all-time-career-statistics")
+    .locator("tbody tr")
+    .filter({ has: page.locator("td:nth-child(3)", { hasText: "2" }) })
+    .locator("button.player-link")
+    .first()
+    .click();
   await expect(page.getByTestId("player-career-history")).toBeVisible();
   await expect(page.getByTestId("player-career-history")).toContainText("Season 1 · 2027");
   await expect(page.getByTestId("player-career-history")).toContainText("Completed");

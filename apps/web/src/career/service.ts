@@ -8,17 +8,22 @@ import {
   type LifecycleSquadTrainingConditionView,
   PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION,
   PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
   PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
+  PERSISTENT_WORLD_STATE_V3_VERSION,
   PERSISTENT_WORLD_STATE_VERSION,
   PersistentWorldRolloverReceiptSchema,
   RosterSeasonMatchCompletionSchema,
   T20SeasonMatchCompletionSchema,
   type AcademyTrainingFocus,
   type ActivePersistentSeasonState,
+  type ClubBudgetState,
   type CompletedCareerMatchEventArchive,
   type CompletedLifecycleMatchEventArchive,
   type CompletedSeasonRecord,
+  type ContractOffer,
+  type ContractOfferKind,
   type LifecycleSeasonState,
   type MatchConditionDelta,
   type NewGameWorldCopy,
@@ -26,7 +31,9 @@ import {
   type PersistentWorldSaveSummary,
   type PersistentWorldState,
   type PersistentWorldStateV2,
+  type PersistentWorldStateV3,
   type Player,
+  type PlayerContract,
   type PlayerLifecycleSkillLedgerEntry,
   type PlayerLifecycleState,
   type PlayerTrainingAssignment,
@@ -34,9 +41,11 @@ import {
   type RosterCareerDayState,
   type SeasonArchive,
   type SeasonCheckpointInspection,
+  type SeasonEconomyTransitionSummary,
   type SeasonFixture,
   type SeasonLifecycleTransitionRecord,
   type SeasonSaveSummary,
+  type SquadEconomyState,
   type SquadTrainingConditionView,
   type StagedRosterPack,
   type T20Scorecard,
@@ -54,16 +63,20 @@ import {
   validateDefaultWorld,
 } from "@lcxxvi/data";
 import {
+  acceptCounterOffer as applyAcceptCounterOffer,
   advanceCareerDayV2,
+  advanceLifecycleAndEconomyAtSeasonClose,
   advancePersistentSeasonCalendar,
   advancePlayerLifecycleAtSeasonClose,
   advanceRosterCareerDay,
   applyMatchConditionDeltaV2,
   applyRosterMatchCondition,
+  closeNegotiationWindowForMatchPlay,
   createCareerDayStateV2,
   createCompletedCareerMatchEventArchive,
   createCompletedLifecycleMatchEventArchive,
   createInitialPlayerLifecycleState,
+  createInitialSquadEconomyState,
   createPersistentLifecycleSeasonScheduleAndDayState,
   createPersistentSeasonScheduleAndDayState,
   createStateHasher,
@@ -76,10 +89,13 @@ import {
   projectSquadTrainingCondition,
   promoteYouthProspectPreSeason,
   recordElapsedTrainingExposure,
+  registerPreSeasonYouthContract,
   rehydrateRosterT20Session,
   rehydrateT20Session,
+  releaseContractedPlayer as applyReleaseContractedPlayer,
   replayCareerMatchEventArchive,
   replayCompletedLifecycleMatchEventArchive,
+  resolveNegotiationRound as applyResolveNegotiationRound,
   sealLifecycleSeasonState,
   seasonStartDateOf,
   selectOffscreenFixtureTeams,
@@ -90,7 +106,10 @@ import {
   setTrainingDirective,
   simulateOffscreenFixture,
   simulateRosterOffscreenFixture,
+  submitContractOffer as applySubmitContractOffer,
+  withdrawContractOffer as applyWithdrawContractOffer,
   type CareerArchivedReplaySummary,
+  type RecentPlayerSeasonStatsSummary,
   type RosterT20Session,
 } from "@lcxxvi/simulation";
 import {
@@ -106,6 +125,7 @@ import {
   collectPersistentWorldCompletions,
   createPersistentWorldPortableArchive,
   createPersistentWorldPortableArchiveV2,
+  createPersistentWorldPortableArchiveV3,
   createSeasonPortableArchive,
   createT20SeasonArchive,
   describeSeasonPersistenceError,
@@ -115,11 +135,13 @@ import {
   PERSISTENT_WORLD_RECORD_TYPE,
   readPersistentWorldPortableArchive,
   readPersistentWorldPortableArchiveV2,
+  readPersistentWorldPortableArchiveV3,
   readSeasonPortableArchive,
   sealCompletedSeasonRecord,
   sealPersistentCareerProjection,
   sealPersistentWorldState,
   sealPersistentWorldStateV2,
+  sealPersistentWorldStateV3,
   sealT20SeasonState,
   SEASON_RECORD_TYPE,
   type AnyCareerMatchEventArchive,
@@ -252,7 +274,8 @@ export type CreateCareerOptions = {
   calendarYear?: number;
   worldStateVersion?:
     | typeof PERSISTENT_WORLD_STATE_VERSION
-    | typeof PERSISTENT_WORLD_STATE_V2_VERSION;
+    | typeof PERSISTENT_WORLD_STATE_V2_VERSION
+    | typeof PERSISTENT_WORLD_STATE_V3_VERSION;
 };
 
 export async function createInitialSeasonState(input: {
@@ -900,6 +923,320 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV2(input: {
   });
 }
 
+export async function createInitialPersistentWorldCareerStateV3(input: {
+  worldId: string;
+  careerId: string;
+  baseSeed: string;
+  controlledTeamId: string | null;
+  calendarYear?: number;
+  startDate?: string;
+  worldCopy?: NewGameWorldCopy | null;
+}): Promise<PersistentWorldStateV3> {
+  const startDate = input.startDate ?? INITIAL_PERSISTENT_START_DATE;
+  const calendarYear =
+    input.calendarYear ??
+    (Number.parseInt(startDate.slice(0, 4), 10) || INITIAL_PERSISTENT_CALENDAR_YEAR);
+  const worldIdentity = derivePersistentWorldIdentity({
+    worldId: input.worldId,
+    baseSeed: input.baseSeed,
+    originKind: "NEW_PERSISTENT_CAREER",
+  });
+  const lifecycle = createInitialPlayerLifecycleState({
+    worldIdentity,
+    baseWorld: world,
+    worldCopy: input.worldCopy ?? null,
+    seasonNumber: 1,
+    calendarYear,
+    useRosterPackImmediately: true,
+  });
+  const currentSeason = await createLifecycleSeasonStateForWorld({
+    worldIdentity,
+    rosterPack: lifecycle.activeRosterPack!,
+    careerId: input.careerId,
+    controlledTeamId: input.controlledTeamId,
+    seasonNumber: 1,
+    calendarYear,
+    startDate,
+    priorSeasonFinalStateSha256: null,
+  });
+  const economy = createInitialSquadEconomyState({
+    worldIdentity,
+    lifecycle,
+    seasonNumber: 1,
+    calendarYear,
+    currentDate: startDate,
+  });
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons: [],
+      activeSeason: currentSeason,
+    }),
+  );
+  return sealPersistentWorldStateV3({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V3_VERSION,
+    worldIdentity,
+    careerId: input.careerId,
+    controlledTeamId: input.controlledTeamId,
+    currentSeasonNumber: 1,
+    currentCalendarYear: calendarYear,
+    currentSeason,
+    completedSeasons: [],
+    careerProjection,
+    lifecycle,
+    economy,
+    lastRolloverReceipt: null,
+    revision: 0,
+  });
+}
+
+export async function rebuildPersistentWorldStateV3(
+  worldState: PersistentWorldStateV3,
+  nextSeason: ActivePersistentSeasonState,
+  nextLifecycle: PlayerLifecycleState,
+  nextEconomy: SquadEconomyState,
+  nextRevision: number,
+): Promise<PersistentWorldStateV3> {
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldState.worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons: worldState.completedSeasons,
+      activeSeason: nextSeason,
+    }),
+  );
+  return sealPersistentWorldStateV3({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V3_VERSION,
+    worldIdentity: worldState.worldIdentity,
+    careerId: worldState.careerId,
+    controlledTeamId: worldState.controlledTeamId,
+    currentSeasonNumber: worldState.currentSeasonNumber,
+    currentCalendarYear: worldState.currentCalendarYear,
+    currentSeason: nextSeason,
+    completedSeasons: worldState.completedSeasons,
+    careerProjection,
+    lifecycle: nextLifecycle,
+    economy: nextEconomy,
+    lastRolloverReceipt: worldState.lastRolloverReceipt,
+    revision: nextRevision,
+  });
+}
+
+export async function rolloverPersistentWorldCareerSeasonV3(
+  worldState: PersistentWorldStateV3,
+  nextRevision = worldState.revision + 1,
+): Promise<{ nextState: PersistentWorldStateV3; closedRecord: CompletedSeasonRecord }> {
+  if (worldState.currentSeason.phase !== "COMPLETE") {
+    throw new Error("Complete all 56 fixtures before closing the season.");
+  }
+  const closedRecord = await sealCompletedSeasonRecord({
+    seasonNumber: worldState.currentSeasonNumber,
+    calendarYear: worldState.currentCalendarYear,
+    completedSeasonState: worldState.currentSeason,
+    completedAt: deterministicSeasonCompletedAt(worldState.currentSeason),
+  });
+  const completedSeasons = [...worldState.completedSeasons, closedRecord];
+  const nextSeasonNumber = worldState.currentSeasonNumber + 1;
+  const { nextCalendarYear, nextStartDate } = advancePersistentSeasonCalendar({
+    closedCalendarYear: worldState.currentCalendarYear,
+    closedEndDate: worldState.currentSeason.careerState.finalScheduledDate,
+    seasonStartMonthDay: seasonStartDateOf(worldState.currentSeason).slice(5, 10),
+  });
+  const seasonPlayerStats = worldState.currentSeason.projection.players.map((p) => ({
+    playerId: p.playerId,
+    matches: p.matches,
+    runs: p.runs,
+    wickets: p.bowlingWickets,
+    ballsFaced: p.ballsFaced,
+    bowlingLegalBalls: p.bowlingLegalBalls,
+  }));
+  const advanced = advanceLifecycleAndEconomyAtSeasonClose({
+    lifecycle: worldState.lifecycle,
+    economy: worldState.economy,
+    worldIdentity: worldState.worldIdentity,
+    fromSeasonNumber: worldState.currentSeasonNumber,
+    toSeasonNumber: nextSeasonNumber,
+    closedCalendarYear: worldState.currentCalendarYear,
+    nextCalendarYear,
+    rolloverDate: nextStartDate,
+    seasonPlayerStats,
+    controlledTeamId: worldState.controlledTeamId,
+  });
+  const nextCurrentSeason = await createLifecycleSeasonStateForWorld({
+    worldIdentity: worldState.worldIdentity,
+    rosterPack: advanced.lifecycle.activeRosterPack!,
+    careerId: worldState.careerId,
+    controlledTeamId: worldState.controlledTeamId,
+    seasonNumber: nextSeasonNumber,
+    calendarYear: nextCalendarYear,
+    startDate: nextStartDate,
+    priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
+    carryForwardDirectives: worldState.currentSeason.careerState.trainingAssignments,
+  });
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldState.worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons,
+      activeSeason: nextCurrentSeason,
+    }),
+  );
+  const receipt = PersistentWorldRolloverReceiptSchema.parse({
+    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
+    fromSeasonNumber: worldState.currentSeasonNumber,
+    toSeasonNumber: nextSeasonNumber,
+    closedSeasonId: closedRecord.seasonId,
+    closedSeasonStateSha256: closedRecord.finalSeasonStateSha256,
+    closedSeasonRecordSha256: closedRecord.recordSha256,
+    nextSeasonId: nextCurrentSeason.seasonId,
+    nextStartDate: seasonStartDateOf(nextCurrentSeason),
+    nextScheduleSha256: nextCurrentSeason.schedule.scheduleSha256,
+  });
+  const nextState = await sealPersistentWorldStateV3({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V3_VERSION,
+    worldIdentity: worldState.worldIdentity,
+    careerId: worldState.careerId,
+    controlledTeamId: worldState.controlledTeamId,
+    currentSeasonNumber: nextSeasonNumber,
+    currentCalendarYear: nextCalendarYear,
+    currentSeason: nextCurrentSeason,
+    completedSeasons,
+    careerProjection,
+    lifecycle: advanced.lifecycle,
+    economy: advanced.economy,
+    lastRolloverReceipt: receipt,
+    revision: nextRevision,
+  });
+  return { nextState, closedRecord };
+}
+
+export async function copyCompletedSingleSeasonToPersistentWorldStateV3(input: {
+  sourceSaveId: string;
+  sourceState: T20SeasonState;
+  worldId: string;
+  newCareerId: string;
+  baseSeed: string;
+  worldCopy?: NewGameWorldCopy | null;
+}): Promise<PersistentWorldStateV3> {
+  const { sourceState } = input;
+  if (sourceState.phase !== "COMPLETE") {
+    throw new Error(
+      "Complete all 56 fixtures in the single-season career before copying into a multi-season world.",
+    );
+  }
+  const closedCalendarYear =
+    Number.parseInt(sourceState.schedule.startDate.slice(0, 4), 10) ||
+    INITIAL_PERSISTENT_CALENDAR_YEAR;
+  const worldIdentity = derivePersistentWorldIdentity({
+    worldId: input.worldId,
+    baseSeed: input.baseSeed,
+    originKind: "COPIED_FROM_SINGLE_SEASON_V1",
+    sourceSingleSeasonSaveId: input.sourceSaveId,
+    sourceSingleSeasonFinalStateSha256: sourceState.stateSha256,
+  });
+  const closedRecord = await sealCompletedSeasonRecord({
+    seasonNumber: 1,
+    calendarYear: closedCalendarYear,
+    completedSeasonState: sourceState,
+    completedAt: deterministicSeasonCompletedAt(sourceState),
+  });
+  const completedSeasons = [closedRecord];
+  const { nextCalendarYear, nextStartDate } = advancePersistentSeasonCalendar({
+    closedCalendarYear,
+    closedEndDate: sourceState.careerState.finalScheduledDate,
+    seasonStartMonthDay: sourceState.schedule.startDate.slice(5, 10),
+  });
+  let initialLifecycle = createInitialPlayerLifecycleState({
+    worldIdentity,
+    baseWorld: world,
+    worldCopy: input.worldCopy ?? null,
+    seasonNumber: 1,
+    calendarYear: closedCalendarYear,
+    useRosterPackImmediately: true,
+  });
+  const elapsedDays = dateDiffDays(
+    sourceState.schedule.startDate,
+    sourceState.careerState.currentDate,
+  );
+  initialLifecycle = recordElapsedTrainingExposure(
+    initialLifecycle,
+    sourceState.careerState.trainingAssignments,
+    elapsedDays,
+  );
+  const initialEconomy = createInitialSquadEconomyState({
+    worldIdentity,
+    lifecycle: initialLifecycle,
+    seasonNumber: 1,
+    calendarYear: closedCalendarYear,
+    currentDate: sourceState.schedule.startDate,
+  });
+  const advanced = advanceLifecycleAndEconomyAtSeasonClose({
+    lifecycle: initialLifecycle,
+    economy: initialEconomy,
+    worldIdentity,
+    fromSeasonNumber: 1,
+    toSeasonNumber: 2,
+    closedCalendarYear,
+    nextCalendarYear,
+    rolloverDate: nextStartDate,
+    seasonPlayerStats: sourceState.projection.players.map((p) => ({
+      playerId: p.playerId,
+      matches: p.matches,
+      runs: p.runs,
+      wickets: p.bowlingWickets,
+      ballsFaced: p.ballsFaced,
+      bowlingLegalBalls: p.bowlingLegalBalls,
+    })),
+    controlledTeamId: sourceState.controlledTeamId,
+  });
+  const currentSeason = await createLifecycleSeasonStateForWorld({
+    worldIdentity,
+    rosterPack: advanced.lifecycle.activeRosterPack!,
+    careerId: input.newCareerId,
+    controlledTeamId: sourceState.controlledTeamId,
+    seasonNumber: 2,
+    calendarYear: nextCalendarYear,
+    startDate: nextStartDate,
+    priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
+    carryForwardDirectives: sourceState.careerState.trainingAssignments,
+  });
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons,
+      activeSeason: currentSeason,
+    }),
+  );
+  const receipt = PersistentWorldRolloverReceiptSchema.parse({
+    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
+    fromSeasonNumber: 1,
+    toSeasonNumber: 2,
+    closedSeasonId: closedRecord.seasonId,
+    closedSeasonStateSha256: closedRecord.finalSeasonStateSha256,
+    closedSeasonRecordSha256: closedRecord.recordSha256,
+    nextSeasonId: currentSeason.seasonId,
+    nextStartDate: seasonStartDateOf(currentSeason),
+    nextScheduleSha256: currentSeason.schedule.scheduleSha256,
+  });
+  return sealPersistentWorldStateV3({
+    worldStateVersion: PERSISTENT_WORLD_STATE_V3_VERSION,
+    worldIdentity,
+    careerId: input.newCareerId,
+    controlledTeamId: sourceState.controlledTeamId,
+    currentSeasonNumber: 2,
+    currentCalendarYear: nextCalendarYear,
+    currentSeason,
+    completedSeasons,
+    careerProjection,
+    lifecycle: advanced.lifecycle,
+    economy: advanced.economy,
+    lastRolloverReceipt: receipt,
+    revision: 0,
+  });
+}
+
 export type CareerReplayOutcome =
   | {
       status: "READY";
@@ -948,6 +1285,7 @@ export type CareerPersistentWorldRepository = {
     damagedFixtureIds: string[];
     totalBytes: number;
   }>;
+  loadLifecycleRosterPacks?(saveId: string): Promise<Map<string, StagedRosterPack>>;
   inspectCheckpoints?(saveId: string): Promise<SeasonCheckpointInspection>;
   loadGeneration?(saveId: string, generation: number): Promise<PersistentWorldLoadResult>;
 };
@@ -993,6 +1331,7 @@ type AnyCareerMutationResult =
         | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
       matchEventArchives?: readonly AnyCareerMatchEventArchive[];
       nextLifecycle?: PlayerLifecycleState;
+      nextEconomy?: SquadEconomyState;
     }
   | Omit<T20SeasonState, "stateSha256" | "revision">
   | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
@@ -1047,8 +1386,15 @@ export class CareerApplicationService {
   }
 
   getLifecycleState(): PlayerLifecycleState | null {
-    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
+      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
       ? this.persistentState.lifecycle
+      : null;
+  }
+
+  getEconomyState(): SquadEconomyState | null {
+    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+      ? this.persistentState.economy
       : null;
   }
 
@@ -1057,11 +1403,21 @@ export class CareerApplicationService {
   }
 
   hasLifecycleEnabled(): boolean {
-    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION;
+    return (
+      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
+      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+    );
+  }
+
+  hasEconomyEnabled(): boolean {
+    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION;
   }
 
   getWorld(): WorldPack {
-    if (this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION) {
+    if (
+      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
+      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+    ) {
       return this.persistentState.lifecycle.activeWorld;
     }
     return this.worldCopy?.world ?? world;
@@ -1091,6 +1447,12 @@ export class CareerApplicationService {
   ): { player: Player; retired: RetiredPlayerRecord | null } | null {
     const active = this.getWorld().players.find((p) => p.playerId === playerId);
     if (active) return { player: active, retired: null };
+    const freeAgent = this.getEconomyState()?.freeAgents.find((fa) => fa.playerId === playerId);
+    if (freeAgent) return { player: freeAgent.player, retired: null };
+    const prospect = this.getLifecycleState()?.youthAcademy.find(
+      (yp) => yp.prospectId === playerId,
+    );
+    if (prospect) return { player: prospect.player, retired: null };
     const retired = this.getLifecycleState()?.retiredPlayers.find((r) => r.playerId === playerId);
     if (retired) return { player: retired.player, retired };
     return null;
@@ -1104,6 +1466,38 @@ export class CareerApplicationService {
 
   latestLifecycleTransition(): SeasonLifecycleTransitionRecord | null {
     return this.getLifecycleState()?.transitions.at(-1) ?? null;
+  }
+
+  latestEconomyTransition(): SeasonEconomyTransitionSummary | null {
+    return this.getEconomyState()?.transitions.at(-1) ?? null;
+  }
+
+  managedClubBudget(): ClubBudgetState | null {
+    const economy = this.getEconomyState();
+    const teamId = this.persistentState?.controlledTeamId ?? null;
+    if (!economy || !teamId) return null;
+    return economy.clubBudgets.find((b) => b.teamId === teamId) ?? null;
+  }
+
+  playerContract(playerId: string): PlayerContract | null {
+    return this.getEconomyState()?.contracts.find((c) => c.playerId === playerId) ?? null;
+  }
+
+  private recentPlayerStatsForMarket(): RecentPlayerSeasonStatsSummary[] {
+    const activePlayers = this.state?.projection.players ?? [];
+    const hasActiveMatches = (this.state?.completedMatches.length ?? 0) > 0;
+    const sourcePlayers =
+      hasActiveMatches
+        ? activePlayers
+        : (this.persistentState?.completedSeasons.at(-1)?.players ?? activePlayers);
+    return sourcePlayers.map((p) => ({
+      playerId: p.playerId,
+      matches: p.matches,
+      runs: p.runs,
+      wickets: p.bowlingWickets,
+      ballsFaced: p.ballsFaced,
+      bowlingLegalBalls: p.bowlingLegalBalls,
+    }));
   }
 
   managedYouthAcademyProspects(): YouthProspect[] {
@@ -1272,7 +1666,9 @@ export class CareerApplicationService {
       const worldState =
         options?.worldStateVersion === PERSISTENT_WORLD_STATE_VERSION
           ? await createInitialPersistentWorldCareerState(createWorldArgs)
-          : await createInitialPersistentWorldCareerStateV2(createWorldArgs);
+          : options?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+            ? await createInitialPersistentWorldCareerStateV2(createWorldArgs)
+            : await createInitialPersistentWorldCareerStateV3(createWorldArgs);
       const saveId = options?.saveId ?? `pworld:${worldId}`;
       if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
         throw new Error("New career save is locked.");
@@ -1526,8 +1922,13 @@ export class CareerApplicationService {
           throw new Error("Writer lease was lost to another tab.");
         }
         const currentLifecycle =
-          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
+          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
             ? beforeWorld.lifecycle
+            : null;
+        const currentEconomy =
+          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+            ? beforeWorld.economy
             : null;
         const builtRaw = await build(before, currentLifecycle);
         const builtCore =
@@ -1544,20 +1945,44 @@ export class CareerApplicationService {
           "core" in builtRaw && "nextLifecycle" in builtRaw && builtRaw.nextLifecycle
             ? builtRaw.nextLifecycle
             : currentLifecycle;
+        let updatedEconomy =
+          "core" in builtRaw && "nextEconomy" in builtRaw && builtRaw.nextEconomy
+            ? builtRaw.nextEconomy
+            : currentEconomy;
         const nextSeason = await this.sealActiveSeasonCore(builtCore, before.revision + 1);
+        if (
+          updatedEconomy &&
+          updatedLifecycle &&
+          nextSeason.completedMatches.length > 0 &&
+          updatedEconomy.negotiationWindow.windowPhase === "OPEN"
+        ) {
+          updatedEconomy = closeNegotiationWindowForMatchPlay(
+            updatedEconomy,
+            updatedLifecycle,
+            beforeWorld.currentSeasonNumber,
+          );
+        }
         const nextWorld: AnyPersistentWorldState =
-          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
-            ? await rebuildPersistentWorldStateV2(
+          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+            ? await rebuildPersistentWorldStateV3(
                 beforeWorld,
                 nextSeason,
                 updatedLifecycle!,
+                updatedEconomy!,
                 expectedRevision + 1,
               )
-            : await rebuildPersistentWorldStateWithActiveSeason(
-                beforeWorld,
-                nextSeason as T20SeasonState,
-                expectedRevision + 1,
-              );
+            : beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+              ? await rebuildPersistentWorldStateV2(
+                  beforeWorld,
+                  nextSeason,
+                  updatedLifecycle!,
+                  expectedRevision + 1,
+                )
+              : await rebuildPersistentWorldStateWithActiveSeason(
+                  beforeWorld,
+                  nextSeason as T20SeasonState,
+                  expectedRevision + 1,
+                );
         const requestCanonical = canonicalJson({ command, expectedRevision, payload });
         const title = this.saveTitle ?? this.defaultCareerTitle(nextWorld);
         await this.persistentRepository.commit({
@@ -1654,7 +2079,8 @@ export class CareerApplicationService {
     const { saveId } = this.requireWritable();
     if (
       !this.persistentState ||
-      this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION ||
+      (this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION &&
+        this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V3_VERSION) ||
       !this.persistentRepository
     ) {
       throw new Error("Player lifecycle controls require a Stage 3 persistent world career.");
@@ -1669,12 +2095,21 @@ export class CareerApplicationService {
         throw new Error("Writer lease was lost to another tab.");
       }
       const nextLifecycle = buildLifecycle(beforeWorld.lifecycle);
-      const nextWorld = await rebuildPersistentWorldStateV2(
-        beforeWorld,
-        beforeWorld.currentSeason,
-        nextLifecycle,
-        expectedRevision + 1,
-      );
+      const nextWorld =
+        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+          ? await rebuildPersistentWorldStateV3(
+              beforeWorld,
+              beforeWorld.currentSeason,
+              nextLifecycle,
+              beforeWorld.economy,
+              expectedRevision + 1,
+            )
+          : await rebuildPersistentWorldStateV2(
+              beforeWorld,
+              beforeWorld.currentSeason,
+              nextLifecycle,
+              expectedRevision + 1,
+            );
       const requestCanonical = canonicalJson({ command, expectedRevision, payload });
       const title = this.saveTitle ?? this.defaultCareerTitle(nextWorld);
       await this.persistentRepository.commit({
@@ -1748,7 +2183,8 @@ export class CareerApplicationService {
     const { state: beforeSeason, saveId } = this.requireWritable();
     if (
       !this.persistentState ||
-      this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION ||
+      (this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION &&
+        this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V3_VERSION) ||
       !this.persistentRepository
     ) {
       throw new Error("Youth promotion requires a Stage 3 persistent world career.");
@@ -1790,12 +2226,33 @@ export class CareerApplicationService {
         priorSeasonFinalStateSha256: priorSeasonSha,
         carryForwardDirectives: beforeSeason.careerState.trainingAssignments,
       });
-      const nextWorld = await rebuildPersistentWorldStateV2(
-        beforeWorld,
-        nextSeason,
-        promoted.lifecycle,
-        expectedRevision + 1,
-      );
+      const nextEconomy =
+        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+          ? registerPreSeasonYouthContract({
+              economy: beforeWorld.economy,
+              lifecycle: promoted.lifecycle,
+              promotedPlayer: promoted.promotedPlayer,
+              teamId: beforeWorld.controlledTeamId!,
+              seasonNumber: beforeWorld.currentSeasonNumber,
+              calendarYear: beforeWorld.currentCalendarYear,
+              currentDate: beforeSeason.careerState.currentDate,
+            })
+          : null;
+      const nextWorld =
+        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+          ? await rebuildPersistentWorldStateV3(
+              beforeWorld,
+              nextSeason,
+              promoted.lifecycle,
+              nextEconomy!,
+              expectedRevision + 1,
+            )
+          : await rebuildPersistentWorldStateV2(
+              beforeWorld,
+              nextSeason,
+              promoted.lifecycle,
+              expectedRevision + 1,
+            );
       const requestCanonical = canonicalJson({
         command: "PROMOTE_YOUTH_PROSPECT_PRESEASON",
         expectedRevision,
@@ -1878,10 +2335,13 @@ export class CareerApplicationService {
       }
       const { nextState }:
         | { nextState: PersistentWorldState }
-        | { nextState: PersistentWorldStateV2 } =
-        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
-          ? await rolloverPersistentWorldCareerSeasonV2(beforeWorld, expectedRevision + 1)
-          : await rolloverPersistentWorldCareerSeason(beforeWorld, expectedRevision + 1);
+        | { nextState: PersistentWorldStateV2 }
+        | { nextState: PersistentWorldStateV3 } =
+        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+          ? await rolloverPersistentWorldCareerSeasonV3(beforeWorld, expectedRevision + 1)
+          : beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+            ? await rolloverPersistentWorldCareerSeasonV2(beforeWorld, expectedRevision + 1)
+            : await rolloverPersistentWorldCareerSeason(beforeWorld, expectedRevision + 1);
       const requestCanonical = canonicalJson({
         command: "ROLLOVER_SEASON",
         closedSeasonId: closingSeasonId,
@@ -1941,7 +2401,7 @@ export class CareerApplicationService {
    * Explicit copy-forward from a completed V0.1 single-season career into a new
    * multi-season persistent world starting at Season 2, preserving the V0.1 slot untouched.
    */
-  async copySingleSeasonToPersistentWorld(customTitle?: string): Promise<PersistentWorldStateV2> {
+  async copySingleSeasonToPersistentWorldV2(customTitle?: string): Promise<PersistentWorldStateV2> {
     const { state: sourceState, saveId: sourceSaveId } = this.requireWritable();
     if (this.persistentState) {
       throw new Error("This career is already a persistent multi-season world.");
@@ -1962,6 +2422,81 @@ export class CareerApplicationService {
     const newCareerId = `career-${key}`;
     const targetSaveId = `pworld:${worldId}`;
     const nextWorld = await copyCompletedSingleSeasonToPersistentWorldStateV2({
+      sourceSaveId,
+      sourceState,
+      worldId,
+      newCareerId,
+      baseSeed: `seed-${key}`,
+      worldCopy: this.worldCopy,
+    });
+    const now = Date.now();
+    if (!(await this.repository.acquireLease(sourceSaveId, this.ownerId, now))) {
+      throw new Error("This career is open in another tab.");
+    }
+    if (!(await this.persistentRepository.acquireLease(targetSaveId, this.ownerId, now))) {
+      throw new Error("New multi-season world slot is locked.");
+    }
+    const title =
+      (customTitle ?? "").trim().slice(0, 120) || this.defaultCareerTitle(nextWorld);
+    this.setStatus("Saving");
+    try {
+      await this.persistentRepository.commit({
+        saveId: targetSaveId,
+        kind: "MANUAL",
+        title,
+        expectedRevision: null,
+        state: nextWorld,
+        command: null,
+        ownerId: this.ownerId,
+        now,
+        updatedAt: nowIso(),
+        setActive: true,
+        worldCopy: this.worldCopy,
+        copySource: {
+          saveId: sourceSaveId,
+          sourceRecordType: SEASON_RECORD_TYPE,
+          revision: sourceState.revision,
+          stateSha256: sourceState.stateSha256,
+          now: () => Date.now(),
+        },
+      });
+      await this.repository.releaseLease(sourceSaveId, this.ownerId);
+      this.persistentState = nextWorld;
+      this.state = nextWorld.currentSeason;
+      this.saveTitle = title;
+      this.saveId = targetSaveId;
+      this.readOnly = false;
+      this.recovered = false;
+      this.setStatus("Saved");
+      return nextWorld;
+    } catch (error) {
+      await this.persistentRepository.releaseLease(targetSaveId, this.ownerId);
+      this.setStatus("Error", error instanceof Error ? error.message : "Copy-forward failed.");
+      throw error;
+    }
+  }
+
+  async copySingleSeasonToPersistentWorld(customTitle?: string): Promise<PersistentWorldStateV3> {
+    const { state: sourceState, saveId: sourceSaveId } = this.requireWritable();
+    if (this.persistentState) {
+      throw new Error("This career is already a persistent multi-season world.");
+    }
+    if (!this.persistentRepository) {
+      throw new Error("Persistent world storage is unavailable.");
+    }
+    if (
+      sourceState.seasonStateVersion !== "LC_T20_SEASON_STATE_V1" ||
+      sourceState.phase !== "COMPLETE"
+    ) {
+      throw new Error(
+        "Complete all 56 fixtures in this single-season career before copying into a multi-season world.",
+      );
+    }
+    const key = crypto.randomUUID().replaceAll("-", "").slice(0, 20);
+    const worldId = `world-${key}`;
+    const newCareerId = `career-${key}`;
+    const targetSaveId = `pworld:${worldId}`;
+    const nextWorld = await copyCompletedSingleSeasonToPersistentWorldStateV3({
       sourceSaveId,
       sourceState,
       worldId,
@@ -2100,6 +2635,7 @@ export class CareerApplicationService {
           sourceRecordType: PERSISTENT_WORLD_RECORD_TYPE,
           revision: sourceWorld.revision,
           stateSha256: sourceWorld.stateSha256,
+          isUpgrade: true,
           now: () => Date.now(),
         },
       });
@@ -2117,6 +2653,464 @@ export class CareerApplicationService {
       this.setStatus("Error", error instanceof Error ? error.message : "Stage 3 upgrade failed.");
       throw error;
     }
+  }
+
+  /**
+   * Explicit copy-upgrade from a Stage 2 V1 or Stage 3 V2 persistent world into a new Stage 4 V3
+   * persistent world slot with domestic contracts, club budgets, free agents & recruitment.
+   */
+  async upgradeToStage4EconomyV3(customTitle?: string): Promise<PersistentWorldStateV3> {
+    const { saveId: sourceSaveId } = this.requireWritable();
+    if (
+      !this.persistentState ||
+      this.persistentState.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+    ) {
+      throw new Error("Only Stage 2 V1 or Stage 3 V2 persistent worlds need a Stage 4 economy upgrade.");
+    }
+    if (!this.persistentRepository) {
+      throw new Error("Persistent world storage is unavailable.");
+    }
+    const sourceWorld = this.persistentState;
+    const key = crypto.randomUUID().replaceAll("-", "").slice(0, 20);
+    const worldId = `world-${key}`;
+    const targetSaveId = `pworld:${worldId}`;
+    const worldIdentity = derivePersistentWorldIdentity({
+      worldId,
+      baseSeed: sourceWorld.worldIdentity.baseSeed,
+      originKind: sourceWorld.worldIdentity.originKind,
+      sourceSingleSeasonSaveId: sourceWorld.worldIdentity.sourceSingleSeasonSaveId,
+      sourceSingleSeasonFinalStateSha256:
+        sourceWorld.worldIdentity.sourceSingleSeasonFinalStateSha256,
+    });
+    const baseLifecycle =
+      sourceWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
+        ? sourceWorld.lifecycle
+        : createInitialPlayerLifecycleState({
+            worldIdentity,
+            baseWorld: careerWorld,
+            worldCopy: this.worldCopy,
+            calendarYear: sourceWorld.currentCalendarYear,
+            seasonNumber: sourceWorld.currentSeasonNumber,
+            useRosterPackImmediately: sourceWorld.currentSeason.completedMatches.length === 0,
+          });
+    let economy = createInitialSquadEconomyState({
+      worldIdentity,
+      lifecycle: baseLifecycle,
+      seasonNumber: sourceWorld.currentSeasonNumber,
+      calendarYear: sourceWorld.currentCalendarYear,
+      currentDate: sourceWorld.currentSeason.careerState.currentDate,
+      recentStats: this.recentPlayerStatsForMarket(),
+    });
+    if (sourceWorld.currentSeason.completedMatches.length > 0) {
+      economy = closeNegotiationWindowForMatchPlay(
+        economy,
+        baseLifecycle,
+        sourceWorld.currentSeasonNumber,
+      );
+    }
+    let upgradedSeason: ActivePersistentSeasonState = sourceWorld.currentSeason;
+    if (
+      sourceWorld.currentSeason.completedMatches.length === 0 &&
+      baseLifecycle.activeRosterPack &&
+      sourceWorld.currentSeason.seasonStateVersion !== LIFECYCLE_SEASON_STATE_VERSION
+    ) {
+      upgradedSeason = await createLifecycleSeasonStateForWorld({
+        worldIdentity,
+        rosterPack: baseLifecycle.activeRosterPack,
+        careerId: sourceWorld.careerId,
+        controlledTeamId: sourceWorld.controlledTeamId,
+        seasonNumber: sourceWorld.currentSeasonNumber,
+        calendarYear: sourceWorld.currentCalendarYear,
+        startDate: seasonStartDateOf(sourceWorld.currentSeason),
+        priorSeasonFinalStateSha256:
+          sourceWorld.completedSeasons.at(-1)?.finalSeasonStateSha256 ?? null,
+        carryForwardDirectives: sourceWorld.currentSeason.careerState.trainingAssignments,
+      });
+    }
+    const careerProjection = await sealPersistentCareerProjection(
+      rebuildPersistentCareerProjectionCore({
+        worldId,
+        teamIds: T20_LEAGUE_COMPETITION.teamIds,
+        completedSeasons: sourceWorld.completedSeasons,
+        activeSeason: upgradedSeason,
+      }),
+    );
+    const nextWorld = await sealPersistentWorldStateV3({
+      worldStateVersion: PERSISTENT_WORLD_STATE_V3_VERSION,
+      worldIdentity,
+      careerId: sourceWorld.careerId,
+      controlledTeamId: sourceWorld.controlledTeamId,
+      currentSeasonNumber: sourceWorld.currentSeasonNumber,
+      currentCalendarYear: sourceWorld.currentCalendarYear,
+      completedSeasons: sourceWorld.completedSeasons,
+      lifecycle: baseLifecycle,
+      economy,
+      currentSeason: upgradedSeason,
+      careerProjection,
+      lastRolloverReceipt: sourceWorld.lastRolloverReceipt,
+      revision: 1,
+    });
+    const now = Date.now();
+    if (!(await this.persistentRepository.acquireLease(sourceSaveId, this.ownerId, now))) {
+      throw new Error("This career is open in another tab.");
+    }
+    if (!(await this.persistentRepository.acquireLease(targetSaveId, this.ownerId, now))) {
+      throw new Error("New Stage 4 persistent world slot is locked.");
+    }
+    const title =
+      (customTitle ?? "").trim().slice(0, 120) || this.defaultCareerTitle(nextWorld);
+    this.setStatus("Saving");
+    try {
+      await this.persistentRepository.commit({
+        saveId: targetSaveId,
+        kind: "MANUAL",
+        title,
+        expectedRevision: null,
+        state: nextWorld,
+        command: null,
+        ownerId: this.ownerId,
+        now,
+        updatedAt: nowIso(),
+        setActive: true,
+        worldCopy: this.worldCopy,
+        copySource: {
+          saveId: sourceSaveId,
+          sourceRecordType: PERSISTENT_WORLD_RECORD_TYPE,
+          revision: sourceWorld.revision,
+          stateSha256: sourceWorld.stateSha256,
+          isUpgrade: true,
+          now: () => Date.now(),
+        },
+      });
+      await this.persistentRepository.releaseLease(sourceSaveId, this.ownerId);
+      this.persistentState = nextWorld;
+      this.state = nextWorld.currentSeason;
+      this.saveTitle = title;
+      this.saveId = targetSaveId;
+      this.readOnly = false;
+      this.recovered = false;
+      this.setStatus("Saved");
+      return nextWorld;
+    } catch (error) {
+      await this.persistentRepository.releaseLease(targetSaveId, this.ownerId);
+      this.setStatus("Error", error instanceof Error ? error.message : "Stage 4 upgrade failed.");
+      throw error;
+    }
+  }
+
+  private async commitEconomyMutation<T>(
+    commandId: string,
+    commandName: string,
+    payload: unknown,
+    mutate: (worldState: PersistentWorldStateV3) => Promise<{
+      economy: SquadEconomyState;
+      lifecycle: PlayerLifecycleState;
+      rosterChanged: boolean;
+      result: T;
+      idempotentDuplicate?: boolean;
+    }> | {
+      economy: SquadEconomyState;
+      lifecycle: PlayerLifecycleState;
+      rosterChanged: boolean;
+      result: T;
+      idempotentDuplicate?: boolean;
+    },
+  ): Promise<T> {
+    const { state: beforeSeason, saveId } = this.requireWritable();
+    if (
+      !this.persistentState ||
+      this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V3_VERSION ||
+      !this.persistentRepository
+    ) {
+      throw new Error("Contract and recruitment actions require a Stage 4 persistent world career.");
+    }
+    const beforeWorld = this.persistentState;
+    const expectedRevision = beforeWorld.revision;
+    this.setStatus("Saving");
+    try {
+      if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
+        this.readOnly = true;
+        throw new Error("Writer lease was lost to another tab.");
+      }
+      const outcome = await mutate(beforeWorld);
+      if (outcome.idempotentDuplicate) {
+        this.setStatus("Saved");
+        return outcome.result;
+      }
+      let nextSeason: ActivePersistentSeasonState = beforeSeason;
+      if (outcome.rosterChanged) {
+        if (beforeSeason.completedMatches.length > 0) {
+          throw new Error("Squad transfers cannot alter an active season after match play begins.");
+        }
+        const priorSeasonSha =
+          beforeWorld.completedSeasons.at(-1)?.finalSeasonStateSha256 ?? null;
+        nextSeason = await createLifecycleSeasonStateForWorld({
+          worldIdentity: beforeWorld.worldIdentity,
+          rosterPack: outcome.lifecycle.activeRosterPack!,
+          careerId: beforeWorld.careerId,
+          controlledTeamId: beforeWorld.controlledTeamId,
+          seasonNumber: beforeWorld.currentSeasonNumber,
+          calendarYear: beforeWorld.currentCalendarYear,
+          startDate: seasonStartDateOf(beforeSeason),
+          priorSeasonFinalStateSha256: priorSeasonSha,
+          carryForwardDirectives: beforeSeason.careerState.trainingAssignments,
+        });
+      }
+      const nextWorld = await rebuildPersistentWorldStateV3(
+        beforeWorld,
+        nextSeason,
+        outcome.lifecycle,
+        outcome.economy,
+        expectedRevision + 1,
+      );
+      const requestCanonical = canonicalJson({ commandName, commandId, payload });
+      const title = this.saveTitle ?? this.defaultCareerTitle(nextWorld);
+      const committed = await this.persistentRepository.commit({
+        saveId,
+        kind: "AUTO",
+        title,
+        expectedRevision,
+        state: nextWorld,
+        command: {
+          commandId,
+          requestCanonical,
+          responseJson: canonicalJson({
+            revision: nextWorld.revision,
+            stateSha256: nextWorld.stateSha256,
+            economySha256: nextWorld.economy.economySha256,
+          }),
+          committedRevision: nextWorld.revision,
+        },
+        idempotentCommandReplay: true,
+        ownerId: this.ownerId,
+        now: Date.now(),
+        updatedAt: nowIso(),
+        setActive: true,
+        worldCopy: this.worldCopy,
+      });
+      if (committed.idempotentReplay) {
+        const reloaded = await this.persistentRepository.load(saveId);
+        if (reloaded) {
+          this.persistentState = reloaded.state;
+          this.state = reloaded.state.currentSeason;
+          this.saveTitle = reloaded.summary.title;
+        }
+        this.setStatus("Saved");
+        return outcome.result;
+      }
+      this.persistentState = nextWorld;
+      this.state = nextSeason;
+      this.saveTitle = title;
+      this.recovered = false;
+      this.setStatus("Saved");
+      return outcome.result;
+    } catch (error) {
+      this.setStatus(
+        this.readOnly ? "Read-only" : "Error",
+        error instanceof Error ? error.message : "Contract action failed.",
+      );
+      throw error;
+    }
+  }
+
+  async submitContractOffer(input: {
+    playerId: string;
+    offerKind: ContractOfferKind;
+    annualWageK: number;
+    termSeasons: number;
+    commandId?: string;
+  }): Promise<{ offer: ContractOffer | null; duplicate: boolean }> {
+    const offeringTeamId = this.persistentState?.controlledTeamId;
+    if (!offeringTeamId) throw new Error("No managed club is selected.");
+    const cmdId = input.commandId ?? token("economy-offer");
+    return this.commitEconomyMutation(
+      cmdId,
+      "SUBMIT_CONTRACT_OFFER",
+      { ...input, offeringTeamId },
+      (worldState) => {
+        const applied = applySubmitContractOffer({
+          economy: worldState.economy,
+          lifecycle: worldState.lifecycle,
+          seasonNumber: worldState.currentSeasonNumber,
+          calendarYear: worldState.currentCalendarYear,
+          currentDate: worldState.currentSeason.careerState.currentDate,
+          rawRequest: {
+            command: "SUBMIT_CONTRACT_OFFER",
+            commandId: cmdId,
+            offeringTeamId,
+            playerId: input.playerId,
+            offerKind: input.offerKind,
+            annualWageK: input.annualWageK,
+            termSeasons: input.termSeasons,
+          },
+          submittedBy: "HUMAN_MANAGER",
+          recentStats: this.recentPlayerStatsForMarket(),
+        });
+        return {
+          economy: applied.economy,
+          lifecycle: worldState.lifecycle,
+          rosterChanged: false,
+          idempotentDuplicate: applied.duplicate,
+          result: { offer: applied.offer, duplicate: applied.duplicate },
+        };
+      },
+    );
+  }
+
+  async withdrawContractOffer(
+    offerId: string,
+    commandId?: string,
+  ): Promise<{ duplicate: boolean }> {
+    const offeringTeamId = this.persistentState?.controlledTeamId;
+    if (!offeringTeamId) throw new Error("No managed club is selected.");
+    const cmdId = commandId ?? token("economy-withdraw");
+    return this.commitEconomyMutation(
+      cmdId,
+      "WITHDRAW_CONTRACT_OFFER",
+      { offerId, offeringTeamId },
+      (worldState) => {
+        const applied = applyWithdrawContractOffer({
+          economy: worldState.economy,
+          lifecycle: worldState.lifecycle,
+          seasonNumber: worldState.currentSeasonNumber,
+          rawRequest: {
+            command: "WITHDRAW_CONTRACT_OFFER",
+            commandId: cmdId,
+            offeringTeamId,
+            offerId,
+          },
+        });
+        return {
+          economy: applied.economy,
+          lifecycle: worldState.lifecycle,
+          rosterChanged: false,
+          idempotentDuplicate: applied.duplicate,
+          result: { duplicate: applied.duplicate },
+        };
+      },
+    );
+  }
+
+  async acceptCounterOffer(
+    offerId: string,
+    commandId?: string,
+  ): Promise<{ duplicate: boolean; rosterChanged: boolean }> {
+    const offeringTeamId = this.persistentState?.controlledTeamId;
+    if (!offeringTeamId) throw new Error("No managed club is selected.");
+    const cmdId = commandId ?? token("economy-accept-counter");
+    return this.commitEconomyMutation(
+      cmdId,
+      "ACCEPT_COUNTER_OFFER",
+      { offerId, offeringTeamId },
+      (worldState) => {
+        const applied = applyAcceptCounterOffer({
+          economy: worldState.economy,
+          lifecycle: worldState.lifecycle,
+          worldId: worldState.worldIdentity.worldId,
+          seasonNumber: worldState.currentSeasonNumber,
+          calendarYear: worldState.currentCalendarYear,
+          currentDate: worldState.currentSeason.careerState.currentDate,
+          rawRequest: {
+            command: "ACCEPT_COUNTER_OFFER",
+            commandId: cmdId,
+            offeringTeamId,
+            offerId,
+          },
+        });
+        return {
+          economy: applied.economy,
+          lifecycle: applied.lifecycle,
+          rosterChanged: applied.rosterChanged,
+          idempotentDuplicate: applied.duplicate,
+          result: { duplicate: applied.duplicate, rosterChanged: applied.rosterChanged },
+        };
+      },
+    );
+  }
+
+  async resolveNegotiationRound(commandId?: string): Promise<{
+    duplicate: boolean;
+    signedOffers: ContractOffer[];
+    counteredOffers: ContractOffer[];
+  }> {
+    const economy = this.getEconomyState();
+    if (!economy) throw new Error("Contract negotiations require a Stage 4 persistent world career.");
+    const expectedRound = economy.negotiationWindow.currentRound;
+    const seasonNumber = this.persistentState!.currentSeasonNumber;
+    const cmdId =
+      commandId ?? `neg-round:${this.saveId}:s${seasonNumber}:r${expectedRound}`;
+    return this.commitEconomyMutation(
+      cmdId,
+      "RESOLVE_NEGOTIATION_ROUND",
+      { seasonNumber, expectedRound },
+      (worldState) => {
+        const applied = applyResolveNegotiationRound({
+          economy: worldState.economy,
+          lifecycle: worldState.lifecycle,
+          worldIdentity: worldState.worldIdentity,
+          controlledTeamId: worldState.controlledTeamId,
+          seasonNumber: worldState.currentSeasonNumber,
+          calendarYear: worldState.currentCalendarYear,
+          currentDate: worldState.currentSeason.careerState.currentDate,
+          rawRequest: {
+            command: "RESOLVE_NEGOTIATION_ROUND",
+            commandId: cmdId,
+            seasonNumber,
+            expectedRound,
+          },
+          recentStats: this.recentPlayerStatsForMarket(),
+        });
+        return {
+          economy: applied.economy,
+          lifecycle: applied.lifecycle,
+          rosterChanged: applied.rosterChanged,
+          idempotentDuplicate: applied.duplicate,
+          result: {
+            duplicate: applied.duplicate,
+            signedOffers: applied.signedOffers,
+            counteredOffers: applied.counteredOffers,
+          },
+        };
+      },
+    );
+  }
+
+  async releaseContractedPlayer(
+    playerId: string,
+    commandId?: string,
+  ): Promise<{ duplicate: boolean }> {
+    const teamId = this.persistentState?.controlledTeamId;
+    if (!teamId) throw new Error("No managed club is selected.");
+    const cmdId = commandId ?? token("economy-release");
+    return this.commitEconomyMutation(
+      cmdId,
+      "RELEASE_CONTRACTED_PLAYER",
+      { teamId, playerId },
+      (worldState) => {
+        const applied = applyReleaseContractedPlayer({
+          economy: worldState.economy,
+          lifecycle: worldState.lifecycle,
+          worldId: worldState.worldIdentity.worldId,
+          seasonNumber: worldState.currentSeasonNumber,
+          calendarYear: worldState.currentCalendarYear,
+          currentDate: worldState.currentSeason.careerState.currentDate,
+          rawRequest: {
+            command: "RELEASE_CONTRACTED_PLAYER",
+            commandId: cmdId,
+            teamId,
+            playerId,
+          },
+          recentStats: this.recentPlayerStatsForMarket(),
+        });
+        return {
+          economy: applied.economy,
+          lifecycle: applied.lifecycle,
+          rosterChanged: !applied.duplicate,
+          idempotentDuplicate: applied.duplicate,
+          result: { duplicate: applied.duplicate },
+        };
+      },
+    );
   }
 
   async setTraining(playerId: string, directive: TrainingDirective): Promise<void> {
@@ -2279,7 +3273,12 @@ export class CareerApplicationService {
       .sort((a, b) => a.fixtureId.localeCompare(b.fixtureId));
     const requiresDateAdvance = initial.careerState.currentDate < target.matchDayDate;
     const pendingOthers = roundOthers.filter((fixture) => !completedIds.has(fixture.fixtureId));
-    if (!requiresDateAdvance && pendingOthers.length === 0) return target;
+    const requiresNegotiationWindowClose =
+      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION &&
+      this.persistentState.economy.negotiationWindow.windowPhase === "OPEN";
+    if (!requiresDateAdvance && pendingOthers.length === 0 && !requiresNegotiationWindowClose) {
+      return target;
+    }
 
     await this.commitMutation(
       "SIMULATE_TO_NEXT_USER_FIXTURE",
@@ -2336,10 +3335,21 @@ export class CareerApplicationService {
           working.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION
             ? { ...stateCore(working), phase: "ACTIVE" }
             : { ...stateCore(working), phase: "ACTIVE" };
+        const nextEconomy =
+          this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION &&
+          this.persistentState.economy.negotiationWindow.windowPhase === "OPEN" &&
+          nextLifecycle
+            ? closeNegotiationWindowForMatchPlay(
+                this.persistentState.economy,
+                nextLifecycle,
+                this.persistentState.currentSeasonNumber,
+              )
+            : undefined;
         return {
           core: activeCore,
           matchEventArchives: archives,
           ...(nextLifecycle ? { nextLifecycle } : {}),
+          ...(nextEconomy ? { nextEconomy } : {}),
         };
       },
     );
@@ -2699,6 +3709,19 @@ export class CareerApplicationService {
       const eventArchives = this.persistentRepository.loadMatchEventArchives
         ? (await this.persistentRepository.loadMatchEventArchives(saveId, loaded.state)).archives
         : [];
+      const rosterPacks = this.persistentRepository.loadLifecycleRosterPacks
+        ? [...(await this.persistentRepository.loadLifecycleRosterPacks(saveId)).values()]
+        : [];
+      if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION) {
+        return createPersistentWorldPortableArchiveV3(
+          loaded.state,
+          loaded.summary,
+          nowIso(),
+          loaded.worldCopy ?? null,
+          eventArchives.length > 0 ? eventArchives : null,
+          rosterPacks.length > 0 ? rosterPacks : null,
+        );
+      }
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION) {
         return createPersistentWorldPortableArchiveV2(
           loaded.state,
@@ -2706,6 +3729,7 @@ export class CareerApplicationService {
           nowIso(),
           loaded.worldCopy ?? null,
           eventArchives.length > 0 ? eventArchives : null,
+          rosterPacks.length > 0 ? rosterPacks : null,
         );
       }
       const v1EventArchives = eventArchives.filter(
@@ -2748,15 +3772,18 @@ export class CareerApplicationService {
     const version = peekPortableArchiveVersion(bytes);
     if (
       version === PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION ||
-      version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION
+      version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION ||
+      version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION
     ) {
       if (!this.persistentRepository) {
         throw new Error("Persistent world storage is unavailable.");
       }
       const imported =
-        version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION
-          ? await readPersistentWorldPortableArchiveV2(bytes)
-          : await readPersistentWorldPortableArchive(bytes);
+        version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION
+          ? await readPersistentWorldPortableArchiveV3(bytes)
+          : version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION
+            ? await readPersistentWorldPortableArchiveV2(bytes)
+            : await readPersistentWorldPortableArchive(bytes);
       const copy = imported.worldCopy ? immutableWorldCopy(imported.worldCopy) : null;
       await this.releaseCurrentLease();
       const saveId = `import-${crypto.randomUUID().replaceAll("-", "")}`;
@@ -2779,6 +3806,9 @@ export class CareerApplicationService {
         worldCopy: copy,
         ...(imported.matchEventArchives.length > 0
           ? { matchEventArchives: imported.matchEventArchives }
+          : {}),
+        ...("seasonRosterPacks" in imported && imported.seasonRosterPacks.length > 0
+          ? { seasonRosterPacks: imported.seasonRosterPacks }
           : {}),
       });
       this.persistentState = imported.state;

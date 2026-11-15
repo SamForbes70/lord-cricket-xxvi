@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "INITIAL_CONTRACT_REGISTERED",
+    "CONTRACT_RENEWED",
+    "FREE_AGENT_SIGNED",
+    "YOUTH_ROOKIE_CONTRACT_SIGNED",
+    "CONTRACT_EXPIRED_TO_FREE_AGENCY",
+    "CONTRACT_RELEASE_BUYOUT",
+    "CONTRACT_ENDED_ON_RETIREMENT",
+    "MINIMUM_SQUAD_TOPUP_SIGNED"
+  ],
+  "$id": "urn:lcxxvi:EconomyTransactionType:1",
+  "title": "EconomyTransactionType"
+}

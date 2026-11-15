@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "UNATTACHED_POOL",
+    "CONTRACT_EXPIRED",
+    "CLUB_RELEASED"
+  ],
+  "$id": "urn:lcxxvi:FreeAgentEntryReason:1",
+  "title": "FreeAgentEntryReason"
+}

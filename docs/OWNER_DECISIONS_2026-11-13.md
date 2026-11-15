@@ -39,3 +39,8 @@ Why this figure. An 8 GB laptop must also run the operating system and other app
 
 - The owner (Sam Forbes) accepted **Stage 3: Player lifecycle and youth pathway** (`feat/stage3-player-lifecycle`, [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md)) on 14 November 2026 (Australia/Brisbane), authorised committing and pushing `feat/stage3-player-lifecycle` and merging it to `main`, and authorised proceeding into **Stage 4: Contracts, budgets and recruitment**.
 - Local Linux core (`740/740` unit tests across `65/65` files, `235` JSON Schemas), 20-season diagnostic horizon (`0` role shortages across all 20 seasons), and Chromium + Firefox Stage 3 + Stage 2 + regression browser checks passed prior to merge; hosted GitHub Actions (`Linux` and `Windows`) run after push.
+
+## Owner decision, 15 November 2026 — Stage 4 (Contracts, budgets and recruitment)
+
+- The owner (Sam Forbes) accepted **Stage 4: Contracts, budgets and recruitment** (`feat/stage4-contracts-recruitment`, [verification-stage04-squad-economy/REPORT.md](verification-stage04-squad-economy/REPORT.md)) on 15 November 2026 (Australia/Brisbane), authorised committing and pushing `feat/stage4-contracts-recruitment` and merging it to `main`, and authorised proceeding into **Stage 5: Tactical briefings and feedback**.
+- Local Linux core (`746/746` unit tests across `66/66` files, `261` JSON Schemas), 12-season domestic economy diagnostic horizon (`0` overspent clubs, `0` role shortages, `0` hidden future-ability reads across all 12 seasons), and Chromium + Firefox Stage 4 + Stage 3 + Stage 2 + regression browser checks passed prior to merge; hosted GitHub Actions (`Linux` and `Windows`) run after push.

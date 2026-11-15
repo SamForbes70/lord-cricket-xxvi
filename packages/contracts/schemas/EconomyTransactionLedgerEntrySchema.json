@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "ledgerEntryVersion": {
+      "type": "string",
+      "const": "LC_ECONOMY_LEDGER_ENTRY_V1"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "transactionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "calendarYear": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 9999
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "INITIAL_CONTRACT_REGISTERED",
+        "CONTRACT_RENEWED",
+        "FREE_AGENT_SIGNED",
+        "YOUTH_ROOKIE_CONTRACT_SIGNED",
+        "CONTRACT_EXPIRED_TO_FREE_AGENCY",
+        "CONTRACT_RELEASE_BUYOUT",
+        "CONTRACT_ENDED_ON_RETIREMENT",
+        "MINIMUM_SQUAD_TOPUP_SIGNED"
+      ]
+    },
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "contractId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "offerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "annualWageK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "deadCapDeltaK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "termSeasons": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "teamCommittedWagesAfterK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20000
+    },
+    "teamDeadCapAfterK": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20000
+    },
+    "teamBudgetLimitK": {
+      "type": "integer",
+      "minimum": 500,
+      "maximum": 20000
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320
+    },
+    "prevEntrySha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "entrySha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "ledgerEntryVersion",
+    "sequence",
+    "transactionId",
+    "seasonNumber",
+    "calendarYear",
+    "date",
+    "type",
+    "teamId",
+    "playerId",
+    "contractId",
+    "offerId",
+    "annualWageK",
+    "deadCapDeltaK",
+    "termSeasons",
+    "teamCommittedWagesAfterK",
+    "teamDeadCapAfterK",
+    "teamBudgetLimitK",
+    "summary",
+    "prevEntrySha256",
+    "entrySha256"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:EconomyTransactionLedgerEntry:1",
+  "title": "EconomyTransactionLedgerEntry"
+}

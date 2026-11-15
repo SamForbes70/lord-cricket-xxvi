@@ -1,0 +1,1050 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "economyVersion": {
+      "type": "string",
+      "const": "LC_SQUAD_ECONOMY_STATE_V1"
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "modelVersion": {
+          "type": "string",
+          "const": "LC_SQUAD_ECONOMY_MODEL_FICTIONAL_V1"
+        },
+        "calibrationStatus": {
+          "type": "string",
+          "const": "FICTIONAL_PLACEHOLDER"
+        },
+        "disclaimer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "annualClubWageBudgetK": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 10000
+        },
+        "minAnnualWageK": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 100
+        },
+        "maxAnnualWageK": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 1000
+        },
+        "youthRookieAnnualWageK": {
+          "type": "integer",
+          "minimum": 25,
+          "maximum": 100
+        },
+        "minContractTermSeasons": {
+          "type": "number",
+          "const": 1
+        },
+        "maxContractTermSeasons": {
+          "type": "number",
+          "const": 3
+        },
+        "maxNegotiationRounds": {
+          "type": "number",
+          "const": 3
+        },
+        "releaseBuyoutPercent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "minFreeAgentPoolSize": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 64
+        },
+        "maxFreeAgentPoolSize": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 128
+        }
+      },
+      "required": [
+        "modelVersion",
+        "calibrationStatus",
+        "disclaimer",
+        "annualClubWageBudgetK",
+        "minAnnualWageK",
+        "maxAnnualWageK",
+        "youthRookieAnnualWageK",
+        "minContractTermSeasons",
+        "maxContractTermSeasons",
+        "maxNegotiationRounds",
+        "releaseBuyoutPercent",
+        "minFreeAgentPoolSize",
+        "maxFreeAgentPoolSize"
+      ],
+      "additionalProperties": false
+    },
+    "contracts": {
+      "minItems": 22,
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "contractId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "signedSeasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "startsSeasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 201
+          },
+          "expiresAfterSeasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 205
+          },
+          "annualWageK": {
+            "type": "integer",
+            "minimum": 20,
+            "maximum": 1000
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "INITIAL_SQUAD",
+              "RENEWAL",
+              "FREE_AGENT_SIGNING",
+              "YOUTH_GRADUATE",
+              "EMERGENCY_MINIMUM"
+            ]
+          },
+          "careerTeamIds": {
+            "minItems": 1,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          }
+        },
+        "required": [
+          "contractId",
+          "playerId",
+          "teamId",
+          "signedSeasonNumber",
+          "startsSeasonNumber",
+          "expiresAfterSeasonNumber",
+          "annualWageK",
+          "origin",
+          "careerTeamIds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "freeAgents": {
+      "maxItems": 2000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "player": {
+            "type": "object",
+            "properties": {
+              "playerId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "name": {
+                "type": "string",
+                "pattern": "^[\\s\\S]{1,80}$"
+              },
+              "birthDate": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              "batHand": {
+                "type": "string",
+                "enum": [
+                  "R",
+                  "L"
+                ]
+              },
+              "bowlHand": {
+                "type": "string",
+                "enum": [
+                  "R",
+                  "L"
+                ]
+              },
+              "bowlingStyle": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "FAST",
+                      "MEDIUM",
+                      "OFF_SPIN",
+                      "LEG_SPIN",
+                      "SLOW_LEFT_ARM",
+                      "LEFT_ARM_WRIST"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "BATTER",
+                  "BOWLER",
+                  "ALLROUNDER",
+                  "KEEPER"
+                ]
+              },
+              "skills": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "T20",
+                    "ODI",
+                    "RED_BALL"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "defence": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "timing": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "power": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "rotation": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "vsPace": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "vsSpin": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "control": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "movement": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "variation": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "stamina": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "catching": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "groundFielding": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "throwing": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "keeping": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "defence",
+                    "timing",
+                    "power",
+                    "rotation",
+                    "vsPace",
+                    "vsSpin",
+                    "control",
+                    "movement",
+                    "variation",
+                    "stamina",
+                    "catching",
+                    "groundFielding",
+                    "throwing",
+                    "keeping"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "variations": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                }
+              },
+              "shotSectorWeights": {
+                "minItems": 8,
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "exposureBalls": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "T20",
+                    "ODI",
+                    "RED_BALL"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "provenance": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "FICTIONAL",
+                      "LICENSED",
+                      "USER_SUPPLIED"
+                    ]
+                  },
+                  "sourceId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "sourceHash": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "confidenceBp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  }
+                },
+                "required": [
+                  "kind",
+                  "sourceId",
+                  "sourceHash",
+                  "confidenceBp"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "playerId",
+              "name",
+              "birthDate",
+              "batHand",
+              "bowlHand",
+              "bowlingStyle",
+              "role",
+              "skills",
+              "variations",
+              "shotSectorWeights",
+              "exposureBalls",
+              "provenance"
+            ],
+            "additionalProperties": false
+          },
+          "enteredMarketSeasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "enteredReason": {
+            "type": "string",
+            "enum": [
+              "UNATTACHED_POOL",
+              "CONTRACT_EXPIRED",
+              "CLUB_RELEASED"
+            ]
+          },
+          "previousTeamId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "careerTeamIds": {
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "restrictedFromSigningTeamId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "restrictedSeasonNumber": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "askingAnnualWageK": {
+            "type": "integer",
+            "minimum": 20,
+            "maximum": 1000
+          },
+          "preferredTermSeasons": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          }
+        },
+        "required": [
+          "playerId",
+          "player",
+          "enteredMarketSeasonNumber",
+          "enteredReason",
+          "previousTeamId",
+          "careerTeamIds",
+          "restrictedFromSigningTeamId",
+          "restrictedSeasonNumber",
+          "askingAnnualWageK",
+          "preferredTermSeasons"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "clubBudgets": {
+      "minItems": 8,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "seasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "annualWageBudgetK": {
+            "type": "integer",
+            "minimum": 500,
+            "maximum": 20000
+          },
+          "committedWagesK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20000
+          },
+          "deadCapWagesK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20000
+          },
+          "pendingOfferReservedWagesK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20000
+          },
+          "availableWageSpaceK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20000
+          }
+        },
+        "required": [
+          "teamId",
+          "seasonNumber",
+          "annualWageBudgetK",
+          "committedWagesK",
+          "deadCapWagesK",
+          "pendingOfferReservedWagesK",
+          "availableWageSpaceK"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "negotiationWindow": {
+      "type": "object",
+      "properties": {
+        "seasonNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "windowPhase": {
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "CLOSED"
+          ]
+        },
+        "currentRound": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "maxRounds": {
+          "type": "number",
+          "const": 3
+        },
+        "offers": {
+          "maxItems": 2000,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "offerId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "commandId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "seasonNumber": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200
+              },
+              "roundSubmitted": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              },
+              "roundResolved": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "offeringTeamId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "submittedBy": {
+                "type": "string",
+                "enum": [
+                  "HUMAN_MANAGER",
+                  "AI_CLUB"
+                ]
+              },
+              "playerId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "offerKind": {
+                "type": "string",
+                "enum": [
+                  "FREE_AGENT",
+                  "RENEWAL"
+                ]
+              },
+              "annualWageK": {
+                "type": "integer",
+                "minimum": 20,
+                "maximum": 1000
+              },
+              "termSeasons": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING_ROUND",
+                  "COUNTERED",
+                  "SIGNED",
+                  "REJECTED",
+                  "WITHDRAWN"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "AWAITING_ROUND_RESOLUTION",
+                  "PLAYER_ACCEPTED_BEST_OFFER",
+                  "PLAYER_COUNTERED_TERMS",
+                  "WAGE_BELOW_RESERVATION",
+                  "SIGNED_WITH_COMPETING_CLUB",
+                  "CLUB_WITHDREW_OFFER",
+                  "PLAYER_NO_LONGER_ELIGIBLE",
+                  "CAP_OR_ROSTER_LIMIT"
+                ]
+              },
+              "counterAnnualWageK": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 20,
+                    "maximum": 1000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "counterTermSeasons": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 280
+              }
+            },
+            "required": [
+              "offerId",
+              "commandId",
+              "seasonNumber",
+              "roundSubmitted",
+              "roundResolved",
+              "offeringTeamId",
+              "submittedBy",
+              "playerId",
+              "offerKind",
+              "annualWageK",
+              "termSeasons",
+              "status",
+              "reason",
+              "counterAnnualWageK",
+              "counterTermSeasons",
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "seasonNumber",
+        "windowPhase",
+        "currentRound",
+        "maxRounds",
+        "offers"
+      ],
+      "additionalProperties": false
+    },
+    "ledger": {
+      "minItems": 1,
+      "maxItems": 50000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ledgerEntryVersion": {
+            "type": "string",
+            "const": "LC_ECONOMY_LEDGER_ENTRY_V1"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "transactionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "seasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "calendarYear": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 9999
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "INITIAL_CONTRACT_REGISTERED",
+              "CONTRACT_RENEWED",
+              "FREE_AGENT_SIGNED",
+              "YOUTH_ROOKIE_CONTRACT_SIGNED",
+              "CONTRACT_EXPIRED_TO_FREE_AGENCY",
+              "CONTRACT_RELEASE_BUYOUT",
+              "CONTRACT_ENDED_ON_RETIREMENT",
+              "MINIMUM_SQUAD_TOPUP_SIGNED"
+            ]
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "contractId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "offerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "annualWageK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2000
+          },
+          "deadCapDeltaK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2000
+          },
+          "termSeasons": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "teamCommittedWagesAfterK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20000
+          },
+          "teamDeadCapAfterK": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20000
+          },
+          "teamBudgetLimitK": {
+            "type": "integer",
+            "minimum": 500,
+            "maximum": 20000
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 320
+          },
+          "prevEntrySha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "entrySha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "ledgerEntryVersion",
+          "sequence",
+          "transactionId",
+          "seasonNumber",
+          "calendarYear",
+          "date",
+          "type",
+          "teamId",
+          "playerId",
+          "contractId",
+          "offerId",
+          "annualWageK",
+          "deadCapDeltaK",
+          "termSeasons",
+          "teamCommittedWagesAfterK",
+          "teamDeadCapAfterK",
+          "teamBudgetLimitK",
+          "summary",
+          "prevEntrySha256",
+          "entrySha256"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "appliedCommandIds": {
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "transitions": {
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fromSeasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 199
+          },
+          "toSeasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "calendarYear": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 9999
+          },
+          "humanRenewedCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "aiRenewedCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "expiredToFreeAgencyIds": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "retiredContractClosedIds": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "youthContractsSignedIds": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "aiOffseasonFreeAgentSigningsIds": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "minimumTopupSignedIds": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          }
+        },
+        "required": [
+          "fromSeasonNumber",
+          "toSeasonNumber",
+          "calendarYear",
+          "humanRenewedCount",
+          "aiRenewedCount",
+          "expiredToFreeAgencyIds",
+          "retiredContractClosedIds",
+          "youthContractsSignedIds",
+          "aiOffseasonFreeAgentSigningsIds",
+          "minimumTopupSignedIds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "economySha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "economyVersion",
+    "model",
+    "contracts",
+    "freeAgents",
+    "clubBudgets",
+    "negotiationWindow",
+    "ledger",
+    "appliedCommandIds",
+    "transitions",
+    "economySha256"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SquadEconomyState:1",
+  "title": "SquadEconomyState"
+}

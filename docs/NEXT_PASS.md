@@ -21,9 +21,16 @@ The owner accepted Stage 3 (`S03-01`) on 14 November 2026 ([OWNER_DECISIONS_2026
 1. **Explicit version & fictional-parameter boundaries**: Uses `LC_PERSISTENT_WORLD_V2_LIFECYCLE`, `LC_PLAYER_LIFECYCLE_STATE_V1`, `LC_PLAYER_LIFECYCLE_MODEL_FICTIONAL_V1` (`parameterProvenance: "FICTIONAL_GAMEPLAY_PLACEHOLDER"`), `LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE`, and `LC_PERSISTENT_WORLD_PORTABLE_V2_LIFECYCLE` (`235` strict JSON Schemas). Stage 2 `LC_PERSISTENT_WORLD_V1` and V0.1 single-season saves remain untouched unless explicitly copied into a new V2 slot.
 2. **Exploit-proof progression, ageing, retirement & youth pathway**: Daily training menu edits change only temporary daily readiness; permanent off-season progression applies once per season close from elapsed calendar training days and match appearances. Players age `+1` per season, retire with club floor guarantees (`18..22` squad size, `>= 1` keeper, `>= 5` bowling-capable), remain inspectable in **Retired Alumni** and **PlayerPage**, and are replenished by deterministic youth academy classes (`0` role shortages across a 20-season diagnostic horizon).
 
-## Active next milestone: Stage 4 — Contracts, budgets and recruitment
+## Stage 4: Contracts, budgets and recruitment (`accepted`, 15 November 2026)
 
-With Stage 3 accepted, **Stage 4 (Contracts, budgets and recruitment)** is authorised: one domestic contract system with wages, team budgets, expiry, offers, acceptance, free agents, an auditable transaction ledger, persistent negotiation rounds, symmetrical AI club recruitment by squad needs and available information (never hidden future ability), reload/duplicate-acceptance/overspending/simultaneous-offer protection, and multi-season economy diagnostics. Defer auctions and international release rules to later competition packs.
+The owner accepted Stage 4 (`S04-01`) on 15 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage04-squad-economy/REPORT.md](verification-stage04-squad-economy/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)):
+
+1. **Explicit version & fictional-economy boundaries**: Uses `LC_PERSISTENT_WORLD_V3_ECONOMY`, `LC_SQUAD_ECONOMY_STATE_V1`, `LC_SQUAD_ECONOMY_MODEL_FICTIONAL_V1` (`parameterProvenance: "FICTIONAL_GAMEPLAY_PLACEHOLDER"`), and `LC_PERSISTENT_WORLD_PORTABLE_V3_ECONOMY` (`261` strict JSON Schemas). V0.1, Stage 2 (`V1`), and Stage 3 (`V2`) saves open unchanged unless explicitly copied into a new V3 slot.
+2. **Symmetrical budgets, auditable ledger & exploit resistance**: All 8 clubs operate under symmetrical `$2,500k` annual wage caps, 3-round pre-season negotiation windows, cap reservations for pending bids, `50%` buyout cap charges against release-and-sign circumvention, `commandId` idempotency, SHA-256 hash-chained transaction ledgers, and public-only AI club recruitment (`0` hidden future-ability reads, `0` overspent clubs, and `0` role shortages across a 12-season diagnostic horizon).
+
+## Active next milestone: Stage 5 — Tactical briefings and feedback
+
+With the core persistent-world, player-lifecycle, and squad-economy foundation complete and accepted (`Stages 1–4`), **Stage 5 (Tactical briefings and feedback)** is active: optional pre-match briefing and assistant panel using existing pitch/fatigue/availability/opponent data, plain-language trade-off explanations for tactical controls, contextual presets submitting legal commands, post-spell plan-vs-outcome factual feedback, and an observed playtest script.
 
 ## Open items that still need people
 

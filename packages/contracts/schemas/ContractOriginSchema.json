@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "INITIAL_SQUAD",
+    "RENEWAL",
+    "FREE_AGENT_SIGNING",
+    "YOUTH_GRADUATE",
+    "EMERGENCY_MINIMUM"
+  ],
+  "$id": "urn:lcxxvi:ContractOrigin:1",
+  "title": "ContractOrigin"
+}

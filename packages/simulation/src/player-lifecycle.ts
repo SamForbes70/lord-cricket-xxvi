@@ -208,13 +208,24 @@ export function buildLifecycleRosterPack(
   return createStagedRosterPack(canonicalJson(sourcePayload), ALLOWED_RULES, ALLOWED_VARIATIONS);
 }
 
+const VERIFIED_LIFECYCLE_SHAS = new Set<string>();
+
 export function sealPlayerLifecycleState(coreInput: Omit<PlayerLifecycleState, "lifecycleSha256">): PlayerLifecycleState {
   const core = PlayerLifecycleStateCoreSchema.parse(coreInput);
   const lifecycleSha256 = sha256Hex(canonicalStateBytes(core));
-  return PlayerLifecycleStateSchema.parse({ ...core, lifecycleSha256 });
+  const sealed = PlayerLifecycleStateSchema.parse({ ...core, lifecycleSha256 });
+  VERIFIED_LIFECYCLE_SHAS.add(lifecycleSha256);
+  return sealed;
 }
 
 export function validatePlayerLifecycleState(raw: unknown): PlayerLifecycleState {
+  const candidateSha =
+    typeof raw === "object" && raw !== null && "lifecycleSha256" in raw
+      ? (raw as { lifecycleSha256?: unknown }).lifecycleSha256
+      : undefined;
+  if (typeof candidateSha === "string" && VERIFIED_LIFECYCLE_SHAS.has(candidateSha)) {
+    return raw as PlayerLifecycleState;
+  }
   const parsed = PlayerLifecycleStateSchema.parse(raw);
   const { lifecycleSha256, ...coreRaw } = parsed;
   const core = PlayerLifecycleStateCoreSchema.parse(coreRaw);
@@ -222,6 +233,7 @@ export function validatePlayerLifecycleState(raw: unknown): PlayerLifecycleState
   if (core.activeRosterPack) {
     validateStagedRosterPack(core.activeRosterPack, ALLOWED_RULES, ALLOWED_VARIATIONS);
   }
+  VERIFIED_LIFECYCLE_SHAS.add(lifecycleSha256);
   const activeIds = new Set(core.activeWorld.players.map((p) => p.playerId));
   const retiredIds = new Set(core.retiredPlayers.map((r) => r.playerId));
   for (const id of activeIds) {

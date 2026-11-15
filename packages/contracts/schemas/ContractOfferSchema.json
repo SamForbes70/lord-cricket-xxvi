@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "offerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "commandId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "seasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "roundSubmitted": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "roundResolved": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "offeringTeamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "submittedBy": {
+      "type": "string",
+      "enum": [
+        "HUMAN_MANAGER",
+        "AI_CLUB"
+      ]
+    },
+    "playerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "offerKind": {
+      "type": "string",
+      "enum": [
+        "FREE_AGENT",
+        "RENEWAL"
+      ]
+    },
+    "annualWageK": {
+      "type": "integer",
+      "minimum": 20,
+      "maximum": 1000
+    },
+    "termSeasons": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PENDING_ROUND",
+        "COUNTERED",
+        "SIGNED",
+        "REJECTED",
+        "WITHDRAWN"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "AWAITING_ROUND_RESOLUTION",
+        "PLAYER_ACCEPTED_BEST_OFFER",
+        "PLAYER_COUNTERED_TERMS",
+        "WAGE_BELOW_RESERVATION",
+        "SIGNED_WITH_COMPETING_CLUB",
+        "CLUB_WITHDREW_OFFER",
+        "PLAYER_NO_LONGER_ELIGIBLE",
+        "CAP_OR_ROSTER_LIMIT"
+      ]
+    },
+    "counterAnnualWageK": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 1000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "counterTermSeasons": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    }
+  },
+  "required": [
+    "offerId",
+    "commandId",
+    "seasonNumber",
+    "roundSubmitted",
+    "roundResolved",
+    "offeringTeamId",
+    "submittedBy",
+    "playerId",
+    "offerKind",
+    "annualWageK",
+    "termSeasons",
+    "status",
+    "reason",
+    "counterAnnualWageK",
+    "counterTermSeasons",
+    "rationale"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ContractOffer:1",
+  "title": "ContractOffer"
+}
