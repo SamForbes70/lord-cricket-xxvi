@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "ALL",
+    "OPENER",
+    "TOP_ORDER",
+    "MIDDLE_ORDER",
+    "LOWER_ORDER"
+  ],
+  "$id": "urn:lcxxvi:HistoricalBattingPositionBand:1",
+  "title": "HistoricalBattingPositionBand"
+}

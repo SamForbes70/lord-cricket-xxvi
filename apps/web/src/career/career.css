@@ -76,3 +76,8 @@
 .file-import-label { display:block; margin-top:14px; }
 .career-error p { margin:.4em 0; }
 .career-error small { display:block; color:#5a2618; }
+.stats-filter-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 190px),1fr)); gap:12px; margin:12px 0; }
+.stats-filter-grid label { display:flex; flex-direction:column; gap:4px; font-weight:600; font-size:.92em; }
+.leaderboard-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 14px; }
+.leaderboard-tabs button { min-height:36px; padding:.4em .7em; font-size:.9em; }
+.historical-rule-meta { font-size:.9em; color:#31473d; margin:6px 0 12px; overflow-wrap:anywhere; }

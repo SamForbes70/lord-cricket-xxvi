@@ -1,170 +1,189 @@
-# Lord Cricket XXVI | Single-season management alpha
+# Lord Cricket XXVI
 
-## Status in one paragraph
+**An evidence-based, deterministic, browser-native statistical cricket management game built as a strict TypeScript monorepo.**
 
-V0.1 (a fictional, single-season synthetic alpha) is closed and owner accepted as of 13 November 2026. The model is `synthetic-alpha-01` and makes no empirical claim. Three gates (reference-hardware run, owner-PC run, screen-reader walkthrough) are owner declared with no measurement stored in the repository. Next: the persistent world, then player lifecycle, then squad economy. Read [docs/HANDOVER.md](docs/HANDOVER.md) first. To run it: `npm ci`, `npm run build`, then serve `apps/web/dist` over http (`node start.mjs`) and open http://127.0.0.1:4180/. To make shareable zips: `npm run package:game`. To brief another AI, paste [docs/AI_INSPECTION_PROMPT.md](docs/AI_INSPECTION_PROMPT.md).
+> **Quick status (16 November 2026, Australia/Brisbane):** V0.1 (`f7ee054`) and Stages 2 through 9 (`Persistent Multi-Season World`, `Player Lifecycle & Youth Pathway`, `Contracts, Budgets & Recruitment`, `Tactical Briefings & Feedback`, `Live Field & Highlight Pacing`, `Contextual Text Commentary`, `Optional Sound & Narration`, and `Historical Statistics & Leaderboards`) are **implemented, verified, merged to `main`, and owner-accepted**. The authoritative production gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA` (fictional teams/players, no empirical calibration claim yet). Next eligible slice: **Stage 10: Match and season awards**.
 
-Lord Cricket XXVI provides a one-season management game over deterministic match and career systems.
-Start with the [documentation hub](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md) or [AI continuation guide](docs/AI_CONTINUATION.md).
-See [current status](docs/CURRENT_STATUS.md), [next slice](docs/NEXT_PASS.md) and the [V0.1 backlog](docs/V01_BACKLOG.json) for active work (the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) is a historical snapshot prior to PRs #39 to #41).
+---
 
-**Model status remains `SYNTHETIC_ALPHA`.** Teams and players are fictional. The career is one fixed T20 season. Limited-overs DLS, transfers, contracts, finances, international management are not enabled. Optional T20 tactical opponent AI is available in the match view. Browser tests cover its controls; empirical tactical quality remains unaccepted.
+## Table of Contents
 
-## Player-facing management loop
+1. [Quick Start & Packaging](#quick-start--packaging)
+2. [What Has Been Built (V0.1 + Stages 2 to 9)](#what-has-been-built-v01--stages-2-to-9)
+3. [Architecture & Engineering Invariants](#architecture--engineering-invariants)
+4. [Full Future Roadmap (Stages 10 to 17 & Research Track)](#full-future-roadmap-stages-10-to-17--research-track)
+5. [Complete Instructions for AIs to Continue Building](#complete-instructions-for-ais-to-continue-building)
+6. [Verification Gates & Evidence](#verification-gates--evidence)
+7. [Maintained Documentation Index](#maintained-documentation-index)
 
-The default web route opens the management career. A player can:
+---
 
-- choose one of the eight frozen fictional teams;
-- use Home, Career, Squad, Fixtures, Statistics and Settings screens;
-- inspect availability, fatigue and temporary readiness;
-- set REST, batting, bowling or fielding practice;
-- advance to the next managed fixture without silently passing it;
-- simulate that fixture through the accepted `LC_T20_MATCH_V1` engine, or launch the existing interactive T20 match UI;
-- follow the authoritative Pass 12E table, exact NRR and player statistics;
-- persist locally through the existing Pass 12F IndexedDB repository;
-- export/import the existing portable `.lcxxvi` season archive;
-- finish all 14 rounds / 56 fixtures and create the immutable final season archive.
+## Quick Start & Packaging
 
-The fixture autopilot remains the transparent deterministic baseline completion policy. It is not presented as tactical captain AI. In interactive T20 matches, the captain dropdown optionally delegates one team to public-information-only, deterministic AI decisions. The user still advances balls; AI commands are persisted in the original match event/command stream.
-
-## Architecture
-
-There is one cricket truth. React is a projection/controller only. `CareerApplicationService` orchestrates the accepted schedule, career condition/training, shared T20 fixture execution, season projections and Pass 12F persistence. Scoring, deterministic random addressing, probability models, format engines and save dispatch are protected compatibility boundaries. The repository has evolved since Pass 12F; use Git history and revision-specific verification for preservation claims.
-
-Scheduled interactive matches use the existing T20 controller with the immutable fixture seed, ground and XI snapshot. A terminal interactive result is returned through the same canonical `USER_MATCH` season-completion boundary used by the management service.
-
-## Verification
-
-Useful gates:
+Requirements: **Node.js `>=22.12.0`**, **npm**, and **Python 3** (for deterministic vector checks and `verify:09:core`).
 
 ```sh
-npm run schemas:check
+npm ci
 npm run build
-npm run typecheck
-npm run lint
-npm test
-npm run management:acceptance
-npm run test:m6g
+node start.mjs
 ```
 
-The deterministic headless M6G acceptance completes exactly 56 fixtures with 14 `USER_MATCH` boundaries and 42 off-screen fixtures, reconciles all condition applications and projections, seals the final state/archive, and round-trips the portable season.
+Then open **`http://127.0.0.1:4180/`** in a modern browser. Because the game uses Web Workers (`apps/web/src/match/match.worker.ts`, `determinism.worker.ts`), serve `apps/web/dist` over HTTP (`node start.mjs` or `npm run dev`) rather than opening `index.html` directly via `file://`.
 
-The earlier browser-policy blocker is superseded by recorded Linux and hosted Windows Chromium/Firefox results.
-These cover match UI, layouts, career reload and archive import into a fresh browser context.
-Hosted Windows results do not establish automation on the owner’s PC.
+- **Development server**: `npm run dev`
+- **Shareable offline zips**: `npm run package:game` (writes playable and source zips to `release-packages/`)
+- **Full core verification**: `npm run verify:09:core`
+- **Browser E2E verification**: `npx playwright install chromium firefox && npm run test:ui`
 
-Sam reports a successful Windows Edge match, layout check and repeat replay verification.
-[The human record](docs/M3_HUMAN_ACCEPTANCE.md) identifies the remaining unrecorded checklist details.
+---
 
-See `docs/CAPABILITY_MATRIX.md`, `docs/MANAGEMENT_UI.md`, `docs/verification-pass12gr/` and `docs/NEXT_PASS.md`.
+## What Has Been Built (V0.1 + Stages 2 to 9)
 
-## Historical research records
+### Core Simulation & Match Formats (Stage 1 / V0.1, `accepted`)
 
-The sections below describe individual passes. Later acceptance evidence is summarised in [current status](docs/CURRENT_STATUS.md).
+- **Single Authoritative Cricket Truth**: Pure deterministic TypeScript engines (`@lcxxvi/domain`, `@lcxxvi/simulation`) running inside a dedicated Web Worker, while React (`apps/web`) acts strictly as a projection and command layer.
+- **Three Playable Formats**:
+  - **T20 (`LC_T20_MATCH_V1`)**: Authoritative 20-over matches (including career fixtures and interactive mode).
+  - **ODI**: 50-over limited-overs exhibitions with fielding circle/powerplay rules.
+  - **Five-Day Red Ball**: Multi-day test-style exhibitions featuring declarations, follow-ons, new-ball rules, workload tracking, and deterministic 30-minute weather segments with uncertain forecasts.
+- **Deterministic Randomness & Hashing**: Seeded splitmix/FNV/SHA-256 hash-chained delivery event logs (`LC_T20_MATCH_V1`), integer-mass probability tables, cross-checked against independent Python verification vectors (`scripts/check-determinism-vectors.py`, `scripts/reference_probability.py`, `scripts/check-generator-vectors.py`).
+- **Tactical Captain AI & Granular Delegation**: Optional public-information-only deterministic tactical captains for all three formats plus 6-category granular T20 delegation (`DELEGATION_JOURNAL`), clearly separated from the baseline off-screen fixture autopilot.
+- **Durable Saves, Crash Recovery & Portable Archives**:
+  - IndexedDB storage (`@lcxxvi/persistence`) with writer leases, checkpoints (`3` generations inspectable/recoverable), durable managed-match bindings (`managed-binding:<matchGameId>`) surviving closed tabs, and `.lcxxvi` portable archive export/import.
+  - Completed career fixtures seal ball-by-ball event logs (`CAREER_MATCH_EVENTS_V1`) for exact deterministic replay without recomputing outcomes.
+- **World Editing, Imported Rosters, Offline PWA & Accessibility**:
+  - Validated immutable presentation copies for team/player names and colours, `8 MiB` imported roster packs, precached offline shell with safe mid-match update deferral, `/engineering.html` recovery surface, and automated keyboard/contrast/`150%` zoom audits.
 
-## M7B bounded development
+### Stage 2: Persistent Multi-Season World (`S02-01`, `accepted`)
 
-A public-data reference ingestion script is included at `scripts/m7b-reference.py`. Run against a locally downloaded Cricsheet JSON ZIP (not bundled):
+- **Consecutive Seasons (`LC_PERSISTENT_WORLD_V1`)**: Transitions smoothly beyond Season 1 across 14-round, 56-fixture T20 seasons with stable `worldId`, `teamId`, `playerId`, and `groundId` identities, rotated home/away parity, and derived per-season seeds.
+- **Immutable Roll of Honour & Cross-Season Replay**: Seals completed seasons into `LC_COMPLETED_SEASON_RECORD_V1`, stores cross-season replay archives keyed by `${seasonNumber}:${fixtureId}`, and exposes `LC_PERSISTENT_WORLD_PORTABLE_V1` `.lcxxvi` archives (`160 MiB` bound).
+- **Crash-Safe Atomic Rollover**: Single-transaction IndexedDB rollover with idempotent receipts (`PERSISTENT_WORLD_ROLLOVER_RECEIPTS_V1`), checkpoint fallback recovery, and explicit non-destructive `Begin Season 2 in a new persistent save` upgrade for legacy V0.1 saves.
 
-```sh
-python3 scripts/m7b-reference.py --input /path/to/ipl_json.zip --out reference.json
-node --import tsx scripts/audit-m7b-quality.ts --matches=16 > paired-quality.json
-```
+### Stage 3: Player Lifecycle & Youth Pathway (`S03-01`, `accepted`)
 
-Cricsheet JSON data licensing: https://cricsheet.org/licensing/ (Open Data Commons Attribution). Preserve attribution and dataset notices if publishing/reference redistributing. At M7B, no real data had been fitted and browser gates were blocked. Later passes add offline research only.
+- **Exploit-Proof Off-Season Progression (`LC_PLAYER_LIFECYCLE_MODEL_FICTIONAL_V1`)**: Separates temporary daily readiness edits from permanent off-season skill growth driven strictly by elapsed calendar days and match appearances (`parameterProvenance: "FICTIONAL_GAMEPLAY_PLACEHOLDER"`).
+- **Ageing, Retirements & Club Role Floors**: Players age `+1` each season and retire deterministically while enforcing club viability invariants (`18..22` squad size, `>= 1` wicketkeeper, `>= 5` bowling-capable players), keeping retired players inspectable in **Retired Alumni** and **PlayerPage**.
+- **Youth Academy & 20-Season Diagnostics**: Generates `17..20`-year-old academy prospects for pre-Round-1 promotion or queued off-season graduation; verified across a 20-season diagnostic horizon with `0` role shortages.
+- **Per-Season Roster Snapshots (`LC_PERSISTENT_WORLD_V2_LIFECYCLE`)**: Archives preserve exact historical rosters (`LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE`) so replays remain exact even after transfers or retirements.
 
-## Pass 15 / M7C offline T20 calibration gate
+### Stage 4: Contracts, Budgets & Recruitment (`S04-01`, `accepted`)
 
-Run `node --import tsx scripts/m7c-synthetic.ts --matches=96 > m7c-synthetic.json`
-to produce an immutable-model first-innings/phase diagnostic; use
-`python3 scripts/m7c-calibration.py extract|compare` with a separately
-acquired reference archive on an authorised host. Details, limitations and
-mandatory holdout checks are in `docs/M7C_CALIBRATION_RUNBOOK.md` and
-`docs/decisions/ADR-027-M7C-CALIBRATION-GATE.md`. M7C has not fitted or enabled
-new coefficients, and the game remains `SYNTHETIC_ALPHA`.
+- **Symmetrical Club Wage Caps & Contracts (`LC_PERSISTENT_WORLD_V3_ECONOMY`)**: `$2,500k` annual domestic wage cap across all 8 clubs, 1 to 3 season contracts, renewal negotiations, and contract buyouts (`50%` annual wage cap charge preventing release-and-sign cap circumvention).
+- **3-Round Pre-Season Negotiation Window & Free-Agent Market**: Persistent multi-round bidding with cap reservations, counter-offers, `commandId` idempotency, and symmetrical AI club recruitment reading strictly public stats and squad role needs (`0` hidden future-ability reads).
+- **SHA-256 Hash-Chained Financial Ledger & 12-Season Diagnostics**: Auditable contract ledger (`verifyEconomyLedgerChain`), cross-season club-transfer career projection tracking, non-destructive V2 -> V3 slot upgrade, and a 12-season economy diagnostic verified with `0` overspent clubs and `0` role shortages.
 
-## Pass 18 / M7F joint empirical envelope (offline research only)
+### Stage 5: Tactical Briefings & Feedback (`S05-01`, `accepted`)
 
-Cricsheet training deliveries are fitted into an immutable integer-normalised
-joint category model (`LC_T20_JOINT_ENVELOPE_RESEARCH_V1`) conditioned on T20
-phase and wickets lost. Python fitting and TypeScript research sampling agree
-on deterministic vectors; the pack is held separately from the accepted game
-model. M7F reference: Cricsheet, https://cricsheet.org/ , ODC-By 1.0,
-https://cricsheet.org/licensing/ . The dataset was user uploaded, not
-independently authenticated or redistributed in this source package.
+- **Optional Pre-Match Briefings (`LC_TACTICAL_BRIEFING_V1`)**: Pitch seam/spin priors, pitch classification, format rules, explicit `SYNTHETIC_ALPHA` model-limit disclosure, XI role balance, squad fatigue/readiness, and public opponent scouting observations with zero hidden rating/ceiling/seed reads.
+- **In-Match Tactical Assistant & Contextual Presets**: Plain-language upside and risk trade-offs for all 7 tactical controls plus one-click legal presets across `T20`, `ODI`, and `RED_BALL`.
+- **Factual Post-Spell & Batting-Stint Reviews**: Incremental and rebuildable spell/stint outcome summaries paired beside the accepted plan without invented causal claims, plus a persistent `Tactical briefings` toggle (`Shown`/`Hidden`) that never alters worker `revision` or RNG draws.
 
-To reproduce offline, use `bash scripts/m7f-run.sh /path/to/t20s_json.zip`.
-The derived candidate and deterministic vectors are in `tests/fixtures/`,
-with full limitations in `docs/decisions/ADR-028-M7F-JOINT-RESEARCH.md`.
-This research sampler does **not** produce the scorer's full delivery format,
-and no model has been promoted to gameplay or to `EMPIRICALLY_VALIDATED`.
-Historical saves continue to use `synthetic-alpha-01` unchanged.
+### Stage 6: Live Field & Highlight Pacing (`S06-01`, `accepted`)
 
-## Pass 19 / M7G: empirical joint scoring research (not gameplay)
+- **2D SVG Live Cricket Field (`LC_FIELD_PRESENTATION_V1`)**: Responsive named-position field across `T20`, `ODI`, and `RED_BALL` with dynamic `RHB`/`LHB` off/leg mirroring, live powerplay infield/outfield legality diagnostics, and keyboard-accessible preset controls.
+- **Illustrative Highlights & Pacing Modes**: `Every ball`, `Key moments`, and `Fast / skip` modes plus `Reduced motion` (`FULL`/`REDUCED`) driven by an isolated FNV-1a presentation seed (`ILLUSTRATIVE_SECTOR_AND_LENGTH`), clean fallback when sector telemetry is absent, and verified byte-identical final state and event hashes across all pacing modes.
 
-The offline-only candidate `LC_T20_SCORING_COMPONENTS_RESEARCH_V1` is documented in [`docs/M7G_RESEARCH_AND_PROMOTION_GATES.md`](docs/M7G_RESEARCH_AND_PROMOTION_GATES.md). It models observed T20 first-innings scoring components and five train-inferred scoring regimes, using a real Cricsheet match-level train/holdout separation. The frozen `synthetic-alpha-01` production model, save versions, random service, scoring kernel, ODI and red-ball remain unchanged. This is **not** an empirically calibrated gameplay update.
+### Stage 7: Contextual Text Commentary (`S07-01`, `accepted`)
 
-To reproduce after obtaining the Cricsheet ZIP from its authorised source, run `bash scripts/m7g-run.sh /absolute/path/to/t20s_json.zip`. The original downloaded/uploaded archive is not included in the source package. Cricsheet attribution and ODC-By licence information: https://cricsheet.org/ and https://cricsheet.org/licensing/.
+- **Shared Fact-Checked Commentary Adapter (`LC_COMMENTARY_ADAPTER_V1`)**: Single pure projection adapter (`packages/projections/src/commentary.ts`) across `T20`, `ODI`, and `RED_BALL` with FNV-1a presentation variation, sliding repetition cooldowns, `factSlots` provenance tracing, format-gated free-hit rules (`T20`/`ODI` only), and milestone badges.
+- **Four Verbosity Modes**: `Standard`, `Detailed`, `Brief`, and `Off` synced between Match Header and Career Settings with `0` network calls.
 
-## Pass 20 / M7H: empirical two-innings research (NOT playable model)
+### Stage 8: Optional Sound & Narration (`S08-01`, `accepted`)
 
-M7H adds a **research-only** target-aware second-innings T20 scoring model and player-history predictive evaluation. Rebuild them from the user-supplied Cricsheet JSON archive (ODC-By 1.0, attribution: https://cricsheet.org/, licence details: https://cricsheet.org/licensing/):
+- **Original Procedural Web Audio & Captions (`LC_AUDIO_PRESENTATION_V1`, `LC_AUDIO_PROVENANCE_V1`)**: 10 original MIT-licensed Web Audio synthesis profiles with SHA-256 provenance manifest, 4-channel mixer (`Crowd`, `Effects`, `Commentary`, `Interface`), mute toggle, optional browser spoken narration, and live ARIA status captions (`role="status"`, `aria-live="polite"`).
+- **Resilient Playback**: User-gesture gating, reload cue deduplication, fast-forward burst expiry, background-tab suppression, graceful decode fallback, and verified byte-identical simulation hashes.
 
-```sh
-bash scripts/m7h-run.sh /absolute/path/to/t20s_json.zip
-```
+### Stage 9: Historical Statistics & Leaderboards (`S09-01`, `accepted`)
 
-The offline command regenerates M7G and M7H in `reference/m7g/` and `reference/m7h/`, audits Cricsheet player registry/exposure and runs research-only Python/TypeScript tests. It does **not** change the executable cricket probability model, player ratings, scoring engine or saves. The original ZIP is not included in source/release packages.
+- **Rebuildable Multi-Season Projections (`LC_HISTORICAL_STATISTICS_PROJECTION_V1`)**: Exact incremental-vs-rebuild parity over sealed season records and `CAREER_MATCH_EVENTS_V1` archives, deduplicating fixtures by `${seasonNumber}:${fixtureId}`, preserving retired alumni and cross-club transfers, and strictly isolating career stats from exhibitions, scenarios, and imported non-career histories.
+- **Multi-Dimensional Filters & 12 Qualified Leaderboards**: Filter by Season scope, Competition, Club, Opponent, Venue, Batting position band/slot (`1..11`), and Player status (`All`/`Active`/`Retired`), displaying 12 leaderboards with explicit qualification thresholds, null denominators (`—` instead of `0`/`NaN`), shared-rank ties, extracted catches/stumpings/run-outs, and clickable **`View replay`** links to contributing matches.
 
-M7H fits a 5-regime second-innings model using training-match data, wickets lost, phase and pre-delivery required scoring rate. It separately simulates 400 two-innings matches with a target, stops on a successful chase and checks scorer-compatible categories in TypeScript. It reports excluded unusual events and unseen holdout categories rather than mapping them to invented cricket outcomes. The already-reviewed Cricsheet holdout is **development validation, not a pristine final test**. Player-history binary predictors use a fixed 300-attempt prior and Cricsheet stable registry IDs. Even when predictive log-loss improves, those marginals are **not** empirically identified 0–100 skills or captain tactical effects.
+---
 
-The existing playable game **remains SYNTHETIC_ALPHA**. The remaining research gates include full delivery support, player/fielding/tactic identification, score tails and untouched final validation.
-Later browser and human evidence is summarised in [current status](docs/CURRENT_STATUS.md). See `docs/NEXT_PASS.md` and `docs/M7_PROGRESS_AND_GATES.md`.
+## Architecture & Engineering Invariants
 
-### Pass 21 / M7I research audit (not gameplay)
+| Package / App | Responsibility | Key Boundary Rules (`scripts/check-boundaries.mjs`) |
+| --- | --- | --- |
+| `packages/contracts` | Zod + strict AJV 2020-12 JSON Schemas (`325` schemas) & versioned protocol types | Only imports `zod`; no ambient browser/clock/RNG APIs |
+| `packages/domain` | Frozen delivery scoring kernel (`scoring-kernel.ts`), resolution validator, innings ledger | Only imports `@lcxxvi/contracts` (+ `@lcxxvi/contracts/m7j`); zero ambient APIs |
+| `packages/data` | Frozen fictional 8-team/160-player/8-ground pack, probability LUTs, rules | Only imports `@lcxxvi/contracts`; zero ambient APIs |
+| `packages/simulation` | Authoritative `T20`/`ODI`/`RED_BALL` engines, splitmix/SHA-256 RNG, lifecycle, economy, rollover | Imports `@lcxxvi/contracts`, `@lcxxvi/data`, `@lcxxvi/domain`, `@noble/hashes`; deterministic only |
+| `packages/ai` | Deterministic public-observation captains (`t20`, `odi`, `red5`) | Only imports `@lcxxvi/contracts`; zero hidden rating/seed reads |
+| `packages/projections` | Pure rebuildable UI/analytics projections (season, historical stats, briefings, field, commentary, audio cues) | Only imports `@lcxxvi/contracts`; zero ambient browser/clock/RNG APIs |
+| `packages/persistence` | IndexedDB repositories, leases, checkpoints, bindings, `.lcxxvi` export/import | Imports `@lcxxvi/contracts`; sole package permitted `indexedDB`/`window`/`document` |
+| `apps/web` | React + Vite + Web Worker UI, match/career controllers, Web Audio synth, PWA shell | Presentation & command dispatch only; never simulates deliveries directly |
+| `apps/batch` | Headless Node batch runner & diagnostics | Consumes workspace packages |
 
-M7I adds source-faithful rare-delivery exception registration, target-conditioned chase lower-tail diagnostics, and predictive player-history generalisation tests. None changes the accepted scorer, match generator or saved careers. To reproduce from the separately supplied Cricsheet `t20s_json.zip` archive:
+---
 
-```bash
-bash scripts/m7i-run.sh /absolute/path/to/t20s_json.zip
-```
+## Full Future Roadmap (Stages 10 to 17 & Research Track)
 
-It rebuilds M7H research inputs if missing, validates the source archive hash, and writes `reference/m7i/*.json`. Licensed archive remains outside the source package. See ADR-031 and `docs/NEXT_PASS.md`. Gameplay promotion remains open. See [current status](docs/CURRENT_STATUS.md) for later browser acceptance.
+See [`docs/ROADMAP_AND_AI_GUIDE.md`](docs/ROADMAP_AND_AI_GUIDE.md) and [`docs/MASTER_BUILD_LEDGER.md`](docs/MASTER_BUILD_LEDGER.md) for the complete stage-by-stage technical specifications and dependency graph:
 
-## Pass 22 / M7J: versioned rare-event adjudication (research only)
+| Stage | Deliverable | Status | Scope & Dependencies |
+| --- | --- | --- | --- |
+| **Stage 10** | **Match & season awards** (`S10-01`) | **Next eligible** | Transparent versioned Player of the Match heuristic (batting, bowling, attributable fielding; losing-side winner & no-result support; explicit game-award labelling; idempotent persistence) + qualified season awards (Batter, Bowler, MVP, Emerging/Youth) integrated into Season Close, Roll of Honour, Statistics, and PlayerPage. |
+| **Stage 11** | **Player & manager stories** | Planned (`deps: 4, 9, 10`) | Structured career milestones, form streaks, contract tension & press/board moments derived from committed career facts without fabricated biographies. |
+| **Stage 12** | **Fictional scenario mode** | Planned (`deps: 5, 6, 7`) | Player-facing isolated scenario challenges (chase targets, collapses, red-ball fourth-innings saves) with clear win objectives and personal-best records, strictly separated from career saves. |
+| **Stage 13** | **Historical scenarios & provenance** | Partial / Blocked (`deps: 12 + data review`) | Player-facing sourced historical scenarios layered over `scripts/research/m7k-historical-fixture.ts`, gated on source permissions and rules adjudication review. |
+| **Stage 14** | **Empirical evaluation & rules expansion** | Blocked (`RES-001`..`RES-003`) | Empirical calibration promotion (`M7F`–`M7K` offline research -> calibrated model version), Super Overs, DLS/rain-adjusted limited-overs targets, and DRS reviews; blocked externally on approved licensed dataset, adjudications, and untouched holdout cohort. |
+| **Stage 15** | **Custom competitions & community packs** | Partial (`deps: 4, 9, 13`) | Custom league structures, tours/bilateral series, auction/draft packs, international release rules, and validated crest/kit/ground asset packs extending existing `8 MiB` roster import & world editing. |
+| **Stage 16** | **Product-quality acceptance** | Partial | Real multi-participant observed playtests ([`docs/PLAYTEST_SCRIPT_STAGE05.md`](docs/PLAYTEST_SCRIPT_STAGE05.md)), measured reference-hardware & owner-PC runs (`<= 768 MiB`), long-career storage soak benchmarks, and formal screen-reader walkthrough transcripts. |
+| **Stage 17** | **Release-candidate preparation** | Partial | Updated post-expansion release manifest (`RELEASE_RECORD.json`), signed/reproducible `npm run package:game` Windows/Linux/macOS bundle checks, and explicit owner deployment authorisation. |
 
-M7J adds `LC_T20_EXCEPTION_ADJUDICATION_RESEARCH_V2` with four additive
-strict JSON schemas under research-only package subpaths and a pure administrative-event boundary. Ordinary
-balls still use the frozen `scoreDelivery` and `reduceScoringBoundary` functions.
-It can represent independently confirmed five-run penalties and dead-ball
-batting retirements without adding a legal ball or mis-crediting bowlers.
-The existing scorer already supports wide plus hit wicket. The M7I register of
-69 source exceptions is routed to explicitly documented adjudication or
-conflict queues; **zero are automatically repaired or approved**.
+---
 
-Reproduce the new audit and focused tests:
+## Complete Instructions for AIs to Continue Building
 
-```sh
-npm run m7j:adjudication
-npm run m7j:test
-```
+If you are an AI coding agent or engineer continuing Lord Cricket XXVI, follow this exact workflow:
 
-This is **not** a new selectable gameplay model, a changed live scoring rule,
-or 69/69 event acceptance. Source JSON alone does not establish umpire signals,
-chronology or attribution of every rare event. The current playable
-`synthetic-alpha-01` and historical saves remain unchanged. See
-`docs/M7J_RUNBOOK.md` and ADR-032. Cricsheet data: https://cricsheet.org/,
-ODC-By 1.0: https://cricsheet.org/licensing/.
+1. **Read the governance chain in order before editing**:
+   - [`AGENTS.md`](AGENTS.md) -> [`docs/ROADMAP_AND_AI_GUIDE.md`](docs/ROADMAP_AND_AI_GUIDE.md) -> [`docs/AI_CONTINUATION.md`](docs/AI_CONTINUATION.md) -> [`docs/MASTER_BUILD_LEDGER.md`](docs/MASTER_BUILD_LEDGER.md) -> [`docs/NEXT_PASS.md`](docs/NEXT_PASS.md) -> [`docs/OWNER_DECISIONS_2026-11-13.md`](docs/OWNER_DECISIONS_2026-11-13.md).
+2. **Always rebuild TypeScript project references after pulling or switching branches**:
+   ```sh
+   npx tsc -b
+   ```
+   *(Future engineers and AIs take note: skipping `npx tsc -b` leaves stale compiled `dist/` files that cause confusing runtime/type errors — as our Hungarian-to-English phrasebook warns, "**My hovercraft is full of Eels**" whenever someone trusts an outdated `dist/` folder without rebuilding first.)*
+3. **Respect every hard invariant**:
+   - **Never mutate frozen engines or saves silently**: `packages/domain/src/scoring-kernel.ts`, `LC_T20_MATCH_V1`, deterministic RNG stream addresses, probability LUTs, and existing save formats (`V1`, `V2`, `V3`) are protected compatibility boundaries. Any new persisted state needs a new explicit schema version ID and non-destructive slot upgrade.
+   - **Respect package boundaries (`scripts/check-boundaries.mjs`)**: No `Date`, `Date.now()`, `Math.random()`, `window`, `document`, `fetch`, or `indexedDB` inside `contracts`, `domain`, `data`, `simulation`, `ai`, or `projections`. Pass timestamps/seeds explicitly as arguments.
+   - **Update schemas whenever contracts change**: Run `npm run schemas` to regenerate `packages/contracts/schemas/*.json`, then commit the generated JSON Schemas and confirm `npm run schemas:check` passes.
+   - **No skipped browser tests (`test.skip`)**: Hosted Windows CI treats skipped tests as `INCOMPLETE_BROWSER_EVIDENCE`.
+   - **Never read hidden state in AI or presentation**: Tactical captains, briefings, AI contract recruitment, commentary, and audio cues must read strictly public match/career observations (`0` hidden future-ability/ceiling/seed reads).
+4. **Required verification before claiming a stage is `tested`**:
+   ```sh
+   npm run verify:09:core
+   MOZ_DISABLE_CONTENT_SANDBOX=1 npx playwright test --config=playwright.ui.config.ts tests/ui/<your-stage>.spec.ts tests/ui/accessibility-release-audit.spec.ts
+   npx vitest run tests/unit/release-record.test.ts
+   ```
+5. **Branch, PR & Handover Discipline**:
+   - Branch cleanly from `main` (e.g., `feat/stage10-match-season-awards`). Never push unreviewed commits directly to `main`.
+   - Record exact commands, environments, revision SHAs, and results (`PASS`/`FAIL`/`BLOCKED`/`NOT RUN`) in `docs/verification-stageXX-<slug>/REPORT.md`, and update `docs/MASTER_BUILD_LEDGER.md`, `docs/CURRENT_STATUS.md`, `docs/HANDOVER.md`, `docs/NEXT_PASS.md`, and `docs/CAPABILITY_MATRIX.md`.
+   - Deliver a handover report and wait for explicit owner stage acceptance before starting dependent stages.
 
+---
 
-## M7 scenario quality harness
+## Verification Gates & Evidence
 
-Run `npm run m7:scenarios -- --seeds-per-cell=2 --out=scenarios.json` after building.
-The developer tool compares existing baseline/tactical policies across all eight teams and grounds.
-It preserves accepted event/scorecard hashes and separates first innings from chase endings.
-See [SCENARIO_QUALITY_HARNESS.md](docs/SCENARIO_QUALITY_HARNESS.md) for scope, results and limits.
-This adds a reproducible quality tool; it does not change the playable scoring model.
+Key verification scripts in `package.json`:
 
-## Maintained documentation
+- `npm run schemas:check` — Validates all Zod contracts against committed JSON Schemas (`325` schemas as of Stage 9).
+- `npm run build` — Runs `tsc -b`, Vite production web build, and Vite runtime bundle build.
+- `npm run typecheck` — Checks workspace `tsc -b` and `tsconfig.tools.json`.
+- `npm run lint` — Runs ESLint and `scripts/check-boundaries.mjs` across all 7 workspace packages.
+- `npm run verify:09:core` — Full offline gate: schemas, build, typecheck, lint + boundaries, scorer fixtures (`45` + `29` rejections), Python determinism/probability/generator vectors, and Vitest unit suite.
+- `npm run test:ui` — Full Chromium + Firefox Playwright UI suite (`1366x768`, keyboard nav, `150%` text scale).
+- `npm run management:acceptance` — Headless 56-fixture career acceptance with `14` `USER_MATCH` boundaries and `.lcxxvi` round-trip.
 
-See the [documentation index](docs/README.md), [engineering guide](docs/ENGINEERING_GUIDE.md), and [AI-only continuation guide](docs/AI_CONTINUATION.md). Read the [11 November GitHub audit](docs/GITHUB_AUDIT_2026-11-11.md) before relying on older queue snapshots.
+---
+
+## Maintained Documentation Index
+
+- **[Full Roadmap & AI Continuation Playbook](docs/ROADMAP_AND_AI_GUIDE.md)** — Complete architecture map, Stages 10–17 technical blueprint, and step-by-step AI guide
+- **[AI-Only Continuation Guide](docs/AI_CONTINUATION.md)** & **[AI Inspection Prompt](docs/AI_INSPECTION_PROMPT.md)**
+- **[Master Build Ledger (Stages 1–17)](docs/MASTER_BUILD_LEDGER.md)**
+- **[Owner Decisions](docs/OWNER_DECISIONS_2026-11-13.md)** & **[Capability Matrix](docs/CAPABILITY_MATRIX.md)**
+- **[Current Status](docs/CURRENT_STATUS.md)**, **[Handover](docs/HANDOVER.md)**, & **[Next Pass](docs/NEXT_PASS.md)**
+- **[Engineering Guide](docs/ENGINEERING_GUIDE.md)**, **[Verification Guide](docs/VERIFICATION_GUIDE.md)**, & **[Documentation Index](docs/README.md)**
+- **Offline Empirical Research (`M7B`–`M7K`, not selectable in gameplay)**: See [`docs/M7G_RESEARCH_AND_PROMOTION_GATES.md`](docs/M7G_RESEARCH_AND_PROMOTION_GATES.md), [`docs/M7J_RUNBOOK.md`](docs/M7J_RUNBOOK.md), and [`docs/M7K_PLAN.md`](docs/M7K_PLAN.md) (Cricsheet ODC-By 1.0 reference data stays external to the repo).

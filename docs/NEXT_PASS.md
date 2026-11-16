@@ -52,7 +52,15 @@ The owner accepted Stage 8 (`S08-01`) on 16 November 2026 ([OWNER_DECISIONS_2026
 
 1. **Original provenance & zero-network cues (`LC_AUDIO_PRESENTATION_V1`, `LC_AUDIO_PROVENANCE_V1`, `309` strict JSON Schemas)**: 10 original MIT procedural synthesis profiles (`packages/projections/src/audio-cues.ts`) with deterministic `pureSha256Hex` hashes and full UI attribution drawer (`AudioControlsPanel.tsx`).
 2. **Resilient playback & complete silent/caption parity**: User-gesture gating, 4-channel volume mixer (`Crowd`, `Effects`, `Commentary`, `Interface`), mute toggle, optional spoken narration, live ARIA captions, reload cue deduplication, fast-forward expiry, background-tab suppression, graceful decode/missing-asset fallback, Career Settings sync, and verified byte-identical `eventsSha256`/`scorecardSha256`/`lastEventHash` across audio modes.
-3. **Next eligible slice**: **Stage 9 (Historical statistics and leaderboards)** (plus human playtest review of Stages 5–8).
+3. **Completed next slice**: **Stage 9 (Historical statistics and leaderboards)** is implemented and verified (`tested`) on `feat/stage9-historical-stats-leaderboards` ([verification-stage09-historical-stats/REPORT.md](verification-stage09-historical-stats/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)).
+
+## Stage 9: Historical statistics and leaderboards (`accepted`, 16 November 2026)
+
+The owner accepted Stage 9 (`S09-01`) on 16 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage09-historical-stats/REPORT.md](verification-stage09-historical-stats/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)):
+
+1. **Rebuildable career projections & 12 qualified leaderboards (`LC_HISTORICAL_STATISTICS_PROJECTION_V1`, `325` strict JSON Schemas)**: Extends `packages/projections` (`historical-stats.ts`) and `packages/contracts` with incremental-vs-rebuild parity, duplicate-fixture rejection, multi-season/transfer/retired-player retention, explicit null denominators, shared-rank ties, and 12 qualified rate/volume leaderboards across batting, bowling, and archived-event fielding.
+2. **Multi-dimensional filters, source isolation & match links**: Statistics and Player pages expose Season, Competition, Club, Opponent, Venue, Batting position band/slot, and Active/Retired filters with explicit unsupported-format notices (`ODI`/`RED_BALL` unavailable in career archives), strict separation from exhibitions/scenarios/imported histories, and clickable contributing-match links opening archived replays (`View replay`).
+3. **Next eligible slice**: **After owner Stage 9 acceptance**: **Stage 10 (Match and season awards)** — transparent versioned Player of the Match & season award projections with batting/bowling/fielding contributions, losing-side winner support, and idempotent historical persistence.
 
 ## Open items that still need people
 

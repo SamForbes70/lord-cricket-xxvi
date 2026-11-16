@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "ALL",
+    "ACTIVE",
+    "RETIRED"
+  ],
+  "$id": "urn:lcxxvi:HistoricalPlayerStatusFilter:1",
+  "title": "HistoricalPlayerStatusFilter"
+}

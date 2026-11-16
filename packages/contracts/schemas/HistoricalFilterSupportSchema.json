@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "formats": {
+      "minItems": 1,
+      "maxItems": 3,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "T20",
+          "ODI",
+          "RED_BALL"
+        ]
+      }
+    },
+    "unsupportedFormatsNote": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "competitions": {
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "competitionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "T20",
+              "ODI",
+              "RED_BALL"
+            ]
+          }
+        },
+        "required": [
+          "competitionId",
+          "label",
+          "format"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "seasons": {
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "seasonNumber": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "calendarYear": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 9999
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "COMPLETE"
+            ]
+          },
+          "matchesCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "seasonNumber",
+          "calendarYear",
+          "phase",
+          "matchesCount"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "opponents": {
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "teams": {
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+      }
+    },
+    "venues": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "coverage": {
+          "type": "string",
+          "enum": [
+            "ALL_RESOLVED",
+            "PARTIAL",
+            "UNAVAILABLE"
+          ]
+        },
+        "groundIds": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "available",
+        "coverage",
+        "groundIds",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "battingPosition": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean",
+          "const": true
+        },
+        "bands": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "ALL",
+              "OPENER",
+              "TOP_ORDER",
+              "MIDDLE_ORDER",
+              "LOWER_ORDER"
+            ]
+          }
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "available",
+        "bands",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "fielding": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "archiveCoverageCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalMatchesCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "coverage": {
+          "type": "string",
+          "enum": [
+            "ALL_ARCHIVED",
+            "PARTIAL_ARCHIVES",
+            "UNAVAILABLE"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      },
+      "required": [
+        "available",
+        "archiveCoverageCount",
+        "totalMatchesCount",
+        "coverage",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "formats",
+    "unsupportedFormatsNote",
+    "competitions",
+    "seasons",
+    "opponents",
+    "teams",
+    "venues",
+    "battingPosition",
+    "fielding"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:HistoricalFilterSupport:1",
+  "title": "HistoricalFilterSupport"
+}

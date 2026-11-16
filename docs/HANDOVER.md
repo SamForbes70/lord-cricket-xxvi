@@ -31,10 +31,11 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 **Known limits:** [release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json) (`knownLimits`), and [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md) for the review of the unreviewed commits.
 
 | Stage 8 (Optional sound & narration) | `accepted` on `main` (16 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage08-optional-sound/REPORT.md](verification-stage08-optional-sound/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): `LC_AUDIO_PRESENTATION_V1` + `LC_AUDIO_PROVENANCE_V1` original MIT procedural synthesis cues, 4-channel mixer + mute + narration + live ARIA captions, user-gesture gate, reload deduplication, fast-forward expiry, background-tab suppression, missing/decode fallback, and byte-identical simulation hashes. |
+| Stage 9 (Historical statistics & leaderboards) | `accepted` on `main` (16 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage09-historical-stats/REPORT.md](verification-stage09-historical-stats/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): `LC_HISTORICAL_STATISTICS_PROJECTION_V1` rebuildable career projections (`325` JSON Schemas, `767/767` unit tests, `6/6` Chromium + Firefox UI tests), 12 qualified leaderboards with explicit denominators/nulls/ties, multi-dimensional filters (season, competition, club, opponent, venue, batting position, active/retired status), fielding records from event archives, source separation, incremental-vs-rebuild parity, and clickable contributing-match replay links. |
 
 ## What is next
 
-1. **Stage 9: Historical statistics and leaderboards** (plus optional multi-participant sessions using [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)). See [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) and [NEXT_PASS.md](NEXT_PASS.md).
+1. **Proceed to Stage 10: Match and season awards (`S10-01`)** (plus optional multi-participant playtests using [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)). See [ROADMAP_AND_AI_GUIDE.md](ROADMAP_AND_AI_GUIDE.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), and [NEXT_PASS.md](NEXT_PASS.md).
 2. The owner applies branch protection ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
 3. Optionally, real measurements for the three declared gates.
 

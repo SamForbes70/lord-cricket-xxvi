@@ -4,11 +4,18 @@ import type {
   AudioPreferences,
   HighlightMotionMode,
   HighlightPacingMode,
+  HistoricalBattingPositionBand,
+  HistoricalLeaderboardMetric,
+  HistoricalPlayerStatusFilter,
   SeasonCheckpointInspection,
   T20SeasonMatchCompletion,
   TrainingDirective,
 } from "@lcxxvi/contracts";
-import { MAX_ACTIVE_TEAM_SQUAD_SIZE, MIN_ACTIVE_TEAM_SQUAD_SIZE } from "@lcxxvi/contracts";
+import {
+  HistoricalLeaderboardMetricSchema,
+  MAX_ACTIVE_TEAM_SQUAD_SIZE,
+  MIN_ACTIVE_TEAM_SQUAD_SIZE,
+} from "@lcxxvi/contracts";
 import {
   CareerApplicationService,
   careerWorld,
@@ -154,6 +161,15 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   });
   const [statsScope, setStatsScope] = useState<StatsScope>("ACTIVE");
   const [historySeasonView, setHistorySeasonView] = useState<number | null>(null);
+  const [historicalOpponent, setHistoricalOpponent] = useState<string>("ALL");
+  const [historicalVenue, setHistoricalVenue] = useState<string>("ALL");
+  const [historicalBattingPosition, setHistoricalBattingPosition] =
+    useState<HistoricalBattingPositionBand>("ALL");
+  const [historicalPlayerStatus, setHistoricalPlayerStatus] =
+    useState<HistoricalPlayerStatusFilter>("ALL");
+  const [historicalLeaderboardMetric, setHistoricalLeaderboardMetric] =
+    useState<HistoricalLeaderboardMetric>("RUNS");
+  const [careerArchivesVersion, setCareerArchivesVersion] = useState(0);
   const [freeAgentRoleFilter, setFreeAgentRoleFilter] = useState<string>("ALL");
   const [ledgerScope, setLedgerScope] = useState<"MANAGED" | "ALL">("MANAGED");
   const [offerDrafts, setOfferDrafts] = useState<
@@ -260,6 +276,16 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   useEffect(() => {
     if (activeReplay) replayPanelRef.current?.focus();
   }, [activeReplay]);
+  useEffect(() => {
+    if (screen !== "STATISTICS" && screen !== "PLAYER") return;
+    let alive = true;
+    void service.loadCareerEventArchives().then(() => {
+      if (alive) setCareerArchivesVersion((v) => v + 1);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [screen, state, persistentWorld]);
   useEffect(() => {
     let alive = true;
     async function afterBoot(): Promise<void> {
@@ -492,6 +518,33 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     () => new Map(state?.completedMatches.map((completion) => [completion.fixtureId, completion]) ?? []),
     [state],
   );
+  const persistentWorldRef = service.getPersistentState();
+  const historicalSeasonScope = useMemo(() => {
+    if (typeof statsScope === "number") return statsScope;
+    if (statsScope === "ACTIVE" && persistentWorldRef) {
+      return "ACTIVE" as const;
+    }
+    return "ALL" as const;
+  }, [statsScope, persistentWorldRef]);
+  const historicalProjection = useMemo(() => {
+    if (!state) return null;
+    return service.historicalStatistics({
+      seasonScope: historicalSeasonScope,
+      opponentTeamId: historicalOpponent,
+      venueGroundId: historicalVenue,
+      battingPositionBand: historicalBattingPosition,
+      playerStatus: historicalPlayerStatus,
+    });
+  }, [
+    state,
+    persistentWorldRef,
+    careerArchivesVersion,
+    historicalSeasonScope,
+    historicalOpponent,
+    historicalVenue,
+    historicalBattingPosition,
+    historicalPlayerStatus,
+  ]);
   const team = displayWorld.teams.find((candidate) => candidate.teamId === controlledTeam) ?? null;
   const tableRow = state?.projection.table.find((row) => row.teamId === controlledTeam) ?? null;
   const activeError = uiError || service.getError();
@@ -1954,6 +2007,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       {screen === "STATISTICS" && (
         <section aria-labelledby="statistics-heading">
           <h2 id="statistics-heading">Statistics</h2>
+          {replayViewerSection}
           {persistentWorld && (
             <div
               className="action-row scope-bar"
@@ -2244,6 +2298,375 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 </div>
               );
             })()
+          )}
+
+          {historicalProjection && (
+            <section
+              className="career-panel"
+              aria-labelledby="historical-records-heading"
+              data-testid="historical-records-panel"
+              style={{ marginTop: "22px" }}
+            >
+              <div className="section-bar">
+                <h3 id="historical-records-heading">
+                  Historical records, filters &amp; qualified leaderboards
+                </h3>
+                <button
+                  type="button"
+                  data-testid="reset-historical-filters-btn"
+                  onClick={() => {
+                    setHistoricalOpponent("ALL");
+                    setHistoricalVenue("ALL");
+                    setHistoricalBattingPosition("ALL");
+                    setHistoricalPlayerStatus("ALL");
+                    if (persistentWorld) setStatsScope("ALL_TIME");
+                  }}
+                >
+                  Reset filters
+                </button>
+              </div>
+              <p
+                className="career-disclosure compact"
+                data-testid="historical-stats-provenance"
+              >
+                {historicalProjection.separationNotice} (<code>{historicalProjection.projectionVersion}</code>{" "}
+                · {historicalProjection.filteredMatchesCount}/
+                {historicalProjection.totalSourceMatches} career fixtures matched).{" "}
+                {historicalProjection.filterSupport.fielding.note}
+              </p>
+              <div className="stats-filter-grid" data-testid="historical-stats-filters">
+                <label>
+                  Format
+                  <select aria-label="Historical format filter" value="T20" onChange={() => {}}>
+                    {historicalProjection.filterSupport.formats.map((fmt) => (
+                      <option key={fmt} value={fmt}>
+                        {fmt} (Career)
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Season
+                  <select
+                    aria-label="Historical season filter"
+                    value={
+                      historicalSeasonScope === "ALL"
+                        ? "ALL"
+                        : historicalSeasonScope === "ACTIVE" && persistentWorldRef
+                          ? String(persistentWorldRef.currentSeasonNumber)
+                          : String(historicalSeasonScope)
+                    }
+                    onChange={(event) => {
+                      const val = event.currentTarget.value;
+                      if (val === "ALL") {
+                        if (persistentWorld) setStatsScope("ALL_TIME");
+                      } else {
+                        const num = Number.parseInt(val, 10);
+                        if (persistentWorld && num === persistentWorld.currentSeasonNumber) {
+                          setStatsScope("ACTIVE");
+                        } else {
+                          setStatsScope(num);
+                        }
+                      }
+                    }}
+                  >
+                    {persistentWorld && <option value="ALL">All seasons</option>}
+                    {historicalProjection.filterSupport.seasons.map((opt) => (
+                      <option key={opt.seasonNumber} value={String(opt.seasonNumber)}>
+                        Season {opt.seasonNumber} ({opt.calendarYear})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Competition
+                  <select
+                    aria-label="Historical competition filter"
+                    value={historicalProjection.filterSupport.competitions[0]?.competitionId ?? "T20_DOMESTIC"}
+                    onChange={() => {}}
+                  >
+                    {historicalProjection.filterSupport.competitions.map((comp) => (
+                      <option key={comp.competitionId} value={comp.competitionId}>
+                        {comp.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Opponent
+                  <select
+                    aria-label="Historical opponent filter"
+                    value={historicalOpponent}
+                    onChange={(event) => setHistoricalOpponent(event.currentTarget.value)}
+                  >
+                    <option value="ALL">All opponents</option>
+                    {historicalProjection.filterSupport.opponents.map((teamId) => (
+                      <option key={teamId} value={teamId}>
+                        {service.teamName(teamId)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Venue
+                  <select
+                    aria-label="Historical venue filter"
+                    disabled={!historicalProjection.filterSupport.venues.available}
+                    value={historicalVenue}
+                    onChange={(event) => setHistoricalVenue(event.currentTarget.value)}
+                  >
+                    <option value="ALL">All venues</option>
+                    {historicalProjection.filterSupport.venues.groundIds.map((groundId) => (
+                      <option key={groundId} value={groundId}>
+                        {service.groundName(groundId)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Batting position
+                  <select
+                    aria-label="Historical batting position filter"
+                    value={historicalBattingPosition}
+                    onChange={(event) =>
+                      setHistoricalBattingPosition(
+                        event.currentTarget.value as HistoricalBattingPositionBand,
+                      )
+                    }
+                  >
+                    {historicalProjection.filterSupport.battingPosition.bands.map((band) => (
+                      <option key={band} value={band}>
+                        {band === "ALL"
+                          ? "All batting positions"
+                          : band === "OPENER"
+                            ? "Openers (1–2)"
+                            : band === "TOP_ORDER"
+                              ? "Top order (1–3)"
+                              : band === "MIDDLE_ORDER"
+                                ? "Middle order (4–6)"
+                                : "Lower order (7–11)"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Player status
+                  <select
+                    aria-label="Historical player inclusion filter"
+                    value={historicalPlayerStatus}
+                    onChange={(event) =>
+                      setHistoricalPlayerStatus(
+                        event.currentTarget.value as HistoricalPlayerStatusFilter,
+                      )
+                    }
+                  >
+                    <option value="ALL">All (active + retired)</option>
+                    <option value="ACTIVE">Active players only</option>
+                    <option value="RETIRED">Retired alumni only</option>
+                  </select>
+                </label>
+              </div>
+
+              {(() => {
+                const activeBoard = historicalProjection.leaderboards[historicalLeaderboardMetric];
+                const visibleEntries = activeBoard.entries;
+                const unqualifiedCount = Math.max(
+                  0,
+                  activeBoard.totalCandidatesCount - activeBoard.qualifiedCount,
+                );
+                return (
+                  <div data-testid="historical-leaderboards-section" style={{ marginTop: "14px" }}>
+                    <div className="section-bar">
+                      <h4>Qualified leaderboards ({activeBoard.title})</h4>
+                      <span className="career-disclosure compact" data-testid="leaderboard-qualification-count">
+                        {activeBoard.qualifiedCount} qualified of {activeBoard.totalCandidatesCount} candidates
+                        {unqualifiedCount > 0
+                          ? ` (${unqualifiedCount} below threshold shown in career records below)`
+                          : ""}
+                      </span>
+                    </div>
+                    <div
+                      className="leaderboard-tabs"
+                      role="group"
+                      aria-label="Leaderboard categories"
+                    >
+                      {HistoricalLeaderboardMetricSchema.options.map((cat) => {
+                        const board = historicalProjection.leaderboards[cat];
+                        return (
+                          <button
+                            key={cat}
+                            type="button"
+                            aria-pressed={activeBoard.metric === cat}
+                            onClick={() => setHistoricalLeaderboardMetric(cat)}
+                          >
+                            {board.title}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="historical-rule-meta" data-testid="leaderboard-rule-summary">
+                      <strong>Qualification:</strong> {activeBoard.qualificationRule.summary} ·{" "}
+                      <strong>Denominator:</strong> {activeBoard.denominatorDefinition} ·{" "}
+                      <strong>Ties:</strong> {activeBoard.tieRule} ·{" "}
+                      <strong>Null handling:</strong> {activeBoard.nullPolicy}
+                    </p>
+                    {visibleEntries.length === 0 ? (
+                      <p>No players meet the qualification threshold for this filter slice yet.</p>
+                    ) : (
+                      <div className="table-wrap">
+                        <table data-testid="historical-leaderboard-table">
+                          <thead>
+                            <tr>
+                              <th>Rank</th>
+                              <th>Player</th>
+                              <th>Team</th>
+                              <th>{activeBoard.title}</th>
+                              <th>Details</th>
+                              <th>Denominator</th>
+                              <th>Contributing match</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {visibleEntries.map((entry) => {
+                              const topFixtureId = entry.contributingFixtureIds[0];
+                              const replayBtnId = topFixtureId
+                                ? `lb-replay-${activeBoard.metric}-${entry.playerId}-${topFixtureId}`
+                                : null;
+                              return (
+                                <tr key={entry.playerId}>
+                                  <td>
+                                    {entry.qualified ? entry.rank : "–"}
+                                    {entry.qualified && entry.tied ? <small> (T)</small> : null}
+                                  </td>
+                                  <td>
+                                    <button
+                                      type="button"
+                                      className="player-link"
+                                      onClick={() => openPlayer(entry.playerId, "STATISTICS")}
+                                    >
+                                      {service.playerName(entry.playerId)}
+                                    </button>
+                                    {entry.status === "RETIRED" ? <small>Retired</small> : null}
+                                  </td>
+                                  <td>{service.teamName(entry.teamId)}</td>
+                                  <td>
+                                    <strong>{entry.primaryDisplay}</strong>
+                                  </td>
+                                  <td>{entry.secondaryDisplay}</td>
+                                  <td>
+                                    {entry.denominatorCount} {entry.denominatorLabel}
+                                  </td>
+                                  <td>
+                                    {topFixtureId && replayBtnId ? (
+                                      <button
+                                        id={replayBtnId}
+                                        type="button"
+                                        className="replay-btn"
+                                        disabled={busy}
+                                        onClick={() => void openReplay(topFixtureId, replayBtnId)}
+                                      >
+                                        View replay ({entry.contributingFixtureIds.length})
+                                      </button>
+                                    ) : (
+                                      "–"
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              <h4 style={{ marginTop: "18px" }}>
+                Filtered career &amp; fielding records ({historicalProjection.players.length})
+              </h4>
+              <div className="table-wrap">
+                <table data-testid="historical-player-records-table">
+                  <thead>
+                    <tr>
+                      <th>Player</th>
+                      <th>Status</th>
+                      <th>M</th>
+                      <th>Runs</th>
+                      <th>HS</th>
+                      <th>Avg</th>
+                      <th>SR</th>
+                      <th>50/100</th>
+                      <th>Wkts</th>
+                      <th>BB</th>
+                      <th>Econ</th>
+                      <th>Fielding (Ct/St/RO)</th>
+                      <th>Latest match</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historicalProjection.players.map((rec) => {
+                      const latest = rec.contributingMatches[0];
+                      const btnId = latest
+                        ? `hist-replay-${rec.playerId}-${latest.fixtureId}`
+                        : null;
+                      return (
+                        <tr key={rec.playerId}>
+                          <td>
+                            <button
+                              type="button"
+                              className="player-link"
+                              onClick={() => openPlayer(rec.playerId, "STATISTICS")}
+                            >
+                              {service.playerName(rec.playerId)}
+                            </button>
+                            <small>{service.teamName(rec.currentTeamId)}</small>
+                          </td>
+                          <td>{rec.status === "RETIRED" ? "Retired" : "Active"}</td>
+                          <td>{rec.matches}</td>
+                          <td>{rec.runs}</td>
+                          <td>
+                            {rec.battingInnings > 0
+                              ? `${rec.highScoreRuns}${rec.highScoreNotOut ? "*" : ""}`
+                              : "–"}
+                          </td>
+                          <td>{metric(rec.battingAverageX100)}</td>
+                          <td>{metric(rec.strikeRateX100)}</td>
+                          <td>
+                            {rec.fifties}/{rec.hundreds}
+                          </td>
+                          <td>{rec.bowlingWickets}</td>
+                          <td>
+                            {rec.bestBowlingRuns !== null
+                              ? `${rec.bestBowlingWickets}/${rec.bestBowlingRuns}`
+                              : "–"}
+                          </td>
+                          <td>{metric(rec.economyX100)}</td>
+                          <td>
+                            {rec.catches}/{rec.stumpings}/{rec.runOuts}
+                          </td>
+                          <td>
+                            {latest && btnId && latest.archiveReplayAvailable ? (
+                              <button
+                                id={btnId}
+                                type="button"
+                                className="replay-btn"
+                                disabled={busy}
+                                onClick={() => void openReplay(latest.fixtureId, btnId)}
+                              >
+                                View replay
+                              </button>
+                            ) : (
+                              "–"
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
           )}
         </section>
       )}
@@ -2933,39 +3356,48 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 })(),
               ]
             : [];
+          const historicalRecord = service.historicalPlayerRecord(player.playerId);
           return (
-            <PlayerPage
-              player={player}
-              condition={retired ? null : service.playerCondition(player.playerId)}
-              stats={
-                state.projection.players.find(
-                  (candidate) => candidate.playerId === player.playerId,
-                ) ?? null
-              }
-              careerStats={careerStats}
-              seasonBreakdown={breakdown}
-              age={service.playerAge(player.birthDate)}
-              retiredRecord={retired}
-              skillLedgerEntry={service.playerLifecycleLedgerEntry(player.playerId)}
-              lastTeamName={retired ? service.teamName(retired.lastTeamId) : null}
-              activeContract={activeContract}
-              contractTeamName={activeContract ? service.teamName(activeContract.teamId) : null}
-              isFreeAgent={Boolean(freeAgentMatch)}
-              careerClubNames={careerClubs}
-              format={playerFormat}
-              onFormat={changePlayerFormat}
-              onBack={() => {
-                setRestorePlayerFocus(player.playerId);
-                setScreen(playerOrigin);
-              }}
-              backLabel={
-                playerOrigin === "SQUAD"
-                  ? "Back to squad"
-                  : playerOrigin === "CONTRACTS"
-                    ? "Back to contracts"
-                    : "Back to statistics"
-              }
-            />
+            <>
+              {replayViewerSection}
+              <PlayerPage
+                player={player}
+                condition={retired ? null : service.playerCondition(player.playerId)}
+                stats={
+                  state.projection.players.find(
+                    (candidate) => candidate.playerId === player.playerId,
+                  ) ?? null
+                }
+                careerStats={careerStats}
+                seasonBreakdown={breakdown}
+                age={service.playerAge(player.birthDate)}
+                retiredRecord={retired}
+                skillLedgerEntry={service.playerLifecycleLedgerEntry(player.playerId)}
+                lastTeamName={retired ? service.teamName(retired.lastTeamId) : null}
+                activeContract={activeContract}
+                contractTeamName={activeContract ? service.teamName(activeContract.teamId) : null}
+                isFreeAgent={Boolean(freeAgentMatch)}
+                careerClubNames={careerClubs}
+                historicalRecord={historicalRecord}
+                teamName={(tid) => service.teamName(tid)}
+                groundName={(gid) => service.groundName(gid)}
+                onOpenReplay={(fixtureId, triggerId) => void openReplay(fixtureId, triggerId)}
+                format={playerFormat}
+                onFormat={changePlayerFormat}
+                onBack={() => {
+                  setActiveReplay(null);
+                  setRestorePlayerFocus(player.playerId);
+                  setScreen(playerOrigin);
+                }}
+                backLabel={
+                  playerOrigin === "SQUAD"
+                    ? "Back to squad"
+                    : playerOrigin === "CONTRACTS"
+                      ? "Back to contracts"
+                      : "Back to statistics"
+                }
+              />
+            </>
           );
         })()}
 

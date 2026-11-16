@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "RUNS",
+    "BATTING_AVERAGE",
+    "BATTING_STRIKE_RATE",
+    "HIGH_SCORE",
+    "SIXES",
+    "WICKETS",
+    "BOWLING_AVERAGE",
+    "ECONOMY",
+    "BOWLING_STRIKE_RATE",
+    "BEST_BOWLING",
+    "FIELDING_DISMISSALS",
+    "CATCHES"
+  ],
+  "$id": "urn:lcxxvi:HistoricalLeaderboardMetric:1",
+  "title": "HistoricalLeaderboardMetric"
+}

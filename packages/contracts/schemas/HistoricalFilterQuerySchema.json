@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "seasonScope": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "ALL"
+        },
+        {
+          "type": "string",
+          "const": "ACTIVE"
+        },
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      ]
+    },
+    "format": {
+      "type": "string",
+      "const": "T20"
+    },
+    "competitionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "opponentTeamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "venueGroundId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "battingPositionBand": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "OPENER",
+        "TOP_ORDER",
+        "MIDDLE_ORDER",
+        "LOWER_ORDER"
+      ]
+    },
+    "battingPositionExact": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 11
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "playerStatus": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "ACTIVE",
+        "RETIRED"
+      ]
+    },
+    "teamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    }
+  },
+  "required": [
+    "seasonScope",
+    "format",
+    "competitionId",
+    "opponentTeamId",
+    "venueGroundId",
+    "battingPositionBand",
+    "battingPositionExact",
+    "playerStatus",
+    "teamId"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:HistoricalFilterQuery:1",
+  "title": "HistoricalFilterQuery"
+}

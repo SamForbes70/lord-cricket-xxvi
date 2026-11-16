@@ -19,3 +19,4 @@ export * from "./tactical-briefing.js";
 export * from "./field-presentation.js";
 export * from "./commentary.js";
 export * from "./audio-cues.js";
+export * from "./historical-stats.js";

@@ -1,0 +1,3575 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "projectionVersion": {
+      "type": "string",
+      "const": "LC_HISTORICAL_STATISTICS_PROJECTION_V1"
+    },
+    "sourceClass": {
+      "type": "string",
+      "enum": [
+        "CAREER"
+      ]
+    },
+    "separationNotice": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "filterQuery": {
+      "type": "object",
+      "properties": {
+        "seasonScope": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "ALL"
+            },
+            {
+              "type": "string",
+              "const": "ACTIVE"
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          ]
+        },
+        "format": {
+          "type": "string",
+          "const": "T20"
+        },
+        "competitionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "opponentTeamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "venueGroundId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "battingPositionBand": {
+          "type": "string",
+          "enum": [
+            "ALL",
+            "OPENER",
+            "TOP_ORDER",
+            "MIDDLE_ORDER",
+            "LOWER_ORDER"
+          ]
+        },
+        "battingPositionExact": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 11
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "playerStatus": {
+          "type": "string",
+          "enum": [
+            "ALL",
+            "ACTIVE",
+            "RETIRED"
+          ]
+        },
+        "teamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "seasonScope",
+        "format",
+        "competitionId",
+        "opponentTeamId",
+        "venueGroundId",
+        "battingPositionBand",
+        "battingPositionExact",
+        "playerStatus",
+        "teamId"
+      ],
+      "additionalProperties": false
+    },
+    "filterSupport": {
+      "type": "object",
+      "properties": {
+        "formats": {
+          "minItems": 1,
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "T20",
+              "ODI",
+              "RED_BALL"
+            ]
+          }
+        },
+        "unsupportedFormatsNote": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "competitions": {
+          "maxItems": 32,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "competitionId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "T20",
+                  "ODI",
+                  "RED_BALL"
+                ]
+              }
+            },
+            "required": [
+              "competitionId",
+              "label",
+              "format"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "seasons": {
+          "maxItems": 200,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "seasonNumber": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200
+              },
+              "calendarYear": {
+                "type": "integer",
+                "minimum": 1900,
+                "maximum": 9999
+              },
+              "phase": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "COMPLETE"
+                ]
+              },
+              "matchesCount": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "seasonNumber",
+              "calendarYear",
+              "phase",
+              "matchesCount"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "opponents": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "teams": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          }
+        },
+        "venues": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "coverage": {
+              "type": "string",
+              "enum": [
+                "ALL_RESOLVED",
+                "PARTIAL",
+                "UNAVAILABLE"
+              ]
+            },
+            "groundIds": {
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              }
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "available",
+            "coverage",
+            "groundIds",
+            "note"
+          ],
+          "additionalProperties": false
+        },
+        "battingPosition": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean",
+              "const": true
+            },
+            "bands": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "ALL",
+                  "OPENER",
+                  "TOP_ORDER",
+                  "MIDDLE_ORDER",
+                  "LOWER_ORDER"
+                ]
+              }
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "available",
+            "bands",
+            "note"
+          ],
+          "additionalProperties": false
+        },
+        "fielding": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "archiveCoverageCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalMatchesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "coverage": {
+              "type": "string",
+              "enum": [
+                "ALL_ARCHIVED",
+                "PARTIAL_ARCHIVES",
+                "UNAVAILABLE"
+              ]
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "available",
+            "archiveCoverageCount",
+            "totalMatchesCount",
+            "coverage",
+            "note"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "formats",
+        "unsupportedFormatsNote",
+        "competitions",
+        "seasons",
+        "opponents",
+        "teams",
+        "venues",
+        "battingPosition",
+        "fielding"
+      ],
+      "additionalProperties": false
+    },
+    "totalSourceMatches": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "filteredMatchesCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "players": {
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "RETIRED"
+            ]
+          },
+          "currentTeamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "careerTeamIds": {
+            "minItems": 1,
+            "maxItems": 64,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+            }
+          },
+          "retiredAfterSeasonNumber": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "retiredCalendarYear": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1900,
+                "maximum": 9999
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "seasonsPlayed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "matches": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "battingInnings": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "notOuts": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "runs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "dismissals": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ballsFaced": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "fours": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "sixes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "fifties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "hundreds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ducks": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "highScoreRuns": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "highScoreNotOut": {
+            "type": "boolean"
+          },
+          "highScoreFixtureId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "battingAverageX100": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "strikeRateX100": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "boundaryRunsPercentX100": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bowlingInnings": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "bowlingRunsConceded": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "bowlingLegalBalls": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "bowlingWickets": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "maidens": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "threeWicketHauls": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "fourWicketHauls": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "fiveWicketHauls": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "bestBowlingWickets": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "bestBowlingRuns": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bestBowlingFixtureId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bowlingAverageX100": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "economyX100": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bowlingStrikeRateX100": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fieldingMatchesArchived": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "catches": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "stumpings": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "runOuts": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "totalFieldingDismissals": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "bestMatchCatches": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "bestMatchFieldingDismissals": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "bestFieldingFixtureId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contributingMatches": {
+            "maxItems": 2800,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fixtureId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "matchId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "seasonNumber": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 200
+                },
+                "calendarYear": {
+                  "type": "integer",
+                  "minimum": 1900,
+                  "maximum": 9999
+                },
+                "roundNumber": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 14
+                },
+                "matchDayDate": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                },
+                "competitionId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "format": {
+                  "type": "string",
+                  "const": "T20"
+                },
+                "groundId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "homeTeamId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "awayTeamId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "teamId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "opponentTeamId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "battedInnings": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 2
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "battingPosition": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 11
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "runsScored": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "ballsFaced": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "fours": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sixes": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "notOut": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bowledLegalBalls": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bowlingRunsConceded": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bowlingWickets": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 10
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "maidens": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "catches": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "stumpings": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "runOuts": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "archiveEvaluated": {
+                  "type": "boolean"
+                },
+                "archiveReplayAvailable": {
+                  "type": "boolean"
+                },
+                "resultSummary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "sourceCompletionSha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "fixtureId",
+                "matchId",
+                "seasonNumber",
+                "calendarYear",
+                "roundNumber",
+                "matchDayDate",
+                "competitionId",
+                "format",
+                "groundId",
+                "homeTeamId",
+                "awayTeamId",
+                "teamId",
+                "opponentTeamId",
+                "battedInnings",
+                "battingPosition",
+                "runsScored",
+                "ballsFaced",
+                "fours",
+                "sixes",
+                "notOut",
+                "bowledLegalBalls",
+                "bowlingRunsConceded",
+                "bowlingWickets",
+                "maidens",
+                "catches",
+                "stumpings",
+                "runOuts",
+                "archiveEvaluated",
+                "archiveReplayAvailable",
+                "resultSummary",
+                "sourceCompletionSha256"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "playerId",
+          "status",
+          "currentTeamId",
+          "careerTeamIds",
+          "retiredAfterSeasonNumber",
+          "retiredCalendarYear",
+          "seasonsPlayed",
+          "matches",
+          "battingInnings",
+          "notOuts",
+          "runs",
+          "dismissals",
+          "ballsFaced",
+          "fours",
+          "sixes",
+          "fifties",
+          "hundreds",
+          "ducks",
+          "highScoreRuns",
+          "highScoreNotOut",
+          "highScoreFixtureId",
+          "battingAverageX100",
+          "strikeRateX100",
+          "boundaryRunsPercentX100",
+          "bowlingInnings",
+          "bowlingRunsConceded",
+          "bowlingLegalBalls",
+          "bowlingWickets",
+          "maidens",
+          "threeWicketHauls",
+          "fourWicketHauls",
+          "fiveWicketHauls",
+          "bestBowlingWickets",
+          "bestBowlingRuns",
+          "bestBowlingFixtureId",
+          "bowlingAverageX100",
+          "economyX100",
+          "bowlingStrikeRateX100",
+          "fieldingMatchesArchived",
+          "catches",
+          "stumpings",
+          "runOuts",
+          "totalFieldingDismissals",
+          "bestMatchCatches",
+          "bestMatchFieldingDismissals",
+          "bestFieldingFixtureId",
+          "contributingMatches"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "leaderboards": {
+      "type": "object",
+      "properties": {
+        "RUNS": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "BATTING_AVERAGE": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "BATTING_STRIKE_RATE": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "HIGH_SCORE": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "SIXES": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "WICKETS": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "BOWLING_AVERAGE": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "ECONOMY": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "BOWLING_STRIKE_RATE": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "BEST_BOWLING": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "FIELDING_DISMISSALS": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        },
+        "CATCHES": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "RUNS",
+                "BATTING_AVERAGE",
+                "BATTING_STRIKE_RATE",
+                "HIGH_SCORE",
+                "SIXES",
+                "WICKETS",
+                "BOWLING_AVERAGE",
+                "ECONOMY",
+                "BOWLING_STRIKE_RATE",
+                "BEST_BOWLING",
+                "FIELDING_DISMISSALS",
+                "CATCHES"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "sortDirection": {
+              "type": "string",
+              "enum": [
+                "DESC",
+                "ASC"
+              ]
+            },
+            "qualificationRule": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minDenominator": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "denominatorField": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "secondaryRule": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "summary",
+                "minDenominator",
+                "denominatorField",
+                "secondaryRule"
+              ],
+              "additionalProperties": false
+            },
+            "denominatorDefinition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "nullPolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "tieRule": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "entries": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "tied": {
+                    "type": "boolean"
+                  },
+                  "playerId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RETIRED"
+                    ]
+                  },
+                  "qualified": {
+                    "type": "boolean"
+                  },
+                  "primaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "primaryValueX100": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "secondaryDisplay": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "denominatorCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "denominatorLabel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "contributingFixtureIds": {
+                    "minItems": 1,
+                    "maxItems": 2800,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                    }
+                  }
+                },
+                "required": [
+                  "rank",
+                  "tied",
+                  "playerId",
+                  "teamId",
+                  "status",
+                  "qualified",
+                  "primaryDisplay",
+                  "primaryValueX100",
+                  "secondaryDisplay",
+                  "denominatorCount",
+                  "denominatorLabel",
+                  "contributingFixtureIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualifiedCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalCandidatesCount": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "metric",
+            "title",
+            "sortDirection",
+            "qualificationRule",
+            "denominatorDefinition",
+            "nullPolicy",
+            "tieRule",
+            "entries",
+            "qualifiedCount",
+            "totalCandidatesCount"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "RUNS",
+        "BATTING_AVERAGE",
+        "BATTING_STRIKE_RATE",
+        "HIGH_SCORE",
+        "SIXES",
+        "WICKETS",
+        "BOWLING_AVERAGE",
+        "ECONOMY",
+        "BOWLING_STRIKE_RATE",
+        "BEST_BOWLING",
+        "FIELDING_DISMISSALS",
+        "CATCHES"
+      ],
+      "additionalProperties": false
+    },
+    "teamStandings": {
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "played": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "wins": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "losses": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "noResults": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "runsFor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ballsFor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "runsAgainst": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "ballsAgainst": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "teamId",
+          "played",
+          "wins",
+          "losses",
+          "ties",
+          "noResults",
+          "points",
+          "runsFor",
+          "ballsFor",
+          "runsAgainst",
+          "ballsAgainst"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "projectionDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    }
+  },
+  "required": [
+    "projectionVersion",
+    "sourceClass",
+    "separationNotice",
+    "filterQuery",
+    "filterSupport",
+    "totalSourceMatches",
+    "filteredMatchesCount",
+    "players",
+    "leaderboards",
+    "teamStandings",
+    "projectionDigest"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:HistoricalStatisticsProjection:1",
+  "title": "HistoricalStatisticsProjection"
+}

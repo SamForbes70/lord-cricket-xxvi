@@ -24,6 +24,9 @@ import {
   type CompletedSeasonRecord,
   type ContractOffer,
   type ContractOfferKind,
+  type HistoricalFilterQuery,
+  type HistoricalPlayerRecord,
+  type HistoricalStatisticsProjection,
   type LifecycleSeasonState,
   type MatchConditionDelta,
   type NewGameWorldCopy,
@@ -64,6 +67,11 @@ import {
   T20_LEAGUE_COMPETITION,
   validateDefaultWorld,
 } from "@lcxxvi/data";
+import {
+  buildHistoricalStatsSourceFromPersistentWorld,
+  buildHistoricalStatsSourceFromSingleSeason,
+  projectHistoricalStatistics,
+} from "@lcxxvi/projections";
 import {
   acceptCounterOffer as applyAcceptCounterOffer,
   advanceCareerDayV2,
@@ -1353,6 +1361,8 @@ export class CareerApplicationService {
   private recovered = false;
   private status: SaveStatus = "Idle";
   private error = "";
+  private cachedArchivesKey: string | null = null;
+  private cachedArchives: readonly AnyCareerMatchEventArchive[] = [];
 
   constructor(
     ownerId?: string,
@@ -4304,6 +4314,102 @@ export class CareerApplicationService {
     if (result.kind === "TIE") return "Tied";
     if (result.kind === "NO_RESULT") return "No result";
     return `${this.teamName(result.winnerTeamId)} won by ${result.marginRuns ?? result.marginWickets} ${result.marginType?.toLowerCase() ?? ""}`.trim();
+  }
+
+  private currentArchiveCacheKey(): string | null {
+    if (!this.saveId || !this.state) return null;
+    const rev = this.persistentState ? this.persistentState.revision : this.state.revision;
+    const ver = this.persistentState
+      ? this.persistentState.worldStateVersion
+      : this.state.seasonStateVersion;
+    return `${this.saveId}:${ver}:${rev}`;
+  }
+
+  async loadCareerEventArchives(): Promise<readonly AnyCareerMatchEventArchive[]> {
+    const cacheKey = this.currentArchiveCacheKey();
+    if (!cacheKey || !this.saveId || !this.state) {
+      this.cachedArchivesKey = null;
+      this.cachedArchives = [];
+      return [];
+    }
+    if (this.cachedArchivesKey === cacheKey) {
+      return this.cachedArchives;
+    }
+    try {
+      let archives: readonly AnyCareerMatchEventArchive[] = [];
+      if (this.persistentState && this.persistentRepository?.loadMatchEventArchives) {
+        const loaded = await this.persistentRepository.loadMatchEventArchives(
+          this.saveId,
+          this.persistentState,
+        );
+        archives = loaded.archives;
+      } else if (
+        this.state.seasonStateVersion === "LC_T20_SEASON_STATE_V1" &&
+        this.repository.loadMatchEventArchives
+      ) {
+        const loaded = await this.repository.loadMatchEventArchives(this.saveId, this.state);
+        archives = loaded.archives;
+      }
+      this.cachedArchivesKey = cacheKey;
+      this.cachedArchives = archives;
+      return archives;
+    } catch {
+      return this.cachedArchivesKey === cacheKey ? this.cachedArchives : [];
+    }
+  }
+
+  private buildCurrentHistoricalSource(
+    archivesOverride?: readonly AnyCareerMatchEventArchive[],
+  ) {
+    if (!this.state) return null;
+    const cacheKey = this.currentArchiveCacheKey();
+    const archives =
+      archivesOverride ??
+      (cacheKey && this.cachedArchivesKey === cacheKey ? this.cachedArchives : []);
+    const world = this.getWorld();
+    const teamAffiliationByPlayerId: Record<string, string> = {};
+    for (const team of world.teams) {
+      for (const pid of team.squadIds) {
+        teamAffiliationByPlayerId[pid] = team.teamId;
+      }
+    }
+    if (this.persistentState) {
+      return buildHistoricalStatsSourceFromPersistentWorld({
+        world: this.persistentState,
+        archives,
+        homeGroundIds: T20_LEAGUE_COMPETITION.homeGroundIds,
+        ...(("lifecycle" in this.persistentState) ? {} : { teamAffiliationByPlayerId }),
+      });
+    }
+    if (this.state.seasonStateVersion !== "LC_T20_SEASON_STATE_V1") {
+      return null;
+    }
+    return buildHistoricalStatsSourceFromSingleSeason({
+      season: this.state,
+      worldId: this.saveId ?? this.state.seasonId,
+      archives,
+      homeGroundIds: T20_LEAGUE_COMPETITION.homeGroundIds,
+      teamAffiliationByPlayerId,
+    });
+  }
+
+  historicalStatistics(
+    query: Partial<HistoricalFilterQuery> = {},
+    archivesOverride?: readonly AnyCareerMatchEventArchive[],
+  ): HistoricalStatisticsProjection | null {
+    const source = this.buildCurrentHistoricalSource(archivesOverride);
+    if (!source) return null;
+    return projectHistoricalStatistics(source, query);
+  }
+
+  historicalPlayerRecord(
+    playerId: string,
+    query: Partial<HistoricalFilterQuery> = {},
+    archivesOverride?: readonly AnyCareerMatchEventArchive[],
+  ): HistoricalPlayerRecord | null {
+    const projection = this.historicalStatistics(query, archivesOverride);
+    if (!projection) return null;
+    return projection.players.find((player) => player.playerId === playerId) ?? null;
   }
 
   sourceHashForUserMatch(parts: unknown): string {

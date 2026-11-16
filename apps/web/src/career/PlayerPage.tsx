@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import type {
+  HistoricalPlayerRecord,
   PersistentCareerPlayerStats,
   PlayerContract,
   PlayerLifecycleSkillLedgerEntry,
@@ -55,6 +56,10 @@ export function PlayerPage({
   contractTeamName = null,
   isFreeAgent = false,
   careerClubNames = [],
+  historicalRecord = null,
+  teamName = (id) => id,
+  groundName = (id) => id,
+  onOpenReplay,
   format,
   onFormat,
   onBack,
@@ -73,6 +78,10 @@ export function PlayerPage({
   contractTeamName?: string | null;
   isFreeAgent?: boolean;
   careerClubNames?: readonly string[];
+  historicalRecord?: HistoricalPlayerRecord | null;
+  teamName?: (teamId: string) => string;
+  groundName?: (groundId: string) => string;
+  onOpenReplay?: (fixtureId: string, triggerId: string) => void;
   format: Format;
   onFormat: (value: Format) => void;
   onBack: () => void;
@@ -307,6 +316,135 @@ export function PlayerPage({
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </section>
+      )}
+      {format === "T20" && historicalRecord && historicalRecord.matches > 0 && (
+        <section
+          className="career-panel"
+          aria-labelledby="player-historical-records-heading"
+          data-testid="player-historical-records"
+          style={{ marginTop: "16px" }}
+        >
+          <h3 id="player-historical-records-heading">
+            Historical batting, bowling, fielding &amp; contributing matches
+          </h3>
+          <p>
+            Career T20 records (<code>{historicalRecord.playerId}</code>) ·{" "}
+            {historicalRecord.status === "RETIRED"
+              ? "Retired alumni record preserved"
+              : "Active career record"}{" "}
+            · Fielding archive matches: {historicalRecord.fieldingMatchesArchived}/
+            {historicalRecord.matches}.
+          </p>
+          <dl className="player-details" style={{ marginBottom: "14px" }}>
+            <dt>High score</dt>
+            <dd>
+              {historicalRecord.battingInnings > 0
+                ? `${historicalRecord.highScoreRuns}${historicalRecord.highScoreNotOut ? "*" : ""}`
+                : "–"}
+            </dd>
+            <dt>50s / 100s / Ducks</dt>
+            <dd>
+              {historicalRecord.fifties} / {historicalRecord.hundreds} / {historicalRecord.ducks}
+            </dd>
+            <dt>4s / 6s / Boundary %</dt>
+            <dd>
+              {historicalRecord.fours} / {historicalRecord.sixes} (
+              {decimal(historicalRecord.boundaryRunsPercentX100)}%)
+            </dd>
+            <dt>Best bowling</dt>
+            <dd>
+              {historicalRecord.bestBowlingRuns !== null
+                ? `${historicalRecord.bestBowlingWickets}/${historicalRecord.bestBowlingRuns}`
+                : "–"}
+            </dd>
+            <dt>3W / 4W / 5W hauls</dt>
+            <dd>
+              {historicalRecord.threeWicketHauls} / {historicalRecord.fourWicketHauls} /{" "}
+              {historicalRecord.fiveWicketHauls}
+            </dd>
+            <dt>Catches / Stumpings / Run outs</dt>
+            <dd>
+              {historicalRecord.catches} / {historicalRecord.stumpings} / {historicalRecord.runOuts}{" "}
+              (Total {historicalRecord.totalFieldingDismissals})
+            </dd>
+          </dl>
+          {historicalRecord.contributingMatches.length > 0 && (
+            <div>
+              <h4>Contributing matches ({historicalRecord.contributingMatches.length})</h4>
+              <div className="table-wrap">
+                <table data-testid="player-contributing-matches-table">
+                  <thead>
+                    <tr>
+                      <th>Season</th>
+                      <th>Round</th>
+                      <th>Match</th>
+                      <th>Venue</th>
+                      <th>Batting</th>
+                      <th>Bowling</th>
+                      <th>Fielding</th>
+                      <th>Replay</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historicalRecord.contributingMatches.map((entry) => {
+                      const btnId = `player-replay-${player.playerId}-${entry.fixtureId}`;
+                      const legalBalls = entry.bowledLegalBalls ?? 0;
+                      const catches = entry.catches ?? 0;
+                      const stumpings = entry.stumpings ?? 0;
+                      const runOuts = entry.runOuts ?? 0;
+                      return (
+                        <tr key={`${entry.seasonNumber}-${entry.fixtureId}`}>
+                          <td>
+                            S{entry.seasonNumber} ({entry.calendarYear})
+                          </td>
+                          <td>R{entry.roundNumber}</td>
+                          <td>
+                            {teamName(entry.teamId)} v {teamName(entry.opponentTeamId)}
+                            {entry.battingPosition ? (
+                              <small> · Bat #{entry.battingPosition}</small>
+                            ) : null}
+                          </td>
+                          <td>{entry.groundId ? groundName(entry.groundId) : "–"}</td>
+                          <td>
+                            {entry.battedInnings !== null
+                              ? `${entry.runsScored ?? 0}${entry.notOut ? "*" : ""} (${entry.ballsFaced ?? 0})`
+                              : "–"}
+                          </td>
+                          <td>
+                            {legalBalls > 0
+                              ? `${entry.bowlingWickets ?? 0}/${entry.bowlingRunsConceded ?? 0} (${Math.floor(legalBalls / 6)}.${legalBalls % 6})`
+                              : "–"}
+                          </td>
+                          <td>
+                            {entry.archiveEvaluated
+                              ? catches + stumpings + runOuts > 0
+                                ? `${catches}c ${stumpings}st ${runOuts}ro`
+                                : "0"
+                              : "–"}
+                          </td>
+                          <td>
+                            {onOpenReplay && entry.archiveReplayAvailable ? (
+                              <button
+                                id={btnId}
+                                type="button"
+                                className="replay-btn"
+                                onClick={() => onOpenReplay(entry.fixtureId, btnId)}
+                              >
+                                View replay
+                              </button>
+                            ) : (
+                              "–"
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </section>
