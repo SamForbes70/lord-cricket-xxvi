@@ -1,5 +1,7 @@
 import {
   canonicalJson,
+  CareerMatchDigestSchema,
+  type CareerMatchDigest,
   CompletedSeasonRecordCoreSchema,
   CompletedSeasonRecordSchema,
   LIFECYCLE_SEASON_STATE_VERSION,
@@ -50,6 +52,7 @@ import { DB_NAME, DB_VERSION } from "./index.js";
 import {
   CAREER_AWARDS_LEDGER_SCOPE,
   CAREER_MATCH_EVENTS_SCOPE,
+  CAREER_MATCH_DIGEST_SCOPE,
   careerMatchEventArchiveByteLength,
   createT20SeasonArchive,
   SEASON_PRESENTATION_SAVE_SCHEMA_VERSION,
@@ -1717,6 +1720,71 @@ export class IndexedDbPersistentWorldRepository {
     } satisfies ProjectionRecord);
     await txDone(tx);
     return ledger;
+  }
+
+  /**
+   * One fixture's archive, read by key; replaying one match no longer loads every season's archives.
+   * Returns `damaged: true` when the row exists but fails its hash or validation.
+   */
+  async loadMatchEventArchive(
+    saveId: string,
+    fixtureId: string,
+    worldState?: AnyPersistentWorldState,
+  ): Promise<{ archive: AnyCareerMatchEventArchive | null; damaged: boolean }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const row = (await req(
+      tx.objectStore("projections").get([saveId, CAREER_MATCH_EVENTS_SCOPE, fixtureId]),
+    )) as ProjectionRecord | undefined;
+    await txDone(tx);
+    if (!row) return { archive: null, damaged: false };
+    if ((await seasonSha256Text(row.payload)) !== row.sha256) return { archive: null, damaged: true };
+    try {
+      const completion = worldState ? collectPersistentWorldCompletions(worldState).get(fixtureId) : undefined;
+      if (worldState && !completion) throw new Error(`UNKNOWN_FIXTURE:${fixtureId}`);
+      const archive = await validateAnyCareerMatchEventArchive(JSON.parse(row.payload), completion);
+      if (archive.fixtureId !== fixtureId) throw new Error("FIXTURE_KEY_MISMATCH");
+      return { archive, damaged: false };
+    } catch {
+      return { archive: null, damaged: true };
+    }
+  }
+
+  /** Stored per-match digests (docs/design/MATCH_ARCHIVE_STORAGE_V2.md); rows failing hash or schema are skipped. */
+  async loadMatchDigests(saveId: string): Promise<Map<string, CareerMatchDigest>> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const rows = await projectionRowsForScope(tx.objectStore("projections"), saveId, CAREER_MATCH_DIGEST_SCOPE);
+    await txDone(tx);
+    const digests = new Map<string, CareerMatchDigest>();
+    for (const row of rows) {
+      if ((await seasonSha256Text(row.payload)) !== row.sha256) continue;
+      try {
+        const digest = CareerMatchDigestSchema.parse(JSON.parse(row.payload));
+        if (digest.fixtureId === row.key) digests.set(row.key, digest);
+      } catch {
+        /* a damaged digest is rebuilt from its archive */
+      }
+    }
+    return digests;
+  }
+
+  /**
+   * Stores derived digests. They are rebuilt from verified archives, so writing them outside a career
+   * commit cannot change career state; a missing or damaged row is simply derived again.
+   */
+  async saveMatchDigests(saveId: string, digests: readonly CareerMatchDigest[]): Promise<void> {
+    if (digests.length === 0) return;
+    const rows: ProjectionRecord[] = [];
+    for (const raw of digests) {
+      const digest = CareerMatchDigestSchema.parse(raw);
+      const payload = canonicalJson(digest);
+      rows.push({ saveId, scope: CAREER_MATCH_DIGEST_SCOPE, key: digest.fixtureId, payload, sha256: await seasonSha256Text(payload) });
+    }
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    for (const row of rows) tx.objectStore("projections").put(row);
+    await txDone(tx);
   }
 
   async loadMatchEventArchives(

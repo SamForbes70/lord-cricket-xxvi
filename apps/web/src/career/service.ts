@@ -63,6 +63,7 @@ import {
   type WorldPack,
   type YouthProspect,
   compareCodePoints,
+  type CareerMatchDigest,
 } from "@lcxxvi/contracts";
 import {
   DEFAULT_CAREER_AVAILABILITY_PACK,
@@ -76,6 +77,7 @@ import {
   buildHistoricalStatsSourceFromSingleSeason,
   projectHistoricalStatistics,
   reconcileCareerAwardsLedger,
+  deriveCareerMatchDigest,
 } from "@lcxxvi/projections";
 import {
   acceptCounterOffer as applyAcceptCounterOffer,
@@ -1305,6 +1307,14 @@ export type CareerPersistentWorldRepository = {
     damagedFixtureIds: string[];
     totalBytes: number;
   }>;
+  /** One fixture's archive by key (docs/design/MATCH_ARCHIVE_STORAGE_V2.md). */
+  loadMatchEventArchive?(
+    saveId: string,
+    fixtureId: string,
+    worldState?: AnyPersistentWorldState,
+  ): Promise<{ archive: AnyCareerMatchEventArchive | null; damaged: boolean }>;
+  loadMatchDigests?(saveId: string): Promise<Map<string, CareerMatchDigest>>;
+  saveMatchDigests?(saveId: string, digests: readonly CareerMatchDigest[]): Promise<void>;
   loadLifecycleRosterPacks?(saveId: string): Promise<Map<string, StagedRosterPack>>;
   inspectCheckpoints?(saveId: string): Promise<SeasonCheckpointInspection>;
   loadGeneration?(saveId: string, generation: number): Promise<PersistentWorldLoadResult>;
@@ -1373,6 +1383,8 @@ export class CareerApplicationService {
   private status: SaveStatus = "Idle";
   private error = "";
   private cachedArchivesKey: string | null = null;
+  private cachedDigestsKey: string | null = null;
+  private cachedDigests: ReadonlyMap<string, CareerMatchDigest> = new Map();
   private cachedArchives: readonly AnyCareerMatchEventArchive[] = [];
   private awardsLedger: CareerAwardsLedger | null = null;
   private awardsLedgerKey: string | null = null;
@@ -1588,6 +1600,8 @@ export class CareerApplicationService {
   }
 
   private resetArchiveAndAwardsCaches(): void {
+    this.cachedDigestsKey = null;
+    this.cachedDigests = new Map();
     this.cachedArchivesKey = null;
     this.cachedArchives = [];
     this.awardsLedger = null;
@@ -3754,7 +3768,8 @@ export class CareerApplicationService {
       const rosterPacks = this.persistentRepository.loadLifecycleRosterPacks
         ? [...(await this.persistentRepository.loadLifecycleRosterPacks(saveId)).values()]
         : [];
-      const awardsLedger = await this.syncAwardsLedger();
+      // The awards ledger is derived and no longer exported (rebuilt on import), so it is not synced here.
+      const awardsLedger = null;
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION) {
         return createPersistentWorldPortableArchiveV3(
           loaded.state,
@@ -3804,7 +3819,8 @@ export class CareerApplicationService {
     const eventArchives = this.repository.loadMatchEventArchives
       ? (await this.repository.loadMatchEventArchives(saveId, state)).archives
       : [];
-    const awardsLedger = await this.syncAwardsLedger();
+    // The awards ledger is derived and no longer exported (rebuilt on import), so it is not synced here.
+    const awardsLedger = null;
     return createSeasonPortableArchive(
       state,
       loaded.summary,
@@ -3933,11 +3949,15 @@ export class CareerApplicationService {
     if (!completion) return { status: "UNAVAILABLE" };
 
     if (this.persistentState && this.persistentRepository) {
-      if (!this.persistentRepository.loadMatchEventArchives) return { status: "UNAVAILABLE" };
-      const loaded = await this.persistentRepository.loadMatchEventArchives(
-        this.saveId,
-        this.persistentState,
-      );
+      const repo = this.persistentRepository;
+      if (!repo.loadMatchEventArchive && !repo.loadMatchEventArchives) return { status: "UNAVAILABLE" };
+      // Read just this fixture when the repository can (docs/design/MATCH_ARCHIVE_STORAGE_V2.md).
+      const loaded = repo.loadMatchEventArchive
+        ? await repo.loadMatchEventArchive(this.saveId, fixtureId, this.persistentState).then((one) => ({
+            archives: one.archive ? [one.archive] : [],
+            damagedFixtureIds: one.damaged ? [fixtureId] : [],
+          }))
+        : await repo.loadMatchEventArchives!(this.saveId, this.persistentState);
       if (loaded.damagedFixtureIds.includes(fixtureId)) {
         return {
           status: "DAMAGED",
@@ -4368,6 +4388,71 @@ export class CareerApplicationService {
     return `${this.saveId}:${ver}:${rev}`;
   }
 
+  private allCompletions(): T20SeasonMatchCompletion[] {
+    if (this.persistentState) {
+      return [
+        ...this.persistentState.completedSeasons.flatMap((season) => season.completedMatches),
+        ...this.persistentState.currentSeason.completedMatches,
+      ];
+    }
+    return this.state ? [...this.state.completedMatches] : [];
+  }
+
+  /**
+   * Per-match digests for statistics and awards (docs/design/MATCH_ARCHIVE_STORAGE_V2.md). Stored digests
+   * are read; any fixture without one has just its own archive loaded, derived and stored back, so a
+   * career is never fully loaded into memory after its first open. Repositories without digest support
+   * fall back to deriving from all archives.
+   */
+  async loadCareerMatchDigests(): Promise<ReadonlyMap<string, CareerMatchDigest>> {
+    const cacheKey = this.currentArchiveCacheKey();
+    if (!cacheKey || !this.saveId || !this.state) {
+      this.cachedDigestsKey = null;
+      this.cachedDigests = new Map();
+      return this.cachedDigests;
+    }
+    if (this.cachedDigestsKey === cacheKey) return this.cachedDigests;
+    const saveId = this.saveId;
+    const completions = this.allCompletions();
+    try {
+      const repo = this.persistentState ? this.persistentRepository : undefined;
+      let digests: Map<string, CareerMatchDigest>;
+      if (repo?.loadMatchDigests && repo.loadMatchEventArchive) {
+        digests = await repo.loadMatchDigests(saveId);
+        const derived: CareerMatchDigest[] = [];
+        for (const completion of completions) {
+          if (digests.has(completion.fixtureId)) continue;
+          const { archive } = await repo.loadMatchEventArchive(saveId, completion.fixtureId, this.persistentState ?? undefined);
+          if (!archive) continue;
+          const digest = deriveCareerMatchDigest(archive, completion);
+          digests.set(completion.fixtureId, digest);
+          derived.push(digest);
+        }
+        if (derived.length > 0 && !this.readOnly && repo.saveMatchDigests) {
+          try {
+            await repo.saveMatchDigests(saveId, derived);
+          } catch {
+            /* derived again on the next open */
+          }
+        }
+      } else {
+        const archives = new Map((await this.loadCareerEventArchives()).map((a) => [a.fixtureId, a]));
+        digests = new Map();
+        for (const completion of completions) {
+          const archive = archives.get(completion.fixtureId);
+          if (archive) digests.set(completion.fixtureId, deriveCareerMatchDigest(archive, completion));
+        }
+      }
+      if (this.currentArchiveCacheKey() === cacheKey) {
+        this.cachedDigestsKey = cacheKey;
+        this.cachedDigests = digests;
+      }
+      return digests;
+    } catch {
+      return this.cachedDigestsKey === cacheKey ? this.cachedDigests : new Map();
+    }
+  }
+
   async loadCareerEventArchives(): Promise<readonly AnyCareerMatchEventArchive[]> {
     const cacheKey = this.currentArchiveCacheKey();
     if (!cacheKey || !this.saveId || !this.state) {
@@ -4406,9 +4491,9 @@ export class CareerApplicationService {
   ) {
     if (!this.state) return null;
     const cacheKey = this.currentArchiveCacheKey();
-    const archives =
-      archivesOverride ??
-      (cacheKey && this.cachedArchivesKey === cacheKey ? this.cachedArchives : []);
+    const archives = archivesOverride ?? [];
+    const digests =
+      !archivesOverride && cacheKey && this.cachedDigestsKey === cacheKey ? this.cachedDigests : undefined;
     const world = this.getWorld();
     const teamAffiliationByPlayerId: Record<string, string> = {};
     for (const team of world.teams) {
@@ -4420,6 +4505,7 @@ export class CareerApplicationService {
       return buildHistoricalStatsSourceFromPersistentWorld({
         world: this.persistentState,
         archives,
+        ...(digests ? { digests } : {}),
         homeGroundIds: T20_LEAGUE_COMPETITION.homeGroundIds,
         ...(("lifecycle" in this.persistentState) ? {} : { teamAffiliationByPlayerId }),
       });
@@ -4431,6 +4517,7 @@ export class CareerApplicationService {
       season: this.state,
       worldId: this.saveId ?? this.state.seasonId,
       archives,
+      ...(digests ? { digests } : {}),
       homeGroundIds: T20_LEAGUE_COMPETITION.homeGroundIds,
       teamAffiliationByPlayerId,
     });
@@ -4507,7 +4594,7 @@ export class CareerApplicationService {
       if (existing && existing.worldOrCareerId !== worldOrCareerId) {
         return null;
       }
-      const archives = await this.loadCareerEventArchives();
+      const digests = await this.loadCareerMatchDigests();
       const { playerNames, teamNames } = this.awardsNameMaps();
       const singleSeason = this.persistentState
         ? null
@@ -4534,7 +4621,7 @@ export class CareerApplicationService {
         existingLedger: existing,
         persistentWorld: this.persistentState,
         singleSeason,
-        archives,
+        digests,
         knownPlayers: [
           ...careerWorld.players,
           ...(this.getEconomyState()?.freeAgents.map((fa) => fa.player) ?? []),

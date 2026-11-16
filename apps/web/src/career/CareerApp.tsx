@@ -309,7 +309,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       return;
     }
     let alive = true;
-    void service.loadCareerEventArchives().then(() => {
+    void service.loadCareerMatchDigests().then(() => {
       if (alive) setCareerArchivesVersion((v) => v + 1);
     });
     void service.syncAwardsLedger().then(() => {

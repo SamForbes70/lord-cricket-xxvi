@@ -22,6 +22,8 @@ import {
   type T20SeasonMatchCompletion,
   type T20SeasonState,
   compareCodePoints,
+  CAREER_MATCH_DIGEST_VERSION,
+  type CareerMatchDigest,
 } from "@lcxxvi/contracts";
 
 export const HISTORICAL_T20_COMPETITION_ID = "LC_T20_LEAGUE_01" as const;
@@ -291,27 +293,6 @@ function extractArchiveDetail(
 
   return { creaseOrder: [order0, order1], fieldingByPlayer };
 }
-
-/** Version of the per-match digest (docs/design/MATCH_ARCHIVE_STORAGE_V2.md). */
-export const CAREER_MATCH_DIGEST_VERSION = "LC_CAREER_MATCH_DIGEST_V1" as const;
-
-/**
- * Everything statistics and awards need from one match's ball-by-ball archive: ground, crease order per
- * innings, and fielding credits. A few hundred bytes instead of the full archive.
- */
-export type CareerMatchDigest = {
-  readonly digestVersion: typeof CAREER_MATCH_DIGEST_VERSION;
-  readonly fixtureId: string;
-  readonly groundId: string | null;
-  readonly creaseOrder: readonly [readonly string[], readonly string[]];
-  readonly fielding: readonly {
-    readonly playerId: string;
-    readonly teamId: string;
-    readonly catches: number;
-    readonly stumpings: number;
-    readonly runOuts: number;
-  }[];
-};
 
 /** Derives the digest with exactly the logic statistics use on a full archive. */
 export function deriveCareerMatchDigest(

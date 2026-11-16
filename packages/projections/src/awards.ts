@@ -22,7 +22,8 @@ import {
   compareCodePoints,
 } from "@lcxxvi/contracts";
 import { pureSha256Hex } from "./audio-cues.js";
-import type { AnyCareerMatchEventArchive, AnyPersistentWorldState, CareerMatchDigest } from "./historical-stats.js";
+import type { AnyCareerMatchEventArchive, AnyPersistentWorldState } from "./historical-stats.js";
+import type { CareerMatchDigest } from "@lcxxvi/contracts";
 
 export const MATCH_AWARD_FORMULA_SUMMARY =
   "Transparent Game Award: batting (runs, boundaries, milestones, not-out, format-par strike rate) + bowling (24 pts/wkt, 3w/5w hauls, maidens, format-par economy) + attributable fielding (catches 7, stumpings 9, run-outs 11) + modest winning-team bonus (5 pts; standout losing performances can still win)." as const;

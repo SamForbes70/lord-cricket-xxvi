@@ -46,6 +46,8 @@ export type AnyCareerMatchEventArchive =
   | CompletedLifecycleMatchEventArchive;
 
 export const CAREER_MATCH_EVENTS_SCOPE = "CAREER_MATCH_EVENTS_V1" as const;
+/** Per-match digests derived from the archives (docs/design/MATCH_ARCHIVE_STORAGE_V2.md). */
+export const CAREER_MATCH_DIGEST_SCOPE = "CAREER_MATCH_DIGEST_V1" as const;
 export const CAREER_AWARDS_LEDGER_SCOPE = "CAREER_AWARDS_LEDGER_V1" as const;
 
 export const SEASON_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V1" as const;
