@@ -50,7 +50,8 @@ test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserve
   const season1Detail = page.getByTestId("archived-season-detail-1");
   await expect(season1Detail).toBeVisible();
   await season1Detail.getByRole("button", { name: "View replay" }).first().click();
-  await expect(page.getByTestId("career-replay-viewer")).toBeVisible();
+  // Before #52 a replay parses every archive of the world; Firefox on the Windows runner took just over 10 s.
+  await expect(page.getByTestId("career-replay-viewer")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("replay-archive-meta")).toContainText(/LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V(1|2_LIFECYCLE)/);
   await page.getByTestId("career-replay-viewer").getByRole("button", { name: "Close replay" }).click();
 

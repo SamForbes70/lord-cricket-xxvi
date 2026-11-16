@@ -80,7 +80,7 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   const season1Detail = page.getByTestId("archived-season-detail-1");
   await expect(season1Detail).toBeVisible();
   await season1Detail.getByRole("button", { name: "View replay" }).first().click();
-  await expect(page.getByTestId("career-replay-viewer")).toBeVisible();
+  await expect(page.getByTestId("career-replay-viewer")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("replay-archive-meta")).toContainText(
     "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE",
   );
