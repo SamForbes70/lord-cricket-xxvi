@@ -21,6 +21,7 @@ import {
   type RetiredPlayerRecord,
   type T20SeasonMatchCompletion,
   type T20SeasonState,
+  compareCodePoints,
 } from "@lcxxvi/contracts";
 
 export const HISTORICAL_T20_COMPETITION_ID = "LC_T20_LEAGUE_01" as const;
@@ -387,7 +388,7 @@ export function buildHistoricalMatchFact(
         runOuts: counts.runOuts,
       });
     }
-    fieldingEntries.sort((a, b) => a.playerId.localeCompare(b.playerId));
+    fieldingEntries.sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   }
 
   const r = completion.scorecard.result;
@@ -552,7 +553,7 @@ export function buildHistoricalMatchFactsFromCareer(source: HistoricalCareerStat
   for (const season of orderedSeasons) {
     registerHistoricalSeasonMetadata(acc, season);
     const orderedCompletions = [...season.completedMatches].sort(
-      (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+      (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || compareCodePoints(a.fixtureId, b.fixtureId),
     );
     for (const completion of orderedCompletions) {
       const archive = archiveMap.get(completion.fixtureId);
@@ -649,7 +650,7 @@ function buildLeaderboardTable(input: {
         ? b.secondaryTieRankValue - a.secondaryTieRankValue
         : a.secondaryTieRankValue - b.secondaryTieRankValue;
     }
-    return a.playerId.localeCompare(b.playerId);
+    return compareCodePoints(a.playerId, b.playerId);
   });
 
   const top = sorted.slice(0, 50);
@@ -729,7 +730,7 @@ export function finalizeHistoricalStatisticsProjection(
     (a, b) =>
       a.seasonNumber - b.seasonNumber ||
       a.fixtureOrdinal - b.fixtureOrdinal ||
-      a.fixtureId.localeCompare(b.fixtureId),
+      compareCodePoints(a.fixtureId, b.fixtureId),
   );
 
   const filteredFacts = orderedFacts.filter((fact) => {
@@ -1123,11 +1124,11 @@ export function finalizeHistoricalStatisticsProjection(
       (a, b) =>
         b.runs - a.runs ||
         b.bowlingWickets - a.bowlingWickets ||
-        a.playerId.localeCompare(b.playerId),
+        compareCodePoints(a.playerId, b.playerId),
     );
 
   const teamStandings = [...teamStandingMap.values()].sort(
-    (a, b) => b.points - a.points || b.wins - a.wins || a.teamId.localeCompare(b.teamId),
+    (a, b) => b.points - a.points || b.wins - a.wins || compareCodePoints(a.teamId, b.teamId),
   );
   const maxTeamMatches = teamStandings.reduce((max, r) => Math.max(max, r.played), 0);
   const isMultiSeasonScope = query.seasonScope === "ALL" && orderedSeasons.length > 1 && filteredFacts.length > 56;

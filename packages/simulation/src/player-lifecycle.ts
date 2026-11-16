@@ -52,6 +52,7 @@ import {
   type WorldPack,
   type YouthCeilingTier,
   type YouthProspect,
+  compareCodePoints,
 } from "@lcxxvi/contracts";
 import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 import { type CareerArchivedReplaySummary } from "./career-replay.js";
@@ -471,7 +472,7 @@ export function generateSeasonYouthAcademyClass(
 ): YouthProspect[] {
   const byId = new Map(activeWorld.players.map((p) => [p.playerId, p]));
   const prospects: YouthProspect[] = [];
-  const sortedTeams = [...activeWorld.teams].sort((a, b) => a.teamId.localeCompare(b.teamId));
+  const sortedTeams = [...activeWorld.teams].sort((a, b) => compareCodePoints(a.teamId, b.teamId));
   for (const team of sortedTeams) {
     const squad = team.squadIds.map((id) => byId.get(id)!).filter(Boolean);
     const keeperCount = squad.filter((p) => p.role === "KEEPER").length;
@@ -532,7 +533,7 @@ export function createInitialPlayerLifecycleState(input: {
 }): PlayerLifecycleState {
   const seasonNumber = input.seasonNumber ?? 1;
   const activeWorld = applyWorldCopyOverlay(input.baseWorld, input.worldCopy ?? null);
-  const sortedPlayers = [...activeWorld.players].sort((a, b) => a.playerId.localeCompare(b.playerId));
+  const sortedPlayers = [...activeWorld.players].sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   const skillLedger: PlayerLifecycleSkillLedgerEntry[] = sortedPlayers.map((p) => ({
     playerId: p.playerId,
     debutSeasonNumber: seasonNumber,
@@ -572,6 +573,22 @@ export function createInitialPlayerLifecycleState(input: {
 }
 
 /**
+ * AI club training policy: practise the role's discipline; all-rounders and keepers alternate between
+ * their two disciplines by taking whichever has fewer days so far. Deterministic from saved state only.
+ */
+export function aiClubTrainingDirective(
+  role: Player["role"],
+  exposure: Pick<PlayerTrainingExposureRecord, "battingPracticeDays" | "bowlingPracticeDays" | "fieldingPracticeDays">,
+): TrainingDirective {
+  if (role === "BATTER") return "BATTING_PRACTICE";
+  if (role === "BOWLER") return "BOWLING_PRACTICE";
+  if (role === "KEEPER") {
+    return exposure.fieldingPracticeDays < exposure.battingPracticeDays ? "FIELDING_PRACTICE" : "BATTING_PRACTICE";
+  }
+  return exposure.bowlingPracticeDays < exposure.battingPracticeDays ? "BOWLING_PRACTICE" : "BATTING_PRACTICE";
+}
+
+/**
  * Records elapsed training exposure strictly from committed calendar day advances (`daysElapsed >= 1`).
  * Toggling directives in menus (`daysElapsed === 0`) never mutates exposure or skills.
  */
@@ -579,11 +596,25 @@ export function recordElapsedTrainingExposure(
   lifecycle: PlayerLifecycleState,
   trainingAssignments: readonly { playerId: string; directive: TrainingDirective }[],
   daysElapsed: number,
+  /**
+   * The club the human manages. When given, players of every other club follow the AI club
+   * training policy, so AI squads develop on the same rules as the player's (audit 16 Nov 2026,
+   * Phase 3). Without it, every unassigned player rests (the original behaviour).
+   */
+  controlledTeamId?: string | null,
 ): PlayerLifecycleState {
   if (daysElapsed <= 0) return lifecycle;
   const directiveByPlayer = new Map(trainingAssignments.map((a) => [a.playerId, a.directive]));
+  const managedSquad =
+    controlledTeamId === undefined
+      ? null
+      : new Set(lifecycle.activeWorld.teams.find((t) => t.teamId === controlledTeamId)?.squadIds ?? []);
+  const roleById = new Map(lifecycle.activeWorld.players.map((p) => [p.playerId, p.role]));
   const nextExposure = lifecycle.seasonTrainingExposure.map((entry) => {
-    const directive = directiveByPlayer.get(entry.playerId) ?? "REST";
+    const aiPlayer = managedSquad !== null && roleById.has(entry.playerId) && !managedSquad.has(entry.playerId);
+    const directive = aiPlayer
+      ? aiClubTrainingDirective(roleById.get(entry.playerId)!, entry)
+      : directiveByPlayer.get(entry.playerId) ?? "REST";
     return {
       playerId: entry.playerId,
       battingPracticeDays:
@@ -684,7 +715,7 @@ export function promoteYouthProspectPreSeason(input: {
 
   const promotedPlayer = structuredClone(prospect!.player);
   const nextPlayers = [...input.lifecycle.activeWorld.players, promotedPlayer].sort((a, b) =>
-    a.playerId.localeCompare(b.playerId),
+    compareCodePoints(a.playerId, b.playerId),
   );
   const nextTeams = input.lifecycle.activeWorld.teams.map((t) =>
     t.teamId === team!.teamId
@@ -712,7 +743,7 @@ export function promoteYouthProspectPreSeason(input: {
       priorSeasonT20Skills: structuredClone(promotedPlayer.skills.T20!),
       lastSeasonDelta: zeroDeltaSummary(),
     },
-  ].sort((a, b) => a.playerId.localeCompare(b.playerId));
+  ].sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   const nextExposure = [
     ...input.lifecycle.seasonTrainingExposure,
     {
@@ -722,7 +753,7 @@ export function promoteYouthProspectPreSeason(input: {
       fieldingPracticeDays: 0,
       restDays: 0,
     },
-  ].sort((a, b) => a.playerId.localeCompare(b.playerId));
+  ].sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   const nextAcademy = input.lifecycle.youthAcademy.map((p) =>
     p.prospectId === prospect!.prospectId
       ? { ...p, queuedForPromotion: false, promotedInSeasonNumber: request.seasonNumber }
@@ -1035,7 +1066,7 @@ export function advancePlayerLifecycleAtSeasonClose(input: {
   const updatedLedgerMap = new Map<string, PlayerLifecycleSkillLedgerEntry>(ledgerMap);
 
   const sortedActive = [...validated.activeWorld.players].sort((a, b) =>
-    a.playerId.localeCompare(b.playerId),
+    compareCodePoints(a.playerId, b.playerId),
   );
   for (const player of sortedActive) {
     const teamId = teamByPlayer.get(player.playerId)!;
@@ -1125,7 +1156,7 @@ export function advancePlayerLifecycleAtSeasonClose(input: {
   const finalActivePlayers: Player[] = [];
 
   const sortedTeams = [...validated.activeWorld.teams].sort((a, b) =>
-    a.teamId.localeCompare(b.teamId),
+    compareCodePoints(a.teamId, b.teamId),
   );
   for (const team of sortedTeams) {
     const clubAvailableProspects = developedAcademy
@@ -1302,7 +1333,7 @@ export function advancePlayerLifecycleAtSeasonClose(input: {
     });
   }
 
-  finalActivePlayers.sort((a, b) => a.playerId.localeCompare(b.playerId));
+  finalActivePlayers.sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   const nextActiveWorld: WorldPack = {
     ...structuredClone(validated.activeWorld),
     teams: nextTeams,
@@ -1366,7 +1397,7 @@ export function advancePlayerLifecycleAtSeasonClose(input: {
   ]);
   const nextSkillLedger = [...updatedLedgerMap.values()]
     .filter((entry) => activeIdSet.has(entry.playerId) || retiredIdSet.has(entry.playerId))
-    .sort((a, b) => a.playerId.localeCompare(b.playerId));
+    .sort((a, b) => compareCodePoints(a.playerId, b.playerId));
 
   const nextHistoricalPacks = validated.historicalRosterPacks.some(
     (p) => p.sourceHash === nextRosterPack.sourceHash,
@@ -1383,7 +1414,7 @@ export function advancePlayerLifecycleAtSeasonClose(input: {
     skillLedger: nextSkillLedger,
     seasonTrainingExposure: nextExposure,
     retiredPlayers: [...validated.retiredPlayers, ...newRetiredRecords].sort((a, b) =>
-      a.playerId.localeCompare(b.playerId),
+      compareCodePoints(a.playerId, b.playerId),
     ),
     youthAcademy: combinedAcademy,
     transitions: [...validated.transitions, transitionRecord],
@@ -1776,7 +1807,7 @@ function* playerLifecycleHorizonSteps(input: PlayerLifecycleHorizonInput): Gener
             a.role === "BOWLER" ? sa.bowling : a.role === "KEEPER" ? sa.batting + sa.keeping * 0.4 : a.role === "ALLROUNDER" ? (sa.batting + sa.bowling) * 0.52 : sa.batting;
           const scoreB =
             b.role === "BOWLER" ? sb.bowling : b.role === "KEEPER" ? sb.batting + sb.keeping * 0.4 : b.role === "ALLROUNDER" ? (sb.batting + sb.bowling) * 0.52 : sb.batting;
-          return scoreB - scoreA || a.playerId.localeCompare(b.playerId);
+          return scoreB - scoreA || compareCodePoints(a.playerId, b.playerId);
         });
         ranked.forEach((player, idx) => {
           let drawIndex = 0;

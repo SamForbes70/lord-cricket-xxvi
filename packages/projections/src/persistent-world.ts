@@ -13,6 +13,7 @@ import {
   type SeasonLeaderboards,
   type SeasonRollOfHonourEntry,
   type T20SeasonMatchCompletion,
+  compareCodePoints,
 } from "@lcxxvi/contracts";
 
 function assertPersistentProjection(condition: unknown, code: string): asserts condition {
@@ -240,7 +241,7 @@ function computeCareerLeaders(players: readonly PersistentCareerPlayerStats[]): 
   ): SeasonLeaderboardEntry[] =>
     entries
       .filter((entry) => entry.value > 0)
-      .sort((a, b) => b.value - a.value || a.playerId.localeCompare(b.playerId))
+      .sort((a, b) => b.value - a.value || compareCodePoints(a.playerId, b.playerId))
       .slice(0, 10);
   return {
     runs: top(players.map((p) => ({ playerId: p.playerId, teamId: p.teamId, value: p.runs }))),
@@ -332,7 +333,7 @@ export function createEmptyPersistentCareerProjectionCore(input: {
   teamIds: readonly string[];
   activeSeasonNumber?: number;
 }): PersistentCareerProjectionCore {
-  const sortedTeams = [...input.teamIds].sort((a, b) => a.localeCompare(b));
+  const sortedTeams = [...input.teamIds].sort((a, b) => compareCodePoints(a, b));
   assertPersistentProjection(new Set(sortedTeams).size === 8, "TEAM_COUNT_MUST_BE_EIGHT");
   return PersistentCareerProjectionCoreSchema.parse({
     careerProjectionVersion: PERSISTENT_CAREER_PROJECTION_VERSION,
@@ -354,7 +355,7 @@ export function rebuildPersistentCareerProjectionCore(input: {
   completedSeasons: readonly unknown[];
   activeSeason: unknown;
 }): PersistentCareerProjectionCore {
-  const sortedTeams = [...input.teamIds].sort((a, b) => a.localeCompare(b));
+  const sortedTeams = [...input.teamIds].sort((a, b) => compareCodePoints(a, b));
   assertPersistentProjection(new Set(sortedTeams).size === 8, "TEAM_COUNT_MUST_BE_EIGHT");
   const completedSeasons: CompletedSeasonRecord[] = input.completedSeasons.map((item) =>
     CompletedSeasonRecordSchema.parse(item),
@@ -409,7 +410,7 @@ export function rebuildPersistentCareerProjectionCore(input: {
     });
 
     const orderedCompletions = [...season.completedMatches].sort(
-      (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+      (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || compareCodePoints(a.fixtureId, b.fixtureId),
     );
     for (const completion of orderedCompletions) {
       assertPersistentProjection(
@@ -433,7 +434,7 @@ export function rebuildPersistentCareerProjectionCore(input: {
     `ACTIVE_SEASON_COLLIDES_WITH_HISTORY:${activeSeason.seasonId}`,
   );
   const activeCompletions = [...activeSeason.completedMatches].sort(
-    (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+    (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || compareCodePoints(a.fixtureId, b.fixtureId),
   );
   for (const completion of activeCompletions) {
     assertPersistentProjection(
@@ -453,7 +454,7 @@ export function rebuildPersistentCareerProjectionCore(input: {
 
   const players = [...playerMap.values()]
     .map(deriveCareerPlayer)
-    .sort((a, b) => a.playerId.localeCompare(b.playerId));
+    .sort((a, b) => compareCodePoints(a.playerId, b.playerId));
 
   return PersistentCareerProjectionCoreSchema.parse({
     careerProjectionVersion: PERSISTENT_CAREER_PROJECTION_VERSION,
@@ -494,7 +495,7 @@ export function applyCompletionToPersistentCareerProjectionCore(input: {
   applyCompletionToPlayerMap(playerMap, seasonsSeenByPlayer, completion);
   const players = [...playerMap.values()]
     .map(deriveCareerPlayer)
-    .sort((a, b) => a.playerId.localeCompare(b.playerId));
+    .sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   return PersistentCareerProjectionCoreSchema.parse({
     ...previous,
     activeSeasonMatchesApplied: previous.activeSeasonMatchesApplied + 1,

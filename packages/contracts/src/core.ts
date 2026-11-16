@@ -288,3 +288,12 @@ export type InningsState = z.infer<typeof InningsStateSchema>;
 export type ClockState = z.infer<typeof ClockStateSchema>;
 export type MatchResult = z.infer<typeof MatchResultSchema>;
 export type MatchState = z.infer<typeof MatchStateSchema>;
+
+/**
+ * Locale-independent string order (UTF-16 code units). Use it wherever an order feeds hashed state,
+ * tie-breaks or deterministic simulation: `localeCompare` follows the machine's locale, and some locales
+ * order ASCII differently (Danish sorts "aa" after "z"), so two machines could diverge from one seed.
+ */
+export function compareCodePoints(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
