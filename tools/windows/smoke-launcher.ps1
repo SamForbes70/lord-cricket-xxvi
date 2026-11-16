@@ -25,10 +25,10 @@ try {
     if (-not $ready) { throw 'FAIL: health endpoint not ready' }
     Write-Host 'PASS health endpoint and binding'
 
-    $home = Invoke-WebRequest -UseBasicParsing -Uri "$base/" -TimeoutSec 5
-    if ($home.StatusCode -ne 200 -or $home.Headers['Content-Type'] -notlike '*text/html*') { throw 'FAIL: root HTML' }
-    if ($home.Headers['X-Content-Type-Options'] -ne 'nosniff') { throw 'FAIL: nosniff header' }
-    if ($home.Headers['Cache-Control'] -ne 'no-store') { throw 'FAIL: cache policy' }
+    $pageResponse = Invoke-WebRequest -UseBasicParsing -Uri "$base/" -TimeoutSec 5
+    if ($pageResponse.StatusCode -ne 200 -or $pageResponse.Headers['Content-Type'] -notlike '*text/html*') { throw 'FAIL: root HTML' }
+    if ($pageResponse.Headers['X-Content-Type-Options'] -ne 'nosniff') { throw 'FAIL: nosniff header' }
+    if ($pageResponse.Headers['Cache-Control'] -ne 'no-store') { throw 'FAIL: cache policy' }
     Write-Host 'PASS HTML and security headers'
 
     $head = Invoke-WebRequest -UseBasicParsing -Method Head -Uri "$base/index.html" -TimeoutSec 5
