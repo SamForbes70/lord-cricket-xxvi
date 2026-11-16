@@ -27,7 +27,7 @@ test("player profiles preserve format across players and reload without changing
   await expect(page.getByText("No T20 career statistics are available yet.")).toBeVisible();
   await format.selectOption("ODI");
   await expect(defence).toHaveText("42");
-  await expect(page.getByText("No ODI career statistics are available in this T20 season.")).toBeVisible();
+  await expect(page.getByText("No ODI career statistics are available in this T20 career.")).toBeVisible();
   await page.getByRole("button", { name: "Back to squad" }).click();
   await expect(page.getByRole("button", { name: "View Ulen Elmcroft", exact: true })).toBeFocused();
   await page.getByRole("button", { name: "View Caro Harden", exact: true }).click();
@@ -36,7 +36,7 @@ test("player profiles preserve format across players and reload without changing
   await expect(defence).toHaveText("56");
   await format.selectOption("RED_BALL");
   await expect(defence).toHaveText("61");
-  await expect(page.getByText("No red-ball career statistics are available in this T20 season.")).toBeVisible();
+  await expect(page.getByText("No red-ball career statistics are available in this T20 career.")).toBeVisible();
   await page.reload();
   await page.getByRole("button", { name: "Squad", exact: true }).click();
   await page.getByRole("button", { name: "View Ulen Elmcroft", exact: true }).click();
