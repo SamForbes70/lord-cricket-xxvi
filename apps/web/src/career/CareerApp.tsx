@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
-  AcademyTrainingFocus,
   AudioPreferences,
   HighlightMotionMode,
   HighlightPacingMode,
@@ -9,7 +8,6 @@ import type {
   HistoricalPlayerStatusFilter,
   SeasonCheckpointInspection,
   T20SeasonMatchCompletion,
-  TrainingDirective,
 } from "@lcxxvi/contracts";
 import {
   AWARDS_PROVENANCE_NOTICE,
@@ -41,8 +39,11 @@ import { WorldEditor } from "../world/WorldEditor.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
 import { offlineUpdateCoordinator } from "../offline-update.js";
 import "./career.css";
+import {    percentageBp } from "./format.js";
 import { StatisticsScreen } from "./StatisticsScreen.js";
 import { ContractsScreen } from "./ContractsScreen.js";
+import { SquadScreen } from "./SquadScreen.js";
+import { CareerScreen } from "./CareerScreen.js";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
 const LAUNCH_KEY = "lcxxvi-career-match-launch";
@@ -118,24 +119,6 @@ type Screen =
   | "PLAYER";
 export type StatsScope = "ACTIVE" | "ALL_TIME" | number;
 
-const directives: TrainingDirective[] = [
-  "REST",
-  "BATTING_PRACTICE",
-  "BOWLING_PRACTICE",
-  "FIELDING_PRACTICE",
-];
-
-const academyFocusOptions: AcademyTrainingFocus[] = [
-  "BALANCED",
-  "BATTING_PRACTICE",
-  "BOWLING_PRACTICE",
-  "FIELDING_PRACTICE",
-];
-
-
-function percentageBp(value: number): string {
-  return `${(value / 100).toFixed(1)}%`;
-}
 
 function oversText(balls: number): string {
   return `${Math.floor(balls / 6)}.${balls % 6}`;
@@ -1404,623 +1387,40 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       )}
 
       {screen === "CAREER" && (
-        <section aria-labelledby="career-heading">
-          <h2 id="career-heading">Career</h2>
-          <div className="career-summary-grid">
-            <div className="career-panel">
-              <h3>Season status</h3>
-              <p>
-                {persistentWorld
-                  ? `Season ${persistentWorld.currentSeasonNumber} (${persistentWorld.currentCalendarYear}) · ${state.phase}`
-                  : state.phase}
-              </p>
-              <p>Date {state.careerState.currentDate}</p>
-              <p>Round {currentRound} of 14</p>
-              {persistentWorld && (
-                <small>
-                  World <code>{persistentWorld.worldIdentity.worldId}</code> ·{" "}
-                  {persistentWorld.completedSeasons.length} sealed{" "}
-                  {persistentWorld.completedSeasons.length === 1 ? "season" : "seasons"}
-                </small>
-              )}
-            </div>
-            <div className="career-panel">
-              <h3>Managed record</h3>
-              <p>
-                {tableRow?.wins ?? 0} wins · {tableRow?.losses ?? 0} losses · {tableRow?.ties ?? 0}{" "}
-                ties
-              </p>
-              <p>{tableRow?.points ?? 0} points (active season)</p>
-              {persistentWorld && (() => {
-                const allTime = persistentWorld.careerProjection.teamHistory.find(
-                  (row) => row.teamId === controlledTeam,
-                );
-                if (!allTime) return null;
-                return (
-                  <p data-testid="managed-all-time-summary">
-                    All-time: {allTime.titles}{" "}
-                    {allTime.titles === 1 ? "title" : "titles"} · {allTime.wins}W · {allTime.losses}L
-                    · {allTime.ties}T ({allTime.played} played)
-                  </p>
-                );
-              })()}
-            </div>
-          </div>
-          {replayViewerSection}
-          {latestTransition && (
-            <section
-              className="career-panel"
-              aria-labelledby="lifecycle-transition-heading"
-              data-testid="offseason-lifecycle-report"
-              style={{ marginTop: "18px", marginBottom: "18px" }}
-            >
-              <h3 id="lifecycle-transition-heading">
-                Off-season lifecycle report · Season {latestTransition.fromSeasonNumber} to Season{" "}
-                {latestTransition.toSeasonNumber} ({latestTransition.calendarYear})
-              </h3>
-              <p>
-                Fictional lifecycle parameters (<code>{lifecycleState?.model.modelVersion}</code>) —
-                permanent off-season ageing, training progression, retirements, and youth intake.
-              </p>
-              <p>
-                <strong>{latestTransition.agedPlayerCount}</strong> aged ·{" "}
-                <strong>{latestTransition.developedPlayers.length}</strong> developed ·{" "}
-                <strong>{latestTransition.retiredPlayerIds.length}</strong> retired ·{" "}
-                <strong>{latestTransition.promotedYouthIds.length}</strong> youth promoted ·{" "}
-                <strong>{latestTransition.generatedYouthIds.length}</strong> new academy prospects
-              </p>
-              {latestTransition.retiredPlayerIds.length > 0 && (
-                <p>
-                  Retirements:{" "}
-                  {latestTransition.retiredPlayerIds
-                    .map((id) => service.playerName(id))
-                    .join(", ")}
-                </p>
-              )}
-            </section>
-          )}
-          {latestEconomyTransition && (
-            <section
-              className="career-panel"
-              aria-labelledby="economy-transition-heading"
-              data-testid="offseason-economy-report"
-              style={{ marginTop: "18px", marginBottom: "18px" }}
-            >
-              <h3 id="economy-transition-heading">
-                Off-season contracts &amp; budget report · Season{" "}
-                {latestEconomyTransition.fromSeasonNumber} to Season{" "}
-                {latestEconomyTransition.toSeasonNumber} ({latestEconomyTransition.calendarYear})
-              </h3>
-              <p>
-                <strong>{latestEconomyTransition.expiredToFreeAgencyIds.length}</strong> contracts
-                expired to free agency ·{" "}
-                <strong>{latestEconomyTransition.youthContractsSignedIds.length}</strong> youth
-                rookie contracts signed ·{" "}
-                <strong>{latestEconomyTransition.aiOffseasonFreeAgentSigningsIds.length}</strong>{" "}
-                off-season AI signings ·{" "}
-                <strong>{latestEconomyTransition.minimumTopupSignedIds.length}</strong> minimum-squad
-                fill signings
-              </p>
-            </section>
-          )}
-          {persistentWorld && persistentWorld.completedSeasons.length > 0 && (
-            <section
-              className="career-panel"
-              aria-labelledby="season-history-heading"
-              data-testid="completed-seasons-history"
-              style={{ marginTop: "18px", marginBottom: "22px" }}
-            >
-              <h3 id="season-history-heading">Season history &amp; roll of honour</h3>
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Season</th>
-                      <th>Champion</th>
-                      <th>Runner-up</th>
-                      <th>Managed finish</th>
-                      <th>Leading runs</th>
-                      <th>Leading wickets</th>
-                      <th>Season awards</th>
-                      <th>Archive</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {persistentWorld.completedSeasons.map((record) => {
-                      const managedRow = record.table.find((r) => r.teamId === controlledTeam);
-                      const topRuns = record.leaders.runs[0] ?? null;
-                      const topWkts = record.leaders.wickets[0] ?? null;
-                      const isInspecting = historySeasonView === record.seasonNumber;
-                      return (
-                        <tr key={record.seasonId}>
-                          <td>
-                            Season {record.seasonNumber} · {record.calendarYear}
-                            <small>
-                              {record.startDate} to {record.endDate}
-                            </small>
-                          </td>
-                          <td>
-                            <strong>{service.teamName(record.championTeamId)}</strong>
-                          </td>
-                          <td>{service.teamName(record.runnerUpTeamId)}</td>
-                          <td>
-                            {managedRow
-                              ? `#${managedRow.rank} (${managedRow.wins}W-${managedRow.losses}L, ${managedRow.points} pts)`
-                              : "–"}
-                          </td>
-                          <td>
-                            {topRuns
-                              ? `${service.playerName(topRuns.playerId)} (${topRuns.value})`
-                              : "–"}
-                          </td>
-                          <td>
-                            {topWkts
-                              ? `${service.playerName(topWkts.playerId)} (${topWkts.value})`
-                              : "–"}
-                          </td>
-                          <td data-testid={`season-awards-cell-${record.seasonNumber}`}>
-                            {(() => {
-                              const summary = service.getSeasonAwards(record.seasonNumber);
-                              if (!summary) {
-                                return <span aria-label="Season awards pending">Pending</span>;
-                              }
-                              const awarded = summary.awards.filter(
-                                (award) => award.status === "AWARDED" && award.winnerPlayerId,
-                              );
-                              return (
-                                <small className="season-awards-list">
-                                  {awarded.map((award, index) => (
-                                    <span key={award.category}>
-                                      {index > 0 && " · "}
-                                      <strong>{service.playerName(award.winnerPlayerId!)}</strong>{" "}
-                                      ({award.label})
-                                    </span>
-                                  ))}
-                                </small>
-                              );
-                            })()}
-                          </td>
-                          <td>
-                            <button
-                              type="button"
-                              aria-pressed={isInspecting}
-                              onClick={() =>
-                                setHistorySeasonView(isInspecting ? null : record.seasonNumber)
-                              }
-                            >
-                              {isInspecting ? "Hide archive" : `Inspect Season ${record.seasonNumber}`}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {inspectedCompletedSeason && (
-                <div data-testid={`archived-season-detail-${inspectedCompletedSeason.seasonNumber}`}>
-                  <h4>
-                    Archived Season {inspectedCompletedSeason.seasonNumber} ({
-                      inspectedCompletedSeason.calendarYear
-                    }) · Managed fixtures &amp; replay
-                  </h4>
-                  <p>
-                    Sealed record SHA-256:{" "}
-                    <code>{inspectedCompletedSeason.recordSha256.slice(0, 16)}…</code> · Final state
-                    SHA-256:{" "}
-                    <code>{inspectedCompletedSeason.finalSeasonStateSha256.slice(0, 16)}…</code>
-                  </p>
-                  <div className="table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Rnd</th>
-                          <th>Date</th>
-                          <th>Fixture</th>
-                          <th>Result</th>
-                          <th>Replay</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {inspectedCompletedSeason.completedMatches
-                          .filter((m) =>
-                            [m.homeTeamId, m.awayTeamId].includes(controlledTeam ?? ""),
-                          )
-                          .map((completion) => {
-                            const replayBtnId = `replay-history-${completion.fixtureId}`;
-                            return (
-                              <tr key={completion.fixtureId}>
-                                <td>{completion.roundNumber}</td>
-                                <td>{completion.matchDayDate}</td>
-                                <td>
-                                  {service.teamName(completion.homeTeamId)} v{" "}
-                                  {service.teamName(completion.awayTeamId)}
-                                </td>
-                                <td>{service.resultText(completion)}</td>
-                                <td>
-                                  <button
-                                    id={replayBtnId}
-                                    type="button"
-                                    className="replay-btn"
-                                    disabled={busy}
-                                    onClick={() => void openReplay(completion.fixtureId, replayBtnId)}
-                                  >
-                                    View replay
-                                  </button>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </section>
-          )}
-          <h3>Managed-team results (active season)</h3>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Rnd</th>
-                  <th>Date</th>
-                  <th>Fixture</th>
-                  <th>Result</th>
-                  <th>Replay</th>
-                </tr>
-              </thead>
-              <tbody>
-                {state.schedule.fixtures
-                  .filter((fixture) =>
-                    [fixture.homeTeamId, fixture.awayTeamId].includes(controlledTeam!),
-                  )
-                  .map((fixture) => {
-                    const completion = completionByFixture.get(fixture.fixtureId);
-                    const replayBtnId = `replay-career-${fixture.fixtureId}`;
-                    return (
-                      <tr key={fixture.fixtureId}>
-                        <td>{fixture.roundNumber}</td>
-                        <td>{fixture.matchDayDate}</td>
-                        <td>
-                          {service.teamName(fixture.homeTeamId)} v{" "}
-                          {service.teamName(fixture.awayTeamId)}
-                        </td>
-                        <td>{completion ? service.resultText(completion) : "Scheduled"}</td>
-                        <td>
-                          {completion ? (
-                            <button
-                              id={replayBtnId}
-                              type="button"
-                              className="replay-btn"
-                              disabled={busy}
-                              aria-label={`View replay for Round ${fixture.roundNumber} ${service.teamName(fixture.homeTeamId)} v ${service.teamName(fixture.awayTeamId)}`}
-                              onClick={() => void openReplay(fixture.fixtureId, replayBtnId)}
-                            >
-                              View replay
-                            </button>
-                          ) : (
-                            "–"
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <CareerScreen
+          service={service}
+          state={state}
+          persistentWorld={persistentWorld}
+          busy={busy}
+          controlledTeam={controlledTeam}
+          completionByFixture={completionByFixture}
+          currentRound={currentRound}
+          historySeasonView={historySeasonView}
+          setHistorySeasonView={setHistorySeasonView}
+          inspectedCompletedSeason={inspectedCompletedSeason}
+          latestEconomyTransition={latestEconomyTransition}
+          latestTransition={latestTransition}
+          lifecycleState={lifecycleState}
+          openReplay={openReplay}
+          replayViewerSection={replayViewerSection}
+          tableRow={tableRow}
+        />
       )}
 
       {screen === "SQUAD" && (
-        <section aria-labelledby="squad-heading">
-          <h2 id="squad-heading">Squad</h2>
-          <p>
-            {lifecycleState
-              ? "Daily training directives affect temporary readiness, daily fatigue recovery, and accumulated season exposure used for off-season fictional skill progression."
-              : "Training changes affect temporary readiness and daily recovery only."}
-          </p>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Player</th>
-                  {lifecycleState && <th>Age</th>}
-                  <th>Role</th>
-                  {economyState && <th>Contract</th>}
-                  <th>Availability</th>
-                  <th>Fatigue</th>
-                  <th>Bat</th>
-                  <th>Bowl</th>
-                  <th>Field</th>
-                  <th>Training</th>
-                </tr>
-              </thead>
-              <tbody>
-                {service.squadView()?.players.map((condition) => {
-                  const player = displayWorld.players.find(
-                    (candidate) => candidate.playerId === condition.playerId,
-                  )!;
-                  const age = service.playerAge(player.birthDate);
-                  const ledger = service.playerLifecycleLedgerEntry(player.playerId);
-                  const contract = service.playerContract(player.playerId);
-                  const lastNetDelta =
-                    ledger
-                      ? ledger.lastSeasonDelta.battingDelta +
-                        ledger.lastSeasonDelta.bowlingDelta +
-                        ledger.lastSeasonDelta.fieldingDelta
-                      : 0;
-                  return (
-                    <tr key={condition.playerId}>
-                      <td>
-                        <button
-                          type="button"
-                          className="player-link"
-                          id={`player-link-SQUAD-${player.playerId}`}
-                          aria-label={`View ${player.name}`}
-                          onClick={() => openPlayer(player.playerId, "SQUAD")}
-                        >
-                          {player.name}
-                        </button>
-                        <small>
-                          {player.playerId}
-                          {lastNetDelta !== 0
-                            ? ` · Off-season ${lastNetDelta > 0 ? `+${lastNetDelta}` : lastNetDelta}`
-                            : ""}
-                        </small>
-                      </td>
-                      {lifecycleState && <td>{age ?? "–"}</td>}
-                      <td>{player.role}</td>
-                      {economyState && (
-                        <td>
-                          {contract ? (
-                            <>
-                              <strong>${contract.annualWageK}k/yr</strong>
-                              <small>
-                                Through S{contract.expiresAfterSeasonNumber}
-                                {persistentWorld &&
-                                contract.expiresAfterSeasonNumber ===
-                                  persistentWorld.currentSeasonNumber
-                                  ? " · Expiring"
-                                  : ""}
-                              </small>
-                            </>
-                          ) : (
-                            "–"
-                          )}
-                        </td>
-                      )}
-                      <td>
-                        {condition.availability}
-                        {condition.availabilityReason ? (
-                          <small>{condition.availabilityReason}</small>
-                        ) : null}
-                      </td>
-                      <td>{percentageBp(condition.fatigueBp)}</td>
-                      <td>
-                        {condition.battingReadiness > 0 ? "+" : ""}
-                        {condition.battingReadiness}
-                      </td>
-                      <td>
-                        {condition.bowlingReadiness > 0 ? "+" : ""}
-                        {condition.bowlingReadiness}
-                      </td>
-                      <td>
-                        {condition.fieldingReadiness > 0 ? "+" : ""}
-                        {condition.fieldingReadiness}
-                      </td>
-                      <td>
-                        <label className="sr-label" htmlFor={`training-${condition.playerId}`}>
-                          Training for {player.name}
-                        </label>
-                        <select
-                          id={`training-${condition.playerId}`}
-                          disabled={
-                            busy ||
-                            inspectionOnly ||
-                            service.isReadOnly() ||
-                            state.phase === "COMPLETE"
-                          }
-                          value={condition.directive}
-                          onChange={(event) =>
-                            void action(async () => {
-                              await service.setTraining(
-                                condition.playerId,
-                                event.currentTarget.value as TrainingDirective,
-                              );
-                            })
-                          }
-                        >
-                          {directives.map((directive) => (
-                            <option key={directive} value={directive}>
-                              {directive.replaceAll("_", " ")}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          {lifecycleState && (
-            <section
-              className="career-panel"
-              aria-labelledby="youth-academy-heading"
-              data-testid="youth-academy-panel"
-              style={{ marginTop: "18px" }}
-            >
-              <h3 id="youth-academy-heading">Youth academy pathway</h3>
-              <p>
-                Academy prospects use fictional ceiling tiers (
-                <code>{lifecycleState.model.modelVersion}</code>). Set training focus, queue
-                prospects for automatic off-season promotion, or promote directly before Round 1.
-              </p>
-              {service.managedYouthAcademyProspects().length === 0 ? (
-                <p>No active academy prospects remain for {service.teamName(controlledTeam)} this season.</p>
-              ) : (
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Prospect</th>
-                        <th>Age</th>
-                        <th>Role</th>
-                        <th>Ceiling tier</th>
-                        <th>Key T20 skills</th>
-                        <th>Academy focus</th>
-                        <th>Off-season queue</th>
-                        <th>Pre-season</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {service.managedYouthAcademyProspects().map((prospect) => {
-                        const t20 = prospect.player.skills.T20;
-                        const prospectAge = persistentWorld
-                          ? Math.max(
-                              16,
-                              persistentWorld.currentCalendarYear -
-                                Number.parseInt(prospect.player.birthDate.slice(0, 4), 10),
-                            )
-                          : 18;
-                        const canPromoteNow =
-                          state.phase === "ACTIVE" &&
-                          state.completedMatches.length === 0 &&
-                          !busy &&
-                          !inspectionOnly &&
-                          !service.isReadOnly();
-                        return (
-                          <tr key={prospect.prospectId} data-testid={`youth-row-${prospect.prospectId}`}>
-                            <td>
-                              <strong>{prospect.player.name}</strong>
-                              <small>{prospect.prospectId}</small>
-                            </td>
-                            <td>{prospectAge}</td>
-                            <td>{prospect.player.role.replaceAll("_", " ")}</td>
-                            <td>{prospect.fictionalCeilingTier.replaceAll("_", " ")}</td>
-                            <td>
-                              Tim {t20.timing} · Pow {t20.power} · Ctl {t20.control} · Cat{" "}
-                              {t20.catching}
-                            </td>
-                            <td>
-                              <label
-                                className="sr-label"
-                                htmlFor={`academy-focus-${prospect.prospectId}`}
-                              >
-                                Academy focus for {prospect.player.name}
-                              </label>
-                              <select
-                                id={`academy-focus-${prospect.prospectId}`}
-                                disabled={busy || inspectionOnly || service.isReadOnly()}
-                                value={prospect.academyFocus}
-                                onChange={(event) =>
-                                  void action(async () => {
-                                    await service.setYouthProspectFocus(
-                                      prospect.prospectId,
-                                      event.currentTarget.value as AcademyTrainingFocus,
-                                    );
-                                  })
-                                }
-                              >
-                                {academyFocusOptions.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {opt.replaceAll("_", " ")}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                            <td>
-                              <label className="check-label">
-                                <input
-                                  type="checkbox"
-                                  aria-label={`Queue ${prospect.player.name} for off-season promotion`}
-                                  disabled={busy || inspectionOnly || service.isReadOnly()}
-                                  checked={prospect.queuedForPromotion}
-                                  onChange={(event) =>
-                                    void action(async () => {
-                                      await service.setYouthProspectQueue(
-                                        prospect.prospectId,
-                                        event.currentTarget.checked,
-                                      );
-                                    })
-                                  }
-                                />{" "}
-                                Queue
-                              </label>
-                            </td>
-                            <td>
-                              <button
-                                type="button"
-                                disabled={!canPromoteNow}
-                                aria-label={`Promote ${prospect.player.name} now`}
-                                onClick={() =>
-                                  void action(async () => {
-                                    await service.promoteYouthProspectNow(prospect.prospectId);
-                                  })
-                                }
-                              >
-                                Promote now
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          )}
-          {lifecycleState && lifecycleState.retiredPlayers.length > 0 && (
-            <section
-              className="career-panel"
-              aria-labelledby="retired-alumni-heading"
-              data-testid="retired-players-panel"
-              style={{ marginTop: "18px" }}
-            >
-              <h3 id="retired-alumni-heading">Retired alumni directory</h3>
-              <p>Retired players keep permanent player pages, skill histories, and career statistics.</p>
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Player</th>
-                      <th>Last club</th>
-                      <th>Retired after</th>
-                      <th>Age at retirement</th>
-                      <th>Reason</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lifecycleState.retiredPlayers.map((retired) => (
-                      <tr key={retired.playerId}>
-                        <td>
-                          <button
-                            type="button"
-                            className="player-link"
-                            id={`player-link-SQUAD-${retired.playerId}`}
-                            aria-label={`View retired player ${retired.player.name}`}
-                            onClick={() => openPlayer(retired.playerId, "SQUAD")}
-                          >
-                            {retired.player.name}
-                          </button>
-                          <small>{retired.playerId}</small>
-                        </td>
-                        <td>{service.teamName(retired.lastTeamId)}</td>
-                        <td>
-                          Season {retired.retiredAfterSeasonNumber} ({retired.retiredCalendarYear})
-                        </td>
-                        <td>{retired.ageAtRetirement}</td>
-                        <td>{retired.retirementReason.replaceAll("_", " ").toLowerCase()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-        </section>
+        <SquadScreen
+          service={service}
+          state={state}
+          persistentWorld={persistentWorld}
+          busy={busy}
+          inspectionOnly={inspectionOnly}
+          action={action}
+          controlledTeam={controlledTeam}
+          displayWorld={displayWorld}
+          economyState={economyState}
+          lifecycleState={lifecycleState}
+          openPlayer={openPlayer}
+        />
       )}
 
       {screen === "FIXTURES" && (
