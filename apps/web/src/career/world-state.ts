@@ -70,6 +70,7 @@ import {
   sealPersistentWorldStateV3,
   sealT20SeasonState,
   sealPersistentWorldStateV4,
+  type AnyPersistentWorldState,
 } from "@lcxxvi/persistence";
 
 export const worldBytes = new TextEncoder().encode(worldText);
@@ -250,10 +251,18 @@ export async function rebuildPersistentWorldStateWithActiveSeason(
   });
 }
 
-export async function rolloverPersistentWorldCareerSeason(
-  worldState: PersistentWorldState,
-  nextRevision = worldState.revision + 1,
-): Promise<{ nextState: PersistentWorldState; closedRecord: CompletedSeasonRecord }> {
+/**
+ * The start every season rollover shares (world states V1 to V4): close the active season into a sealed
+ * record and work out the next season's number, calendar year and start date. For a V1 season,
+ * `seasonStartDateOf` is its schedule's start date, so all versions compute exactly what they did before.
+ */
+async function closeCurrentSeason(worldState: AnyPersistentWorldState): Promise<{
+  closedRecord: CompletedSeasonRecord;
+  completedSeasons: CompletedSeasonRecord[];
+  nextSeasonNumber: number;
+  nextCalendarYear: number;
+  nextStartDate: string;
+}> {
   if (worldState.currentSeason.phase !== "COMPLETE") {
     throw new Error("Complete all 56 fixtures before closing the season.");
   }
@@ -263,13 +272,54 @@ export async function rolloverPersistentWorldCareerSeason(
     completedSeasonState: worldState.currentSeason,
     completedAt: deterministicSeasonCompletedAt(worldState.currentSeason),
   });
-  const completedSeasons = [...worldState.completedSeasons, closedRecord];
-  const nextSeasonNumber = worldState.currentSeasonNumber + 1;
   const { nextCalendarYear, nextStartDate } = advancePersistentSeasonCalendar({
     closedCalendarYear: worldState.currentCalendarYear,
     closedEndDate: worldState.currentSeason.careerState.finalScheduledDate,
-    seasonStartMonthDay: worldState.currentSeason.schedule.startDate.slice(5, 10),
+    seasonStartMonthDay: seasonStartDateOf(worldState.currentSeason).slice(5, 10),
   });
+  return {
+    closedRecord,
+    completedSeasons: [...worldState.completedSeasons, closedRecord],
+    nextSeasonNumber: worldState.currentSeasonNumber + 1,
+    nextCalendarYear,
+    nextStartDate,
+  };
+}
+
+/** The end every season rollover shares: the rebuilt career projection and the rollover receipt. */
+async function rolloverProjectionAndReceipt(
+  worldState: AnyPersistentWorldState,
+  closed: { closedRecord: CompletedSeasonRecord; completedSeasons: CompletedSeasonRecord[]; nextSeasonNumber: number },
+  nextCurrentSeason: ActivePersistentSeasonState,
+) {
+  const careerProjection = await sealPersistentCareerProjection(
+    rebuildPersistentCareerProjectionCore({
+      worldId: worldState.worldIdentity.worldId,
+      teamIds: T20_LEAGUE_COMPETITION.teamIds,
+      completedSeasons: closed.completedSeasons,
+      activeSeason: nextCurrentSeason,
+    }),
+  );
+  const receipt = PersistentWorldRolloverReceiptSchema.parse({
+    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
+    fromSeasonNumber: worldState.currentSeasonNumber,
+    toSeasonNumber: closed.nextSeasonNumber,
+    closedSeasonId: closed.closedRecord.seasonId,
+    closedSeasonStateSha256: closed.closedRecord.finalSeasonStateSha256,
+    closedSeasonRecordSha256: closed.closedRecord.recordSha256,
+    nextSeasonId: nextCurrentSeason.seasonId,
+    nextStartDate: seasonStartDateOf(nextCurrentSeason),
+    nextScheduleSha256: nextCurrentSeason.schedule.scheduleSha256,
+  });
+  return { careerProjection, receipt };
+}
+
+export async function rolloverPersistentWorldCareerSeason(
+  worldState: PersistentWorldState,
+  nextRevision = worldState.revision + 1,
+): Promise<{ nextState: PersistentWorldState; closedRecord: CompletedSeasonRecord }> {
+  const { closedRecord, completedSeasons, nextSeasonNumber, nextCalendarYear, nextStartDate } =
+    await closeCurrentSeason(worldState);
   const built = createPersistentSeasonScheduleAndDayState({
     worldIdentity: worldState.worldIdentity,
     careerId: worldState.careerId,
@@ -296,25 +346,11 @@ export async function rolloverPersistentWorldCareerSeason(
     revision: 0,
     phase: "ACTIVE",
   });
-  const careerProjection = await sealPersistentCareerProjection(
-    rebuildPersistentCareerProjectionCore({
-      worldId: worldState.worldIdentity.worldId,
-      teamIds: T20_LEAGUE_COMPETITION.teamIds,
-      completedSeasons,
-      activeSeason: nextCurrentSeason,
-    }),
+  const { careerProjection, receipt } = await rolloverProjectionAndReceipt(
+    worldState,
+    { closedRecord, completedSeasons, nextSeasonNumber },
+    nextCurrentSeason,
   );
-  const receipt = PersistentWorldRolloverReceiptSchema.parse({
-    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
-    fromSeasonNumber: worldState.currentSeasonNumber,
-    toSeasonNumber: nextSeasonNumber,
-    closedSeasonId: closedRecord.seasonId,
-    closedSeasonStateSha256: closedRecord.finalSeasonStateSha256,
-    closedSeasonRecordSha256: closedRecord.recordSha256,
-    nextSeasonId: nextCurrentSeason.seasonId,
-    nextStartDate: nextCurrentSeason.schedule.startDate,
-    nextScheduleSha256: nextCurrentSeason.schedule.scheduleSha256,
-  });
   const nextState = await sealPersistentWorldState({
     worldStateVersion: PERSISTENT_WORLD_STATE_VERSION,
     worldIdentity: worldState.worldIdentity,
@@ -571,22 +607,8 @@ export async function rolloverPersistentWorldCareerSeasonV2(
   worldState: PersistentWorldStateV2,
   nextRevision = worldState.revision + 1,
 ): Promise<{ nextState: PersistentWorldStateV2; closedRecord: CompletedSeasonRecord }> {
-  if (worldState.currentSeason.phase !== "COMPLETE") {
-    throw new Error("Complete all 56 fixtures before closing the season.");
-  }
-  const closedRecord = await sealCompletedSeasonRecord({
-    seasonNumber: worldState.currentSeasonNumber,
-    calendarYear: worldState.currentCalendarYear,
-    completedSeasonState: worldState.currentSeason,
-    completedAt: deterministicSeasonCompletedAt(worldState.currentSeason),
-  });
-  const completedSeasons = [...worldState.completedSeasons, closedRecord];
-  const nextSeasonNumber = worldState.currentSeasonNumber + 1;
-  const { nextCalendarYear, nextStartDate } = advancePersistentSeasonCalendar({
-    closedCalendarYear: worldState.currentCalendarYear,
-    closedEndDate: worldState.currentSeason.careerState.finalScheduledDate,
-    seasonStartMonthDay: seasonStartDateOf(worldState.currentSeason).slice(5, 10),
-  });
+  const { closedRecord, completedSeasons, nextSeasonNumber, nextCalendarYear, nextStartDate } =
+    await closeCurrentSeason(worldState);
   const seasonPlayerStats = worldState.currentSeason.projection.players.map((p) => ({
     playerId: p.playerId,
     matches: p.matches,
@@ -614,25 +636,11 @@ export async function rolloverPersistentWorldCareerSeasonV2(
     priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
     carryForwardDirectives: worldState.currentSeason.careerState.trainingAssignments,
   });
-  const careerProjection = await sealPersistentCareerProjection(
-    rebuildPersistentCareerProjectionCore({
-      worldId: worldState.worldIdentity.worldId,
-      teamIds: T20_LEAGUE_COMPETITION.teamIds,
-      completedSeasons,
-      activeSeason: nextCurrentSeason,
-    }),
+  const { careerProjection, receipt } = await rolloverProjectionAndReceipt(
+    worldState,
+    { closedRecord, completedSeasons, nextSeasonNumber },
+    nextCurrentSeason,
   );
-  const receipt = PersistentWorldRolloverReceiptSchema.parse({
-    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
-    fromSeasonNumber: worldState.currentSeasonNumber,
-    toSeasonNumber: nextSeasonNumber,
-    closedSeasonId: closedRecord.seasonId,
-    closedSeasonStateSha256: closedRecord.finalSeasonStateSha256,
-    closedSeasonRecordSha256: closedRecord.recordSha256,
-    nextSeasonId: nextCurrentSeason.seasonId,
-    nextStartDate: seasonStartDateOf(nextCurrentSeason),
-    nextScheduleSha256: nextCurrentSeason.schedule.scheduleSha256,
-  });
   const nextState = await sealPersistentWorldStateV2({
     worldStateVersion: PERSISTENT_WORLD_STATE_V2_VERSION,
     worldIdentity: worldState.worldIdentity,
@@ -888,22 +896,8 @@ export async function rolloverPersistentWorldCareerSeasonV3(
   worldState: EconomyWorldState,
   nextRevision = worldState.revision + 1,
 ): Promise<{ nextState: EconomyWorldState; closedRecord: CompletedSeasonRecord }> {
-  if (worldState.currentSeason.phase !== "COMPLETE") {
-    throw new Error("Complete all 56 fixtures before closing the season.");
-  }
-  const closedRecord = await sealCompletedSeasonRecord({
-    seasonNumber: worldState.currentSeasonNumber,
-    calendarYear: worldState.currentCalendarYear,
-    completedSeasonState: worldState.currentSeason,
-    completedAt: deterministicSeasonCompletedAt(worldState.currentSeason),
-  });
-  const completedSeasons = [...worldState.completedSeasons, closedRecord];
-  const nextSeasonNumber = worldState.currentSeasonNumber + 1;
-  const { nextCalendarYear, nextStartDate } = advancePersistentSeasonCalendar({
-    closedCalendarYear: worldState.currentCalendarYear,
-    closedEndDate: worldState.currentSeason.careerState.finalScheduledDate,
-    seasonStartMonthDay: seasonStartDateOf(worldState.currentSeason).slice(5, 10),
-  });
+  const { closedRecord, completedSeasons, nextSeasonNumber, nextCalendarYear, nextStartDate } =
+    await closeCurrentSeason(worldState);
   const seasonPlayerStats = worldState.currentSeason.projection.players.map((p) => ({
     playerId: p.playerId,
     matches: p.matches,
@@ -935,25 +929,11 @@ export async function rolloverPersistentWorldCareerSeasonV3(
     priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
     carryForwardDirectives: worldState.currentSeason.careerState.trainingAssignments,
   });
-  const careerProjection = await sealPersistentCareerProjection(
-    rebuildPersistentCareerProjectionCore({
-      worldId: worldState.worldIdentity.worldId,
-      teamIds: T20_LEAGUE_COMPETITION.teamIds,
-      completedSeasons,
-      activeSeason: nextCurrentSeason,
-    }),
+  const { careerProjection, receipt } = await rolloverProjectionAndReceipt(
+    worldState,
+    { closedRecord, completedSeasons, nextSeasonNumber },
+    nextCurrentSeason,
   );
-  const receipt = PersistentWorldRolloverReceiptSchema.parse({
-    receiptVersion: PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
-    fromSeasonNumber: worldState.currentSeasonNumber,
-    toSeasonNumber: nextSeasonNumber,
-    closedSeasonId: closedRecord.seasonId,
-    closedSeasonStateSha256: closedRecord.finalSeasonStateSha256,
-    closedSeasonRecordSha256: closedRecord.recordSha256,
-    nextSeasonId: nextCurrentSeason.seasonId,
-    nextStartDate: seasonStartDateOf(nextCurrentSeason),
-    nextScheduleSha256: nextCurrentSeason.schedule.scheduleSha256,
-  });
   const nextState = await sealEconomyWorld(worldState.worldStateVersion, {
     worldIdentity: worldState.worldIdentity,
     careerId: worldState.careerId,
