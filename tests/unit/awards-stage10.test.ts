@@ -4,6 +4,7 @@ import {
   AWARDS_MODEL_VERSION,
   CareerAwardsLedgerSchema,
   canonicalJson,
+  PERSISTENT_WORLD_STATE_V3_VERSION,
   type CareerAwardsLedger,
   type NewGameWorldCopy,
   type PersistentWorldSaveSummary,
@@ -349,6 +350,8 @@ describe("Stage 10 — Match and season awards (S10-01)", () => {
       seed: "stage10-awards-seed",
       worldId: "world-stage10",
       careerId: "career-stage10",
+      // This test checks the V4 export against V3 contents, so it pins world state V3 (new careers use V4).
+      worldStateVersion: PERSISTENT_WORLD_STATE_V3_VERSION,
     });
     const beforeStateSha = svc.getPersistentState()!.stateSha256;
     await svc.simulateToNextUserFixture();

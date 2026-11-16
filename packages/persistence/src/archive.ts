@@ -2,13 +2,19 @@ import { RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type Roste
   PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
   PersistentWorldPortableV4ManifestSchema,
   type PersistentWorldPortableV4Manifest,
+  PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION,
+  PersistentWorldPortableV5ManifestSchema,
+  type PersistentWorldPortableV5Manifest,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION,
+  type PersistentWorldStateV4,
 } from "@lcxxvi/contracts";
 import { SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
 import { SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SEASON_SAVE_VERSION, validateCompletedCareerMatchEventArchive, validateSeasonMatchEventArchiveSet, validateStoredWorldCopy, validateT20SeasonArchive, validateT20SeasonState, type AnyCareerMatchEventArchive,
   gunzipBytes,
   gzipBytes,
 } from "./season.js";
-import { validatePersistentWorldMatchEventArchiveSet, validatePersistentWorldState, validatePersistentWorldStateV2, validatePersistentWorldStateV3, type AnyPersistentWorldState } from "./persistent-world.js";
+import { validatePersistentWorldMatchEventArchiveSet, validatePersistentWorldState, validatePersistentWorldStateV2, validatePersistentWorldStateV3, validatePersistentWorldStateV4, type AnyPersistentWorldState } from "./persistent-world.js";
 
 export const ARCHIVE_EXTENSION = ".lcxxvi";
 export const ARCHIVE_VERSION = "LC_ARCHIVE_V1" as const;
@@ -1387,15 +1393,19 @@ async function buildPersistentWorldV3Contents(
   worldCopyRaw: unknown | null = null,
   matchEventArchivesRaw: readonly unknown[] | null = null,
   seasonRosterPacksRaw: readonly unknown[] | null = null,
+  worldVersion: "V3" | "V4" = "V3",
 ): Promise<{
-  state: PersistentWorldStateV3;
+  state: PersistentWorldStateV3 | PersistentWorldStateV4;
   summary: PersistentWorldSaveSummary;
   worldCopy: NewGameWorldCopy | null;
   sortedRosterPacks: [string, StagedRosterPack][];
   eventArchiveCount: number;
   payloads: Entry[];
 }> {
-  const state = await validatePersistentWorldStateV3(stateRaw);
+  const state =
+    worldVersion === "V4"
+      ? await validatePersistentWorldStateV4(stateRaw)
+      : await validatePersistentWorldStateV3(stateRaw);
   const summary = PersistentWorldSaveSummarySchema.parse(summaryRaw);
   if (
     summary.worldId !== state.worldIdentity.worldId ||
@@ -1432,6 +1442,14 @@ async function buildPersistentWorldV3Contents(
     const activePack = StagedRosterPackSchema.parse(state.lifecycle.activeRosterPack);
     const activeSha = await sha256Bytes(encoder.encode(canonicalJson(activePack)));
     packMap.set(activeSha, activePack);
+  }
+  if (worldVersion === "V4") {
+    // The stored rows are the full history; the embedded packs are included in case a row is missing.
+    for (const pack of state.lifecycle.historicalRosterPacks) {
+      const parsedPack = StagedRosterPackSchema.parse(pack);
+      packMap.set(await sha256Bytes(encoder.encode(canonicalJson(parsedPack))), parsedPack);
+    }
+    assertLifecycleArchivePacksPresent(validatedEventArchives, new Set(packMap.keys()));
   }
   const sortedRosterPacks = [...packMap.entries()].sort(([a], [b]) => a.localeCompare(b));
 
@@ -1508,9 +1526,14 @@ function persistentWorldV3ManifestCore(
 ) {
   const { state, summary, worldCopy, sortedRosterPacks, eventArchiveCount } = contents;
   return {
-    saveSchema: worldCopy
-      ? PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
-      : PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION,
+    saveSchema:
+      state.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V4"
+        ? worldCopy
+          ? PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION
+          : PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION
+        : worldCopy
+          ? PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
+          : PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION,
     ...(worldCopy ? { worldCopySha256: fileMeta["world-copy.json"]!.sha256 } : {}),
     exportedAt,
     summary,
@@ -1568,8 +1591,35 @@ export async function createPersistentWorldPortableArchiveV4(
     compression: "gzip",
     ...persistentWorldV3ManifestCore(contents, exportedAt, fileMeta),
   });
+  return gzipPersistentWorldArchive(manifest, contents.payloads);
+}
+
+/**
+ * V5: the V4 layout for a world state V4 save (docs/design/WORLD_STATE_HISTORY_V4.md). The state embeds
+ * only the last two seasons' roster packs, so `seasonRosterPacksRaw` must be every stored pack; the
+ * export is refused if a lifecycle match archive names a pack that is not included.
+ */
+export async function createPersistentWorldPortableArchiveV5(
+  stateRaw: unknown,
+  summaryRaw: unknown,
+  exportedAt: string,
+  worldCopyRaw: unknown | null = null,
+  matchEventArchivesRaw: readonly unknown[] | null = null,
+  seasonRosterPacksRaw: readonly unknown[] | null = null,
+): Promise<Uint8Array> {
+  const contents = await buildPersistentWorldV3Contents(stateRaw, summaryRaw, exportedAt, worldCopyRaw, matchEventArchivesRaw, seasonRosterPacksRaw, "V4");
+  const fileMeta = await payloadFileMeta(contents.payloads);
+  const manifest = PersistentWorldPortableV5ManifestSchema.parse({
+    archiveVersion: PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION,
+    compression: "gzip",
+    ...persistentWorldV3ManifestCore(contents, exportedAt, fileMeta),
+  });
+  return gzipPersistentWorldArchive(manifest, contents.payloads);
+}
+
+async function gzipPersistentWorldArchive(manifest: unknown, payloads: readonly Entry[]): Promise<Uint8Array> {
   const compressed: Entry[] = [];
-  for (const payload of contents.payloads) {
+  for (const payload of payloads) {
     compressed.push({ name: `${payload.name}.gz`, data: await gzipBytes(payload.data) });
   }
   const archive = makeZip([
@@ -1580,10 +1630,22 @@ export async function createPersistentWorldPortableArchiveV4(
   return archive;
 }
 
+/** Every lifecycle match archive must name a roster pack that the export or import carries. */
+function assertLifecycleArchivePacksPresent(
+  archives: readonly AnyCareerMatchEventArchive[],
+  packHashes: ReadonlySet<string>,
+): void {
+  for (const archive of archives) {
+    if ("rosterPackSha256" in archive && !packHashes.has(archive.rosterPackSha256)) {
+      throw new Error("PERSISTENT_WORLD_ARCHIVE_ROSTER_PACK_MISSING");
+    }
+  }
+}
+
 type PersistentWorldV3ReadResult = {
   state: PersistentWorldStateV3;
   summary: PersistentWorldSaveSummary;
-  manifest: PersistentWorldPortableV3Manifest | PersistentWorldPortableV4Manifest;
+  manifest: PersistentWorldPortableV3Manifest | PersistentWorldPortableV4Manifest | PersistentWorldPortableV5Manifest;
   worldCopy: NewGameWorldCopy | null;
   matchEventArchives: AnyCareerMatchEventArchive[];
   seasonRosterPacks: StagedRosterPack[];
@@ -1605,6 +1667,28 @@ const MAX_PERSISTENT_V4_EXPANDED_BYTES = 1024 * 1024 * 1024;
  * budget (a crafted archive cannot expand without bound), then validated exactly as V3.
  */
 export async function readPersistentWorldPortableArchiveV4(bytes: Uint8Array): Promise<PersistentWorldV3ReadResult & { manifest: PersistentWorldPortableV4Manifest }> {
+  const files = await gunzipPersistentWorldArchive(bytes);
+  return (await readPersistentWorldV3Files(files, PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION)) as PersistentWorldV3ReadResult & {
+    manifest: PersistentWorldPortableV4Manifest;
+  };
+}
+
+type PersistentWorldV5ReadResult = Omit<PersistentWorldV3ReadResult, "state" | "manifest"> & {
+  state: PersistentWorldStateV4;
+  manifest: PersistentWorldPortableV5Manifest;
+};
+
+/** Reads a V5 export: the V4 layout carrying a world state V4 save. */
+export async function readPersistentWorldPortableArchiveV5(bytes: Uint8Array): Promise<PersistentWorldV5ReadResult> {
+  const files = await gunzipPersistentWorldArchive(bytes);
+  return (await readPersistentWorldV3Files(files, PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION)) as unknown as PersistentWorldV5ReadResult;
+}
+
+/**
+ * Every payload entry of a V4 or V5 export is `<name>.gz`. Each is decompressed under a shared expansion
+ * budget (a crafted archive cannot expand without bound), then validated exactly as V3.
+ */
+async function gunzipPersistentWorldArchive(bytes: Uint8Array): Promise<Map<string, Uint8Array>> {
   const stored = parseZip(bytes, MAX_PERSISTENT_ARCHIVE_BYTES, MAX_PERSISTENT_ARCHIVE_BYTES);
   const files = new Map<string, Uint8Array>();
   let budget = MAX_PERSISTENT_V4_EXPANDED_BYTES;
@@ -1624,15 +1708,17 @@ export async function readPersistentWorldPortableArchiveV4(bytes: Uint8Array): P
     budget -= expanded.byteLength;
     files.set(name.slice(0, -".gz".length), expanded);
   }
-  return (await readPersistentWorldV3Files(files, PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION)) as PersistentWorldV3ReadResult & {
-    manifest: PersistentWorldPortableV4Manifest;
-  };
+  return files;
 }
 
 async function readPersistentWorldV3Files(
   files: Map<string, Uint8Array>,
-  archiveVersion: typeof PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION | typeof PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
-): Promise<PersistentWorldV3ReadResult> {
+  archiveVersion:
+    | typeof PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION
+    | typeof PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
+    | typeof PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION,
+): Promise<Omit<PersistentWorldV3ReadResult, "state"> & { state: PersistentWorldStateV3 | PersistentWorldStateV4 }> {
+  const isV5 = archiveVersion === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION;
   const allowed = new Set([
     "manifest.json",
     "game.json",
@@ -1668,16 +1754,18 @@ async function readPersistentWorldV3Files(
   if ((manifestRaw as { archiveVersion?: unknown } | null)?.archiveVersion !== archiveVersion) {
     throw new Error("PERSISTENT_WORLD_ARCHIVE_VERSION_UNSUPPORTED");
   }
-  // V4 never carries the derived awards ledger.
-  if (archiveVersion === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION && files.has("awards-ledger.json")) {
+  // V4 and V5 never carry the derived awards ledger.
+  if (archiveVersion !== PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION && files.has("awards-ledger.json")) {
     throw new Error("PERSISTENT_WORLD_ARCHIVE_FILE_NOT_ALLOWED");
   }
-  const manifest =
-    archiveVersion === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
+  const manifest = isV5
+    ? PersistentWorldPortableV5ManifestSchema.parse(manifestRaw)
+    : archiveVersion === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
       ? PersistentWorldPortableV4ManifestSchema.parse(manifestRaw)
       : PersistentWorldPortableV3ManifestSchema.parse(manifestRaw);
   const expectsWorldCopy =
-    manifest.saveSchema === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION;
+    manifest.saveSchema === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION ||
+    manifest.saveSchema === PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION;
   if (expectsWorldCopy !== files.has("world-copy.json")) {
     throw new Error("PERSISTENT_WORLD_ARCHIVE_WORLD_COPY_FILE_MISMATCH");
   }
@@ -1722,7 +1810,10 @@ async function readPersistentWorldV3Files(
   } catch {
     throw new Error("PERSISTENT_WORLD_ARCHIVE_GAME_JSON_INVALID");
   }
-  const state = await validatePersistentWorldStateV3(stateRaw);
+  // A V5 archive carries only world state V4; V3 and V4 archives only world state V3.
+  const state = isV5
+    ? await validatePersistentWorldStateV4(stateRaw)
+    : await validatePersistentWorldStateV3(stateRaw);
   const summary = PersistentWorldSaveSummarySchema.parse(manifest.summary);
   if (
     summary.worldId !== state.worldIdentity.worldId ||
@@ -1848,6 +1939,13 @@ async function readPersistentWorldV3Files(
     matchEventArchives = (
       await validatePersistentWorldMatchEventArchiveSet(rawArchives, state)
     ).archives;
+  }
+  if (isV5) {
+    const packHashes = new Set(manifest.rosterPackHashes);
+    for (const pack of [state.lifecycle.activeRosterPack, ...state.lifecycle.historicalRosterPacks]) {
+      if (pack) packHashes.add(await sha256Bytes(encoder.encode(canonicalJson(pack))));
+    }
+    assertLifecycleArchivePacksPresent(matchEventArchives, packHashes);
   }
 
   let awardsLedger: CareerAwardsLedger | null = null;

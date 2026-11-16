@@ -30,6 +30,14 @@ import { T20EventChainManifestSchema, T20MatchEventSchema } from "./t20-match.js
 
 export const PLAYER_LIFECYCLE_MODEL_VERSION = "LC_PLAYER_LIFECYCLE_MODEL_FICTIONAL_V1" as const;
 export const PLAYER_LIFECYCLE_STATE_VERSION = "LC_PLAYER_LIFECYCLE_STATE_V1" as const;
+/**
+ * Lifecycle V2 (world state V4, docs/design/WORLD_STATE_HISTORY_V4.md): the same structure as V1, but
+ * `historicalRosterPacks` holds at most the current and previous season's packs. Every pack is also stored
+ * once in its own hash-keyed projection row (PERSISTENT_LIFECYCLE_ROSTER_PACK_V1), which is where older
+ * seasons' packs are read from. V1 embeds every season's pack and grew about 320 KB a season.
+ */
+export const PLAYER_LIFECYCLE_STATE_V2_VERSION = "LC_PLAYER_LIFECYCLE_STATE_V2_BOUNDED_PACKS" as const;
+export const MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS = 2 as const;
 export const LIFECYCLE_SEASON_STATE_VERSION = "LC_T20_LIFECYCLE_SEASON_STATE_V1" as const;
 export const LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION =
   "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE" as const;
@@ -175,6 +183,25 @@ export const PlayerLifecycleStateSchema = z.strictObject({
   ...PlayerLifecycleStateCoreSchema.shape,
   lifecycleSha256: HashSchema,
 });
+
+export const PlayerLifecycleStateV2CoreSchema = PlayerLifecycleStateCoreSchema.extend({
+  lifecycleVersion: z.literal(PLAYER_LIFECYCLE_STATE_V2_VERSION),
+  historicalRosterPacks: z.array(StagedRosterPackSchema).max(MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS),
+});
+
+export const PlayerLifecycleStateV2Schema = z.strictObject({
+  ...PlayerLifecycleStateV2CoreSchema.shape,
+  lifecycleSha256: HashSchema,
+});
+
+export const AnyPlayerLifecycleStateCoreSchema = z.discriminatedUnion("lifecycleVersion", [
+  PlayerLifecycleStateCoreSchema,
+  PlayerLifecycleStateV2CoreSchema,
+]);
+export const AnyPlayerLifecycleStateSchema = z.discriminatedUnion("lifecycleVersion", [
+  PlayerLifecycleStateSchema,
+  PlayerLifecycleStateV2Schema,
+]);
 
 export const LifecycleSeasonStateCoreSchema = z.strictObject({
   seasonStateVersion: z.literal(LIFECYCLE_SEASON_STATE_VERSION),
@@ -328,7 +355,11 @@ export type PlayerLifecycleSkillLedgerEntry = z.infer<
   typeof PlayerLifecycleSkillLedgerEntrySchema
 >;
 export type PlayerLifecycleStateCore = z.infer<typeof PlayerLifecycleStateCoreSchema>;
-export type PlayerLifecycleState = z.infer<typeof PlayerLifecycleStateSchema>;
+/** Lifecycle V1 only (worlds V2 and V3). */
+export type PlayerLifecycleStateV1 = z.infer<typeof PlayerLifecycleStateSchema>;
+export type PlayerLifecycleStateV2 = z.infer<typeof PlayerLifecycleStateV2Schema>;
+/** Either lifecycle version; the simulation handles both with the same rules apart from pack retention. */
+export type PlayerLifecycleState = PlayerLifecycleStateV1 | PlayerLifecycleStateV2;
 export type LifecycleSeasonStateCore = z.infer<typeof LifecycleSeasonStateCoreSchema>;
 export type LifecycleSeasonState = z.infer<typeof LifecycleSeasonStateSchema>;
 export type ActivePersistentSeasonState = z.infer<typeof ActivePersistentSeasonStateSchema>;

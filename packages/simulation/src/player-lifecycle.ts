@@ -14,8 +14,10 @@ import {
   MIN_ACTIVE_TEAM_SQUAD_SIZE,
   PLAYER_LIFECYCLE_MODEL_VERSION,
   PLAYER_LIFECYCLE_STATE_VERSION,
-  PlayerLifecycleStateCoreSchema,
-  PlayerLifecycleStateSchema,
+  AnyPlayerLifecycleStateCoreSchema,
+  AnyPlayerLifecycleStateSchema,
+  MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS,
+  PLAYER_LIFECYCLE_STATE_V2_VERSION,
   PlayerSchema,
   PromoteYouthProspectRequestSchema,
   RetiredPlayerRecordSchema,
@@ -41,6 +43,8 @@ import {
   type Player,
   type PlayerLifecycleSkillLedgerEntry,
   type PlayerLifecycleState,
+  type PlayerLifecycleStateV1,
+  type PlayerLifecycleStateV2,
   type PlayerSeasonDevelopmentReport,
   type PlayerSkillDeltaSummary,
   type PlayerTrainingExposureRecord,
@@ -210,24 +214,53 @@ export function buildLifecycleRosterPack(
 }
 
 /**
+ * Adds a season's roster pack to the embedded history. Lifecycle V1 keeps every pack (its saved format);
+ * lifecycle V2 keeps only the newest MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS, because every pack is also stored
+ * once in its own projection row (docs/design/WORLD_STATE_HISTORY_V4.md).
+ */
+export function withHistoricalRosterPack(
+  lifecycle: Pick<PlayerLifecycleState, "lifecycleVersion" | "historicalRosterPacks">,
+  pack: StagedRosterPack,
+): StagedRosterPack[] {
+  const packs = lifecycle.historicalRosterPacks.some((p) => p.sourceHash === pack.sourceHash)
+    ? [...lifecycle.historicalRosterPacks]
+    : [...lifecycle.historicalRosterPacks, pack];
+  return lifecycle.lifecycleVersion === PLAYER_LIFECYCLE_STATE_V2_VERSION
+    ? packs.slice(-MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS)
+    : packs;
+}
+
+/** Narrows to lifecycle V1 (worlds V2 and V3), throwing if a V2 lifecycle reached a V1-only world. */
+export function expectLifecycleV1(lifecycle: PlayerLifecycleState): PlayerLifecycleStateV1 {
+  assertLifecycle(lifecycle.lifecycleVersion === PLAYER_LIFECYCLE_STATE_VERSION, "LIFECYCLE_V1_REQUIRED");
+  return lifecycle as PlayerLifecycleStateV1;
+}
+
+/** Narrows to lifecycle V2 (world V4), throwing if a V1 lifecycle reached a V4 world. */
+export function expectLifecycleV2(lifecycle: PlayerLifecycleState): PlayerLifecycleStateV2 {
+  assertLifecycle(lifecycle.lifecycleVersion === PLAYER_LIFECYCLE_STATE_V2_VERSION, "LIFECYCLE_V2_REQUIRED");
+  return lifecycle as PlayerLifecycleStateV2;
+}
+
+/**
  * Lifecycle states that passed full validation in this session, keyed by object identity.
  * A self-reported hash is never trusted: an imported or edited object is a new object and is fully checked.
  */
 const verifiedLifecycleStates = new WeakSet<object>();
 
 export function sealPlayerLifecycleState(coreInput: Omit<PlayerLifecycleState, "lifecycleSha256">): PlayerLifecycleState {
-  const core = PlayerLifecycleStateCoreSchema.parse(coreInput);
+  const core = AnyPlayerLifecycleStateCoreSchema.parse(coreInput);
   const lifecycleSha256 = sha256Hex(canonicalStateBytes(core));
-  return PlayerLifecycleStateSchema.parse({ ...core, lifecycleSha256 });
+  return AnyPlayerLifecycleStateSchema.parse({ ...core, lifecycleSha256 });
 }
 
 export function validatePlayerLifecycleState(raw: unknown): PlayerLifecycleState {
   if (typeof raw === "object" && raw !== null && verifiedLifecycleStates.has(raw)) {
     return raw as PlayerLifecycleState;
   }
-  const parsed = PlayerLifecycleStateSchema.parse(raw);
+  const parsed = AnyPlayerLifecycleStateSchema.parse(raw);
   const { lifecycleSha256, ...coreRaw } = parsed;
-  const core = PlayerLifecycleStateCoreSchema.parse(coreRaw);
+  const core = AnyPlayerLifecycleStateCoreSchema.parse(coreRaw);
   assertLifecycle(sha256Hex(canonicalStateBytes(core)) === lifecycleSha256, "HASH_MISMATCH");
   if (core.activeRosterPack) {
     validateStagedRosterPack(core.activeRosterPack, ALLOWED_RULES, ALLOWED_VARIATIONS);
@@ -530,6 +563,8 @@ export function createInitialPlayerLifecycleState(input: {
   seasonNumber?: number;
   calendarYear: number;
   useRosterPackImmediately?: boolean;
+  /** Lifecycle V2 for world state V4; V1 (the default) for worlds V2 and V3. */
+  lifecycleVersion?: PlayerLifecycleState["lifecycleVersion"];
 }): PlayerLifecycleState {
   const seasonNumber = input.seasonNumber ?? 1;
   const activeWorld = applyWorldCopyOverlay(input.baseWorld, input.worldCopy ?? null);
@@ -558,7 +593,7 @@ export function createInitialPlayerLifecycleState(input: {
     ? buildLifecycleRosterPack(activeWorld, input.worldIdentity.worldId, seasonNumber, 0)
     : null;
   return sealPlayerLifecycleState({
-    lifecycleVersion: PLAYER_LIFECYCLE_STATE_VERSION,
+    lifecycleVersion: input.lifecycleVersion ?? PLAYER_LIFECYCLE_STATE_VERSION,
     model: FICTIONAL_PLAYER_LIFECYCLE_MODEL_V1,
     activeWorld: activeRosterPack ? structuredClone(activeRosterPack.world) : activeWorld,
     activeRosterPack,
@@ -760,15 +795,11 @@ export function promoteYouthProspectPreSeason(input: {
       : p,
   );
 
-  const nextHistoricalPacks = input.lifecycle.historicalRosterPacks.some(
-    (p) => p.sourceHash === nextPack.sourceHash,
-  )
-    ? input.lifecycle.historicalRosterPacks
-    : [...input.lifecycle.historicalRosterPacks, nextPack];
+  const nextHistoricalPacks = withHistoricalRosterPack(input.lifecycle, nextPack);
 
   return {
     lifecycle: sealPlayerLifecycleState({
-      lifecycleVersion: PLAYER_LIFECYCLE_STATE_VERSION,
+      lifecycleVersion: input.lifecycle.lifecycleVersion,
       model: input.lifecycle.model,
       activeWorld: structuredClone(nextPack.world),
       activeRosterPack: nextPack,
@@ -1399,14 +1430,10 @@ export function advancePlayerLifecycleAtSeasonClose(input: {
     .filter((entry) => activeIdSet.has(entry.playerId) || retiredIdSet.has(entry.playerId))
     .sort((a, b) => compareCodePoints(a.playerId, b.playerId));
 
-  const nextHistoricalPacks = validated.historicalRosterPacks.some(
-    (p) => p.sourceHash === nextRosterPack.sourceHash,
-  )
-    ? validated.historicalRosterPacks
-    : [...validated.historicalRosterPacks, nextRosterPack];
+  const nextHistoricalPacks = withHistoricalRosterPack(validated, nextRosterPack);
 
   return sealPlayerLifecycleState({
-    lifecycleVersion: PLAYER_LIFECYCLE_STATE_VERSION,
+    lifecycleVersion: validated.lifecycleVersion,
     model,
     activeWorld: structuredClone(nextRosterPack.world),
     activeRosterPack: nextRosterPack,

@@ -8,6 +8,7 @@ import {
   PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
   PERSISTENT_WORLD_STATE_V3_VERSION,
+  PERSISTENT_WORLD_STATE_V4_VERSION,
   SQUAD_ECONOMY_MODEL_VERSION,
   type NewGameWorldCopy,
   type PersistentWorldSaveSummary,
@@ -466,7 +467,7 @@ describe("Stage 4 domestic contracts, club budgets, and recruitment (LC_PERSISTE
     await service.createCareer(teamId);
 
     const persistent = service.getPersistentState()!;
-    expect(persistent.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V3_VERSION);
+    expect(persistent.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V4_VERSION);
     const economy0 = service.getEconomyState()!;
     expect(economy0.model.modelVersion).toBe(SQUAD_ECONOMY_MODEL_VERSION);
     expect(economy0.clubBudgets).toHaveLength(8);

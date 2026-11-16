@@ -9,6 +9,7 @@ import {
   PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION,
   PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
   PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
   PERSISTENT_WORLD_STATE_V3_VERSION,
   PERSISTENT_WORLD_STATE_VERSION,
@@ -59,6 +60,8 @@ import {
   type YouthProspect,
   compareCodePoints,
   type CareerMatchDigest,
+  PERSISTENT_WORLD_STATE_V4_VERSION,
+  type PersistentWorldStateV4,
 } from "@lcxxvi/contracts";
 import {
   DEFAULT_CAREER_AVAILABILITY_PACK,
@@ -112,6 +115,7 @@ import {
   type CareerArchivedReplaySummary,
   type RecentPlayerSeasonStatsSummary,
   type RosterT20Session,
+  expectLifecycleV1,
 } from "@lcxxvi/simulation";
 import {
   applyRosterSeasonCompletion,
@@ -126,6 +130,7 @@ import {
   createPersistentWorldPortableArchive,
   createPersistentWorldPortableArchiveV2,
   createPersistentWorldPortableArchiveV4,
+  createPersistentWorldPortableArchiveV5,
   createSeasonPortableArchive,
   createT20SeasonArchive,
   describeSeasonPersistenceError,
@@ -137,6 +142,7 @@ import {
   readPersistentWorldPortableArchiveV2,
   readPersistentWorldPortableArchiveV3,
   readPersistentWorldPortableArchiveV4,
+  readPersistentWorldPortableArchiveV5,
   readSeasonPortableArchive,
   sealPersistentCareerProjection,
   sealPersistentWorldStateV2,
@@ -369,6 +375,16 @@ type AnyCareerMutationResult =
   | Omit<T20SeasonState, "stateSha256" | "revision">
   | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
 
+/** Contracts-era worlds: V3, and V4 (the same rules with bounded embedded roster packs). */
+function isEconomyWorld(
+  world: AnyPersistentWorldState | null | undefined,
+): world is PersistentWorldStateV3 | PersistentWorldStateV4 {
+  return (
+    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION ||
+    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION
+  );
+}
+
 export class CareerApplicationService {
   private readonly repository: CareerSeasonRepository;
   private readonly persistentRepository: CareerPersistentWorldRepository | null;
@@ -390,6 +406,8 @@ export class CareerApplicationService {
   private cachedArchives: readonly AnyCareerMatchEventArchive[] = [];
   private awardsLedger: CareerAwardsLedger | null = null;
   private awardsLedgerKey: string | null = null;
+  /** Every stored lifecycle roster pack of the loaded world (world state V4 embeds only the last two). */
+  private storedRosterPacks: { saveId: string; packs: Map<string, StagedRosterPack> } | null = null;
 
   constructor(
     ownerId?: string,
@@ -427,13 +445,13 @@ export class CareerApplicationService {
 
   getLifecycleState(): PlayerLifecycleState | null {
     return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
-      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+      isEconomyWorld(this.persistentState)
       ? this.persistentState.lifecycle
       : null;
   }
 
   getEconomyState(): SquadEconomyState | null {
-    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+    return isEconomyWorld(this.persistentState)
       ? this.persistentState.economy
       : null;
   }
@@ -445,18 +463,18 @@ export class CareerApplicationService {
   hasLifecycleEnabled(): boolean {
     return (
       this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
-      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+      isEconomyWorld(this.persistentState)
     );
   }
 
   hasEconomyEnabled(): boolean {
-    return this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION;
+    return isEconomyWorld(this.persistentState);
   }
 
   getWorld(): WorldPack {
     if (
       this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
-      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+      isEconomyWorld(this.persistentState)
     ) {
       return this.persistentState.lifecycle.activeWorld;
     }
@@ -721,7 +739,11 @@ export class CareerApplicationService {
           ? await createInitialPersistentWorldCareerState(createWorldArgs)
           : options?.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
             ? await createInitialPersistentWorldCareerStateV2(createWorldArgs)
-            : await createInitialPersistentWorldCareerStateV3(createWorldArgs);
+            : await createInitialPersistentWorldCareerStateV3({
+                ...createWorldArgs,
+                // New careers use world state V4 (docs/design/WORLD_STATE_HISTORY_V4.md); V3 stays selectable.
+                worldStateVersion: options?.worldStateVersion ?? PERSISTENT_WORLD_STATE_V4_VERSION,
+              });
       const saveId = options?.saveId ?? `pworld:${worldId}`;
       if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
         throw new Error("New career save is locked.");
@@ -980,11 +1002,11 @@ export class CareerApplicationService {
         }
         const currentLifecycle =
           beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
-          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+          isEconomyWorld(beforeWorld)
             ? beforeWorld.lifecycle
             : null;
         const currentEconomy =
-          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+          isEconomyWorld(beforeWorld)
             ? beforeWorld.economy
             : null;
         const builtRaw = await build(before, currentLifecycle);
@@ -1020,7 +1042,7 @@ export class CareerApplicationService {
           );
         }
         const nextWorld: AnyPersistentWorldState =
-          beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+          isEconomyWorld(beforeWorld)
             ? await rebuildPersistentWorldStateV3(
                 beforeWorld,
                 nextSeason,
@@ -1137,7 +1159,7 @@ export class CareerApplicationService {
     if (
       !this.persistentState ||
       (this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION &&
-        this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V3_VERSION) ||
+        !isEconomyWorld(this.persistentState)) ||
       !this.persistentRepository
     ) {
       throw new Error("Player lifecycle controls require a Stage 3 persistent world career.");
@@ -1153,7 +1175,7 @@ export class CareerApplicationService {
       }
       const nextLifecycle = buildLifecycle(beforeWorld.lifecycle);
       const nextWorld =
-        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+        isEconomyWorld(beforeWorld)
           ? await rebuildPersistentWorldStateV3(
               beforeWorld,
               beforeWorld.currentSeason,
@@ -1241,7 +1263,7 @@ export class CareerApplicationService {
     if (
       !this.persistentState ||
       (this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V2_VERSION &&
-        this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V3_VERSION) ||
+        !isEconomyWorld(this.persistentState)) ||
       !this.persistentRepository
     ) {
       throw new Error("Youth promotion requires a Stage 3 persistent world career.");
@@ -1284,7 +1306,7 @@ export class CareerApplicationService {
         carryForwardDirectives: beforeSeason.careerState.trainingAssignments,
       });
       const nextEconomy =
-        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+        isEconomyWorld(beforeWorld)
           ? registerPreSeasonYouthContract({
               economy: beforeWorld.economy,
               lifecycle: promoted.lifecycle,
@@ -1296,7 +1318,7 @@ export class CareerApplicationService {
             })
           : null;
       const nextWorld =
-        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+        isEconomyWorld(beforeWorld)
           ? await rebuildPersistentWorldStateV3(
               beforeWorld,
               nextSeason,
@@ -1393,8 +1415,8 @@ export class CareerApplicationService {
       const { nextState }:
         | { nextState: PersistentWorldState }
         | { nextState: PersistentWorldStateV2 }
-        | { nextState: PersistentWorldStateV3 } =
-        beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+        | { nextState: PersistentWorldStateV3 | PersistentWorldStateV4 } =
+        isEconomyWorld(beforeWorld)
           ? await rolloverPersistentWorldCareerSeasonV3(beforeWorld, expectedRevision + 1)
           : beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
             ? await rolloverPersistentWorldCareerSeasonV2(beforeWorld, expectedRevision + 1)
@@ -1533,7 +1555,9 @@ export class CareerApplicationService {
     }
   }
 
-  async copySingleSeasonToPersistentWorld(customTitle?: string): Promise<PersistentWorldStateV3> {
+  async copySingleSeasonToPersistentWorld(
+    customTitle?: string,
+  ): Promise<PersistentWorldStateV3 | PersistentWorldStateV4> {
     const { state: sourceState, saveId: sourceSaveId } = this.requireWritable();
     if (this.persistentState) {
       throw new Error("This career is already a persistent multi-season world.");
@@ -1560,6 +1584,7 @@ export class CareerApplicationService {
       newCareerId,
       baseSeed: `seed-${key}`,
       worldCopy: this.worldCopy,
+      worldStateVersion: PERSISTENT_WORLD_STATE_V4_VERSION,
     });
     const now = Date.now();
     if (!(await this.repository.acquireLease(sourceSaveId, this.ownerId, now))) {
@@ -1658,7 +1683,7 @@ export class CareerApplicationService {
       currentSeasonNumber: sourceWorld.currentSeasonNumber,
       currentCalendarYear: sourceWorld.currentCalendarYear,
       completedSeasons: sourceWorld.completedSeasons,
-      lifecycle,
+      lifecycle: expectLifecycleV1(lifecycle),
       currentSeason: sourceWorld.currentSeason,
       careerProjection,
       lastRolloverReceipt: sourceWorld.lastRolloverReceipt,
@@ -1720,7 +1745,7 @@ export class CareerApplicationService {
     const { saveId: sourceSaveId } = this.requireWritable();
     if (
       !this.persistentState ||
-      this.persistentState.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION
+      isEconomyWorld(this.persistentState)
     ) {
       throw new Error("Only Stage 2 V1 or Stage 3 V2 persistent worlds need a Stage 4 economy upgrade.");
     }
@@ -1800,7 +1825,7 @@ export class CareerApplicationService {
       currentSeasonNumber: sourceWorld.currentSeasonNumber,
       currentCalendarYear: sourceWorld.currentCalendarYear,
       completedSeasons: sourceWorld.completedSeasons,
-      lifecycle: baseLifecycle,
+      lifecycle: expectLifecycleV1(baseLifecycle),
       economy,
       currentSeason: upgradedSeason,
       careerProjection,
@@ -1859,7 +1884,7 @@ export class CareerApplicationService {
     commandId: string,
     commandName: string,
     payload: unknown,
-    mutate: (worldState: PersistentWorldStateV3) => Promise<{
+    mutate: (worldState: PersistentWorldStateV3 | PersistentWorldStateV4) => Promise<{
       economy: SquadEconomyState;
       lifecycle: PlayerLifecycleState;
       rosterChanged: boolean;
@@ -1876,7 +1901,7 @@ export class CareerApplicationService {
     const { state: beforeSeason, saveId } = this.requireWritable();
     if (
       !this.persistentState ||
-      this.persistentState.worldStateVersion !== PERSISTENT_WORLD_STATE_V3_VERSION ||
+      !isEconomyWorld(this.persistentState) ||
       !this.persistentRepository
     ) {
       throw new Error("Contract and recruitment actions require a Stage 4 persistent world career.");
@@ -2331,7 +2356,7 @@ export class CareerApplicationService {
     const requiresDateAdvance = initial.careerState.currentDate < target.matchDayDate;
     const pendingOthers = roundOthers.filter((fixture) => !completedIds.has(fixture.fixtureId));
     const requiresNegotiationWindowClose =
-      this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION &&
+      isEconomyWorld(this.persistentState) &&
       this.persistentState.economy.negotiationWindow.windowPhase === "OPEN";
     if (!requiresDateAdvance && pendingOthers.length === 0 && !requiresNegotiationWindowClose) {
       return target;
@@ -2394,7 +2419,7 @@ export class CareerApplicationService {
             ? { ...stateCore(working), phase: "ACTIVE" }
             : { ...stateCore(working), phase: "ACTIVE" };
         const nextEconomy =
-          this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION &&
+          isEconomyWorld(this.persistentState) &&
           this.persistentState.economy.negotiationWindow.windowPhase === "OPEN" &&
           nextLifecycle
             ? closeNegotiationWindowForMatchPlay(
@@ -2772,6 +2797,17 @@ export class CareerApplicationService {
         : [];
       // The awards ledger is derived and no longer exported (rebuilt on import), so it is not synced here.
       const awardsLedger = null;
+      if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION) {
+        // World state V4 embeds two seasons' roster packs; the V5 export carries every stored pack.
+        return createPersistentWorldPortableArchiveV5(
+          loaded.state,
+          loaded.summary,
+          nowIso(),
+          loaded.worldCopy ?? null,
+          eventArchives.length > 0 ? eventArchives : null,
+          rosterPacks.length > 0 ? rosterPacks : null,
+        );
+      }
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION) {
         // Compressed V4 export (docs/design/MATCH_ARCHIVE_STORAGE_V2.md): long careers fit the size limit.
         void awardsLedger;
@@ -2841,13 +2877,16 @@ export class CareerApplicationService {
       version === PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION ||
       version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION ||
       version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION ||
-      version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
+      version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION ||
+      version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION
     ) {
       if (!this.persistentRepository) {
         throw new Error("Persistent world storage is unavailable.");
       }
       const imported =
-        version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
+        version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION
+          ? await readPersistentWorldPortableArchiveV5(bytes)
+          : version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
           ? await readPersistentWorldPortableArchiveV4(bytes)
           : version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION
           ? await readPersistentWorldPortableArchiveV3(bytes)
@@ -2949,6 +2988,31 @@ export class CareerApplicationService {
     return findLifecycleRosterPackBySha256(lifecycle, sha256);
   }
 
+  /**
+   * Reads every stored lifecycle roster pack (PERSISTENT_LIFECYCLE_ROSTER_PACK_V1 rows). World state V4
+   * embeds only the last two seasons' packs (docs/design/WORLD_STATE_HISTORY_V4.md), so older replays
+   * and award eligibility read the stored rows. Reloaded when a looked-up pack is missing.
+   */
+  private async loadStoredRosterPacks(refresh = false): Promise<Map<string, StagedRosterPack>> {
+    const saveId = this.saveId;
+    const repository = this.persistentRepository;
+    if (!saveId || !repository?.loadLifecycleRosterPacks) return new Map();
+    if (!refresh && this.storedRosterPacks?.saveId === saveId) return this.storedRosterPacks.packs;
+    const packs = await repository.loadLifecycleRosterPacks(saveId);
+    this.storedRosterPacks = { saveId, packs };
+    return packs;
+  }
+
+  private async findRosterPackByShaIncludingStored(sha256: string): Promise<StagedRosterPack | null> {
+    const embedded = this.findRosterPackBySha(sha256);
+    if (embedded) return embedded;
+    return (
+      (await this.loadStoredRosterPacks()).get(sha256) ??
+      (await this.loadStoredRosterPacks(true)).get(sha256) ??
+      null
+    );
+  }
+
   async replayFixtureArchive(fixtureId: string): Promise<CareerReplayOutcome> {
     if (!this.state || !this.saveId) throw new Error("No career is loaded.");
     const completion = this.findCompletionByFixtureId(fixtureId);
@@ -2975,7 +3039,7 @@ export class CareerApplicationService {
       if (!archive) return { status: "UNAVAILABLE" };
       try {
         if (archive.archiveVersion === LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION) {
-          const pack = this.findRosterPackBySha(archive.rosterPackSha256);
+          const pack = await this.findRosterPackByShaIncludingStored(archive.rosterPackSha256);
           if (!pack) {
             return {
               status: "DAMAGED",
@@ -3659,6 +3723,9 @@ export class CareerApplicationService {
         knownPlayers: [
           ...careerWorld.players,
           ...(this.getEconomyState()?.freeAgents.map((fa) => fa.player) ?? []),
+          ...(this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION
+            ? [...(await this.loadStoredRosterPacks()).values()].flatMap((pack) => pack.world.players)
+            : []),
         ],
         playerNames,
         teamNames,
