@@ -114,6 +114,10 @@ const serve = readFileSync(
   join(root, "tools", "windows", "serve-portable.mjs"),
   "utf8",
 );
+const staticServer = readFileSync(
+  join(root, "tools", "windows", "static-server.mjs"),
+  "utf8",
+);
 const startWindowsPs1 = readFileSync(
   join(root, "tools", "windows", "start-windows.ps1"),
   "utf8",
@@ -221,6 +225,7 @@ Your saves live in your browser (IndexedDB), tied to http://127.0.0.1:4180. Use 
 
 for (const [name, text, mode] of [
   ["serve.mjs", serve, 0o644],
+  ["static-server.mjs", staticServer, 0o644],
   ["start-game.sh", startSh, 0o755],
   ["Play-Lord-Cricket.bat", playBat, 0o644],
   ["start-game.bat", startBat, 0o644],
