@@ -12,7 +12,7 @@ A managed match is a match played from a career fixture. The match checkpoint an
 
 The binding is an identity record only. It holds the career save id and kind, the match, fixture and season ids, the schedule hash, the career state hash, the validated launch, a status and a hash of its own content. It is never used to infer a result.
 
-Standard careers scope new `matchGameId` values by both `careerSaveId` and `seasonId` (`career-match-<careerSaveId>-<seasonId>-<fixtureId>`, `apps/web/src/career/managed-game-id.ts`) while resolving pre-existing legacy `career-match-<fixtureId>` bindings and checkpoints transparently so multiple careers or manual career copies in the same browser profile never collide.
+Standard careers scope new `matchGameId` values by career slot: `cm-<first 12 hex characters of a hash of careerSaveId>-<fixtureId>` (`apps/web/src/career/managed-game-id.ts`); fixture ids already embed a hash of the season id, so they differ across seasons while resolving pre-existing legacy `career-match-<fixtureId>` bindings and checkpoints transparently so multiple careers or manual career copies in the same browser profile never collide.
 
 ## Life cycle
 

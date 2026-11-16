@@ -11,6 +11,9 @@ This package owns browser durability and portable archives. It does not decide c
 | [archive.ts](src/archive.ts) | `createPortableArchive`, `readPortableArchive` | Match archive encoding and validation |
 | [archive.ts](src/archive.ts) | `createSeasonPortableArchive`, `readSeasonPortableArchive` | Standard career portable archives |
 | [archive.ts](src/archive.ts) | `createRosterSeasonPortableArchive`, `readRosterSeasonPortableArchive` | Imported-roster career portable archives |
+| [persistent-world.ts](src/persistent-world.ts) | `IndexedDbPersistentWorldRepository`, `PersistentWorldDurableCommit` | Multi-season worlds (V1 to V3 state): one-transaction commits and rollover, archives, roster packs, match digests, single-fixture archive loads |
+| [archive.ts](src/archive.ts) | `createPersistentWorldPortableArchive*`, `readPersistentWorldPortableArchive*` | Multi-season portable archives, V1 to V3 and compressed V4 (`LC_PERSISTENT_WORLD_PORTABLE_V4_GZIP`) |
+| [binding.ts](src/binding.ts) | `ManagedMatchBindings` | Durable career-fixture to match bindings |
 
 These are in-process TypeScript APIs, not HTTP endpoints. Consult the exported types for exact arguments and return shapes. A documentation example must not become an alternate implementation of validation.
 
@@ -25,14 +28,29 @@ Both repositories open IndexedDB `lord-cricket-xxvi`, database version 1. Databa
 | `events` | `[saveId, sequence]` | Accepted match events |
 | `commands` | `[saveId, commandId]` | Durable command identity and receipts |
 | `worldPacks`, `modelPacks`, `rulePacks` | `hash` | Pack storage slots; inspect current callers before assuming all are populated |
-| `projections` | `[saveId, scope, key]` | Derived data storage |
+| `projections` | `[saveId, scope, key]` | Derived and per-save auxiliary data; read by `[saveId, scope]` key range (`projectionRowsForScope`), never the whole store |
 | `settings` | `key` | Namespaced operational pointers, leases, delegation journals and managed-match bindings (`managed-binding:<matchGameId>`) |
 
 Sharing stores does not make career completion and match persistence one atomic transaction. The match checkpoint can survive while a browser-session-only career handoff disappears.
 
+## Projection scopes
+
+| Scope | Key | Content |
+| --- | --- | --- |
+| `T20_SEASON` | season id | Season projection |
+| `CAREER_MATCH_EVENTS_V1` | fixture id | Ball-by-ball match archive, canonical JSON (single-season saves and older worlds) |
+| `CAREER_MATCH_EVENTS_GZIP_V1` | fixture id | The same archive, gzip then base64; `sha256` is of the uncompressed JSON; decompression capped at 1 MB |
+| `CAREER_MATCH_DIGEST_V1` | fixture id | Per-match digest for statistics and awards (derived, hash- and schema-checked, rebuilt if damaged) |
+| `PERSISTENT_LIFECYCLE_ROSTER_PACK_V1` | pack sha256 | Season roster packs |
+| `CAREER_AWARDS_LEDGER_V1` | ledger key | Awards ledger (derived; not exported) |
+
+See [MATCH_ARCHIVE_STORAGE_V2.md](../../docs/design/MATCH_ARCHIVE_STORAGE_V2.md) for why archives are compressed and digested. Readers accept both archive scopes; new commits write the compressed one.
+
+**No rollback.** An older build cannot read compressed archive rows or V4 exports, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete. Moving a profile back below the build that introduced these is unsupported.
+
 ## Commit and recovery invariants
 
-Match commits validate and hash input before opening the write transaction. The transaction includes games, snapshots, events, commands, settings, projections and world packs. It checks writer ownership and expected durable revision. A first commit (`expectedRevision: null`) throws `SAVE_ALREADY_EXISTS` if the save id exists; it never replaces a save. `list()` omits career rows of both kinds (`SEASON` and `ROSTER_SEASON`). Do not add unrelated asynchronous work inside an IndexedDB transaction: transaction activity must remain valid until all dependent requests are submitted.
+Match commits validate and hash input before opening the write transaction. The transaction includes games, snapshots, events, commands, settings, projections and world packs. It checks writer ownership and expected durable revision. A first commit (`expectedRevision: null`) throws `SAVE_ALREADY_EXISTS` if the save id exists; it never replaces a save. `list()` returns match saves only: every career kind sets a `recordType` and is omitted, including kinds a newer build might add. Do not add unrelated asynchronous work inside an IndexedDB transaction: transaction activity must remain valid until all dependent requests are submitted.
 
 Match and season writer lease durations are currently 12 seconds. The match worker renews its lease every 4 seconds and becomes read-only if renewal fails. A new browser session has a new owner id, so it cannot write until the old lease expires or is released; the pages release it on `pagehide` (best effort) and retry for about 30 seconds, and never take over a live lease. A live lease owned elsewhere prevents writing; renewal requires current, unexpired ownership. Release must only remove the releasing owner's lease. Time used for ownership is operational metadata, not a source of simulation randomness.
 
@@ -57,6 +75,7 @@ Browser storage belongs to an origin and browser profile. Copying the repository
 - [Career service tests](../../tests/unit/career-application-service.test.ts).
 - [Imported-roster career tests](../../tests/unit/roster-season.test.ts).
 - [Binding rules and result regeneration](../../tests/unit/managed-binding.test.ts), and the real-IndexedDB [binding spec](../../tests/m4/managed-binding-persistence.spec.ts).
+- Real-IndexedDB specs for [scoped reads](../../tests/m4/projection-scope-reads.spec.ts), [match digests](../../tests/m4/match-digest-storage.spec.ts) and [compressed payloads](../../tests/m4/compressed-archive-storage.spec.ts).
 - Browser save/reload, archive and fresh-session checks in the [verification guide](../../docs/VERIFICATION_GUIDE.md).
 
 Pure unit tests do not establish browser IndexedDB transaction behaviour. Keep real browser coverage for leases, interrupted saves, imports and session recovery.

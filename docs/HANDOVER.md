@@ -1,45 +1,55 @@
-# Handover, 13 November 2026
+# Handover, 16 November 2026
 
 One page for a person or an AI picking this project up. It points at the evidence; it does not replace it. If this page and the repository disagree, trust the repository and fix this page.
 
 ## What this is
 
-Lord Cricket XXVI is a browser-based statistical cricket management game: a TypeScript monorepo (Vite and React web app, deterministic simulation engines, IndexedDB saves, portable `.lcxxvi` archives). It is a **fictional, single-season, synthetic alpha** (`synthetic-alpha-01`). It makes no claim that its results match real cricket.
+Lord Cricket XXVI is a browser-based statistical cricket management game: a TypeScript monorepo (Vite and React web app, deterministic simulation engines, IndexedDB saves, portable `.lcxxvi` archives). It is a **fictional, synthetic alpha** (`synthetic-alpha-01`) that makes no claim its results match real cricket.
 
 Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default branch `main`.
 
 ## Where it stands
 
-| Area | State |
+**The project is in stabilisation.** On 16 November 2026 the owner directed: "Get what we currently have as excellent, then we will finish the full game." No new features until the phased plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md) is complete and reviewed. Decisions: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md) (16 November entry).
+
+Stages 2 to 10 were pushed straight to `main` (14 to 16 November) with hosted CI failing on every commit. The owner has confirmed their acceptance; that is not a CI pass.
+
+| Stage | Commit on `main` |
 | --- | --- |
-| V0.1 | Closed and owner accepted on 13 November 2026. Every V01 backlog item is `DONE`. |
-| Stage 2 (Persistent world) | `accepted` on `main` (`161e781`, 14 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), [verification-stage02-persistent-world/REPORT.md](verification-stage02-persistent-world/REPORT.md)). |
-| Stage 3 (Player lifecycle & youth pathway) | `accepted` on `main` (`1fc2175`, 14 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage03-player-lifecycle/REPORT.md](verification-stage03-player-lifecycle/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): fictional ageing, exploit-proof off-season skill progression, retirement, preserved alumni pages, youth academy intake/promotion, and 20-season diagnostics (`0` role shortages). |
-| Stage 4 (Contracts, budgets & recruitment) | `accepted` on `main` (15 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage04-squad-economy/REPORT.md](verification-stage04-squad-economy/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): domestic wages, symmetrical `$2,500k` club budgets, multi-round pre-season negotiations, free agents, hash-chained transaction ledger, public-only AI club recruitment (`0` hidden future-ability reads), cross-season transfer projections, and 12-season economy diagnostics (`0` overspent clubs, `0` role shortages). |
-| Stage 5 (Tactical briefings & feedback) | `accepted` on `main` (`4fa82d8`, 15 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage05-tactical-briefings/REPORT.md](verification-stage05-tactical-briefings/REPORT.md), [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)): optional pre-match briefing, plain-language upside/trade-off explanations for all 7 tactical controls, contextual legal presets across `T20`/`ODI`/`RED_BALL`, and factual post-spell/stint outcome summaries beside the accepted plan. |
-| Stage 6 (Live field & highlight pacing) | `accepted` on `main` (`031abd3`, 15 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage06-live-field-highlights/REPORT.md](verification-stage06-live-field-highlights/REPORT.md)): responsive 2D SVG named-position field with RHB/LHB mirroring, powerplay legal-placement feedback, keyboard preset controls, illustrative highlight trajectories (`EVERY_BALL`, `KEY_MOMENTS`, `FAST`), `reducedMotion` suppression, and identical final state/event hashes across modes. |
-| Stage 7 (Contextual text commentary) | `accepted` on `main` (15 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage07-contextual-commentary/REPORT.md](verification-stage07-contextual-commentary/REPORT.md)): shared fact-checked `LC_COMMENTARY_ADAPTER_V1` across `T20`/`ODI`/`RED_BALL` with FNV-1a presentation seed, repetition cooldowns, `Brief`/`Standard`/`Detailed`/`Off` modes, milestone badges, and zero network calls. |
-| Match formats | T20, ODI and five-day red ball, with hash-chained replay. Tactical captains for all three. Seeded red-ball weather. |
-| Career | Single-season V0.1 careers (`14` rounds, `56` fixtures), Stage 2 persistent worlds (`LC_PERSISTENT_WORLD_V1`), Stage 3 lifecycle worlds (`LC_PERSISTENT_WORLD_V2_LIFECYCLE`), and Stage 4 domestic-economy worlds (`LC_PERSISTENT_WORLD_V3_ECONOMY`). |
-| Saves | IndexedDB with checkpoints and writer leases; crash-safe idempotent season rollover; durable managed-match recovery across closed tabs; per-season roster-snapshotted completed-match event archives (`V2`) and replay across seasons; non-destructive single-season copy-forward and Stage 2 -> Stage 3 slot upgrade; `.lcxxvi` export and import. |
-| Offline and accessibility | Precached offline shell with safe updates; automated keyboard, focus, contrast and 150 percent checks. |
-| Packaging | `npm run package:game` builds a playable zip and a source zip. |
-| Research track | Blocked on data. The model is synthetic and uncalibrated. |
+| V0.1 single-season game | closed 13 Nov (`f7ee054`) |
+| 2 Persistent multi-season world | `161e781` |
+| 3 Player lifecycle and youth | `1fc2175` |
+| 4 Contracts, budgets and recruitment | `cf24121` |
+| 5 Tactical briefings | `4fa82d8` |
+| 6 Live 2D field and highlights | `031abd3` |
+| 7 Contextual text commentary | `3762ed3` |
+| 8 Optional sound and narration | `d02e899` |
+| 9 Historical statistics | `9e4ea36` |
+| 10 Match and season awards | `c40a908` (acceptance note `8517205`) |
+| Windows launcher and EXE builder | `b66bc60` |
 
-**Owner declared, not measured:** the reference-hardware performance run, the owner-PC run and the human screen-reader walkthrough. There is no measurement or observation for them in this repository. See [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md).
+### Stabilisation pull requests (stacked; merge in order)
 
-**Known limits:** [release-v01/RELEASE_RECORD.json](release-v01/RELEASE_RECORD.json) (`knownLimits`), and [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md) for the review of the unreviewed commits.
+| PR | Phase | What it does |
+| --- | --- | --- |
+| #48 | 1 | Hosted CI green: time limits fitted to measured runs; four failing browser specs fixed (three real bugs); yielding long horizons; management-screen layout at 150% and 390 px |
+| #49 | 2 | Safety and format integrity: no hash-trust validation shortcuts; local-only launcher shutdown; no in-place archive widening; upgrades refused during a pending match |
+| #50 | 3 | Career correctness: awards from season-fixed facts; AI clubs train; locale-independent ordering |
+| #51 | 4a | Scale: key-range reads, statistics only on their screen, windowed commentary |
+| #52 | 4b | Long careers: match digests, compressed archive storage, compressed V4 export ([design](design/MATCH_ARCHIVE_STORAGE_V2.md)) |
+| (next) | 6 | Windows EXE built and smoke-tested in CI; documentation reconciled (this page) |
 
-| Stage 8 (Optional sound & narration) | `accepted` on `main` (16 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage08-optional-sound/REPORT.md](verification-stage08-optional-sound/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): `LC_AUDIO_PRESENTATION_V1` + `LC_AUDIO_PROVENANCE_V1` original MIT procedural synthesis cues, 4-channel mixer + mute + narration + live ARIA captions, user-gesture gate, reload deduplication, fast-forward expiry, background-tab suppression, missing/decode fallback, and byte-identical simulation hashes. |
-| Stage 9 (Historical statistics & leaderboards) | `accepted` on `main` (16 November 2026: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage09-historical-stats/REPORT.md](verification-stage09-historical-stats/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): `LC_HISTORICAL_STATISTICS_PROJECTION_V1` rebuildable career projections (`325` JSON Schemas, `767/767` unit tests, `6/6` Chromium + Firefox UI tests), 12 qualified leaderboards with explicit denominators/nulls/ties, multi-dimensional filters (season, competition, club, opponent, venue, batting position, active/retired status), fielding records from event archives, source separation, incremental-vs-rebuild parity, and clickable contributing-match replay links. |
-| Windows double-click & `.NET` launcher | `accepted` on `main` (16 November 2026: `Play-Lord-Cricket.bat`, `tools/windows/*`, `LordCricketLauncher.cs` -> `LordCricketXXVI.exe`, `tests/unit/windows-launcher.test.ts` `3/3`). |
-| Stage 10 (Match & season awards) | `accepted` on `main` (`S10-01`, 16 November 2026: [verification-stage10-match-season-awards/REPORT.md](verification-stage10-match-season-awards/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)): `LC_AWARDS_HEURISTIC_GAME_V1` + `LC_CAREER_AWARDS_LEDGER_V1` (`334` JSON Schemas, `770/770` unit tests across `72/72` files, Chromium + Firefox Stage 10 + accessibility UI suites), transparent Player of the Match (`T20`/`ODI`/`RED_BALL`, losing-side & no-result support, archived-event fielding) + 5 qualified season awards, idempotent IndexedDB + `.lcxxvi` persistence, and Match Result, Roll of Honour, Statistics, Replay, and PlayerPage UI. Owner-accepted 16 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). |
+Each PR's description records its commands, tested revision and NOT RUN items.
 
-## What is next
+**Owner declared, not measured:** the reference-hardware performance run, the owner-PC run and the human screen-reader walkthrough.
 
-1. **Stage 11: Player and manager stories** (`S11-01` — event-driven milestone, streak, selection/contract pressure, and board-review cards) (plus optional multi-participant playtests using [PLAYTEST_SCRIPT_STAGE05.md](PLAYTEST_SCRIPT_STAGE05.md)). See [ROADMAP_AND_AI_GUIDE.md](ROADMAP_AND_AI_GUIDE.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md), and [NEXT_PASS.md](NEXT_PASS.md).
-2. The owner applies branch protection ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
-3. Optionally, real measurements for the three declared gates.
+## Limits a newcomer must know
+
+- **No rollback below the stabilisation builds.** An older build cannot read compressed archive rows or V4 exports, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete.
+- **Career length:** compressed archives fit about 40 seasons in the 128 MB per-world archive ceiling (one season stores about 3 MB). Measured on one season; a long soak is still to do.
+- **Frozen code:** the match engines still sort with `localeCompare`; changing them needs the owner's approval.
+- **Concurrent agents:** Copilot, "Agent Zero" and "Lord Cricket Engineer" have written to this repository. The owner agreed to pause them during stabilisation.
+- **Branch protection:** the owner will apply it ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
 
 ## Run it
 
@@ -48,41 +58,43 @@ You need Node.js 22.12 or later (Python 3 only for `verify:09:core`).
 ```bash
 npm ci
 npm run build
-npm run dev          # development server
+node start.mjs        # then open http://127.0.0.1:4180/
 ```
 
-To play a built copy, serve `apps/web/dist` over http (it uses web workers, so opening `index.html` directly does not work), for example `node start.mjs` after `npm run build`, then open `http://127.0.0.1:4180/`. To make shareable zips: `npm run package:game`, which writes to `release-packages/`.
-
-Browser saves live in the browser profile, tied to the address and port. Use the in-game export to keep backups.
+On Windows, double-click `Play-Lord-Cricket.bat`. To make shareable zips: `npm run package:game`, which writes to `release-packages/`. Browser saves live in the browser profile, tied to the address and port; use the in-game export to keep backups.
 
 ## Verify it
 
 ```bash
 npx tsc -b                      # always first after a pull: compiled packages go stale
 npm run lint
-npm run verify:09:core          # schemas, build, typecheck, lint, vectors, unit tests (about 4 minutes)
+npm run verify:09:core          # schemas, build, typecheck, lint, vectors, unit tests (about 6 minutes)
 npm run build
 npx playwright install chromium firefox
-npx playwright test --config playwright.ui.config.ts     # browser suite
-npm run smoke
-npm run management:acceptance
+npx playwright test --config playwright.ui.config.ts     # browser suite, about 20 minutes per browser
+npx playwright test --config playwright.m4.config.ts     # real-IndexedDB persistence
+node scripts/owner-acceptance.mjs --skip-install         # what hosted Windows runs, about an hour
 ```
 
-Last verified on `8a7c164`: `verify:09:core` 63 files and 731 tests passing, and the Chromium UI suite 60 of 60. Re-run them; do not rely on these numbers. Hosted CI runs a Linux job and a Windows job (Chromium and Firefox) on every pull request; the Windows job takes 25 to 30 minutes.
+Last local results (Linux, Node 22, Chromium) on #52's head `582f9ce`: `verify:09:core` exit 0, 76 files, 791 tests. On #48's head: Chromium UI suite 71/71, m6g 12/12, m4 16/16. Re-run them; do not rely on these numbers. Hosted CI runs a Linux job (about 25 minutes) and a Windows job (Chromium and Firefox, about an hour) on every pull request.
 
 ## Read in this order
 
-1. [AGENTS.md](../AGENTS.md), the project rules and architecture invariants.
-2. [AI_CONTINUATION.md](AI_CONTINUATION.md), including the working agreements.
-3. [CURRENT_STATUS.md](CURRENT_STATUS.md), [CAPABILITY_MATRIX.md](CAPABILITY_MATRIX.md), [V01_BACKLOG.json](V01_BACKLOG.json), [V01_DELIVERY_PLAN.md](V01_DELIVERY_PLAN.md).
-4. [ENGINEERING_GUIDE.md](ENGINEERING_GUIDE.md), [VERIFICATION_GUIDE.md](VERIFICATION_GUIDE.md), [../packages/persistence/README.md](../packages/persistence/README.md).
-5. [MANAGED_MATCH_RECOVERY.md](MANAGED_MATCH_RECOVERY.md), [PERFORMANCE_BUDGETS.md](PERFORMANCE_BUDGETS.md), [REVIEW_2026-11-13.md](REVIEW_2026-11-13.md).
-6. To brief another AI quickly, paste [AI_INSPECTION_PROMPT.md](AI_INSPECTION_PROMPT.md).
+1. [AGENTS.md](../AGENTS.md), the project rules and the current task boundary.
+2. [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md), the findings and the phased plan.
+3. [AI_CONTINUATION.md](AI_CONTINUATION.md), including the working agreements.
+4. [CURRENT_STATUS.md](CURRENT_STATUS.md), [CAPABILITY_MATRIX.md](CAPABILITY_MATRIX.md).
+5. [ENGINEERING_GUIDE.md](ENGINEERING_GUIDE.md), [VERIFICATION_GUIDE.md](VERIFICATION_GUIDE.md), [../packages/persistence/README.md](../packages/persistence/README.md).
+6. [MANAGED_MATCH_RECOVERY.md](MANAGED_MATCH_RECOVERY.md), [PERFORMANCE_BUDGETS.md](PERFORMANCE_BUDGETS.md), [design/MATCH_ARCHIVE_STORAGE_V2.md](design/MATCH_ARCHIVE_STORAGE_V2.md).
+7. To brief another AI quickly, paste [AI_INSPECTION_PROMPT.md](AI_INSPECTION_PROMPT.md).
 
 ## Traps
 
 - Stale `dist` folders after a pull make unit tests fail confusingly. Run `npx tsc -b` first.
-- Windows CI fails on any skipped browser test.
-- A first commit never replaces an existing save (`SAVE_ALREADY_EXISTS`); a pending career match blocks "New exhibition" until it is finished or abandoned.
+- `npm run typecheck` also checks test files (`tsconfig.tools.json`); `npx tsc -b` does not.
+- Windows CI fails on any skipped browser test, and the acceptance script stops at the first failing step, so a later step may never have run.
+- Vitest has a fixed 60 s RPC limit: one synchronous call must not run that long (use the yielding horizon runners).
+- The pinned schema counts in `tests/unit/contracts.test.ts` and `tests/unit/scoring-fixtures.test.ts` change with every new contract schema.
+- A first commit never replaces an existing save (`SAVE_ALREADY_EXISTS`); a pending career match blocks "New exhibition" and career upgrades until it is finished or abandoned.
 - The Windows checkout changes line endings, so file hashes computed on Windows differ from Linux. This is not a change to a frozen file.
 - Do not mark an owner gate passed, change repository settings or merge the owner's pull requests without the owner's say.

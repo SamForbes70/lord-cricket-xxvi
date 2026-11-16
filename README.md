@@ -2,6 +2,8 @@
 
 **An evidence-based, deterministic, browser-native statistical cricket management game built as a strict TypeScript monorepo.**
 
+> **Stabilisation in progress (16 November 2026).** The owner directed: "Get what we currently have as excellent, then we will finish the full game." No new stages (including Stage 11) until the plan in [docs/AUDIT_2026-11-16.md](docs/AUDIT_2026-11-16.md) is complete and reviewed. Current state and the open pull requests: [docs/HANDOVER.md](docs/HANDOVER.md). Stages 2 to 10 landed on `main` with hosted CI failing; the stabilisation pull requests make it green.
+
 > **Quick status (16 November 2026, Australia/Brisbane):** V0.1 (`f7ee054`), **Stages 2 through 10** (`Persistent Multi-Season World`, `Player Lifecycle & Youth Pathway`, `Contracts, Budgets & Recruitment`, `Tactical Briefings & Feedback`, `Live Field & Highlight Pacing`, `Contextual Text Commentary`, `Optional Sound & Narration`, `Historical Statistics & Leaderboards`, and `Match & Season Awards`), and the **Windows Double-Click & Zero-Dependency `.NET` Portable Launcher** are **implemented, verified (`773/773` unit tests across `73/73` files, `334` strict JSON Schemas, Chromium + Firefox E2E suites), merged to `main`, and owner-accepted**. Next eligible roadmap slice: **Stage 11 (`S11-01`: Player and manager stories)**. The authoritative production gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA` (fictional teams/players, no empirical calibration claim yet).
 
 ---
