@@ -70,11 +70,16 @@ test("V01-018 completed career match event archives replay in UI, survive .lcxxv
     const get = <T,>(req: IDBRequest<T>) => new Promise<T>((resolve, reject) => { req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); });
     const active = await get(tx.objectStore("settings").get("activeSeasonSaveId"));
     const all = await get(tx.objectStore("projections").getAll());
-    const eventRows = all.filter((row: { saveId: string; scope: string }) => row.saveId === active.value && row.scope === "CAREER_MATCH_EVENTS_V1");
+    // New archives are stored compressed (CAREER_MATCH_EVENTS_GZIP_V1); older saves use CAREER_MATCH_EVENTS_V1.
+    const eventRows = all.filter((row: { saveId: string; scope: string }) => row.saveId === active.value && (row.scope === "CAREER_MATCH_EVENTS_V1" || row.scope === "CAREER_MATCH_EVENTS_GZIP_V1"));
     const deletedKey = eventRows[0].key as string;
     const corruptedKey = eventRows[1].key as string;
-    tx.objectStore("projections").delete([active.value, "CAREER_MATCH_EVENTS_V1", deletedKey]);
-    tx.objectStore("projections").put({ ...eventRows[1], payload: `${eventRows[1].payload} ` });
+    tx.objectStore("projections").delete([active.value, eventRows[0].scope, deletedKey]);
+    // Change one character in the middle of the stored payload (a trailing space is ignored by base64 decoding).
+    const payload = eventRows[1].payload as string;
+    const mid = Math.floor(payload.length / 2);
+    const flipped = payload[mid] === "A" ? "B" : "A";
+    tx.objectStore("projections").put({ ...eventRows[1], payload: payload.slice(0, mid) + flipped + payload.slice(mid + 1) });
     await new Promise<void>((resolve, reject) => { tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); });
     db.close();
     return { deletedKey, corruptedKey };

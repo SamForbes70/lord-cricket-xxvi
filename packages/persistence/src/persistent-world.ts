@@ -1,5 +1,8 @@
 import {
   canonicalJson,
+  MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
+  CareerMatchDigestSchema,
+  type CareerMatchDigest,
   CompletedSeasonRecordCoreSchema,
   CompletedSeasonRecordSchema,
   LIFECYCLE_SEASON_STATE_VERSION,
@@ -50,6 +53,10 @@ import { DB_NAME, DB_VERSION } from "./index.js";
 import {
   CAREER_AWARDS_LEDGER_SCOPE,
   CAREER_MATCH_EVENTS_SCOPE,
+  CAREER_MATCH_DIGEST_SCOPE,
+  CAREER_MATCH_EVENTS_GZIP_SCOPE,
+  gzipToBase64,
+  gunzipBase64ToText,
   careerMatchEventArchiveByteLength,
   createT20SeasonArchive,
   SEASON_PRESENTATION_SAVE_SCHEMA_VERSION,
@@ -995,6 +1002,13 @@ export async function inspectPersistentWorldCheckpoints(input: {
   });
 }
 
+/** The archive JSON of a stored row, decompressing rows from the compressed scope. */
+async function archiveRowText(row: ProjectionRecord): Promise<string> {
+  return row.scope === CAREER_MATCH_EVENTS_GZIP_SCOPE
+    ? gunzipBase64ToText(row.payload, MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES)
+    : row.payload;
+}
+
 export class IndexedDbPersistentWorldRepository {
   private dbPromise: Promise<IDBDatabase> | null = null;
   constructor(private readonly databaseName = DB_NAME) {}
@@ -1181,6 +1195,8 @@ export class IndexedDbPersistentWorldRepository {
     const preparedArchives: Array<{
       fixtureId: string;
       payload: string;
+      /** Compressed form written to CAREER_MATCH_EVENTS_GZIP_V1; prepared before the transaction opens. */
+      storedPayload: string;
       sha256: string;
       bytes: number;
     }> = [];
@@ -1194,6 +1210,7 @@ export class IndexedDbPersistentWorldRepository {
         preparedArchives.push({
           fixtureId: archive.fixtureId,
           payload: archivePayload,
+          storedPayload: await gzipToBase64(archivePayload),
           sha256: await seasonSha256Text(archivePayload),
           bytes: careerMatchEventArchiveByteLength(archive),
         });
@@ -1378,31 +1395,23 @@ export class IndexedDbPersistentWorldRepository {
 
     if (input.copySource || preparedArchives.length > 0 || preparedRosterPacks.size > 0) {
       // Only the rows the loops below use; reading the whole store grew with every career on the device.
-      const allProjections: ProjectionRecord[] = [
-        ...(input.copySource
-          ? await projectionRowsForScope(projections, input.copySource.saveId, PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE)
-          : []),
-        ...(input.copySource
-          ? await projectionRowsForScope(projections, input.copySource.saveId, CAREER_MATCH_EVENTS_SCOPE)
-          : []),
-        ...(input.copySource || preparedArchives.length > 0
-          ? await projectionRowsForScope(projections, input.saveId, CAREER_MATCH_EVENTS_SCOPE)
-          : []),
-        // The copy loop below also copies the source's awards ledger.
-        ...(input.copySource
-          ? await projectionRowsForScope(projections, input.copySource.saveId, CAREER_AWARDS_LEDGER_SCOPE)
-          : []),
+      const eventScopes = [CAREER_MATCH_EVENTS_SCOPE, CAREER_MATCH_EVENTS_GZIP_SCOPE] as const;
+      const sourceRows = async (scope: string) =>
+        input.copySource ? projectionRowsForScope(projections, input.copySource.saveId, scope) : [];
+      const sourcePacks = await sourceRows(PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE);
+      const sourceEvents = [...(await sourceRows(eventScopes[0])), ...(await sourceRows(eventScopes[1]))];
+      const sourceDerived = [
+        ...(await sourceRows(CAREER_AWARDS_LEDGER_SCOPE)),
+        ...(await sourceRows(CAREER_MATCH_DIGEST_SCOPE)),
       ];
-      if (input.copySource) {
-        for (const row of allProjections) {
-          if (
-            row.saveId === input.copySource.saveId &&
-            row.scope === PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE
-          ) {
-            projections.put({ ...row, saveId: input.saveId });
-          }
-        }
-      }
+      const targetEvents =
+        input.copySource || preparedArchives.length > 0
+          ? [
+              ...(await projectionRowsForScope(projections, input.saveId, eventScopes[0])),
+              ...(await projectionRowsForScope(projections, input.saveId, eventScopes[1])),
+            ]
+          : [];
+      for (const row of sourcePacks) projections.put({ ...row, saveId: input.saveId });
       for (const packItem of preparedRosterPacks.values()) {
         projections.put({
           saveId: input.saveId,
@@ -1413,25 +1422,16 @@ export class IndexedDbPersistentWorldRepository {
         } satisfies ProjectionRecord);
       }
       if (input.copySource || preparedArchives.length > 0) {
+        // One row per fixture, whichever scope holds it; new archives are stored compressed.
         const mergedByFixture = new Map<string, ProjectionRecord>();
-        if (input.copySource) {
-          for (const row of allProjections) {
-            if (row.saveId === input.copySource.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
-              mergedByFixture.set(row.key, { ...row, saveId: input.saveId });
-            }
-          }
-        }
-        for (const row of allProjections) {
-          if (row.saveId === input.saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE) {
-            mergedByFixture.set(row.key, row);
-          }
-        }
+        for (const row of sourceEvents) mergedByFixture.set(row.key, { ...row, saveId: input.saveId });
+        for (const row of targetEvents) mergedByFixture.set(row.key, row);
         for (const item of preparedArchives) {
           mergedByFixture.set(item.fixtureId, {
             saveId: input.saveId,
-            scope: CAREER_MATCH_EVENTS_SCOPE,
+            scope: CAREER_MATCH_EVENTS_GZIP_SCOPE,
             key: item.fixtureId,
-            payload: item.payload,
+            payload: item.storedPayload,
             sha256: item.sha256,
           });
         }
@@ -1443,15 +1443,13 @@ export class IndexedDbPersistentWorldRepository {
         if (totalArchiveBytes > MAX_PERSISTENT_WORLD_EVENT_ARCHIVES_TOTAL_BYTES) {
           return abortWith("LC_PERSISTENT_WORLD_MATCH_EVENT_ARCHIVE_TOTAL_SIZE_EXCEEDED");
         }
+        // A fixture moving to the compressed scope must not keep a stale uncompressed row.
+        for (const row of targetEvents) {
+          if (mergedByFixture.get(row.key)?.scope !== row.scope) projections.delete([row.saveId, row.scope, row.key]);
+        }
         for (const row of mergedByFixture.values()) projections.put(row);
       }
-      if (input.copySource) {
-        for (const row of allProjections) {
-          if (row.saveId === input.copySource.saveId && row.scope === CAREER_AWARDS_LEDGER_SCOPE) {
-            projections.put({ ...row, saveId: input.saveId });
-          }
-        }
-      }
+      for (const row of sourceDerived) projections.put({ ...row, saveId: input.saveId });
     }
 
     const summary = persistentSummaryFor({ ...input, state });
@@ -1723,6 +1721,73 @@ export class IndexedDbPersistentWorldRepository {
     return ledger;
   }
 
+  /**
+   * One fixture's archive, read by key; replaying one match no longer loads every season's archives.
+   * Returns `damaged: true` when the row exists but fails its hash or validation.
+   */
+  async loadMatchEventArchive(
+    saveId: string,
+    fixtureId: string,
+    worldState?: AnyPersistentWorldState,
+  ): Promise<{ archive: AnyCareerMatchEventArchive | null; damaged: boolean }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const store = tx.objectStore("projections");
+    const row =
+      ((await req(store.get([saveId, CAREER_MATCH_EVENTS_GZIP_SCOPE, fixtureId]))) as ProjectionRecord | undefined) ??
+      ((await req(store.get([saveId, CAREER_MATCH_EVENTS_SCOPE, fixtureId]))) as ProjectionRecord | undefined);
+    await txDone(tx);
+    if (!row) return { archive: null, damaged: false };
+    try {
+      const text = await archiveRowText(row);
+      if ((await seasonSha256Text(text)) !== row.sha256) return { archive: null, damaged: true };
+      const completion = worldState ? collectPersistentWorldCompletions(worldState).get(fixtureId) : undefined;
+      if (worldState && !completion) throw new Error(`UNKNOWN_FIXTURE:${fixtureId}`);
+      const archive = await validateAnyCareerMatchEventArchive(JSON.parse(text), completion);
+      if (archive.fixtureId !== fixtureId) throw new Error("FIXTURE_KEY_MISMATCH");
+      return { archive, damaged: false };
+    } catch {
+      return { archive: null, damaged: true };
+    }
+  }
+
+  /** Stored per-match digests (docs/design/MATCH_ARCHIVE_STORAGE_V2.md); rows failing hash or schema are skipped. */
+  async loadMatchDigests(saveId: string): Promise<Map<string, CareerMatchDigest>> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const rows = await projectionRowsForScope(tx.objectStore("projections"), saveId, CAREER_MATCH_DIGEST_SCOPE);
+    await txDone(tx);
+    const digests = new Map<string, CareerMatchDigest>();
+    for (const row of rows) {
+      if ((await seasonSha256Text(row.payload)) !== row.sha256) continue;
+      try {
+        const digest = CareerMatchDigestSchema.parse(JSON.parse(row.payload));
+        if (digest.fixtureId === row.key) digests.set(row.key, digest);
+      } catch {
+        /* a damaged digest is rebuilt from its archive */
+      }
+    }
+    return digests;
+  }
+
+  /**
+   * Stores derived digests. They are rebuilt from verified archives, so writing them outside a career
+   * commit cannot change career state; a missing or damaged row is simply derived again.
+   */
+  async saveMatchDigests(saveId: string, digests: readonly CareerMatchDigest[]): Promise<void> {
+    if (digests.length === 0) return;
+    const rows: ProjectionRecord[] = [];
+    for (const raw of digests) {
+      const digest = CareerMatchDigestSchema.parse(raw);
+      const payload = canonicalJson(digest);
+      rows.push({ saveId, scope: CAREER_MATCH_DIGEST_SCOPE, key: digest.fixtureId, payload, sha256: await seasonSha256Text(payload) });
+    }
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    for (const row of rows) tx.objectStore("projections").put(row);
+    await txDone(tx);
+  }
+
   async loadMatchEventArchives(
     saveId: string,
     worldState?: AnyPersistentWorldState,
@@ -1733,11 +1798,11 @@ export class IndexedDbPersistentWorldRepository {
   }> {
     const db = await this.open();
     const tx = db.transaction("projections", "readonly");
-    const allRows = await projectionRowsForScope(tx.objectStore("projections"), saveId, CAREER_MATCH_EVENTS_SCOPE);
+    const rows = [
+      ...(await projectionRowsForScope(tx.objectStore("projections"), saveId, CAREER_MATCH_EVENTS_SCOPE)),
+      ...(await projectionRowsForScope(tx.objectStore("projections"), saveId, CAREER_MATCH_EVENTS_GZIP_SCOPE)),
+    ];
     await txDone(tx);
-    const rows = allRows.filter(
-      (row) => row.saveId === saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE,
-    );
     const completionByFixture = worldState
       ? collectPersistentWorldCompletions(worldState)
       : new Map<string, T20SeasonMatchCompletion>();
@@ -1749,7 +1814,14 @@ export class IndexedDbPersistentWorldRepository {
     const seenFixtures = new Set<string>();
     for (const row of rows) {
       totalBytes += enc.encode(row.payload).byteLength;
-      if ((await seasonSha256Text(row.payload)) !== row.sha256) {
+      let text: string;
+      try {
+        text = await archiveRowText(row);
+      } catch {
+        damagedFixtureIds.push(row.key);
+        continue;
+      }
+      if ((await seasonSha256Text(text)) !== row.sha256) {
         damagedFixtureIds.push(row.key);
         continue;
       }
@@ -1757,7 +1829,7 @@ export class IndexedDbPersistentWorldRepository {
         const completion = worldState ? completionByFixture.get(row.key) : undefined;
         if (worldState && !completion) throw new Error(`UNKNOWN_FIXTURE:${row.key}`);
         const parsed = await validateAnyCareerMatchEventArchive(
-          JSON.parse(row.payload),
+          JSON.parse(text),
           completion,
         );
         if (seenFixtures.has(parsed.fixtureId)) {

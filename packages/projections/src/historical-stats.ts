@@ -22,6 +22,8 @@ import {
   type T20SeasonMatchCompletion,
   type T20SeasonState,
   compareCodePoints,
+  CAREER_MATCH_DIGEST_VERSION,
+  type CareerMatchDigest,
 } from "@lcxxvi/contracts";
 
 export const HISTORICAL_T20_COMPETITION_ID = "LC_T20_LEAGUE_01" as const;
@@ -130,6 +132,8 @@ export type HistoricalCareerStatsSource = {
   readonly archivesByFixtureId?:
     | ReadonlyMap<string, AnyCareerMatchEventArchive>
     | readonly AnyCareerMatchEventArchive[];
+  /** Per-match digests, used for fixtures whose full archive is not supplied. */
+  readonly digestsByFixtureId?: ReadonlyMap<string, CareerMatchDigest>;
   readonly retiredPlayers?: readonly RetiredPlayerRecord[];
   readonly activeTeamIds?: readonly string[];
   readonly teamAffiliationByPlayerId?: Readonly<Record<string, string>>;
@@ -290,6 +294,35 @@ function extractArchiveDetail(
   return { creaseOrder: [order0, order1], fieldingByPlayer };
 }
 
+/** Derives the digest with exactly the logic statistics use on a full archive. */
+export function deriveCareerMatchDigest(
+  archive: AnyCareerMatchEventArchive,
+  completion: T20SeasonMatchCompletion,
+): CareerMatchDigest {
+  const detail = extractArchiveDetail(archive, completion)!;
+  return {
+    digestVersion: CAREER_MATCH_DIGEST_VERSION,
+    fixtureId: completion.fixtureId,
+    groundId: archiveGroundId(archive),
+    creaseOrder: [[...detail.creaseOrder[0]], [...detail.creaseOrder[1]]],
+    fielding: [...detail.fieldingByPlayer.entries()]
+      .map(([playerId, f]) => ({ playerId, teamId: f.teamId, catches: f.catches, stumpings: f.stumpings, runOuts: f.runOuts }))
+      .sort((a, b) => compareCodePoints(a.playerId, b.playerId)),
+  };
+}
+
+function detailFromDigest(digest: CareerMatchDigest): {
+  creaseOrder: [string[], string[]];
+  fieldingByPlayer: Map<string, { teamId: string; catches: number; stumpings: number; runOuts: number }>;
+} {
+  return {
+    creaseOrder: [[...digest.creaseOrder[0]], [...digest.creaseOrder[1]]],
+    fieldingByPlayer: new Map(
+      digest.fielding.map((f) => [f.playerId, { teamId: f.teamId, catches: f.catches, stumpings: f.stumpings, runOuts: f.runOuts }]),
+    ),
+  };
+}
+
 function lookupGroundFromSeasonMap(
   map: ReadonlyMap<string, string> | Readonly<Record<string, string>> | undefined,
   fixtureId: string,
@@ -306,11 +339,14 @@ export function buildHistoricalMatchFact(
     competitionId: string;
     homeGroundIds?: Readonly<Record<string, string>>;
     archive?: AnyCareerMatchEventArchive;
+    /** Used when the full archive is not loaded; derived from it, so the result is the same. */
+    digest?: CareerMatchDigest;
   },
 ): HistoricalMatchFact {
   const resolvedGroundId =
     lookupGroundFromSeasonMap(season.groundByFixtureId, completion.fixtureId) ??
     archiveGroundId(options.archive) ??
+    options.digest?.groundId ??
     options.homeGroundIds?.[completion.homeTeamId] ??
     null;
 
@@ -323,7 +359,11 @@ export function buildHistoricalMatchFact(
     }
   }
 
-  const archiveDetail = extractArchiveDetail(options.archive, completion);
+  const archiveDetail = options.archive
+    ? extractArchiveDetail(options.archive, completion)
+    : options.digest
+      ? detailFromDigest(options.digest)
+      : null;
   const battingEntries: HistoricalBattingEntryFact[] = [];
   const bowlingEntries: HistoricalBowlingEntryFact[] = [];
 
@@ -445,8 +485,9 @@ export function buildHistoricalMatchFact(
     battingEntries,
     bowlingEntries,
     fieldingEntries,
-    archiveEvaluated: Boolean(options.archive),
-    archiveReplayAvailable: Boolean(options.archive),
+    // A digest is only ever derived from a stored, verified archive, so the replay is available.
+    archiveEvaluated: Boolean(options.archive ?? options.digest),
+    archiveReplayAvailable: Boolean(options.archive ?? options.digest),
   };
 }
 
@@ -557,10 +598,12 @@ export function buildHistoricalMatchFactsFromCareer(source: HistoricalCareerStat
     );
     for (const completion of orderedCompletions) {
       const archive = archiveMap.get(completion.fixtureId);
+      const digest = archive ? undefined : source.digestsByFixtureId?.get(completion.fixtureId);
       const fact = buildHistoricalMatchFact(season, completion, {
         competitionId: acc.competitionId,
         ...(source.homeGroundIds ? { homeGroundIds: source.homeGroundIds } : {}),
         ...(archive ? { archive } : {}),
+        ...(digest ? { digest } : {}),
       });
       applyHistoricalMatchFact(acc, fact);
     }
@@ -1590,6 +1633,7 @@ export function projectHistoricalStatistics(
 export function buildHistoricalStatsSourceFromPersistentWorld(input: {
   world: AnyPersistentWorldState;
   archives?: readonly AnyCareerMatchEventArchive[] | ReadonlyMap<string, AnyCareerMatchEventArchive>;
+  digests?: ReadonlyMap<string, CareerMatchDigest>;
   homeGroundIds?: Readonly<Record<string, string>>;
   teamAffiliationByPlayerId?: Readonly<Record<string, string>>;
   activeTeamIds?: readonly string[];
@@ -1635,6 +1679,7 @@ export function buildHistoricalStatsSourceFromPersistentWorld(input: {
     seasons,
     ...(input.homeGroundIds ? { homeGroundIds: input.homeGroundIds } : {}),
     ...(input.archives ? { archivesByFixtureId: input.archives } : {}),
+    ...(input.digests ? { digestsByFixtureId: input.digests } : {}),
     ...(retiredPlayers ? { retiredPlayers } : {}),
     activeTeamIds,
     teamAffiliationByPlayerId,
@@ -1646,6 +1691,7 @@ export function buildHistoricalStatsSourceFromSingleSeason(input: {
   worldId: string;
   calendarYear?: number;
   archives?: readonly AnyCareerMatchEventArchive[] | ReadonlyMap<string, AnyCareerMatchEventArchive>;
+  digests?: ReadonlyMap<string, CareerMatchDigest>;
   homeGroundIds?: Readonly<Record<string, string>>;
   teamAffiliationByPlayerId?: Readonly<Record<string, string>>;
 }): HistoricalCareerStatsSource {
@@ -1670,6 +1716,7 @@ export function buildHistoricalStatsSourceFromSingleSeason(input: {
     ],
     ...(input.homeGroundIds ? { homeGroundIds: input.homeGroundIds } : {}),
     ...(input.archives ? { archivesByFixtureId: input.archives } : {}),
+    ...(input.digests ? { digestsByFixtureId: input.digests } : {}),
     activeTeamIds: season.schedule.teamIds,
     ...(input.teamAffiliationByPlayerId
       ? { teamAffiliationByPlayerId: input.teamAffiliationByPlayerId }

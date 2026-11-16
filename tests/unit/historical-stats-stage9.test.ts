@@ -3,7 +3,7 @@ import {
   canonicalJson,
   HISTORICAL_STATS_PROJECTION_VERSION,
   HistoricalLeaderboardMetricSchema,
-  PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
   type NewGameWorldCopy,
   type PersistentWorldSaveSummary,
   type SeasonCheckpointInspection,
@@ -22,7 +22,7 @@ import {
 import {
   peekPortableArchiveVersion,
   PERSISTENT_WORLD_RECORD_TYPE,
-  readPersistentWorldPortableArchiveV3,
+  readPersistentWorldPortableArchiveV4,
   seasonSha256Text,
   validateAnyCareerMatchEventArchive,
   validateAnyPersistentWorldState,
@@ -525,8 +525,8 @@ describe("Stage 9 historical statistics and leaderboards", () => {
 
     // Portable .lcxxvi export/import parity in a fresh CareerApplicationService.
     const exportedBytes = await service.exportCareer();
-    expect(peekPortableArchiveVersion(exportedBytes)).toBe(PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION);
-    const readArchive = await readPersistentWorldPortableArchiveV3(exportedBytes);
+    expect(peekPortableArchiveVersion(exportedBytes)).toBe(PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION);
+    const readArchive = await readPersistentWorldPortableArchiveV4(exportedBytes);
     expect(readArchive.matchEventArchives.length).toBe(68);
 
     const importSeasonRepo = new InMemorySeasonRepo();

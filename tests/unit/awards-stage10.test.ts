@@ -12,8 +12,11 @@ import {
   type T20SeasonMatchCompletion,
 } from "@lcxxvi/contracts";
 import {
+  buildHistoricalMatchFactsFromCareer,
+  buildHistoricalStatsSourceFromPersistentWorld,
   computeMatchAward,
   computeSeasonAwards,
+  deriveCareerMatchDigest,
   createEmptyCareerAwardsLedger,
   reconcileCareerAwardsLedger,
   recordMatchAwardIdempotent,
@@ -24,6 +27,7 @@ import {
   createPersistentWorldPortableArchiveV3,
   PERSISTENT_WORLD_RECORD_TYPE,
   readPersistentWorldPortableArchiveV3,
+  readPersistentWorldPortableArchiveV4,
   validateAnyCareerMatchEventArchive,
   validateAnyPersistentWorldState,
   validateCompletedCareerMatchEventArchive,
@@ -301,6 +305,40 @@ describe("Stage 10 — Match and season awards (S10-01)", () => {
     expect(emerging(retired)?.winnerPlayerId).toBe(youngest.playerId);
   });
 
+  it("match digests give the same statistics and awards as the full archives", async () => {
+    // docs/design/MATCH_ARCHIVE_STORAGE_V2.md: statistics and awards must not need full archives.
+    const seasonRepo = new InMemorySeasonRepo();
+    const persistentRepo = new InMemoryPersistentWorldRepo(seasonRepo);
+    const svc = new CareerApplicationService("owner-digest", seasonRepo, undefined, persistentRepo);
+    await svc.boot();
+    await svc.createCareer(careerWorld.teams[0]!.teamId, null, { seed: "digest-seed", worldId: "world-digest", careerId: "career-digest" });
+    for (let round = 0; round < 3; round += 1) {
+      await svc.simulateToNextUserFixture();
+      await svc.simulateManagedFixture();
+    }
+    const world = svc.getPersistentState()!;
+    const completions = svc.getState()!.completedMatches;
+    const archives = await svc.loadCareerEventArchives();
+    expect(archives.length).toBe(completions.length);
+    const archiveMap = new Map(archives.map((a) => [a.fixtureId, a]));
+    const digests = new Map(
+      completions.map((c) => [c.fixtureId, deriveCareerMatchDigest(archiveMap.get(c.fixtureId)!, c)]),
+    );
+    expect([...digests.values()].some((d) => d.fielding.length > 0)).toBe(true);
+    // A digest is small: well under a hundredth of its archive.
+    const bytes = (v: unknown) => new TextEncoder().encode(JSON.stringify(v)).byteLength;
+    expect(bytes([...digests.values()]) * 100).toBeLessThan(bytes(archives));
+
+    const fromArchives = buildHistoricalMatchFactsFromCareer(buildHistoricalStatsSourceFromPersistentWorld({ world, archives }));
+    const fromDigests = buildHistoricalMatchFactsFromCareer(buildHistoricalStatsSourceFromPersistentWorld({ world, digests }));
+    expect(fromDigests.facts).toEqual(fromArchives.facts);
+
+    const seasonInput = { seasonNumber: 1, calendarYear: 2026, completedMatches: completions };
+    expect(computeSeasonAwards({ ...seasonInput, digestsByFixtureId: digests })).toEqual(
+      computeSeasonAwards({ ...seasonInput, archivesByFixtureId: archiveMap }),
+    );
+  }, 120_000);
+
   it("records awards idempotently, preserves match/season hashes, and round-trips through portable archives and CareerApplicationService", async () => {
     const worldCopy = createNewGameWorldCopy(structuredClone(careerWorld), careerWorld);
     const seasonRepo = new InMemorySeasonRepo();
@@ -343,7 +381,20 @@ describe("Stage 10 — Match and season awards (S10-01)", () => {
 
     // Season ledger idempotency + portable archive export/import round-trip.
     const exported = await svc.exportCareer();
-    const readBack = await readPersistentWorldPortableArchiveV3(exported);
+    const readBack = await readPersistentWorldPortableArchiveV4(exported);
+    // V4 holds exactly the V3 contents, gzip-compressed (docs/design/MATCH_ARCHIVE_STORAGE_V2.md, step 5).
+    expect(readBack.manifest.compression).toBe("gzip");
+    expect(readBack.state.stateSha256).toBe(svc.getPersistentState()!.stateSha256);
+    const sameAsV3 = await createPersistentWorldPortableArchiveV3(
+      readBack.state, readBack.summary, readBack.manifest.exportedAt, readBack.worldCopy,
+      readBack.matchEventArchives, readBack.seasonRosterPacks,
+    );
+    const v3 = await readPersistentWorldPortableArchiveV3(sameAsV3);
+    expect(v3.manifest.files).toEqual(readBack.manifest.files);
+    expect(exported.byteLength * 3).toBeLessThan(sameAsV3.byteLength);
+    // A V4 file is not accepted by the V3 reader, and the reverse.
+    await expect(readPersistentWorldPortableArchiveV3(exported)).rejects.toThrow();
+    await expect(readPersistentWorldPortableArchiveV4(sameAsV3)).rejects.toThrow();
     // The ledger is derived data and is not written into the V3 archive (writing it widened the format
     // in place; audit 16 Nov 2026). It is rebuilt from the exported match events on import.
     expect(readBack.awardsLedger).toBeNull();

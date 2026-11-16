@@ -43,3 +43,5 @@ export * from "./commentary.js";
 export * from "./audio.js";
 export * from "./historical-stats.js";
 export * from "./awards.js";
+export * from "./match-digest.js";
+export * from "./portable-v4.js";

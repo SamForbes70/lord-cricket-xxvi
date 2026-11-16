@@ -46,6 +46,65 @@ export type AnyCareerMatchEventArchive =
   | CompletedLifecycleMatchEventArchive;
 
 export const CAREER_MATCH_EVENTS_SCOPE = "CAREER_MATCH_EVENTS_V1" as const;
+/** Per-match digests derived from the archives (docs/design/MATCH_ARCHIVE_STORAGE_V2.md). */
+export const CAREER_MATCH_DIGEST_SCOPE = "CAREER_MATCH_DIGEST_V1" as const;
+/**
+ * Career match archives stored gzip-compressed and base64-encoded (about 4.5 times smaller). The row's
+ * sha256 is of the uncompressed canonical JSON, so integrity checks are unchanged after decompression.
+ */
+export const CAREER_MATCH_EVENTS_GZIP_SCOPE = "CAREER_MATCH_EVENTS_GZIP_V1" as const;
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(binary);
+}
+
+/** gzip with the platform CompressionStream (browsers and Node 18+). */
+export async function gzipBytes(data: Uint8Array): Promise<Uint8Array> {
+  const stream = new Blob([new Uint8Array(data)]).stream().pipeThrough(new CompressionStream("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+/**
+ * Reverses gzipBytes. Stops with an error once more than `maxBytes` would be produced, so crafted input
+ * cannot expand without bound.
+ */
+export async function gunzipBytes(compressed: Uint8Array, maxBytes: number): Promise<Uint8Array> {
+  const reader = new Blob([new Uint8Array(compressed)]).stream().pipeThrough(new DecompressionStream("gzip")).getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel();
+      throw new Error("COMPRESSED_PAYLOAD_TOO_LARGE");
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
+}
+
+/** gzip then base64, for text stored in a projection row. */
+export async function gzipToBase64(text: string): Promise<string> {
+  return bytesToBase64(await gzipBytes(new TextEncoder().encode(text)));
+}
+
+/** Reverses gzipToBase64, with the same expansion cap as gunzipBytes. */
+export async function gunzipBase64ToText(payload: string, maxBytes: number): Promise<string> {
+  const binary = atob(payload);
+  const compressed = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) compressed[i] = binary.charCodeAt(i);
+  return new TextDecoder("utf-8", { fatal: true }).decode(await gunzipBytes(compressed, maxBytes));
+}
 export const CAREER_AWARDS_LEDGER_SCOPE = "CAREER_AWARDS_LEDGER_V1" as const;
 
 export const SEASON_SAVE_SCHEMA_VERSION = "LC_SEASON_SAVE_V1" as const;

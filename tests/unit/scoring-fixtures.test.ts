@@ -180,7 +180,9 @@ it("accounts for all exported schema definitions", () => {
       ([name, value]) => name.endsWith("Schema") && value instanceof z.ZodType,
     )
     .map(([name]) => name);
-  expect(names).toHaveLength(330);
+  expect(names).toHaveLength(332);
+  expect(names).toContain("CareerMatchDigestSchema");
+  expect(names).toContain("PersistentWorldPortableV4ManifestSchema");
   expect(names).toContain("HistoricalStatisticsProjectionSchema");
   expect(names).toContain("MatchAwardRecordSchema");
   expect(names).toContain("SeasonAwardsSummarySchema");
