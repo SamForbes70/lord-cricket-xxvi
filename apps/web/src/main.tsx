@@ -66,6 +66,9 @@ type Body = Request extends infer R
     : never
   : never;
 const overs = (balls: number) => `${Math.floor(balls / 6)}.${balls % 6}`;
+/** Commentary entries rendered by default; a red-ball match records thousands. */
+const COMMENTARY_WINDOW = 150;
+
 export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?: (roster: boolean) => void; onReturnCareer?: (roster: boolean) => void } = {}) {
   const worker = useRef<Worker | null>(null),
     serial = useRef(0),
@@ -144,6 +147,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       const saved = localStorage.getItem("lcxxvi-match-scale");
       return saved && ["100", "115", "125", "150"].includes(saved) ? saved : "100";
     }),
+    [showAllCommentary, setShowAllCommentary] = useState(false),
     [commentary, setCommentary] = useState<"full" | "detailed" | "brief" | "off">(() => {
       const saved = localStorage.getItem("lcxxvi-match-commentary");
       if (saved === "standard") return "full";
@@ -1364,8 +1368,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               {commentary === "off" ? (
                 <p>Commentary hidden. Match decisions remain above.</p>
               ) : (
+                <>
                 <ol reversed>
-                  {view.commentary
+                  {(showAllCommentary ? view.commentary : view.commentary.slice(-COMMENTARY_WINDOW))
                     .slice()
                     .reverse()
                     .map((e) => (
@@ -1383,6 +1388,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       </li>
                     ))}
                 </ol>
+                {view.commentary.length > COMMENTARY_WINDOW && (
+                  <button type="button" className="secondary" onClick={() => setShowAllCommentary((v) => !v)}>
+                    {showAllCommentary
+                      ? `Show the latest ${COMMENTARY_WINDOW} entries`
+                      : `Show all ${view.commentary.length} entries`}
+                  </button>
+                )}
+                </>
               )}
             </section>
           </div>
