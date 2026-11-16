@@ -1388,6 +1388,10 @@ export class IndexedDbPersistentWorldRepository {
         ...(input.copySource || preparedArchives.length > 0
           ? await projectionRowsForScope(projections, input.saveId, CAREER_MATCH_EVENTS_SCOPE)
           : []),
+        // The copy loop below also copies the source's awards ledger.
+        ...(input.copySource
+          ? await projectionRowsForScope(projections, input.copySource.saveId, CAREER_AWARDS_LEDGER_SCOPE)
+          : []),
       ];
       if (input.copySource) {
         for (const row of allProjections) {
