@@ -21,10 +21,17 @@ import { deflateRawSync } from "node:zlib";
 
 const root = resolve(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const dist = join(root, "apps", "web", "dist");
-const outDir = resolve(process.argv[2] ?? join(root, "release-packages"));
+const argumentsList = process.argv.slice(2);
+const requiresWindowsExe = argumentsList.includes("--require-windows-exe");
+const outDir = resolve(argumentsList.find(arg => !arg.startsWith("--")) ?? join(root, "release-packages"));
 
 if (!existsSync(join(dist, "index.html"))) {
   console.error("The built game is missing. Run `npm run build` first.");
+  process.exit(1);
+}
+
+if (requiresWindowsExe && !existsSync(join(dist, "LordCricketXXVI.exe"))) {
+  console.error("Windows release requires a compiled LordCricketXXVI.exe in apps/web/dist. Run tools/windows/build-exe.ps1 first.");
   process.exit(1);
 }
 
@@ -94,11 +101,14 @@ if command -v node >/dev/null 2>&1; then exec node serve.mjs "$PORT"
 elif command -v python3 >/dev/null 2>&1; then echo "Serving $URL (Ctrl+C to stop)"; exec python3 -m http.server "$PORT" --bind 127.0.0.1
 else echo "Install Node.js 18 or later (https://nodejs.org) or Python 3, then run this again."; exit 1; fi
 `;
-const startBat = ["@echo off", 'cd /d "%~dp0"', "set PORT=4180", "where node >nul 2>nul", "if %errorlevel%==0 (",
-  '  start "" /b cmd /c "timeout /t 2 /nobreak >nul & start http://127.0.0.1:%PORT%/"', "  node serve.mjs %PORT%", "  goto :end", ")",
-  "where python >nul 2>nul", "if %errorlevel%==0 (", '  start "" /b cmd /c "timeout /t 2 /nobreak >nul & start http://127.0.0.1:%PORT%/"',
-  "  echo Serving http://127.0.0.1:%PORT%/ - leave this window open. Press Ctrl+C to stop.", "  python -m http.server %PORT% --bind 127.0.0.1", "  goto :end", ")",
-  "echo Install Node.js 18 or later from https://nodejs.org or Python 3, then run this again.", ":end", "pause", ""].join("\r\n");
+const startBat = ["@echo off", 'cd /d "%~dp0"', 'call "%~dp0Play-Lord-Cricket.bat"', ""].join("\r\n");
+const windowsFiles = [
+  "LordCricketLauncher.cs",
+  "build-exe.ps1",
+  "start-windows.ps1",
+  "Play-Lord-Cricket.bat",
+  "Build-Exe.bat",
+];
 
 let record = null;
 try { record = JSON.parse(readFileSync(join(root, "docs", "release-v01", "RELEASE_RECORD.json"), "utf8")); } catch { /* optional */ }
@@ -124,11 +134,15 @@ An ALPHA with a synthetic model: a fictional eight-team, 14-round, 56-fixture T2
 exhibitions. It is not calibrated to real cricket and it is not a finished game. See VERSION.txt for the commit,
 the known limits and recovery instructions.
 
-How to play (needs Node.js 18 or later, or Python 3)
-  Windows   : double-click start-game.bat
+How to play
+  Windows   : double-click LordCricketXXVI.exe (if included) or Play-Lord-Cricket.bat
+              The Windows release ZIP includes the compiled executable and needs no Node.js,
+              Python or developer tools. The source-only ZIP can compile it with Build-Exe.bat
+              or use Node.js 18+ / Python 3 as a fallback.
   Mac/Linux : run  ./start-game.sh   (or: bash start-game.sh)
   Then open http://127.0.0.1:4180/ in Chrome, Edge or Firefox if it did not open by itself.
-  Leave the window open while you play. Ctrl+C stops it. If the page is blank the first time, refresh once.
+  The native launcher has a tray icon. Right-click it and choose Quit Server when done.
+  If using a Node/Python fallback, the terminal must remain open. If blank, refresh once.
 
 You cannot just double-click index.html: the game uses web workers, which browsers only allow over http, so it is
 served by the small local server in this folder. Nothing is uploaded.
@@ -138,6 +152,8 @@ site data, hides or deletes them. Use the game's Export buttons to keep .lcxxvi 
 `;
 for (const [name, text, mode] of [["serve.mjs", serve, 0o644], ["start-game.sh", startSh, 0o755], ["start-game.bat", startBat, 0o644], ["README.txt", readme, 0o644], ["VERSION.txt", version, 0o644]])
   files.push({ name: `${folder}/${name}`, data: Buffer.from(text, "utf8"), mode });
+for (const name of windowsFiles)
+  files.push({ name: `${folder}/${name}`, data: readFileSync(join(root, "tools", "windows", name)), mode: 0o644 });
 
 mkdirSync(outDir, { recursive: true });
 const gameZip = join(outDir, `lord-cricket-xxvi-game-${short}.zip`);
