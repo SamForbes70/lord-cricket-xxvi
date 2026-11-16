@@ -18,8 +18,11 @@ test("Stage 8 optional sound and narration supports gesture gating, mixer contro
   const audioPanel = page.getByTestId("match-audio-panel");
   await expect(audioPanel).toBeVisible();
   const statusPill = page.getByTestId("audio-status-pill");
-  await expect(statusPill).toHaveText("Awaiting click/key gesture");
+  // Sound is muted by default (owner decision, 16 Nov 2026); turning it on is the player's choice.
+  await expect(statusPill).toHaveText("Muted (silent captions)");
   await expect(page.getByTestId("audio-caption-banner")).toContainText("Ready");
+  await page.getByRole("button", { name: "Sound: Muted" }).click();
+  await expect(statusPill).toHaveText(/Awaiting click\/key gesture|Audio active/);
 
   // Open mixer & provenance drawer (also unlocks audio from user gesture)
   await page.getByRole("button", { name: "Audio mixer & provenance" }).click();
