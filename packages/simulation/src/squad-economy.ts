@@ -57,6 +57,8 @@ import {
   type TrainingDirective,
   type WorldPack,
   compareCodePoints,
+  MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS,
+  PLAYER_LIFECYCLE_STATE_V2_VERSION,
 } from "@lcxxvi/contracts";
 import { isBowlingCapable } from "@lcxxvi/data";
 import { canonicalStateBytes, createRandomService, sha256Hex } from "./determinism.js";
@@ -855,7 +857,7 @@ function syncLifecycleWithWorldRosterMutation(input: {
         restDays: 0,
       },
   );
-  const nextHistoricalPacks = input.lifecycle.historicalRosterPacks.some(
+  const fullHistoricalPacks = input.lifecycle.historicalRosterPacks.some(
     (p) => p.sourceHash === nextPack.sourceHash,
   )
     ? input.lifecycle.historicalRosterPacks
@@ -865,6 +867,11 @@ function syncLifecycleWithWorldRosterMutation(input: {
         ),
         nextPack,
       ];
+  // Lifecycle V2 embeds only the newest packs; all packs are also stored in their own projection rows.
+  const nextHistoricalPacks =
+    input.lifecycle.lifecycleVersion === PLAYER_LIFECYCLE_STATE_V2_VERSION
+      ? fullHistoricalPacks.slice(-MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS)
+      : fullHistoricalPacks;
 
   return sealPlayerLifecycleState({
     lifecycleVersion: input.lifecycle.lifecycleVersion,
@@ -3081,6 +3088,8 @@ type SquadEconomyHorizonInput = {
   startDate?: string;
   controlledTeamId?: string | null;
   simulateFullMatches?: boolean;
+  /** Lifecycle V2 (world state V4) keeps two embedded roster packs; defaults to V1. */
+  lifecycleVersion?: PlayerLifecycleState["lifecycleVersion"];
 };
 type SquadEconomyHorizonResult = {
   snapshots: EconomyDiagnosticSeasonSnapshot[];
@@ -3103,6 +3112,7 @@ function* squadEconomyHorizonSteps(input: SquadEconomyHorizonInput): Generator<n
     seasonNumber: 1,
     calendarYear: startCalendarYear,
     useRosterPackImmediately: true,
+    ...(input.lifecycleVersion ? { lifecycleVersion: input.lifecycleVersion } : {}),
   });
   let economy = createInitialSquadEconomyState({
     worldIdentity: input.worldIdentity,

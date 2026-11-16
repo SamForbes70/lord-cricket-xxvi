@@ -11,8 +11,8 @@ This package owns browser durability and portable archives. It does not decide c
 | [archive.ts](src/archive.ts) | `createPortableArchive`, `readPortableArchive` | Match archive encoding and validation |
 | [archive.ts](src/archive.ts) | `createSeasonPortableArchive`, `readSeasonPortableArchive` | Standard career portable archives |
 | [archive.ts](src/archive.ts) | `createRosterSeasonPortableArchive`, `readRosterSeasonPortableArchive` | Imported-roster career portable archives |
-| [persistent-world.ts](src/persistent-world.ts) | `IndexedDbPersistentWorldRepository`, `PersistentWorldDurableCommit` | Multi-season worlds (V1 to V3 state): one-transaction commits and rollover, archives, roster packs, match digests, single-fixture archive loads |
-| [archive.ts](src/archive.ts) | `createPersistentWorldPortableArchive*`, `readPersistentWorldPortableArchive*` | Multi-season portable archives, V1 to V3 and compressed V4 (`LC_PERSISTENT_WORLD_PORTABLE_V4_GZIP`) |
+| [persistent-world.ts](src/persistent-world.ts) | `IndexedDbPersistentWorldRepository`, `PersistentWorldDurableCommit` | Multi-season worlds (V1 to V4 state; V4 embeds two roster packs, [design](../../docs/design/WORLD_STATE_HISTORY_V4.md)): one-transaction commits and rollover, archives, roster packs, match digests, single-fixture archive loads |
+| [archive.ts](src/archive.ts) | `createPersistentWorldPortableArchive*`, `readPersistentWorldPortableArchive*` | Multi-season portable archives, V1 to V3, compressed V4 (`LC_PERSISTENT_WORLD_PORTABLE_V4_GZIP`), and V5 for world state V4 (`LC_PERSISTENT_WORLD_PORTABLE_V5_WORLD_V4`, every stored roster pack) |
 | [binding.ts](src/binding.ts) | `ManagedMatchBindings` | Durable career-fixture to match bindings |
 
 These are in-process TypeScript APIs, not HTTP endpoints. Consult the exported types for exact arguments and return shapes. A documentation example must not become an alternate implementation of validation.
@@ -46,7 +46,7 @@ Sharing stores does not make career completion and match persistence one atomic 
 
 See [MATCH_ARCHIVE_STORAGE_V2.md](../../docs/design/MATCH_ARCHIVE_STORAGE_V2.md) for why archives are compressed and digested. Readers accept both archive scopes; new commits write the compressed one.
 
-**No rollback.** An older build cannot read compressed archive rows or V4 exports, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete. Moving a profile back below the build that introduced these is unsupported.
+**No rollback.** An older build cannot read compressed archive rows, V4 or V5 exports, or world state V4 saves, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete. Moving a profile back below the build that introduced these is unsupported.
 
 ## Commit and recovery invariants
 
@@ -75,7 +75,7 @@ Browser storage belongs to an origin and browser profile. Copying the repository
 - [Career service tests](../../tests/unit/career-application-service.test.ts).
 - [Imported-roster career tests](../../tests/unit/roster-season.test.ts).
 - [Binding rules and result regeneration](../../tests/unit/managed-binding.test.ts), and the real-IndexedDB [binding spec](../../tests/m4/managed-binding-persistence.spec.ts).
-- Real-IndexedDB specs for [scoped reads](../../tests/m4/projection-scope-reads.spec.ts), [match digests](../../tests/m4/match-digest-storage.spec.ts) and [compressed payloads](../../tests/m4/compressed-archive-storage.spec.ts).
+- Real-IndexedDB specs for [scoped reads](../../tests/m4/projection-scope-reads.spec.ts), [match digests](../../tests/m4/match-digest-storage.spec.ts) and [compressed payloads](../../tests/m4/compressed-archive-storage.spec.ts) and [world state V4 roster packs](../../tests/m4/world-state-v4-roster-packs.spec.ts).
 - Browser save/reload, archive and fresh-session checks in the [verification guide](../../docs/VERIFICATION_GUIDE.md).
 
 Pure unit tests do not establish browser IndexedDB transaction behaviour. Keep real browser coverage for leases, interrupted saves, imports and session recovery.

@@ -12,6 +12,7 @@ import {
   ActivePersistentSeasonStateSchema,
   LifecycleAbilityBandSummarySchema,
   PlayerLifecycleStateSchema,
+  PlayerLifecycleStateV2Schema,
 } from "./player-lifecycle.js";
 
 export const SQUAD_ECONOMY_MODEL_VERSION = "LC_SQUAD_ECONOMY_MODEL_FICTIONAL_V1" as const;
@@ -23,6 +24,11 @@ export const PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION =
   "LC_PERSISTENT_WORLD_SAVE_V3_PRESENTATION" as const;
 export const PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION =
   "LC_PERSISTENT_WORLD_PORTABLE_V3_ECONOMY" as const;
+/** World state V4: V3 with lifecycle V2 (bounded embedded roster packs). docs/design/WORLD_STATE_HISTORY_V4.md */
+export const PERSISTENT_WORLD_STATE_V4_VERSION = "LC_PERSISTENT_WORLD_STATE_V4" as const;
+export const PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION = "LC_PERSISTENT_WORLD_SAVE_V4" as const;
+export const PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION =
+  "LC_PERSISTENT_WORLD_SAVE_V4_PRESENTATION" as const;
 
 export const DEFAULT_ANNUAL_CLUB_WAGE_BUDGET_K = 2_500 as const;
 export const MIN_PLAYER_ANNUAL_WAGE_K = 35 as const;
@@ -237,6 +243,16 @@ export const PersistentWorldStateV3Schema = z.strictObject({
   stateSha256: HashSchema,
 });
 
+export const PersistentWorldStateV4CoreSchema = PersistentWorldStateV3CoreSchema.extend({
+  worldStateVersion: z.literal(PERSISTENT_WORLD_STATE_V4_VERSION),
+  lifecycle: PlayerLifecycleStateV2Schema,
+});
+
+export const PersistentWorldStateV4Schema = z.strictObject({
+  ...PersistentWorldStateV4CoreSchema.shape,
+  stateSha256: HashSchema,
+});
+
 export const PersistentWorldPortableV3ManifestSchema = z.strictObject({
   archiveVersion: z.literal(PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION),
   saveSchema: z.enum([
@@ -332,6 +348,8 @@ export type SquadEconomyStateCore = z.infer<typeof SquadEconomyStateCoreSchema>;
 export type SquadEconomyState = z.infer<typeof SquadEconomyStateSchema>;
 export type PersistentWorldStateV3Core = z.infer<typeof PersistentWorldStateV3CoreSchema>;
 export type PersistentWorldStateV3 = z.infer<typeof PersistentWorldStateV3Schema>;
+export type PersistentWorldStateV4Core = z.infer<typeof PersistentWorldStateV4CoreSchema>;
+export type PersistentWorldStateV4 = z.infer<typeof PersistentWorldStateV4Schema>;
 export type PersistentWorldPortableV3Manifest = z.infer<
   typeof PersistentWorldPortableV3ManifestSchema
 >;

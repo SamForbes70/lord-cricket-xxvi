@@ -1,6 +1,6 @@
 # World state history out of the per-commit hash (design)
 
-Status: proposed, 16 November 2026. Audit item M1 (`docs/AUDIT_2026-11-16.md`). Needs owner review before building: it adds new state versions.
+Status: built on branch `feat/world-state-v4` (16 November 2026) after the owner said "go ahead with world state V4". Audit item M1 (`docs/AUDIT_2026-11-16.md`). The proposal below is kept as written; "As built" records where the implementation differs.
 
 ## Problem (measured)
 
@@ -41,6 +41,30 @@ Sealing that state takes 221 ms: schema parse 29 ms, canonical JSON 49 ms, sha25
 
 Expected effect [Inference]: lifecycle stays near its season-one size (the active pack and per-player records), so day advances stop growing with career length.
 
+## As built
+
+The implementation bounds the embedded history instead of replacing it with hashes:
+
+1. **Lifecycle state V2** (`LC_PLAYER_LIFECYCLE_STATE_V2_BOUNDED_PACKS`): the same fields as V1, but `historicalRosterPacks` holds at most two packs (`MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS`), the most recent ones. Keeping the two most recent packs embedded means the simulation code that reads them (mid-season pack updates, recent replays, award eligibility) needs no new lookup path. The horizon test shows a V2 lifecycle plays out exactly as V1: same active world, same economy hash, same season snapshots.
+2. **World state V4** (`LC_PERSISTENT_WORLD_STATE_V4`) is world state V3 with lifecycle V2. Save schemas `LC_PERSISTENT_WORLD_SAVE_V4` and the presentation variant.
+3. **Stored packs are the full history.** Every commit already stores the active pack as a `PERSISTENT_LIFECYCLE_ROSTER_PACK_V1` row; the first commit of a V4 save (new, copied or imported) also stores the embedded packs. Replay of an older fixture and award eligibility fall back to the stored rows (`CareerApplicationService.loadStoredRosterPacks`).
+4. **Export V5** (`LC_PERSISTENT_WORLD_PORTABLE_V5_WORLD_V4`): the V4 gzip layout with a V4 save schema, carrying every stored pack. Export and import are refused if a lifecycle match archive names a pack the archive does not carry. V3 and V4 readers refuse it, and the V5 reader refuses V3 states.
+5. **What uses V4.** New careers and copies of a completed single season. Existing V3 saves load, commit and export (V4 archive) unchanged. The V2 to V3 upgrade still produces V3.
+
+### Measured effect
+
+Same method as above (three simulated seasons, in-memory repository, one run each on a Linux container, so the figures are indicative), measured on the built branch:
+
+| Season | V3 median day advance | V4 median | V3 state | V4 state | V3 lifecycle | V4 lifecycle |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 331 ms | 321 ms | 1,588 KB | 1,589 KB | 967 KB | 967 KB |
+| 2 | 438 ms | 458 ms | 2,467 KB | 2,469 KB | 1,395 KB | 1,395 KB |
+| 3 | 576 ms | 539 ms | 3,320 KB | 2,993 KB | 1,813 KB | 1,484 KB |
+
+V4 only differs once a third pack would be embedded, so seasons 1 and 2 are the same within noise. From season 3 the lifecycle grows about 90 KB a season instead of about 420 KB. The rest of the state (current season, completed seasons, economy) still grows about 240 KB a season, and day advances still grow with it: about 80 ms from season 2 to 3 under V4, against 138 ms under V3. [Inference] Bounding the packs removes roughly half of the growth; the remainder needs the two items under "Also worth doing" and a smaller per-commit validation cost for completed seasons.
+
+Not built: the copy-forward from an existing V3 world into a V4 slot (proposal step 3). [Inference] It needs every historical pack written as a row before the embedded list is trimmed, which a single commit can do with `seasonRosterPacks`; it is the next step if long V3 careers matter.
+
 ## Also worth doing
 
 - Completed-season records are re-put on every commit (`persistent-world.ts`, commit). They are immutable once sealed; write each once, at rollover.
@@ -48,4 +72,4 @@ Expected effect [Inference]: lifecycle stays near its season-one size (the activ
 
 ## Out of scope
 
-Changing how the state hash is defined for existing versions. V1 to V3 world states and lifecycle V1 and V2 keep their hashes byte-for-byte.
+Changing how the state hash is defined for existing versions. V1 to V3 world states and lifecycle V1 keep their hashes byte-for-byte.

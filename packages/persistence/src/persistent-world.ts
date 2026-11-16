@@ -15,6 +15,13 @@ import {
   PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION,
   PERSISTENT_WORLD_STATE_V3_VERSION,
+  PERSISTENT_WORLD_STATE_V4_VERSION,
+  PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION,
+  PersistentWorldStateV4CoreSchema,
+  PersistentWorldStateV4Schema,
+  type PersistentWorldStateV4,
+  type PersistentWorldStateV4Core,
   PersistentCareerProjectionCoreSchema,
   PersistentCareerProjectionSchema,
   PersistentWorldSaveSummarySchema,
@@ -25,6 +32,7 @@ import {
   PersistentWorldStateV3CoreSchema,
   PersistentWorldStateV3Schema,
   PlayerLifecycleStateSchema,
+  PlayerLifecycleStateV2Schema,
   SquadEconomyStateSchema,
   SeasonCheckpointInspectionSchema,
   SeasonDurableCommandSchema,
@@ -82,7 +90,8 @@ export const PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE = "PERSISTENT_LIFECYCLE_ROST
 export type AnyPersistentWorldState =
   | PersistentWorldState
   | PersistentWorldStateV2
-  | PersistentWorldStateV3;
+  | PersistentWorldStateV3
+  | PersistentWorldStateV4;
 
 type PersistentWorldSchemaVersion =
   | typeof PERSISTENT_WORLD_SAVE_SCHEMA_VERSION
@@ -90,7 +99,9 @@ type PersistentWorldSchemaVersion =
   | typeof PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION
   | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION
   | typeof PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION
-  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION;
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION;
 
 const ALLOWED_PERSISTENT_WORLD_SCHEMAS: readonly PersistentWorldSchemaVersion[] = [
   PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
@@ -99,17 +110,26 @@ const ALLOWED_PERSISTENT_WORLD_SCHEMAS: readonly PersistentWorldSchemaVersion[] 
   PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION,
   PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION,
 ];
 
 function isPresentationPersistentSchema(schemaVersion: string): boolean {
   return (
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION ||
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION ||
-    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION
   );
 }
 
-function persistentSchemaTier(schemaVersion: string): 1 | 2 | 3 {
+function persistentSchemaTier(schemaVersion: string): 1 | 2 | 3 | 4 {
+  if (
+    schemaVersion === PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION
+  ) {
+    return 4;
+  }
   if (
     schemaVersion === PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION ||
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
@@ -514,13 +534,15 @@ const VERIFIED_LEDGER_ENTRY_OBJECTS = new WeakMap<object, string>();
 const VERIFIED_ROSTER_PACK_OBJECTS = new WeakMap<object, { packSha: string; worldJson: string }>();
 
 async function validateSharedLifecycleWorldInvariants(
-  state: PersistentWorldStateV2 | PersistentWorldStateV3,
+  state: PersistentWorldStateV2 | PersistentWorldStateV3 | PersistentWorldStateV4,
 ): Promise<void> {
   const cachedLifecycleSha = VERIFIED_LIFECYCLE_OBJECTS.get(state.lifecycle as object);
   const lifecycle =
     cachedLifecycleSha === state.lifecycle.lifecycleSha256
       ? state.lifecycle
-      : PlayerLifecycleStateSchema.parse(state.lifecycle);
+      : state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION
+        ? PlayerLifecycleStateV2Schema.parse(state.lifecycle)
+        : PlayerLifecycleStateSchema.parse(state.lifecycle);
   if (cachedLifecycleSha !== lifecycle.lifecycleSha256) {
     const { lifecycleSha256, ...lifecycleCore } = lifecycle;
     const expectedLifecycleHash = await seasonSha256Text(canonicalJson(lifecycleCore));
@@ -734,7 +756,7 @@ function persistentStateV3Core(state: PersistentWorldStateV3): PersistentWorldSt
   return PersistentWorldStateV3CoreSchema.parse(core);
 }
 
-async function validatePersistentEconomyInvariants(state: PersistentWorldStateV3): Promise<void> {
+async function validatePersistentEconomyInvariants(state: PersistentWorldStateV3 | PersistentWorldStateV4): Promise<void> {
   const cachedEconomySha = VERIFIED_ECONOMY_OBJECTS.get(state.economy as object);
   const economy =
     cachedEconomySha === state.economy.economySha256
@@ -835,6 +857,35 @@ export async function validatePersistentWorldStateV3(raw: unknown): Promise<Pers
   return state;
 }
 
+const VERIFIED_STATE_V4_OBJECTS = new WeakSet<object>();
+
+/** World state V4: V3 with lifecycle V2 (bounded embedded roster packs). docs/design/WORLD_STATE_HISTORY_V4.md */
+export async function sealPersistentWorldStateV4(
+  raw: PersistentWorldStateV4Core,
+): Promise<PersistentWorldStateV4> {
+  const core = PersistentWorldStateV4CoreSchema.parse(raw);
+  const stateSha256 = await seasonSha256Text(canonicalJson(core));
+  const state: PersistentWorldStateV4 = { ...core, stateSha256 };
+  await validatePersistentEconomyInvariants(state);
+  await validateSharedLifecycleWorldInvariants(state);
+  VERIFIED_STATE_V4_OBJECTS.add(state);
+  return state;
+}
+
+export async function validatePersistentWorldStateV4(raw: unknown): Promise<PersistentWorldStateV4> {
+  if (typeof raw === "object" && raw !== null && VERIFIED_STATE_V4_OBJECTS.has(raw)) {
+    return raw as PersistentWorldStateV4;
+  }
+  const state = PersistentWorldStateV4Schema.parse(raw);
+  const { stateSha256, ...core } = state;
+  const expectedHash = await seasonSha256Text(canonicalJson(core));
+  assertPersistent(stateSha256 === expectedHash, "STATE_V4_HASH_MISMATCH");
+  await validatePersistentEconomyInvariants(state);
+  await validateSharedLifecycleWorldInvariants(state);
+  VERIFIED_STATE_V4_OBJECTS.add(state);
+  return state;
+}
+
 export async function validateAnyPersistentWorldState(
   raw: unknown,
 ): Promise<AnyPersistentWorldState> {
@@ -842,6 +893,9 @@ export async function validateAnyPersistentWorldState(
     typeof raw === "object" && raw !== null
       ? (raw as { worldStateVersion?: unknown }).worldStateVersion
       : undefined;
+  if (version === PERSISTENT_WORLD_STATE_V4_VERSION) {
+    return validatePersistentWorldStateV4(raw);
+  }
   if (version === PERSISTENT_WORLD_STATE_V3_VERSION) {
     return validatePersistentWorldStateV3(raw);
   }
@@ -1145,8 +1199,9 @@ export class IndexedDbPersistentWorldRepository {
   ): Promise<{ summary: PersistentWorldSaveSummary; idempotentReplay: boolean }> {
     const state = await validateAnyPersistentWorldState(input.state);
     const isStateV2 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION;
+    const isStateV4 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION;
     const isStateV3 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION;
-    const stateTier: 1 | 2 | 3 = isStateV3 ? 3 : isStateV2 ? 2 : 1;
+    const stateTier: 1 | 2 | 3 | 4 = isStateV4 ? 4 : isStateV3 ? 3 : isStateV2 ? 2 : 1;
     const command = input.command ? SeasonDurableCommandSchema.parse(input.command) : null;
     assertPersistent(
       input.updatedAt.length > 0 && !Number.isNaN(Date.parse(input.updatedAt)),
@@ -1185,8 +1240,15 @@ export class IndexedDbPersistentWorldRepository {
         candidateRosterPacks.push(StagedRosterPackSchema.parse(pack));
       }
     }
+    // World state V4 embeds only the last two seasons' packs; the stored rows are the full history.
+    // A new save (first commit, including a copied or imported world) stores the embedded ones too.
+    if (isStateV4 && input.expectedRevision === null) {
+      for (const pack of state.lifecycle.historicalRosterPacks) {
+        candidateRosterPacks.push(StagedRosterPackSchema.parse(pack));
+      }
+    }
     let preparedActivePack: { hash: string; payload: string } | null = null;
-    if ((isStateV2 || isStateV3) && state.lifecycle.activeRosterPack) {
+    if ((isStateV2 || isStateV3 || isStateV4) && state.lifecycle.activeRosterPack) {
       const parsedActivePack = StagedRosterPackSchema.parse(state.lifecycle.activeRosterPack);
       candidateRosterPacks.push(parsedActivePack);
       const activePackPayload = canonicalJson(parsedActivePack);
@@ -1491,7 +1553,11 @@ export class IndexedDbPersistentWorldRepository {
       }
     }
 
-    const nextSchemaVersion: PersistentWorldSchemaVersion = isStateV3
+    const nextSchemaVersion: PersistentWorldSchemaVersion = isStateV4
+      ? copyHash
+        ? PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION
+        : PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION
+      : isStateV3
       ? copyHash
         ? PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION
         : PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION

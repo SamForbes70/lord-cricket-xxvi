@@ -18,6 +18,7 @@ import {
   type PersistentWorldState,
   type PersistentWorldStateV2,
   type PersistentWorldStateV3,
+  type PersistentWorldStateV4,
   type RetiredPlayerRecord,
   type T20SeasonMatchCompletion,
   type T20SeasonState,
@@ -113,7 +114,8 @@ export type AnyCareerMatchEventArchive =
 export type AnyPersistentWorldState =
   | PersistentWorldState
   | PersistentWorldStateV2
-  | PersistentWorldStateV3;
+  | PersistentWorldStateV3
+  | PersistentWorldStateV4;
 
 export type HistoricalSeasonInput = {
   readonly seasonNumber: number;
