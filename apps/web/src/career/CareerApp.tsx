@@ -66,6 +66,22 @@ function roundOf(launch: unknown): number | null {
   return typeof round === "number" ? round : null;
 }
 
+/**
+ * A career upgrade copies the career into a new slot with a new state format. A match launched from
+ * the old slot cannot be applied to it safely, so the upgrade waits until that match is finished or
+ * abandoned (audit 16 Nov 2026, Phase 2).
+ */
+async function refuseUpgradeWhileMatchPending(): Promise<void> {
+  const saveId = service.getSaveId();
+  if (!saveId) return;
+  const { bindings } = await managedBindings.pendingForCareer(saveId);
+  if (bindings.length > 0) {
+    throw new Error(
+      "A career match from this save is still in progress. Finish it and return the result, or abandon it, before creating an upgraded copy.",
+    );
+  }
+}
+
 /** Applies completed pending matches and retires bindings for fixtures completed another way. */
 async function settleStandard() {
   const saveId = service.getSaveId();
@@ -1167,6 +1183,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 disabled={busy || inspectionOnly || service.isReadOnly()}
                 onClick={() =>
                   void action(async () => {
+                    await refuseUpgradeWhileMatchPending();
                     await service.upgradeStage2V1ToStage3V2();
                     setActiveReplay(null);
                     setStatsScope("ACTIVE");
@@ -1182,6 +1199,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               disabled={busy || inspectionOnly || service.isReadOnly()}
               onClick={() =>
                 void action(async () => {
+                  await refuseUpgradeWhileMatchPending();
                   await service.upgradeToStage4EconomyV3();
                   setActiveReplay(null);
                   setStatsScope("ACTIVE");

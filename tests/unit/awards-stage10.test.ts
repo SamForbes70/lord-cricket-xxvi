@@ -310,16 +310,19 @@ describe("Stage 10 — Match and season awards (S10-01)", () => {
     // Season ledger idempotency + portable archive export/import round-trip.
     const exported = await svc.exportCareer();
     const readBack = await readPersistentWorldPortableArchiveV3(exported);
-    expect(readBack.awardsLedger?.ledgerSha256).toBe(ledger1!.ledgerSha256);
+    // The ledger is derived data and is not written into the V3 archive (writing it widened the format
+    // in place; audit 16 Nov 2026). It is rebuilt from the exported match events on import.
+    expect(readBack.awardsLedger).toBeNull();
     const importedState = await svc.importCareer(exported);
     expect(importedState.careerId).toBe(s1.careerId);
     const afterImportLedger = await svc.syncAwardsLedger();
     expect(afterImportLedger?.ledgerSha256).toBe(ledger1!.ledgerSha256);
 
-    // Direct archive writer preserves optional awardsLedger.
+    // The direct archive writer keeps its signature but no longer writes the ledger file.
     const directBytes = await createPersistentWorldPortableArchiveV3(svc.getPersistentState()!, (await persistentRepo.list())[0]!, "2027-01-01T00:00:00.000Z", worldCopy, null, null, ledger1);
     const directParsed = await readPersistentWorldPortableArchiveV3(directBytes);
-    expect(directParsed.awardsLedger?.ledgerSha256).toBe(ledger1!.ledgerSha256);
+    expect(directParsed.awardsLedger).toBeNull();
+    expect(Object.keys(directParsed.manifest.files)).not.toContain("awards-ledger.json");
 
     // Duplicate season awards with same seal are a no-op.
     const synthSeason = computeSeasonAwards({ seasonNumber: 1, calendarYear: 2027, sealedAtSeasonSha256: "e".repeat(64), completedMatches: afterRound.completedMatches });

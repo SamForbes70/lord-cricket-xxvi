@@ -41,7 +41,7 @@ function Stop-RunningServer {
     return $false
   }
   try {
-    Invoke-RestMethod -Uri $ShutdownUrl -Method Post -TimeoutSec 3 | Out-Null
+    Invoke-RestMethod -Uri $ShutdownUrl -Method Post -Headers @{ "X-LCXXVI-Shutdown" = "1" } -TimeoutSec 3 | Out-Null
     Start-Sleep -Milliseconds 350
   } catch {
     if ($health.pid) {

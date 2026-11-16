@@ -208,22 +208,20 @@ export function buildLifecycleRosterPack(
   return createStagedRosterPack(canonicalJson(sourcePayload), ALLOWED_RULES, ALLOWED_VARIATIONS);
 }
 
-const VERIFIED_LIFECYCLE_SHAS = new Set<string>();
+/**
+ * Lifecycle states that passed full validation in this session, keyed by object identity.
+ * A self-reported hash is never trusted: an imported or edited object is a new object and is fully checked.
+ */
+const verifiedLifecycleStates = new WeakSet<object>();
 
 export function sealPlayerLifecycleState(coreInput: Omit<PlayerLifecycleState, "lifecycleSha256">): PlayerLifecycleState {
   const core = PlayerLifecycleStateCoreSchema.parse(coreInput);
   const lifecycleSha256 = sha256Hex(canonicalStateBytes(core));
-  const sealed = PlayerLifecycleStateSchema.parse({ ...core, lifecycleSha256 });
-  VERIFIED_LIFECYCLE_SHAS.add(lifecycleSha256);
-  return sealed;
+  return PlayerLifecycleStateSchema.parse({ ...core, lifecycleSha256 });
 }
 
 export function validatePlayerLifecycleState(raw: unknown): PlayerLifecycleState {
-  const candidateSha =
-    typeof raw === "object" && raw !== null && "lifecycleSha256" in raw
-      ? (raw as { lifecycleSha256?: unknown }).lifecycleSha256
-      : undefined;
-  if (typeof candidateSha === "string" && VERIFIED_LIFECYCLE_SHAS.has(candidateSha)) {
+  if (typeof raw === "object" && raw !== null && verifiedLifecycleStates.has(raw)) {
     return raw as PlayerLifecycleState;
   }
   const parsed = PlayerLifecycleStateSchema.parse(raw);
@@ -233,7 +231,6 @@ export function validatePlayerLifecycleState(raw: unknown): PlayerLifecycleState
   if (core.activeRosterPack) {
     validateStagedRosterPack(core.activeRosterPack, ALLOWED_RULES, ALLOWED_VARIATIONS);
   }
-  VERIFIED_LIFECYCLE_SHAS.add(lifecycleSha256);
   const activeIds = new Set(core.activeWorld.players.map((p) => p.playerId));
   const retiredIds = new Set(core.retiredPlayers.map((r) => r.playerId));
   for (const id of activeIds) {
@@ -259,6 +256,7 @@ export function validatePlayerLifecycleState(raw: unknown): PlayerLifecycleState
       `INSUFFICIENT_BOWLERS:${team.teamId}`,
     );
   }
+  verifiedLifecycleStates.add(parsed);
   return parsed;
 }
 

@@ -1,10 +1,39 @@
 import { spawn, spawnSync } from "node:child_process";
+import { request } from "node:http";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = resolve(__dirname, "../..");
+
+/** Raw HTTP so the test can send any Host and Origin, which fetch forbids. */
+function rawRequest(port: number, method: string, path: string, headers: Record<string, string>): Promise<number> {
+  return new Promise((resolveStatus, rejectStatus) => {
+    const req = request({ host: "127.0.0.1", port, method, path, headers }, (res) => {
+      res.resume();
+      resolveStatus(res.statusCode ?? 0);
+    });
+    req.on("error", rejectStatus);
+    req.end();
+  });
+}
+
+/** Audit 16 Nov 2026, Phase 2: only the launcher itself may stop the server. */
+async function expectShutdownGuarded(port: number): Promise<void> {
+  const local = { Host: `127.0.0.1:${port}` };
+  // A bare POST is what any web page can send cross-site ("no-cors").
+  expect(await rawRequest(port, "POST", "/__lcxxvi-shutdown", local)).toBe(403);
+  // A foreign Origin is refused even with the header.
+  expect(await rawRequest(port, "POST", "/__lcxxvi-shutdown", { ...local, Origin: "https://example.com", "X-LCXXVI-Shutdown": "1" })).toBe(403);
+  // A DNS-rebinding page arrives with its own Host name.
+  expect(await rawRequest(port, "GET", "/__lcxxvi-health", { Host: `attacker.example:${port}` })).toBe(403);
+  expect(await rawRequest(port, "POST", "/__lcxxvi-shutdown", { Host: `attacker.example:${port}`, "X-LCXXVI-Shutdown": "1" })).toBe(403);
+  // The server is still up after every refused attempt.
+  expect(await rawRequest(port, "GET", "/__lcxxvi-health", local)).toBe(200);
+  // The launcher's own request, with the header, stops it.
+  expect(await rawRequest(port, "POST", "/__lcxxvi-shutdown", { ...local, "X-LCXXVI-Shutdown": "1" })).toBe(200);
+}
 
 describe("Windows double-click launcher and portable game package", () => {
   it("ships CRLF batch launchers and standalone C#/.NET + PowerShell launcher assets", () => {
@@ -42,9 +71,15 @@ describe("Windows double-click launcher and portable game package", () => {
     expect(csSource).toContain("/__lcxxvi-health");
     expect(csSource).toContain("/__lcxxvi-shutdown");
     expect(csSource).toContain("Application.Exit()");
+    // The C# server is not compiled in CI yet; at least pin that the guard and localhost fallback exist.
+    expect(csSource).toContain("IsLocalRequest(req, pathname == \"/__lcxxvi-shutdown\")");
+    expect(csSource).toContain("X-LCXXVI-Shutdown");
+    expect(csSource).toContain("\"http://localhost:\" + _port");
+    expect(launchPs1).toContain('"X-LCXXVI-Shutdown" = "1"');
+    expect(startWinPs1).toContain('"X-LCXXVI-Shutdown" = "1"');
   });
 
-  it("serves /__lcxxvi-health, static index.html, and shuts down cleanly via POST /__lcxxvi-shutdown", async () => {
+  it("serves /__lcxxvi-health, static index.html, and shuts down only on the launcher's own request", async () => {
     const testPort = 44180 + Math.floor(process.pid % 1000);
     const child = spawn(process.execPath, ["start.mjs"], {
       cwd: repoRoot,
@@ -86,10 +121,33 @@ describe("Windows double-click launcher and portable game package", () => {
       const html = await indexRes.text();
       expect(html).toContain("Lord Cricket XXVI");
 
-      const stopRes = await fetch(`http://127.0.0.1:${testPort}/__lcxxvi-shutdown`, {
-        method: "POST",
+      await expectShutdownGuarded(testPort);
+    } finally {
+      child.kill("SIGTERM");
+    }
+  });
+
+  it("the portable server applies the same local-only shutdown guard", async () => {
+    const testPort = 45180 + Math.floor(process.pid % 1000);
+    const child = spawn(process.execPath, [join("tools", "windows", "serve-portable.mjs"), String(testPort)], {
+      cwd: repoRoot,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    try {
+      await new Promise<void>((resolveReady, rejectReady) => {
+        const timer = setTimeout(() => rejectReady(new Error("Timed out waiting for serve-portable.mjs")), 8000);
+        child.stdout.on("data", (chunk: Buffer) => {
+          if (chunk.toString("utf8").includes(`http://127.0.0.1:${testPort}`)) {
+            clearTimeout(timer);
+            resolveReady();
+          }
+        });
+        child.once("exit", (code) => {
+          clearTimeout(timer);
+          rejectReady(new Error(`serve-portable.mjs exited early with code ${code}`));
+        });
       });
-      expect(stopRes.status).toBe(200);
+      await expectShutdownGuarded(testPort);
     } finally {
       child.kill("SIGTERM");
     }

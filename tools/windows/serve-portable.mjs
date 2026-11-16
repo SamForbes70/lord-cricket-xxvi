@@ -24,11 +24,31 @@ const types = {
   ".woff2": "font/woff2",
 };
 
+/**
+ * Local-only request guard (audit 16 Nov 2026, Phase 2).
+ * - Host must be this server's loopback address: blocks DNS-rebinding pages.
+ * - A browser Origin, if present, must be this server's own origin.
+ * - Shutdown also needs the X-LCXXVI-Shutdown header, which a cross-site page
+ *   cannot send without a CORS preflight this server never approves.
+ */
+function rejectNonLocal(req, res, listenPort, isShutdown) {
+  const allowed = new Set([`127.0.0.1:${listenPort}`, `localhost:${listenPort}`]);
+  const host = String(req.headers.host ?? "").toLowerCase();
+  const origin = req.headers.origin;
+  const originOk = origin === undefined || allowed.has(String(origin).toLowerCase().replace(/^http:\/\//, ""));
+  const headerOk = !isShutdown || req.headers["x-lcxxvi-shutdown"] === "1";
+  if (allowed.has(host) && originOk && headerOk) return false;
+  res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" });
+  res.end("Forbidden");
+  return true;
+}
+
 const server = createServer(async (req, res) => {
   try {
     let path = decodeURIComponent(
       new URL(req.url ?? "/", "http://localhost").pathname,
     );
+    if (rejectNonLocal(req, res, port, path === "/__lcxxvi-shutdown")) return;
     if (
       path === "/__lcxxvi-health" &&
       (req.method === "GET" || req.method === "HEAD")

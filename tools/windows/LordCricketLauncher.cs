@@ -72,14 +72,30 @@ namespace LordCricketLauncher
                 _listener.Prefixes.Add(baseUrl + "/");
                 _listener.Start();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(
-                    "Cannot start local server on " + baseUrl + ".\nClose another instance or set PORT.\n\n" + ex.Message,
-                    "Lord Cricket XXVI",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return 1;
+                // A standard (non-admin) user may not register 127.0.0.1 without a URL reservation;
+                // http.sys allows "localhost" for every user.
+                _listener = null;
+            }
+            if (_listener == null)
+            {
+                try
+                {
+                    baseUrl = "http://localhost:" + _port;
+                    _listener = new HttpListener();
+                    _listener.Prefixes.Add(baseUrl + "/");
+                    _listener.Start();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        "Cannot start local server on " + baseUrl + ".\nClose another instance or set PORT.\n\n" + ex.Message,
+                        "Lord Cricket XXVI",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return 1;
+                }
             }
 
             Thread serverThread = new Thread(ServeLoop);
@@ -224,6 +240,27 @@ namespace LordCricketLauncher
             }
         }
 
+        /// <summary>
+        /// Local-only guard (audit 16 Nov 2026, Phase 2): loopback Host only (blocks DNS rebinding),
+        /// any browser Origin must be this server, and shutdown needs the X-LCXXVI-Shutdown header,
+        /// which a cross-site page cannot send without a CORS preflight this server never approves.
+        /// </summary>
+        private static bool IsLocalRequest(HttpListenerRequest req, bool isShutdown)
+        {
+            string a = "127.0.0.1:" + _port;
+            string b = "localhost:" + _port;
+            string host = (req.Headers["Host"] ?? "").ToLowerInvariant();
+            if (host != a && host != b) return false;
+            string origin = req.Headers["Origin"];
+            if (origin != null)
+            {
+                string o = origin.ToLowerInvariant();
+                if (o != "http://" + a && o != "http://" + b) return false;
+            }
+            if (isShutdown && req.Headers["X-LCXXVI-Shutdown"] != "1") return false;
+            return true;
+        }
+
         private static void HandleRequest(HttpListenerContext ctx)
         {
             HttpListenerRequest req = ctx.Request;
@@ -231,6 +268,12 @@ namespace LordCricketLauncher
             try
             {
                 string pathname = Uri.UnescapeDataString(req.Url.AbsolutePath ?? "/");
+                if (!IsLocalRequest(req, pathname == "/__lcxxvi-shutdown"))
+                {
+                    res.StatusCode = 403;
+                    res.Close();
+                    return;
+                }
                 if (pathname == "/__lcxxvi-health" && (req.HttpMethod == "GET" || req.HttpMethod == "HEAD"))
                 {
                     byte[] json = Encoding.UTF8.GetBytes("{\"app\":\"lord-cricket-xxvi\",\"status\":\"ok\",\"port\":" + _port + ",\"pid\":" + Process.GetCurrentProcess().Id + "}");
