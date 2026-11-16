@@ -328,35 +328,26 @@ function appendLedgerEntry(
   ledger.push(EconomyTransactionLedgerEntrySchema.parse({ ...core, entrySha256 }));
 }
 
-const VERIFIED_LEDGER_TAIL_SHAS = new Set<string>();
-const VERIFIED_ECONOMY_SHAS = new Set<string>();
+/**
+ * Validation caches keyed by object identity, filled only after every check passes.
+ * A self-reported hash is never trusted: imported or edited objects are new objects and are fully checked.
+ */
+const verifiedLedgerEntries = new WeakMap<object, { sequence: number; prevEntrySha256: string | null }>();
+const verifiedEconomyStates = new WeakSet<object>();
 
 export function verifyEconomyLedgerChain(
   ledger: readonly EconomyTransactionLedgerEntry[],
 ): void {
   assertEconomy(ledger.length >= 1, "EMPTY_ECONOMY_LEDGER");
-  const lastEntry = ledger[ledger.length - 1];
-  if (lastEntry && VERIFIED_LEDGER_TAIL_SHAS.has(lastEntry.entrySha256)) {
-    assertEconomy(
-      lastEntry.sequence === ledger.length,
-      `LEDGER_SEQUENCE_MISMATCH:${lastEntry.sequence}`,
-    );
-    return;
-  }
-  let startIdx = 0;
   let expectedPrev: string | null = null;
-  if (ledger.length >= 2) {
-    const prevEntry = ledger[ledger.length - 2]!;
-    if (
-      VERIFIED_LEDGER_TAIL_SHAS.has(prevEntry.entrySha256) &&
-      prevEntry.sequence === ledger.length - 1
-    ) {
-      startIdx = ledger.length - 1;
-      expectedPrev = prevEntry.entrySha256;
+  for (let i = 0; i < ledger.length; i += 1) {
+    const rawEntry = ledger[i]!;
+    const cached = typeof rawEntry === "object" && rawEntry !== null ? verifiedLedgerEntries.get(rawEntry) : undefined;
+    if (cached && cached.sequence === i + 1 && cached.prevEntrySha256 === expectedPrev) {
+      expectedPrev = rawEntry.entrySha256;
+      continue;
     }
-  }
-  for (let i = startIdx; i < ledger.length; i += 1) {
-    const entry = EconomyTransactionLedgerEntrySchema.parse(ledger[i]);
+    const entry = EconomyTransactionLedgerEntrySchema.parse(rawEntry);
     const { entrySha256, ...coreRaw } = entry;
     const core = EconomyTransactionLedgerEntryCoreSchema.parse(coreRaw);
     assertEconomy(core.sequence === i + 1, `LEDGER_SEQUENCE_MISMATCH:${core.sequence}`);
@@ -369,8 +360,8 @@ export function verifyEconomyLedgerChain(
       core.teamCommittedWagesAfterK + core.teamDeadCapAfterK <= core.teamBudgetLimitK,
       `LEDGER_ENTRY_OVERSPENT:${core.sequence}`,
     );
+    verifiedLedgerEntries.set(rawEntry, { sequence: i + 1, prevEntrySha256: expectedPrev });
     expectedPrev = entrySha256;
-    VERIFIED_LEDGER_TAIL_SHAS.add(entrySha256);
   }
 }
 
@@ -380,9 +371,7 @@ export function sealSquadEconomyState(
   const core = SquadEconomyStateCoreSchema.parse(coreInput);
   verifyEconomyLedgerChain(core.ledger);
   const economySha256 = sha256Hex(canonicalStateBytes(core));
-  const sealed = SquadEconomyStateSchema.parse({ ...core, economySha256 });
-  VERIFIED_ECONOMY_SHAS.add(economySha256);
-  return sealed;
+  return SquadEconomyStateSchema.parse({ ...core, economySha256 });
 }
 
 export function validateSquadEconomyState(
@@ -390,12 +379,7 @@ export function validateSquadEconomyState(
   lifecycle?: PlayerLifecycleState,
   seasonNumber?: number,
 ): SquadEconomyState {
-  const candidateSha =
-    typeof raw === "object" && raw !== null && "economySha256" in raw
-      ? (raw as { economySha256?: unknown }).economySha256
-      : undefined;
-  const fastVerified =
-    typeof candidateSha === "string" && VERIFIED_ECONOMY_SHAS.has(candidateSha);
+  const fastVerified = typeof raw === "object" && raw !== null && verifiedEconomyStates.has(raw);
   const parsed = fastVerified
     ? (raw as SquadEconomyState)
     : SquadEconomyStateSchema.parse(raw);
@@ -403,8 +387,7 @@ export function validateSquadEconomyState(
     const { economySha256, ...coreRaw } = parsed;
     const coreCheck = SquadEconomyStateCoreSchema.parse(coreRaw);
     assertEconomy(sha256Hex(canonicalStateBytes(coreCheck)) === economySha256, "HASH_MISMATCH");
-    verifyEconomyLedgerChain(coreCheck.ledger);
-    VERIFIED_ECONOMY_SHAS.add(economySha256);
+    verifyEconomyLedgerChain(parsed.ledger);
   }
   const core = parsed;
 
@@ -470,6 +453,7 @@ export function validateSquadEconomyState(
       `BUDGET_INVARIANT_MISMATCH:${stored.teamId}`,
     );
   }
+  verifiedEconomyStates.add(parsed);
   return parsed;
 }
 
