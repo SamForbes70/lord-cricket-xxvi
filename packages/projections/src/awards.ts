@@ -22,7 +22,7 @@ import {
   compareCodePoints,
 } from "@lcxxvi/contracts";
 import { pureSha256Hex } from "./audio-cues.js";
-import type { AnyCareerMatchEventArchive, AnyPersistentWorldState } from "./historical-stats.js";
+import type { AnyCareerMatchEventArchive, AnyPersistentWorldState, CareerMatchDigest } from "./historical-stats.js";
 
 export const MATCH_AWARD_FORMULA_SUMMARY =
   "Transparent Game Award: batting (runs, boundaries, milestones, not-out, format-par strike rate) + bowling (24 pts/wkt, 3w/5w hauls, maidens, format-par economy) + attributable fielding (catches 7, stumpings 9, run-outs 11) + modest winning-team bonus (5 pts; standout losing performances can still win)." as const;
@@ -125,6 +125,16 @@ export function extractAttributableFieldingFromEvents(
   return { byPlayer, evaluated: true };
 }
 
+function fieldingFromDigest(fielding: CareerMatchDigest["fielding"]): {
+  byPlayer: Map<string, { teamId: string; catches: number; stumpings: number; runOuts: number }>;
+  evaluated: boolean;
+} {
+  return {
+    byPlayer: new Map(fielding.map((f) => [f.playerId, { teamId: f.teamId, catches: f.catches, stumpings: f.stumpings, runOuts: f.runOuts }])),
+    evaluated: true,
+  };
+}
+
 function computeBattingPointsX100(p: PlayerMatchAccumulator, format: AwardFormat): number {
   if (!p.batted) return 0;
   let pts = p.runs * 100;
@@ -187,6 +197,8 @@ function computeMatchAwardInternal(input: {
   scorecard: AnyMatchScorecard;
   events?: readonly AwardMatchEventLike[];
   archive?: AnyCareerMatchEventArchive | null;
+  /** Fielding credits from the match digest, used when no events or archive are supplied. */
+  fieldingDigest?: CareerMatchDigest["fielding"] | null;
   fixtureId?: string | null;
   seasonNumber?: number | null;
   sourceCompletionSha256?: string | null;
@@ -258,7 +270,10 @@ function computeMatchAwardInternal(input: {
     }
   }
 
-  const fielding = extractAttributableFieldingFromEvents(events, participantTeamByPlayerId);
+  const fielding =
+    !events && input.fieldingDigest
+      ? fieldingFromDigest(input.fieldingDigest)
+      : extractAttributableFieldingFromEvents(events, participantTeamByPlayerId);
   for (const [playerId, counts] of fielding.byPlayer.entries()) {
     const acc = ensurePlayer(playerId, counts.teamId);
     acc.catches += counts.catches;
@@ -377,6 +392,8 @@ export function computeMatchAward(input: {
   scorecard: AnyMatchScorecard;
   events?: readonly AwardMatchEventLike[];
   archive?: AnyCareerMatchEventArchive | null;
+  /** Fielding credits from the match digest, used when no events or archive are supplied. */
+  fieldingDigest?: CareerMatchDigest["fielding"] | null;
   fixtureId?: string | null;
   seasonNumber?: number | null;
   sourceCompletionSha256?: string | null;
@@ -392,6 +409,7 @@ export function computeMatchAwardFromCompletion(
   options: {
     seasonNumber?: number | null;
     archive?: AnyCareerMatchEventArchive | null;
+    digest?: CareerMatchDigest | null;
     playerNames?: Readonly<Record<string, string>>;
     teamNames?: Readonly<Record<string, string>>;
   } = {},
@@ -404,6 +422,7 @@ export function computeMatchAwardFromCompletion(
     format: "T20",
     scorecard: completion.scorecard,
     archive: options.archive ?? null,
+    fieldingDigest: options.archive ? null : options.digest?.fielding ?? null,
     fixtureId: completion.fixtureId,
     seasonNumber: options.seasonNumber ?? null,
     sourceCompletionSha256: completion.sourceCompletionSha256,
@@ -438,6 +457,8 @@ export function computeSeasonAwards(input: {
   completedMatches: readonly T20SeasonMatchCompletion[];
   matchAwards?: readonly MatchAwardRecord[];
   archivesByFixtureId?: ReadonlyMap<string, AnyCareerMatchEventArchive>;
+  /** Per-match digests, used for fixtures whose full archive is not supplied. */
+  digestsByFixtureId?: ReadonlyMap<string, CareerMatchDigest>;
   lifecycle?: PlayerLifecycleState | null;
   /** Extra players whose birth dates are known (base world, free agents); used only for youth eligibility. */
   knownPlayers?: readonly { playerId: string; birthDate: string }[];
@@ -455,12 +476,14 @@ export function computeSeasonAwards(input: {
 
   for (const completion of input.completedMatches) {
     const archive = input.archivesByFixtureId?.get(completion.fixtureId) ?? null;
-    if (archive) evaluatedArchives += 1;
+    const digest = archive ? null : input.digestsByFixtureId?.get(completion.fixtureId) ?? null;
+    if (archive || digest) evaluatedArchives += 1;
     const matchAward =
       matchAwardByFixture.get(completion.fixtureId) ??
       computeMatchAwardFromCompletion(completion, {
         seasonNumber: input.seasonNumber,
         archive,
+        digest,
         ...(input.playerNames ? { playerNames: input.playerNames } : {}),
         ...(input.teamNames ? { teamNames: input.teamNames } : {}),
       });
@@ -472,10 +495,10 @@ export function computeSeasonAwards(input: {
         matchPlayers.add(pid);
       }
     }
-    const fielding = extractAttributableFieldingFromEvents(
-      archive?.events,
-      participantTeamByPlayerId,
-    );
+    const fielding =
+      !archive && digest
+        ? fieldingFromDigest(digest.fielding)
+        : extractAttributableFieldingFromEvents(archive?.events, participantTeamByPlayerId);
 
     const ensure = (playerId: string, teamId: string): SeasonPlayerAggregate => {
       let cur = byPlayer.get(playerId);
@@ -531,6 +554,7 @@ export function computeSeasonAwards(input: {
       format: "T20",
       scorecard: completion.scorecard,
       archive,
+      fieldingDigest: digest?.fielding ?? null,
       fixtureId: completion.fixtureId,
       seasonNumber: input.seasonNumber,
       sourceCompletionSha256: completion.sourceCompletionSha256,
@@ -911,6 +935,8 @@ export function reconcileCareerAwardsLedger(input: {
     completedMatches: readonly T20SeasonMatchCompletion[];
   } | null;
   archives?: readonly AnyCareerMatchEventArchive[] | ReadonlyMap<string, AnyCareerMatchEventArchive>;
+  /** Per-match digests, used for fixtures whose full archive is not supplied. */
+  digests?: ReadonlyMap<string, CareerMatchDigest>;
   knownPlayers?: readonly { playerId: string; birthDate: string }[];
   playerNames?: Readonly<Record<string, string>>;
   teamNames?: Readonly<Record<string, string>>;
@@ -980,6 +1006,7 @@ export function reconcileCareerAwardsLedger(input: {
       const award = computeMatchAwardFromCompletion(completion, {
         seasonNumber: season.seasonNumber,
         archive,
+        digest: archive ? null : input.digests?.get(completion.fixtureId) ?? null,
         ...(input.playerNames ? { playerNames: input.playerNames } : {}),
         ...(input.teamNames ? { teamNames: input.teamNames } : {}),
       });
@@ -1007,6 +1034,7 @@ export function reconcileCareerAwardsLedger(input: {
           completedMatches: season.completedMatches,
           matchAwards: seasonMatchAwards,
           archivesByFixtureId: archiveMap,
+          ...(input.digests ? { digestsByFixtureId: input.digests } : {}),
           lifecycle,
           ...(input.knownPlayers ? { knownPlayers: input.knownPlayers } : {}),
           ...(input.playerNames ? { playerNames: input.playerNames } : {}),

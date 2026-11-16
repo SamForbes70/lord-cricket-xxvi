@@ -12,8 +12,11 @@ import {
   type T20SeasonMatchCompletion,
 } from "@lcxxvi/contracts";
 import {
+  buildHistoricalMatchFactsFromCareer,
+  buildHistoricalStatsSourceFromPersistentWorld,
   computeMatchAward,
   computeSeasonAwards,
+  deriveCareerMatchDigest,
   createEmptyCareerAwardsLedger,
   reconcileCareerAwardsLedger,
   recordMatchAwardIdempotent,
@@ -300,6 +303,40 @@ describe("Stage 10 — Match and season awards (S10-01)", () => {
     ];
     expect(emerging(retired)?.winnerPlayerId).toBe(youngest.playerId);
   });
+
+  it("match digests give the same statistics and awards as the full archives", async () => {
+    // docs/design/MATCH_ARCHIVE_STORAGE_V2.md: statistics and awards must not need full archives.
+    const seasonRepo = new InMemorySeasonRepo();
+    const persistentRepo = new InMemoryPersistentWorldRepo(seasonRepo);
+    const svc = new CareerApplicationService("owner-digest", seasonRepo, undefined, persistentRepo);
+    await svc.boot();
+    await svc.createCareer(careerWorld.teams[0]!.teamId, null, { seed: "digest-seed", worldId: "world-digest", careerId: "career-digest" });
+    for (let round = 0; round < 3; round += 1) {
+      await svc.simulateToNextUserFixture();
+      await svc.simulateManagedFixture();
+    }
+    const world = svc.getPersistentState()!;
+    const completions = svc.getState()!.completedMatches;
+    const archives = await svc.loadCareerEventArchives();
+    expect(archives.length).toBe(completions.length);
+    const archiveMap = new Map(archives.map((a) => [a.fixtureId, a]));
+    const digests = new Map(
+      completions.map((c) => [c.fixtureId, deriveCareerMatchDigest(archiveMap.get(c.fixtureId)!, c)]),
+    );
+    expect([...digests.values()].some((d) => d.fielding.length > 0)).toBe(true);
+    // A digest is small: well under a hundredth of its archive.
+    const bytes = (v: unknown) => new TextEncoder().encode(JSON.stringify(v)).byteLength;
+    expect(bytes([...digests.values()]) * 100).toBeLessThan(bytes(archives));
+
+    const fromArchives = buildHistoricalMatchFactsFromCareer(buildHistoricalStatsSourceFromPersistentWorld({ world, archives }));
+    const fromDigests = buildHistoricalMatchFactsFromCareer(buildHistoricalStatsSourceFromPersistentWorld({ world, digests }));
+    expect(fromDigests.facts).toEqual(fromArchives.facts);
+
+    const seasonInput = { seasonNumber: 1, calendarYear: 2026, completedMatches: completions };
+    expect(computeSeasonAwards({ ...seasonInput, digestsByFixtureId: digests })).toEqual(
+      computeSeasonAwards({ ...seasonInput, archivesByFixtureId: archiveMap }),
+    );
+  }, 120_000);
 
   it("records awards idempotently, preserves match/season hashes, and round-trips through portable archives and CareerApplicationService", async () => {
     const worldCopy = createNewGameWorldCopy(structuredClone(careerWorld), careerWorld);
