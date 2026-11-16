@@ -9,6 +9,7 @@ import {
   PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION,
   PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION,
   PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
   PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
   PERSISTENT_WORLD_STATE_V3_VERSION,
@@ -143,7 +144,7 @@ import {
   collectPersistentWorldCompletions,
   createPersistentWorldPortableArchive,
   createPersistentWorldPortableArchiveV2,
-  createPersistentWorldPortableArchiveV3,
+  createPersistentWorldPortableArchiveV4,
   createSeasonPortableArchive,
   createT20SeasonArchive,
   describeSeasonPersistenceError,
@@ -154,6 +155,7 @@ import {
   readPersistentWorldPortableArchive,
   readPersistentWorldPortableArchiveV2,
   readPersistentWorldPortableArchiveV3,
+  readPersistentWorldPortableArchiveV4,
   readSeasonPortableArchive,
   sealCompletedSeasonRecord,
   sealPersistentCareerProjection,
@@ -3771,14 +3773,15 @@ export class CareerApplicationService {
       // The awards ledger is derived and no longer exported (rebuilt on import), so it is not synced here.
       const awardsLedger = null;
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION) {
-        return createPersistentWorldPortableArchiveV3(
+        // Compressed V4 export (docs/design/MATCH_ARCHIVE_STORAGE_V2.md): long careers fit the size limit.
+        void awardsLedger;
+        return createPersistentWorldPortableArchiveV4(
           loaded.state,
           loaded.summary,
           nowIso(),
           loaded.worldCopy ?? null,
           eventArchives.length > 0 ? eventArchives : null,
           rosterPacks.length > 0 ? rosterPacks : null,
-          awardsLedger,
         );
       }
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION) {
@@ -3837,13 +3840,16 @@ export class CareerApplicationService {
     if (
       version === PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION ||
       version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION ||
-      version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION
+      version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION ||
+      version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
     ) {
       if (!this.persistentRepository) {
         throw new Error("Persistent world storage is unavailable.");
       }
       const imported =
-        version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION
+        version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
+          ? await readPersistentWorldPortableArchiveV4(bytes)
+          : version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION
           ? await readPersistentWorldPortableArchiveV3(bytes)
           : version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION
             ? await readPersistentWorldPortableArchiveV2(bytes)

@@ -27,6 +27,7 @@ import {
   createPersistentWorldPortableArchiveV3,
   PERSISTENT_WORLD_RECORD_TYPE,
   readPersistentWorldPortableArchiveV3,
+  readPersistentWorldPortableArchiveV4,
   validateAnyCareerMatchEventArchive,
   validateAnyPersistentWorldState,
   validateCompletedCareerMatchEventArchive,
@@ -380,7 +381,20 @@ describe("Stage 10 — Match and season awards (S10-01)", () => {
 
     // Season ledger idempotency + portable archive export/import round-trip.
     const exported = await svc.exportCareer();
-    const readBack = await readPersistentWorldPortableArchiveV3(exported);
+    const readBack = await readPersistentWorldPortableArchiveV4(exported);
+    // V4 holds exactly the V3 contents, gzip-compressed (docs/design/MATCH_ARCHIVE_STORAGE_V2.md, step 5).
+    expect(readBack.manifest.compression).toBe("gzip");
+    expect(readBack.state.stateSha256).toBe(svc.getPersistentState()!.stateSha256);
+    const sameAsV3 = await createPersistentWorldPortableArchiveV3(
+      readBack.state, readBack.summary, readBack.manifest.exportedAt, readBack.worldCopy,
+      readBack.matchEventArchives, readBack.seasonRosterPacks,
+    );
+    const v3 = await readPersistentWorldPortableArchiveV3(sameAsV3);
+    expect(v3.manifest.files).toEqual(readBack.manifest.files);
+    expect(exported.byteLength * 3).toBeLessThan(sameAsV3.byteLength);
+    // A V4 file is not accepted by the V3 reader, and the reverse.
+    await expect(readPersistentWorldPortableArchiveV3(exported)).rejects.toThrow();
+    await expect(readPersistentWorldPortableArchiveV4(sameAsV3)).rejects.toThrow();
     // The ledger is derived data and is not written into the V3 archive (writing it widened the format
     // in place; audit 16 Nov 2026). It is rebuilt from the exported match events on import.
     expect(readBack.awardsLedger).toBeNull();

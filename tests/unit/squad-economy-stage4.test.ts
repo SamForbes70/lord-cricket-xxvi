@@ -5,7 +5,7 @@ import {
   LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION,
   MAX_ACTIVE_TEAM_SQUAD_SIZE,
   MIN_ACTIVE_TEAM_SQUAD_SIZE,
-  PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
   PERSISTENT_WORLD_STATE_V3_VERSION,
   SQUAD_ECONOMY_MODEL_VERSION,
@@ -17,7 +17,7 @@ import {
 import {
   peekPortableArchiveVersion,
   PERSISTENT_WORLD_RECORD_TYPE,
-  readPersistentWorldPortableArchiveV3,
+  readPersistentWorldPortableArchiveV4,
   seasonSha256Text,
   validateAnyCareerMatchEventArchive,
   validateAnyPersistentWorldState,
@@ -792,14 +792,14 @@ describe("Stage 4 domestic contracts, club budgets, and recruitment (LC_PERSISTE
       expect(service.latestEconomyTransition()?.toSeasonNumber).toBe(2);
       expect(() => verifyEconomyLedgerChain(service.getEconomyState()!.ledger)).not.toThrow();
 
-      // Export V3 .lcxxvi portable archive and verify round-trip
+      // Export the compressed V4 .lcxxvi (V3 contents, gzip entries) and verify round-trip
       const archiveBytes = await service.exportCareer();
       expect(peekPortableArchiveVersion(archiveBytes)).toBe(
-        PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
+        PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
       );
-      const parsedArchive = await readPersistentWorldPortableArchiveV3(archiveBytes);
+      const parsedArchive = await readPersistentWorldPortableArchiveV4(archiveBytes);
       expect(parsedArchive.manifest.archiveVersion).toBe(
-        PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
+        PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
       );
       expect(parsedArchive.state.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V3_VERSION);
       expect(parsedArchive.matchEventArchives).toHaveLength(56);

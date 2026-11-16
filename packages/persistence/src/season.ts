@@ -60,21 +60,18 @@ function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-/** gzip then base64; uses the platform CompressionStream (browsers and Node 18+). */
-export async function gzipToBase64(text: string): Promise<string> {
-  const stream = new Blob([new TextEncoder().encode(text)]).stream().pipeThrough(new CompressionStream("gzip"));
-  return bytesToBase64(new Uint8Array(await new Response(stream).arrayBuffer()));
+/** gzip with the platform CompressionStream (browsers and Node 18+). */
+export async function gzipBytes(data: Uint8Array): Promise<Uint8Array> {
+  const stream = new Blob([new Uint8Array(data)]).stream().pipeThrough(new CompressionStream("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
 /**
- * Reverses gzipToBase64. Stops with an error once more than `maxBytes` would be produced, so a crafted
- * row cannot expand without bound.
+ * Reverses gzipBytes. Stops with an error once more than `maxBytes` would be produced, so crafted input
+ * cannot expand without bound.
  */
-export async function gunzipBase64ToText(payload: string, maxBytes: number): Promise<string> {
-  const binary = atob(payload);
-  const compressed = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) compressed[i] = binary.charCodeAt(i);
-  const reader = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("gzip")).getReader();
+export async function gunzipBytes(compressed: Uint8Array, maxBytes: number): Promise<Uint8Array> {
+  const reader = new Blob([new Uint8Array(compressed)]).stream().pipeThrough(new DecompressionStream("gzip")).getReader();
   const chunks: Uint8Array[] = [];
   let total = 0;
   for (;;) {
@@ -93,7 +90,20 @@ export async function gunzipBase64ToText(payload: string, maxBytes: number): Pro
     out.set(chunk, offset);
     offset += chunk.byteLength;
   }
-  return new TextDecoder("utf-8", { fatal: true }).decode(out);
+  return out;
+}
+
+/** gzip then base64, for text stored in a projection row. */
+export async function gzipToBase64(text: string): Promise<string> {
+  return bytesToBase64(await gzipBytes(new TextEncoder().encode(text)));
+}
+
+/** Reverses gzipToBase64, with the same expansion cap as gunzipBytes. */
+export async function gunzipBase64ToText(payload: string, maxBytes: number): Promise<string> {
+  const binary = atob(payload);
+  const compressed = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) compressed[i] = binary.charCodeAt(i);
+  return new TextDecoder("utf-8", { fatal: true }).decode(await gunzipBytes(compressed, maxBytes));
 }
 export const CAREER_AWARDS_LEDGER_SCOPE = "CAREER_AWARDS_LEDGER_V1" as const;
 
