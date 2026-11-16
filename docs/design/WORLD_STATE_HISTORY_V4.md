@@ -65,9 +65,24 @@ V4 only differs once a third pack would be embedded, so seasons 1 and 2 are the 
 
 Not built: the copy-forward from an existing V3 world into a V4 slot (proposal step 3). [Inference] It needs every historical pack written as a row before the embedded list is trimmed, which a single commit can do with `seasonRosterPacks`; it is the next step if long V3 careers matter.
 
+### Completed seasons are checked once
+
+Measured at season 2: re-validating one completed-season record (schema parse, canonical JSON, hash, archive check) took about 23 ms, on every commit. The rows were already written only once (commit `244adbe`), but sealing re-parsed the state into new objects, so a carried-forward season was never recognised as already checked. Now:
+
+- `validateCompletedSeasonRecord` remembers each record that passed full validation, keyed by object identity, and fills the cache only after full validation;
+- every seal keeps a completed season's original object when that object is already verified, so later commits hit both this cache and the prepared-row cache.
+
+Any other object, whether imported, edited or copied, is still checked in full; a test edits a copy and sees it refused. Same benchmark, V4:
+
+| Season | Before | After |
+| --- | --- | --- |
+| 1 | 321 ms | 310 ms |
+| 2 | 458 ms | 410 ms |
+| 3 | 539 ms | 470 ms |
+
 ## Also worth doing
 
-- Completed-season records are re-put on every commit (`persistent-world.ts`, commit). They are immutable once sealed; write each once, at rollover.
+- Completed seasons are still parsed (about 5 ms each) and serialised into the state hash (about 9 ms each) on every commit. Taking them out of the state hash, or caching their canonical JSON inside a hash that is otherwise unchanged, needs a new state version.
 - One process-wide verified-object registry shared by simulation and persistence would stop the same lifecycle being rehashed in both packages. It must stay identity-keyed and filled only after full validation (see Phase 2).
 
 ## Out of scope
