@@ -12,7 +12,7 @@ Lord Cricket XXVI is a playable single-season management alpha.
 Main includes merged PR #2, capability reconciliation from PR #4 and the scenario harness from PR #5.
 PR #3 merged as `4aa71d9` after integration with `b4aceda`. Historical simulation and save boundaries remain intact.
 The accepted gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
-M7 quality validation and M8 release acceptance remain incomplete.
+M7 quality validation remains synthetic only, and M8 release acceptance rests on owner-declared gates (performance, owner PC, screen reader) with no measurement stored here.
 
 ## Active V0.1 delivery
 
@@ -72,7 +72,7 @@ Local saves, checkpoints, replay verification and `.lcxxvi` export/import are im
 Optional T20 tactical captain delegation is distinct from the fixture autopilot.
 
 DLS, limited-overs rain, prediction, super overs and DRS are not enabled.
-Multiyear careers, contracts, transfers, finances, youth and international management are not implemented.
+Multi-season careers (Stage 2), player ageing, development, retirement and youth (Stage 3), and domestic contracts, wage budgets, free agency and recruitment (Stage 4) are implemented; see [HANDOVER.md](HANDOVER.md). Transfers between clubs happen through free agency only; there are no transfer fees, cash finances or international management.
 No empirical-realism or complete ICC-conformity claim accompanies the custom game rules.
 [CAPABILITY_MATRIX.md](CAPABILITY_MATRIX.md) records the full current boundary.
 

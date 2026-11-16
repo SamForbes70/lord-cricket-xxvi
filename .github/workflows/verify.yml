@@ -76,6 +76,36 @@ jobs:
       - run: npm ci
       - name: Collect hosted Windows build and browser evidence
         run: node scripts/owner-acceptance.mjs --skip-install
+      - name: Build and smoke-test the Windows EXE launcher
+        if: always()
+        timeout-minutes: 10
+        shell: pwsh
+        run: |
+          # Audit 16 Nov 2026, Phase 6: compile the EXE from source, start it, and check its local-only
+          # shutdown guard. The runner is an administrator, so the standard-user http.sys path is not covered.
+          npm run build
+          powershell -NoProfile -ExecutionPolicy Bypass -File tools/windows/build-exe.ps1
+          $env:PORT = "4381"
+          $exe = Start-Process -FilePath (Join-Path $PWD 'LordCricketXXVI.exe') -PassThru
+          $base = $null
+          foreach ($i in 1..60) {
+            foreach ($candidate in @('http://127.0.0.1:4381', 'http://localhost:4381')) {
+              try { $h = Invoke-RestMethod "$candidate/__lcxxvi-health" -TimeoutSec 2; if ($h.app -eq 'lord-cricket-xxvi') { $base = $candidate } } catch {}
+            }
+            if ($base) { break }
+            Start-Sleep -Seconds 1
+          }
+          if (-not $base) { Stop-Process -Id $exe.Id -Force -ErrorAction SilentlyContinue; throw 'EXE launcher did not report healthy within 60 s' }
+          Write-Host "EXE serving at $base"
+          $index = Invoke-WebRequest "$base/" -UseBasicParsing
+          if ($index.Content -notmatch 'Lord Cricket XXVI') { throw 'EXE did not serve index.html' }
+          $bare = try { Invoke-WebRequest "$base/__lcxxvi-shutdown" -Method Post -UseBasicParsing; 200 } catch { [int]$_.Exception.Response.StatusCode }
+          if ($bare -ne 403) { throw "Bare shutdown POST returned $bare, expected 403" }
+          $foreign = try { Invoke-WebRequest "$base/__lcxxvi-shutdown" -Method Post -Headers @{ 'X-LCXXVI-Shutdown' = '1'; 'Origin' = 'https://example.com' } -UseBasicParsing; 200 } catch { [int]$_.Exception.Response.StatusCode }
+          if ($foreign -ne 403) { throw "Foreign-origin shutdown POST returned $foreign, expected 403" }
+          Invoke-RestMethod "$base/__lcxxvi-shutdown" -Method Post -Headers @{ 'X-LCXXVI-Shutdown' = '1' } | Out-Null
+          if (-not $exe.WaitForExit(15000)) { Stop-Process -Id $exe.Id -Force; throw 'EXE did not exit after an authorised shutdown' }
+          Write-Host 'EXE launcher: built, served, refused bare and foreign-origin shutdown, stopped on the launcher request'
       - name: Retain structured verification evidence
         if: always()
         run: node scripts/ci-evidence.mjs --kind=windows

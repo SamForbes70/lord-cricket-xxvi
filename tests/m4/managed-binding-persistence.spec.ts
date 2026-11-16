@@ -35,7 +35,7 @@ test("a first commit never replaces an existing save", async ({ page }) => {
   expect(result.commands).toBeNull();
 });
 
-test("the match save list omits career rows of both kinds", async ({ page }) => {
+test("the match save list omits career rows of every kind, including unknown future kinds", async ({ page }) => {
   await page.goto("/#exhibition");
   const u = urls();
   const result = await page.evaluate(async (paths) => {
@@ -57,6 +57,12 @@ test("the match save list omits career rows of both kinds", async ({ page }) => 
       command: { commandId: "c", requestCanonical: "r", responseJson: "s", committedRevision: 1 },
       metadata: { matchGameId: "g", matchId: "m", teams: ["A", "B"], ground: "G", phase: "TOSS", completed: false }, ownerId: "owner", now, updatedAt: "2026-10-30T00:00:00.000Z",
     });
+    // A career kind this build does not know (as a newer build might write) must not appear as a match save.
+    const db = await new Promise<IDBDatabase>((resolve, reject) => { const r = indexedDB.open(name); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); });
+    const tx = db.transaction("games", "readwrite");
+    tx.objectStore("games").put({ saveId: "future-career", recordType: "SOME_FUTURE_CAREER", title: "Future", updatedAt: "2026-10-31T00:00:00.000Z" });
+    await new Promise<void>((resolve) => { tx.oncomplete = () => resolve(); });
+    db.close();
     return (await matches.list()).map((save) => save.saveId);
   }, u);
   expect(result).toEqual(["auto:g"]);

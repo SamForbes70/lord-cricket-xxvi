@@ -299,13 +299,9 @@ export class IndexedDbSaveRepository {
     await txDone(tx);
     return rows
       .filter((row) => {
-        const recordType = (row as GameRecord & { recordType?: string }).recordType;
-        // Career rows (standard and imported-roster) share the games store but are not match saves.
-        return (
-          recordType !== "SEASON" &&
-          recordType !== "ROSTER_SEASON" &&
-          recordType !== "PERSISTENT_WORLD"
-        );
+        // Match saves carry no recordType; every career kind (SEASON, ROSTER_SEASON, PERSISTENT_WORLD and
+        // any future kind) does, so an unknown career kind can never appear here as a deletable match save.
+        return (row as GameRecord & { recordType?: string }).recordType === undefined;
       })
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .map(summaryFromGame);

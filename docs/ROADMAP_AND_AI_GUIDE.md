@@ -2,6 +2,8 @@
 
 *Last reconciled on 16 November 2026 (Australia/Brisbane) with Stages 1–10 and the Windows Double-Click / `.NET` Portable Launcher owner-accepted on `main` (`773/773` unit tests across `73/73` files, `334` strict JSON Schemas).* 
 
+> **Stabilisation in progress (16 November 2026).** The owner directed: "Get what we currently have as excellent, then we will finish the full game." No new stages (including Stage 11) until the plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md) is complete and reviewed. Current state and the open pull requests: [HANDOVER.md](HANDOVER.md). Stages 2 to 10 landed on `main` with hosted CI failing; the stabilisation pull requests make it green.
+
 This guide gives engineers and AI coding agents a single authoritative blueprint of:
 1. **What has been built and verified (Stages 1 through 10 + Windows Native Launcher)**,
 2. **The complete remaining roadmap with concrete execution plans (Stages 11 to 17 & the Empirical Research Track)**, and

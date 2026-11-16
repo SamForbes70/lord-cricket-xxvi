@@ -2,7 +2,9 @@
 
 **V0.1 is closed.** The owner accepted it on 13 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)): every V01 backlog item is `DONE`, and RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. "Done" for the performance, owner-PC and screen-reader gates means the owner declared them complete; no measurement or observation for them is stored in this repository.
 
-The owner's sequence from here is **persistent world, then player lifecycle, then squad economy**, each accepted before the next begins. A separate research track (a licensed, well-characterised calibration dataset) is the brief's next priority for model quality and is blocked on data, not on routine development.
+**Current direction (16 November 2026): stabilise before adding features.** The owner directed: "Get what we currently have as excellent, then we will finish the full game." The next work is the phased plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md), delivered through stacked pull requests #48 to #52 and a Phase 6 follow-up (see [HANDOVER.md](HANDOVER.md)). Stage 11 and later wait until that plan is complete and reviewed. The "Master Build Brief" cited below is not in the repository and is retired as an authority; the sections below are history.
+
+A separate research track (a licensed, well-characterised calibration dataset) remains the brief's priority for model quality and is blocked on data, not on routine development.
 
 Read [HANDOVER.md](HANDOVER.md) first, then [AI_CONTINUATION.md](AI_CONTINUATION.md).
 
