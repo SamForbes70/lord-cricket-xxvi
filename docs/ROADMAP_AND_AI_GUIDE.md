@@ -1,12 +1,12 @@
 # Lord Cricket XXVI: Comprehensive Architecture, Full Roadmap & AI Continuation Playbook
 
-*Last reconciled on 16 November 2026 (Australia/Brisbane) with Stages 1–9 owner-accepted on `main` and Stage 10 (`S10-01`, Match and season awards) `tested` on `feat/stage10-match-season-awards`.*
+*Last reconciled on 16 November 2026 (Australia/Brisbane) with Stages 1–10 owner-accepted on `main`.*
 
 This guide gives engineers and AI agents a single authoritative map of **what has been built**, **the complete remaining roadmap (Stages 10 to 17 and the empirical research track)**, and **exact rules and commands to continue development safely**.
 
 ---
 
-## 1. What Has Been Built (Stages 1 through 9 — Owner Accepted)
+## 1. What Has Been Built (Stages 1 through 10 — Owner Accepted)
 
 ### 1.1 Stage 1 / V0.1 Foundation (`main` `f7ee054`, accepted 13 November 2026)
 
@@ -65,7 +65,7 @@ This guide gives engineers and AI agents a single authoritative map of **what ha
 
 ## 2. Complete Future Roadmap (Stages 10 to 17 & Research Track)
 
-### Stage 10 — Match and season awards (`S10-01`, **`tested` on `feat/stage10-match-season-awards`**, awaiting owner acceptance)
+### Stage 10 — Match and season awards (`S10-01`, **`accepted` on `main`**, 16 November 2026)
 
 - **Verification evidence**: [verification-stage10-match-season-awards/REPORT.md](verification-stage10-match-season-awards/REPORT.md) (`334` strict JSON Schemas, `770/770` unit tests across `72/72` files, Chromium + Firefox Stage 10 + accessibility UI suites).
 - **Delivered**:

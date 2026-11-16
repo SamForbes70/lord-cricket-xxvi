@@ -62,13 +62,13 @@ The owner accepted Stage 9 (`S09-01`) on 16 November 2026 ([OWNER_DECISIONS_2026
 2. **Multi-dimensional filters, source isolation & match links**: Statistics and Player pages expose Season, Competition, Club, Opponent, Venue, Batting position band/slot, and Active/Retired filters with explicit unsupported-format notices (`ODI`/`RED_BALL` unavailable in career archives), strict separation from exhibitions/scenarios/imported histories, and clickable contributing-match links opening archived replays (`View replay`).
 3. **Completed next slice**: **Stage 10 (Match and season awards)** is implemented and verified (`tested`) on `feat/stage10-match-season-awards` ([verification-stage10-match-season-awards/REPORT.md](verification-stage10-match-season-awards/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)).
 
-## Stage 10: Match and season awards (`tested` on `feat/stage10-match-season-awards`, 16 November 2026)
+## Stage 10: Match and season awards (`accepted` on `main`, 16 November 2026)
 
-Stage 10 (`S10-01`) is implemented and verified (`770/770` unit tests across `72/72` files, `334` strict JSON Schemas, Chromium + Firefox Stage 10 + accessibility UI suites), pending owner review/acceptance and merge to `main`:
+The owner accepted Stage 10 (`S10-01`) on 16 November 2026 ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md), [verification-stage10-match-season-awards/REPORT.md](verification-stage10-match-season-awards/REPORT.md), [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md)):
 
 1. **Transparent versioned heuristic & disclaimers (`LC_AWARDS_HEURISTIC_GAME_V1`, `LC_CAREER_AWARDS_LEDGER_V1`)**: Computes deterministic Player of the Match (`T20`, `ODI`, `RED_BALL`, losing-side winner & no-result support, archived-event fielding integration) and 5 season awards (`PLAYER_OF_THE_SEASON`, `LEADING_RUN_SCORER`, `LEADING_WICKET_TAKER`, `BEST_FIELDER`, `EMERGING_YOUTH_PLAYER`) with explicit `GAME_AWARD` disclaimers and zero extra RNG calls.
 2. **Idempotent persistence & full UI coverage**: Persists `CAREER_AWARDS_LEDGER_V1` in IndexedDB and optional hash-checked `awards/ledger.json` entries inside `.lcxxvi` archives without breaking backwards compatibility, surfacing awards in Match Result, Archived Replay, Career Roll of Honour, Statistics Season Awards, and `PlayerPage`.
-3. **Next eligible slice**: **After owner Stage 10 acceptance**: **Stage 11 (Player and manager stories)** — event-driven milestone, streak, selection/contract pressure, and board-review cards derived strictly from committed seasons, awards, and stats.
+3. **Next eligible slice**: **Stage 11 (Player and manager stories)** — event-driven milestone, streak, selection/contract pressure, and board-review cards derived strictly from committed seasons, awards, and stats.
 
 ## Open items that still need people
 
