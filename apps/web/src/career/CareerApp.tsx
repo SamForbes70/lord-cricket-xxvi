@@ -28,8 +28,6 @@ import {
   recordManagedLaunch,
   settleManagedMatches,
 } from "./managed-match.js";
-import { PitchInspection } from "../match/PitchInspection.js";
-import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import {
   AUDIO_PREFERENCES_STORAGE_KEY,
   loadStoredAudioPreferences,
@@ -39,11 +37,12 @@ import { WorldEditor } from "../world/WorldEditor.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
 import { offlineUpdateCoordinator } from "../offline-update.js";
 import "./career.css";
-import {    percentageBp } from "./format.js";
 import { StatisticsScreen } from "./StatisticsScreen.js";
 import { ContractsScreen } from "./ContractsScreen.js";
 import { SquadScreen } from "./SquadScreen.js";
 import { CareerScreen } from "./CareerScreen.js";
+import { HomeScreen } from "./HomeScreen.js";
+import { FixturesScreen } from "./FixturesScreen.js";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
 const LAUNCH_KEY = "lcxxvi-career-match-launch";
@@ -1206,184 +1205,38 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       )}
 
       {screen === "HOME" && (
-        <section aria-labelledby="home-heading">
-          <h2 id="home-heading">Home</h2>
-          <div className="dashboard-grid">
-            <article className="career-panel emphasis">
-              <h3>Next required action</h3>
-              {state.phase === "COMPLETE" ? (
-                <>
-                  <p className="big-stat">Season complete</p>
-                  <p>
-                    Champion: <strong>{service.teamName(state.projection.table[0]?.teamId)}</strong>
-                  </p>
-                  {persistentWorld ? (
-                    <div className="action-row" style={{ marginTop: "10px" }}>
-                      <button
-                        type="button"
-                        className="primary"
-                        data-testid="rollover-next-season-btn"
-                        disabled={busy || inspectionOnly || service.isReadOnly()}
-                        onClick={() =>
-                          void action(async () => {
-                            const closingId = state.seasonId;
-                            await service.closeSeasonAndAdvance(closingId);
-                            setActiveReplay(null);
-                            setStatsScope("ACTIVE");
-                          })
-                        }
-                      >
-                        Close season &amp; advance to Season{" "}
-                        {persistentWorld.currentSeasonNumber + 1} ({
-                          persistentWorld.currentCalendarYear + 1
-                        })
-                      </button>
-                    </div>
-                  ) : (
-                    <div style={{ marginTop: "10px" }}>
-                      <p>
-                        This V0.1 single-season save remains frozen as completed. You can start a
-                        new multi-season copy from this exact outcome without altering the original
-                        slot.
-                      </p>
-                      <button
-                        type="button"
-                        className="primary"
-                        data-testid="copy-to-persistent-world-btn"
-                        disabled={busy || inspectionOnly || service.isReadOnly()}
-                        onClick={() =>
-                          void action(async () => {
-                            await service.copySingleSeasonToPersistentWorld();
-                            setActiveReplay(null);
-                            setStatsScope("ACTIVE");
-                          })
-                        }
-                      >
-                        Copy into multi-season world (Season 2)
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : nextFixture ? (
-                <>
-                  {state.careerState.currentDate < nextFixture.matchDayDate ? (
-                    <button
-                      className="primary"
-                      disabled={busy || inspectionOnly || service.isReadOnly()}
-                      onClick={() =>
-                        action(async () => {
-                          await service.simulateToNextUserFixture();
-                        })
-                      }
-                    >
-                      Advance to match day
-                    </button>
-                  ) : (
-                    <div className="action-row">
-                      <button
-                        className="primary"
-                        disabled={busy || inspectionOnly || service.isReadOnly()}
-                        onClick={() =>
-                          action(async () => {
-                            await service.simulateManagedFixture();
-                            await settleStandard();
-                            setPendingMatch(null);
-                          })
-                        }
-                      >
-                        Simulate match
-                      </button>
-                      <button
-                        disabled={busy || inspectionOnly || service.isReadOnly()}
-                        onClick={() => void playMatch()}
-                      >
-                        Play match
-                      </button>
-                    </div>
-                  )}
-                  {pendingMatch && (
-                    <p role="status" data-testid="pending-career-match">
-                      A match for round {pendingMatch.round ?? nextFixture.roundNumber} is already
-                      in progress. Play match resumes it.
-                    </p>
-                  )}
-                  <p className="big-stat">Round {nextFixture.roundNumber}</p>
-                  <p>
-                    <strong>{service.teamName(nextFixture.homeTeamId)}</strong> v{" "}
-                    <strong>{service.teamName(nextFixture.awayTeamId)}</strong>
-                  </p>
-                  <p>
-                    {nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}
-                  </p>
-                  <PitchInspection
-                    ground={displayWorld.grounds.find(
-                      (ground) => ground.groundId === nextFixture.groundId,
-                    )}
-                    format="T20"
-                  />
-                  {showTacticalBriefings && (() => {
-                    const briefing = service.fixtureBriefing(nextFixture.fixtureId);
-                    return briefing ? (
-                      <PreMatchBriefingPanel
-                        briefing={briefing}
-                        focusTeamId={controlledTeam}
-                      />
-                    ) : null;
-                  })()}
-                </>
-              ) : (
-                <p>No remaining managed fixture.</p>
-              )}
-            </article>
-            <article className="career-panel">
-              <h3>League position</h3>
-              <p className="big-stat">{tableRow ? `#${tableRow.rank}` : "–"}</p>
-              {tableRow && (
-                <p>
-                  {tableRow.wins}W · {tableRow.losses}L · {tableRow.ties}T · {tableRow.noResults}NR
-                  · {tableRow.points} pts · NRR{" "}
-                  {tableRow.nrrX1000 === null ? "–" : (tableRow.nrrX1000 / 1000).toFixed(3)}
-                </p>
-              )}
-            </article>
-            <article className="career-panel">
-              <h3>Condition</h3>
-              {(() => {
-                const squad = service.squadView();
-                const avg = squad
-                  ? Math.round(
-                      squad.players.reduce((sum, player) => sum + player.fatigueBp, 0) /
-                        squad.players.length,
-                    )
-                  : 0;
-                const unavailable =
-                  squad?.players.filter((player) => player.availability === "UNAVAILABLE").length ??
-                  0;
-                return (
-                  <>
-                    <p className="big-stat">{percentageBp(avg)} fatigue</p>
-                    <p>
-                      {unavailable} unavailable ·{" "}
-                      {squad?.players.filter((p) => p.directive !== "REST").length ?? 0} in practice
-                    </p>
-                  </>
-                );
-              })()}
-            </article>
-            <article className="career-panel">
-              <h3>Progress</h3>
-              <p className="big-stat">{state.completedMatches.length}/56</p>
-              <p>{completedManaged.length}/14 managed-team fixtures complete.</p>
-              {persistentWorld && (
-                <p data-testid="persistent-world-progress">
-                  Season {persistentWorld.currentSeasonNumber} ({persistentWorld.currentCalendarYear})
-                  · {persistentWorld.completedSeasons.length} completed{" "}
-                  {persistentWorld.completedSeasons.length === 1 ? "season" : "seasons"}
-                </p>
-              )}
-            </article>
-          </div>
-        </section>
+        <HomeScreen
+          service={service}
+          state={state}
+          persistentWorld={persistentWorld}
+          busy={busy}
+          inspectionOnly={inspectionOnly}
+          action={action}
+          nextFixture={nextFixture}
+          pendingMatch={pendingMatch}
+          playMatch={playMatch}
+          simulateMatch={async () => {
+            await service.simulateManagedFixture();
+            await settleStandard();
+            setPendingMatch(null);
+          }}
+          closeSeason={async () => {
+            const closingId = state.seasonId;
+            await service.closeSeasonAndAdvance(closingId);
+            setActiveReplay(null);
+            setStatsScope("ACTIVE");
+          }}
+          copyToPersistentWorld={async () => {
+            await service.copySingleSeasonToPersistentWorld();
+            setActiveReplay(null);
+            setStatsScope("ACTIVE");
+          }}
+          displayWorld={displayWorld}
+          showTacticalBriefings={showTacticalBriefings}
+          controlledTeam={controlledTeam}
+          tableRow={tableRow}
+          completedManaged={completedManaged}
+        />
       )}
 
       {screen === "CAREER" && (
@@ -1424,90 +1277,17 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       )}
 
       {screen === "FIXTURES" && (
-        <section aria-labelledby="fixtures-heading">
-          <h2 id="fixtures-heading">Fixtures</h2>
-          {replayViewerSection}
-          {nextFixture &&
-            showTacticalBriefings &&
-            (() => {
-              const briefing = service.fixtureBriefing(nextFixture.fixtureId);
-              return briefing ? (
-                <div style={{ marginBottom: "14px" }}>
-                  <PreMatchBriefingPanel
-                    briefing={briefing}
-                    focusTeamId={controlledTeam}
-                  />
-                </div>
-              ) : null;
-            })()}
-          {state.schedule.rounds.map((round) => (
-            <section
-              className="round-block"
-              key={round.roundNumber}
-              aria-labelledby={`round-${round.roundNumber}`}
-            >
-              <h3 id={`round-${round.roundNumber}`}>
-                Round {round.roundNumber} · {round.matchDayDate}
-              </h3>
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Home</th>
-                      <th>Away</th>
-                      <th>Ground</th>
-                      <th>Status</th>
-                      <th>Result</th>
-                      <th>Replay</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {state.schedule.fixtures
-                      .filter((fixture) => fixture.roundNumber === round.roundNumber)
-                      .map((fixture) => {
-                        const completion = completionByFixture.get(fixture.fixtureId);
-                        const managed = [fixture.homeTeamId, fixture.awayTeamId].includes(
-                          controlledTeam!,
-                        );
-                        const replayBtnId = `replay-fixtures-${fixture.fixtureId}`;
-                        return (
-                          <tr
-                            key={fixture.fixtureId}
-                            className={managed ? "managed-fixture" : ""}
-                          >
-                            <td>{service.teamName(fixture.homeTeamId)}</td>
-                            <td>{service.teamName(fixture.awayTeamId)}</td>
-                            <td>{service.groundName(fixture.groundId)}</td>
-                            <td>
-                              {completion ? "Completed" : "Scheduled"}
-                              {managed ? <small>Managed fixture</small> : null}
-                            </td>
-                            <td>{completion ? service.resultText(completion) : "–"}</td>
-                            <td>
-                              {completion ? (
-                                <button
-                                  id={replayBtnId}
-                                  type="button"
-                                  className="replay-btn"
-                                  disabled={busy}
-                                  aria-label={`View replay for ${service.teamName(fixture.homeTeamId)} v ${service.teamName(fixture.awayTeamId)}`}
-                                  onClick={() => void openReplay(fixture.fixtureId, replayBtnId)}
-                                >
-                                  View replay
-                                </button>
-                              ) : (
-                                "–"
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          ))}
-        </section>
+        <FixturesScreen
+          service={service}
+          state={state}
+          busy={busy}
+          nextFixture={nextFixture}
+          showTacticalBriefings={showTacticalBriefings}
+          controlledTeam={controlledTeam}
+          completionByFixture={completionByFixture}
+          openReplay={openReplay}
+          replayViewerSection={replayViewerSection}
+        />
       )}
 
       {screen === "STATISTICS" && (
