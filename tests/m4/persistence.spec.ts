@@ -196,12 +196,14 @@ test("manual copy, export and staged import preserve a rehydratable match", asyn
   await download.saveAs(archivePath);
 
   await page.getByLabel("Import saved game").setInputFiles(archivePath);
+  // The file is read before the import starts, and the imported match has the same revision,
+  // so "not busy" and the revision alone can be observed before the import commits.
+  await expect.poll(() => gameCount(page), { timeout: 30_000 }).toBe(3);
   await settled(page);
   await expect(page.locator("#decision")).toHaveAttribute(
     "data-revision",
     revision!,
   );
-  expect(await gameCount(page)).toBe(3);
   const importedSaveId = await activeSaveId(page);
   expect(importedSaveId).toMatch(/^import-/);
   expect(await commandCount(page, importedSaveId)).toBeGreaterThan(0);

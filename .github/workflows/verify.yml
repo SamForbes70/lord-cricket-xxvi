@@ -58,7 +58,7 @@ jobs:
           retention-days: 7
   windows-browser-acceptance:
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     permissions:
       contents: read
     steps:

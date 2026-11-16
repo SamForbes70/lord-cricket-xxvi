@@ -74,7 +74,8 @@ test("M6G management career creates, persists, navigates, progresses and complet
     await importedPage.goto(page.url());
     await expect(importedPage.getByRole("heading", { name: /Start a Career/i })).toBeVisible();
     await importedPage.getByLabel("Choose .lcxxvi archive").setInputFiles(archivePath!);
-    await expect(importedPage.getByText("Season complete", { exact: true }).first()).toBeVisible();
+    // Import validates all 56 match archives first; over 5 s in Firefox on hosted Windows (as other specs allow).
+    await expect(importedPage.getByText("Season complete", { exact: true }).first()).toBeVisible({ timeout: 30_000 });
     await importedPage.getByRole("button", { name: "Statistics", exact: true }).click();
     await expect(importedPage.getByRole("table").first()).toHaveText(completedTable!);
     await importedPage.reload();

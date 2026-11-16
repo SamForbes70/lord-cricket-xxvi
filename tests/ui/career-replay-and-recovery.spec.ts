@@ -22,7 +22,8 @@ test("V01-018 completed career match event archives replay in UI, survive .lcxxv
   const viewer = page.getByTestId("career-replay-viewer");
   await expect(viewer).toBeVisible();
   const metaText = await page.getByTestId("replay-archive-meta").textContent();
-  expect(metaText).toContain("LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V1");
+  // New careers start in the Stage 3 lifecycle world, whose simulated fixtures write the lifecycle archive version.
+  expect(metaText).toContain("LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE");
   await expect(viewer.locator("tbody tr").first()).toBeVisible();
 
   const innings2Button = viewer.getByRole("button", { name: /Innings 2:/i });
