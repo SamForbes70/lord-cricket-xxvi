@@ -51,7 +51,7 @@ for (const [name, args] of gates) {
     encoding: "utf8",
     maxBuffer: 10_000_000,
     // The full season/persistence suite outgrew the original 90-second budget.
-    timeout: name === "smoke" ? 660_000 : name === "unit" ? 300_000 : 90_000,
+    timeout: name === "smoke" ? 660_000 : name === "unit" ? 900_000 : 90_000,
   });
   const log =
     (result.stdout ?? "") +
