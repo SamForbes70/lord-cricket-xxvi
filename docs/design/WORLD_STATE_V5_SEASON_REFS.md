@@ -28,6 +28,18 @@ Only what is stored and hashed changes. The in-memory shape stays the same, so s
 - **No rollback:** older builds cannot open a V5 save or read a V6 export.
 - Rows: no new projection scope. V5 relies on `COMPLETED_SEASON_RECORD_V1` rows, which every world version already writes.
 
+## Measured (as built)
+
+One finished season of about 335 KB, the same state sealed and stored both ways, averages of 10 runs on a Linux container:
+
+| Per save | V4 | V5 |
+| --- | --- | --- |
+| Seal (parse, hash, invariants) | 110 ms | 93 ms |
+| Checkpoint canonical JSON | 30 ms | 23 ms |
+| Checkpoint size | 2,062 KB | 1,729 KB |
+
+So each finished season costs about 24 ms and 333 KB less per save. [Inference] By season 20 that is roughly 0.45 s and 6 MB per save. The three-season day-advance benchmark (in-memory repository, one run each) is within noise of V4 at that length: season medians 245, 310 and 369 ms against 249, 321 and 362 ms. That harness writes the full state, so it does not see the smaller checkpoint.
+
 ## Verification plan
 
 - A V5 world plays out exactly as V4: same active world, economy and season records across rollovers. Only the state hash differs.
