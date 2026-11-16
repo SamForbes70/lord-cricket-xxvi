@@ -40,6 +40,7 @@ import {
   releaseContractedPlayer,
   resolveNegotiationRound,
   runSquadEconomyDiagnosticHorizon,
+  runSquadEconomyDiagnosticHorizonAsync,
   sealPlayerLifecycleState,
   submitContractOffer,
   verifyEconomyLedgerChain,
@@ -831,18 +832,17 @@ describe("Stage 4 domestic contracts, club budgets, and recruitment (LC_PERSISTE
 
   it(
     "runs a 12-season domestic economy diagnostic horizon with symmetrical caps, zero overspend, and zero role shortages",
-    () => {
+    async () => {
       const diagIdentity = derivePersistentWorldIdentity({
         worldId: "economy-diag-12y",
         baseSeed: "seed-economy-diag-12y",
         originKind: "NEW_PERSISTENT_CAREER",
       });
-      const report = runSquadEconomyDiagnosticHorizon({
-        worldIdentity: diagIdentity,
-        baseWorld: careerWorld,
-        seasons: 12,
-        startCalendarYear: 2026,
-      });
+      // About a minute of simulation: yield between seasons so the test worker stays responsive.
+      const report = await runSquadEconomyDiagnosticHorizonAsync(
+        { worldIdentity: diagIdentity, baseWorld: careerWorld, seasons: 12, startCalendarYear: 2026 },
+        () => new Promise((resolve) => setTimeout(resolve, 0)),
+      );
 
       expect(report.snapshots).toHaveLength(12);
       expect(() => verifyEconomyLedgerChain(report.finalEconomy.ledger)).not.toThrow();
@@ -865,7 +865,7 @@ describe("Stage 4 domestic contracts, club budgets, and recruitment (LC_PERSISTE
 
   it(
     "reproduces identical economySha256 and diagnostic snapshots across repeated 3-season horizons",
-    () => {
+    async () => {
       const detIdentity = derivePersistentWorldIdentity({
         worldId: "economy-det-check",
         baseSeed: "seed-economy-det-check",
@@ -877,12 +877,11 @@ describe("Stage 4 domestic contracts, club budgets, and recruitment (LC_PERSISTE
         seasons: 3,
         startCalendarYear: 2026,
       });
-      const runB = runSquadEconomyDiagnosticHorizon({
-        worldIdentity: detIdentity,
-        baseWorld: careerWorld,
-        seasons: 3,
-        startCalendarYear: 2026,
-      });
+      // The yielding runner must give exactly the same result as the synchronous one.
+      const runB = await runSquadEconomyDiagnosticHorizonAsync(
+        { worldIdentity: detIdentity, baseWorld: careerWorld, seasons: 3, startCalendarYear: 2026 },
+        () => new Promise((resolve) => setTimeout(resolve, 0)),
+      );
       expect(runB.finalEconomy.economySha256).toBe(runA.finalEconomy.economySha256);
       expect(runB.snapshots).toEqual(runA.snapshots);
     },

@@ -3071,7 +3071,7 @@ export function snapshotSquadEconomyDiagnostics(
   });
 }
 
-export function runSquadEconomyDiagnosticHorizon(input: {
+type SquadEconomyHorizonInput = {
   worldIdentity: PersistentWorldIdentity;
   baseWorld: WorldPack;
   worldCopy?: NewGameWorldCopy | null;
@@ -3080,12 +3080,16 @@ export function runSquadEconomyDiagnosticHorizon(input: {
   startDate?: string;
   controlledTeamId?: string | null;
   simulateFullMatches?: boolean;
-}): {
+};
+type SquadEconomyHorizonResult = {
   snapshots: EconomyDiagnosticSeasonSnapshot[];
   finalLifecycle: PlayerLifecycleState;
   finalEconomy: SquadEconomyState;
   totalLedgerEntries: number;
-} {
+};
+
+/** One season per step, so callers can yield between seasons (a 12-season horizon runs for about a minute). */
+function* squadEconomyHorizonSteps(input: SquadEconomyHorizonInput): Generator<number, SquadEconomyHorizonResult> {
   assertEconomy(input.seasons >= 1 && input.seasons <= 200, "INVALID_DIAGNOSTIC_HORIZON");
   const startCalendarYear = input.startCalendarYear ?? 2026;
   const startDate = input.startDate ?? "2026-04-04";
@@ -3111,6 +3115,7 @@ export function runSquadEconomyDiagnosticHorizon(input: {
   let priorStats: RecentPlayerSeasonStatsSummary[] = [];
 
   for (let s = 1; s <= input.seasons; s += 1) {
+    if (s > 1) yield s;
     const calendarYear = startCalendarYear + (s - 1);
     const seasonDate = `${String(calendarYear).padStart(4, "0")}-${monthDay}`;
 
@@ -3271,4 +3276,24 @@ export function runSquadEconomyDiagnosticHorizon(input: {
     finalEconomy: economy,
     totalLedgerEntries: economy.ledger.length,
   };
+}
+
+export function runSquadEconomyDiagnosticHorizon(input: SquadEconomyHorizonInput): SquadEconomyHorizonResult {
+  const steps = squadEconomyHorizonSteps(input);
+  for (let step = steps.next(); ; step = steps.next()) if (step.done) return step.value;
+}
+
+/**
+ * Same result as runSquadEconomyDiagnosticHorizon, but awaits `yieldControl` between seasons so a long
+ * horizon never blocks its thread for the whole run. The caller supplies the yield (no ambient APIs here).
+ */
+export async function runSquadEconomyDiagnosticHorizonAsync(
+  input: SquadEconomyHorizonInput,
+  yieldControl: () => Promise<void>,
+): Promise<SquadEconomyHorizonResult> {
+  const steps = squadEconomyHorizonSteps(input);
+  for (let step = steps.next(); ; step = steps.next()) {
+    if (step.done) return step.value;
+    await yieldControl();
+  }
 }

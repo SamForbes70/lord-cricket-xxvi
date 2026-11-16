@@ -97,7 +97,9 @@ test("Stage 4 squad economy manages contracts, free-agent offers across reloads,
   // Export V3 .lcxxvi portable archive and verify clean import in an isolated browser context.
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   const [download] = await Promise.all([
-    page.waitForEvent("download"),
+    // Exporting a contracts-era world packs 56 match archives (2.7 s in Chromium on Linux); the general
+    // 10 s action limit was too tight for Firefox on a shared Windows runner.
+    page.waitForEvent("download", { timeout: 60_000 }),
     page.getByRole("button", { name: "Export .lcxxvi" }).click(),
   ]);
   const archivePath = await download.path();
