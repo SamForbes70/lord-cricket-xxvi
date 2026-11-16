@@ -187,3 +187,11 @@ Key verification scripts in `package.json`:
 - **[Current Status](docs/CURRENT_STATUS.md)**, **[Handover](docs/HANDOVER.md)**, & **[Next Pass](docs/NEXT_PASS.md)**
 - **[Engineering Guide](docs/ENGINEERING_GUIDE.md)**, **[Verification Guide](docs/VERIFICATION_GUIDE.md)**, & **[Documentation Index](docs/README.md)**
 - **Offline Empirical Research (`M7B`–`M7K`, not selectable in gameplay)**: See [`docs/M7G_RESEARCH_AND_PROMOTION_GATES.md`](docs/M7G_RESEARCH_AND_PROMOTION_GATES.md), [`docs/M7J_RUNBOOK.md`](docs/M7J_RUNBOOK.md), and [`docs/M7K_PLAN.md`](docs/M7K_PLAN.md) (Cricsheet ODC-By 1.0 reference data stays external to the repo).
+
+
+### Double-Click Launch on Windows 10/11
+
+- **From the portable game ZIP (`npm run package:game`)**: Extract `release-packages/lord-cricket-xxvi-game-<commit>.zip` and double-click `Play-Lord-Cricket.bat` (or `start-game.bat`). Works out-of-the-box on Windows 10/11 even without Node.js or Python installed by compiling `LordCricketXXVI.exe` via Windows' built-in `.NET Framework 4.x` `csc.exe` compiler and opening `http://127.0.0.1:4180/` in a standalone Edge/Chrome `--app=` window.
+- **From a Git checkout**: Double-click `Play-Lord-Cricket.bat` in the repository root (auto-runs `npm ci` if `node_modules` is missing, auto-runs `npm run build` if `apps/web/dist` is missing or stale, starts `127.0.0.1:4180`, and opens the standalone app window). Use `tools\windows\Stop-Lord-Cricket.bat` to stop the background server or `npm run package:windows-exe` to build `LordCricketXXVI.exe` directly.
+
+### Build & Play Locally
