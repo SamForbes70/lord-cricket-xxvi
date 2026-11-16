@@ -1387,6 +1387,7 @@ export class CareerApplicationService {
   private cachedArchivesKey: string | null = null;
   private cachedDigestsKey: string | null = null;
   private cachedDigests: ReadonlyMap<string, CareerMatchDigest> = new Map();
+  private digestsInFlight: Promise<ReadonlyMap<string, CareerMatchDigest>> | null = null;
   private cachedArchives: readonly AnyCareerMatchEventArchive[] = [];
   private awardsLedger: CareerAwardsLedger | null = null;
   private awardsLedgerKey: string | null = null;
@@ -4411,6 +4412,22 @@ export class CareerApplicationService {
    * fall back to deriving from all archives.
    */
   async loadCareerMatchDigests(): Promise<ReadonlyMap<string, CareerMatchDigest>> {
+    // One backfill at a time: concurrent callers (career screen, awards sync, post-save refresh) each
+    // re-derived every missing digest at once, which made a two-season export take about 9 s longer.
+    const previous = this.digestsInFlight;
+    const run = (async () => {
+      if (previous) await previous.catch(() => undefined);
+      return this.loadCareerMatchDigestsOnce();
+    })();
+    this.digestsInFlight = run;
+    try {
+      return await run;
+    } finally {
+      if (this.digestsInFlight === run) this.digestsInFlight = null;
+    }
+  }
+
+  private async loadCareerMatchDigestsOnce(): Promise<ReadonlyMap<string, CareerMatchDigest>> {
     const cacheKey = this.currentArchiveCacheKey();
     if (!cacheKey || !this.saveId || !this.state) {
       this.cachedDigestsKey = null;
@@ -4426,9 +4443,21 @@ export class CareerApplicationService {
       if (repo?.loadMatchDigests && repo.loadMatchEventArchive) {
         digests = await repo.loadMatchDigests(saveId);
         const derived: CareerMatchDigest[] = [];
-        for (const completion of completions) {
-          if (digests.has(completion.fixtureId)) continue;
-          const { archive } = await repo.loadMatchEventArchive(saveId, completion.fixtureId, this.persistentState ?? undefined);
+        const missing = completions.filter((completion) => !digests.has(completion.fixtureId));
+        // Many missing (first open of an older save): one transaction for all archives. A few (new
+        // matches since the last open): read just those fixtures.
+        const bulk =
+          missing.length > 8 && repo.loadMatchEventArchives
+            ? new Map(
+                (await repo.loadMatchEventArchives(saveId, this.persistentState ?? undefined)).archives.map(
+                  (archive) => [archive.fixtureId, archive] as const,
+                ),
+              )
+            : null;
+        for (const completion of missing) {
+          const archive = bulk
+            ? bulk.get(completion.fixtureId) ?? null
+            : (await repo.loadMatchEventArchive(saveId, completion.fixtureId, this.persistentState ?? undefined)).archive;
           if (!archive) continue;
           const digest = deriveCareerMatchDigest(archive, completion);
           digests.set(completion.fixtureId, digest);
