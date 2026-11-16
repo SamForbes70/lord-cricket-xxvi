@@ -38,7 +38,7 @@ try {
     try {
         Invoke-WebRequest -UseBasicParsing -Uri "$base/LordCricketXXVI.exe" -TimeoutSec 5 | Out-Null
         throw 'FAIL: executable was served over HTTP'
-    } catch [System.Net.WebException] {
+    } catch {
         if ([int]$_.Exception.Response.StatusCode -ne 403) { throw }
     }
     Write-Host 'PASS executable denied'
@@ -46,7 +46,7 @@ try {
     try {
         Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$base/__lcxxvi-shutdown" -TimeoutSec 5 | Out-Null
         throw 'FAIL: shutdown accepted without control header'
-    } catch [System.Net.WebException] {
+    } catch {
         if ([int]$_.Exception.Response.StatusCode -ne 403) { throw }
     }
     Write-Host 'PASS unauthorised shutdown denied'
