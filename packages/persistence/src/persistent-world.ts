@@ -64,6 +64,7 @@ import {
   validateT20SeasonState,
   type AnyCareerMatchEventArchive,
   type SeasonCheckpoint,
+  projectionRowsForScope,
 } from "./season.js";
 
 export const PERSISTENT_WORLD_RECORD_TYPE = "PERSISTENT_WORLD" as const;
@@ -1376,7 +1377,22 @@ export class IndexedDbPersistentWorldRepository {
     }
 
     if (input.copySource || preparedArchives.length > 0 || preparedRosterPacks.size > 0) {
-      const allProjections = (await req(projections.getAll())) as ProjectionRecord[];
+      // Only the rows the loops below use; reading the whole store grew with every career on the device.
+      const allProjections: ProjectionRecord[] = [
+        ...(input.copySource
+          ? await projectionRowsForScope(projections, input.copySource.saveId, PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE)
+          : []),
+        ...(input.copySource
+          ? await projectionRowsForScope(projections, input.copySource.saveId, CAREER_MATCH_EVENTS_SCOPE)
+          : []),
+        ...(input.copySource || preparedArchives.length > 0
+          ? await projectionRowsForScope(projections, input.saveId, CAREER_MATCH_EVENTS_SCOPE)
+          : []),
+        // The copy loop below also copies the source's awards ledger.
+        ...(input.copySource
+          ? await projectionRowsForScope(projections, input.copySource.saveId, CAREER_AWARDS_LEDGER_SCOPE)
+          : []),
+      ];
       if (input.copySource) {
         for (const row of allProjections) {
           if (
@@ -1660,7 +1676,7 @@ export class IndexedDbPersistentWorldRepository {
   ): Promise<Map<string, StagedRosterPack>> {
     const db = await this.open();
     const tx = db.transaction("projections", "readonly");
-    const allRows = (await req(tx.objectStore("projections").getAll())) as ProjectionRecord[];
+    const allRows = await projectionRowsForScope(tx.objectStore("projections"), saveId, PERSISTENT_LIFECYCLE_ROSTER_PACK_SCOPE);
     await txDone(tx);
     const result = new Map<string, StagedRosterPack>();
     for (const row of allRows) {
@@ -1717,7 +1733,7 @@ export class IndexedDbPersistentWorldRepository {
   }> {
     const db = await this.open();
     const tx = db.transaction("projections", "readonly");
-    const allRows = (await req(tx.objectStore("projections").getAll())) as ProjectionRecord[];
+    const allRows = await projectionRowsForScope(tx.objectStore("projections"), saveId, CAREER_MATCH_EVENTS_SCOPE);
     await txDone(tx);
     const rows = allRows.filter(
       (row) => row.saveId === saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE,

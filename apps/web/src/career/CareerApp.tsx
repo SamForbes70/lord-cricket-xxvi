@@ -560,7 +560,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     return "ALL" as const;
   }, [statsScope, persistentWorldRef]);
   const historicalProjection = useMemo(() => {
-    if (!state) return null;
+    // Rebuilt from every completed match; only the Statistics screen shows it, so compute it only there.
+    if (!state || screen !== "STATISTICS") return null;
     return service.historicalStatistics({
       seasonScope: historicalSeasonScope,
       opponentTeamId: historicalOpponent,
@@ -570,6 +571,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     });
   }, [
     state,
+    screen,
     persistentWorldRef,
     careerArchivesVersion,
     historicalSeasonScope,

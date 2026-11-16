@@ -110,6 +110,11 @@ function req<T>(request: IDBRequest<T>): Promise<T> {
     request.onerror = () => reject(request.error ?? new Error("IndexedDB request failed"));
   });
 }
+/** One save's projection rows for one scope, by key range on [saveId, scope, key] (an empty array sorts after every key). */
+export function projectionRowsForScope(store: IDBObjectStore, saveId: string, scope: string): Promise<ProjectionRecord[]> {
+  return req(store.getAll(IDBKeyRange.bound([saveId, scope], [saveId, scope, []]))) as Promise<ProjectionRecord[]>;
+}
+
 function txDone(tx: IDBTransaction): Promise<void> {
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();
@@ -806,7 +811,10 @@ export class IndexedDbSeasonRepository {
     if (command) commands.put({ saveId: input.saveId, ...command } satisfies CommandRecord);
     projections.put({ saveId: input.saveId, scope: "T20_SEASON", key: state.seasonId, payload: projectionPayload, sha256: projectionHash } satisfies ProjectionRecord);
     if (input.copySource || preparedArchives.length > 0) {
-      const allProjections = await req(projections.getAll()) as ProjectionRecord[];
+      const allProjections: ProjectionRecord[] = [
+        ...(input.copySource ? await projectionRowsForScope(projections, input.copySource.saveId, CAREER_MATCH_EVENTS_SCOPE) : []),
+        ...await projectionRowsForScope(projections, input.saveId, CAREER_MATCH_EVENTS_SCOPE),
+      ];
       const mergedByFixture = new Map<string, ProjectionRecord>();
       if (input.copySource) {
         for (const row of allProjections) {
@@ -839,7 +847,7 @@ export class IndexedDbSeasonRepository {
       for (const row of mergedByFixture.values()) projections.put(row);
     }
     if (input.copySource) {
-      const allProjections = await req(projections.getAll()) as ProjectionRecord[];
+      const allProjections = await projectionRowsForScope(projections, input.copySource.saveId, CAREER_AWARDS_LEDGER_SCOPE);
       for (const row of allProjections) {
         if (row.saveId === input.copySource.saveId && row.scope === CAREER_AWARDS_LEDGER_SCOPE) {
           projections.put({ ...row, saveId: input.saveId });
@@ -1001,7 +1009,7 @@ export class IndexedDbSeasonRepository {
   ): Promise<{ archives: CompletedCareerMatchEventArchive[]; damagedFixtureIds: string[]; totalBytes: number }> {
     const db = await this.open();
     const tx = db.transaction("projections", "readonly");
-    const allRows = await req(tx.objectStore("projections").getAll()) as ProjectionRecord[];
+    const allRows = await projectionRowsForScope(tx.objectStore("projections"), saveId, CAREER_MATCH_EVENTS_SCOPE);
     await txDone(tx);
     const rows = allRows.filter((row) => row.saveId === saveId && row.scope === CAREER_MATCH_EVENTS_SCOPE);
     const completionByFixture = new Map(state?.completedMatches.map((c) => [c.fixtureId, c]) ?? []);
