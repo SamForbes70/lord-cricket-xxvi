@@ -563,10 +563,9 @@ export async function createSeasonPortableArchive(
       data: encoder.encode(validatedEventArchives.map((a) => canonicalJson(a)).join("\n") + "\n"),
     });
   }
-  if (awardsLedgerRaw !== null) {
-    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
-    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
-  }
+  // awards-ledger.json is no longer written: it is derived from the match events and is
+  // rebuilt on import. Writing it widened this archive version in place (audit 16 Nov 2026).
+  void awardsLedgerRaw;
   const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
   for (const payload of payloads) fileMeta[payload.name] = { bytes: payload.data.length, sha256: await sha256Bytes(payload.data) };
   const manifestValues = {
@@ -814,11 +813,10 @@ export async function createPersistentWorldPortableArchive(
     });
   }
 
-  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};if (awardsLedgerRaw !== null) {
-    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
-    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
-  }
-  
+  // awards-ledger.json is no longer written: it is derived from the match events and is
+  // rebuilt on import. Writing it widened this archive version in place (audit 16 Nov 2026).
+  void awardsLedgerRaw;
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
   for (const payload of payloads) {
     fileMeta[payload.name] = {
       bytes: payload.data.length,
@@ -1123,11 +1121,10 @@ export async function createPersistentWorldPortableArchiveV2(
     });
   }
 
-  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};if (awardsLedgerRaw !== null) {
-    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
-    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
-  }
-  
+  // awards-ledger.json is no longer written: it is derived from the match events and is
+  // rebuilt on import. Writing it widened this archive version in place (audit 16 Nov 2026).
+  void awardsLedgerRaw;
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
   for (const payload of payloads) {
     fileMeta[payload.name] = {
       bytes: payload.data.length,
@@ -1472,11 +1469,10 @@ export async function createPersistentWorldPortableArchiveV3(
     });
   }
 
-  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};if (awardsLedgerRaw !== null) {
-    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
-    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
-  }
-  
+  // awards-ledger.json is no longer written: it is derived from the match events and is
+  // rebuilt on import. Writing it widened this archive version in place (audit 16 Nov 2026).
+  void awardsLedgerRaw;
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
   for (const payload of payloads) {
     fileMeta[payload.name] = {
       bytes: payload.data.length,
