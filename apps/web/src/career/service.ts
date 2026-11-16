@@ -10,6 +10,7 @@ import {
   PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION,
   PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
   PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
   PERSISTENT_WORLD_STATE_V3_VERSION,
   PERSISTENT_WORLD_STATE_VERSION,
@@ -62,6 +63,8 @@ import {
   type CareerMatchDigest,
   PERSISTENT_WORLD_STATE_V4_VERSION,
   type PersistentWorldStateV4,
+  PERSISTENT_WORLD_STATE_V5_VERSION,
+  type PersistentWorldStateV5,
 } from "@lcxxvi/contracts";
 import {
   DEFAULT_CAREER_AVAILABILITY_PACK,
@@ -131,6 +134,7 @@ import {
   createPersistentWorldPortableArchiveV2,
   createPersistentWorldPortableArchiveV4,
   createPersistentWorldPortableArchiveV5,
+  createPersistentWorldPortableArchiveV6,
   createSeasonPortableArchive,
   createT20SeasonArchive,
   describeSeasonPersistenceError,
@@ -143,6 +147,7 @@ import {
   readPersistentWorldPortableArchiveV3,
   readPersistentWorldPortableArchiveV4,
   readPersistentWorldPortableArchiveV5,
+  readPersistentWorldPortableArchiveV6,
   readSeasonPortableArchive,
   sealPersistentCareerProjection,
   sealPersistentWorldStateV2,
@@ -378,10 +383,11 @@ type AnyCareerMutationResult =
 /** Contracts-era worlds: V3, and V4 (the same rules with bounded embedded roster packs). */
 function isEconomyWorld(
   world: AnyPersistentWorldState | null | undefined,
-): world is PersistentWorldStateV3 | PersistentWorldStateV4 {
+): world is PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 {
   return (
     world?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION ||
-    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION
+    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION ||
+    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION
   );
 }
 
@@ -741,8 +747,8 @@ export class CareerApplicationService {
             ? await createInitialPersistentWorldCareerStateV2(createWorldArgs)
             : await createInitialPersistentWorldCareerStateV3({
                 ...createWorldArgs,
-                // New careers use world state V4 (docs/design/WORLD_STATE_HISTORY_V4.md); V3 stays selectable.
-                worldStateVersion: options?.worldStateVersion ?? PERSISTENT_WORLD_STATE_V4_VERSION,
+                // New careers use world state V5 (docs/design/WORLD_STATE_V5_SEASON_REFS.md); V3 and V4 stay selectable.
+                worldStateVersion: options?.worldStateVersion ?? PERSISTENT_WORLD_STATE_V5_VERSION,
               });
       const saveId = options?.saveId ?? `pworld:${worldId}`;
       if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
@@ -1415,7 +1421,7 @@ export class CareerApplicationService {
       const { nextState }:
         | { nextState: PersistentWorldState }
         | { nextState: PersistentWorldStateV2 }
-        | { nextState: PersistentWorldStateV3 | PersistentWorldStateV4 } =
+        | { nextState: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 } =
         isEconomyWorld(beforeWorld)
           ? await rolloverPersistentWorldCareerSeasonV3(beforeWorld, expectedRevision + 1)
           : beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
@@ -1557,7 +1563,7 @@ export class CareerApplicationService {
 
   async copySingleSeasonToPersistentWorld(
     customTitle?: string,
-  ): Promise<PersistentWorldStateV3 | PersistentWorldStateV4> {
+  ): Promise<PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5> {
     const { state: sourceState, saveId: sourceSaveId } = this.requireWritable();
     if (this.persistentState) {
       throw new Error("This career is already a persistent multi-season world.");
@@ -1584,7 +1590,7 @@ export class CareerApplicationService {
       newCareerId,
       baseSeed: `seed-${key}`,
       worldCopy: this.worldCopy,
-      worldStateVersion: PERSISTENT_WORLD_STATE_V4_VERSION,
+      worldStateVersion: PERSISTENT_WORLD_STATE_V5_VERSION,
     });
     const now = Date.now();
     if (!(await this.repository.acquireLease(sourceSaveId, this.ownerId, now))) {
@@ -1884,7 +1890,7 @@ export class CareerApplicationService {
     commandId: string,
     commandName: string,
     payload: unknown,
-    mutate: (worldState: PersistentWorldStateV3 | PersistentWorldStateV4) => Promise<{
+    mutate: (worldState: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5) => Promise<{
       economy: SquadEconomyState;
       lifecycle: PlayerLifecycleState;
       rosterChanged: boolean;
@@ -2797,6 +2803,17 @@ export class CareerApplicationService {
         : [];
       // The awards ledger is derived and no longer exported (rebuilt on import), so it is not synced here.
       const awardsLedger = null;
+      if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION) {
+        // World state V5 exports as V6: the full state, finished seasons included, plus every stored pack.
+        return createPersistentWorldPortableArchiveV6(
+          loaded.state,
+          loaded.summary,
+          nowIso(),
+          loaded.worldCopy ?? null,
+          eventArchives.length > 0 ? eventArchives : null,
+          rosterPacks.length > 0 ? rosterPacks : null,
+        );
+      }
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION) {
         // World state V4 embeds two seasons' roster packs; the V5 export carries every stored pack.
         return createPersistentWorldPortableArchiveV5(
@@ -2878,13 +2895,16 @@ export class CareerApplicationService {
       version === PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION ||
       version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION ||
       version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION ||
-      version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION
+      version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION ||
+      version === PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION
     ) {
       if (!this.persistentRepository) {
         throw new Error("Persistent world storage is unavailable.");
       }
       const imported =
-        version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION
+        version === PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION
+          ? await readPersistentWorldPortableArchiveV6(bytes)
+          : version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION
           ? await readPersistentWorldPortableArchiveV5(bytes)
           : version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION
           ? await readPersistentWorldPortableArchiveV4(bytes)
@@ -3723,7 +3743,8 @@ export class CareerApplicationService {
         knownPlayers: [
           ...careerWorld.players,
           ...(this.getEconomyState()?.freeAgents.map((fa) => fa.player) ?? []),
-          ...(this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION
+          ...(this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION ||
+          this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION
             ? [...(await this.loadStoredRosterPacks()).values()].flatMap((pack) => pack.world.players)
             : []),
         ],

@@ -29,6 +29,14 @@ export const PERSISTENT_WORLD_STATE_V4_VERSION = "LC_PERSISTENT_WORLD_STATE_V4" 
 export const PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION = "LC_PERSISTENT_WORLD_SAVE_V4" as const;
 export const PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION =
   "LC_PERSISTENT_WORLD_SAVE_V4_PRESENTATION" as const;
+/**
+ * World state V5: V4 in memory, but finished seasons are hashed and stored by reference
+ * (docs/design/WORLD_STATE_V5_SEASON_REFS.md).
+ */
+export const PERSISTENT_WORLD_STATE_V5_VERSION = "LC_PERSISTENT_WORLD_STATE_V5" as const;
+export const PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION = "LC_PERSISTENT_WORLD_SAVE_V5" as const;
+export const PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION =
+  "LC_PERSISTENT_WORLD_SAVE_V5_PRESENTATION" as const;
 
 export const DEFAULT_ANNUAL_CLUB_WAGE_BUDGET_K = 2_500 as const;
 export const MIN_PLAYER_ANNUAL_WAGE_K = 35 as const;
@@ -253,6 +261,28 @@ export const PersistentWorldStateV4Schema = z.strictObject({
   stateSha256: HashSchema,
 });
 
+/** In memory a V5 state is V4's shape; `stateSha256` covers finished seasons by their `recordSha256` only. */
+export const PersistentWorldStateV5CoreSchema = PersistentWorldStateV4CoreSchema.extend({
+  worldStateVersion: z.literal(PERSISTENT_WORLD_STATE_V5_VERSION),
+});
+
+export const PersistentWorldStateV5Schema = z.strictObject({
+  ...PersistentWorldStateV5CoreSchema.shape,
+  stateSha256: HashSchema,
+});
+
+/** A finished season as a V5 checkpoint stores it; the record itself is in its COMPLETED_SEASON_RECORD_V1 row. */
+export const CompletedSeasonReferenceSchema = z.strictObject({
+  seasonId: IDSchema,
+  recordSha256: HashSchema,
+});
+
+/** A V5 checkpoint payload: the state with finished seasons as references. */
+export const PersistentWorldStateV5StoredSchema = z.strictObject({
+  ...PersistentWorldStateV5Schema.shape,
+  completedSeasons: z.array(CompletedSeasonReferenceSchema).max(MAX_PERSISTENT_SEASONS - 1),
+});
+
 export const PersistentWorldPortableV3ManifestSchema = z.strictObject({
   archiveVersion: z.literal(PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION),
   saveSchema: z.enum([
@@ -350,6 +380,10 @@ export type PersistentWorldStateV3Core = z.infer<typeof PersistentWorldStateV3Co
 export type PersistentWorldStateV3 = z.infer<typeof PersistentWorldStateV3Schema>;
 export type PersistentWorldStateV4Core = z.infer<typeof PersistentWorldStateV4CoreSchema>;
 export type PersistentWorldStateV4 = z.infer<typeof PersistentWorldStateV4Schema>;
+export type PersistentWorldStateV5Core = z.infer<typeof PersistentWorldStateV5CoreSchema>;
+export type PersistentWorldStateV5 = z.infer<typeof PersistentWorldStateV5Schema>;
+export type CompletedSeasonReference = z.infer<typeof CompletedSeasonReferenceSchema>;
+export type PersistentWorldStateV5Stored = z.infer<typeof PersistentWorldStateV5StoredSchema>;
 export type PersistentWorldPortableV3Manifest = z.infer<
   typeof PersistentWorldPortableV3ManifestSchema
 >;
