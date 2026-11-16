@@ -1090,6 +1090,9 @@ code {
   color: #143d2d;
   font-size: 0.82em;
   font-weight: 600;
+  /* The tag carries a long unbroken version identifier: let it wrap on narrow screens. */
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .match-award-explain,
 .match-award-breakdown,

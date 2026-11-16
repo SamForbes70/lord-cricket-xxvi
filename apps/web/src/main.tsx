@@ -691,13 +691,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               : "Local autosave ready"}
         </span>
       </div>
-      <AudioControlsPanel
-        preferences={audioPrefs}
-        snapshot={audioSnapshot}
-        onChangePreferences={setAudioPrefs}
-        onUnlockAudio={() => audioManagerRef.current?.unlockFromUserGesture()}
-        onUiInteract={(caption) => void audioManagerRef.current?.playUiFeedback(caption)}
-      />
       {careerLaunch.current && (
         <div className="career-match-banner">
           <strong>Scheduled career match</strong>
@@ -1395,6 +1388,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           </div>
         </>
       )}
+      <AudioControlsPanel
+        preferences={audioPrefs}
+        snapshot={audioSnapshot}
+        onChangePreferences={setAudioPrefs}
+        onUnlockAudio={() => audioManagerRef.current?.unlockFromUserGesture()}
+        onUiInteract={(caption) => void audioManagerRef.current?.playUiFeedback(caption)}
+      />
       <section className="panel" aria-label="Match diagnostic export">
         <h2>Match diagnostic</h2>
         <p>The file contains match events, identifiers and the most recent rejected command if available. The random seed is included once the match is complete, or if you choose to include it. With the seed, anyone can replay the rest of an unfinished match. Review the file before sharing.</p>
