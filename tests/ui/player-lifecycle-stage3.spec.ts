@@ -96,7 +96,7 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   const retiredLink = retiredPanel.locator("button.player-link").first();
   const retiredName = (await retiredLink.innerText()).trim();
   await retiredLink.click();
-  await expect(page.getByText("Retired alumni record")).toBeVisible();
+  await expect(page.getByTestId("retired-player-banner").getByText("Retired alumni record")).toBeVisible();
   await expect(page.getByText(/Retired at age \d+ after Season 1/)).toBeVisible();
   await expect(page.getByTestId("player-skill-ledger")).toBeVisible();
 
