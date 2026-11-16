@@ -29,7 +29,7 @@
 .import-panel { margin-top:24px; max-width:700px; }
 .import-panel input, .settings-actions input { display:block; margin-top:8px; }
 .import-panel input[type="file"], .settings-actions input[type="file"] { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
-.table-wrap { overflow-x:auto; width:100%; margin:10px 0 24px; }
+.table-wrap { overflow-x:auto; width:100%; margin:10px 0 24px; position:relative; }
 .career-shell table { border-collapse:collapse; width:100%; min-width:760px; background:#fffdf8; }
 .career-shell th, .career-shell td { text-align:left; border-bottom:1px solid #dedfd7; padding:9px 10px; vertical-align:top; }
 .career-shell th { background:#eef0e8; white-space:nowrap; }
@@ -92,3 +92,7 @@
 .season-award-winner { margin:4px 0; }
 .season-award-stat { margin:4px 0; font-weight:600; color:#194b38; }
 .season-award-unavailable { margin:4px 0; font-style:italic; color:#5a2618; }
+/* No text field or select may exceed its container on a narrow screen at large text scales. */
+.career-shell input:not([type="checkbox"]):not([type="radio"]), .career-shell select { max-width:100%; min-width:0; box-sizing:border-box; }
+/* Version identifiers are long unbroken tokens; let them wrap rather than widen the page. */
+.career-shell code, .career-disclosure { overflow-wrap:anywhere; }

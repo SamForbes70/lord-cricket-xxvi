@@ -1211,27 +1211,6 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           </div>
         </section>
       )}
-      <section className="career-panel" aria-label="Manual career copy">
-        <label>
-          Copy name{" "}
-          <input
-            value={copyName}
-            maxLength={120}
-            onChange={(event) => setCopyName(event.currentTarget.value)}
-          />
-        </label>
-        <button
-          disabled={busy || service.isReadOnly() || !copyName.trim()}
-          onClick={() =>
-            void action(async () => {
-              await service.createManualCopy(copyName);
-              setCopyName("");
-            })
-          }
-        >
-          Save career copy
-        </button>
-      </section>
       {activeError && <ErrorBanner rawError={activeError} />}
       {service.isReadOnly() && (
         <p className="career-warning">
@@ -3862,6 +3841,28 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           {checkpointInspectorSection}
         </section>
       )}
+      {/* Below the screen content, so the next required action stays in the first view at 150% text. */}
+      <section className="career-panel" aria-label="Manual career copy">
+        <label>
+          Copy name{" "}
+          <input
+            value={copyName}
+            maxLength={120}
+            onChange={(event) => setCopyName(event.currentTarget.value)}
+          />
+        </label>
+        <button
+          disabled={busy || service.isReadOnly() || !copyName.trim()}
+          onClick={() =>
+            void action(async () => {
+              await service.createManualCopy(copyName);
+              setCopyName("");
+            })
+          }
+        >
+          Save career copy
+        </button>
+      </section>
     </main>
   );
 }
