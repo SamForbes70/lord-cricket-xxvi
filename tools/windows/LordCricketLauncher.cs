@@ -27,7 +27,7 @@ internal static class LordCricketLauncher
 
         if (ProbeExisting())
         {
-            OpenBrowser(Address);
+            if (Environment.GetEnvironmentVariable("LCXXVI_NO_BROWSER") != "1") OpenBrowser(Address);
             return;
         }
 
@@ -47,7 +47,11 @@ internal static class LordCricketLauncher
         catch (HttpListenerException ex)
         {
             listener.Close();
-            if (ProbeExisting()) { OpenBrowser(Address); return; }
+            if (ProbeExisting())
+            {
+                if (Environment.GetEnvironmentVariable("LCXXVI_NO_BROWSER") != "1") OpenBrowser(Address);
+                return;
+            }
             MessageBox.Show("Unable to start the local game server on port 4180.\r\n" +
                 "Another application may be using the port, or Windows may deny the URL reservation.\r\n\r\n" + ex.Message,
                 "Lord Cricket XXVI", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -98,11 +102,13 @@ internal static class LordCricketLauncher
 
     private static void ServeLoop()
     {
-        while (listener != null && listener.IsListening)
+        while (true)
         {
+            HttpListener current = listener;
+            if (current == null || !current.IsListening) break;
             try
             {
-                HttpListenerContext context = listener.GetContext();
+                HttpListenerContext context = current.GetContext();
                 ThreadPool.QueueUserWorkItem(delegate(object state) { Handle((HttpListenerContext)state); }, context);
             }
             catch (HttpListenerException) { break; }
