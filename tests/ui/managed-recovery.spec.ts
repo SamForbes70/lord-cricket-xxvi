@@ -110,6 +110,8 @@ async function awaitWritable(page: Page) {
   await expect(page.getByTestId("save-status")).not.toContainText("Read only", { timeout: 45_000 });
 }
 
+// A returned result is applied first and its binding marked APPLIED just after, so the page can show the
+// completed fixture before the binding settles. Settled states are polled; PENDING checks read once.
 async function bindingStates(page: Page) {
   return page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => { const request = indexedDB.open("lord-cricket-xxvi"); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });
@@ -141,7 +143,7 @@ test("a standard managed match is recovered in a fresh tab and its result applie
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
   await fresh.reload();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
-  expect(await bindingStates(fresh)).toEqual(["APPLIED"]);
+  await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
 });
 
 test("a match completed in a lost tab is applied when the career opens, with no match page", async ({ page, context }) => {
@@ -152,7 +154,7 @@ test("a match completed in a lost tab is applied when the career opens, with no 
   const fresh = await context.newPage();
   await fresh.goto("/#career");
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
-  expect(await bindingStates(fresh)).toEqual(["APPLIED"]);
+  await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
   await fresh.reload();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(fresh.getByRole("alert")).toHaveCount(0);
@@ -172,7 +174,7 @@ test("abandoning a career match keeps it as an exhibition, and playing the fixtu
   fresh.once("dialog", (dialog) => void dialog.accept());
   await fresh.getByRole("button", { name: "Abandon career match" }).click();
   await expect(fresh.getByRole("button", { name: "Confirm XIs and start" })).toBeEnabled({ timeout: 30_000 });
-  expect(await bindingStates(fresh)).toEqual(["ABANDONED"]);
+  await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["ABANDONED"]);
   await fresh.goto("/#career");
   await expect(fresh.getByText("0/14 managed-team fixtures complete.", { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(fresh.getByRole("button", { name: "Play match" })).toBeEnabled({ timeout: 45_000 });
@@ -245,7 +247,7 @@ test("an edited-world managed match keeps its edited world when recovered and ap
   await fresh.reload();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(fresh.getByRole("heading", { name: /Quay Rovers/i }).first()).toBeVisible();
-  expect(await bindingStates(fresh)).toEqual(["APPLIED"]);
+  await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
 });
 
 test("an imported-roster managed match is recovered in a fresh tab and applies exactly once", async ({ page, context }) => {
@@ -266,7 +268,7 @@ test("an imported-roster managed match is recovered in a fresh tab and applies e
   await expect(fresh.getByText("0/56 fixtures")).toHaveCount(0);
   await fresh.reload();
   await expect(fresh.getByText("0/56 fixtures")).toHaveCount(0);
-  expect(await bindingStates(fresh)).toEqual(["APPLIED"]);
+  await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
 });
 
 test("a match survives closing the whole browser with a retained profile", async ({ browserName }, testInfo) => {
@@ -353,7 +355,7 @@ test("a damaged managed-match checkpoint recovers into a new slot, resumes from 
   const careerTab = await context.newPage();
   await careerTab.goto("/#career");
   await expect(careerTab.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
-  expect(await bindingStates(careerTab)).toEqual(["APPLIED"]);
+  await expect.poll(() => bindingStates(careerTab), { timeout: 30_000 }).toEqual(["APPLIED"]);
 });
 
 test("a live writer lease held in another tab keeps a recovered managed match read-only until released", async ({ page, context }) => {
@@ -433,5 +435,5 @@ test("a damaged imported-roster career moves its pending match binding when crea
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(/\d+\/56 fixtures/)).toBeVisible({ timeout: 60_000 });
   await expect(fresh.getByText("0/56 fixtures")).toHaveCount(0);
-  expect(await bindingStates(fresh)).toEqual(["APPLIED"]);
+  await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
 });
