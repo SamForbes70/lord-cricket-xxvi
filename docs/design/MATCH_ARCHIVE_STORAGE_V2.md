@@ -37,7 +37,7 @@ Only replay and import need full events. Everything else needs a few hundred byt
 1. **Match digest.** A pure function in `@lcxxvi/projections`, `deriveCareerMatchDigest(archive, completion)`, returns `{ digestVersion, fixtureId, groundId, creaseOrder, fielding[] }` where `fielding` is sorted by player id. It is exactly what `extractArchiveDetail` derives today, so statistics and awards are unchanged. A test proves equality on real archives.
 2. **Digest storage.** Each commit that adds archives also writes a digest row (new projection scope `CAREER_MATCH_DIGEST_V1`, key `fixtureId`), hashed like other rows. Digests for existing archives are derived on first load and written back when the tab holds the writer lease.
 3. **Lazy archive loads.** Statistics and awards take digests. Full archives are loaded per fixture for replay (`loadMatchEventArchive(saveId, fixtureId)`), and in full only for export.
-4. **Compressed storage.** New commits write archives to a new scope `CAREER_MATCH_EVENTS_GZIP_V1`: payload is base64 of gzip of the same canonical JSON, `sha256` is the hash of the uncompressed JSON, so integrity checks are unchanged after decompression. Readers accept both scopes. The ceiling counts stored bytes, which gives roughly 40 seasons at 128 MB (base64 adds a third to the 6:1 gzip).
+4. **Compressed storage.** New commits write archives to a new scope `CAREER_MATCH_EVENTS_GZIP_V1`: payload is base64 of gzip of the same canonical JSON, `sha256` is the hash of the uncompressed JSON, so integrity checks are unchanged after decompression. Readers accept both scopes. The ceiling counts stored bytes. Measured after implementation: 3.3 MB stored per season (14.4 MB raw), so about 38 seasons at 128 MB.
 5. **Compressed export.** A new archive version, `LC_PERSISTENT_WORLD_PORTABLE_V4`, carries `match-events.ndjson.gz` and `game.json.gz`. The reader decompresses with a hard cap on expanded bytes (the existing zip-bomb limits apply to expanded size). V1 to V3 readers stay byte-for-byte.
 
 ## Order of work
@@ -53,4 +53,5 @@ Each step is separately testable and keeps old saves readable:
 ## Out of scope
 
 - Pruning old archives. Not needed if 40 seasons fit; it would also lose replays.
-- Raising `MAX_PERSISTENT_SEASONS` (200). The binding limit becomes the archive ceiling; documented as about 40 seasons.
+- Raising `MAX_PERSISTENT_SEASONS` (200). The binding limit becomes the archive ceiling: about 38 seasons, measured.
+- The world state itself (1.6 MB after one season, 2.5 MB after two) is rewritten on every commit; storing completed seasons once and referencing them is separate work (audit M1).

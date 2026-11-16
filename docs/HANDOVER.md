@@ -46,7 +46,7 @@ Each PR's description records its commands, tested revision and NOT RUN items.
 ## Limits a newcomer must know
 
 - **No rollback below the stabilisation builds.** An older build cannot read compressed archive rows or V4 exports, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete.
-- **Career length:** compressed archives fit about 40 seasons in the 128 MB per-world archive ceiling (one season stores about 3 MB). Measured on one season; a long soak is still to do.
+- **Career length:** measured over two contracts-era seasons, each season stores 3.3 MB of compressed match archives (14.4 MB raw), so the 128 MB per-world ceiling holds about 38 seasons. The world state grows about 0.9 MB a season (1.6 MB after one, 2.5 MB after two) and every commit rewrites and revalidates it, so commits slow as a career lengthens (audit item M1, open).
 - **Frozen code:** the match engines still sort with `localeCompare`; changing them needs the owner's approval.
 - **Concurrent agents:** Copilot, "Agent Zero" and "Lord Cricket Engineer" have written to this repository. The owner agreed to pause them during stabilisation.
 - **Branch protection:** the owner will apply it ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
