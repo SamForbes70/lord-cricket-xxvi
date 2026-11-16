@@ -62,6 +62,7 @@ import {
   type TrainingDirective,
   type WorldPack,
   type YouthProspect,
+  compareCodePoints,
 } from "@lcxxvi/contracts";
 import {
   DEFAULT_CAREER_AVAILABILITY_PACK,
@@ -876,6 +877,7 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV2(input: {
     initialLifecycle,
     sourceState.careerState.trainingAssignments,
     elapsedDays,
+    sourceState.controlledTeamId,
   );
   const nextLifecycle = advancePlayerLifecycleAtSeasonClose({
     lifecycle: initialLifecycle,
@@ -1178,6 +1180,7 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV3(input: {
     initialLifecycle,
     sourceState.careerState.trainingAssignments,
     elapsedDays,
+    sourceState.controlledTeamId,
   );
   const initialEconomy = createInitialSquadEconomyState({
     worldIdentity,
@@ -1558,7 +1561,7 @@ export class CareerApplicationService {
       ? (await this.persistentRepository.list()).map(toSlotSummaryFromPersistent)
       : [];
     return [...persistentRows, ...singleRows].sort((a, b) =>
-      b.updatedAt.localeCompare(a.updatedAt),
+      compareCodePoints(b.updatedAt, a.updatedAt),
     );
   }
 
@@ -3189,7 +3192,7 @@ export class CareerApplicationService {
         throw new Error("Resolve the managed fixture before advancing the career date.");
       }
       const nextLifecycle = lifecycle
-        ? recordElapsedTrainingExposure(lifecycle, state.careerState.trainingAssignments, 1)
+        ? recordElapsedTrainingExposure(lifecycle, state.careerState.trainingAssignments, 1, state.controlledTeamId)
         : undefined;
       if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
         const pack = this.requireActiveRosterPack();
@@ -3251,7 +3254,7 @@ export class CareerApplicationService {
         rosterCompletion,
       );
       const completedMatches = [...state.completedMatches, completion].sort(
-        (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+        (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || compareCodePoints(a.fixtureId, b.fixtureId),
       );
       return {
         core: {
@@ -3284,7 +3287,7 @@ export class CareerApplicationService {
       completion,
     });
     const completedMatches = [...state.completedMatches, completion].sort(
-      (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+      (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || compareCodePoints(a.fixtureId, b.fixtureId),
     );
     return {
       core: {
@@ -3308,7 +3311,7 @@ export class CareerApplicationService {
         (fixture) =>
           fixture.roundNumber === target.roundNumber && fixture.fixtureId !== target.fixtureId,
       )
-      .sort((a, b) => a.fixtureId.localeCompare(b.fixtureId));
+      .sort((a, b) => compareCodePoints(a.fixtureId, b.fixtureId));
     const requiresDateAdvance = initial.careerState.currentDate < target.matchDayDate;
     const pendingOthers = roundOthers.filter((fixture) => !completedIds.has(fixture.fixtureId));
     const requiresNegotiationWindowClose =
@@ -3356,6 +3359,7 @@ export class CareerApplicationService {
                 lifecycle,
                 state.careerState.trainingAssignments,
                 daysAdvanced,
+                state.controlledTeamId,
               )
             : lifecycle ?? undefined;
         const already = new Set(working.completedMatches.map((match) => match.fixtureId));
@@ -3600,7 +3604,7 @@ export class CareerApplicationService {
             rosterCompletion,
           );
           const completedMatches = [...state.completedMatches, completion].sort(
-            (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+            (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || compareCodePoints(a.fixtureId, b.fixtureId),
           );
           return {
             core: {
@@ -3641,7 +3645,7 @@ export class CareerApplicationService {
           completion,
         });
         const completedMatches = [...state.completedMatches, completion].sort(
-          (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || a.fixtureId.localeCompare(b.fixtureId),
+          (a, b) => a.fixtureOrdinal - b.fixtureOrdinal || compareCodePoints(a.fixtureId, b.fixtureId),
         );
         return {
           core: {

@@ -21,6 +21,7 @@ import {
   type TacticalControlTradeOff,
   type TacticalPresetOption,
   type T20TeamSelection,
+  compareCodePoints,
 } from "@lcxxvi/contracts";
 
 const INSIDE_CIRCLE_SLOT_IDS = new Set([
@@ -429,7 +430,7 @@ function sameFieldSlots(
   if (a.length !== b.length) return false;
   const sig = (list: readonly FieldSlot[]) =>
     [...list]
-      .sort((x, y) => x.playerId.localeCompare(y.playerId))
+      .sort((x, y) => compareCodePoints(x.playerId, y.playerId))
       .map((s) => `${s.playerId}:${s.slotId}`)
       .join("|");
   return sig(a) === sig(b);

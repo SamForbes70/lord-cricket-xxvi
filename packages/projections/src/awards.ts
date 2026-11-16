@@ -19,6 +19,7 @@ import {
   type SeasonAwardsSummary,
   type T20Scorecard,
   type T20SeasonMatchCompletion,
+  compareCodePoints,
 } from "@lcxxvi/contracts";
 import { pureSha256Hex } from "./audio-cues.js";
 import type { AnyCareerMatchEventArchive, AnyPersistentWorldState } from "./historical-stats.js";
@@ -327,7 +328,7 @@ function computeMatchAwardInternal(input: {
       const bRaw = b.battingPointsX100 + b.bowlingPointsX100 + b.fieldingPointsX100;
       if (bRaw !== aRaw) return bRaw - aRaw;
       if (a.fromWinningTeam !== b.fromWinningTeam) return a.fromWinningTeam ? -1 : 1;
-      return a.playerId.localeCompare(b.playerId);
+      return compareCodePoints(a.playerId, b.playerId);
     });
 
   const winner = scored[0]!;
@@ -598,7 +599,7 @@ export function computeSeasonAwards(input: {
         b.primaryX100 - a.primaryX100 ||
         b.secondaryX100 - a.secondaryX100 ||
         b.tertiaryX100 - a.tertiaryX100 ||
-        a.playerId.localeCompare(b.playerId),
+        compareCodePoints(a.playerId, b.playerId),
     );
     const top = sorted[0]!;
     const second = sorted[1] ?? null;
@@ -820,8 +821,8 @@ export function sealCareerAwardsLedger(
   const sortedMatchAwards = [...raw.matchAwards].sort(
     (a, b) =>
       a.seasonNumber - b.seasonNumber ||
-      a.award.fixtureId?.localeCompare(b.award.fixtureId ?? "") ||
-      a.key.localeCompare(b.key),
+      compareCodePoints(a.award.fixtureId ?? "", b.award.fixtureId ?? "") ||
+      compareCodePoints(a.key, b.key),
   );
   const sortedSeasonAwards = [...raw.seasonAwards].sort(
     (a, b) => a.seasonNumber - b.seasonNumber,

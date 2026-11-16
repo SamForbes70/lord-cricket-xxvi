@@ -56,6 +56,7 @@ import {
   type SquadEconomyState,
   type TrainingDirective,
   type WorldPack,
+  compareCodePoints,
 } from "@lcxxvi/contracts";
 import { isBowlingCapable } from "@lcxxvi/data";
 import { canonicalStateBytes, createRandomService, sha256Hex } from "./determinism.js";
@@ -245,7 +246,7 @@ export function computeClubBudgets(input: {
   model: FictionalSquadEconomyModel;
 }): ClubBudgetState[] {
   const contractsByPlayer = new Map(input.contracts.map((c) => [c.playerId, c]));
-  const sortedTeams = [...input.teamIds].sort((a, b) => a.localeCompare(b));
+  const sortedTeams = [...input.teamIds].sort((a, b) => compareCodePoints(a, b));
   return sortedTeams.map((teamId) => {
     const committedWagesK = input.contracts
       .filter((c) => c.teamId === teamId)
@@ -668,7 +669,7 @@ export function createInitialSquadEconomyState(input: {
   const contracts: PlayerContract[] = [];
   const ledger: EconomyTransactionLedgerEntry[] = [];
   const sortedTeams = [...validatedLifecycle.activeWorld.teams].sort((a, b) =>
-    a.teamId.localeCompare(b.teamId),
+    compareCodePoints(a.teamId, b.teamId),
   );
 
   let contractSeq = 1;
@@ -678,7 +679,7 @@ export function createInitialSquadEconomyState(input: {
       rawWageK: number;
       expiresAfterSeasonNumber: number;
     }> = [];
-    const sortedSquad = [...team.squadIds].sort((a, b) => a.localeCompare(b));
+    const sortedSquad = [...team.squadIds].sort((a, b) => compareCodePoints(a, b));
     sortedSquad.forEach((pid, idx) => {
       const player = playerById.get(pid)!;
       const view = buildPublicMarketPlayerView(player, input.calendarYear, statsMap.get(pid));
@@ -773,8 +774,8 @@ export function createInitialSquadEconomyState(input: {
   return sealSquadEconomyState({
     economyVersion: SQUAD_ECONOMY_STATE_VERSION,
     model,
-    contracts: contracts.sort((a, b) => a.playerId.localeCompare(b.playerId)),
-    freeAgents: freeAgents.sort((a, b) => a.playerId.localeCompare(b.playerId)),
+    contracts: contracts.sort((a, b) => compareCodePoints(a.playerId, b.playerId)),
+    freeAgents: freeAgents.sort((a, b) => compareCodePoints(a.playerId, b.playerId)),
     clubBudgets,
     negotiationWindow,
     ledger,
@@ -809,7 +810,7 @@ function syncLifecycleWithWorldRosterMutation(input: {
     }
   }
   const nextRegistrationRevision = input.lifecycle.squadRegistrationRevision + 1;
-  const sortedPlayers = [...input.nextPlayers].sort((a, b) => a.playerId.localeCompare(b.playerId));
+  const sortedPlayers = [...input.nextPlayers].sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   const nextWorld: WorldPack = {
     ...structuredClone(input.lifecycle.activeWorld),
     teams: input.nextTeams,
@@ -871,7 +872,7 @@ function syncLifecycleWithWorldRosterMutation(input: {
     activeWorld: structuredClone(nextPack.world),
     activeRosterPack: nextPack,
     historicalRosterPacks: nextHistoricalPacks,
-    skillLedger: [...ledgerMap.values()].sort((a, b) => a.playerId.localeCompare(b.playerId)),
+    skillLedger: [...ledgerMap.values()].sort((a, b) => compareCodePoints(a.playerId, b.playerId)),
     seasonTrainingExposure: nextExposure,
     retiredPlayers: input.lifecycle.retiredPlayers,
     youthAcademy: input.lifecycle.youthAcademy,
@@ -916,7 +917,7 @@ export function registerPreSeasonYouthContract(input: {
     careerTeamIds: [input.teamId],
   });
   const nextContracts = [...economy.contracts, newContract].sort((a, b) =>
-    a.playerId.localeCompare(b.playerId),
+    compareCodePoints(a.playerId, b.playerId),
   );
   const deadCapMap = new Map(economy.clubBudgets.map((b) => [b.teamId, b.deadCapWagesK]));
   const nextBudgets = computeClubBudgets({
@@ -1496,7 +1497,7 @@ export function acceptCounterOffer(input: {
     return o;
   });
 
-  nextContracts.sort((a, b) => a.playerId.localeCompare(b.playerId));
+  nextContracts.sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   const nextBudgets = computeClubBudgets({
     teamIds: economy.clubBudgets.map((b) => b.teamId),
     seasonNumber: input.seasonNumber,
@@ -1614,7 +1615,7 @@ export function releaseContractedPlayer(input: {
 
   const nextContracts = economy.contracts.filter((c) => c.playerId !== request.playerId);
   const nextFreeAgents = [...economy.freeAgents, newFreeAgent].sort((a, b) =>
-    a.playerId.localeCompare(b.playerId),
+    compareCodePoints(a.playerId, b.playerId),
   );
   // Withdraw any pending renewal offer for the released player
   const nextOffers = economy.negotiationWindow.offers.map((o) =>
@@ -1715,7 +1716,7 @@ function submitSymmetricalAiClubOffersForRound(input: {
 
   const aiTeams = [...input.lifecycle.activeWorld.teams]
     .filter((t) => t.teamId !== input.controlledTeamId)
-    .sort((a, b) => a.teamId.localeCompare(b.teamId));
+    .sort((a, b) => compareCodePoints(a.teamId, b.teamId));
 
   for (const team of aiTeams) {
     let drawIdx = 0;
@@ -1792,7 +1793,7 @@ function submitSymmetricalAiClubOffersForRound(input: {
         const needB = b.role === "KEEPER" && securedKeepers < 1 ? 20 : 0;
         return (
           publicPlayerRoleRating(b) + needB - (publicPlayerRoleRating(a) + needA) ||
-          a.playerId.localeCompare(b.playerId)
+          compareCodePoints(a.playerId, b.playerId)
         );
       });
 
@@ -1889,7 +1890,7 @@ function submitSymmetricalAiClubOffersForRound(input: {
                   : 0;
           return { fa, view, score: rating + needBonus };
         })
-        .sort((a, b) => b.score - a.score || a.fa.playerId.localeCompare(b.fa.playerId));
+        .sort((a, b) => b.score - a.score || compareCodePoints(a.fa.playerId, b.fa.playerId));
 
       if (candidateFAs.length > 0 && (needsKeeper || needsBowler || needsDepth || roll(100) < 65)) {
         const pickIdx = candidateFAs.length > 1 && roll(100) < 30 ? 1 : 0;
@@ -2024,7 +2025,7 @@ export function resolveNegotiationRound(input: {
     ...new Set(
       nextOffers.filter((o) => o.status === "PENDING_ROUND").map((o) => o.playerId),
     ),
-  ].sort((a, b) => a.localeCompare(b));
+  ].sort((a, b) => compareCodePoints(a, b));
 
   let contractSeq = nextLedger.length + 1;
 
@@ -2079,8 +2080,8 @@ export function resolveNegotiationRound(input: {
       .sort(
         (a, b) =>
           b.score - a.score ||
-          a.tieHash.localeCompare(b.tieHash) ||
-          a.o.offerId.localeCompare(b.o.offerId),
+          compareCodePoints(a.tieHash, b.tieHash) ||
+          compareCodePoints(a.o.offerId, b.o.offerId),
       );
 
     // Find highest acceptable offer that still fits club budget & squad capacity
@@ -2288,8 +2289,8 @@ export function resolveNegotiationRound(input: {
       })
     : input.lifecycle;
 
-  nextContracts.sort((a, b) => a.playerId.localeCompare(b.playerId));
-  nextFreeAgents.sort((a, b) => a.playerId.localeCompare(b.playerId));
+  nextContracts.sort((a, b) => compareCodePoints(a.playerId, b.playerId));
+  nextFreeAgents.sort((a, b) => compareCodePoints(a.playerId, b.playerId));
   const nextBudgets = computeClubBudgets({
     teamIds: economy.clubBudgets.map((b) => b.teamId),
     seasonNumber: input.seasonNumber,
@@ -2458,7 +2459,7 @@ export function advanceLifecycleAndEconomyAtSeasonClose(input: {
   // Step 2: Symmetrical AI club off-season renewals for expiring contracts (`expiresAfterSeasonNumber <= fromSeasonNumber`)
   let aiRenewedCount = 0;
   const sortedTeams = [...stage3NextLifecycle.activeWorld.teams].sort((a, b) =>
-    a.teamId.localeCompare(b.teamId),
+    compareCodePoints(a.teamId, b.teamId),
   );
 
   for (const team of sortedTeams) {
@@ -2496,7 +2497,7 @@ export function advanceLifecycleAndEconomyAtSeasonClose(input: {
               : 0;
         return { p, c, view, rating, ask, priority: rating + rolePriority };
       })
-      .sort((a, b) => b.priority - a.priority || a.p.playerId.localeCompare(b.p.playerId));
+      .sort((a, b) => b.priority - a.priority || compareCodePoints(a.p.playerId, b.p.playerId));
 
     // Leave room for youth promotions and 1–2 free-agent market moves so the market stays lively!
     const reservedYouthWages =
@@ -2556,7 +2557,7 @@ export function advanceLifecycleAndEconomyAtSeasonClose(input: {
   const expiredToFreeAgencyIds: string[] = [];
   const newlyExpiredFreeAgents: FreeAgentRecord[] = [];
 
-  for (const c of [...workingContracts.values()].sort((a, b) => a.playerId.localeCompare(b.playerId))) {
+  for (const c of [...workingContracts.values()].sort((a, b) => compareCodePoints(a.playerId, b.playerId))) {
     if (c.expiresAfterSeasonNumber > input.fromSeasonNumber) continue;
     const player = developedPlayerById.get(c.playerId);
     workingContracts.delete(c.playerId);
@@ -2721,7 +2722,7 @@ export function advanceLifecycleAndEconomyAtSeasonClose(input: {
               publicPlayerRoleRating(vb) +
               bonusB -
               (publicPlayerRoleRating(va) + bonusA) ||
-              a.playerId.localeCompare(b.playerId)
+              compareCodePoints(a.playerId, b.playerId)
             );
           });
         if (affordable.length === 0) break;
@@ -2909,11 +2910,11 @@ export function advanceLifecycleAndEconomyAtSeasonClose(input: {
     freeAgentPool.sort((a, b) => {
       const expA = a.enteredReason === "CONTRACT_EXPIRED" ? 20 : 0;
       const expB = b.enteredReason === "CONTRACT_EXPIRED" ? 20 : 0;
-      return b.askingAnnualWageK + expB - (a.askingAnnualWageK + expA) || a.playerId.localeCompare(b.playerId);
+      return b.askingAnnualWageK + expB - (a.askingAnnualWageK + expA) || compareCodePoints(a.playerId, b.playerId);
     });
     freeAgentPool = freeAgentPool.slice(0, model.maxFreeAgentPoolSize);
   }
-  freeAgentPool.sort((a, b) => a.playerId.localeCompare(b.playerId));
+  freeAgentPool.sort((a, b) => compareCodePoints(a.playerId, b.playerId));
 
   // Step 6: Synchronize lifecycle activeWorld & rosterPack with post-contract squads + enriched retired records
   const signedYouthSet = new Set(youthContractsSignedIds);
@@ -2935,7 +2936,7 @@ export function advanceLifecycleAndEconomyAtSeasonClose(input: {
     historicalRosterPacks: stage3NextLifecycle.historicalRosterPacks,
     skillLedger: stage3NextLifecycle.skillLedger,
     seasonTrainingExposure: stage3NextLifecycle.seasonTrainingExposure,
-    retiredPlayers: enrichedRetiredPlayers.sort((a, b) => a.playerId.localeCompare(b.playerId)),
+    retiredPlayers: enrichedRetiredPlayers.sort((a, b) => compareCodePoints(a.playerId, b.playerId)),
     youthAcademy: reconciledYouthAcademy,
     transitions: stage3NextLifecycle.transitions,
     squadRegistrationRevision: stage3NextLifecycle.squadRegistrationRevision,
@@ -2954,7 +2955,7 @@ export function advanceLifecycleAndEconomyAtSeasonClose(input: {
   });
 
   const finalContracts = [...workingContracts.values()].sort((a, b) =>
-    a.playerId.localeCompare(b.playerId),
+    compareCodePoints(a.playerId, b.playerId),
   );
   const nextWindow: NegotiationWindowState = NegotiationWindowStateSchema.parse({
     seasonNumber: input.toSeasonNumber,
@@ -3071,7 +3072,7 @@ export function snapshotSquadEconomyDiagnostics(
   });
 }
 
-export function runSquadEconomyDiagnosticHorizon(input: {
+type SquadEconomyHorizonInput = {
   worldIdentity: PersistentWorldIdentity;
   baseWorld: WorldPack;
   worldCopy?: NewGameWorldCopy | null;
@@ -3080,12 +3081,16 @@ export function runSquadEconomyDiagnosticHorizon(input: {
   startDate?: string;
   controlledTeamId?: string | null;
   simulateFullMatches?: boolean;
-}): {
+};
+type SquadEconomyHorizonResult = {
   snapshots: EconomyDiagnosticSeasonSnapshot[];
   finalLifecycle: PlayerLifecycleState;
   finalEconomy: SquadEconomyState;
   totalLedgerEntries: number;
-} {
+};
+
+/** One season per step, so callers can yield between seasons (a 12-season horizon runs for about a minute). */
+function* squadEconomyHorizonSteps(input: SquadEconomyHorizonInput): Generator<number, SquadEconomyHorizonResult> {
   assertEconomy(input.seasons >= 1 && input.seasons <= 200, "INVALID_DIAGNOSTIC_HORIZON");
   const startCalendarYear = input.startCalendarYear ?? 2026;
   const startDate = input.startDate ?? "2026-04-04";
@@ -3111,6 +3116,7 @@ export function runSquadEconomyDiagnosticHorizon(input: {
   let priorStats: RecentPlayerSeasonStatsSummary[] = [];
 
   for (let s = 1; s <= input.seasons; s += 1) {
+    if (s > 1) yield s;
     const calendarYear = startCalendarYear + (s - 1);
     const seasonDate = `${String(calendarYear).padStart(4, "0")}-${monthDay}`;
 
@@ -3271,4 +3277,24 @@ export function runSquadEconomyDiagnosticHorizon(input: {
     finalEconomy: economy,
     totalLedgerEntries: economy.ledger.length,
   };
+}
+
+export function runSquadEconomyDiagnosticHorizon(input: SquadEconomyHorizonInput): SquadEconomyHorizonResult {
+  const steps = squadEconomyHorizonSteps(input);
+  for (let step = steps.next(); ; step = steps.next()) if (step.done) return step.value;
+}
+
+/**
+ * Same result as runSquadEconomyDiagnosticHorizon, but awaits `yieldControl` between seasons so a long
+ * horizon never blocks its thread for the whole run. The caller supplies the yield (no ambient APIs here).
+ */
+export async function runSquadEconomyDiagnosticHorizonAsync(
+  input: SquadEconomyHorizonInput,
+  yieldControl: () => Promise<void>,
+): Promise<SquadEconomyHorizonResult> {
+  const steps = squadEconomyHorizonSteps(input);
+  for (let step = steps.next(); ; step = steps.next()) {
+    if (step.done) return step.value;
+    await yieldControl();
+  }
 }
