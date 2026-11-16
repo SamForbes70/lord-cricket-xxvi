@@ -276,7 +276,47 @@ export async function sealCompletedSeasonRecord(input: {
   return CompletedSeasonRecordSchema.parse({ ...core, recordSha256 });
 }
 
+/**
+ * Completed-season records that passed full validation in this session, keyed by object identity. A sealed
+ * season is carried forward unchanged, so every later commit would otherwise re-parse, re-hash and re-check
+ * it (about 23 ms each, measured, per season per commit). Filled only after full validation; an imported or
+ * edited record is a new object and is checked in full (audit M1, Phase 2 rule).
+ */
+const VERIFIED_COMPLETED_SEASON_RECORDS = new WeakMap<object, CompletedSeasonRecord>();
+
+/**
+ * Schema parsing copies every completed season, so a carried-forward season would be a new object on each
+ * commit and miss the verified-record and prepared-row caches. A season whose input object already passed
+ * full validation is kept as that object; anything else stays the freshly parsed copy and is fully checked.
+ */
+function keepVerifiedCompletedSeasons<T extends { completedSeasons: CompletedSeasonRecord[] }>(
+  raw: { completedSeasons: readonly unknown[] },
+  core: T,
+): T {
+  let kept = false;
+  const completedSeasons = core.completedSeasons.map((parsed, index) => {
+    const input = raw.completedSeasons[index];
+    if (typeof input === "object" && input !== null && VERIFIED_COMPLETED_SEASON_RECORDS.has(input)) {
+      kept = true;
+      return input as CompletedSeasonRecord;
+    }
+    return parsed;
+  });
+  return kept ? { ...core, completedSeasons } : core;
+}
+
 export async function validateCompletedSeasonRecord(raw: unknown): Promise<CompletedSeasonRecord> {
+  if (typeof raw === "object" && raw !== null) {
+    const verified = VERIFIED_COMPLETED_SEASON_RECORDS.get(raw);
+    if (verified) return verified;
+  }
+  const record = await validateCompletedSeasonRecordFully(raw);
+  if (typeof raw === "object" && raw !== null) VERIFIED_COMPLETED_SEASON_RECORDS.set(raw, record);
+  VERIFIED_COMPLETED_SEASON_RECORDS.set(record, record);
+  return record;
+}
+
+async function validateCompletedSeasonRecordFully(raw: unknown): Promise<CompletedSeasonRecord> {
   const record = CompletedSeasonRecordSchema.parse(raw);
   const { recordSha256, ...coreRaw } = record;
   const core = CompletedSeasonRecordCoreSchema.parse(coreRaw);
@@ -352,7 +392,7 @@ function persistentStateCore(state: PersistentWorldState): PersistentWorldStateC
 export async function sealPersistentWorldState(
   raw: PersistentWorldStateCore,
 ): Promise<PersistentWorldState> {
-  const core = PersistentWorldStateCoreSchema.parse(raw);
+  const core = keepVerifiedCompletedSeasons(raw, PersistentWorldStateCoreSchema.parse(raw));
   const stateSha256 = await seasonSha256Text(canonicalJson(core));
   const state = PersistentWorldStateSchema.parse({ ...core, stateSha256 });
   return validatePersistentWorldState(state);
@@ -727,7 +767,7 @@ async function validateSharedLifecycleWorldInvariants(
 export async function sealPersistentWorldStateV2(
   raw: PersistentWorldStateV2Core,
 ): Promise<PersistentWorldStateV2> {
-  const core = PersistentWorldStateV2CoreSchema.parse(raw);
+  const core = keepVerifiedCompletedSeasons(raw, PersistentWorldStateV2CoreSchema.parse(raw));
   const stateSha256 = await seasonSha256Text(canonicalJson(core));
   const state: PersistentWorldStateV2 = { ...core, stateSha256 };
   await validateSharedLifecycleWorldInvariants(state);
@@ -834,7 +874,7 @@ export async function sealPersistentWorldStateV3(
 ): Promise<PersistentWorldStateV3> {
   void persistentStateV2Core;
   void persistentStateV3Core;
-  const core = PersistentWorldStateV3CoreSchema.parse(raw);
+  const core = keepVerifiedCompletedSeasons(raw, PersistentWorldStateV3CoreSchema.parse(raw));
   const stateSha256 = await seasonSha256Text(canonicalJson(core));
   const state: PersistentWorldStateV3 = { ...core, stateSha256 };
   await validatePersistentEconomyInvariants(state);
@@ -863,7 +903,7 @@ const VERIFIED_STATE_V4_OBJECTS = new WeakSet<object>();
 export async function sealPersistentWorldStateV4(
   raw: PersistentWorldStateV4Core,
 ): Promise<PersistentWorldStateV4> {
-  const core = PersistentWorldStateV4CoreSchema.parse(raw);
+  const core = keepVerifiedCompletedSeasons(raw, PersistentWorldStateV4CoreSchema.parse(raw));
   const stateSha256 = await seasonSha256Text(canonicalJson(core));
   const state: PersistentWorldStateV4 = { ...core, stateSha256 };
   await validatePersistentEconomyInvariants(state);
