@@ -115,6 +115,10 @@ function defaultTitle(session: AnySession, copy: NewGameWorldCopy | null): strin
   const names = metadata(session, copy).teams;
   return `${names[0]} v ${names[1]}`;
 }
+/** Persistence keeps one world type per save: a roster pack is the world, so its name overrides are not stored. */
+function persistedWorldCopy(): NewGameWorldCopy | null {
+  return activeRosterPack ? null : activeWorldCopy;
+}
 function applyWorldCopy(target: MatchController, copy: NewGameWorldCopy | null) {
   target.setWorldCopy(copy);
 }
@@ -255,8 +259,15 @@ async function rebindManaged(): Promise<string | null> {
     launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
       ? launch.rosterPack
       : null;
-  if (canonicalJson(requestedCopy) !== canonicalJson(activeWorldCopy)) return "The saved match belongs to a different world copy.";
   if (canonicalJson(requestedRoster) !== canonicalJson(activeRosterPack)) return "The saved match belongs to a different roster.";
+  if (requestedRoster) {
+    // A roster-pack match stores no world copy (persistence keeps one world type per save).
+    // Its display names come from the hash-checked launch bound to this match.
+    if (activeWorldCopy !== null) return "The saved match belongs to a different world copy.";
+    activeWorldCopy = requestedCopy;
+  } else if (canonicalJson(requestedCopy) !== canonicalJson(activeWorldCopy)) {
+    return "The saved match belongs to a different world copy.";
+  }
   const result = (controller as ReturnType<typeof createMatchController>).handle({
     version: UI_VERSION,
     type: "BOOT",
@@ -316,7 +327,7 @@ async function restoreSave(saveId: string): Promise<void> {
       ),
       ...(loaded.delegationJournal ? { delegationJournal: loaded.delegationJournal } : {}),
       metadata: metadata(session, activeWorldCopy),
-      worldCopy: activeWorldCopy,
+      worldCopy: persistedWorldCopy(),
       rosterPack: activeRosterPack,
       ownerId,
       now: nowMs(),
@@ -450,7 +461,7 @@ async function commitCandidate(
         committedRevision: session.revision,
       },
       metadata: metadata(session, activeWorldCopy),
-      worldCopy: activeWorldCopy,
+      worldCopy: persistedWorldCopy(),
       rosterPack: activeRosterPack,
       ownerId,
       now: nowMs(),
