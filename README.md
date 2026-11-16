@@ -2,7 +2,7 @@
 
 **An evidence-based, deterministic, browser-native statistical cricket management game built as a strict TypeScript monorepo.**
 
-> **Quick status (16 November 2026, Australia/Brisbane):** V0.1 (`f7ee054`) and Stages 2 through 9 (`Persistent Multi-Season World`, `Player Lifecycle & Youth Pathway`, `Contracts, Budgets & Recruitment`, `Tactical Briefings & Feedback`, `Live Field & Highlight Pacing`, `Contextual Text Commentary`, `Optional Sound & Narration`, and `Historical Statistics & Leaderboards`) are **implemented, verified, merged to `main`, and owner-accepted**. The authoritative production gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA` (fictional teams/players, no empirical calibration claim yet). Next eligible slice: **Stage 10: Match and season awards**.
+> **Quick status (16 November 2026, Australia/Brisbane):** V0.1 (`f7ee054`) and Stages 2 through 9 (`Persistent Multi-Season World`, `Player Lifecycle & Youth Pathway`, `Contracts, Budgets & Recruitment`, `Tactical Briefings & Feedback`, `Live Field & Highlight Pacing`, `Contextual Text Commentary`, `Optional Sound & Narration`, and `Historical Statistics & Leaderboards`) are **implemented, verified, merged to `main`, and owner-accepted**. **Stage 10 (`Match & season awards`, `S10-01`) is `tested` on `feat/stage10-match-season-awards`** awaiting owner acceptance. The authoritative production gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA` (fictional teams/players, no empirical calibration claim yet).
 
 ---
 
@@ -105,7 +105,7 @@ Then open **`http://127.0.0.1:4180/`** in a modern browser. Because the game use
 
 | Package / App | Responsibility | Key Boundary Rules (`scripts/check-boundaries.mjs`) |
 | --- | --- | --- |
-| `packages/contracts` | Zod + strict AJV 2020-12 JSON Schemas (`325` schemas) & versioned protocol types | Only imports `zod`; no ambient browser/clock/RNG APIs |
+| `packages/contracts` | Zod + strict AJV 2020-12 JSON Schemas (`334` schemas) & versioned protocol types | Only imports `zod`; no ambient browser/clock/RNG APIs |
 | `packages/domain` | Frozen delivery scoring kernel (`scoring-kernel.ts`), resolution validator, innings ledger | Only imports `@lcxxvi/contracts` (+ `@lcxxvi/contracts/m7j`); zero ambient APIs |
 | `packages/data` | Frozen fictional 8-team/160-player/8-ground pack, probability LUTs, rules | Only imports `@lcxxvi/contracts`; zero ambient APIs |
 | `packages/simulation` | Authoritative `T20`/`ODI`/`RED_BALL` engines, splitmix/SHA-256 RNG, lifecycle, economy, rollover | Imports `@lcxxvi/contracts`, `@lcxxvi/data`, `@lcxxvi/domain`, `@noble/hashes`; deterministic only |
@@ -123,7 +123,7 @@ See [`docs/ROADMAP_AND_AI_GUIDE.md`](docs/ROADMAP_AND_AI_GUIDE.md) and [`docs/MA
 
 | Stage | Deliverable | Status | Scope & Dependencies |
 | --- | --- | --- | --- |
-| **Stage 10** | **Match & season awards** (`S10-01`) | **Next eligible** | Transparent versioned Player of the Match heuristic (batting, bowling, attributable fielding; losing-side winner & no-result support; explicit game-award labelling; idempotent persistence) + qualified season awards (Batter, Bowler, MVP, Emerging/Youth) integrated into Season Close, Roll of Honour, Statistics, and PlayerPage. |
+| **Stage 10** | **Match & season awards** (`S10-01`) | **Tested** (`feat/stage10-match-season-awards`, awaiting owner acceptance) | Transparent versioned Player of the Match heuristic (`T20`/`ODI`/`RED_BALL`, batting, bowling, attributable fielding; losing-side winner & no-result support; explicit `GAME_AWARD` disclaimer; idempotent persistence & `.lcxxvi` round-trip) + 5 qualified season awards (`Player of the Season`, `Leading Run-Scorer`, `Leading Wicket-Taker`, `Best Fielder`, `Emerging / Youth Player`) integrated into Match Result, Archived Replay, Roll of Honour, Statistics, and PlayerPage. |
 | **Stage 11** | **Player & manager stories** | Planned (`deps: 4, 9, 10`) | Structured career milestones, form streaks, contract tension & press/board moments derived from committed career facts without fabricated biographies. |
 | **Stage 12** | **Fictional scenario mode** | Planned (`deps: 5, 6, 7`) | Player-facing isolated scenario challenges (chase targets, collapses, red-ball fourth-innings saves) with clear win objectives and personal-best records, strictly separated from career saves. |
 | **Stage 13** | **Historical scenarios & provenance** | Partial / Blocked (`deps: 12 + data review`) | Player-facing sourced historical scenarios layered over `scripts/research/m7k-historical-fixture.ts`, gated on source permissions and rules adjudication review. |

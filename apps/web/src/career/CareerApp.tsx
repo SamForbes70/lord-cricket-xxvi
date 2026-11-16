@@ -12,6 +12,7 @@ import type {
   TrainingDirective,
 } from "@lcxxvi/contracts";
 import {
+  AWARDS_PROVENANCE_NOTICE,
   HistoricalLeaderboardMetricSchema,
   MAX_ACTIVE_TEAM_SQUAD_SIZE,
   MIN_ACTIVE_TEAM_SQUAD_SIZE,
@@ -153,7 +154,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   const [editingWorld, setEditingWorld] = useState(false);
   const [restoreEditorFocus, setRestoreEditorFocus] = useState(false);
   const editWorldButton = useRef<HTMLButtonElement>(null);
-  const [playerOrigin, setPlayerOrigin] = useState<"SQUAD" | "STATISTICS" | "CONTRACTS">("SQUAD");
+  const [playerOrigin, setPlayerOrigin] = useState<
+    "SQUAD" | "STATISTICS" | "CONTRACTS" | "CAREER" | "FIXTURES"
+  >("SQUAD");
   const [restorePlayerFocus, setRestorePlayerFocus] = useState<string | null>(null);
   const [playerFormat, setPlayerFormat] = useState<PlayerFormat>(() => {
     const stored = localStorage.getItem("lcxxvi-player-format");
@@ -176,7 +179,10 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     Record<string, { wageK: string; termSeasons: string }>
   >({});
 
-  function openPlayer(id: string, origin: "SQUAD" | "STATISTICS" | "CONTRACTS") {
+  function openPlayer(
+    id: string,
+    origin: "SQUAD" | "STATISTICS" | "CONTRACTS" | "CAREER" | "FIXTURES",
+  ) {
     setPlayerId(id);
     setPlayerOrigin(origin);
     setScreen("PLAYER");
@@ -216,6 +222,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   const [recoveryTitle, setRecoveryTitle] = useState("");
   const [checkpointTriggerId, setCheckpointTriggerId] = useState<string | null>(null);
   const checkpointPanelRef = useRef<HTMLElement>(null);
+  const [awardsSeasonFilter, setAwardsSeasonFilter] = useState<number | "LATEST">("LATEST");
   const [activeReplay, setActiveReplay] = useState<{
     fixtureId: string;
     completion: T20SeasonMatchCompletion;
@@ -277,9 +284,19 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     if (activeReplay) replayPanelRef.current?.focus();
   }, [activeReplay]);
   useEffect(() => {
-    if (screen !== "STATISTICS" && screen !== "PLAYER") return;
+    if (
+      screen !== "CAREER" &&
+      screen !== "FIXTURES" &&
+      screen !== "STATISTICS" &&
+      screen !== "PLAYER"
+    ) {
+      return;
+    }
     let alive = true;
     void service.loadCareerEventArchives().then(() => {
+      if (alive) setCareerArchivesVersion((v) => v + 1);
+    });
+    void service.syncAwardsLedger().then(() => {
       if (alive) setCareerArchivesVersion((v) => v + 1);
     });
     return () => {
@@ -666,6 +683,77 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         <strong>{service.resultText(activeReplay.completion)}</strong> ·{" "}
         {activeReplay.completion.matchDayDate} · Source: {activeReplay.completion.source}
       </p>
+      {(() => {
+        const matchSeasonNumber =
+          persistentWorld?.completedSeasons.find((season) =>
+            season.completedMatches.some(
+              (match) => match.fixtureId === activeReplay.completion.fixtureId,
+            ),
+          )?.seasonNumber ??
+          persistentWorld?.currentSeasonNumber ??
+          1;
+        const matchAward = service.getMatchAwardForFixture(
+          matchSeasonNumber,
+          activeReplay.completion.fixtureId,
+        );
+        if (!matchAward) return null;
+        return (
+          <div
+            className="match-award-box"
+            data-testid="replay-match-award-panel"
+            style={{ marginBottom: "14px" }}
+          >
+            <div className="match-award-head">
+              <strong>Player of the Match</strong>
+              <span className="award-provenance-tag">
+                Game award · {matchAward.awardVersion}
+              </span>
+            </div>
+            {matchAward.status === "AWARDED" && matchAward.winnerPlayerId ? (
+              <>
+                <p data-testid="replay-match-award-winner">
+                  <button
+                    type="button"
+                    className="player-link"
+                    onClick={() =>
+                      openPlayer(
+                        matchAward.winnerPlayerId!,
+                        screen === "SQUAD" ||
+                          screen === "CONTRACTS" ||
+                          screen === "CAREER" ||
+                          screen === "FIXTURES" ||
+                          screen === "STATISTICS"
+                          ? screen
+                          : "STATISTICS",
+                      )
+                    }
+                  >
+                    <strong>{service.playerName(matchAward.winnerPlayerId)}</strong>
+                  </button>{" "}
+                  ({matchAward.winnerTeamId ? service.teamName(matchAward.winnerTeamId) : "–"}
+                  {matchAward.fromLosingTeam ? " · losing side" : ""}) ·{" "}
+                  {((matchAward.scoreTotalX100 ?? 0) / 100).toFixed(2)} pts
+                </p>
+                <p className="match-award-explain">{matchAward.explanationText}</p>
+                {matchAward.components && (
+                  <p className="match-award-breakdown">
+                    Bat {(matchAward.components.battingPointsX100 / 100).toFixed(1)} · Bowl{" "}
+                    {(matchAward.components.bowlingPointsX100 / 100).toFixed(1)} · Field{" "}
+                    {(matchAward.components.fieldingPointsX100 / 100).toFixed(1)} · Result{" "}
+                    {(matchAward.components.resultBonusX100 / 100).toFixed(1)} · Fielding source:{" "}
+                    {matchAward.fieldingSourceStatus === "ARCHIVE_EVENTS"
+                      ? "archive events"
+                      : "scorecard fallback"}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p data-testid="replay-match-award-winner">{matchAward.explanationText}</p>
+            )}
+            <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+          </div>
+        );
+      })()}
       <div className="career-summary-grid">
         {activeReplay.completion.scorecard.innings.map((inn, innIdx) => (
           <div key={innIdx} className="career-panel">
@@ -1438,6 +1526,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                       <th>Managed finish</th>
                       <th>Leading runs</th>
                       <th>Leading wickets</th>
+                      <th>Season awards</th>
                       <th>Archive</th>
                     </tr>
                   </thead>
@@ -1473,6 +1562,28 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                             {topWkts
                               ? `${service.playerName(topWkts.playerId)} (${topWkts.value})`
                               : "–"}
+                          </td>
+                          <td data-testid={`season-awards-cell-${record.seasonNumber}`}>
+                            {(() => {
+                              const summary = service.getSeasonAwards(record.seasonNumber);
+                              if (!summary) {
+                                return <span aria-label="Season awards pending">Pending</span>;
+                              }
+                              const awarded = summary.awards.filter(
+                                (award) => award.status === "AWARDED" && award.winnerPlayerId,
+                              );
+                              return (
+                                <small className="season-awards-list">
+                                  {awarded.map((award, index) => (
+                                    <span key={award.category}>
+                                      {index > 0 && " · "}
+                                      <strong>{service.playerName(award.winnerPlayerId!)}</strong>{" "}
+                                      ({award.label})
+                                    </span>
+                                  ))}
+                                </small>
+                              );
+                            })()}
                           </td>
                           <td>
                             <button
@@ -2668,6 +2779,100 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               </div>
             </section>
           )}
+          {(() => {
+            const awardsLedger = service.getAwardsLedger();
+            const summaries = awardsLedger?.seasonAwards ?? [];
+            if (summaries.length === 0) return null;
+            const activeSummary =
+              (awardsSeasonFilter !== "LATEST"
+                ? summaries.find((s) => s.seasonNumber === awardsSeasonFilter)
+                : undefined) ??
+              summaries[summaries.length - 1] ??
+              null;
+            if (!activeSummary) return null;
+            return (
+              <section
+                className="career-panel"
+                aria-labelledby="season-awards-heading"
+                data-testid="season-awards-panel"
+                style={{ marginTop: "18px" }}
+              >
+                <div className="section-bar">
+                  <h3 id="season-awards-heading">
+                    Season awards · Season {activeSummary.seasonNumber} ({activeSummary.calendarYear})
+                  </h3>
+                  <span className="award-provenance-tag" data-testid="season-awards-provenance">
+                    Game award · {activeSummary.awardVersion}
+                  </span>
+                </div>
+                {summaries.length > 1 && (
+                  <div className="action-row" style={{ marginBottom: "12px" }}>
+                    <label>
+                      Awards season{" "}
+                      <select
+                        aria-label="Season awards selector"
+                        value={
+                          awardsSeasonFilter === "LATEST"
+                            ? String(activeSummary.seasonNumber)
+                            : String(awardsSeasonFilter)
+                        }
+                        onChange={(event) =>
+                          setAwardsSeasonFilter(Number.parseInt(event.currentTarget.value, 10))
+                        }
+                      >
+                        {summaries.map((s) => (
+                          <option key={s.seasonNumber} value={String(s.seasonNumber)}>
+                            Season {s.seasonNumber} ({s.calendarYear})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                )}
+                <div className="season-awards-grid">
+                  {activeSummary.awards.map((award) => (
+                    <article
+                      key={award.category}
+                      className="career-panel season-award-card"
+                      data-testid={`season-award-card-${award.category}`}
+                    >
+                      <h4>{award.label}</h4>
+                      {award.status === "AWARDED" && award.winnerPlayerId ? (
+                        <>
+                          <p className="season-award-winner">
+                            <button
+                              type="button"
+                              className="player-link"
+                              onClick={() => openPlayer(award.winnerPlayerId!, "STATISTICS")}
+                            >
+                              <strong>{service.playerName(award.winnerPlayerId)}</strong>
+                            </button>{" "}
+                            ({award.winnerTeamId ? service.teamName(award.winnerTeamId) : "–"})
+                          </p>
+                          <p className="season-award-stat">
+                            {award.headlineStat ?? "–"}{" "}
+                            {award.scoreX100 !== null
+                              ? `· ${(award.scoreX100 / 100).toFixed(2)} pts`
+                              : ""}
+                            {award.tieBroken ? " · Tie-break" : ""}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="season-award-unavailable">
+                          Unavailable ({award.unavailableReason ?? "Not awarded"})
+                        </p>
+                      )}
+                      <p className="match-award-explain">{award.explanationText}</p>
+                      <small className="historical-rule-meta">
+                        Qualification: {award.qualificationRule}
+                      </small>
+                    </article>
+                  ))}
+                </div>
+                <p className="award-notice">{activeSummary.provenanceNotice}</p>
+              </section>
+            );
+          })()}
         </section>
       )}
 
@@ -3379,6 +3584,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 isFreeAgent={Boolean(freeAgentMatch)}
                 careerClubNames={careerClubs}
                 historicalRecord={historicalRecord}
+                awardsSummary={service.getPlayerAwardsSummary(player.playerId)}
                 teamName={(tid) => service.teamName(tid)}
                 groundName={(gid) => service.groundName(gid)}
                 onOpenReplay={(fixtureId, triggerId) => void openReplay(fixtureId, triggerId)}
@@ -3394,7 +3600,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                     ? "Back to squad"
                     : playerOrigin === "CONTRACTS"
                       ? "Back to contracts"
-                      : "Back to statistics"
+                      : playerOrigin === "CAREER"
+                        ? "Back to career"
+                        : playerOrigin === "FIXTURES"
+                          ? "Back to fixtures"
+                          : "Back to statistics"
                 }
               />
             </>

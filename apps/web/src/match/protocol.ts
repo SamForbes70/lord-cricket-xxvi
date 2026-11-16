@@ -5,6 +5,7 @@ import type {
   CommentaryEntry,
   InMatchTacticalAssistantView,
   LiveFieldPresentation,
+  MatchAwardRecord,
 } from "@lcxxvi/contracts";
 import type { SaveSummary } from "@lcxxvi/persistence";
 import {
@@ -238,6 +239,7 @@ export type View = {
   analytics?: MatchAnalytics | null;
   tacticalAssistant?: InMatchTacticalAssistantView | null;
   fieldPresentation?: LiveFieldPresentation | null;
+  matchAward?: MatchAwardRecord | null;
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;

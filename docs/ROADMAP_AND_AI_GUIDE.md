@@ -1,6 +1,6 @@
 # Lord Cricket XXVI: Comprehensive Architecture, Full Roadmap & AI Continuation Playbook
 
-*Last reconciled on 16 November 2026 (Australia/Brisbane) upon owner acceptance of Stage 9 (`S09-01`, Historical statistics and leaderboards).*
+*Last reconciled on 16 November 2026 (Australia/Brisbane) with Stages 1–9 owner-accepted on `main` and Stage 10 (`S10-01`, Match and season awards) `tested` on `feat/stage10-match-season-awards`.*
 
 This guide gives engineers and AI agents a single authoritative map of **what has been built**, **the complete remaining roadmap (Stages 10 to 17 and the empirical research track)**, and **exact rules and commands to continue development safely**.
 
@@ -65,14 +65,14 @@ This guide gives engineers and AI agents a single authoritative map of **what ha
 
 ## 2. Complete Future Roadmap (Stages 10 to 17 & Research Track)
 
-### Stage 10 — Match and season awards (`S10-01`, **Next Eligible Slice**)
+### Stage 10 — Match and season awards (`S10-01`, **`tested` on `feat/stage10-match-season-awards`**, awaiting owner acceptance)
 
-- **Goal**: Transparent, deterministic, explicitly labelled game awards for individual matches and completed seasons.
-- **Required Deliverables**:
-  - Versioned contracts (`packages/contracts/src/awards.ts` or additive schema pack) + generated JSON Schemas.
-  - Pure **Player of the Match** heuristic (`packages/projections` / `packages/simulation`) scoring batting impact, bowling impact, and attributable fielding contributions from sealed delivery events; supports **losing-side winners** on exceptional performances and explicit **no-result / abandoned** handling.
-  - **Season Awards** (`Player of the Season / MVP`, `Leading Run-Scorer`, `Leading Wicket-Taker`, `Best Fielder`, `Emerging / Youth Player` when lifecycle is active) with explicit minimum qualification thresholds, tie-break rules, and clear **`GAME_AWARD` / heuristic disclaimer** (`not an official ICC/real-world formula`).
-  - Idempotent award persistence in season rollover / match summaries, replayable without re-computing RNG, and displayed across **Match Result**, **Career / Roll of Honour**, **Statistics**, and **PlayerPage** trophy lists.
+- **Verification evidence**: [verification-stage10-match-season-awards/REPORT.md](verification-stage10-match-season-awards/REPORT.md) (`334` strict JSON Schemas, `770/770` unit tests across `72/72` files, Chromium + Firefox Stage 10 + accessibility UI suites).
+- **Delivered**:
+  - Versioned contracts (`packages/contracts/src/awards.ts`: `LC_AWARDS_HEURISTIC_GAME_V1`, `LC_CAREER_AWARDS_LEDGER_V1`) + generated JSON Schemas.
+  - Pure **Player of the Match** heuristic (`packages/projections/src/awards.ts`) scoring batting impact, bowling impact, and attributable fielding contributions from sealed delivery events; supports **losing-side winners** on exceptional performances and explicit **no-result / abandoned** handling.
+  - **Season Awards** (`PLAYER_OF_THE_SEASON`, `LEADING_RUN_SCORER`, `LEADING_WICKET_TAKER`, `BEST_FIELDER`, `EMERGING_YOUTH_PLAYER`) with explicit minimum qualification thresholds, tie-break rules, and clear **`GAME_AWARD` / heuristic disclaimer** (`not an official ICC/real-world formula`).
+  - Idempotent award persistence in `CAREER_AWARDS_LEDGER_V1` + `.lcxxvi` `awards/ledger.json`, replayable without re-computing RNG, and displayed across **Match Result**, **Archived Replay**, **Career / Roll of Honour**, **Statistics**, and **PlayerPage** (`Awards & honours`).
 
 ### Stage 11 — Player and manager stories (`deps: Stages 4, 9, 10`)
 

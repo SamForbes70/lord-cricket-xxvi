@@ -26,6 +26,8 @@ import {
   SeasonCheckpointInspectionSchema,
   SeasonDurableCommandSchema,
   StagedRosterPackSchema,
+  CareerAwardsLedgerSchema,
+  type CareerAwardsLedger,
   type CompletedSeasonRecord,
   type NewGameWorldCopy,
   type PersistentCareerProjection,
@@ -46,6 +48,7 @@ import {
 } from "@lcxxvi/contracts";
 import { DB_NAME, DB_VERSION } from "./index.js";
 import {
+  CAREER_AWARDS_LEDGER_SCOPE,
   CAREER_MATCH_EVENTS_SCOPE,
   careerMatchEventArchiveByteLength,
   createT20SeasonArchive,
@@ -1426,6 +1429,13 @@ export class IndexedDbPersistentWorldRepository {
         }
         for (const row of mergedByFixture.values()) projections.put(row);
       }
+      if (input.copySource) {
+        for (const row of allProjections) {
+          if (row.saveId === input.copySource.saveId && row.scope === CAREER_AWARDS_LEDGER_SCOPE) {
+            projections.put({ ...row, saveId: input.saveId });
+          }
+        }
+      }
     }
 
     const summary = persistentSummaryFor({ ...input, state });
@@ -1661,6 +1671,40 @@ export class IndexedDbPersistentWorldRepository {
       result.set(row.key, StagedRosterPackSchema.parse(JSON.parse(row.payload)));
     }
     return result;
+  }
+
+  async loadAwardsLedger(saveId: string): Promise<CareerAwardsLedger | null> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const row = (await req(
+      tx.objectStore("projections").get([saveId, CAREER_AWARDS_LEDGER_SCOPE, "ledger"]),
+    )) as ProjectionRecord | undefined;
+    await txDone(tx);
+    if (!row) return null;
+    if ((await seasonSha256Text(row.payload)) !== row.sha256) {
+      throw new Error("CAREER_AWARDS_LEDGER_DAMAGED");
+    }
+    return CareerAwardsLedgerSchema.parse(JSON.parse(row.payload));
+  }
+
+  async saveAwardsLedger(
+    saveId: string,
+    ledgerRaw: CareerAwardsLedger,
+  ): Promise<CareerAwardsLedger> {
+    const ledger = CareerAwardsLedgerSchema.parse(ledgerRaw);
+    const payload = canonicalJson(ledger);
+    const sha256 = await seasonSha256Text(payload);
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    tx.objectStore("projections").put({
+      saveId,
+      scope: CAREER_AWARDS_LEDGER_SCOPE,
+      key: "ledger",
+      payload,
+      sha256,
+    } satisfies ProjectionRecord);
+    await txDone(tx);
+    return ledger;
   }
 
   async loadMatchEventArchives(

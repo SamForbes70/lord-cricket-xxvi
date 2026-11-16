@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "awardVersion": {
+      "type": "string",
+      "const": "LC_AWARDS_HEURISTIC_GAME_V1"
+    },
+    "seasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "calendarYear": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 9999
+    },
+    "competitionId": {
+      "type": "string",
+      "const": "LC_T20_LEAGUE_01"
+    },
+    "sealedAtSeasonSha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "provenanceNotice": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320
+    },
+    "awards": {
+      "minItems": 5,
+      "maxItems": 5,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "awardVersion": {
+            "type": "string",
+            "const": "LC_AWARDS_HEURISTIC_GAME_V1"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "PLAYER_OF_THE_SEASON",
+              "LEADING_RUN_SCORER",
+              "LEADING_WICKET_TAKER",
+              "BEST_FIELDER",
+              "EMERGING_YOUTH_PLAYER"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "awardProvenance": {
+            "type": "string",
+            "const": "GAME_AWARD"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "AWARDED",
+              "UNAVAILABLE"
+            ]
+          },
+          "unavailableReason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "qualificationRule": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "formulaSummary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 320
+          },
+          "winnerPlayerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "winnerTeamId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "headlineStat": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scoreX100": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tieBroken": {
+            "type": "boolean"
+          },
+          "runnerUpPlayerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "explanationText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          }
+        },
+        "required": [
+          "awardVersion",
+          "category",
+          "label",
+          "awardProvenance",
+          "status",
+          "unavailableReason",
+          "qualificationRule",
+          "formulaSummary",
+          "winnerPlayerId",
+          "winnerTeamId",
+          "headlineStat",
+          "scoreX100",
+          "tieBroken",
+          "runnerUpPlayerId",
+          "explanationText"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "awardVersion",
+    "seasonNumber",
+    "calendarYear",
+    "competitionId",
+    "sealedAtSeasonSha256",
+    "provenanceNotice",
+    "awards"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:SeasonAwardsSummary:1",
+  "title": "SeasonAwardsSummary"
+}

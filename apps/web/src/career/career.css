@@ -81,3 +81,14 @@
 .leaderboard-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 14px; }
 .leaderboard-tabs button { min-height:36px; padding:.4em .7em; font-size:.9em; }
 .historical-rule-meta { font-size:.9em; color:#31473d; margin:6px 0 12px; overflow-wrap:anywhere; }
+.match-award-box { margin:12px 0; padding:12px 14px; border:1px solid #8ea896; border-left:4px solid #194b38; border-radius:6px; background:#f5f9f6; color:#16261d; }
+.match-award-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
+.award-provenance-tag { display:inline-block; padding:2px 9px; border-radius:999px; border:1px solid #8ea896; background:#fff; color:#143d2d; font-size:.82em; font-weight:600; }
+.match-award-explain, .match-award-breakdown, .award-notice { margin:5px 0; font-size:.92em; color:#243b2f; }
+.award-notice { font-size:.84em; color:#354f41; }
+.season-awards-list { display:inline-block; line-height:1.4; }
+.season-awards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 240px),1fr)); gap:12px; margin-bottom:10px; }
+.season-award-card h4 { margin:0 0 6px; font-size:1em; }
+.season-award-winner { margin:4px 0; }
+.season-award-stat { margin:4px 0; font-weight:600; color:#194b38; }
+.season-award-unavailable { margin:4px 0; font-style:italic; color:#5a2618; }

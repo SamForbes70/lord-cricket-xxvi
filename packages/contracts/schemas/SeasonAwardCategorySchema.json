@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "PLAYER_OF_THE_SEASON",
+    "LEADING_RUN_SCORER",
+    "LEADING_WICKET_TAKER",
+    "BEST_FIELDER",
+    "EMERGING_YOUTH_PLAYER"
+  ],
+  "$id": "urn:lcxxvi:SeasonAwardCategory:1",
+  "title": "SeasonAwardCategory"
+}

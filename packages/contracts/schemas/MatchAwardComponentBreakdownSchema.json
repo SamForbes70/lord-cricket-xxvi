@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "battingPointsX100": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "bowlingPointsX100": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "fieldingPointsX100": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "resultBonusX100": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "battingPointsX100",
+    "bowlingPointsX100",
+    "fieldingPointsX100",
+    "resultBonusX100"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:MatchAwardComponentBreakdown:1",
+  "title": "MatchAwardComponentBreakdown"
+}

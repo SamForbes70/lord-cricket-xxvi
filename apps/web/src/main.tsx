@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AWARDS_PROVENANCE_NOTICE, type MatchAwardCandidate } from "@lcxxvi/contracts";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
 import {
   projectPreMatchBriefing,
@@ -1200,6 +1201,56 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   : view.format}
                 . Review the innings below.
               </p>
+              {view.matchAward && (
+                <div
+                  className="match-award-box"
+                  data-testid="match-award-panel"
+                >
+                  <div className="match-award-head">
+                    <strong>Player of the Match</strong>
+                    <span className="award-provenance-tag" data-testid="match-award-provenance">
+                      Game award · {view.matchAward.awardVersion}
+                    </span>
+                  </div>
+                  {view.matchAward.status === "AWARDED" && view.matchAward.winnerPlayerId ? (
+                    <>
+                      <p data-testid="match-award-winner">
+                        <strong>
+                          {view.names[view.matchAward.winnerPlayerId] ?? view.matchAward.winnerPlayerId}
+                        </strong>{" "}
+                        (
+                        {view.teams.find((t) => t.id === view.matchAward?.winnerTeamId)?.name ??
+                          view.matchAward.winnerTeamId}
+                        {view.matchAward.fromLosingTeam ? " · losing side" : ""}) ·{" "}
+                        {((view.matchAward.scoreTotalX100 ?? 0) / 100).toFixed(2)} pts
+                      </p>
+                      <p className="match-award-explain">{view.matchAward.explanationText}</p>
+                      {view.matchAward.components && (
+                        <p className="match-award-breakdown" data-testid="match-award-breakdown">
+                          Bat {(view.matchAward.components.battingPointsX100 / 100).toFixed(1)} · Bowl{" "}
+                          {(view.matchAward.components.bowlingPointsX100 / 100).toFixed(1)} · Field{" "}
+                          {(view.matchAward.components.fieldingPointsX100 / 100).toFixed(1)} · Result{" "}
+                          {(view.matchAward.components.resultBonusX100 / 100).toFixed(1)}
+                        </p>
+                      )}
+                      {view.matchAward.candidates.length > 1 && (
+                        <ol className="match-award-candidates">
+                          {view.matchAward.candidates.slice(0, 3).map((cand: MatchAwardCandidate) => (
+                            <li key={cand.playerId}>
+                              {view.names[cand.playerId] ?? cand.playerId} (
+                              {view.teams.find((t) => t.id === cand.teamId)?.name ?? cand.teamId}):{" "}
+                              {(cand.totalPointsX100 / 100).toFixed(2)} pts — {cand.summaryLine}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </>
+                  ) : (
+                    <p data-testid="match-award-winner">{view.matchAward.explanationText}</p>
+                  )}
+                  <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+                </div>
+              )}
               <button
                 disabled={busy || fatal}
                 onClick={() => send({ type: "VERIFY" })}

@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "awardVersion": {
+      "type": "string",
+      "const": "LC_AWARDS_HEURISTIC_GAME_V1"
+    },
+    "awardCategory": {
+      "type": "string",
+      "const": "PLAYER_OF_THE_MATCH"
+    },
+    "awardProvenance": {
+      "type": "string",
+      "const": "GAME_AWARD"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "T20",
+        "ODI",
+        "RED_BALL"
+      ]
+    },
+    "matchId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "fixtureId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "seasonNumber": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sourceCompletionSha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "AWARDED",
+        "NO_RESULT_NOT_AWARDED"
+      ]
+    },
+    "winnerPlayerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "winnerTeamId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fromWinningTeam": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fromLosingTeam": {
+      "type": "boolean"
+    },
+    "scoreTotalX100": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "components": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "battingPointsX100": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "bowlingPointsX100": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "fieldingPointsX100": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "resultBonusX100": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "battingPointsX100",
+            "bowlingPointsX100",
+            "fieldingPointsX100",
+            "resultBonusX100"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fieldingSourceStatus": {
+      "type": "string",
+      "enum": [
+        "ARCHIVE_EVENTS",
+        "SCORECARD_NOT_ATTRIBUTABLE"
+      ]
+    },
+    "explanationText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "formulaSummary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "candidates": {
+      "maxItems": 5,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "battingPointsX100": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "bowlingPointsX100": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "fieldingPointsX100": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "resultBonusX100": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "totalPointsX100": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "fromWinningTeam": {
+            "type": "boolean"
+          },
+          "summaryLine": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "playerId",
+          "teamId",
+          "battingPointsX100",
+          "bowlingPointsX100",
+          "fieldingPointsX100",
+          "resultBonusX100",
+          "totalPointsX100",
+          "fromWinningTeam",
+          "summaryLine"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "awardVersion",
+    "awardCategory",
+    "awardProvenance",
+    "format",
+    "matchId",
+    "fixtureId",
+    "seasonNumber",
+    "sourceCompletionSha256",
+    "status",
+    "winnerPlayerId",
+    "winnerTeamId",
+    "fromWinningTeam",
+    "fromLosingTeam",
+    "scoreTotalX100",
+    "components",
+    "fieldingSourceStatus",
+    "explanationText",
+    "formulaSummary",
+    "candidates"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:MatchAwardRecord:1",
+  "title": "MatchAwardRecord"
+}

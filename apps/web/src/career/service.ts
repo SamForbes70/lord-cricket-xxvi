@@ -19,6 +19,7 @@ import {
   type AcademyTrainingFocus,
   type ActivePersistentSeasonState,
   type ClubBudgetState,
+  type CareerAwardsLedger,
   type CompletedCareerMatchEventArchive,
   type CompletedLifecycleMatchEventArchive,
   type CompletedSeasonRecord,
@@ -28,6 +29,7 @@ import {
   type HistoricalPlayerRecord,
   type HistoricalStatisticsProjection,
   type LifecycleSeasonState,
+  type MatchAwardRecord,
   type MatchConditionDelta,
   type NewGameWorldCopy,
   type PersistentWorldIdentity,
@@ -44,6 +46,7 @@ import {
   type RetiredPlayerRecord,
   type RosterCareerDayState,
   type SeasonArchive,
+  type SeasonAwardsSummary,
   type SeasonCheckpointInspection,
   type SeasonEconomyTransitionSummary,
   type SeasonFixture,
@@ -71,6 +74,7 @@ import {
   buildHistoricalStatsSourceFromPersistentWorld,
   buildHistoricalStatsSourceFromSingleSeason,
   projectHistoricalStatistics,
+  reconcileCareerAwardsLedger,
 } from "@lcxxvi/projections";
 import {
   acceptCounterOffer as applyAcceptCounterOffer,
@@ -1275,6 +1279,8 @@ export type CareerSeasonRepository = {
   }>;
   inspectCheckpoints?(saveId: string): Promise<SeasonCheckpointInspection>;
   loadGeneration?(saveId: string, generation: number): Promise<SeasonLoadResult>;
+  loadAwardsLedger?(saveId: string): Promise<CareerAwardsLedger | null>;
+  saveAwardsLedger?(saveId: string, ledger: CareerAwardsLedger): Promise<CareerAwardsLedger>;
 };
 
 export type CareerPersistentWorldRepository = {
@@ -1299,6 +1305,8 @@ export type CareerPersistentWorldRepository = {
   loadLifecycleRosterPacks?(saveId: string): Promise<Map<string, StagedRosterPack>>;
   inspectCheckpoints?(saveId: string): Promise<SeasonCheckpointInspection>;
   loadGeneration?(saveId: string, generation: number): Promise<PersistentWorldLoadResult>;
+  loadAwardsLedger?(saveId: string): Promise<CareerAwardsLedger | null>;
+  saveAwardsLedger?(saveId: string, ledger: CareerAwardsLedger): Promise<CareerAwardsLedger>;
 };
 
 function toSlotSummaryFromSingle(summary: SeasonSaveSummary): CareerSlotSummary {
@@ -1363,6 +1371,8 @@ export class CareerApplicationService {
   private error = "";
   private cachedArchivesKey: string | null = null;
   private cachedArchives: readonly AnyCareerMatchEventArchive[] = [];
+  private awardsLedger: CareerAwardsLedger | null = null;
+  private awardsLedgerKey: string | null = null;
 
   constructor(
     ownerId?: string,
@@ -1574,6 +1584,13 @@ export class CareerApplicationService {
     }
   }
 
+  private resetArchiveAndAwardsCaches(): void {
+    this.cachedArchivesKey = null;
+    this.cachedArchives = [];
+    this.awardsLedger = null;
+    this.awardsLedgerKey = null;
+  }
+
   async leaveCareer(): Promise<void> {
     if (this.saveId) {
       await this.releaseCurrentLease();
@@ -1590,6 +1607,7 @@ export class CareerApplicationService {
     this.saveId = null;
     this.readOnly = false;
     this.recovered = false;
+    this.resetArchiveAndAwardsCaches();
     this.setStatus("Idle");
   }
 
@@ -1625,6 +1643,7 @@ export class CareerApplicationService {
       this.worldCopy = null;
       this.saveId = null;
       this.readOnly = true;
+      this.resetArchiveAndAwardsCaches();
       this.setStatus("Idle");
       return;
     }
@@ -1638,6 +1657,7 @@ export class CareerApplicationService {
       this.saveId = saveId;
       this.readOnly = true;
       this.recovered = loaded.recovered;
+      this.resetArchiveAndAwardsCaches();
       this.setStatus("Read-only");
       return;
     }
@@ -1650,6 +1670,7 @@ export class CareerApplicationService {
     this.saveId = saveId;
     this.readOnly = true;
     this.recovered = loaded.recovered;
+    this.resetArchiveAndAwardsCaches();
     this.setStatus("Read-only");
   }
 
@@ -1708,6 +1729,7 @@ export class CareerApplicationService {
       this.saveId = saveId;
       this.readOnly = false;
       this.recovered = false;
+      this.resetArchiveAndAwardsCaches();
       this.setStatus("Saved");
       return worldState.currentSeason;
     }
@@ -1751,6 +1773,7 @@ export class CareerApplicationService {
     this.saveId = saveId;
     this.readOnly = false;
     this.recovered = false;
+    this.resetArchiveAndAwardsCaches();
     this.setStatus("Saved");
     return state;
   }
@@ -1815,6 +1838,7 @@ export class CareerApplicationService {
       this.saveId = targetSaveId;
       this.readOnly = readOnly;
       this.recovered = loaded.recovered;
+      this.resetArchiveAndAwardsCaches();
       this.setStatus(readOnly ? "Read-only" : loaded.recovered ? "Recovered" : "Saved");
       return loaded.state.currentSeason;
     }
@@ -1876,6 +1900,7 @@ export class CareerApplicationService {
     this.saveId = targetSaveId;
     this.readOnly = readOnly;
     this.recovered = loaded.recovered;
+    this.resetArchiveAndAwardsCaches();
     this.setStatus(readOnly ? "Read-only" : loaded.recovered ? "Recovered" : "Saved");
     return loaded.state;
   }
@@ -3725,6 +3750,7 @@ export class CareerApplicationService {
       const rosterPacks = this.persistentRepository.loadLifecycleRosterPacks
         ? [...(await this.persistentRepository.loadLifecycleRosterPacks(saveId)).values()]
         : [];
+      const awardsLedger = await this.syncAwardsLedger();
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION) {
         return createPersistentWorldPortableArchiveV3(
           loaded.state,
@@ -3733,6 +3759,7 @@ export class CareerApplicationService {
           loaded.worldCopy ?? null,
           eventArchives.length > 0 ? eventArchives : null,
           rosterPacks.length > 0 ? rosterPacks : null,
+          awardsLedger,
         );
       }
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION) {
@@ -3743,6 +3770,7 @@ export class CareerApplicationService {
           loaded.worldCopy ?? null,
           eventArchives.length > 0 ? eventArchives : null,
           rosterPacks.length > 0 ? rosterPacks : null,
+          awardsLedger,
         );
       }
       const v1EventArchives = eventArchives.filter(
@@ -3755,6 +3783,7 @@ export class CareerApplicationService {
         nowIso(),
         loaded.worldCopy ?? null,
         v1EventArchives.length > 0 ? v1EventArchives : null,
+        awardsLedger,
       );
     }
 
@@ -3771,6 +3800,7 @@ export class CareerApplicationService {
     const eventArchives = this.repository.loadMatchEventArchives
       ? (await this.repository.loadMatchEventArchives(saveId, state)).archives
       : [];
+    const awardsLedger = await this.syncAwardsLedger();
     return createSeasonPortableArchive(
       state,
       loaded.summary,
@@ -3778,6 +3808,7 @@ export class CareerApplicationService {
       archive,
       loaded.worldCopy ?? null,
       eventArchives.length > 0 ? eventArchives : null,
+      awardsLedger,
     );
   }
 
@@ -3824,6 +3855,9 @@ export class CareerApplicationService {
           ? { seasonRosterPacks: imported.seasonRosterPacks }
           : {}),
       });
+      if (imported.awardsLedger && this.persistentRepository.saveAwardsLedger) {
+        await this.persistentRepository.saveAwardsLedger(saveId, imported.awardsLedger);
+      }
       this.persistentState = imported.state;
       this.state = imported.state.currentSeason;
       this.saveTitle = title;
@@ -3831,6 +3865,7 @@ export class CareerApplicationService {
       this.saveId = saveId;
       this.readOnly = false;
       this.recovered = false;
+      this.resetArchiveAndAwardsCaches();
       this.setStatus("Saved");
       return imported.state.currentSeason;
     }
@@ -3860,6 +3895,9 @@ export class CareerApplicationService {
         ? { matchEventArchives: imported.matchEventArchives }
         : {}),
     });
+    if (imported.awardsLedger && this.repository.saveAwardsLedger) {
+      await this.repository.saveAwardsLedger(saveId, imported.awardsLedger);
+    }
     this.persistentState = null;
     this.state = imported.state;
     this.saveTitle = title;
@@ -3867,6 +3905,7 @@ export class CareerApplicationService {
     this.saveId = saveId;
     this.readOnly = false;
     this.recovered = false;
+    this.resetArchiveAndAwardsCaches();
     this.setStatus("Saved");
     return imported.state;
   }
@@ -4410,6 +4449,141 @@ export class CareerApplicationService {
     const projection = this.historicalStatistics(query, archivesOverride);
     if (!projection) return null;
     return projection.players.find((player) => player.playerId === playerId) ?? null;
+  }
+
+  private awardsWorldOrCareerId(): string | null {
+    if (this.persistentState) {
+      return this.persistentState.worldIdentity.worldId;
+    }
+    return this.state?.careerId ?? null;
+  }
+
+  private awardsNameMaps(): {
+    playerNames: Record<string, string>;
+    teamNames: Record<string, string>;
+  } {
+    const activeWorld = this.getWorld();
+    const playerNames: Record<string, string> = {};
+    for (const player of world.players) playerNames[player.playerId] = player.name;
+    for (const r of this.getLifecycleState()?.retiredPlayers ?? []) {
+      playerNames[r.playerId] = r.player.name;
+    }
+    for (const fa of this.getEconomyState()?.freeAgents ?? []) {
+      playerNames[fa.playerId] = fa.player.name;
+    }
+    for (const yp of this.getLifecycleState()?.youthAcademy ?? []) {
+      playerNames[yp.prospectId] = yp.player.name;
+    }
+    for (const player of activeWorld.players) playerNames[player.playerId] = player.name;
+    const teamNames: Record<string, string> = {};
+    for (const team of world.teams) teamNames[team.teamId] = team.name;
+    for (const team of activeWorld.teams) teamNames[team.teamId] = team.name;
+    return { playerNames, teamNames };
+  }
+
+  /**
+   * Reconciles the persistent CAREER_AWARDS_LEDGER_V1 against every completed
+   * fixture across all seasons of the loaded career, idempotently, and persists
+   * it when the ledger changed and this tab holds the writer lease.
+   */
+  async syncAwardsLedger(): Promise<CareerAwardsLedger | null> {
+    if (!this.state || !this.saveId) return null;
+    const worldOrCareerId = this.awardsWorldOrCareerId();
+    if (!worldOrCareerId) return null;
+    const ledgerKey = `${this.saveId}:${worldOrCareerId}:${this.currentArchiveCacheKey() ?? "none"}`;
+    if (this.awardsLedger && this.awardsLedgerKey === ledgerKey) {
+      return this.awardsLedger;
+    }
+    const repository = this.persistentState ? this.persistentRepository : this.repository;
+    if (!repository?.loadAwardsLedger || !repository.saveAwardsLedger) {
+      return null;
+    }
+    try {
+      const existing = await repository.loadAwardsLedger(this.saveId);
+      if (existing && existing.worldOrCareerId !== worldOrCareerId) {
+        return null;
+      }
+      const archives = await this.loadCareerEventArchives();
+      const { playerNames, teamNames } = this.awardsNameMaps();
+      const singleSeason = this.persistentState
+        ? null
+        : {
+            seasonNumber: 1,
+            calendarYear: (() => {
+              const schedule = this.state!.schedule as unknown as {
+                startDate?: string;
+                request?: { startDate?: string };
+              };
+              const startDate = schedule.startDate ?? schedule.request?.startDate;
+              return (
+                (startDate ? Number.parseInt(startDate.slice(0, 4), 10) : NaN) ||
+                INITIAL_PERSISTENT_CALENDAR_YEAR
+              );
+            })(),
+            phase: this.state.phase,
+            finalSeasonStateSha256:
+              this.state.phase === "COMPLETE" ? this.state.stateSha256 : null,
+            completedMatches: this.state.completedMatches,
+          };
+      const { ledger, changed } = reconcileCareerAwardsLedger({
+        worldOrCareerId,
+        existingLedger: existing,
+        persistentWorld: this.persistentState,
+        singleSeason,
+        archives,
+        playerNames,
+        teamNames,
+      });
+      this.awardsLedger = ledger;
+      this.awardsLedgerKey = ledgerKey;
+      if (changed && !this.readOnly) {
+        this.awardsLedger = await repository.saveAwardsLedger(this.saveId, ledger);
+      }
+      return this.awardsLedger;
+    } catch {
+      return this.awardsLedgerKey === ledgerKey ? this.awardsLedger : null;
+    }
+  }
+
+  getAwardsLedger(): CareerAwardsLedger | null {
+    return this.awardsLedger;
+  }
+
+  getSeasonAwards(seasonNumber: number): SeasonAwardsSummary | null {
+    return (
+      this.awardsLedger?.seasonAwards.find((season) => season.seasonNumber === seasonNumber) ??
+      null
+    );
+  }
+
+  getMatchAwardForFixture(seasonNumber: number, fixtureId: string): MatchAwardRecord | null {
+    const entry = this.awardsLedger?.matchAwards.find(
+      (item) => item.seasonNumber === seasonNumber && item.fixtureId === fixtureId,
+    );
+    return entry?.award ?? null;
+  }
+
+  getPlayerAwardsSummary(playerId: string): {
+    playerOfTheMatchCount: number;
+    playerOfTheMatchSeasons: number[];
+    seasonAwards: SeasonAwardsSummary[];
+  } | null {
+    if (!this.awardsLedger || !this.state) return null;
+    const potmEntries = this.awardsLedger.matchAwards.filter(
+      (entry) => entry.award.status === "AWARDED" && entry.award.winnerPlayerId === playerId,
+    );
+    const seasonAwards = this.awardsLedger.seasonAwards.filter((season) =>
+      season.awards.some(
+        (award) => award.status === "AWARDED" && award.winnerPlayerId === playerId,
+      ),
+    );
+    return {
+      playerOfTheMatchCount: potmEntries.length,
+      playerOfTheMatchSeasons: [...new Set(potmEntries.map((entry) => entry.seasonNumber))].sort(
+        (a, b) => a - b,
+      ),
+      seasonAwards,
+    };
   }
 
   sourceHashForUserMatch(parts: unknown): string {

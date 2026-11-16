@@ -1,4 +1,4 @@
-import { RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type RosterSeasonState, StagedRosterPackSchema, type StagedRosterPack, canonicalJson, replayDelegationJournal, type DelegationJournal, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonPortableManifestV3Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION, PersistentWorldPortableManifestSchema, PersistentWorldPortableV2ManifestSchema, PersistentWorldPortableV3ManifestSchema, PersistentWorldSaveSummarySchema, type CompletedCareerMatchEventArchive, type PersistentWorldPortableManifest, type PersistentWorldPortableV2Manifest, type PersistentWorldPortableV3Manifest, type PersistentWorldSaveSummary, type PersistentWorldState, type PersistentWorldStateV2, type PersistentWorldStateV3, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonPortableManifestV3, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, type NewGameWorldCopy } from "@lcxxvi/contracts";
+import { RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type RosterSeasonState, StagedRosterPackSchema, type StagedRosterPack, canonicalJson, replayDelegationJournal, type DelegationJournal, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonPortableManifestV3Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION, PersistentWorldPortableManifestSchema, PersistentWorldPortableV2ManifestSchema, PersistentWorldPortableV3ManifestSchema, PersistentWorldSaveSummarySchema, type CompletedCareerMatchEventArchive, type PersistentWorldPortableManifest, type PersistentWorldPortableV2Manifest, type PersistentWorldPortableV3Manifest, type PersistentWorldSaveSummary, type PersistentWorldState, type PersistentWorldStateV2, type PersistentWorldStateV3, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonPortableManifestV3, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, CareerAwardsLedgerSchema, type CareerAwardsLedger, type NewGameWorldCopy } from "@lcxxvi/contracts";
 import { SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION, sha256Bytes, type SaveSummary } from "./index.js";
 import { SEASON_SAVE_SCHEMA_VERSION, SEASON_PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SEASON_SAVE_VERSION, validateCompletedCareerMatchEventArchive, validateSeasonMatchEventArchiveSet, validateStoredWorldCopy, validateT20SeasonArchive, validateT20SeasonState, type AnyCareerMatchEventArchive } from "./season.js";
 import { validatePersistentWorldMatchEventArchiveSet, validatePersistentWorldState, validatePersistentWorldStateV2, validatePersistentWorldStateV3, type AnyPersistentWorldState } from "./persistent-world.js";
@@ -535,6 +535,7 @@ export async function createSeasonPortableArchive(
   completedArchiveRaw: unknown | null = null,
   worldCopyRaw: unknown | null = null,
   matchEventArchivesRaw: readonly unknown[] | null = null,
+  awardsLedgerRaw: unknown | null = null,
 ): Promise<Uint8Array> {
   const state = await validateT20SeasonState(stateRaw);
   const summary = SeasonSaveSummarySchema.parse(summaryRaw);
@@ -561,6 +562,10 @@ export async function createSeasonPortableArchive(
       name: "match-events.ndjson",
       data: encoder.encode(validatedEventArchives.map((a) => canonicalJson(a)).join("\n") + "\n"),
     });
+  }
+  if (awardsLedgerRaw !== null) {
+    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
+    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
   }
   const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
   for (const payload of payloads) fileMeta[payload.name] = { bytes: payload.data.length, sha256: await sha256Bytes(payload.data) };
@@ -601,9 +606,10 @@ export async function readSeasonPortableArchive(bytes: Uint8Array): Promise<{
   seasonArchive: SeasonArchive | null;
   worldCopy: NewGameWorldCopy | null;
   matchEventArchives: CompletedCareerMatchEventArchive[];
+  awardsLedger: CareerAwardsLedger | null;
 }> {
   const files = parseZip(bytes);
-  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "projection.json", "season-archive.json", "world-copy.json", "match-events.ndjson"]);
+  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "projection.json", "season-archive.json", "world-copy.json", "match-events.ndjson", "awards-ledger.json"]);
   for (const name of files.keys()) if (!allowed.has(name)) throw new Error("SEASON_ARCHIVE_FILE_NOT_ALLOWED");
   for (const required of ["manifest.json", "game.json", "events.ndjson", "projection.json"])
     if (!files.has(required)) throw new Error(`SEASON_ARCHIVE_MISSING_${required}`);
@@ -678,7 +684,13 @@ export async function readSeasonPortableArchive(bytes: Uint8Array): Promise<{
     if (seasonArchive.stateSha256 !== state.stateSha256) throw new Error("SEASON_ARCHIVE_FINAL_STATE_MISMATCH");
   }
   if ((state.phase === "COMPLETE") !== Boolean(seasonArchive)) throw new Error("SEASON_ARCHIVE_COMPLETION_PAYLOAD_MISMATCH");
-  return { state, summary, manifest, seasonArchive, worldCopy, matchEventArchives };
+  let awardsLedger: CareerAwardsLedger | null = null;
+  if (files.has("awards-ledger.json")) {
+    let ledgerRaw: unknown;
+    try { ledgerRaw = JSON.parse(decoder.decode(files.get("awards-ledger.json")!)); } catch { throw new Error("SEASON_ARCHIVE_AWARDS_LEDGER_JSON_INVALID"); }
+    awardsLedger = CareerAwardsLedgerSchema.parse(ledgerRaw);
+  }
+  return { state, summary, manifest, seasonArchive, worldCopy, matchEventArchives, awardsLedger };
 }
 
 export const ROSTER_SEASON_PORTABLE_VERSION = "LC_T20_ROSTER_SEASON_PORTABLE_V1" as const;
@@ -742,6 +754,7 @@ export async function createPersistentWorldPortableArchive(
   exportedAt: string,
   worldCopyRaw: unknown | null = null,
   matchEventArchivesRaw: readonly unknown[] | null = null,
+  awardsLedgerRaw: unknown | null = null,
 ): Promise<Uint8Array> {
   const state = await validatePersistentWorldState(stateRaw);
   const summary = PersistentWorldSaveSummarySchema.parse(summaryRaw);
@@ -801,7 +814,11 @@ export async function createPersistentWorldPortableArchive(
     });
   }
 
-  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};if (awardsLedgerRaw !== null) {
+    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
+    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
+  }
+  
   for (const payload of payloads) {
     fileMeta[payload.name] = {
       bytes: payload.data.length,
@@ -835,6 +852,7 @@ export async function readPersistentWorldPortableArchive(bytes: Uint8Array): Pro
   manifest: PersistentWorldPortableManifest;
   worldCopy: NewGameWorldCopy | null;
   matchEventArchives: CompletedCareerMatchEventArchive[];
+  awardsLedger: CareerAwardsLedger | null;
 }> {
   const files = parseZip(bytes, MAX_PERSISTENT_ARCHIVE_BYTES, MAX_PERSISTENT_EXPANDED_BYTES);
   const allowed = new Set([
@@ -845,6 +863,7 @@ export async function readPersistentWorldPortableArchive(bytes: Uint8Array): Pro
     "active-events.ndjson",
     "world-copy.json",
     "match-events.ndjson",
+    "awards-ledger.json",
   ]);
   for (const name of files.keys()) {
     if (!allowed.has(name)) throw new Error("PERSISTENT_WORLD_ARCHIVE_FILE_NOT_ALLOWED");
@@ -1003,7 +1022,13 @@ export async function readPersistentWorldPortableArchive(bytes: Uint8Array): Pro
     );
   }
 
-  return { state, summary, manifest, worldCopy, matchEventArchives };
+  let awardsLedger: CareerAwardsLedger | null = null;
+  if (files.has("awards-ledger.json")) {
+    let ledgerRaw: unknown;
+    try { ledgerRaw = JSON.parse(decoder.decode(files.get("awards-ledger.json")!)); } catch { throw new Error("PERSISTENT_WORLD_ARCHIVE_AWARDS_LEDGER_JSON_INVALID"); }
+    awardsLedger = CareerAwardsLedgerSchema.parse(ledgerRaw);
+  }
+  return { state, summary, manifest, worldCopy, matchEventArchives, awardsLedger };
 }
 
 export async function createPersistentWorldPortableArchiveV2(
@@ -1013,6 +1038,7 @@ export async function createPersistentWorldPortableArchiveV2(
   worldCopyRaw: unknown | null = null,
   matchEventArchivesRaw: readonly unknown[] | null = null,
   seasonRosterPacksRaw: readonly unknown[] | null = null,
+  awardsLedgerRaw: unknown | null = null,
 ): Promise<Uint8Array> {
   const state = await validatePersistentWorldStateV2(stateRaw);
   const summary = PersistentWorldSaveSummarySchema.parse(summaryRaw);
@@ -1097,7 +1123,11 @@ export async function createPersistentWorldPortableArchiveV2(
     });
   }
 
-  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};if (awardsLedgerRaw !== null) {
+    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
+    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
+  }
+  
   for (const payload of payloads) {
     fileMeta[payload.name] = {
       bytes: payload.data.length,
@@ -1134,6 +1164,7 @@ export async function readPersistentWorldPortableArchiveV2(bytes: Uint8Array): P
   worldCopy: NewGameWorldCopy | null;
   matchEventArchives: AnyCareerMatchEventArchive[];
   seasonRosterPacks: StagedRosterPack[];
+  awardsLedger: CareerAwardsLedger | null;
 }> {
   const files = parseZip(bytes, MAX_PERSISTENT_ARCHIVE_BYTES, MAX_PERSISTENT_EXPANDED_BYTES);
   const allowed = new Set([
@@ -1145,6 +1176,7 @@ export async function readPersistentWorldPortableArchiveV2(bytes: Uint8Array): P
     "lifecycle-roster-packs.ndjson",
     "world-copy.json",
     "match-events.ndjson",
+    "awards-ledger.json",
   ]);
   for (const name of files.keys()) {
     if (!allowed.has(name)) throw new Error("PERSISTENT_WORLD_ARCHIVE_FILE_NOT_ALLOWED");
@@ -1335,7 +1367,13 @@ export async function readPersistentWorldPortableArchiveV2(bytes: Uint8Array): P
     ).archives;
   }
 
-  return { state, summary, manifest, worldCopy, matchEventArchives, seasonRosterPacks };
+  let awardsLedger: CareerAwardsLedger | null = null;
+  if (files.has("awards-ledger.json")) {
+    let ledgerRaw: unknown;
+    try { ledgerRaw = JSON.parse(decoder.decode(files.get("awards-ledger.json")!)); } catch { throw new Error("PERSISTENT_WORLD_ARCHIVE_AWARDS_LEDGER_JSON_INVALID"); }
+    awardsLedger = CareerAwardsLedgerSchema.parse(ledgerRaw);
+  }
+  return { state, summary, manifest, worldCopy, matchEventArchives, seasonRosterPacks, awardsLedger };
 }
 
 export async function createPersistentWorldPortableArchiveV3(
@@ -1345,6 +1383,7 @@ export async function createPersistentWorldPortableArchiveV3(
   worldCopyRaw: unknown | null = null,
   matchEventArchivesRaw: readonly unknown[] | null = null,
   seasonRosterPacksRaw: readonly unknown[] | null = null,
+  awardsLedgerRaw: unknown | null = null,
 ): Promise<Uint8Array> {
   const state = await validatePersistentWorldStateV3(stateRaw);
   const summary = PersistentWorldSaveSummarySchema.parse(summaryRaw);
@@ -1433,7 +1472,11 @@ export async function createPersistentWorldPortableArchiveV3(
     });
   }
 
-  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};
+  const fileMeta: Record<string, { bytes: number; sha256: string }> = {};if (awardsLedgerRaw !== null) {
+    const awardsLedger = CareerAwardsLedgerSchema.parse(awardsLedgerRaw);
+    payloads.push({ name: "awards-ledger.json", data: encoder.encode(canonicalJson(awardsLedger)) });
+  }
+  
   for (const payload of payloads) {
     fileMeta[payload.name] = {
       bytes: payload.data.length,
@@ -1471,6 +1514,7 @@ export async function readPersistentWorldPortableArchiveV3(bytes: Uint8Array): P
   worldCopy: NewGameWorldCopy | null;
   matchEventArchives: AnyCareerMatchEventArchive[];
   seasonRosterPacks: StagedRosterPack[];
+  awardsLedger: CareerAwardsLedger | null;
 }> {
   const files = parseZip(bytes, MAX_PERSISTENT_ARCHIVE_BYTES, MAX_PERSISTENT_EXPANDED_BYTES);
   const allowed = new Set([
@@ -1483,6 +1527,7 @@ export async function readPersistentWorldPortableArchiveV3(bytes: Uint8Array): P
     "lifecycle-roster-packs.ndjson",
     "world-copy.json",
     "match-events.ndjson",
+    "awards-ledger.json",
   ]);
   for (const name of files.keys()) {
     if (!allowed.has(name)) throw new Error("PERSISTENT_WORLD_ARCHIVE_FILE_NOT_ALLOWED");
@@ -1685,7 +1730,13 @@ export async function readPersistentWorldPortableArchiveV3(bytes: Uint8Array): P
     ).archives;
   }
 
-  return { state, summary, manifest, worldCopy, matchEventArchives, seasonRosterPacks };
+  let awardsLedger: CareerAwardsLedger | null = null;
+  if (files.has("awards-ledger.json")) {
+    let ledgerRaw: unknown;
+    try { ledgerRaw = JSON.parse(decoder.decode(files.get("awards-ledger.json")!)); } catch { throw new Error("PERSISTENT_WORLD_ARCHIVE_AWARDS_LEDGER_JSON_INVALID"); }
+    awardsLedger = CareerAwardsLedgerSchema.parse(ledgerRaw);
+  }
+  return { state, summary, manifest, worldCopy, matchEventArchives, seasonRosterPacks, awardsLedger };
 }
 
 export async function readAnyPersistentWorldPortableArchive(bytes: Uint8Array): Promise<{

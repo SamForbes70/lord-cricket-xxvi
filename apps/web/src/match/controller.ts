@@ -3,6 +3,7 @@ import {
   projectInMatchTacticalAssistant,
   projectLiveFieldPresentation,
   projectMatchAudioCues,
+  computeMatchAward,
   projectMatchCommentary,
 } from "@lcxxvi/projections";
 import {
@@ -41,6 +42,7 @@ import {
   type CommentaryEntry,
   type InMatchTacticalAssistantView,
   type LiveFieldPresentation,
+  type MatchAwardRecord,
 } from "@lcxxvi/contracts";
 import { validateNewGameWorldCopy } from "../world/new-game-world.js";
 import {
@@ -154,6 +156,7 @@ export function createMatchController(
   let cachedDisplayWorld: typeof displayWorld | null = null;
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
   let cachedFieldPresentation: LiveFieldPresentation | null = null;
+  let cachedMatchAward: MatchAwardRecord | null = null;
   let cachedCommentary: CommentaryEntry[] = [];
   let cachedAudioCues: AudioCue[] = [];
   function view(): View | null {
@@ -329,6 +332,17 @@ export function createMatchController(
       analytics: scorecard ? analyticsCache.snapshot(scorecard) : null,
       tacticalAssistant: cachedAssistant,
       fieldPresentation: cachedFieldPresentation,
+      matchAward:
+        c.phase === "COMPLETE" && scorecard
+          ? (cachedMatchAward ??=
+              computeMatchAward({
+                format: "T20",
+                scorecard,
+                events: s.events,
+                playerNames: names,
+                teamNames: Object.fromEntries(displayWorld.teams.map((t) => [t.teamId, t.name])),
+              }))
+          : null,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,

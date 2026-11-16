@@ -1,14 +1,22 @@
 import React, { useEffect, useRef } from "react";
-import type {
-  HistoricalPlayerRecord,
-  PersistentCareerPlayerStats,
-  PlayerContract,
-  PlayerLifecycleSkillLedgerEntry,
-  RetiredPlayerRecord,
-  SeasonPlayerStats,
-  SquadPlayerTrainingConditionView,
-  WorldPack,
+import {
+  AWARDS_PROVENANCE_NOTICE,
+  type HistoricalPlayerRecord,
+  type PersistentCareerPlayerStats,
+  type PlayerContract,
+  type PlayerLifecycleSkillLedgerEntry,
+  type RetiredPlayerRecord,
+  type SeasonAwardsSummary,
+  type SeasonPlayerStats,
+  type SquadPlayerTrainingConditionView,
+  type WorldPack,
 } from "@lcxxvi/contracts";
+
+export type PlayerAwardsSummary = {
+  playerOfTheMatchCount: number;
+  playerOfTheMatchSeasons: number[];
+  seasonAwards: SeasonAwardsSummary[];
+};
 
 type Format = "T20" | "ODI" | "RED_BALL";
 const labels = { T20: "T20", ODI: "ODI", RED_BALL: "Red ball" } as const;
@@ -64,6 +72,7 @@ export function PlayerPage({
   onFormat,
   onBack,
   backLabel,
+  awardsSummary = null,
 }: {
   player: WorldPack["players"][number];
   condition: SquadPlayerTrainingConditionView | null;
@@ -86,6 +95,7 @@ export function PlayerPage({
   onFormat: (value: Format) => void;
   onBack: () => void;
   backLabel: string;
+  awardsSummary?: PlayerAwardsSummary | null;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -447,6 +457,77 @@ export function PlayerPage({
               </div>
             </div>
           )}
+        </section>
+      )}
+      {format === "T20" && awardsSummary && (
+        <section
+          className="career-panel"
+          aria-labelledby="player-awards-heading"
+          data-testid="player-awards-summary"
+          style={{ marginTop: "16px" }}
+        >
+          <div className="section-bar">
+            <h3 id="player-awards-heading">Awards &amp; honours</h3>
+            <span className="award-provenance-tag">Game award</span>
+          </div>
+          <dl className="player-details" style={{ maxWidth: "460px", marginBottom: "12px" }}>
+            <dt>Player of the Match awards</dt>
+            <dd data-testid="player-potm-count">
+              {awardsSummary.playerOfTheMatchCount}
+              {awardsSummary.playerOfTheMatchSeasons.length > 0 && (
+                <small style={{ marginLeft: "6px" }}>
+                  (Seasons {awardsSummary.playerOfTheMatchSeasons.join(", ")})
+                </small>
+              )}
+            </dd>
+          </dl>
+          {(() => {
+            const wonSeasonAwards = awardsSummary.seasonAwards.flatMap((season) =>
+              season.awards
+                .filter(
+                  (award) =>
+                    award.status === "AWARDED" && award.winnerPlayerId === player.playerId,
+                )
+                .map((award) => ({ season, award })),
+            );
+            if (wonSeasonAwards.length === 0) {
+              return <p>No season awards won yet across completed or active T20 seasons.</p>;
+            }
+            return (
+              <div className="table-wrap">
+                <table data-testid="player-season-awards-table">
+                  <thead>
+                    <tr>
+                      <th>Season</th>
+                      <th>Award</th>
+                      <th>Club</th>
+                      <th>Headline stat</th>
+                      <th>Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {wonSeasonAwards.map(({ season, award }) => (
+                      <tr key={`${season.seasonNumber}-${award.category}`}>
+                        <td>
+                          Season {season.seasonNumber} ({season.calendarYear})
+                        </td>
+                        <td>
+                          <strong>{award.label}</strong>
+                          {award.tieBroken ? <small> · Tie-break applied</small> : null}
+                        </td>
+                        <td>{award.winnerTeamId ? teamName(award.winnerTeamId) : "–"}</td>
+                        <td>{award.headlineStat ?? "–"}</td>
+                        <td>
+                          {award.scoreX100 !== null ? `${(award.scoreX100 / 100).toFixed(2)} pts` : "–"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
+          <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
         </section>
       )}
     </section>

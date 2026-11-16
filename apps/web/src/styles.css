@@ -1064,3 +1064,46 @@ code {
 .audio-provenance-details {
   margin-top: 0.7rem;
 }
+.match-award-box {
+  margin: 0.9rem 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid #8ea896;
+  border-left: 4px solid #194b38;
+  border-radius: 6px;
+  background: #f5f9f6;
+  color: #16261d;
+}
+.match-award-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+.award-provenance-tag {
+  display: inline-block;
+  padding: 0.16rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #8ea896;
+  background: #ffffff;
+  color: #143d2d;
+  font-size: 0.82em;
+  font-weight: 600;
+}
+.match-award-explain,
+.match-award-breakdown,
+.award-notice {
+  margin: 0.3rem 0;
+  font-size: 0.92em;
+  color: #243b2f;
+}
+.award-notice {
+  font-size: 0.84em;
+  color: #354f41;
+}
+.match-award-candidates {
+  margin: 0.45rem 0 0.25rem 1.25rem;
+  padding: 0;
+  font-size: 0.88em;
+}
