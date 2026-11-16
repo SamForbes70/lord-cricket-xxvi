@@ -4531,6 +4531,10 @@ export class CareerApplicationService {
         persistentWorld: this.persistentState,
         singleSeason,
         archives,
+        knownPlayers: [
+          ...careerWorld.players,
+          ...(this.getEconomyState()?.freeAgents.map((fa) => fa.player) ?? []),
+        ],
         playerNames,
         teamNames,
       });

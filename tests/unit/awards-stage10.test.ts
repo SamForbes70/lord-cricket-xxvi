@@ -42,6 +42,7 @@ import {
   type CareerSeasonRepository,
 } from "../../apps/web/src/career/service.js";
 import { createNewGameWorldCopy } from "../../apps/web/src/world/new-game-world.js";
+import { createInitialPlayerLifecycleState, derivePersistentWorldIdentity } from "@lcxxvi/simulation";
 
 class InMemorySeasonRepo implements CareerSeasonRepository {
   private activeId: string | null = null;
@@ -265,6 +266,39 @@ describe("Stage 10 — Match and season awards (S10-01)", () => {
     expect(seasonAwards.awards.find((a) => a.category === "LEADING_WICKET_TAKER")?.winnerPlayerId).toBe("starBowl");
     expect(seasonAwards.awards.find((a) => a.category === "BEST_FIELDER")?.status).toBe("UNAVAILABLE");
     expect(seasonAwards.awards.find((a) => a.category === "EMERGING_YOUTH_PLAYER")?.status).toBe("UNAVAILABLE");
+  });
+
+  it("Emerging Player for a past season does not change when the winner later leaves the active world", () => {
+    const worldIdentity = derivePersistentWorldIdentity({ worldId: "world-emerging", baseSeed: "seed-emerging", originKind: "NEW_PERSISTENT_CAREER" });
+    const lifecycle = createInitialPlayerLifecycleState({ worldIdentity, baseWorld: careerWorld, seasonNumber: 1, calendarYear: 2026 });
+    const youngest = [...lifecycle.activeWorld.players].sort((a, b) => (a.birthDate < b.birthDate ? 1 : a.birthDate > b.birthDate ? -1 : 0))[0]!;
+    const calendarYear = Number.parseInt(youngest.birthDate.slice(0, 4), 10) + 21;
+    const completion = makeSyntheticCompletion({
+      fixtureId: "fix-e", matchId: "m-e", ordinal: 0, round: 1, homeTeamId: "t1", awayTeamId: "t2", winnerTeamId: "t1", hashChar: "b",
+      homeBatting: { [youngest.playerId]: { runs: 71, ballsFaced: 44, fours: 7, sixes: 2, dismissed: false } },
+      awayBatting: { oppBat: { runs: 30, ballsFaced: 30, fours: 2, sixes: 0, dismissed: true } },
+      homeBowling: { otherBowl: { legalBalls: 24, runsConceded: 20, wickets: 2, maidens: 0 } },
+      awayBowling: { oppBowl: { legalBalls: 24, runsConceded: 30, wickets: 0, maidens: 0 } },
+    });
+    const emerging = (lc: typeof lifecycle) =>
+      computeSeasonAwards({ seasonNumber: 1, calendarYear, completedMatches: [completion], lifecycle: lc, knownPlayers: careerWorld.players })
+        .awards.find((a) => a.category === "EMERGING_YOUTH_PLAYER");
+    const atSeasonEnd = emerging(lifecycle);
+    expect(atSeasonEnd?.winnerPlayerId).toBe(youngest.playerId);
+
+    // Released at rollover: gone from the active world; the birth date still comes from the base world.
+    const released = structuredClone(lifecycle);
+    released.activeWorld.players = released.activeWorld.players.filter((p) => p.playerId !== youngest.playerId);
+    expect(emerging(released)?.winnerPlayerId).toBe(youngest.playerId);
+
+    // Retired after this season: still eligible for this season.
+    const retired = structuredClone(released);
+    retired.retiredPlayers = [
+      ...retired.retiredPlayers,
+      { playerId: youngest.playerId, player: youngest, debutSeasonNumber: 1, retiredAfterSeasonNumber: 1, retiredCalendarYear: calendarYear,
+        ageAtRetirement: 21, lastTeamId: "t1", careerTeamIds: ["t1"], retirementReason: "VETERAN_TRANSITION" } as (typeof lifecycle)["retiredPlayers"][number],
+    ];
+    expect(emerging(retired)?.winnerPlayerId).toBe(youngest.playerId);
   });
 
   it("records awards idempotently, preserves match/season hashes, and round-trips through portable archives and CareerApplicationService", async () => {

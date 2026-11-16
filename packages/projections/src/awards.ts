@@ -438,6 +438,8 @@ export function computeSeasonAwards(input: {
   matchAwards?: readonly MatchAwardRecord[];
   archivesByFixtureId?: ReadonlyMap<string, AnyCareerMatchEventArchive>;
   lifecycle?: PlayerLifecycleState | null;
+  /** Extra players whose birth dates are known (base world, free agents); used only for youth eligibility. */
+  knownPlayers?: readonly { playerId: string; birthDate: string }[];
   playerNames?: Readonly<Record<string, string>>;
   teamNames?: Readonly<Record<string, string>>;
 }): SeasonAwardsSummary {
@@ -734,23 +736,41 @@ export function computeSeasonAwards(input: {
   );
 
   // 5. Emerging / Youth Player
+  // Eligibility uses only facts fixed for this season (birth date, promotion season, retirement season),
+  // so the award is the same whenever the ledger is computed, including after rollovers and on import
+  // (audit 16 Nov 2026, Phase 3). The current active world alone is not enough: released and retired
+  // players have left it.
   const youthEligibleIds = new Set<string>();
   const ageByPlayerId = new Map<string, number>();
   if (input.lifecycle) {
-    const retiredIds = new Set(input.lifecycle.retiredPlayers.map((r) => r.playerId));
-    const promotedIds = new Set(
+    const birthDateById = new Map<string, string>();
+    const remember = (player: { playerId: string; birthDate: string }) => {
+      if (!birthDateById.has(player.playerId)) birthDateById.set(player.playerId, player.birthDate);
+    };
+    input.lifecycle.activeWorld.players.forEach(remember);
+    input.lifecycle.retiredPlayers.forEach((r) => remember(r.player));
+    input.lifecycle.youthAcademy.forEach((y) => remember(y.player));
+    for (const pack of input.lifecycle.historicalRosterPacks) pack.world.players.forEach(remember);
+    (input.knownPlayers ?? []).forEach(remember);
+    const retiredAfter = new Map(
+      input.lifecycle.retiredPlayers.map((r) => [r.playerId, r.retiredAfterSeasonNumber] as const),
+    );
+    const promotedIn = new Map(
       input.lifecycle.youthAcademy
         .filter((y) => y.promotedInSeasonNumber !== null)
-        .map((y) => y.player.playerId),
+        .map((y) => [y.player.playerId, y.promotedInSeasonNumber!] as const),
     );
-    for (const lp of input.lifecycle.activeWorld.players) {
-      const birthYear = Number.parseInt(lp.birthDate.slice(0, 4), 10);
+    for (const p of players) {
+      const birthDate = birthDateById.get(p.playerId);
+      if (!birthDate) continue;
+      const birthYear = Number.parseInt(birthDate.slice(0, 4), 10);
       const age = Number.isInteger(birthYear) && birthYear >= 1900
         ? Math.max(16, input.calendarYear - birthYear)
         : 99;
-      ageByPlayerId.set(lp.playerId, age);
-      if (!retiredIds.has(lp.playerId) && (age <= 22 || promotedIds.has(lp.playerId))) {
-        youthEligibleIds.add(lp.playerId);
+      ageByPlayerId.set(p.playerId, age);
+      const retiredBefore = (retiredAfter.get(p.playerId) ?? Number.POSITIVE_INFINITY) < input.seasonNumber;
+      if (!retiredBefore && (age <= 22 || promotedIn.get(p.playerId) === input.seasonNumber)) {
+        youthEligibleIds.add(p.playerId);
       }
     }
   }
@@ -890,6 +910,7 @@ export function reconcileCareerAwardsLedger(input: {
     completedMatches: readonly T20SeasonMatchCompletion[];
   } | null;
   archives?: readonly AnyCareerMatchEventArchive[] | ReadonlyMap<string, AnyCareerMatchEventArchive>;
+  knownPlayers?: readonly { playerId: string; birthDate: string }[];
   playerNames?: Readonly<Record<string, string>>;
   teamNames?: Readonly<Record<string, string>>;
 }): { ledger: CareerAwardsLedger; changed: boolean } {
@@ -986,6 +1007,7 @@ export function reconcileCareerAwardsLedger(input: {
           matchAwards: seasonMatchAwards,
           archivesByFixtureId: archiveMap,
           lifecycle,
+          ...(input.knownPlayers ? { knownPlayers: input.knownPlayers } : {}),
           ...(input.playerNames ? { playerNames: input.playerNames } : {}),
           ...(input.teamNames ? { teamNames: input.teamNames } : {}),
         });
