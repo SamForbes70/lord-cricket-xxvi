@@ -74,3 +74,7 @@ Why this figure. An 8 GB laptop must also run the operating system and other app
 
 - The owner (Sam Forbes) accepted **Stage 10: Match and season awards** (`feat/stage10-match-season-awards`, [verification-stage10-match-season-awards/REPORT.md](verification-stage10-match-season-awards/REPORT.md)) on 16 November 2026 (Australia/Brisbane), authorised committing and pushing `feat/stage10-match-season-awards` and merging it to `main`, and authorised proceeding with a dedicated Windows double-click launcher branch (`feat/windows-double-click-launcher`) from `main`.
 - Local Linux core (`770/770` unit tests across `72/72` files, `334` JSON Schemas) and Chromium + Firefox Stage 10 + Stage 9/accessibility regression browser checks (`8/8` across both runs) passed prior to merge; hosted GitHub Actions (`Linux` and `Windows`) run after push.
+
+## Owner decision, 16 November 2026 — Windows Double-Click & Zero-Dependency `.NET` Portable Launcher
+
+- The owner (Sam Forbes) approved Option A on 16 November 2026 (Australia/Brisbane): accepting and merging Stage 10 (`feat/stage10-match-season-awards`) to `main`, implementing the non-disruptive Windows double-click launcher and zero-dependency `.NET Framework 4.x` portable executable builder (`Play-Lord-Cricket.bat`, `tools/windows/*`, `scripts/package-game.mjs`, `start.mjs`, `tests/unit/windows-launcher.test.ts`), and pushing the fully documented repository and AI roadmap guide to GitHub.

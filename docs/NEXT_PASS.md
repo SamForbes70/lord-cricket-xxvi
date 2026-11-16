@@ -68,7 +68,8 @@ The owner accepted Stage 10 (`S10-01`) on 16 November 2026 ([OWNER_DECISIONS_202
 
 1. **Transparent versioned heuristic & disclaimers (`LC_AWARDS_HEURISTIC_GAME_V1`, `LC_CAREER_AWARDS_LEDGER_V1`)**: Computes deterministic Player of the Match (`T20`, `ODI`, `RED_BALL`, losing-side winner & no-result support, archived-event fielding integration) and 5 season awards (`PLAYER_OF_THE_SEASON`, `LEADING_RUN_SCORER`, `LEADING_WICKET_TAKER`, `BEST_FIELDER`, `EMERGING_YOUTH_PLAYER`) with explicit `GAME_AWARD` disclaimers and zero extra RNG calls.
 2. **Idempotent persistence & full UI coverage**: Persists `CAREER_AWARDS_LEDGER_V1` in IndexedDB and optional hash-checked `awards/ledger.json` entries inside `.lcxxvi` archives without breaking backwards compatibility, surfacing awards in Match Result, Archived Replay, Career Roll of Honour, Statistics Season Awards, and `PlayerPage`.
-3. **Next eligible slice**: **Stage 11 (Player and manager stories)** — event-driven milestone, streak, selection/contract pressure, and board-review cards derived strictly from committed seasons, awards, and stats.
+3. **Windows double-click & portable `.NET` launcher**: Implemented and verified (`Play-Lord-Cricket.bat`, `tools/windows/*`, `LordCricketLauncher.cs` -> `LordCricketXXVI.exe`, `tests/unit/windows-launcher.test.ts` `3/3`).
+4. **Next eligible slice**: **Stage 11 (Player and manager stories, `S11-01`)** — event-driven milestone, streak, selection/contract pressure, and board-review cards derived strictly from committed seasons, awards, and stats ([ROADMAP_AND_AI_GUIDE.md](ROADMAP_AND_AI_GUIDE.md)).
 
 ## Open items that still need people
 

@@ -1,6 +1,6 @@
 # Prompt for an AI inspecting this project
 
-Paste everything below the line into another AI, or point it at this file. It is written to be checked against the repository, not trusted. The commit numbers and counts in it are a snapshot taken on 13 November 2026; run `git log` to see whether main has moved, and trust the repository over this text.
+Paste everything below the line into another AI, or point it at this file. It is written to be checked against the repository, not trusted. The commit numbers and counts in sections 4–7 are a historical V0.1 snapshot taken on 13 November 2026. Since then, Stages 2 through 10 and the Windows double-click launcher have been implemented, verified (`773/773` unit tests across `73/73` files, `334` JSON Schemas), and merged to `main` (16 November 2026). Read `docs/ROADMAP_AND_AI_GUIDE.md` and `docs/MASTER_BUILD_LEDGER.md` first for the current post-Stage-10 state and Stage 11–17 blueprints, run `git log` to see the latest revision, and always trust the repository over this text.
 
 ---
 

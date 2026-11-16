@@ -2,7 +2,7 @@
 
 ## Start here
 
-Lord Cricket XXVI is a browser-based statistical cricket management game built as a TypeScript monorepo. The current playable product is a fictional, single-season synthetic alpha. The finished multi-season management game remains a development goal.
+Lord Cricket XXVI is a browser-based statistical cricket management game built as a TypeScript monorepo. The current playable product (`main`) includes V0.1 plus Stages 2 through 10 (persistent multi-season world, player lifecycle & youth academy, contracts/budgets & recruitment, tactical briefings, 2D live field, contextual commentary, optional procedural audio, historical statistics & leaderboards, and match/season awards) plus double-click Windows launchers (`Play-Lord-Cricket.bat`, `tools/windows/*`). Stages 11 through 17 and empirical model calibration remain on the roadmap ([ROADMAP_AND_AI_GUIDE.md](ROADMAP_AND_AI_GUIDE.md)).
 
 | Reader | Start with |
 | --- | --- |
