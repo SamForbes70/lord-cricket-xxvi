@@ -29,6 +29,9 @@ async function expectShutdownGuarded(port: number): Promise<void> {
   // A DNS-rebinding page arrives with its own Host name.
   expect(await rawRequest(port, "GET", "/__lcxxvi-health", { Host: `attacker.example:${port}` })).toBe(403);
   expect(await rawRequest(port, "POST", "/__lcxxvi-shutdown", { Host: `attacker.example:${port}`, "X-LCXXVI-Shutdown": "1" })).toBe(403);
+  // Only GET and HEAD are served, and nothing outside the served folder.
+  expect(await rawRequest(port, "POST", "/index.html", local)).toBe(405);
+  expect(await rawRequest(port, "GET", "/%2e%2e/%2e%2e/package.json", local)).not.toBe(200);
   // The server is still up after every refused attempt.
   expect(await rawRequest(port, "GET", "/__lcxxvi-health", local)).toBe(200);
   // The launcher's own request, with the header, stops it.
@@ -176,6 +179,7 @@ describe("Windows double-click launcher and portable game package", () => {
         "lord-cricket-xxvi-game/start-windows.ps1",
         "lord-cricket-xxvi-game/LordCricketLauncher.cs",
         "lord-cricket-xxvi-game/serve.mjs",
+        "lord-cricket-xxvi-game/static-server.mjs",
         "lord-cricket-xxvi-game/index.html",
         "lord-cricket-xxvi-game/README.txt",
         "lord-cricket-xxvi-game/VERSION.txt",
