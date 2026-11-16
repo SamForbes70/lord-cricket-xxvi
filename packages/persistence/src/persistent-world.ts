@@ -1002,6 +1002,8 @@ export async function inspectPersistentWorldCheckpoints(input: {
   });
 }
 
+const PREPARED_COMPLETED_RECORDS = new WeakMap<object, { seasonId: string; payload: string; sha256: string }>();
+
 /** The archive JSON of a stored row, decompressing rows from the compressed scope. */
 async function archiveRowText(row: ProjectionRecord): Promise<string> {
   return row.scope === CAREER_MATCH_EVENTS_GZIP_SCOPE
@@ -1011,6 +1013,8 @@ async function archiveRowText(row: ProjectionRecord): Promise<string> {
 
 export class IndexedDbPersistentWorldRepository {
   private dbPromise: Promise<IDBDatabase> | null = null;
+  /** saveId + seasonId to the sha256 of the completed-season row this instance last committed. */
+  private readonly writtenCompletedRecords = new Map<string, string>();
   constructor(private readonly databaseName = DB_NAME) {}
 
   private open(): Promise<IDBDatabase> {
@@ -1158,14 +1162,20 @@ export class IndexedDbPersistentWorldRepository {
     const worldCopyPayload = worldCopy ? canonicalJson(worldCopy) : null;
     const suppliedCopyHash = worldCopyPayload ? await seasonSha256Text(worldCopyPayload) : null;
 
+    // Sealed seasons are carried forward as the same objects, so their serialisation is cached by identity
+    // instead of being recomputed on every commit (audit M1).
     const preparedCompletedRecords = await Promise.all(
       state.completedSeasons.map(async (record) => {
+        const cached = PREPARED_COMPLETED_RECORDS.get(record as object);
+        if (cached) return cached;
         const recordPayload = canonicalJson(record);
-        return {
+        const prepared = {
           seasonId: record.seasonId,
           payload: recordPayload,
           sha256: await seasonSha256Text(recordPayload),
         };
+        PREPARED_COMPLETED_RECORDS.set(record as object, prepared);
+        return prepared;
       }),
     );
 
@@ -1383,7 +1393,12 @@ export class IndexedDbPersistentWorldRepository {
       payload: careerProjectionPayload,
       sha256: careerProjectionHash,
     } satisfies ProjectionRecord);
+    const pendingCompletedWrites: Array<[string, string]> = [];
     for (const rec of preparedCompletedRecords) {
+      // An unchanged sealed season already written by this repository need not be written again.
+      const writtenKey = `${input.saveId}\u0000${rec.seasonId}`;
+      if (this.writtenCompletedRecords.get(writtenKey) === rec.sha256) continue;
+      pendingCompletedWrites.push([writtenKey, rec.sha256]);
       projections.put({
         saveId: input.saveId,
         scope: COMPLETED_SEASON_RECORD_SCOPE,
@@ -1505,6 +1520,8 @@ export class IndexedDbPersistentWorldRepository {
       return abortWith("SEASON_SAVE_INJECTED_ABORT");
     }
     await txDone(tx);
+    // Only after the transaction has committed.
+    for (const [key, sha256] of pendingCompletedWrites) this.writtenCompletedRecords.set(key, sha256);
     return { summary, idempotentReplay: false };
   }
 
