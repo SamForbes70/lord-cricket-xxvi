@@ -31,6 +31,7 @@ import {
 import {
   derivePersistentWorldIdentity,
   runPlayerLifecycleDiagnosticHorizon,
+  runPlayerLifecycleDiagnosticHorizonAsync,
 } from "@lcxxvi/simulation";
 import {
   CareerApplicationService,
@@ -541,21 +542,22 @@ describe("Stage 3 player lifecycle and youth pathway", () => {
 
   it(
     "simulates a 20-season player lifecycle diagnostic horizon with balanced ability distributions, squad supply, and zero role shortages",
-    () => {
+    async () => {
       const worldIdentity = derivePersistentWorldIdentity({
         worldId: "diag-world-20s",
         baseSeed: "diag-seed-stage3-20-seasons",
         originKind: "NEW_PERSISTENT_CAREER",
       });
 
-      const reportA = runPlayerLifecycleDiagnosticHorizon({
+      const reportA = await runPlayerLifecycleDiagnosticHorizonAsync({
         worldIdentity,
         baseWorld: careerWorld,
         seasons: 20,
         startCalendarYear: 2026,
         startDate: "2026-04-04",
         controlledTeamId: "team-01",
-      });
+      }, () => new Promise((resolve) => setTimeout(resolve, 0)));
+      // Synchronous runner: must match the yielding one exactly.
       const reportB = runPlayerLifecycleDiagnosticHorizon({
         worldIdentity,
         baseWorld: careerWorld,

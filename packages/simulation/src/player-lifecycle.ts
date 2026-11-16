@@ -1644,7 +1644,7 @@ export function snapshotLifecycleSeasonDiagnostics(
  * T20 seasons (`simulateMatches: true`) or deterministic workload seasons, reporting ability
  * distributions, squad supply, and role-shortage counts per season.
  */
-export function runPlayerLifecycleDiagnosticHorizon(input: {
+type PlayerLifecycleHorizonInput = {
   worldIdentity: PersistentWorldIdentity;
   baseWorld: WorldPack;
   seasons: number;
@@ -1652,11 +1652,15 @@ export function runPlayerLifecycleDiagnosticHorizon(input: {
   startDate?: string;
   controlledTeamId?: string | null;
   simulateFullMatches?: boolean;
-}): {
+};
+type PlayerLifecycleHorizonResult = {
   snapshots: LifecycleDiagnosticSeasonSnapshot[];
   finalLifecycle: PlayerLifecycleState;
   totalMatchesSimulated: number;
-} {
+};
+
+/** One season per step, so callers can yield between seasons. */
+function* playerLifecycleHorizonSteps(input: PlayerLifecycleHorizonInput): Generator<number, PlayerLifecycleHorizonResult> {
   assertLifecycle(input.seasons >= 1 && input.seasons <= 200, "INVALID_DIAGNOSTIC_HORIZON");
   const startCalendarYear = input.startCalendarYear ?? 2027;
   const startMonthDay = (input.startDate ?? "2027-01-03").slice(5, 10);
@@ -1671,6 +1675,7 @@ export function runPlayerLifecycleDiagnosticHorizon(input: {
   let totalMatchesSimulated = 0;
 
   for (let s = 1; s <= input.seasons; s++) {
+    if (s > 1) yield s;
     const calendarYear = startCalendarYear + (s - 1);
     snapshots.push(snapshotLifecycleSeasonDiagnostics(lifecycle, s, calendarYear));
     if (s === input.seasons) break;
@@ -1835,6 +1840,23 @@ export function runPlayerLifecycleDiagnosticHorizon(input: {
   }
 
   return { snapshots, finalLifecycle: lifecycle, totalMatchesSimulated };
+}
+
+export function runPlayerLifecycleDiagnosticHorizon(input: PlayerLifecycleHorizonInput): PlayerLifecycleHorizonResult {
+  const steps = playerLifecycleHorizonSteps(input);
+  for (let step = steps.next(); ; step = steps.next()) if (step.done) return step.value;
+}
+
+/** Same result as runPlayerLifecycleDiagnosticHorizon, awaiting the caller's `yieldControl` between seasons. */
+export async function runPlayerLifecycleDiagnosticHorizonAsync(
+  input: PlayerLifecycleHorizonInput,
+  yieldControl: () => Promise<void>,
+): Promise<PlayerLifecycleHorizonResult> {
+  const steps = playerLifecycleHorizonSteps(input);
+  for (let step = steps.next(); ; step = steps.next()) {
+    if (step.done) return step.value;
+    await yieldControl();
+  }
 }
 
 export function seasonStartDateOf(season: ActivePersistentSeasonState): string {
