@@ -78,3 +78,19 @@ Why this figure. An 8 GB laptop must also run the operating system and other app
 ## Owner decision, 16 November 2026 — Windows Double-Click & Zero-Dependency `.NET` Portable Launcher
 
 - The owner (Sam Forbes) approved Option A on 16 November 2026 (Australia/Brisbane): accepting and merging Stage 10 (`feat/stage10-match-season-awards`) to `main`, implementing the non-disruptive Windows double-click launcher and zero-dependency `.NET Framework 4.x` portable executable builder (`Play-Lord-Cricket.bat`, `tools/windows/*`, `scripts/package-game.mjs`, `start.mjs`, `tests/unit/windows-launcher.test.ts`), and pushing the fully documented repository and AI roadmap guide to GitHub.
+
+## Owner decision, 16 November 2026: audit response and stabilisation first
+
+Recorded from the owner's chat reply to the five questions in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md) (Phase 0). Owner's words, verbatim:
+
+> My decisions: 1. Yes we keep 2. Your best advice please 3. Yes they may pause 4. Yes 5. Yes. I am open to the idea that the fastest route to finishing is to stabilise and review what exists before adding any new features. Do that first. Get what we currently have as excellent, then we will finish the full game.
+
+What each answer settles:
+
+1. **Scope.** Stages 2 to 10 stay as delivered scope. They are not feature-flagged.
+2. **Authority.** The owner delegated this to the reviewing agent. Advice adopted: the "AI Master Build Brief" is retired as an authority, because it is not in the repository and cannot be checked. [MASTER_BUILD_LEDGER.md](MASTER_BUILD_LEDGER.md) remains as history only. The governing roadmap is the design brief (Lord_Cricket_XXVI_Technical_Design_V0_1) plus the phased plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md). The owner can reverse this by committing the Master Build Brief.
+3. **Concurrent agents.** Other agents (Copilot, "Agent Zero", "Lord Cricket Engineer") may be paused while stabilisation runs. Pausing them is an owner action outside the repository.
+4. **Branch protection.** The owner will apply it; see [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md). Agents do not change repository settings.
+5. **Acceptance records.** The owner confirms the Stage 2 to 10 acceptances recorded above. Hosted CI for those commits was red (see the audit); this confirmation does not convert that into a pass.
+
+**Direction:** no new features until the audit's stabilisation phases (1 to 6) are complete and reviewed. Each phase lands through a draft pull request with green hosted CI before the owner merges.

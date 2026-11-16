@@ -39,16 +39,13 @@ Research promotion, public deployment, purchases and deletion of owner data reta
 5. Commit coherent changes. Separate unpromoted research work from production code and keep all capability flags accurate.
 
 ## Current task boundary
-V0.1 is closed and owner accepted (13 November 2026; see `docs/OWNER_DECISIONS_2026-11-13.md`). The performance, owner-PC and screen-reader gates are owner declared with no measurement stored in the repository: never describe them as measured or observed.
-The owner's sequence is persistent world, then player lifecycle, then squad economy, each accepted before the next begins. Start with `docs/HANDOVER.md` and `docs/NEXT_PASS.md`.
-The baseline recovery task is delivered through merged PR #2. Issue #1 retains the owner-PC automation evidence gap.
-The owner authorised M7K research preparation on 26 October 2026. PR #3 records that research preparation.
-All source-case adjudication flags remain false; a merge does not authorise production ledger integration or model promotion.
-Research-model promotion still requires explicit approval.
-Use `docs/CURRENT_STATUS.md` and `docs/ACCEPTANCE_RECONCILIATION.md` before selecting further work.
+**Stabilise before adding features.** On 16 November 2026 the owner directed: "Get what we currently have as excellent, then we will finish the full game." Work only on the phased plan in `docs/AUDIT_2026-11-16.md` (Phase 1: green hosted CI; Phase 2: safety and save-format integrity; Phase 3: career-system correctness; Phase 4: scale and performance; Phase 5: maintainability; Phase 6: Windows delivery and documentation). No new features until those phases are complete and reviewed. See `docs/OWNER_DECISIONS_2026-11-13.md` (16 November entry).
+The governing roadmap is the design brief plus that plan. The "AI Master Build Brief" is not in the repository and is retired as an authority; `docs/MASTER_BUILD_LEDGER.md` is history only.
+V0.1 is closed and owner accepted (13 November 2026). Stages 2 to 10 are owner accepted (confirmed 16 November 2026) but landed with hosted CI red; that is not a pass. The performance, owner-PC and screen-reader gates are owner declared with no measurement stored in the repository: never describe them as measured or observed.
+All source-case adjudication flags remain false; research-model promotion still requires explicit approval.
 
 ## Working agreements (read before you change anything)
-- All changes go through a pull request: branch from `main`, open a draft PR, wait for hosted CI (Linux, and Windows which takes 25 to 30 minutes), merge only on green. Never push directly to `main`; five unreviewed direct pushes had to be reviewed after the fact (`docs/REVIEW_2026-11-13.md`).
+- All changes go through a pull request: branch from `main`, open a draft PR, wait for hosted CI (Linux about 25 minutes, Windows about 60 minutes), merge only on green. Never push directly to `main`: five unreviewed direct pushes had to be reviewed after the fact (`docs/REVIEW_2026-11-13.md`), and twelve more (Stages 2 to 10, 14 to 16 November) landed with CI red (`docs/AUDIT_2026-11-16.md`). Never write "accepted" or "passed" without a green hosted CI run link and, for acceptance, the owner's quoted words.
 - After every pull run `npx tsc -b` before the tests; stale compiled packages cause confusing unit failures. Check exit codes, not only output.
 - Do not add skipped browser tests (hosted Windows CI fails them). Never skip or disable a test to get green.
 - Do not widen a persisted format without a new version identifier. Do not change the frozen scoring kernel, engines, generator, random stream or probability tables.
