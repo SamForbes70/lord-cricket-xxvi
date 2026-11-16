@@ -1,0 +1,54 @@
+name: Windows native game launcher
+
+on:
+  pull_request:
+    paths:
+      - "tools/windows/**"
+      - "scripts/package-game.mjs"
+      - "package.json"
+      - ".github/workflows/windows-launcher.yml"
+      - "apps/web/**"
+      - "packages/**"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  package-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install pinned project build dependencies
+        run: npm ci
+      - name: Build Vite distribution
+        run: npm run build
+      - name: Compile native C# launcher using Windows .NET Framework
+        shell: pwsh
+        run: ./tools/windows/build-exe.ps1 -OutFile ./apps/web/dist/LordCricketXXVI.exe
+      - name: Create portable release ZIP (Windows EXE required)
+        run: npm run package:game -- --require-windows-exe
+      - name: Test extracted ZIP on Windows (HTTP, single instance, shutdown)
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem release-packages/lord-cricket-xxvi-game-*.zip | Select-Object -First 1
+          if (-not $zip) { throw 'Package ZIP was not generated' }
+          $dest = Join-Path $env:RUNNER_TEMP 'LordCricketWindowsPackage'
+          Expand-Archive -LiteralPath $zip.FullName -DestinationPath $dest -Force
+          $game = Join-Path $dest 'lord-cricket-xxvi-game'
+          foreach ($required in @('index.html', 'LordCricketXXVI.exe', 'Play-Lord-Cricket.bat', 'start-windows.ps1', 'LordCricketLauncher.cs', 'Build-Exe.bat')) {
+            if (-not (Test-Path (Join-Path $game $required))) { throw "Missing packaged file: $required" }
+          }
+          ./tools/windows/smoke-launcher.ps1 -GameDir $game
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lord-Cricket-XXVI-Windows-Portable
+          path: release-packages/lord-cricket-xxvi-game-*.zip
+          if-no-files-found: error
+          retention-days: 30
