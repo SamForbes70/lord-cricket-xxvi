@@ -53,7 +53,7 @@ function Open-GameWindow([string]$Url) {
 if ($Stop) {
   $h = Get-ServerHealth
   if ($h) {
-    try { Invoke-RestMethod -Uri $ShutdownUrl -Method Post -TimeoutSec 3 | Out-Null } catch {}
+    try { Invoke-RestMethod -Uri $ShutdownUrl -Method Post -Headers @{ "X-LCXXVI-Shutdown" = "1" } -TimeoutSec 3 | Out-Null } catch {}
     Write-Host "Stopped Lord Cricket XXVI server on $BaseUrl."
   } else {
     Write-Host "No running server found on $BaseUrl."
