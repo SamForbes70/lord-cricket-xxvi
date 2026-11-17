@@ -102,3 +102,10 @@ Owner's words, verbatim: "merge #56 to #59 once green too", then "muted by defau
 1. **Sound is muted by default.** A player with no saved audio preferences starts muted (`DEFAULT_AUDIO_PREFERENCES.muted`); turning sound on is their choice. Saved preferences are unchanged.
 2. **Finished seasons out of the per-save hash.** Approved as the next save-format work: a new world state version, with V1 to V4 saves still loading unchanged.
 3. **Merging.** Pull requests #56 to #59 are merged once hosted CI is green on their final heads.
+
+## Owner decision, 17 November 2026: pause other agents
+
+Owner's words, verbatim: "Pause other Agents".
+
+- Copilot, "Agent Zero" and "Lord Cricket Engineer" are paused: they must not write to this repository. `AGENTS.md` now says so, for any agent that reads the project instructions.
+- None of them runs from this repository (its only workflows are the CI jobs `verify.yml` and `windows-launcher.yml`), so stopping them where they run is an owner action. At the time of this decision: "Lord Cricket Engineer" last committed `806ef50` on 16 November 2026, from a local address; Copilot has draft pull request #44, idle since 15 November; no commit names "Agent Zero".
