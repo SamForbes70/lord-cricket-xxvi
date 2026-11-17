@@ -6,8 +6,8 @@ import {
   StagedRosterPackSchema,
   ScenarioRecordLedgerSchema,
   type ScenarioRecordLedger,
-  T20SuperOverRecordSchema,
-  type T20SuperOverRecord,
+  SuperOverRecordSchema,
+  type SuperOverRecord,
   type StagedRosterPack,
   type ID,
   type MatchState,
@@ -343,7 +343,7 @@ export class IndexedDbSaveRepository {
   }
 
   /** Stage 14: the super-over record for a tied game, or null when none has started. */
-  async loadSuperOverRecord(gameId: string): Promise<T20SuperOverRecord | null> {
+  async loadSuperOverRecord(gameId: string): Promise<SuperOverRecord | null> {
     const db = await this.open();
     const tx = db.transaction("projections", "readonly");
     const row = (await req(tx.objectStore("projections").get([SUPER_OVER_OWNER, SUPER_OVER_SCOPE, gameId]))) as
@@ -352,7 +352,7 @@ export class IndexedDbSaveRepository {
     await txDone(tx);
     if (!row) return null;
     if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("SUPER_OVER_RECORD_DAMAGED");
-    const record = T20SuperOverRecordSchema.parse(JSON.parse(row.payload));
+    const record = SuperOverRecordSchema.parse(JSON.parse(row.payload));
     if (record.gameId !== gameId) throw new Error("SUPER_OVER_RECORD_DAMAGED");
     return record;
   }
@@ -361,17 +361,17 @@ export class IndexedDbSaveRepository {
    * Writes the record only if the stored one still has `expectedCommands` commands (0 when none is stored), so two tabs
    * cannot interleave commands. Commands are append-only: the stored commands must be a prefix of the new ones.
    */
-  async saveSuperOverRecord(recordRaw: T20SuperOverRecord, expectedCommands: number): Promise<T20SuperOverRecord> {
-    const record = T20SuperOverRecordSchema.parse(recordRaw);
+  async saveSuperOverRecord(recordRaw: SuperOverRecord, expectedCommands: number): Promise<SuperOverRecord> {
+    const record = SuperOverRecordSchema.parse(recordRaw);
     const payload = canonicalJson(record);
     const sha256 = await sha256Text(payload);
     const db = await this.open();
     const tx = db.transaction("projections", "readwrite");
     const store = tx.objectStore("projections");
     const existing = (await req(store.get([SUPER_OVER_OWNER, SUPER_OVER_SCOPE, record.gameId]))) as { payload: string } | undefined;
-    const stored = existing ? T20SuperOverRecordSchema.parse(JSON.parse(existing.payload)) : null;
+    const stored = existing ? SuperOverRecordSchema.parse(JSON.parse(existing.payload)) : null;
     const storedCount = stored?.commands.length ?? 0;
-    const prefixOk = !stored || (stored.baseLastEventHash === record.baseLastEventHash &&
+    const prefixOk = !stored || (stored.schemaId === record.schemaId && stored.baseLastEventHash === record.baseLastEventHash &&
       canonicalJson(stored.commands) === canonicalJson(record.commands.slice(0, storedCount)));
     if (storedCount !== expectedCommands || !prefixOk) {
       tx.abort();

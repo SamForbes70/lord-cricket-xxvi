@@ -1,17 +1,17 @@
-import type { SuperOverCommand, T20SuperOverRecord } from "@lcxxvi/contracts";
+import type { SuperOverCommand, SuperOverRecord } from "@lcxxvi/contracts";
 import {
   createT20SuperOver,
   eligibleSuperOverBatters,
   eligibleSuperOverBowlers,
   executeSuperOverCommand,
-  isTiedT20Match,
+  isTiedLimitedOversMatch,
   summariseSuperOver,
   superOverAutopilotCommand,
   superOverPendingTeam,
   superOverRecord,
   verifySuperOverRecord,
   SUPER_OVER_BATTERS,
-  type T20Session,
+  type SuperOverSession,
   type T20SuperOverState,
 } from "@lcxxvi/simulation";
 import type { SuperOverView } from "./protocol.js";
@@ -22,19 +22,19 @@ import type { SuperOverView } from "./protocol.js";
  */
 
 export type SuperOverStore = {
-  load(gameId: string): Promise<T20SuperOverRecord | null>;
-  save(record: T20SuperOverRecord, expectedCommands: number): Promise<T20SuperOverRecord>;
+  load(gameId: string): Promise<SuperOverRecord | null>;
+  save(record: SuperOverRecord, expectedCommands: number): Promise<SuperOverRecord>;
 };
 
-/** Exhibitions only (owner decision 2a), standard T20 setups only, and only a completed tie. */
-export function superOverEligible(session: unknown, careerBound: boolean): session is T20Session {
-  const s = session as T20Session | null;
+/** Exhibitions only (owner decision 2a), standard T20 and one-day setups only (not roster packs), and only a completed tie. */
+export function superOverEligible(session: unknown, careerBound: boolean): session is SuperOverSession {
+  const s = session as SuperOverSession | null;
+  const setupVersion = (s?.setup as { setupVersion?: string } | undefined)?.setupVersion;
   return (
     !careerBound &&
     !!s &&
-    s.setup?.format === "T20" &&
-    (s.setup as { setupVersion?: string }).setupVersion === "LC_T20_SETUP_V1" &&
-    isTiedT20Match(s)
+    ((s.setup?.format === "T20" && setupVersion === "LC_T20_SETUP_V1") || (s.setup?.format === "ODI" && setupVersion === "LC_ODI_SETUP_V1")) &&
+    isTiedLimitedOversMatch(s)
   );
 }
 
@@ -47,12 +47,13 @@ function ballText(event: T20SuperOverState["deliveries"][number]): string {
   return String(total);
 }
 
-export function superOverView(session: T20Session, state: T20SuperOverState | null): SuperOverView {
+export function superOverView(session: SuperOverSession, state: T20SuperOverState | null): SuperOverView {
   const names = Object.fromEntries(session.setup.teams.flatMap((t) => t.xi.map((p) => [p.playerId, p.name])));
   for (const team of session.setup.teams) names[team.teamId] = team.name;
+  const rulesId = session.setup.format === "ODI" ? ("LC_ODI_SUPER_OVER_01" as const) : ("LC_T20_SUPER_OVER_01" as const);
   if (!state)
     return {
-      rulesId: "LC_T20_SUPER_OVER_01",
+      rulesId,
       started: false,
       phase: "NOT_STARTED",
       rounds: [],
@@ -90,7 +91,7 @@ export function superOverView(session: T20Session, state: T20SuperOverState | nu
       }
     : null;
   return {
-    rulesId: "LC_T20_SUPER_OVER_01",
+    rulesId,
     started: true,
     phase: state.phase,
     rounds: summariseSuperOver(state),
@@ -104,7 +105,7 @@ export function superOverView(session: T20Session, state: T20SuperOverState | nu
   };
 }
 
-export async function loadSuperOverState(session: T20Session, store: SuperOverStore): Promise<{ state: T20SuperOverState | null; commands: SuperOverCommand[] }> {
+export async function loadSuperOverState(session: SuperOverSession, store: SuperOverStore): Promise<{ state: T20SuperOverState | null; commands: SuperOverCommand[] }> {
   const record = await store.load(String(session.setup.gameId));
   if (!record) return { state: null, commands: [] };
   return { state: verifySuperOverRecord(session, record), commands: [...record.commands] };
@@ -116,7 +117,7 @@ export type SuperOverAction =
   | { kind: "AI"; teamId: string };
 
 /** Applies one action and stores the result. Returns the new state (unchanged when the action is a no-op). */
-export async function applySuperOverAction(session: T20Session, store: SuperOverStore, action: SuperOverAction): Promise<T20SuperOverState> {
+export async function applySuperOverAction(session: SuperOverSession, store: SuperOverStore, action: SuperOverAction): Promise<T20SuperOverState> {
   const { state: loaded, commands } = await loadSuperOverState(session, store);
   if (action.kind === "START") {
     if (loaded) return loaded;

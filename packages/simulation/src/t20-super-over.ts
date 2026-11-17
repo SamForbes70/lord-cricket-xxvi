@@ -5,24 +5,28 @@ import {
   EXP_LUT_VERSION,
   PROBABILITY_MODEL_ID,
   SuperOverCommandSchema,
-  T20SuperOverRecordSchema,
+  SuperOverRecordSchema,
   T20_SUPER_OVER_RECORD_SCHEMA_ID,
   T20_SUPER_OVER_RULES_ID,
+  ODI_SUPER_OVER_RECORD_SCHEMA_ID,
+  ODI_SUPER_OVER_RULES_ID,
   type DeliveryRecorded,
   type InningsLedger,
   type Player,
   type SuperOverCommand,
   type SuperOverRoundSummary,
-  type T20SuperOverRecord,
+  type SuperOverRecord,
 } from "@lcxxvi/contracts";
-import { FIELD_REGISTRY, T20_POWERPLAY_SLOTS, MODEL_PACK_SHA256, DELIVERY_STAGE_PACK_SHA256, EXP_LUT_SHA256 } from "@lcxxvi/data";
+import { FIELD_REGISTRY, T20_POWERPLAY_SLOTS, ODI_POWERPLAY_SLOTS, MODEL_PACK_SHA256, DELIVERY_STAGE_PACK_SHA256, EXP_LUT_SHA256 } from "@lcxxvi/data";
 import { validateInningsLedger, contextFromLedger, reduceInningsLedger, selectInningsBatter, selectInningsBowler, scoreDelivery } from "@lcxxvi/domain";
 import { createStateHasher } from "./determinism.js";
 import { generateDelivery, expectedGeneratorPhase } from "./generator.js";
 import { validateT20Field, type T20Session } from "./t20-match.js";
+import { validateODIField, type ODISession } from "./odi-match.js";
 
 /**
- * Stage 14 super overs for tied T20 exhibitions (`LC_T20_SUPER_OVER_01`; rules in `@lcxxvi/contracts` super-over.ts).
+ * Stage 14 super overs for tied T20 and one-day exhibitions (`LC_T20_SUPER_OVER_01`, `LC_ODI_SUPER_OVER_01`; rules in
+ * `@lcxxvi/contracts` super-over.ts).
  * Pure and deterministic: the state is a function of the tied match and the command list. Each ball goes through the
  * frozen generator (`generateDelivery`) and scoring kernel (`scoreDelivery`, `reduceInningsLedger`); this module only
  * decides when a super-over innings ends, who may take part, and who won.
@@ -45,12 +49,35 @@ function assert(value: unknown, code: string): asserts value {
 /** Batters per side in a super over, and so the wickets that end an innings (one fewer). */
 export const SUPER_OVER_BATTERS = 3;
 export const SUPER_OVER_BALLS = 6;
+/** A tied limited-overs match: T20 or one-day. */
+export type SuperOverSession = T20Session | ODISession;
+
 /**
- * The frozen ledger accepts only a 120-ball T20 innings with index 0 or 1, so a super-over innings uses that profile and
- * this module stops it at 6 balls. Random addresses stay unique because the attempt ordinal keeps counting up from the
- * match's last delivery: no (innings, ordinal) pair the match used can recur.
+ * Per-format profile. The frozen ledger accepts only the format's full innings (120 or 300 balls) with index 0 or 1,
+ * so a super-over innings uses that profile and this module stops it at 6 balls. Random addresses stay unique because
+ * the attempt ordinal keeps counting up from the match's last delivery: no (innings, ordinal) pair the match used recurs.
  */
-const LEDGER_ALLOCATED_BALLS = 120;
+const PROFILES = {
+  T20: {
+    ledgerRulesId: "LC_T20_01" as const,
+    allocatedBalls: 120,
+    slots: T20_POWERPLAY_SLOTS,
+    validateField: validateT20Field,
+    rulesId: T20_SUPER_OVER_RULES_ID,
+    recordSchemaId: T20_SUPER_OVER_RECORD_SCHEMA_ID,
+  },
+  ODI: {
+    ledgerRulesId: "LC_ODI_01" as const,
+    allocatedBalls: 300,
+    slots: ODI_POWERPLAY_SLOTS,
+    validateField: validateODIField,
+    rulesId: ODI_SUPER_OVER_RULES_ID,
+    recordSchemaId: ODI_SUPER_OVER_RECORD_SCHEMA_ID,
+  },
+};
+function profileOf(session: SuperOverSession) {
+  return PROFILES[session.setup.format];
+}
 
 export type SuperOverPhase = "AWAITING_LINEUP" | "READY" | "COMPLETE";
 
@@ -64,7 +91,7 @@ type SuperOverInnings = {
 };
 
 export type T20SuperOverState = {
-  rulesId: typeof T20_SUPER_OVER_RULES_ID;
+  rulesId: typeof T20_SUPER_OVER_RULES_ID | typeof ODI_SUPER_OVER_RULES_ID;
   gameId: string;
   baseLastEventHash: string;
   rounds: { roundNumber: number; innings: SuperOverInnings[] }[];
@@ -81,17 +108,17 @@ export type T20SuperOverState = {
   completionReason: "WON" | "NO_ELIGIBLE_PLAYERS" | null;
 };
 
-function teamOf(session: T20Session, teamId: string) {
+function teamOf(session: SuperOverSession, teamId: string) {
   const team = session.setup.teams.find((t) => t.teamId === teamId);
   assert(team, "UNKNOWN_TEAM");
   return team;
 }
-function otherTeam(session: T20Session, teamId: string): string {
+function otherTeam(session: SuperOverSession, teamId: string): string {
   const team = session.setup.teams.find((t) => t.teamId !== teamId);
   assert(team, "UNKNOWN_TEAM");
   return team.teamId;
 }
-function playerOf(session: T20Session, playerId: string): Readonly<Player> {
+function playerOf(session: SuperOverSession, playerId: string): Readonly<Player> {
   const found = session.setup.teams.flatMap((t) => t.xi).find((p) => p.playerId === playerId);
   assert(found, "UNKNOWN_PLAYER");
   return found;
@@ -102,16 +129,18 @@ function namedPosition(slotId: string) {
   return position;
 }
 
-/** True when the match is a completed T20 tie, the only case a super over applies to. */
-export function isTiedT20Match(session: T20Session): boolean {
-  return session.core.phase === "COMPLETE" && session.core.result?.kind === "TIE";
+/** True when the match is a completed T20 or one-day tie, the only case a super over applies to. */
+export function isTiedLimitedOversMatch(session: SuperOverSession): boolean {
+  return (session.setup.format === "T20" || session.setup.format === "ODI") && session.core.phase === "COMPLETE" && session.core.result?.kind === "TIE";
 }
+/** Kept for callers written before one-day super overs. */
+export const isTiedT20Match = isTiedLimitedOversMatch;
 
-export function eligibleSuperOverBatters(session: T20Session, state: T20SuperOverState, teamId: string): string[] {
+export function eligibleSuperOverBatters(session: SuperOverSession, state: T20SuperOverState, teamId: string): string[] {
   const excluded = new Set(state.excludedBatters[teamId] ?? []);
   return teamOf(session, teamId).playerIds.filter((id) => !excluded.has(id));
 }
-export function eligibleSuperOverBowlers(session: T20Session, state: T20SuperOverState, teamId: string): string[] {
+export function eligibleSuperOverBowlers(session: SuperOverSession, state: T20SuperOverState, teamId: string): string[] {
   const team = teamOf(session, teamId);
   const excluded = new Set(state.excludedBowlers[teamId] ?? []);
   return team.playerIds.filter((id) => id !== team.keeperId && playerOf(session, id).bowlingStyle !== null && !excluded.has(id));
@@ -128,14 +157,14 @@ function inningsIndexFor(state: T20SuperOverState): 0 | 1 {
   return state.rounds[state.rounds.length - 1]!.innings.length === 1 ? 0 : 1;
 }
 
-function canStartInnings(session: T20Session, state: T20SuperOverState, battingTeamId: string): boolean {
+function canStartInnings(session: SuperOverSession, state: T20SuperOverState, battingTeamId: string): boolean {
   return (
     eligibleSuperOverBatters(session, state, battingTeamId).length >= 2 &&
     eligibleSuperOverBowlers(session, state, otherTeam(session, battingTeamId)).length >= 1
   );
 }
 
-function openInnings(session: T20Session, state: T20SuperOverState, battingTeamId: string): void {
+function openInnings(session: SuperOverSession, state: T20SuperOverState, battingTeamId: string): void {
   const round = state.rounds[state.rounds.length - 1]!;
   if (!canStartInnings(session, state, battingTeamId)) {
     state.phase = "COMPLETE";
@@ -153,12 +182,12 @@ function openInnings(session: T20Session, state: T20SuperOverState, battingTeamI
   state.phase = "AWAITING_LINEUP";
 }
 
-export function createT20SuperOver(session: T20Session): T20SuperOverState {
-  assert(isTiedT20Match(session), "MATCH_NOT_TIED");
+export function createT20SuperOver(session: SuperOverSession): T20SuperOverState {
+  assert(isTiedLimitedOversMatch(session), "MATCH_NOT_TIED");
   const battedSecond = session.core.innings[1]?.innings.battingTeamId;
   assert(battedSecond, "NO_SECOND_INNINGS");
   const state: T20SuperOverState = {
-    rulesId: T20_SUPER_OVER_RULES_ID,
+    rulesId: profileOf(session).rulesId,
     gameId: session.setup.gameId,
     baseLastEventHash: session.lastEventHash,
     rounds: [{ roundNumber: 1, innings: [] }],
@@ -176,13 +205,13 @@ export function createT20SuperOver(session: T20Session): T20SuperOverState {
   return state;
 }
 
-function newLedger(session: T20Session, state: T20SuperOverState, innings: SuperOverInnings, target: number | null): InningsLedger {
+function newLedger(session: SuperOverSession, state: T20SuperOverState, innings: SuperOverInnings, target: number | null): InningsLedger {
   const bat = teamOf(session, innings.battingTeamId);
   const bowl = teamOf(session, innings.bowlingTeamId);
   const order = [...innings.batterIds!, ...bat.playerIds.filter((id) => !innings.batterIds!.includes(id))];
   return validateInningsLedger({
     engineVersion: SCORING_ENGINE_VERSION,
-    rulesId: "LC_T20_01",
+    rulesId: profileOf(session).ledgerRulesId,
     nextDeliveryIndex: state.attemptOrdinal,
     batting: Object.fromEntries(bat.playerIds.map((id) => [id, { runs: 0, ballsFaced: 0, fours: 0, sixes: 0, dismissed: false }])),
     bowling: Object.fromEntries(bowl.playerIds.map((id) => [id, { runsConceded: 0, legalBalls: 0, wickets: 0, maidens: 0 }])),
@@ -199,7 +228,7 @@ function newLedger(session: T20Session, state: T20SuperOverState, innings: Super
       legalBalls: 0,
       deliveryAttempts: 0,
       targetToWin: target,
-      allocatedBalls: LEDGER_ALLOCATED_BALLS,
+      allocatedBalls: profileOf(session).allocatedBalls,
       extras: { wides: 0, noBalls: 0, byes: 0, legByes: 0, penalties: 0 },
       northBatterId: null,
       southBatterId: null,
@@ -217,7 +246,7 @@ function newLedger(session: T20Session, state: T20SuperOverState, innings: Super
 }
 
 /** Opens the innings at the crease once both sides have named their players. */
-function startPlay(session: T20Session, state: T20SuperOverState): void {
+function startPlay(session: SuperOverSession, state: T20SuperOverState): void {
   const innings = currentInnings(state);
   if (!innings.batterIds || !innings.bowlerId) return;
   const round = state.rounds[state.rounds.length - 1]!;
@@ -233,19 +262,21 @@ function startPlay(session: T20Session, state: T20SuperOverState): void {
   state.phase = "READY";
 }
 
-function fieldSlots(ledger: InningsLedger) {
-  return [...ledger.outfieldIds].sort().map((id, index) => ({ slotId: T20_POWERPLAY_SLOTS[index]!, playerId: id }));
+function fieldSlots(session: SuperOverSession, ledger: InningsLedger) {
+  const slots = profileOf(session).slots;
+  return [...ledger.outfieldIds].sort().map((id, index) => ({ slotId: slots[index]!, playerId: id }));
 }
 
-function bowlBall(session: T20Session, state: T20SuperOverState): void {
+function bowlBall(session: SuperOverSession, state: T20SuperOverState): void {
   const innings = currentInnings(state);
   const ledger = innings.ledger!;
   const context = contextFromLedger(ledger);
   const striker = playerOf(session, context.strikerId);
   const bowler = playerOf(session, context.bowlerId);
   const keeper = playerOf(session, context.keeperId);
-  const slots = fieldSlots(ledger);
-  validateT20Field(slots, ledger.outfieldIds, striker.batHand, ledger.innings.legalBalls);
+  const format = session.setup.format;
+  const slots = fieldSlots(session, ledger);
+  profileOf(session).validateField(slots, ledger.outfieldIds, striker.batHand, ledger.innings.legalBalls);
   const generated = generateDelivery({
     kind: "GENERATE_DELIVERY",
     generatorVersion: "LC_CONDITIONAL_DELIVERY_V1",
@@ -261,13 +292,13 @@ function bowlBall(session: T20Session, state: T20SuperOverState): void {
     matchId: session.setup.matchId,
     seed: session.setup.seed,
     attemptOrdinal: state.attemptOrdinal,
-    format: "T20",
-    phase: expectedGeneratorPhase("T20", ledger.innings.legalBalls),
+    format,
+    phase: expectedGeneratorPhase(format, ledger.innings.legalBalls),
     context,
     bowling: {
       bowlingStyle: bowler.bowlingStyle!,
-      controlRating: bowler.skills.T20.control,
-      movementRating: bowler.skills.T20.movement,
+      controlRating: bowler.skills[format].control,
+      movementRating: bowler.skills[format].movement,
       fatigueBp: session.core.fatigueBp[bowler.playerId] ?? 0,
       line: "STUMPS",
       intendedLength: "GOOD",
@@ -275,12 +306,12 @@ function bowlBall(session: T20Session, state: T20SuperOverState): void {
       variationId: "stock",
     },
     batting: {
-      defenceRating: striker.skills.T20.defence,
-      timingRating: striker.skills.T20.timing,
-      powerRating: striker.skills.T20.power,
-      rotationRating: striker.skills.T20.rotation,
-      vsPaceRating: striker.skills.T20.vsPace,
-      vsSpinRating: striker.skills.T20.vsSpin,
+      defenceRating: striker.skills[format].defence,
+      timingRating: striker.skills[format].timing,
+      powerRating: striker.skills[format].power,
+      rotationRating: striker.skills[format].rotation,
+      vsPaceRating: striker.skills[format].vsPace,
+      vsSpinRating: striker.skills[format].vsSpin,
       aggression: state.aggression[striker.playerId] ?? 3,
       intent: "NORMAL",
       attemptedStroke: true,
@@ -288,7 +319,7 @@ function bowlBall(session: T20Session, state: T20SuperOverState): void {
     },
     conditions: { seamBp: session.core.pitch.seamBp, turnBp: session.core.pitch.turnBp },
     field: {
-      keeper: { keepingRating: keeper.skills.T20.keeping, catchingRating: keeper.skills.T20.catching, throwingRating: keeper.skills.T20.throwing },
+      keeper: { keepingRating: keeper.skills[format].keeping, catchingRating: keeper.skills[format].catching, throwingRating: keeper.skills[format].throwing },
       slots: slots.map((slot) => {
         const fielder = playerOf(session, slot.playerId);
         const position = namedPosition(slot.slotId);
@@ -297,8 +328,8 @@ function bowlBall(session: T20Session, state: T20SuperOverState): void {
           sector: position.sector,
           depth: position.depth,
           role: slot.slotId.startsWith("slip") ? ("SLIP" as const) : ("NORMAL" as const),
-          catchingRating: fielder.skills.T20.catching,
-          throwingRating: fielder.skills.T20.throwing,
+          catchingRating: fielder.skills[format].catching,
+          throwingRating: fielder.skills[format].throwing,
         };
       }),
     },
@@ -321,7 +352,7 @@ function bowlBall(session: T20Session, state: T20SuperOverState): void {
   }
 }
 
-function closeInnings(session: T20Session, state: T20SuperOverState): void {
+function closeInnings(session: SuperOverSession, state: T20SuperOverState): void {
   const innings = currentInnings(state);
   innings.complete = true;
   const i = innings.ledger!.innings;
@@ -346,7 +377,7 @@ function closeInnings(session: T20Session, state: T20SuperOverState): void {
 }
 
 /** Applies one command. Throws `LC_SUPER_OVER_*` on an illegal command; the input state is not changed. */
-export function executeSuperOverCommand(session: T20Session, input: T20SuperOverState, raw: unknown): T20SuperOverState {
+export function executeSuperOverCommand(session: SuperOverSession, input: T20SuperOverState, raw: unknown): T20SuperOverState {
   const command = SuperOverCommandSchema.parse(raw);
   const state = clone(input);
   assert(state.phase !== "COMPLETE", "COMPLETE");
@@ -388,7 +419,7 @@ export function executeSuperOverCommand(session: T20Session, input: T20SuperOver
 }
 
 /** A sensible automatic choice for the side whose decision is pending, for the tactical captain and for tests. */
-export function superOverAutopilotCommand(session: T20Session, state: T20SuperOverState): SuperOverCommand | null {
+export function superOverAutopilotCommand(session: SuperOverSession, state: T20SuperOverState): SuperOverCommand | null {
   if (state.phase === "COMPLETE") return null;
   if (state.phase === "READY") return { kind: "BOWL_SUPER_OVER_BALL" };
   const innings = currentInnings(state);
@@ -398,7 +429,7 @@ export function superOverAutopilotCommand(session: T20Session, state: T20SuperOv
   }
   const bowlers = eligibleSuperOverBowlers(session, state, innings.bowlingTeamId)
     .map((id) => playerOf(session, id))
-    .sort((a, b) => b.skills.T20.control - a.skills.T20.control || (a.playerId < b.playerId ? -1 : 1));
+    .sort((a, b) => b.skills[session.setup.format].control - a.skills[session.setup.format].control || (a.playerId < b.playerId ? -1 : 1));
   return { kind: "SET_SUPER_OVER_BOWLER", teamId: innings.bowlingTeamId, playerId: bowlers[0]!.playerId };
 }
 
@@ -429,16 +460,16 @@ export function superOverStateSha256(state: T20SuperOverState): string {
 }
 
 /** Replays commands from the tied match. Throws if any command is illegal. */
-export function replaySuperOver(session: T20Session, commands: readonly SuperOverCommand[]): T20SuperOverState {
+export function replaySuperOver(session: SuperOverSession, commands: readonly SuperOverCommand[]): T20SuperOverState {
   let state = createT20SuperOver(session);
   for (const command of commands) state = executeSuperOverCommand(session, state, command);
   return state;
 }
 
-export function superOverRecord(state: T20SuperOverState, commands: readonly SuperOverCommand[]): T20SuperOverRecord {
-  return T20SuperOverRecordSchema.parse({
-    schemaId: T20_SUPER_OVER_RECORD_SCHEMA_ID,
-    rulesId: T20_SUPER_OVER_RULES_ID,
+export function superOverRecord(state: T20SuperOverState, commands: readonly SuperOverCommand[]): SuperOverRecord {
+  return SuperOverRecordSchema.parse({
+    schemaId: state.rulesId === ODI_SUPER_OVER_RULES_ID ? ODI_SUPER_OVER_RECORD_SCHEMA_ID : T20_SUPER_OVER_RECORD_SCHEMA_ID,
+    rulesId: state.rulesId,
     gameId: state.gameId,
     baseLastEventHash: state.baseLastEventHash,
     commands: [...commands],
@@ -447,8 +478,9 @@ export function superOverRecord(state: T20SuperOverState, commands: readonly Sup
 }
 
 /** Verifies a stored record against the tied match it claims to belong to, and returns the replayed state. */
-export function verifySuperOverRecord(session: T20Session, raw: unknown): T20SuperOverState {
-  const record = T20SuperOverRecordSchema.parse(raw);
+export function verifySuperOverRecord(session: SuperOverSession, raw: unknown): T20SuperOverState {
+  const record = SuperOverRecordSchema.parse(raw);
+  assert(record.rulesId === profileOf(session).rulesId, "RECORD_FORMAT_MISMATCH");
   assert(record.gameId === session.setup.gameId && record.baseLastEventHash === session.lastEventHash, "RECORD_MATCH_MISMATCH");
   const state = replaySuperOver(session, record.commands);
   assert(superOverStateSha256(state) === record.stateSha256, "RECORD_STATE_MISMATCH");

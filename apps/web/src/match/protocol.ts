@@ -172,7 +172,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
     type: z.literal("IMPORT_SAVE"),
     archive: z.instanceof(Uint8Array),
   }),
-  /** Stage 14: super overs for a tied T20 exhibition. START opens them; AI lets the tactical captain decide for its side. */
+  /** Stage 14: super overs for a tied T20 or one-day exhibition. START opens them; AI lets the tactical captain decide for its side. */
   z.strictObject({
     ...base,
     type: z.literal("SUPER_OVER"),
@@ -322,7 +322,7 @@ export type CareerFixtureLaunch = z.infer<typeof CareerFixtureLaunchSchema>;
 export type ManagedStatus = "PENDING" | "APPLIED" | "ABANDONED";
 /** Stage 14: super-over status for a tied T20 exhibition. */
 export type SuperOverView = {
-  rulesId: "LC_T20_SUPER_OVER_01";
+  rulesId: "LC_T20_SUPER_OVER_01" | "LC_ODI_SUPER_OVER_01";
   started: boolean;
   phase: "AWAITING_LINEUP" | "READY" | "COMPLETE" | "NOT_STARTED";
   rounds: SuperOverRoundSummary[];

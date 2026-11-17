@@ -2,7 +2,7 @@ import { z } from "zod";
 import { CounterSchema, HashSchema, IDSchema, PositiveCounterSchema } from "./core.js";
 
 /**
- * Stage 14: super overs for tied T20 exhibitions (owner decision, 17 November 2026: ICC standard, exhibitions only).
+ * Stage 14: super overs for tied T20 and one-day exhibitions (owner decision, 17 November 2026: ICC standard, exhibitions only).
  *
  * This is a new opt-in ruleset, `LC_T20_SUPER_OVER_01`. The tied match itself is unchanged and stays a tie under
  * `LC_T20_MATCH_V1`; the super overs decide a winner on top of it. Every super-over ball is produced by the frozen
@@ -17,6 +17,9 @@ import { CounterSchema, HashSchema, IDSchema, PositiveCounterSchema } from "./co
  */
 export const T20_SUPER_OVER_RULES_ID = "LC_T20_SUPER_OVER_01" as const;
 export const T20_SUPER_OVER_RECORD_SCHEMA_ID = "LC_T20_SUPER_OVER_RECORD_V1" as const;
+/** The same rules for tied one-day exhibitions, under their own ruleset and record identifiers. */
+export const ODI_SUPER_OVER_RULES_ID = "LC_ODI_SUPER_OVER_01" as const;
+export const ODI_SUPER_OVER_RECORD_SCHEMA_ID = "LC_ODI_SUPER_OVER_RECORD_V1" as const;
 
 export const SuperOverCommandSchema = z.discriminatedUnion("kind", [
   /** The batting side names its batters in order: the first two open, the third comes in after a wicket. */
@@ -39,6 +42,18 @@ export const T20SuperOverRecordSchema = z.strictObject({
   stateSha256: HashSchema,
 });
 
+export const ODISuperOverRecordSchema = z.strictObject({
+  schemaId: z.literal(ODI_SUPER_OVER_RECORD_SCHEMA_ID),
+  rulesId: z.literal(ODI_SUPER_OVER_RULES_ID),
+  gameId: IDSchema,
+  baseLastEventHash: HashSchema,
+  commands: z.array(SuperOverCommandSchema).max(2000),
+  stateSha256: HashSchema,
+});
+
+/** Either format's record; the stored row is read with this. */
+export const SuperOverRecordSchema = z.discriminatedUnion("schemaId", [T20SuperOverRecordSchema, ODISuperOverRecordSchema]);
+
 export const SuperOverInningsSummarySchema = z.strictObject({
   battingTeamId: IDSchema,
   runs: CounterSchema,
@@ -53,5 +68,7 @@ export const SuperOverRoundSummarySchema = z.strictObject({
 
 export type SuperOverCommand = z.infer<typeof SuperOverCommandSchema>;
 export type T20SuperOverRecord = z.infer<typeof T20SuperOverRecordSchema>;
+export type ODISuperOverRecord = z.infer<typeof ODISuperOverRecordSchema>;
+export type SuperOverRecord = z.infer<typeof SuperOverRecordSchema>;
 export type SuperOverInningsSummary = z.infer<typeof SuperOverInningsSummarySchema>;
 export type SuperOverRoundSummary = z.infer<typeof SuperOverRoundSummarySchema>;
