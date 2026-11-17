@@ -14,7 +14,7 @@ import {
 
 export const DEFAULT_AUDIO_PREFERENCES: AudioPreferences = Object.freeze({
   version: AUDIO_PRESENTATION_VERSION,
-  muted: false,
+  muted: true,
   crowdVolume: 55,
   effectsVolume: 75,
   commentaryVolume: 65,

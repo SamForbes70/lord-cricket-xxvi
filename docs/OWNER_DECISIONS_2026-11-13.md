@@ -94,3 +94,11 @@ What each answer settles:
 5. **Acceptance records.** The owner confirms the Stage 2 to 10 acceptances recorded above. Hosted CI for those commits was red (see the audit); this confirmation does not convert that into a pass.
 
 **Direction:** no new features until the audit's stabilisation phases (1 to 6) are complete and reviewed. Each phase lands through a draft pull request with green hosted CI before the owner merges.
+
+## Owner decisions, 16 November 2026 (evening)
+
+Owner's words, verbatim: "merge #56 to #59 once green too", then "muted by default; start finished seasons out of the hash".
+
+1. **Sound is muted by default.** A player with no saved audio preferences starts muted (`DEFAULT_AUDIO_PREFERENCES.muted`); turning sound on is their choice. Saved preferences are unchanged.
+2. **Finished seasons out of the per-save hash.** Approved as the next save-format work: a new world state version, with V1 to V4 saves still loading unchanged.
+3. **Merging.** Pull requests #56 to #59 are merged once hosted CI is green on their final heads.
