@@ -53,7 +53,10 @@ For each step, note whether every control was announced with a sensible name, wh
 
 ## 4. Long-career soak (optional, about 30 minutes of mostly waiting)
 
-Start a career and simulate seasons until at least season 20 (Home, then simulate repeatedly). Then use Settings to export the career as a `.lcxxvi` file and import it again.
+Start a career and simulate seasons until at least season 20 (Home, then simulate repeatedly). Then:
+
+1. Export the career: Settings, then **Export .lcxxvi** under "Career file & recovery".
+2. Import it again: Choose career, then **Import portable career**, then **Choose .lcxxvi archive**.
 
 **Send back:**
 - the number of seasons reached;
