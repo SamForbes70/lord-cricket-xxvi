@@ -27,6 +27,82 @@ function overs(balls: number): string {
   return `${Math.floor(balls / 6)}.${balls % 6}`;
 }
 
+/** The fixed identity of a tournament fixture's match: the save id is `auto:${gameId}`. */
+export function tournamentMatchIdentity(runId: string, matchNumber: number): { gameId: string; matchId: string } {
+  return { gameId: `tour-${runId}-m${matchNumber}`.slice(0, 128), matchId: `tour-m${matchNumber}` };
+}
+
+/** True when a tied match at this stage must be settled by super overs. */
+export function isKnockoutStage(stage: TournamentFixture["stage"]): boolean {
+  return stage === "SEMI_FINAL" || stage === "FINAL";
+}
+
+/**
+ * Checks that a completed session really is this fixture's match (seed, match and game id, teams, ground) and turns
+ * it into a result. Used for simulated matches and for matches the player played on the match screen.
+ */
+export function tournamentResultFromSession(input: {
+  competition: CustomCompetition;
+  fixture: TournamentFixture;
+  runId: string;
+  runSeed: string;
+  session: T20Session | ODISession;
+  superOverWinnerTeamId: string | null;
+  teamName: (teamId: string) => string;
+}): TournamentResult {
+  const { fixture, session } = input;
+  const identity = tournamentMatchIdentity(input.runId, fixture.matchNumber);
+  const teams = session.setup.teams.map((t) => t.teamId);
+  if (
+    session.setup.format !== input.competition.format ||
+    session.setup.seed !== fixtureSeed(input.runSeed, fixture.fixtureId) ||
+    session.setup.matchId !== identity.matchId ||
+    session.setup.gameId !== identity.gameId ||
+    teams[0] !== fixture.homeTeamId ||
+    teams[1] !== fixture.awayTeamId ||
+    session.setup.ground.groundId !== fixture.groundId
+  )
+    throw new Error("TOURNAMENT_MATCH_MISMATCH");
+  if (session.core.phase !== "COMPLETE" || !session.core.result) throw new Error("TOURNAMENT_MATCH_NOT_COMPLETE");
+  const result = session.core.result;
+  if (result.kind !== "WIN" && result.kind !== "TIE") throw new Error("TOURNAMENT_RESULT_UNSUPPORTED");
+  const inningsOf = (teamId: string) => session.core.innings.find((l) => l.innings.battingTeamId === teamId)!.innings;
+  const home = inningsOf(fixture.homeTeamId);
+  const away = inningsOf(fixture.awayTeamId);
+  const superOverWinnerTeamId = result.kind === "TIE" && isKnockoutStage(fixture.stage) ? input.superOverWinnerTeamId : null;
+  const score = (teamId: string, i: { runs: number; wickets: number; legalBalls: number }) =>
+    `${input.teamName(teamId)} ${i.runs}/${i.wickets} (${overs(i.legalBalls)})`;
+  const margin =
+    result.kind === "WIN"
+      ? result.marginType === "WICKETS"
+        ? `by ${result.marginWickets} wicket${result.marginWickets === 1 ? "" : "s"}`
+        : `by ${result.marginRuns} run${result.marginRuns === 1 ? "" : "s"}`
+      : "";
+  const headline =
+    result.kind === "WIN"
+      ? `${input.teamName(result.winnerTeamId)} won ${margin}`
+      : superOverWinnerTeamId
+        ? `Tied; ${input.teamName(superOverWinnerTeamId)} won the super over`
+        : "Tied";
+  return {
+    fixtureId: fixture.fixtureId,
+    homeTeamId: fixture.homeTeamId,
+    awayTeamId: fixture.awayTeamId,
+    resultKind: result.kind,
+    winnerTeamId: result.kind === "WIN" ? result.winnerTeamId : null,
+    superOverWinnerTeamId,
+    homeRuns: home.runs,
+    homeWickets: home.wickets,
+    homeLegalBalls: home.legalBalls,
+    awayRuns: away.runs,
+    awayWickets: away.wickets,
+    awayLegalBalls: away.legalBalls,
+    resultText: `${headline}. ${score(fixture.homeTeamId, home)}; ${score(fixture.awayTeamId, away)}.`.slice(0, 160),
+    lastEventHash: session.lastEventHash,
+  };
+}
+
+/** Simulates one fixture with both captains on the fixture autopilot (and super overs for a tied knockout match). */
 export function playTournamentFixture(input: {
   competition: CustomCompetition;
   fixture: TournamentFixture;
@@ -38,7 +114,7 @@ export function playTournamentFixture(input: {
 }): TournamentResult {
   const { competition, fixture } = input;
   const seed = fixtureSeed(input.runSeed, fixture.fixtureId);
-  const identity = () => ({ gameId: `tour-${input.runId}-m${fixture.matchNumber}`.slice(0, 128), matchId: `tour-m${fixture.matchNumber}` });
+  const identity = () => tournamentMatchIdentity(input.runId, fixture.matchNumber);
   const ctl =
     competition.format === "T20"
       ? createMatchController(input.worldBytes, input.worldManifest, () => seed, identity)
@@ -67,44 +143,11 @@ export function playTournamentFixture(input: {
         ? executeT20Command(session as T20Session, fixtureAutopilotStep(session as T20Session)).session
         : executeODICommand(session as ODISession, odiFixtureAutopilotStep(session as ODISession)).session;
   }
-  const result = session.core.result!;
-  const inningsOf = (teamId: string) => session.core.innings.find((l) => l.innings.battingTeamId === teamId)!.innings;
-  const home = inningsOf(fixture.homeTeamId);
-  const away = inningsOf(fixture.awayTeamId);
   let superOverWinnerTeamId: string | null = null;
-  if (result.kind === "TIE" && (fixture.stage === "SEMI_FINAL" || fixture.stage === "FINAL")) {
+  if (session.core.result?.kind === "TIE" && isKnockoutStage(fixture.stage)) {
     let state = createT20SuperOver(session);
     while (state.phase !== "COMPLETE") state = executeSuperOverCommand(session, state, superOverAutopilotCommand(session, state)!);
     superOverWinnerTeamId = state.winnerTeamId;
   }
-  const score = (teamId: string, i: { runs: number; wickets: number; legalBalls: number }) =>
-    `${input.teamName(teamId)} ${i.runs}/${i.wickets} (${overs(i.legalBalls)})`;
-  const margin =
-    result.kind === "WIN"
-      ? result.marginType === "WICKETS"
-        ? `by ${result.marginWickets} wicket${result.marginWickets === 1 ? "" : "s"}`
-        : `by ${result.marginRuns} run${result.marginRuns === 1 ? "" : "s"}`
-      : "";
-  const headline =
-    result.kind === "WIN"
-      ? `${input.teamName(result.winnerTeamId)} won ${margin}`
-      : superOverWinnerTeamId
-        ? `Tied; ${input.teamName(superOverWinnerTeamId)} won the super over`
-        : "Tied";
-  return {
-    fixtureId: fixture.fixtureId,
-    homeTeamId: fixture.homeTeamId,
-    awayTeamId: fixture.awayTeamId,
-    resultKind: result.kind === "WIN" ? "WIN" : "TIE",
-    winnerTeamId: result.kind === "WIN" ? result.winnerTeamId : null,
-    superOverWinnerTeamId,
-    homeRuns: home.runs,
-    homeWickets: home.wickets,
-    homeLegalBalls: home.legalBalls,
-    awayRuns: away.runs,
-    awayWickets: away.wickets,
-    awayLegalBalls: away.legalBalls,
-    resultText: `${headline}. ${score(fixture.homeTeamId, home)}; ${score(fixture.awayTeamId, away)}.`.slice(0, 160),
-    lastEventHash: session.lastEventHash,
-  };
+  return tournamentResultFromSession({ ...input, session, superOverWinnerTeamId });
 }

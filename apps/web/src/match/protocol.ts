@@ -18,6 +18,7 @@ import {
   DelegationCategorySchema,
   RedBallTacticalProfileSchema,
   SuperOverCommandSchema,
+  TournamentFixtureSchema,
   type SuperOverRoundSummary,
   type DelegationJournal,
   type T20Command,
@@ -181,6 +182,18 @@ export const RequestSchema = z.discriminatedUnion("type", [
       z.strictObject({ kind: z.literal("COMMAND"), command: SuperOverCommandSchema }),
       z.strictObject({ kind: z.literal("AI"), teamId: z.string().min(1).max(128) }),
     ]),
+  }),
+  /**
+   * Stage 15 (owner decision 10a): starts, or resumes, the player's tournament fixture as an exhibition match with the
+   * fixture's fixed seed and ids. The Tournaments screen reads the finished match back from its save.
+   */
+  z.strictObject({
+    ...base,
+    type: z.literal("TOURNAMENT_START"),
+    format: z.enum(["T20", "ODI"]),
+    runId: z.string().min(1).max(128),
+    runSeed: z.string().min(1).max(128),
+    fixture: TournamentFixtureSchema,
   }),
   /** Stage 12: starts a curated scenario challenge from its checkpoint. Replaces a non-career active match. */
   z.strictObject({ ...base, type: z.literal("SCENARIO_START"), scenarioId: z.string().min(1).max(128) }),

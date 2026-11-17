@@ -4,7 +4,10 @@ import { describe, expect, it } from "vitest";
 import { CustomCompetitionSchema, TournamentRunSchema, type CustomCompetition, type TournamentResult } from "@lcxxvi/contracts";
 import { TOURNAMENT_PACK, competitionById } from "@lcxxvi/data";
 import { computeStandings, roundRobinPairings, viewTournament } from "@lcxxvi/projections";
-import { playTournamentFixture } from "../../apps/web/src/tournament/runner.js";
+import { fixtureSeed, playTournamentFixture, tournamentMatchIdentity, tournamentResultFromSession } from "../../apps/web/src/tournament/runner.js";
+import { createMatchController } from "../../apps/web/src/match/controller.js";
+import { UI_VERSION } from "../../apps/web/src/match/protocol.js";
+import { executeT20Command, fixtureAutopilotStep, type T20Session } from "@lcxxvi/simulation";
 
 // Stage 15 first slice (owner decision 17 November 2026, answer 5a): fictional custom tournaments.
 const root = resolve(import.meta.dirname, "../..");
@@ -122,4 +125,27 @@ describe("Stage 15 tournaments on the real engines", () => {
       for (const r of results) expect(r.homeLegalBalls).toBeLessThanOrEqual(300);
     }
   }, 120_000);
+});
+
+describe("Stage 15 recording a match the player played", () => {
+  it("accepts only the fixture's own match (seed, ids, teams, ground) and gives the same result as simulation", () => {
+    const c = competitionById("northern-t20-league")!;
+    const [first, second] = viewTournament(c, []).fixtures as [import("@lcxxvi/contracts").TournamentFixture, import("@lcxxvi/contracts").TournamentFixture];
+    const play = (f: typeof first) => {
+      const ctl = createMatchController(worldBytes, manifest, () => fixtureSeed("seed-x", f.fixtureId), () => tournamentMatchIdentity("run-x", f.matchNumber));
+      const catalog = ctl.currentResponse("ui-0").catalog!;
+      const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+      ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "T20", selections: [pick(f.homeTeamId), pick(f.awayTeamId)], groundId: f.groundId });
+      let s = ctl.snapshot() as T20Session;
+      while (s.core.phase !== "COMPLETE") s = executeT20Command(s, fixtureAutopilotStep(s)).session;
+      return s;
+    };
+    const session = play(first);
+    const teamName = (id: string) => names[id] ?? id;
+    const recorded = tournamentResultFromSession({ competition: c, fixture: first, runId: "run-x", runSeed: "seed-x", session, superOverWinnerTeamId: null, teamName });
+    const simulated = playTournamentFixture({ competition: c, fixture: first, runId: "run-x", runSeed: "seed-x", worldBytes, worldManifest: manifest, teamName });
+    expect(recorded).toEqual(simulated);
+    expect(() => tournamentResultFromSession({ competition: c, fixture: second, runId: "run-x", runSeed: "seed-x", session, superOverWinnerTeamId: null, teamName })).toThrow("TOURNAMENT_MATCH_MISMATCH");
+    expect(() => tournamentResultFromSession({ competition: c, fixture: first, runId: "run-y", runSeed: "seed-x", session, superOverWinnerTeamId: null, teamName })).toThrow("TOURNAMENT_MATCH_MISMATCH");
+  }, 60_000);
 });

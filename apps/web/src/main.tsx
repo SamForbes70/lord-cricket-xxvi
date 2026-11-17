@@ -40,7 +40,7 @@ import {
 } from "./match/protocol.js";
 import { SuperOverPanel } from "./match/SuperOverPanel.js";
 import { ScenariosApp, SCENARIO_LAUNCH_KEY } from "./scenario/ScenariosApp.js";
-import { TournamentsApp } from "./tournament/TournamentsApp.js";
+import { TournamentsApp, TOURNAMENT_LAUNCH_KEY, type TournamentLaunch } from "./tournament/TournamentsApp.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
@@ -102,6 +102,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   })());
   const [scenario, setScenario] = useState<ScenarioStatus | null>(null);
+  /** Stage 15: the player's tournament fixture chosen on the Tournaments screen, started once the worker has booted. */
+  const tournamentLaunch = useRef<TournamentLaunch | null>((() => {
+    try {
+      const raw = sessionStorage.getItem(TOURNAMENT_LAUNCH_KEY);
+      sessionStorage.removeItem(TOURNAMENT_LAUNCH_KEY);
+      return raw ? (JSON.parse(raw) as TournamentLaunch) : null;
+    } catch {
+      return null;
+    }
+  })());
   const [superOver, setSuperOver] = useState<SuperOverView | null>(null);
   const recoverIssued = useRef(false);
   // Ids for requests that never commit. Commands use ui-(10000 + revision + 1) so that a reloaded page, which
@@ -379,7 +389,19 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         // The scenario's opponent is always the tactical captain; the player owns their own side.
         if (nextScenario && !careerLaunch.current) setAiTeamId(nextScenario.opponentTeamId);
       } else if (!r.error) setScenario(null);
-      if (r.catalog && !r.view && !careerLaunch.current && scenarioLaunch.current && !r.error) {
+      if (!careerLaunch.current && tournamentLaunch.current && !r.error && (r.catalog || r.view)) {
+        const launch = tournamentLaunch.current;
+        tournamentLaunch.current = null;
+        recoverIssued.current = true;
+        // The player's side is theirs; the tactical captain plays the other.
+        const opponent = launch.fixture.homeTeamId === launch.playerTeamId ? launch.fixture.awayTeamId : launch.fixture.homeTeamId;
+        setAiTeamId(opponent);
+        try { sessionStorage.setItem("lcxxvi-optional-ai-team", opponent); } catch { /* preference only */ }
+        const requestId = auxId();
+        inflight.current = requestId;
+        setBusy(true);
+        w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "TOURNAMENT_START", format: launch.format, runId: launch.runId, runSeed: launch.runSeed, fixture: launch.fixture });
+      } else       if (r.catalog && !r.view && !careerLaunch.current && scenarioLaunch.current && !r.error) {
         const scenarioId = scenarioLaunch.current;
         scenarioLaunch.current = null;
         recoverIssued.current = true;
@@ -747,6 +769,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               : "Local autosave ready"}
         </span>
       </div>
+      {view?.matchId?.startsWith("tour-m") && (
+        <section className="career-match-banner" data-testid="tournament-banner" aria-label="Tournament match">
+          <strong>Tournament match</strong>
+          <p>When the match ends (and any super over), go back to Tournaments to record the result.</p>
+          <a href="#tournaments">Back to Tournaments</a>
+        </section>
+      )}
       {scenario && view && (
         <section className="career-match-banner" data-testid="scenario-banner" aria-label="Scenario challenge">
           <strong>Scenario: {scenario.title}</strong>{" "}
