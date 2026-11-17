@@ -36,7 +36,9 @@ import {
   type PersistenceView,
   type AnalyticsProgress,
   type ScenarioStatus,
+  type SuperOverView,
 } from "./match/protocol.js";
+import { SuperOverPanel } from "./match/SuperOverPanel.js";
 import { ScenariosApp, SCENARIO_LAUNCH_KEY } from "./scenario/ScenariosApp.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
@@ -99,6 +101,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   })());
   const [scenario, setScenario] = useState<ScenarioStatus | null>(null);
+  const [superOver, setSuperOver] = useState<SuperOverView | null>(null);
   const recoverIssued = useRef(false);
   // Ids for requests that never commit. Commands use ui-(10000 + revision + 1) so that a reloaded page, which
   // restarts from the durable revision, cannot reuse a committed id; borrowing from that range would break it.
@@ -367,6 +370,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
       if (r.persistence) setPersistence(r.persistence);
       if (r.delegation) setDelegation(r.delegation);
+      if (r.view && "superOver" in r) setSuperOver(r.superOver ?? null);
+      else if (!r.view && !r.error) setSuperOver(null);
       if (r.view && "scenario" in r) {
         const nextScenario = r.scenario ?? null;
         setScenario(nextScenario);
@@ -553,6 +558,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       return;
     }
   }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly]);
+  // Stage 14: the tactical captain makes its side's super-over choices.
+  const lastSuperOverAi = useRef("");
+  useEffect(() => {
+    if (!superOver?.pending || !aiTeamId || busy || fatal || persistence?.readOnly) return;
+    if (superOver.pending.teamId !== aiTeamId) return;
+    const stamp = `${superOver.rounds.length}:${JSON.stringify(superOver.rounds)}:${superOver.pending.decision}`;
+    if (lastSuperOverAi.current === stamp) return;
+    lastSuperOverAi.current = stamp;
+    send({ type: "SUPER_OVER", action: { kind: "AI", teamId: aiTeamId } });
+  }, [superOver, aiTeamId, busy, fatal, persistence?.readOnly]);
   function changeAiOpponent(id: string) {
     const next = id || null;
     setAiTeamId(next);
@@ -1236,6 +1251,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               activeBowlerId={i?.bowlerId ?? null}
               bowlingTeamId={i?.bowlingTeamId ?? null}
               onApplyAction={act}
+            />
+          )}
+          {view.phase === "COMPLETE" && superOver && (
+            <SuperOverPanel
+              view={superOver}
+              aiTeamId={aiTeamId}
+              busy={busy || fatal || Boolean(persistence?.readOnly)}
+              onStart={() => send({ type: "SUPER_OVER", action: { kind: "START" } })}
+              onCommand={(command) => send({ type: "SUPER_OVER", action: { kind: "COMMAND", command } })}
             />
           )}
           {view.resultText && (

@@ -47,3 +47,4 @@ export * from "./match-digest.js";
 export * from "./portable-v4.js";
 export * from "./career-stories.js";
 export * from "./scenario-mode.js";
+export * from "./super-over.js";
