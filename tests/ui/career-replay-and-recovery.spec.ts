@@ -131,6 +131,8 @@ test("V01-019 checkpoint inspector isolates corrupted generations, retains damag
   await page.getByRole("button", { name: "Choose career" }).click();
   await expect(page.getByRole("heading", { name: /Continue career/i })).toBeVisible();
   const checkpointsBtn = page.locator(`[id="inspect-checkpoints-${originalSaveId}"]`);
+  // The button stays disabled until the saved-career list has reloaded; a disabled button cannot take focus.
+  await expect(checkpointsBtn).toBeEnabled({ timeout: 30_000 });
   await checkpointsBtn.focus();
   await expect(checkpointsBtn).toBeFocused();
   await page.keyboard.press("Enter");
