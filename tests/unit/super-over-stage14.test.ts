@@ -215,3 +215,30 @@ describe("Stage 14 one-day super overs", () => {
     expect(() => verifySuperOverRecord(tied[0]!, record)).toThrow("RECORD_FORMAT_MISMATCH");
   });
 });
+
+describe("Stage 14 super overs in .lcxxvi exports (archive V5)", () => {
+  it("round-trips the record, rejects one from another match, and still reads older archives", async () => {
+    const { createPortableArchive, readPortableArchive, SUPER_OVER_ARCHIVE_VERSION } = await import("@lcxxvi/persistence");
+    const { ARCHIVE_PINS } = await import("../../apps/web/src/match/protocol.js");
+    const session = playMatch("lc-tie-469", "team-03", "team-06", "ground-03");
+    const other = playMatch("lc-tie-177", "team-01", "team-02", "ground-01");
+    const { state, commands } = autopilot(session);
+    const record = superOverRecord(state, commands);
+    const summary = (s: T20Session) => ({
+      saveId: `auto:${s.setup.gameId}`, kind: "AUTO" as const, title: "Tied", matchGameId: s.setup.gameId, matchId: s.setup.matchId,
+      teams: [s.setup.teams[0].teamId, s.setup.teams[1].teamId] as [string, string], ground: s.setup.ground.groundId, phase: s.core.phase,
+      revision: s.revision, eventCount: s.events.length, lastEventHash: s.lastEventHash, updatedAt: "2026-11-17T00:00:00.000Z", completed: true,
+    });
+    const bytes = await createPortableArchive(session, summary(session), ARCHIVE_PINS, "2026-11-17T00:00:00.000Z", null, null, null, record);
+    const read = await readPortableArchive(bytes, [ARCHIVE_PINS]);
+    expect(read.manifest.archiveVersion).toBe(SUPER_OVER_ARCHIVE_VERSION);
+    expect(read.superOverRecord).toEqual(record);
+    expect(JSON.stringify(verifySuperOverRecord(session, read.superOverRecord!))).toBe(JSON.stringify(state));
+    // A record from a different match is refused at export.
+    await expect(createPortableArchive(other, summary(other), ARCHIVE_PINS, "2026-11-17T00:00:00.000Z", null, null, null, record)).rejects.toThrow("ARCHIVE_SUPER_OVER_MATCH_MISMATCH");
+    // Without a record the archive keeps its old version, and reads with no record.
+    const plain = await readPortableArchive(await createPortableArchive(session, summary(session), ARCHIVE_PINS, "2026-11-17T00:00:00.000Z"), [ARCHIVE_PINS]);
+    expect(plain.manifest.archiveVersion).toBe("LC_ARCHIVE_V1");
+    expect(plain.superOverRecord).toBeNull();
+  }, 60_000);
+});
