@@ -2,6 +2,8 @@ import { z } from "zod";
 import {
   PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION,
   PersistentWorldPortableV3ManifestSchema,
 } from "./squad-economy.js";
 
@@ -33,3 +35,18 @@ export const PersistentWorldPortableV5ManifestSchema = PersistentWorldPortableV4
   ]),
 });
 export type PersistentWorldPortableV5Manifest = z.infer<typeof PersistentWorldPortableV5ManifestSchema>;
+
+/**
+ * Export of a world state V5 save (docs/design/WORLD_STATE_V5_SEASON_REFS.md): the V5 gzip layout, a V5 save
+ * schema, and `game.json` holding the full V5 state, so the archive is self-contained.
+ */
+export const PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION = "LC_PERSISTENT_WORLD_PORTABLE_V6_WORLD_V5" as const;
+
+export const PersistentWorldPortableV6ManifestSchema = PersistentWorldPortableV4ManifestSchema.extend({
+  archiveVersion: z.literal(PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION),
+  saveSchema: z.enum([
+    PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION,
+    PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION,
+  ]),
+});
+export type PersistentWorldPortableV6Manifest = z.infer<typeof PersistentWorldPortableV6ManifestSchema>;

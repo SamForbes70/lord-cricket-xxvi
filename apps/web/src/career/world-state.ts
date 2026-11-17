@@ -25,9 +25,11 @@ import {
   type StagedRosterPack,
   type T20SeasonState,
   PERSISTENT_WORLD_STATE_V4_VERSION,
+  PERSISTENT_WORLD_STATE_V5_VERSION,
   PLAYER_LIFECYCLE_STATE_V2_VERSION,
   PLAYER_LIFECYCLE_STATE_VERSION,
   type PersistentWorldStateV4,
+  type PersistentWorldStateV5,
   type PersistentWorldStateV3Core,
 } from "@lcxxvi/contracts";
 import {
@@ -70,6 +72,7 @@ import {
   sealPersistentWorldStateV3,
   sealT20SeasonState,
   sealPersistentWorldStateV4,
+  sealPersistentWorldStateV5,
   type AnyPersistentWorldState,
 } from "@lcxxvi/persistence";
 
@@ -117,7 +120,8 @@ export type CreateCareerOptions = {
     | typeof PERSISTENT_WORLD_STATE_VERSION
     | typeof PERSISTENT_WORLD_STATE_V2_VERSION
     | typeof PERSISTENT_WORLD_STATE_V3_VERSION
-    | typeof PERSISTENT_WORLD_STATE_V4_VERSION;
+    | typeof PERSISTENT_WORLD_STATE_V4_VERSION
+    | typeof PERSISTENT_WORLD_STATE_V5_VERSION;
 };
 
 export async function createInitialSeasonState(input: {
@@ -773,7 +777,7 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV2(input: {
   });
 }
 
-type EconomyWorldState = PersistentWorldStateV3 | PersistentWorldStateV4;
+type EconomyWorldState = PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5;
 type EconomyWorldVersion = EconomyWorldState["worldStateVersion"];
 
 /**
@@ -784,6 +788,9 @@ async function sealEconomyWorld(
   worldStateVersion: EconomyWorldVersion,
   core: Omit<PersistentWorldStateV3Core, "worldStateVersion" | "lifecycle"> & { lifecycle: PlayerLifecycleState },
 ): Promise<EconomyWorldState> {
+  if (worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION) {
+    return sealPersistentWorldStateV5({ ...core, worldStateVersion, lifecycle: expectLifecycleV2(core.lifecycle) });
+  }
   return worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION
     ? sealPersistentWorldStateV4({ ...core, worldStateVersion, lifecycle: expectLifecycleV2(core.lifecycle) })
     : sealPersistentWorldStateV3({ ...core, worldStateVersion, lifecycle: expectLifecycleV1(core.lifecycle) });
@@ -818,7 +825,7 @@ export async function createInitialPersistentWorldCareerStateV3(input: {
     calendarYear,
     useRosterPackImmediately: true,
     lifecycleVersion:
-      worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION ? PLAYER_LIFECYCLE_STATE_V2_VERSION : PLAYER_LIFECYCLE_STATE_VERSION,
+      worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION ? PLAYER_LIFECYCLE_STATE_VERSION : PLAYER_LIFECYCLE_STATE_V2_VERSION,
   });
   const currentSeason = await createLifecycleSeasonStateForWorld({
     worldIdentity,
@@ -998,7 +1005,7 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV3(input: {
     calendarYear: closedCalendarYear,
     useRosterPackImmediately: true,
     lifecycleVersion:
-      worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION ? PLAYER_LIFECYCLE_STATE_V2_VERSION : PLAYER_LIFECYCLE_STATE_VERSION,
+      worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION ? PLAYER_LIFECYCLE_STATE_VERSION : PLAYER_LIFECYCLE_STATE_V2_VERSION,
   });
   const elapsedDays = dateDiffDays(
     sourceState.schedule.startDate,

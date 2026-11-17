@@ -190,7 +190,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
     };
     for (const raw of input.seasonRosterPacks ?? []) await add(raw);
     if ("lifecycle" in state && state.lifecycle.activeRosterPack) await add(state.lifecycle.activeRosterPack);
-    if (state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION && input.expectedRevision === null) {
+    if ((state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION || state.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V5") && input.expectedRevision === null) {
       for (const pack of state.lifecycle.historicalRosterPacks) await add(pack);
     }
     return packs;

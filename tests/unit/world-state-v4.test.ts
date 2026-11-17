@@ -203,7 +203,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
     };
     for (const raw of input.seasonRosterPacks ?? []) await add(raw);
     if ("lifecycle" in state && state.lifecycle.activeRosterPack) await add(state.lifecycle.activeRosterPack);
-    if (state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION && input.expectedRevision === null) {
+    if ((state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION || state.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V5") && input.expectedRevision === null) {
       for (const pack of state.lifecycle.historicalRosterPacks) await add(pack);
     }
     return packs;
@@ -373,7 +373,7 @@ describe("world state V4", () => {
   it("refuses a lifecycle V2 state embedding more than two roster packs", async () => {
     const { service } = newService("v4-schema");
     await service.boot();
-    await service.createCareer(careerWorld.teams[0]!.teamId, null, { seed: "v4-schema", worldId: "world-v4-schema" });
+    await service.createCareer(careerWorld.teams[0]!.teamId, null, { seed: "v4-schema", worldId: "world-v4-schema", worldStateVersion: PERSISTENT_WORLD_STATE_V4_VERSION });
     const world = service.getPersistentState()!;
     expect(world.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V4_VERSION);
     if (world.worldStateVersion !== PERSISTENT_WORLD_STATE_V4_VERSION) throw new Error("expected V4");
@@ -419,7 +419,7 @@ describe("world state V4", () => {
   it("exports a V4 world as a V5 archive that older readers refuse, and imports it unchanged", async () => {
     const { service } = newService("v4-export");
     await service.boot();
-    await service.createCareer(careerWorld.teams[2]!.teamId, null, { seed: "v4-export", worldId: "world-v4-export" });
+    await service.createCareer(careerWorld.teams[2]!.teamId, null, { seed: "v4-export", worldId: "world-v4-export", worldStateVersion: PERSISTENT_WORLD_STATE_V4_VERSION });
     const before = service.getPersistentState()!;
     const bytes = await service.exportCareer();
     expect(peekPortableArchiveVersion(bytes)).toBe(PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION);
