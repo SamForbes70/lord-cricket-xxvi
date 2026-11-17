@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "string",
+  "enum": [
+    "MILESTONE_BATTING",
+    "MILESTONE_BOWLING",
+    "MILESTONE_FIELDING",
+    "FORM_STREAK",
+    "YOUTH_BREAKTHROUGH",
+    "CONTRACT_TENSION",
+    "RETIREMENT_WATCH",
+    "AWARD_RECOGNITION",
+    "CLUB_BOARD_REVIEW"
+  ],
+  "$id": "urn:lcxxvi:CareerStoryCategory:1",
+  "title": "CareerStoryCategory"
+}

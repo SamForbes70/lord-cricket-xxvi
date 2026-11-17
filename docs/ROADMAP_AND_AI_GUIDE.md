@@ -93,7 +93,9 @@ This guide gives engineers and AI coding agents a single authoritative blueprint
 
 Any AI agent or engineer implementing the next stages should follow the exact blueprints below, strictly one stage at a time, branching from `main`.
 
-### Stage 11 — Player and manager stories (`Slice S11-01`, **NEXT ELIGIBLE**, `deps: Stages 4, 9, 10` satisfied)
+### Stage 11 — Player and manager stories (`Slice S11-01`, **IN PROGRESS** on `feat/stage11-career-stories`, `deps: Stages 4, 9, 10` satisfied)
+
+> As built (17 November 2026): stories are derived on demand and never stored (no persisted format change). The projection takes the ordered match facts of `buildHistoricalMatchFactsFromCareer`, the awards ledger, contracts and the lifecycle. Form streaks and contract and board stories are told for the managed club; milestones, youth debuts, awards and retirements league-wide. Every number in a story's text appears in its `factProvenance`, which a unit test checks for every story.
 
 - **Goal**: Surface factual, event-driven career milestones, form streaks, selection/contract pressure, and board/season review story cards derived deterministically from committed career data, with **zero fabricated biographies or hallucinated match claims**.
 - **Implementation Plan**:

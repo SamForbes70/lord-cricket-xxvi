@@ -109,3 +109,9 @@ Owner's words, verbatim: "Pause other Agents".
 
 - Copilot, "Agent Zero" and "Lord Cricket Engineer" are paused: they must not write to this repository. `AGENTS.md` now says so, for any agent that reads the project instructions.
 - None of them runs from this repository (its only workflows are the CI jobs `verify.yml` and `windows-launcher.yml`), so stopping them where they run is an owner action. At the time of this decision: "Lord Cricket Engineer" last committed `806ef50` on 16 November 2026, from a local address; Copilot has draft pull request #44, idle since 15 November; no commit names "Agent Zero".
+
+## Owner decision, 17 November 2026: start the finished-game features
+
+Owner's words, verbatim: "start the finished-game features next".
+
+- Stabilisation (pull requests #48 to #62) is the base; the remaining roadmap stages in [ROADMAP_AND_AI_GUIDE.md](ROADMAP_AND_AI_GUIDE.md) are now in scope, in order, starting with Stage 11 (player and manager stories).

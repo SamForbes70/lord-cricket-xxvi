@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "storyId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "seasonNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "roundNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 99
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "MILESTONE_BATTING",
+        "MILESTONE_BOWLING",
+        "MILESTONE_FIELDING",
+        "FORM_STREAK",
+        "YOUTH_BREAKTHROUGH",
+        "CONTRACT_TENSION",
+        "RETIREMENT_WATCH",
+        "AWARD_RECOGNITION",
+        "CLUB_BOARD_REVIEW"
+      ]
+    },
+    "headline": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "summaryText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 480
+    },
+    "subjectPlayerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "subjectTeamId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "linkedMatchKey": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "factProvenance": {
+      "minItems": 1,
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "storyId",
+    "seasonNumber",
+    "roundNumber",
+    "category",
+    "headline",
+    "summaryText",
+    "subjectPlayerId",
+    "subjectTeamId",
+    "linkedMatchKey",
+    "factProvenance"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:CareerStoryCard:1",
+  "title": "CareerStoryCard"
+}

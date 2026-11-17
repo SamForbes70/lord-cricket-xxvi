@@ -20,6 +20,7 @@ import {
   type ActivePersistentSeasonState,
   type ClubBudgetState,
   type CareerAwardsLedger,
+  type CareerStoriesProjection,
   type CompletedCareerMatchEventArchive,
   type CompletedLifecycleMatchEventArchive,
   type ContractOffer,
@@ -74,6 +75,8 @@ import {
 import {
   buildHistoricalStatsSourceFromPersistentWorld,
   buildHistoricalStatsSourceFromSingleSeason,
+  buildHistoricalMatchFactsFromCareer,
+  projectCareerStories,
   projectHistoricalStatistics,
   reconcileCareerAwardsLedger,
   deriveCareerMatchDigest,
@@ -3726,6 +3729,34 @@ export class CareerApplicationService {
     const source = this.buildCurrentHistoricalSource(archivesOverride);
     if (!source) return null;
     return projectHistoricalStatistics(source, query);
+  }
+
+  /**
+   * Stage 11 story cards (docs/ROADMAP_AND_AI_GUIDE.md): derived on demand from match facts, the awards ledger,
+   * contracts and the lifecycle; never stored. Season awards appear once `syncAwardsLedger` has run.
+   */
+  careerStories(): CareerStoriesProjection | null {
+    const source = this.buildCurrentHistoricalSource();
+    const worldOrCareerId = this.awardsWorldOrCareerId();
+    if (!source || !this.state || !worldOrCareerId) return null;
+    const { facts } = buildHistoricalMatchFactsFromCareer(source);
+    const { playerNames, teamNames } = this.awardsNameMaps();
+    const lifecycle = this.getLifecycleState();
+    const economy = this.getEconomyState();
+    return projectCareerStories({
+      worldOrCareerId,
+      facts,
+      controlledTeamId: this.state.controlledTeamId,
+      playerNames,
+      teamNames,
+      awardsLedger: this.awardsLedger,
+      currentSeasonNumber: this.persistentState?.currentSeasonNumber ?? 1,
+      contracts: economy?.contracts ?? [],
+      youthPromotions: (lifecycle?.youthAcademy ?? [])
+        .filter((y) => y.promotedInSeasonNumber !== null)
+        .map((y) => ({ playerId: y.player.playerId, teamId: y.teamId, promotedInSeasonNumber: y.promotedInSeasonNumber! })),
+      retirements: lifecycle?.retiredPlayers ?? [],
+    });
   }
 
   historicalPlayerRecord(
