@@ -13,6 +13,7 @@ import {
 } from "@lcxxvi/simulation";
 import {
   IndexedDbSaveRepository,
+  sha256Text,
   createManagedMatchBindings,
   createPortableArchive,
   readPortableArchive,
@@ -35,7 +36,12 @@ import {
   type ManagedStatus,
   type Request,
   type Response,
+  type ScenarioStatus,
 } from "./protocol.js";
+import { scenarioById } from "@lcxxvi/data";
+import { emptyScenarioLedger, evaluateScenarioResult, recordScenarioFinish, recordScenarioStart, scenarioAttemptFor } from "@lcxxvi/projections";
+import type { ScenarioRecordLedger } from "@lcxxvi/contracts";
+import { scenarioResultOf, startScenarioOnController } from "./scenario-runtime.js";
 
 const worldBytes = new TextEncoder().encode(worldText);
 const repository = new IndexedDbSaveRepository();
@@ -79,6 +85,14 @@ function privateSeed(): string {
 function privateIdentity() {
   const token = randomHex(12);
   return { gameId: `game-${token}`, matchId: `match-${token}` };
+}
+/** A scenario uses its fixed seed and match id; only the game id (the save's identity) is fresh per attempt. */
+function makeScenarioController(format: "T20" | "ODI" | "RED_BALL", seed: string, matchId: string): MatchController {
+  const fixed = () => seed;
+  const identity = () => ({ gameId: privateIdentity().gameId, matchId });
+  if (format === "ODI") return createODIMatchController(worldBytes, manifest, fixed, identity);
+  if (format === "RED_BALL") return createRed5MatchController(worldBytes, manifest, fixed, identity);
+  return createMatchController(worldBytes, manifest, fixed, identity);
 }
 function makeController(format: "T20" | "ODI" | "RED_BALL" = "T20"): MatchController {
   if (format === "ODI") return createODIMatchController(worldBytes, manifest, privateSeed, privateIdentity);
@@ -201,14 +215,59 @@ async function managedStatusFor(gameId: string): Promise<ManagedStatus | null> {
     return null;
   }
 }
+async function loadScenarioLedger(): Promise<ScenarioRecordLedger> {
+  try {
+    return (await repository.loadScenarioLedger()) ?? emptyScenarioLedger();
+  } catch {
+    // A damaged ledger row only loses personal bests; scenario matches themselves are ordinary saves.
+    return emptyScenarioLedger();
+  }
+}
+/** The active match's scenario, scoring it once when its managed lineage has just completed. */
+async function scenarioStatusFor(gameId: string | null, phase: string | null): Promise<ScenarioStatus | null> {
+  if (!gameId) return null;
+  let ledger = await loadScenarioLedger();
+  let attempt = scenarioAttemptFor(ledger, gameId);
+  if (!attempt) return null;
+  const challenge = scenarioById(attempt.scenarioId);
+  if (!challenge) return null;
+  if (attempt.outcome === null && phase === "COMPLETE" && bindableSave(gameId) && !readOnly) {
+    const session = controller.snapshot();
+    const result = session && String(session.setup.gameId) === gameId ? scenarioResultOf(session) : null;
+    if (result) {
+      try {
+        ledger = await repository.saveScenarioLedger(recordScenarioFinish(ledger, gameId, evaluateScenarioResult(attempt, result)));
+        attempt = scenarioAttemptFor(ledger, gameId) ?? attempt;
+      } catch {
+        /* the result stays unscored; the next response retries */
+      }
+    }
+  }
+  return {
+    scenarioId: challenge.scenarioId,
+    title: challenge.title,
+    format: challenge.format,
+    difficulty: challenge.difficulty,
+    objectiveSummary: challenge.objectiveSummary,
+    briefing: challenge.briefing,
+    playerTeamId: attempt.playerTeamId,
+    opponentTeamId: challenge.teamIds.find((teamId) => teamId !== attempt!.playerTeamId) ?? challenge.teamIds[1],
+    outcome: attempt.outcome,
+    resultText: attempt.resultText,
+  };
+}
 async function decorate(
   base: Response,
   archive: Uint8Array | null = null,
 ): Promise<Response> {
   const fixture = boundFixture();
+  const persistence = await persistenceState();
+  const current = persistence.saves.find((save) => save.saveId === persistence.saveId) ?? null;
+  const scenario = await scenarioStatusFor(current?.matchGameId ?? null, base.view?.phase ?? null);
   return {
     ...base,
-    persistence: await persistenceState(),
+    scenario,
+    persistence,
     archive,
     delegation,
     ...(fixture ? { managedStatus: await managedStatusFor(fixture.matchGameId) } : {}),
@@ -484,6 +543,7 @@ async function commitCandidate(
       },
       archive: null,
       delegation,
+      scenario: await scenarioStatusFor(String(session.setup.gameId), response.view?.phase ?? null),
       ...(session.receipts[request.requestId] ? { acknowledgement: session.receipts[request.requestId] } : {}),
     };
   } catch (error) {
@@ -696,6 +756,78 @@ async function handlePersistence(request: Request): Promise<Response | null> {
   return null;
 }
 
+/** Stage 12: plays the challenge to its checkpoint in memory, then commits it once as a new auto save. */
+async function startScenario(request: Extract<Request, { type: "SCENARIO_START" }>): Promise<Response> {
+  const challenge = scenarioById(request.scenarioId);
+  if (!challenge) return decorate(controller.currentResponse(request.requestId, "Unknown scenario."));
+  const active = controller.snapshot();
+  if (active) {
+    const { binding } = await pendingBindingFor(String(active.setup.gameId));
+    if (binding) return decorate(controller.currentResponse(request.requestId, "This match is linked to a career fixture. Finish it, or abandon the career match first."));
+  }
+  const candidate = makeScenarioController(challenge.format, challenge.seed, challenge.matchId);
+  let session: AnySession;
+  let response: Response;
+  try {
+    response = startScenarioOnController(candidate as never, challenge, request.requestId);
+    session = candidate.snapshot()!;
+  } catch (error) {
+    return decorate(controller.currentResponse(request.requestId, `The scenario could not be prepared. ${error instanceof Error ? error.message : ""}`.trim()));
+  }
+  const saveId = `auto:${session.setup.gameId}`;
+  if (!(await repository.acquireLease(saveId, ownerId, nowMs())))
+    return decorate(controller.currentResponse(request.requestId, "A writer lease could not be acquired for the scenario."));
+  try {
+    await repository.commit({
+      saveId,
+      kind: "AUTO",
+      title: `Scenario: ${challenge.title}`,
+      expectedRevision: null,
+      session,
+      revision: session.revision,
+      events: session.events,
+      command: null,
+      historyCommands: durableHistoryFromSession(session),
+      metadata: metadata(session, null),
+      worldCopy: null,
+      rosterPack: null,
+      ownerId,
+      now: nowMs(),
+      updatedAt: nowIso(),
+    });
+  } catch (error) {
+    try { await repository.releaseLease(saveId, ownerId); } catch { /* best effort */ }
+    return decorate(controller.currentResponse(request.requestId, `Save failed. ${error instanceof Error ? error.message : ""}`.trim()));
+  }
+  if (activeSaveId && activeSaveId !== saveId && !readOnly) {
+    try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
+  }
+  controller = candidate;
+  activeSaveId = saveId;
+  activeWorldCopy = null;
+  activeRosterPack = null;
+  delegation = emptyDelegation();
+  readOnly = false;
+  recovered = false;
+  recoveredFromGeneration = null;
+  bindNote = null;
+  await repository.setActiveSaveId(saveId);
+  try {
+    const ledger = await loadScenarioLedger();
+    await repository.saveScenarioLedger(
+      recordScenarioStart(ledger, {
+        gameId: String(session.setup.gameId),
+        scenarioId: challenge.scenarioId,
+        challengeSha256: await sha256Text(canonicalJson(challenge)),
+        playerTeamId: challenge.playerTeamId,
+        objective: challenge.objective,
+      }),
+    );
+  } catch {
+    /* the match is saved; only its personal-best record is missing */
+  }
+  return decorate(response);
+}
 async function handleInner(raw: unknown): Promise<Response> {
   const parsed = RequestSchema.safeParse(raw);
   if (!parsed.success) {
@@ -865,6 +997,7 @@ async function handleInner(raw: unknown): Promise<Response> {
     controller = makeController();
     await repository.setActiveSaveId(null);
   }
+  if (request.type === "SCENARIO_START") return startScenario(request);
   const persistenceResponse = await handlePersistence(request);
   if (persistenceResponse) return persistenceResponse;
   if (request.type === "SET_DELEGATION") {

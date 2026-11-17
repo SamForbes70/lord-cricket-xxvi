@@ -15,7 +15,9 @@ const steps = [
   { name: "browser-installation", args: ["exec", "--", "playwright", "install", "chromium", "firefox"] },
   ...["schemas:check", "build", "typecheck", "lint", "fixtures:engine"].map(name => ({ name: name.replace(":", "-"), args: ["run", name] })),
   { name: "frozen-world", node: true, args: ["scripts/verify-world.mjs"] },
-  { name: "unit", args: ["test", "--", "--maxWorkers=2", "--reporter=default", "--reporter=json", `--outputFile=${directory}/unit.json`], report: "unit.json" },
+  // The unit suite runs whole multi-season careers; on hosted Windows it took 533 s on one run and passed 900 s on the
+  // next, for the same code. 30 minutes gives the same kind of headroom as match-ui.
+  { name: "unit", timeoutMs: 1_800_000, args: ["test", "--", "--maxWorkers=2", "--reporter=default", "--reporter=json", `--outputFile=${directory}/unit.json`], report: "unit.json" },
   { name: "persistence-m4", args: ["exec", "--", "playwright", "test", "--config=playwright.m4.config.ts", "--reporter=list,json", `--output=${directory}/m4`, "--trace=retain-on-failure"], report: "persistence-m4.json" },
   { name: "match-ui", timeoutMs: 4_500_000, args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
   { name: "career", args: ["exec", "--", "playwright", "test", "--config=playwright.m6g.portable.config.ts", "--reporter=list,json", `--output=${directory}/career`, "--trace=retain-on-failure"], report: "career.json" },

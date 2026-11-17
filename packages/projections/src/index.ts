@@ -22,3 +22,4 @@ export * from "./audio-cues.js";
 export * from "./historical-stats.js";
 export * from "./awards.js";
 export * from "./career-stories.js";
+export * from "./scenario-mode.js";

@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "const": "LC_SCENARIO_CHALLENGE_V1"
+    },
+    "scenarioId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "T20",
+        "ODI",
+        "RED_BALL"
+      ]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "STANDARD",
+        "HARD",
+        "ELITE"
+      ]
+    },
+    "sourceType": {
+      "type": "string",
+      "const": "FICTIONAL_CURATED"
+    },
+    "seed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "matchId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "teamIds": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false
+    },
+    "groundId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "playerTeamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "objective": {
+      "type": "string",
+      "enum": [
+        "WIN",
+        "AVOID_DEFEAT"
+      ]
+    },
+    "objectiveSummary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "briefing": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 480
+    },
+    "checkpoint": {
+      "type": "object",
+      "properties": {
+        "inningsIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "legalBalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "battingTeamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "runs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "wickets": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "targetToWin": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "inningsIndex",
+        "legalBalls",
+        "revision",
+        "battingTeamId",
+        "runs",
+        "wickets",
+        "targetToWin"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaId",
+    "scenarioId",
+    "title",
+    "format",
+    "difficulty",
+    "sourceType",
+    "seed",
+    "matchId",
+    "teamIds",
+    "groundId",
+    "playerTeamId",
+    "objective",
+    "objectiveSummary",
+    "briefing",
+    "checkpoint"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ScenarioChallenge:1",
+  "title": "ScenarioChallenge"
+}

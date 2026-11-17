@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "inningsIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "legalBalls": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3000
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "battingTeamId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "runs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "wickets": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10
+    },
+    "targetToWin": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "inningsIndex",
+    "legalBalls",
+    "revision",
+    "battingTeamId",
+    "runs",
+    "wickets",
+    "targetToWin"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:ScenarioCheckpoint:1",
+  "title": "ScenarioCheckpoint"
+}

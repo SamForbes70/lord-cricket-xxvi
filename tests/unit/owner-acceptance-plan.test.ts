@@ -26,6 +26,7 @@ describe("owner acceptance command plan", () => {
     const plan = JSON.parse(execFileSync(process.execPath, ["scripts/owner-acceptance.mjs", "--plan", "--owner-pc"], { encoding: "utf8" }));
     expect(plan.steps.map((s: { name: string }) => s.name)).toEqual(expect.arrayContaining(["installation", "unit", "match-ui", "career", "research-browser", "performance-observations"]));
     expect(plan.steps.find((s: { name: string }) => s.name === "match-ui").timeoutMs).toBe(4_500_000);
+    expect(plan.steps.find((s: { name: string }) => s.name === "unit").timeoutMs).toBe(1_800_000);
     expect(plan.externalUploads).toBe(false); expect(plan.existingBrowserProfilesOpened).toBe(false);
   });
   it("rejects unknown or duplicate flags before running commands", () => {
