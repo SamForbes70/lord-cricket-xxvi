@@ -27,7 +27,7 @@ test("Stage 12 scenario challenge starts at its checkpoint, plays to a result an
 
   await page.goto("/#scenarios");
   const list = page.getByRole("list", { name: "Scenario challenges" });
-  await expect(list.locator("> li")).toHaveCount(8, { timeout: 30_000 });
+  await expect(list.locator("> li")).toHaveCount(12, { timeout: 30_000 });
   await expect(page.getByTestId("scenario-record-t20-death-overs-chase")).toHaveText("Not attempted yet.");
 
   await page.getByRole("button", { name: "Play Death-overs chase" }).click();
