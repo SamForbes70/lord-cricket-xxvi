@@ -21,6 +21,7 @@ import {
 } from "@lcxxvi/projections";
 import {
   CricketAudioManager,
+  loadStoredAudioPreferences,
   type AudioContextPort,
   type SpeechSynthesisPort,
 } from "../../apps/web/src/match/audio-manager.js";
@@ -28,6 +29,9 @@ import { createMatchController } from "../../apps/web/src/match/controller.js";
 import { createODIMatchController } from "../../apps/web/src/match/controller-odi.js";
 import { createRed5MatchController } from "../../apps/web/src/match/controller-red5.js";
 import { UI_VERSION } from "../../apps/web/src/match/protocol.js";
+
+// Sound is muted by default (owner decision, 16 Nov 2026). Playback tests start from audible preferences.
+const AUDIBLE_PREFERENCES = { ...DEFAULT_AUDIO_PREFERENCES, muted: false };
 
 const repoRoot = resolve(import.meta.dirname, "../..");
 const worldBytes = new Uint8Array(
@@ -238,6 +242,12 @@ function runRed5Sample() {
 }
 
 describe("Stage 8 optional sound and narration", () => {
+  it("starts muted for a player with no saved audio preferences (owner decision, 16 Nov 2026)", () => {
+    expect(DEFAULT_AUDIO_PREFERENCES.muted).toBe(true);
+    // In tests there is no window, so the loader returns the default.
+    expect(loadStoredAudioPreferences().muted).toBe(true);
+  });
+
   it("provides a schema-valid original procedural provenance manifest with zero external network assets", () => {
     const parsed = AudioProvenanceManifestSchema.parse(ORIGINAL_AUDIO_PROVENANCE_MANIFEST);
     expect(parsed.networkCallsAllowed).toBe(false);
@@ -286,7 +296,7 @@ describe("Stage 8 optional sound and narration", () => {
     const speech = makeFakeSpeech();
     let createdCount = 0;
     const manager = new CricketAudioManager(
-      { ...DEFAULT_AUDIO_PREFERENCES, narrationEnabled: true },
+      { ...AUDIBLE_PREFERENCES, narrationEnabled: true },
       {
         createAudioContext: () => {
           createdCount += 1;
@@ -325,7 +335,7 @@ describe("Stage 8 optional sound and narration", () => {
 
   it("deduplicates historical cues across reload and expires stale cues during fast-forward", async () => {
     const fake = makeFakeAudioContext();
-    const manager = new CricketAudioManager(DEFAULT_AUDIO_PREFERENCES, {
+    const manager = new CricketAudioManager(AUDIBLE_PREFERENCES, {
       createAudioContext: () => fake.ctx,
       speechSynthesis: null,
       getVisibilityState: () => "visible",
@@ -417,7 +427,7 @@ describe("Stage 8 optional sound and narration", () => {
     const fake = makeFakeAudioContext();
     const speech = makeFakeSpeech();
     const manager = new CricketAudioManager(
-      { ...DEFAULT_AUDIO_PREFERENCES, narrationEnabled: true },
+      { ...AUDIBLE_PREFERENCES, narrationEnabled: true },
       {
         createAudioContext: () => fake.ctx,
         speechSynthesis: speech.port,
@@ -492,7 +502,7 @@ describe("Stage 8 optional sound and narration", () => {
     expect(manager.getSnapshot().failedAssetIds).toEqual(["lc-sfx-over-bell-v1", "lc-crowd-boundary-six-v1"]);
 
     // Muting silences cues and cancels speech while preserving captions.
-    manager.setPreferences({ ...DEFAULT_AUDIO_PREFERENCES, muted: true });
+    manager.setPreferences({ ...AUDIBLE_PREFERENCES, muted: true });
     const mutedResult = await manager.processCueQueue({
       matchId: "m3",
       cues: [
@@ -515,10 +525,10 @@ describe("Stage 8 optional sound and narration", () => {
 
   it("proves audio settings, narration, and playback failures never alter simulation outcomes or random draws", async () => {
     const configs: { label: string; prefs: AudioPreferences; failAudio?: boolean }[] = [
-      { label: "active-full", prefs: { ...DEFAULT_AUDIO_PREFERENCES, narrationEnabled: true } },
-      { label: "muted-silent", prefs: { ...DEFAULT_AUDIO_PREFERENCES, muted: true, narrationEnabled: false } },
-      { label: "zero-channels", prefs: { ...DEFAULT_AUDIO_PREFERENCES, crowdVolume: 0, effectsVolume: 0, commentaryVolume: 0, interfaceVolume: 0 } },
-      { label: "broken-audio-device", prefs: DEFAULT_AUDIO_PREFERENCES, failAudio: true },
+      { label: "active-full", prefs: { ...AUDIBLE_PREFERENCES, narrationEnabled: true } },
+      { label: "muted-silent", prefs: { ...AUDIBLE_PREFERENCES, muted: true, narrationEnabled: false } },
+      { label: "zero-channels", prefs: { ...AUDIBLE_PREFERENCES, crowdVolume: 0, effectsVolume: 0, commentaryVolume: 0, interfaceVolume: 0 } },
+      { label: "broken-audio-device", prefs: AUDIBLE_PREFERENCES, failAudio: true },
     ];
 
     const hashes: { eventsSha256: string; scorecardSha256: string; lastEventHash: string; revision: number }[] = [];
