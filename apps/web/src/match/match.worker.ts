@@ -42,6 +42,8 @@ import { scenarioById } from "@lcxxvi/data";
 import { emptyScenarioLedger, evaluateScenarioResult, recordScenarioFinish, recordScenarioStart, scenarioAttemptFor } from "@lcxxvi/projections";
 import type { ScenarioRecordLedger } from "@lcxxvi/contracts";
 import { scenarioResultOf, startScenarioOnController } from "./scenario-runtime.js";
+import { applySuperOverAction, loadSuperOverState, superOverEligible, superOverView, type SuperOverStore } from "./super-over-runtime.js";
+import type { SuperOverView } from "./protocol.js";
 
 const worldBytes = new TextEncoder().encode(worldText);
 const repository = new IndexedDbSaveRepository();
@@ -256,6 +258,21 @@ async function scenarioStatusFor(gameId: string | null, phase: string | null): P
     resultText: attempt.resultText,
   };
 }
+const superOverStore: SuperOverStore = {
+  load: (gameId) => repository.loadSuperOverRecord(gameId),
+  save: (record, expected) => repository.saveSuperOverRecord(record, expected),
+};
+/** Stage 14: the super-over view for a completed tied T20 exhibition, or null. */
+async function superOverStatus(phase: string | null): Promise<SuperOverView | null> {
+  if (phase !== "COMPLETE") return null;
+  const session = controller.snapshot();
+  if (!superOverEligible(session, boundFixture() !== null)) return null;
+  try {
+    return superOverView(session, (await loadSuperOverState(session, superOverStore)).state);
+  } catch {
+    return null;
+  }
+}
 async function decorate(
   base: Response,
   archive: Uint8Array | null = null,
@@ -264,9 +281,11 @@ async function decorate(
   const persistence = await persistenceState();
   const current = persistence.saves.find((save) => save.saveId === persistence.saveId) ?? null;
   const scenario = await scenarioStatusFor(current?.matchGameId ?? null, base.view?.phase ?? null);
+  const superOver = await superOverStatus(base.view?.phase ?? null);
   return {
     ...base,
     scenario,
+    superOver,
     persistence,
     archive,
     delegation,
@@ -544,6 +563,7 @@ async function commitCandidate(
       archive: null,
       delegation,
       scenario: await scenarioStatusFor(String(session.setup.gameId), response.view?.phase ?? null),
+      superOver: await superOverStatus(response.view?.phase ?? null),
       ...(session.receipts[request.requestId] ? { acknowledgement: session.receipts[request.requestId] } : {}),
     };
   } catch (error) {
@@ -998,6 +1018,20 @@ async function handleInner(raw: unknown): Promise<Response> {
     await repository.setActiveSaveId(null);
   }
   if (request.type === "SCENARIO_START") return startScenario(request);
+  if (request.type === "SUPER_OVER") {
+    const session = controller.snapshot();
+    if (!superOverEligible(session, boundFixture() !== null))
+      return decorate(controller.currentResponse(request.requestId, "Super overs are for tied T20 exhibition matches."));
+    if (readOnly || !activeSaveId || !(await repository.renewLease(activeSaveId, ownerId, nowMs())))
+      return decorate(controller.currentResponse(request.requestId, "Super overs need a writable save."));
+    try {
+      await applySuperOverAction(session, superOverStore, request.action);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "The super over could not continue.";
+      return decorate(controller.currentResponse(request.requestId, message === "SUPER_OVER_STALE" ? "Another tab changed this super over. Reload to continue." : message));
+    }
+    return decorate(controller.currentResponse(request.requestId));
+  }
   const persistenceResponse = await handlePersistence(request);
   if (persistenceResponse) return persistenceResponse;
   if (request.type === "SET_DELEGATION") {

@@ -17,6 +17,8 @@ import {
   StagedRosterPackSchema,
   DelegationCategorySchema,
   RedBallTacticalProfileSchema,
+  SuperOverCommandSchema,
+  type SuperOverRoundSummary,
   type DelegationJournal,
   type T20Command,
   type ODICommand,
@@ -170,6 +172,16 @@ export const RequestSchema = z.discriminatedUnion("type", [
     type: z.literal("IMPORT_SAVE"),
     archive: z.instanceof(Uint8Array),
   }),
+  /** Stage 14: super overs for a tied T20 exhibition. START opens them; AI lets the tactical captain decide for its side. */
+  z.strictObject({
+    ...base,
+    type: z.literal("SUPER_OVER"),
+    action: z.discriminatedUnion("kind", [
+      z.strictObject({ kind: z.literal("START") }),
+      z.strictObject({ kind: z.literal("COMMAND"), command: SuperOverCommandSchema }),
+      z.strictObject({ kind: z.literal("AI"), teamId: z.string().min(1).max(128) }),
+    ]),
+  }),
   /** Stage 12: starts a curated scenario challenge from its checkpoint. Replaces a non-career active match. */
   z.strictObject({ ...base, type: z.literal("SCENARIO_START"), scenarioId: z.string().min(1).max(128) }),
   /** Re-associates a restored match with its career fixture from the durable binding. Never resets state. */
@@ -308,6 +320,32 @@ export type CareerMatchResult = {
 
 export type CareerFixtureLaunch = z.infer<typeof CareerFixtureLaunchSchema>;
 export type ManagedStatus = "PENDING" | "APPLIED" | "ABANDONED";
+/** Stage 14: super-over status for a tied T20 exhibition. */
+export type SuperOverView = {
+  rulesId: "LC_T20_SUPER_OVER_01";
+  started: boolean;
+  phase: "AWAITING_LINEUP" | "READY" | "COMPLETE" | "NOT_STARTED";
+  rounds: SuperOverRoundSummary[];
+  pending: { teamId: string; decision: "BATTERS" | "BOWLER" } | null;
+  /** For the pending decision: the players that may be chosen, and how many batters to name. */
+  choices: { id: string; name: string }[];
+  battersToName: number;
+  current: {
+    battingTeamId: string;
+    bowlingTeamId: string;
+    strikerId: string | null;
+    nonStrikerId: string | null;
+    bowlerId: string | null;
+    runs: number;
+    wickets: number;
+    legalBalls: number;
+    targetToWin: number | null;
+    balls: string[];
+  } | null;
+  winnerTeamId: string | null;
+  completionReason: "WON" | "NO_ELIGIBLE_PLAYERS" | null;
+  names: Record<string, string>;
+};
 /** Stage 12: the scenario challenge the active match belongs to, if any. */
 export type ScenarioStatus = {
   scenarioId: string;
@@ -336,6 +374,8 @@ export type Response = {
   rosterCareerSession?: unknown;
   /** Set by RECOVER_MANAGED: the validated launch restored from the durable binding, or null when none applies. */
   careerFixture?: CareerFixtureLaunch | null;
+  /** Set when the active match is a tied T20 exhibition that may go to super overs. */
+  superOver?: SuperOverView | null;
   /** Set when the active match is a scenario challenge. */
   scenario?: ScenarioStatus | null;
   /** Status of the durable binding for the active match, when one exists. */
