@@ -115,3 +115,18 @@ Owner's words, verbatim: "Pause other Agents".
 Owner's words, verbatim: "start the finished-game features next".
 
 - Stabilisation (pull requests #48 to #62) is the base; the remaining roadmap stages in [ROADMAP_AND_AI_GUIDE.md](ROADMAP_AND_AI_GUIDE.md) are now in scope, in order, starting with Stage 11 (player and manager stories).
+
+## Owner decisions, 17 November 2026: Stages 13 to 15, signing, frozen sorting, merging
+
+Owner's words, verbatim: "merge #65 once green too", then "1a, 2a, 3 yes, 4b, 5a, 8a, 9a, 12 yes", answering a numbered list of questions. Pull request #65 (Stage 12) was merged on green CI.
+
+1. **Super overs (Stage 14), answer 1a.** Use the ICC standard. Each side bats one over, and an innings ends at 2 wickets. Super overs repeat until there is a winner. A batter dismissed, or a bowler who bowled, in one super over cannot take part in the next. They are built under a new opt-in ruleset version; the frozen engines do not change.
+2. **Where super overs apply, answer 2a.** Exhibitions only at first. Careers are unchanged.
+3. **DLS and DRS, answer 3 yes.** Build them after super overs, each in its own pull request. DLS will be a fictional, documented method, not the licensed DLS tables.
+4. **Stage 13 historical data, answer 4b.** No source or licence is approved. Stage 13 stays parked, and more fictional scenarios may be built instead.
+5. **Stage 15, answer 5a.** Build the parts that do not need historical data now: custom round-robin, group and knockout formats and tours for the fictional world.
+6. **EXE signing, answer 8a.** The Windows executable stays unsigned for now.
+7. **Frozen-engine sorting, answer 9a.** The frozen engines keep `localeCompare`; no change.
+8. **Merging, answer 12 yes.** An agent may merge its own pull requests once both hosted checks pass on the final head and the branch is clean, without asking each time.
+
+Still open (not answered): owner playtests and measurements (Stage 16), public release (Stage 17), branch protection, and stopping the paused agents where they run.
