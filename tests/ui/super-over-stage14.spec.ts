@@ -60,7 +60,7 @@ async function tiedArchive(format: "T20" | "ODI" = "T20"): Promise<string> {
   return file;
 }
 
-test("Stage 14 tied T20 exhibition goes to a super over, played by hand, and keeps the winner across a reload", async ({ page }) => {
+test("Stage 14 tied T20 exhibition goes to a super over, played by hand, and keeps the winner across a reload and an export", async ({ page, browser }) => {
   test.setTimeout(180_000);
   const pageErrors: string[] = [];
   page.on("pageerror", (err) => pageErrors.push(err.message));
@@ -105,6 +105,23 @@ test("Stage 14 tied T20 exhibition goes to a super over, played by hand, and kee
   await page.reload();
   await expect(page.getByTestId("super-over-result")).toHaveText(text, { timeout: 30_000 });
   await expect(page.getByTestId("super-over-round-1")).toBeVisible();
+
+  // Portable (owner decision 8a): the export carries the super overs, and a fresh browser imports them.
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export current" }).click();
+  const exported = await (await download).path();
+  const context = await browser.newContext();
+  try {
+    const imported = await context.newPage();
+    await imported.goto("/#exhibition");
+    await expect(imported.getByLabel("Import saved game")).toBeEnabled({ timeout: 30_000 });
+    await imported.getByLabel("Import saved game").setInputFiles(exported!);
+    await expect(imported.getByTestId("super-over-result")).toHaveText(text, { timeout: 30_000 });
+    await expect(imported.getByTestId("super-over-round-1")).toHaveText("Super over 1: Silver Fen 2/0 (6 balls) · Northlight Ridge 7/0 (2 balls)");
+    await expect(imported.getByRole("alert")).toHaveCount(0);
+  } finally {
+    await context.close();
+  }
   expect(pageErrors).toEqual([]);
 });
 

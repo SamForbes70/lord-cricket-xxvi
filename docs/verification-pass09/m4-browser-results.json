@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/mnt/data/lcxxvi-pass09/source/Lord_Cricket_XXVI_PASS_08_Source/playwright.m4.config.ts",
-    "rootDir": "/mnt/data/lcxxvi-pass09/source/Lord_Cricket_XXVI_PASS_08_Source/tests/m4",
+    "configFile": "/home/user/lord-cricket-xxvi/playwright.m4.config.ts",
+    "rootDir": "/home/user/lord-cricket-xxvi/tests/m4",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -33,7 +33,7 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/mnt/data/lcxxvi-pass09/source/Lord_Cricket_XXVI_PASS_08_Source/test-results-m4",
+        "outputDir": "/home/user/lord-cricket-xxvi/test-results-m4",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -41,7 +41,7 @@
         },
         "id": "chromium-m4",
         "name": "chromium-m4",
-        "testDir": "/mnt/data/lcxxvi-pass09/source/Lord_Cricket_XXVI_PASS_08_Source/tests/m4",
+        "testDir": "/home/user/lord-cricket-xxvi/tests/m4",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -83,12 +83,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4869,
+                  "duration": 4190,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-04T04:21:01.981Z",
+                  "startTime": "2026-11-17T21:39:55.660Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -117,12 +117,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6494,
+                  "duration": 3495,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-04T04:21:07.199Z",
+                  "startTime": "2026-11-17T21:40:00.006Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -151,12 +151,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2834,
+                  "duration": 2455,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-04T04:21:13.715Z",
+                  "startTime": "2026-11-17T21:40:03.509Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -185,12 +185,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3225,
+                  "duration": 4174,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-04T04:21:16.576Z",
+                  "startTime": "2026-11-17T21:40:05.972Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -200,7 +200,7 @@
           ],
           "id": "a5ef73a4e2a1baaea746-24f7980b568d9634526b",
           "file": "persistence.spec.ts",
-          "line": 210,
+          "line": 212,
           "column": 1
         },
         {
@@ -219,12 +219,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1731,
+                  "duration": 1998,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-04T04:21:19.816Z",
+                  "startTime": "2026-11-17T21:40:10.159Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -234,7 +234,7 @@
           ],
           "id": "a5ef73a4e2a1baaea746-79ca70a9227f51c79890",
           "file": "persistence.spec.ts",
-          "line": 269,
+          "line": 271,
           "column": 1
         },
         {
@@ -253,12 +253,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 609,
+                  "duration": 899,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-04T04:21:21.566Z",
+                  "startTime": "2026-11-17T21:40:12.165Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -268,7 +268,75 @@
           ],
           "id": "a5ef73a4e2a1baaea746-f3fd947fd236c104b4b7",
           "file": "persistence.spec.ts",
-          "line": 303,
+          "line": 305,
+          "column": 1
+        },
+        {
+          "title": "edited match world is atomic, immutable and retained during recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-m4",
+              "projectName": "chromium-m4",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1353,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T21:40:13.075Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5ef73a4e2a1baaea746-0b1357476a23fcbce3fc",
+          "file": "persistence.spec.ts",
+          "line": 386,
+          "column": 1
+        },
+        {
+          "title": "delegation history checks the writer lease and durable match revision",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-m4",
+              "projectName": "chromium-m4",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 985,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T21:40:14.440Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5ef73a4e2a1baaea746-8d8e46a26c8df8be5d7d",
+          "file": "persistence.spec.ts",
+          "line": 447,
           "column": 1
         }
       ]
@@ -276,9 +344,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-04T04:21:00.227Z",
-    "duration": 22083.205,
-    "expected": 6,
+    "startTime": "2026-11-17T21:39:54.217Z",
+    "duration": 21349.946,
+    "expected": 8,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
