@@ -4,6 +4,8 @@ import {
   replayDelegationJournal,
   type DelegationJournal,
   StagedRosterPackSchema,
+  ScenarioRecordLedgerSchema,
+  type ScenarioRecordLedger,
   type StagedRosterPack,
   type ID,
   type MatchState,
@@ -39,6 +41,9 @@ export const DELEGATION_SAVE_SCHEMA_VERSION = "LC_SAVE_V4_DELEGATION" as const;
 export const DB_NAME = "lord-cricket-xxvi";
 export const DB_VERSION = 1;
 export const WRITER_LEASE_MS = 12_000;
+/** Projections row holding the Stage 12 scenario record ledger. */
+export const SCENARIO_RECORDS_SCOPE = "SCENARIO_RECORDS_V1";
+const SCENARIO_LEDGER_KEY = ["lcxxvi-scenarios", SCENARIO_RECORDS_SCOPE, "ledger"] as const;
 
 export type SaveKind = "AUTO" | "MANUAL" | "IMPORTED";
 export type SaveSummary = {
@@ -305,6 +310,31 @@ export class IndexedDbSaveRepository {
       })
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .map(summaryFromGame);
+  }
+
+  /** Stage 12: scenario personal bests. One row, outside every save, so no career or match save carries it. */
+  async loadScenarioLedger(): Promise<ScenarioRecordLedger | null> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const row = (await req(tx.objectStore("projections").get([...SCENARIO_LEDGER_KEY]))) as
+      | { payload: string; sha256: string }
+      | undefined;
+    await txDone(tx);
+    if (!row) return null;
+    if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("SCENARIO_LEDGER_DAMAGED");
+    return ScenarioRecordLedgerSchema.parse(JSON.parse(row.payload));
+  }
+
+  async saveScenarioLedger(ledgerRaw: ScenarioRecordLedger): Promise<ScenarioRecordLedger> {
+    const ledger = ScenarioRecordLedgerSchema.parse(ledgerRaw);
+    const payload = canonicalJson(ledger);
+    const sha256 = await sha256Text(payload);
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    const [saveId, scope, key] = SCENARIO_LEDGER_KEY;
+    tx.objectStore("projections").put({ saveId, scope, key, payload, sha256 });
+    await txDone(tx);
+    return ledger;
   }
 
   async activeSaveId(): Promise<string | null> {

@@ -138,6 +138,8 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
   5. **Verification**:
      - `tests/unit/scenario-mode-stage12.test.ts` + `tests/ui/scenario-mode-stage12.spec.ts`.
 
+> As built (17 November 2026): 8 challenges (4 T20, 2 ODI, 2 five-day). Each challenge pins a seed **and a match id**, because the engines' random stream is keyed by both. The worker's new `SCENARIO_START` request plays the match to the checkpoint in memory with the engines' own fixture autopilot, refuses to start if the reached state differs from the pinned `checkpoint`, then commits once as a new auto save through the same history-command path that save import uses. Only the game id is fresh for each attempt. The opponent is the tactical captain. Results are scored once, when the managed lineage (the auto save or its recovered copy) completes; manual copies and imports are never scored. Personal bests are kept in one projections row (`lcxxvi-scenarios` / `SCENARIO_RECORDS_V1` / `ledger`) outside every save. Scenario matches are ordinary exhibition saves, so no career, statistic, award or story reads them; no existing persisted format changed. Not built: a red-ball "survive day five" challenge. In the seed search, every autopilot five-day match under the current synthetic model finished by day three, so no fixed seed reaches a day-five draw position. The `AVOID_DEFEAT` objective exists and is unit-tested for when one does.
+
 ### Stage 13 — Historical scenarios and provenance (`Slice S13-01`, `deps: Stage 12 + source permissions/rules review`)
 
 - **Goal**: Layer sourced historical cricket scenarios over Stage 12's scenario runner and `scripts/research/m7k-historical-fixture.ts` with full provenance citations.

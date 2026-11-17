@@ -170,6 +170,8 @@ export const RequestSchema = z.discriminatedUnion("type", [
     type: z.literal("IMPORT_SAVE"),
     archive: z.instanceof(Uint8Array),
   }),
+  /** Stage 12: starts a curated scenario challenge from its checkpoint. Replaces a non-career active match. */
+  z.strictObject({ ...base, type: z.literal("SCENARIO_START"), scenarioId: z.string().min(1).max(128) }),
   /** Re-associates a restored match with its career fixture from the durable binding. Never resets state. */
   z.strictObject({ ...base, type: z.literal("RECOVER_MANAGED") }),
   /** Releases a pending career binding so the match is kept as a plain exhibition. */
@@ -306,6 +308,19 @@ export type CareerMatchResult = {
 
 export type CareerFixtureLaunch = z.infer<typeof CareerFixtureLaunchSchema>;
 export type ManagedStatus = "PENDING" | "APPLIED" | "ABANDONED";
+/** Stage 12: the scenario challenge the active match belongs to, if any. */
+export type ScenarioStatus = {
+  scenarioId: string;
+  title: string;
+  format: "T20" | "ODI" | "RED_BALL";
+  difficulty: "STANDARD" | "HARD" | "ELITE";
+  objectiveSummary: string;
+  briefing: string;
+  playerTeamId: string;
+  opponentTeamId: string;
+  outcome: "COMPLETED" | "FAILED" | null;
+  resultText: string | null;
+};
 export type Response = {
   version: typeof UI_VERSION;
   requestId: string;
@@ -321,6 +336,8 @@ export type Response = {
   rosterCareerSession?: unknown;
   /** Set by RECOVER_MANAGED: the validated launch restored from the durable binding, or null when none applies. */
   careerFixture?: CareerFixtureLaunch | null;
+  /** Set when the active match is a scenario challenge. */
+  scenario?: ScenarioStatus | null;
   /** Status of the durable binding for the active match, when one exists. */
   managedStatus?: ManagedStatus | null;
   /** On BOOT and restores: the highest committed ui-N id, so the page can start its ids above it. */

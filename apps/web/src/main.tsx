@@ -35,7 +35,9 @@ import {
   type Verification,
   type PersistenceView,
   type AnalyticsProgress,
+  type ScenarioStatus,
 } from "./match/protocol.js";
+import { ScenariosApp, SCENARIO_LAUNCH_KEY } from "./scenario/ScenariosApp.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
@@ -86,6 +88,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   })());
   const careerStartIssued = useRef(false);
+  /** Stage 12: a scenario chosen on the Scenarios screen, started once the worker has booted. */
+  const scenarioLaunch = useRef<string | null>((() => {
+    try {
+      const id = sessionStorage.getItem(SCENARIO_LAUNCH_KEY);
+      sessionStorage.removeItem(SCENARIO_LAUNCH_KEY);
+      return id;
+    } catch {
+      return null;
+    }
+  })());
+  const [scenario, setScenario] = useState<ScenarioStatus | null>(null);
   const recoverIssued = useRef(false);
   // Ids for requests that never commit. Commands use ui-(10000 + revision + 1) so that a reloaded page, which
   // restarts from the durable revision, cannot reuse a committed id; borrowing from that range would break it.
@@ -354,6 +367,29 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
       if (r.persistence) setPersistence(r.persistence);
       if (r.delegation) setDelegation(r.delegation);
+      if (r.view && "scenario" in r) {
+        const nextScenario = r.scenario ?? null;
+        setScenario(nextScenario);
+        // The scenario's opponent is always the tactical captain; the player owns their own side.
+        if (nextScenario && !careerLaunch.current) setAiTeamId(nextScenario.opponentTeamId);
+      } else if (!r.error) setScenario(null);
+      if (r.catalog && !r.view && !careerLaunch.current && scenarioLaunch.current && !r.error) {
+        const scenarioId = scenarioLaunch.current;
+        scenarioLaunch.current = null;
+        recoverIssued.current = true;
+        const requestId = auxId();
+        inflight.current = requestId;
+        setBusy(true);
+        w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "SCENARIO_START", scenarioId });
+      } else if (r.view && !careerLaunch.current && scenarioLaunch.current && !r.error) {
+        // A match is already open in this tab. Replace it with the scenario; the old match stays in Saved games.
+        const scenarioId = scenarioLaunch.current;
+        scenarioLaunch.current = null;
+        const requestId = auxId();
+        inflight.current = requestId;
+        setBusy(true);
+        w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "SCENARIO_START", scenarioId });
+      }
       // These are caches only. The career rebuilds the result from the durable match and binding, so a
       // full or unavailable sessionStorage must not break the message handler.
       try {
@@ -695,6 +731,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               : "Local autosave ready"}
         </span>
       </div>
+      {scenario && view && (
+        <section className="career-match-banner" data-testid="scenario-banner" aria-label="Scenario challenge">
+          <strong>Scenario: {scenario.title}</strong>{" "}
+          <span className="alpha">{scenario.difficulty}</span>
+          <p data-testid="scenario-objective">Objective: {scenario.objectiveSummary}</p>
+          <p>{scenario.briefing}</p>
+          {scenario.outcome && (
+            <p role="status" data-testid="scenario-outcome">
+              <strong>{scenario.resultText}</strong>
+            </p>
+          )}
+          <a href="#scenarios">Back to scenarios</a>
+        </section>
+      )}
       {careerLaunch.current && (
         <div className="career-match-banner">
           <strong>Scheduled career match</strong>
@@ -1979,7 +2029,8 @@ function RootApp() {
       </section>
     )}
     {(hash === "#exhibition" || retainedMatch) && <div hidden={hash !== "#exhibition"}><MatchApp onInspectCareer={inspect} onReturnCareer={finish} /></div>}
-    {hash !== "#exhibition" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
+    {hash === "#scenarios" && <ScenariosApp />}
+    {hash !== "#exhibition" && hash !== "#scenarios" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
   </>;
 }
 
