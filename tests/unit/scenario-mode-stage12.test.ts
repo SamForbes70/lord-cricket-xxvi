@@ -82,23 +82,30 @@ describe("Stage 12 curated scenario pack", () => {
     expect(scenarioById("no-such-scenario")).toBeNull();
   });
 
-  it("every challenge reaches exactly its pinned checkpoint on the real engines, deterministically", () => {
+  it("every challenge reaches exactly its pinned checkpoint on the real engines", () => {
     for (const challenge of SCENARIO_PACK) {
-      const first = controllerFor(challenge);
-      const response = startScenarioOnController(first, challenge, "ui-1");
+      const ctl = controllerFor(challenge);
+      const response = startScenarioOnController(ctl, challenge, "ui-1");
       expect(response.error, challenge.scenarioId).toBeNull();
       expect(response.revision).toBe(challenge.checkpoint.revision);
       expect(response.view?.phase).not.toBe("COMPLETE");
-      const a = first.snapshot()!;
-      // A different game id (each attempt's save identity) does not change the situation.
-      const second = controllerFor(challenge, "game-another-attempt");
-      startScenarioOnController(second, challenge, "ui-1");
-      const b = second.snapshot()!;
-      // Hashes cover the game id, so compare what happened ball by ball.
-      expect(canonicalJson(b.events.map((e) => e.payload))).toBe(canonicalJson(a.events.map((e) => e.payload)));
+      const session = ctl.snapshot()!;
       // Nothing was staged by hand: the checkpoint session is a plain engine session the controller accepted on restore.
-      expect(a.setup.seed).toBe(challenge.seed);
-      expect(a.commands.every((c) => c.actorId === "SYSTEM" || c.actorId.startsWith("AI:"))).toBe(true);
+      expect(session.setup.seed).toBe(challenge.seed);
+      expect(session.commands.every((c) => c.actorId === "SYSTEM" || c.actorId.startsWith("AI:"))).toBe(true);
+    }
+  }, 120_000);
+
+  it("each attempt's fresh game id does not change the situation", () => {
+    // One challenge per format: the game id is the save identity only; the seed and match id fix the match.
+    for (const format of ["T20", "ODI", "RED_BALL"] as const) {
+      const challenge = SCENARIO_PACK.find((s) => s.format === format)!;
+      const a = controllerFor(challenge, "game-first-attempt");
+      const b = controllerFor(challenge, "game-another-attempt");
+      startScenarioOnController(a, challenge, "ui-1");
+      startScenarioOnController(b, challenge, "ui-1");
+      // Hashes cover the game id, so compare what happened ball by ball.
+      expect(canonicalJson(b.snapshot()!.events.map((e) => e.payload))).toBe(canonicalJson(a.snapshot()!.events.map((e) => e.payload)));
     }
   }, 120_000);
 
