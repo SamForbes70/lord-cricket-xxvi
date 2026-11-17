@@ -40,6 +40,10 @@ One finished season of about 335 KB, the same state sealed and stored both ways,
 
 So each finished season costs about 24 ms and 333 KB less per save. [Inference] By season 20 that is roughly 0.45 s and 6 MB per save. The three-season day-advance benchmark (in-memory repository, one run each) is within noise of V4 at that length: season medians 245, 310 and 369 ms against 249, 321 and 362 ms. That harness writes the full state, so it does not see the smaller checkpoint.
 
+## Copying older careers forward
+
+A world state V3 or V4 career can be copied into V5 from the career screen ("Copy to current save format (V5)"), owner decision 17 November 2026. The copy goes into a new slot and the source save is left untouched. Nothing a player can see changes: the same world identity, seasons, economy and match history. A V3 lifecycle becomes lifecycle V2, which embeds only the two newest roster packs, so the copy's first commit stores every pack the source holds (embedded or stored) as a row. A V4 lifecycle is already V2 and is kept. Match archives, digests and derived rows are copied as in the earlier upgrades. Like them, the copy is refused while a career match from the save is still in progress.
+
 ## Verification plan
 
 - A V5 world plays out exactly as V4: same active world, economy and season records across rollovers. Only the state hash differs.

@@ -51,6 +51,7 @@ All source-case adjudication flags remain false; research-model promotion still 
 - Do not widen a persisted format without a new version identifier. Do not change the frozen scoring kernel, engines, generator, random stream or probability tables.
 - A document must not cite a file that does not exist, and a failing check in a results file must be reported.
 - Do not close or merge the owner's pull requests, change repository settings, or mark an owner gate passed without the owner's explicit say. If a permission is denied, stop and tell the owner.
+- **Other agents are paused (owner, 17 November 2026: "Pause other Agents").** Copilot, "Agent Zero" and "Lord Cricket Engineer" must not write to this repository: no pushes, branches, pull requests or comments. If you are one of them, stop and tell the owner. Only the agent the owner is directing in the current session works here.
 - See `docs/AI_CONTINUATION.md` for the full list and `docs/AI_INSPECTION_PROMPT.md` for a prompt that briefs a new AI.
 
 ## Engineering and reporting standards
