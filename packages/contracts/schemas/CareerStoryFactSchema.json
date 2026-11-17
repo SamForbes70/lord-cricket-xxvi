@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      ]
+    }
+  },
+  "required": [
+    "key",
+    "value"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:CareerStoryFact:1",
+  "title": "CareerStoryFact"
+}

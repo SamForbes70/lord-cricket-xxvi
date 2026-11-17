@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from "react";
+import type { CareerStoryCard } from "@lcxxvi/contracts";
+import { CareerStoriesPanel } from "./CareerStoriesPanel.js";
 import {
   AWARDS_PROVENANCE_NOTICE,
   type HistoricalPlayerRecord,
@@ -73,6 +75,7 @@ export function PlayerPage({
   onBack,
   backLabel,
   awardsSummary = null,
+  stories = [],
 }: {
   player: WorldPack["players"][number];
   condition: SquadPlayerTrainingConditionView | null;
@@ -96,6 +99,8 @@ export function PlayerPage({
   onBack: () => void;
   backLabel: string;
   awardsSummary?: PlayerAwardsSummary | null;
+  /** Stage 11 story cards about this player, oldest first. */
+  stories?: readonly CareerStoryCard[];
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -329,6 +334,16 @@ export function PlayerPage({
             </div>
           )}
         </section>
+      )}
+      {stories.length > 0 && (
+        <CareerStoriesPanel
+          stories={stories}
+          title="Career timeline & milestones"
+          testId="player-career-timeline"
+          withControls={false}
+          busy={false}
+          {...(onOpenReplay ? { onOpenReplay } : {})}
+        />
       )}
       {format === "T20" && historicalRecord && historicalRecord.matches > 0 && (
         <section

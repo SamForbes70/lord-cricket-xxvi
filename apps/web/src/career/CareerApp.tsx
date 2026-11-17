@@ -530,6 +530,12 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     [state],
   );
   const persistentWorldRef = service.getPersistentState();
+  const awardsLedgerRef = service.getAwardsLedger();
+  // Stage 11 stories are derived from committed data, so they change only when the career does.
+  const careerStories = useMemo(
+    () => (state ? (service.careerStories()?.stories ?? []) : []),
+    [state, persistentWorldRef, awardsLedgerRef],
+  );
   const historicalSeasonScope = useMemo(() => {
     if (typeof statsScope === "number") return statsScope;
     if (statsScope === "ACTIVE" && persistentWorldRef) {
@@ -1257,6 +1263,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           openReplay={openReplay}
           replayViewerSection={replayViewerSection}
           tableRow={tableRow}
+          careerStories={careerStories}
         />
       )}
 
@@ -1453,6 +1460,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 careerClubNames={careerClubs}
                 historicalRecord={historicalRecord}
                 awardsSummary={service.getPlayerAwardsSummary(player.playerId)}
+                stories={careerStories.filter((story) => story.subjectPlayerId === player.playerId)}
                 teamName={(tid) => service.teamName(tid)}
                 groundName={(gid) => service.groundName(gid)}
                 onOpenReplay={(fixtureId, triggerId) => void openReplay(fixtureId, triggerId)}

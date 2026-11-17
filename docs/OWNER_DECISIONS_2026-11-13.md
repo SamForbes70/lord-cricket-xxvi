@@ -102,3 +102,9 @@ Owner's words, verbatim: "merge #56 to #59 once green too", then "muted by defau
 1. **Sound is muted by default.** A player with no saved audio preferences starts muted (`DEFAULT_AUDIO_PREFERENCES.muted`); turning sound on is their choice. Saved preferences are unchanged.
 2. **Finished seasons out of the per-save hash.** Approved as the next save-format work: a new world state version, with V1 to V4 saves still loading unchanged.
 3. **Merging.** Pull requests #56 to #59 are merged once hosted CI is green on their final heads.
+
+## Owner decision, 17 November 2026: start the finished-game features
+
+Owner's words, verbatim: "start the finished-game features next".
+
+- Stabilisation (pull requests #48 to #62) is the base; the remaining roadmap stages in [ROADMAP_AND_AI_GUIDE.md](ROADMAP_AND_AI_GUIDE.md) are now in scope, in order, starting with Stage 11 (player and manager stories).

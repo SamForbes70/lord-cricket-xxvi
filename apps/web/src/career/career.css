@@ -73,6 +73,9 @@
 .contract-inline-controls { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
 .scope-bar { margin:12px 0 18px; }
 .replay-btn { white-space:nowrap; padding:.35em .65em; min-height:34px; }
+.career-stories { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.career-stories li { border-top:1px solid #d3d8c9; padding-top:8px; }
+.career-stories li p { margin:2px 0; }
 .file-import-label { display:block; margin-top:14px; }
 .career-error p { margin:.4em 0; }
 .career-error small { display:block; color:#5a2618; }

@@ -1,4 +1,6 @@
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import type { CareerStoryCard } from "@lcxxvi/contracts";
+import { CareerStoriesPanel } from "./CareerStoriesPanel.js";
 import {
   CareerApplicationService,
 } from "./service.js";
@@ -23,6 +25,7 @@ export function CareerScreen(props: CareerScreenProps) {
     openReplay,
     replayViewerSection,
     tableRow,
+    careerStories,
   } = props;
   return (
         <section aria-labelledby="career-heading">
@@ -330,6 +333,14 @@ export function CareerScreen(props: CareerScreenProps) {
               </tbody>
             </table>
           </div>
+          <CareerStoriesPanel
+            stories={careerStories}
+            title="Career Stories & Club Digest"
+            testId="career-stories"
+            withControls
+            busy={busy}
+            onOpenReplay={(fixtureId, triggerId) => void openReplay(fixtureId, triggerId)}
+          />
         </section>
   );
 }
@@ -354,4 +365,6 @@ export type CareerScreenProps = {
   openReplay: (fixtureId: string, triggerId: string) => Promise<void>;
   replayViewerSection: ReactNode;
   tableRow: ActiveState["projection"]["table"][number] | null;
+  /** Stage 11 story cards, oldest first. */
+  careerStories: readonly CareerStoryCard[];
 };
