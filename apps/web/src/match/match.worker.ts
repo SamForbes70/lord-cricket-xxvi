@@ -44,6 +44,7 @@ import type { ScenarioRecordLedger } from "@lcxxvi/contracts";
 import { scenarioResultOf, startScenarioOnController } from "./scenario-runtime.js";
 import { applySuperOverAction, loadSuperOverState, superOverEligible, superOverView, type SuperOverStore } from "./super-over-runtime.js";
 import { fixtureSeed, tournamentMatchIdentity } from "../tournament/runner.js";
+import { verifySuperOverRecord } from "@lcxxvi/simulation";
 import type { SuperOverView } from "./protocol.js";
 
 const worldBytes = new TextEncoder().encode(worldText);
@@ -697,6 +698,8 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       const fmt = sessionFormat(loaded.session);
       const delegation = loaded.delegationJournal;
       const archivePins = loaded.rosterPack ? rosterPins(loaded.session as RosterT20Session | RosterODISession | RosterRed5Session) : fmt === "ODI" ? ODI_ARCHIVE_PINS : fmt === "RED_BALL" ? RED5_ARCHIVE_PINS : ARCHIVE_PINS;
+      // Stage 14: a tied exhibition's super overs travel with it (archive V5).
+      const superOverRecord = loaded.rosterPack ? null : await repository.loadSuperOverRecord(String((loaded.session as AnySession).setup.gameId));
       const archive = await createPortableArchive(
         loaded.session,
         loaded.summary,
@@ -705,6 +708,7 @@ async function handlePersistence(request: Request): Promise<Response | null> {
         loaded.worldCopy ?? null,
         loaded.rosterPack ?? null,
         delegation?.changes.length ? delegation : null,
+        superOverRecord,
       );
       return decorate(controller.currentResponse(request.requestId), archive);
     } catch (e) {
@@ -732,6 +736,14 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       restoreController(validationController, imported.session, imported.rosterPack);
       applyWorldCopy(validationController, imported.worldCopy);
       const session = validationController.snapshot()!;
+      // Stage 14: replay an imported super-over record on the engine before anything is stored.
+      if (imported.superOverRecord) {
+        if (!superOverEligible(session, false)) throw new Error("ARCHIVE_SUPER_OVER_NOT_ELIGIBLE");
+        verifySuperOverRecord(session, imported.superOverRecord);
+        const existing = await repository.loadSuperOverRecord(String(session.setup.gameId));
+        if (existing && canonicalJson(existing) !== canonicalJson(imported.superOverRecord))
+          throw new Error("A different super-over record already exists for this game in this browser.");
+      }
       const target = `import-${randomHex(10)}`;
       if (!(await repository.acquireLease(target, ownerId, nowMs())))
         throw new Error("Imported save slot is locked.");
@@ -764,6 +776,8 @@ async function handlePersistence(request: Request): Promise<Response | null> {
       recoveredFromGeneration = null;
       controller = validationController;
       await repository.setActiveSaveId(target);
+      if (imported.superOverRecord && !(await repository.loadSuperOverRecord(String(session.setup.gameId))))
+        await repository.saveSuperOverRecord(imported.superOverRecord, 0);
       return decorate(controller.currentResponse(request.requestId));
     } catch (e) {
       return decorate(

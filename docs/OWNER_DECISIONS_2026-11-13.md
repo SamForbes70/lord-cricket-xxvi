@@ -130,3 +130,26 @@ Owner's words, verbatim: "merge #65 once green too", then "1a, 2a, 3 yes, 4b, 5a
 8. **Merging, answer 12 yes.** An agent may merge its own pull requests once both hosted checks pass on the final head and the branch is clean, without asking each time.
 
 Still open (not answered): owner playtests and measurements (Stage 16), public release (Stage 17), branch protection, and stopping the paused agents where they run.
+
+## Owner decisions, 17 November 2026 (afternoon): recommended options adopted
+
+Owner's words, verbatim: "Proceed, choosing all the options you recomended as my fully authorised decisions." This answers the numbered list of 18 questions. Each answer is the option marked recommended.
+
+1. **DLS ledger (1a).** Add new rules profiles `LC_T20_02` and `LC_ODI_02` to the innings ledger, allowing shorter innings. This is additive: `LC_T20_01`, `LC_ODI_01`, `LC_RED5_01`, their results, saves and frozen vectors are unchanged.
+2. **Revised targets (2a).** A fictional resource-table method, documented in the repository. Not the licensed DLS tables.
+3. **Rain (3a).** Seeded, deterministic weather, the same approach as the red-ball delays: a per-match option, off by default.
+4. **Rain scope (4a).** Exhibitions only at first.
+5. **DRS (5a).** A design proposal comes first, for the owner to approve. Building it needs a new match-model version.
+6. **Review limit (6a).** Two unsuccessful reviews per side per innings.
+7. **Super-over phase (7a).** Super-over balls keep the frozen generator's powerplay phase and field limits, as documented.
+8. **Super overs in exports (8a).** Include the super-over record in `.lcxxvi` exports under a new archive version.
+9. **Super-over scope (9a).** Exhibitions and tournaments only.
+10. **Stage 15 next (10a).** Let the player choose a team and play its tournament matches on the match screen.
+11. **Tournament speed (11a).** Run tournament matches in a background worker.
+12. **More scenarios (12a).** Add 4 more fictional scenarios, including super-over and tournament-final situations.
+13. **Stage 16 (13a).** The agent prepares a checklist and a one-command measurement script; the owner runs them and returns the results.
+14. **Release (14a).** Public release later, after the Stage 16 measurements pass.
+15. **Channel (15a).** A GitHub Release with the Windows zip and the web build.
+16. **Branch protection (16a).** The owner turns it on (required checks `pass07a` and `windows-browser-acceptance`, no direct pushes); see [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md). This is an owner action; agents do not change repository settings.
+17. **Paused agents (17).** No option was marked recommended, so stopping them where they run remains an open owner action.
+18. **Stacked pull requests (18a).** Allowed; each merges once both hosted checks pass on its final head and the branch is clean.

@@ -1,4 +1,4 @@
-import { RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type RosterSeasonState, StagedRosterPackSchema, type StagedRosterPack, canonicalJson, replayDelegationJournal, type DelegationJournal, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonPortableManifestV3Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION, PersistentWorldPortableManifestSchema, PersistentWorldPortableV2ManifestSchema, PersistentWorldPortableV3ManifestSchema, PersistentWorldSaveSummarySchema, type CompletedCareerMatchEventArchive, type PersistentWorldPortableManifest, type PersistentWorldPortableV2Manifest, type PersistentWorldPortableV3Manifest, type PersistentWorldSaveSummary, type PersistentWorldState, type PersistentWorldStateV2, type PersistentWorldStateV3, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonPortableManifestV3, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, CareerAwardsLedgerSchema, type CareerAwardsLedger, type NewGameWorldCopy,
+import { SuperOverRecordSchema, type SuperOverRecord, RosterSeasonStateSchema, RosterSeasonPortableManifestSchema, type RosterSeasonState, StagedRosterPackSchema, type StagedRosterPack, canonicalJson, replayDelegationJournal, type DelegationJournal, SeasonPortableManifestSchema, SeasonPortableManifestV2Schema, SeasonPortableManifestV3Schema, SeasonSaveSummarySchema, SeasonArchiveSchema, PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V2_ARCHIVE_VERSION, PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V2_SCHEMA_VERSION, PERSISTENT_WORLD_SAVE_V3_SCHEMA_VERSION, PersistentWorldPortableManifestSchema, PersistentWorldPortableV2ManifestSchema, PersistentWorldPortableV3ManifestSchema, PersistentWorldSaveSummarySchema, type CompletedCareerMatchEventArchive, type PersistentWorldPortableManifest, type PersistentWorldPortableV2Manifest, type PersistentWorldPortableV3Manifest, type PersistentWorldSaveSummary, type PersistentWorldState, type PersistentWorldStateV2, type PersistentWorldStateV3, type SeasonPortableManifest, type SeasonPortableManifestV2, type SeasonPortableManifestV3, type SeasonSaveSummary, type SeasonArchive, type T20SeasonState, CareerAwardsLedgerSchema, type CareerAwardsLedger, type NewGameWorldCopy,
   PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION,
   PersistentWorldPortableV4ManifestSchema,
   type PersistentWorldPortableV4Manifest,
@@ -27,6 +27,12 @@ export const ARCHIVE_VERSION = "LC_ARCHIVE_V1" as const;
 export const PRESENTATION_ARCHIVE_VERSION = "LC_ARCHIVE_V2_PRESENTATION" as const;
 export const ROSTER_ARCHIVE_VERSION = "LC_ARCHIVE_V3_ROSTER" as const;
 export const DELEGATION_ARCHIVE_VERSION = "LC_ARCHIVE_V4_DELEGATION" as const;
+/**
+ * Stage 14 (owner decision 8a, 17 November 2026): a match archive that also carries the match's super-over record in
+ * `super-over.json`. Delegation is optional in this version (present when `delegation.json` is listed). Roster-pack
+ * matches never have super overs, so this version never embeds a roster pack. Older readers refuse it.
+ */
+export const SUPER_OVER_ARCHIVE_VERSION = "LC_ARCHIVE_V5_SUPER_OVER" as const;
 const MAX_ARCHIVE_BYTES = 20 * 1024 * 1024;
 const MAX_EXPANDED_BYTES = 50 * 1024 * 1024;
 const MAX_PERSISTENT_ARCHIVE_BYTES = 160 * 1024 * 1024;
@@ -199,7 +205,7 @@ export type ArchivePins = {
   worldHash: string;
 };
 export type ArchiveManifest = {
-  archiveVersion: typeof ARCHIVE_VERSION | typeof PRESENTATION_ARCHIVE_VERSION | typeof ROSTER_ARCHIVE_VERSION | typeof DELEGATION_ARCHIVE_VERSION;
+  archiveVersion: typeof ARCHIVE_VERSION | typeof PRESENTATION_ARCHIVE_VERSION | typeof ROSTER_ARCHIVE_VERSION | typeof DELEGATION_ARCHIVE_VERSION | typeof SUPER_OVER_ARCHIVE_VERSION;
   saveSchema: typeof SAVE_SCHEMA_VERSION | typeof PRESENTATION_SAVE_SCHEMA_VERSION | typeof ROSTER_SAVE_SCHEMA_VERSION;
   exportedAt: string;
   summary: SaveSummary;
@@ -210,6 +216,11 @@ export type ArchiveManifest = {
   rosterPackSha256?: string;
 };
 
+/** The record must belong to this exact match; the engine replay check happens where the engine is available. */
+function validateSuperOverForSession(record: SuperOverRecord, session: Record<string, unknown>): void {
+  const setup = asRecord(session.setup, "ARCHIVE_SETUP");
+  if (record.gameId !== setup.gameId || record.baseLastEventHash !== session.lastEventHash) throw new Error("ARCHIVE_SUPER_OVER_MATCH_MISMATCH");
+}
 function asRecord(value: unknown, label: string): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error(`${label}_INVALID`);
@@ -335,6 +346,7 @@ export async function createPortableArchive(
   worldCopyRaw: unknown | null = null,
   rosterPackRaw: unknown | null = null,
   delegationRaw: unknown | null = null,
+  superOverRaw: unknown | null = null,
 ): Promise<Uint8Array> {
   const sessionRecord = asRecord(session, "ARCHIVE_SESSION");
   const setup = sessionRecord.setup ? asRecord(sessionRecord.setup, "ARCHIVE_SETUP") : null;
@@ -361,6 +373,12 @@ export async function createPortableArchive(
     validateDelegationForSession(delegation, sessionRecord);
     payloads.push({ name: "delegation.json", data: encoder.encode(canonicalJson(delegation)) });
   }
+  const superOver = superOverRaw === null ? null : SuperOverRecordSchema.parse(superOverRaw);
+  if (superOver) {
+    if (rosterPack) throw new Error("ARCHIVE_SUPER_OVER_ROSTER_UNSUPPORTED");
+    validateSuperOverForSession(superOver, sessionRecord);
+    payloads.push({ name: "super-over.json", data: encoder.encode(canonicalJson(superOver)) });
+  }
   const files: Record<string, { bytes: number; sha256: string }> = {};
   for (const p of payloads)
     files[p.name] = {
@@ -368,7 +386,7 @@ export async function createPortableArchive(
       sha256: await sha256Bytes(p.data),
     };
   const manifest: ArchiveManifest = {
-    archiveVersion: delegation ? DELEGATION_ARCHIVE_VERSION : rosterPack ? ROSTER_ARCHIVE_VERSION : worldCopy ? PRESENTATION_ARCHIVE_VERSION : ARCHIVE_VERSION,
+    archiveVersion: superOver ? SUPER_OVER_ARCHIVE_VERSION : delegation ? DELEGATION_ARCHIVE_VERSION : rosterPack ? ROSTER_ARCHIVE_VERSION : worldCopy ? PRESENTATION_ARCHIVE_VERSION : ARCHIVE_VERSION,
     saveSchema: rosterPack ? ROSTER_SAVE_SCHEMA_VERSION : worldCopy ? PRESENTATION_SAVE_SCHEMA_VERSION : SAVE_SCHEMA_VERSION,
     exportedAt,
     summary,
@@ -394,9 +412,10 @@ export async function readPortableArchive(
   worldCopy: NewGameWorldCopy | null;
   rosterPack: StagedRosterPack | null;
   delegationJournal: DelegationJournal | null;
+  superOverRecord: SuperOverRecord | null;
 }> {
   const files = parseZip(bytes);
-  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "world-copy.json", "roster-pack.json", "delegation.json"]);
+  const allowed = new Set(["manifest.json", "game.json", "events.ndjson", "world-copy.json", "roster-pack.json", "delegation.json", "super-over.json"]);
   for (const name of files.keys())
     if (!allowed.has(name)) throw new Error("ARCHIVE_FILE_NOT_ALLOWED");
   for (const required of ["manifest.json", "game.json", "events.ndjson"])
@@ -410,11 +429,14 @@ export async function readPortableArchive(
     throw new Error("ARCHIVE_MANIFEST_JSON_INVALID");
   }
   const version = asRecord(manifestValue, "ARCHIVE_MANIFEST").archiveVersion;
-  if (version !== ARCHIVE_VERSION && version !== PRESENTATION_ARCHIVE_VERSION && version !== ROSTER_ARCHIVE_VERSION && version !== DELEGATION_ARCHIVE_VERSION) throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
-  const hasDelegation = version === DELEGATION_ARCHIVE_VERSION;
+  if (version !== ARCHIVE_VERSION && version !== PRESENTATION_ARCHIVE_VERSION && version !== ROSTER_ARCHIVE_VERSION && version !== DELEGATION_ARCHIVE_VERSION && version !== SUPER_OVER_ARCHIVE_VERSION) throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
+  const hasSuperOver = version === SUPER_OVER_ARCHIVE_VERSION;
+  const listedFiles = asRecord(manifestValue, "ARCHIVE_MANIFEST").files;
+  const hasDelegation = version === DELEGATION_ARCHIVE_VERSION ||
+    (hasSuperOver && !!listedFiles && typeof listedFiles === "object" && Object.hasOwn(listedFiles as object, "delegation.json"));
   const saveSchema = asRecord(manifestValue, "ARCHIVE_MANIFEST").saveSchema;
-  const presentation = version === PRESENTATION_ARCHIVE_VERSION || (hasDelegation && saveSchema === PRESENTATION_SAVE_SCHEMA_VERSION);
-  const roster = version === ROSTER_ARCHIVE_VERSION || (hasDelegation && saveSchema === ROSTER_SAVE_SCHEMA_VERSION);
+  const presentation = version === PRESENTATION_ARCHIVE_VERSION || ((version === DELEGATION_ARCHIVE_VERSION || hasSuperOver) && saveSchema === PRESENTATION_SAVE_SCHEMA_VERSION);
+  const roster = version === ROSTER_ARCHIVE_VERSION || (version === DELEGATION_ARCHIVE_VERSION && saveSchema === ROSTER_SAVE_SCHEMA_VERSION);
   strictKeys(
     manifestValue,
     [
@@ -435,7 +457,8 @@ export async function readPortableArchive(
     !(manifest.archiveVersion === ARCHIVE_VERSION && manifest.saveSchema === SAVE_SCHEMA_VERSION) &&
     !(manifest.archiveVersion === PRESENTATION_ARCHIVE_VERSION && manifest.saveSchema === PRESENTATION_SAVE_SCHEMA_VERSION) &&
     !(manifest.archiveVersion === ROSTER_ARCHIVE_VERSION && manifest.saveSchema === ROSTER_SAVE_SCHEMA_VERSION) &&
-    !(manifest.archiveVersion === DELEGATION_ARCHIVE_VERSION && [SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION].includes(manifest.saveSchema))
+    !(manifest.archiveVersion === DELEGATION_ARCHIVE_VERSION && [SAVE_SCHEMA_VERSION, PRESENTATION_SAVE_SCHEMA_VERSION, ROSTER_SAVE_SCHEMA_VERSION].includes(manifest.saveSchema)) &&
+    !(manifest.archiveVersion === SUPER_OVER_ARCHIVE_VERSION && (manifest.saveSchema === SAVE_SCHEMA_VERSION || manifest.saveSchema === PRESENTATION_SAVE_SCHEMA_VERSION))
   )
     throw new Error("ARCHIVE_VERSION_UNSUPPORTED");
   if (
@@ -446,7 +469,9 @@ export async function readPortableArchive(
   validateSummary(manifest.summary);
   const payloadNames = roster ? ["game.json", "events.ndjson", "roster-pack.json"] : presentation ? ["game.json", "events.ndjson", "world-copy.json"] : ["game.json", "events.ndjson"];
   if (hasDelegation) payloadNames.push("delegation.json");
+  if (hasSuperOver) payloadNames.push("super-over.json");
   if (files.has("delegation.json") !== hasDelegation) throw new Error("ARCHIVE_DELEGATION_FILE_MISMATCH");
+  if (files.has("super-over.json") !== hasSuperOver) throw new Error("ARCHIVE_SUPER_OVER_FILE_MISMATCH");
   if (files.has("roster-pack.json") !== roster) throw new Error("ARCHIVE_ROSTER_FILE_MISMATCH");
   if (files.has("world-copy.json") !== presentation) throw new Error("ARCHIVE_WORLD_COPY_FILE_MISMATCH");
   validateFileManifest(manifest.files, payloadNames);
@@ -539,7 +564,14 @@ export async function readPortableArchive(
     canonicalJson(sessionEvents) !== canonicalJson(archiveEvents)
   )
     throw new Error("ARCHIVE_EVENT_STREAM_MISMATCH");
-  return { session, summary: manifest.summary, manifest, worldCopy, rosterPack, delegationJournal };
+  let superOverRecord: SuperOverRecord | null = null;
+  if (hasSuperOver) {
+    let raw: unknown;
+    try { raw = JSON.parse(decoder.decode(files.get("super-over.json")!)); } catch { throw new Error("ARCHIVE_SUPER_OVER_JSON_INVALID"); }
+    superOverRecord = SuperOverRecordSchema.parse(raw);
+    validateSuperOverForSession(superOverRecord, gameRecord);
+  }
+  return { session, summary: manifest.summary, manifest, worldCopy, rosterPack, delegationJournal, superOverRecord };
 }
 
 

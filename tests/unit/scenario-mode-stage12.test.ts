@@ -63,9 +63,9 @@ function finishWithAutopilot(session: any): any {
 }
 
 describe("Stage 12 curated scenario pack", () => {
-  it("ships 6 to 8 fictional challenges across T20, ODI and red-ball on the frozen world", () => {
-    expect(SCENARIO_PACK.length).toBeGreaterThanOrEqual(6);
-    expect(SCENARIO_PACK.length).toBeLessThanOrEqual(8);
+  it("ships 12 fictional challenges across T20, ODI and red-ball on the frozen world", () => {
+    // 8 from Stage 12, plus 4 more (owner decision 12a, 17 November 2026).
+    expect(SCENARIO_PACK).toHaveLength(12);
     expect(new Set(SCENARIO_PACK.map((s) => s.format))).toEqual(new Set(["T20", "ODI", "RED_BALL"]));
     expect(new Set(SCENARIO_PACK.map((s) => s.scenarioId)).size).toBe(SCENARIO_PACK.length);
     const teams = new Set(world.teams.map((t) => t.teamId));
@@ -134,7 +134,7 @@ describe("Stage 12 curated scenario pack", () => {
       const won = result.kind === "WIN" && result.winnerTeamId === challenge.playerTeamId;
       expect(evaluation.outcome).toBe(won ? "COMPLETED" : "FAILED");
     }
-  });
+  }, 60_000);
 });
 
 describe("Stage 12 scenario scoring and personal bests", () => {

@@ -10,6 +10,9 @@ import {
  * it with the fixture autopilot and refuses to start if the state differs. `tests/unit/scenario-mode-stage12.test.ts`
  * replays every challenge against the engines, so a briefing can never describe a state the engine did not produce.
  *
+ * The last four (owner decision 12a, 17 November 2026) start from matches the engine's own autopilot finishes tied; a
+ * tie at the end goes to a super over, but only an outright win completes the challenge.
+ *
  * Not included: a red-ball "survive day five" challenge. Under the current synthetic model every autopilot five-day match
  * in the seed search finished by day three, so no fixed seed reaches a day-five draw position.
  */
@@ -157,6 +160,78 @@ const SCENARIOS: readonly ScenarioChallenge[] = [
     briefing:
       "Larchwood are 28 for 3 in the fourth innings, chasing 91 at Westmere Oval. Westmere Isles must bowl them out to win.",
     checkpoint: { inningsIndex: 3, legalBalls: 84, revision: 301, battingTeamId: "team-07", runs: 28, wickets: 3, targetToWin: 91 },
+  },
+  {
+    schemaId: SCENARIO_CHALLENGE_SCHEMA_ID,
+    scenarioId: "t20-super-over-decider",
+    title: "Level at the death",
+    format: "T20",
+    difficulty: "HARD",
+    sourceType: "FICTIONAL_CURATED",
+    seed: "lc-tie-469",
+    matchId: "human-t20",
+    teamIds: ["team-03", "team-06"],
+    groundId: "ground-03",
+    playerTeamId: "team-06",
+    objective: "WIN",
+    objectiveSummary: "Score 12 from the last 12 balls with 2 wickets in hand.",
+    briefing:
+      "Silver Fen are 71 for 8 after 18 overs, chasing 83 against Northlight Ridge. Left to the engine, this match finishes level. Finish it level and it goes to a super over; only an outright win completes the challenge.",
+    checkpoint: { inningsIndex: 1, legalBalls: 108, revision: 109, battingTeamId: "team-06", runs: 71, wickets: 8, targetToWin: 83 },
+  },
+  {
+    schemaId: SCENARIO_CHALLENGE_SCHEMA_ID,
+    scenarioId: "t20-six-to-defend",
+    title: "Six to defend",
+    format: "T20",
+    difficulty: "ELITE",
+    sourceType: "FICTIONAL_CURATED",
+    seed: "lc-tie-555",
+    matchId: "human-t20",
+    teamIds: ["team-01", "team-02"],
+    groundId: "ground-01",
+    playerTeamId: "team-01",
+    objective: "WIN",
+    objectiveSummary: "Stop Copper Vale scoring 6 from the last 18 balls.",
+    briefing:
+      "Copper Vale are 70 for 5 after 17 overs, chasing 76 at Aster Quay. Left to the engine, this match ends in a tie. Aster Harbour need five wickets, or to keep the last six runs out, to win outright.",
+    checkpoint: { inningsIndex: 1, legalBalls: 102, revision: 98, battingTeamId: "team-02", runs: 70, wickets: 5, targetToWin: 76 },
+  },
+  {
+    schemaId: SCENARIO_CHALLENGE_SCHEMA_ID,
+    scenarioId: "odi-cup-final-defence",
+    title: "Cup final: three wickets",
+    format: "ODI",
+    difficulty: "HARD",
+    sourceType: "FICTIONAL_CURATED",
+    seed: "lc-odi-tie-8",
+    matchId: "human-odi",
+    teamIds: ["team-01", "team-02"],
+    groundId: "ground-01",
+    playerTeamId: "team-01",
+    objective: "WIN",
+    objectiveSummary: "Take 3 wickets before Copper Vale score 10.",
+    briefing:
+      "A one-day cup final at Aster Quay. Copper Vale are 65 for 7 after 22 overs, chasing 75. Left to the engine, this final ends in a tie. Aster Harbour need three wickets before the last ten runs come.",
+    checkpoint: { inningsIndex: 1, legalBalls: 132, revision: 125, battingTeamId: "team-02", runs: 65, wickets: 7, targetToWin: 75 },
+  },
+  {
+    schemaId: SCENARIO_CHALLENGE_SCHEMA_ID,
+    scenarioId: "odi-cup-final-chase",
+    title: "Cup final: the tail's turn",
+    format: "ODI",
+    difficulty: "HARD",
+    sourceType: "FICTIONAL_CURATED",
+    seed: "lc-odi-tie-95",
+    matchId: "human-odi",
+    teamIds: ["team-05", "team-08"],
+    groundId: "ground-05",
+    playerTeamId: "team-08",
+    objective: "WIN",
+    objectiveSummary: "Score 21 more with 3 wickets in hand.",
+    briefing:
+      "A one-day cup final at Ember Meadow. Moonstone Bay are 45 for 7 after 11 overs, chasing 66 against Ember Plains. Left to the engine, this final ends in a tie. Find 21 runs before the last three wickets fall.",
+    checkpoint: { inningsIndex: 1, legalBalls: 66, revision: 106, battingTeamId: "team-08", runs: 45, wickets: 7, targetToWin: 66 },
   },
 ];
 
