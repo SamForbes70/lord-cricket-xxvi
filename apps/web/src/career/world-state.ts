@@ -27,6 +27,7 @@ import {
   PERSISTENT_WORLD_STATE_V4_VERSION,
   PERSISTENT_WORLD_STATE_V5_VERSION,
   PLAYER_LIFECYCLE_STATE_V2_VERSION,
+  MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS,
   PLAYER_LIFECYCLE_STATE_VERSION,
   type PersistentWorldStateV4,
   type PersistentWorldStateV5,
@@ -58,6 +59,7 @@ import {
   seasonStartDateOf,
   expectLifecycleV1,
   expectLifecycleV2,
+  sealPlayerLifecycleState,
 } from "@lcxxvi/simulation";
 import {
   createRosterSeasonProjection,
@@ -1089,3 +1091,38 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV3(input: {
   });
 }
 
+
+/**
+ * Copies a world state V3 or V4 career into world state V5 (docs/design/WORLD_STATE_V5_SEASON_REFS.md),
+ * changing nothing a player can see: the same world identity, seasons, economy and match history. A V3
+ * lifecycle becomes lifecycle V2, which embeds only the two newest roster packs; the caller must store every
+ * pack as a row (they are returned for that). A V4 lifecycle is already V2 and is kept as it is.
+ */
+export async function copyEconomyWorldForwardToV5(
+  source: PersistentWorldStateV3 | PersistentWorldStateV4,
+): Promise<{ state: PersistentWorldStateV5; embeddedRosterPacks: StagedRosterPack[] }> {
+  const embeddedRosterPacks = [...source.lifecycle.historicalRosterPacks];
+  const lifecycle =
+    source.lifecycle.lifecycleVersion === PLAYER_LIFECYCLE_STATE_V2_VERSION
+      ? source.lifecycle
+      : sealPlayerLifecycleState({
+          ...lifecycleCoreOf(source.lifecycle),
+          lifecycleVersion: PLAYER_LIFECYCLE_STATE_V2_VERSION,
+          historicalRosterPacks: source.lifecycle.historicalRosterPacks.slice(-MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS),
+        });
+  const { stateSha256: _stateSha256, worldStateVersion: _version, ...core } = source;
+  void _stateSha256;
+  void _version;
+  const state = await sealPersistentWorldStateV5({
+    ...core,
+    worldStateVersion: PERSISTENT_WORLD_STATE_V5_VERSION,
+    lifecycle: expectLifecycleV2(lifecycle),
+  });
+  return { state, embeddedRosterPacks };
+}
+
+function lifecycleCoreOf(lifecycle: PlayerLifecycleState): Omit<PlayerLifecycleState, "lifecycleSha256"> {
+  const { lifecycleSha256: _sha, ...core } = lifecycle;
+  void _sha;
+  return core;
+}

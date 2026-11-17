@@ -1191,6 +1191,32 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           </div>
         </section>
       )}
+      {(persistentWorld?.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V3" ||
+        persistentWorld?.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V4") && (
+        <section className="career-panel" aria-label="Save format update">
+          <p>
+            This career uses an older save format. A copy in the current format (V5) saves faster as the
+            career grows and plays exactly the same. The copy goes into a new slot; this save stays as it is.
+          </p>
+          <div className="action-row">
+            <button
+              type="button"
+              data-testid="copy-forward-to-v5-btn"
+              disabled={busy || inspectionOnly || service.isReadOnly()}
+              onClick={() =>
+                void action(async () => {
+                  await refuseUpgradeWhileMatchPending();
+                  await service.copyForwardToWorldStateV5();
+                  setActiveReplay(null);
+                  setStatsScope("ACTIVE");
+                })
+              }
+            >
+              Copy to current save format (V5)
+            </button>
+          </div>
+        </section>
+      )}
       {activeError && <ErrorBanner rawError={activeError} />}
       {service.isReadOnly() && (
         <p className="career-warning">

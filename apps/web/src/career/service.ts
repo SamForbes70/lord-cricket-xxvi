@@ -171,6 +171,7 @@ import {
   careerWorld,
   copyCompletedSingleSeasonToPersistentWorldStateV2,
   copyCompletedSingleSeasonToPersistentWorldStateV3,
+  copyEconomyWorldForwardToV5,
   createInitialPersistentWorldCareerState,
   createInitialPersistentWorldCareerStateV2,
   createInitialPersistentWorldCareerStateV3,
@@ -1739,6 +1740,83 @@ export class CareerApplicationService {
     } catch (error) {
       await this.persistentRepository.releaseLease(targetSaveId, this.ownerId);
       this.setStatus("Error", error instanceof Error ? error.message : "Stage 3 upgrade failed.");
+      throw error;
+    }
+  }
+
+  /**
+   * Copies a world state V3 or V4 career forward into world state V5 in a new slot
+   * (docs/design/WORLD_STATE_V5_SEASON_REFS.md). Nothing a player can see changes: the same world, seasons,
+   * economy and match history. The source save is left untouched. Every lifecycle roster pack is stored as a
+   * row, because V5 embeds only the two newest.
+   */
+  async copyForwardToWorldStateV5(customTitle?: string): Promise<PersistentWorldStateV5> {
+    const { saveId: sourceSaveId } = this.requireWritable();
+    const sourceWorld = this.persistentState;
+    if (
+      !sourceWorld ||
+      (sourceWorld.worldStateVersion !== PERSISTENT_WORLD_STATE_V3_VERSION &&
+        sourceWorld.worldStateVersion !== PERSISTENT_WORLD_STATE_V4_VERSION)
+    ) {
+      throw new Error("Only world state V3 or V4 careers can be copied forward to V5.");
+    }
+    if (!this.persistentRepository) {
+      throw new Error("Persistent world storage is unavailable.");
+    }
+    const repository = this.persistentRepository;
+    const { state: nextWorld, embeddedRosterPacks } = await copyEconomyWorldForwardToV5(sourceWorld);
+    const storedPacks = repository.loadLifecycleRosterPacks
+      ? [...(await repository.loadLifecycleRosterPacks(sourceSaveId)).values()]
+      : [];
+    const key = crypto.randomUUID().replaceAll("-", "").slice(0, 20);
+    const targetSaveId = `pworld:${sourceWorld.worldIdentity.worldId}-v5-${key}`;
+    const now = Date.now();
+    if (!(await repository.acquireLease(sourceSaveId, this.ownerId, now))) {
+      throw new Error("This career is open in another tab.");
+    }
+    if (!(await repository.acquireLease(targetSaveId, this.ownerId, now))) {
+      throw new Error("New V5 career slot is locked.");
+    }
+    const title =
+      (customTitle ?? "").trim().slice(0, 120) || `${this.saveTitle ?? this.defaultCareerTitle(nextWorld)} (V5)`;
+    this.setStatus("Saving");
+    try {
+      await repository.commit({
+        saveId: targetSaveId,
+        kind: "MANUAL",
+        title,
+        expectedRevision: null,
+        state: nextWorld,
+        command: null,
+        ownerId: this.ownerId,
+        now,
+        updatedAt: nowIso(),
+        setActive: true,
+        worldCopy: this.worldCopy,
+        // Every pack the source holds, embedded or stored, so older replays still find theirs.
+        seasonRosterPacks: [...embeddedRosterPacks, ...storedPacks],
+        copySource: {
+          saveId: sourceSaveId,
+          sourceRecordType: PERSISTENT_WORLD_RECORD_TYPE,
+          revision: sourceWorld.revision,
+          stateSha256: sourceWorld.stateSha256,
+          isUpgrade: true,
+          now: () => Date.now(),
+        },
+      });
+      await repository.releaseLease(sourceSaveId, this.ownerId);
+      this.persistentState = nextWorld;
+      this.state = nextWorld.currentSeason;
+      this.saveTitle = title;
+      this.saveId = targetSaveId;
+      this.readOnly = false;
+      this.recovered = false;
+      this.resetArchiveAndAwardsCaches();
+      this.setStatus("Saved");
+      return nextWorld;
+    } catch (error) {
+      await repository.releaseLease(targetSaveId, this.ownerId);
+      this.setStatus("Error", error instanceof Error ? error.message : "Copy to V5 failed.");
       throw error;
     }
   }
