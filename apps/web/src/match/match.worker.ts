@@ -262,7 +262,7 @@ const superOverStore: SuperOverStore = {
   load: (gameId) => repository.loadSuperOverRecord(gameId),
   save: (record, expected) => repository.saveSuperOverRecord(record, expected),
 };
-/** Stage 14: the super-over view for a completed tied T20 exhibition, or null. */
+/** Stage 14: the super-over view for a completed tied T20 or one-day exhibition, or null. */
 async function superOverStatus(phase: string | null): Promise<SuperOverView | null> {
   if (phase !== "COMPLETE") return null;
   const session = controller.snapshot();
@@ -1021,7 +1021,7 @@ async function handleInner(raw: unknown): Promise<Response> {
   if (request.type === "SUPER_OVER") {
     const session = controller.snapshot();
     if (!superOverEligible(session, boundFixture() !== null))
-      return decorate(controller.currentResponse(request.requestId, "Super overs are for tied T20 exhibition matches."));
+      return decorate(controller.currentResponse(request.requestId, "Super overs are for tied T20 and one-day exhibition matches."));
     if (readOnly || !activeSaveId || !(await repository.renewLease(activeSaveId, ownerId, nowMs())))
       return decorate(controller.currentResponse(request.requestId, "Super overs need a writable save."));
     try {

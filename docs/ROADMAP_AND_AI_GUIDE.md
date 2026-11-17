@@ -154,11 +154,13 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
      - **DRS Player Reviews** (umpire's call / edge / pitch / impact margins using deterministic delivery trajectory metadata).
      - *Critical rule*: Must use a new match ruleset/schema version so `LC_T20_MATCH_V1` frozen vectors remain 100% bit-exact.
 
-> As built, super overs (17 November 2026; owner answers 1a and 2a): ICC-standard super overs for tied T20 exhibitions, under the new opt-in ruleset `LC_T20_SUPER_OVER_01` (`packages/simulation/src/t20-super-over.ts`). The tied match stays a tie under `LC_T20_MATCH_V1`; the super overs decide a winner on top of it. Every ball comes from the frozen delivery generator and scoring kernel, with attempt ordinals continuing after the match's last delivery, so no match random draw is reused. Each side names up to three batters, and an innings ends at 6 legal balls, 2 wickets or the target. The side that batted second bats first, and that order swaps for each repeat. Batters dismissed in a super over, and bowlers who bowled one, cannot take part in a later super over. Super overs repeat until there is a winner, or until a side cannot name two eligible batters and one eligible bowler, when the match stays tied. The record (`LC_T20_SUPER_OVER_RECORD_V1`: the command list plus a state hash, tied to the match's final event hash) is kept in one projections row per game (`lcxxvi-super-overs` / `SUPER_OVER_V1` / game id), outside the match save, so no existing format changed. Limits of reusing the frozen engine unchanged:
+> As built, super overs (17 November 2026; owner answers 1a and 2a): ICC-standard super overs for tied T20 and one-day exhibitions, under the new opt-in ruleset `LC_T20_SUPER_OVER_01` (`packages/simulation/src/t20-super-over.ts`). The tied match stays a tie under `LC_T20_MATCH_V1`; the super overs decide a winner on top of it. Every ball comes from the frozen delivery generator and scoring kernel, with attempt ordinals continuing after the match's last delivery, so no match random draw is reused. Each side names up to three batters, and an innings ends at 6 legal balls, 2 wickets or the target. The side that batted second bats first, and that order swaps for each repeat. Batters dismissed in a super over, and bowlers who bowled one, cannot take part in a later super over. Super overs repeat until there is a winner, or until a side cannot name two eligible batters and one eligible bowler, when the match stays tied. The record (`LC_T20_SUPER_OVER_RECORD_V1`: the command list plus a state hash, tied to the match's final event hash) is kept in one projections row per game (`lcxxvi-super-overs` / `SUPER_OVER_V1` / game id), outside the match save, so no existing format changed. Limits of reusing the frozen engine unchanged:
 > - The generator's phase follows balls bowled in the innings, so super-over balls use its early (powerplay) phase and powerplay field limits.
 > - Fatigue and pitch stay at their end-of-match values.
 >
-> Not yet covered: ODI super overs, roster-pack exhibitions, careers (owner answer 2a), and carrying the super-over record inside a `.lcxxvi` export. DLS (a fictional method) and DRS follow in their own pull requests.
+> One-day exhibitions follow the same rules under `LC_ODI_SUPER_OVER_01` (record `LC_ODI_SUPER_OVER_RECORD_V1`), using the frozen one-day ledger and powerplay field.
+>
+> Not yet covered: roster-pack exhibitions, careers (owner answer 2a), and carrying the super-over record inside a `.lcxxvi` export. DLS (a fictional method) and DRS follow in their own pull requests.
 
   2. **Empirical Calibration Promotion (`RES-001`..`RES-003`)**:
      - Remains `BLOCKED_EXTERNAL` until historical incident adjudications, an untouched holdout cohort, and an owner-approved dataset are provided (`docs/M7G_RESEARCH_AND_PROMOTION_GATES.md`).
@@ -166,6 +168,16 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
 ### Stage 15 — Custom competitions and community packs (`Slice S15-01`, `deps: Stages 4, 9, 13`)
 
 - **Goal**: Expand the existing World Editor and `8 MiB` roster pack importer to support custom tournament manifests (`LC_CUSTOM_COMPETITION_PACK_V1`: custom round-robin/group/knockout playoff structures, bilateral/tri-series tours, optional auction/draft rules, international call-up windows) and validated SVG/PNG crest, kit, and ground asset packs.
+
+> As built, first slice (17 November 2026; owner answer 5a, the parts that need no historical data):
+> - **Contracts.** `LC_CUSTOM_COMPETITION_PACK_V1` (`packages/contracts/src/custom-competition.ts`) defines three structures: round robins (one or two legs, with an optional top-two final), two groups then semi-finals and a final, and bilateral series of 1, 3, 5 or 7 matches.
+> - **Logic.** Fixtures, standings and knockout progression are pure functions of the manifest and the recorded results (`packages/projections/src/tournament.ts`).
+> - **Standings.** Order is points, wins, net run rate, then team id. A side bowled out is charged its full quota of balls.
+> - **Knockout ties.** A tied semi-final or final goes to the super-over winner. If the super overs stay tied, the higher-placed side goes through.
+> - **Curated pack.** Four fictional tournaments (`packages/data/src/tournament-pack.ts`). They are played match by match on the authoritative T20 and one-day engines, with the world's suggested XIs, the fixture autopilot, and a fixed seed per run and fixture.
+> - **Storage.** Runs (`LC_TOURNAMENT_RUN_V1`) are stored one hashed row per run (`lcxxvi-tournaments` / `TOURNAMENT_RUNS_V1` / run id), append-only, outside every career and match save.
+> - **Screen.** The Tournaments screen is at `#tournaments`.
+> - **Not yet built:** user-authored packs, tours with call-up windows, auctions and drafts, asset packs, and playing a tournament match yourself.
 
 ### Stage 16 — Product-quality acceptance (`Slice S16-01`)
 

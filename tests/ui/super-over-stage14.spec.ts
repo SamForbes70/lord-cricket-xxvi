@@ -2,30 +2,43 @@ import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, test } from "@playwright/test";
-import { executeT20Command, fixtureAutopilotStep } from "@lcxxvi/simulation";
+import { executeT20Command, fixtureAutopilotStep, executeODICommand, odiFixtureAutopilotStep, type ODISession } from "@lcxxvi/simulation";
 import { createPortableArchive } from "@lcxxvi/persistence";
 import { createMatchController } from "../../apps/web/src/match/controller.js";
-import { ARCHIVE_PINS, UI_VERSION } from "../../apps/web/src/match/protocol.js";
+import { createODIMatchController } from "../../apps/web/src/match/controller-odi.js";
+import { ARCHIVE_PINS, ODI_ARCHIVE_PINS, UI_VERSION } from "../../apps/web/src/match/protocol.js";
 
 // Stage 14 (owner decision 17 November 2026, answers 1a and 2a): a tied T20 exhibition goes to ICC-standard super overs.
 // Exhibitions use a private random seed, so the spec builds a known tied match (seed lc-tie-469, which needs two super
 // overs under the autopilot; see the unit test) in Node and loads it through the ordinary "Import saved game" control.
 const root = resolve(import.meta.dirname, "../..");
 
-async function tiedArchive(): Promise<string> {
+async function tiedArchive(format: "T20" | "ODI" = "T20"): Promise<string> {
   const worldBytes = new Uint8Array(readFileSync(resolve(root, "packages/data/worlds/fictional-eight-01.json")));
   const manifest = JSON.parse(readFileSync(resolve(root, "packages/data/worlds/fictional-eight-01.manifest.json"), "utf8"));
-  const ctl = createMatchController(worldBytes, manifest, () => "lc-tie-469", () => ({ gameId: "game-super-over-spec", matchId: "human-t20" }));
-  const catalog = ctl.currentResponse("ui-0").catalog!;
-  const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
-  ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "T20", selections: [pick("team-03"), pick("team-06")], groundId: "ground-03" });
-  let s = ctl.snapshot()!;
-  while (s.core.phase !== "COMPLETE") s = executeT20Command(s, fixtureAutopilotStep(s)).session;
+  let s;
+  if (format === "T20") {
+    const ctl = createMatchController(worldBytes, manifest, () => "lc-tie-469", () => ({ gameId: "game-super-over-spec", matchId: "human-t20" }));
+    const catalog = ctl.currentResponse("ui-0").catalog!;
+    const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+    ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "T20", selections: [pick("team-03"), pick("team-06")], groundId: "ground-03" });
+    let t = ctl.snapshot()!;
+    while (t.core.phase !== "COMPLETE") t = executeT20Command(t, fixtureAutopilotStep(t)).session;
+    s = t;
+  } else {
+    const ctl = createODIMatchController(worldBytes, manifest, () => "lc-odi-tie-8", () => ({ gameId: "game-odi-super-over-spec", matchId: "human-odi" }));
+    const catalog = ctl.currentResponse("ui-0").catalog!;
+    const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+    ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "ODI", selections: [pick("team-01"), pick("team-02")], groundId: "ground-01" });
+    let o = ctl.snapshot() as ODISession;
+    while (o.core.phase !== "COMPLETE") o = executeODICommand(o, odiFixtureAutopilotStep(o)).session;
+    s = o;
+  }
   expect(s.core.result?.kind).toBe("TIE");
   const bytes = await createPortableArchive(
     s,
     {
-      saveId: "auto:game-super-over-spec",
+      saveId: `auto:${s.setup.gameId}`,
       kind: "AUTO",
       title: "Tied exhibition",
       matchGameId: s.setup.gameId,
@@ -39,7 +52,7 @@ async function tiedArchive(): Promise<string> {
       updatedAt: "2026-11-17T00:00:00.000Z",
       completed: true,
     },
-    ARCHIVE_PINS,
+    format === "T20" ? ARCHIVE_PINS : ODI_ARCHIVE_PINS,
     "2026-11-17T00:00:00.000Z",
   );
   const file = join(mkdtempSync(join(tmpdir(), "lcxxvi-super-over-")), "tied.lcxxvi");
@@ -115,5 +128,31 @@ test("Stage 14 the tactical captain makes its side's super-over choices", async 
   await expect(panel.getByRole("button", { name: "Bowl next ball" })).toBeEnabled({ timeout: 30_000 });
   // Silver Fen's batters are at the crease, so the player is not offered their batting intent.
   await expect(panel.getByLabel(/intent/)).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});
+
+test("Stage 14 a tied one-day exhibition also goes to a super over", async ({ page }) => {
+  test.setTimeout(180_000);
+  const pageErrors: string[] = [];
+  page.on("pageerror", (err) => pageErrors.push(err.message));
+  const archive = await tiedArchive("ODI");
+  await page.goto("/#exhibition");
+  await expect(page.getByLabel("Import saved game")).toBeEnabled({ timeout: 30_000 });
+  await page.getByLabel("Import saved game").setInputFiles(archive);
+  const panel = page.getByTestId("super-over-panel");
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  await panel.getByRole("button", { name: "Play super over" }).click();
+  await expect(panel.getByRole("button", { name: "Play super over" })).toHaveCount(0, { timeout: 30_000 });
+  for (let step = 0; step < 80; step += 1) {
+    if (await page.getByTestId("super-over-result").isVisible().catch(() => false)) break;
+    const buttons = ["Confirm batters", "Confirm bowler", "Bowl next ball"].map((name) => panel.getByRole("button", { name }));
+    let target = null;
+    for (const button of buttons) if (await button.isVisible().catch(() => false)) { target = button; break; }
+    if (!target) continue;
+    await target.click();
+    await expect(panel.locator("button:disabled, fieldset:disabled")).toHaveCount(0, { timeout: 30_000 });
+    await expect(page.getByRole("alert")).toHaveCount(0);
+  }
+  await expect(page.getByTestId("super-over-result")).toHaveText(/won the super over\.$|stays tied\.$/);
   expect(pageErrors).toEqual([]);
 });

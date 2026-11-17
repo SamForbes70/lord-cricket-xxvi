@@ -6,8 +6,11 @@ import {
   createT20SuperOver,
   executeSuperOverCommand,
   executeT20Command,
+  executeODICommand,
   fixtureAutopilotStep,
+  odiFixtureAutopilotStep,
   isTiedT20Match,
+  isTiedLimitedOversMatch,
   replaySuperOver,
   summariseSuperOver,
   superOverAutopilotCommand,
@@ -16,9 +19,11 @@ import {
   verifySuperOverRecord,
   eligibleSuperOverBatters,
   type T20Session,
+  type ODISession,
   type T20SuperOverState,
 } from "@lcxxvi/simulation";
 import { createMatchController } from "../../apps/web/src/match/controller.js";
+import { createODIMatchController } from "../../apps/web/src/match/controller-odi.js";
 import { UI_VERSION } from "../../apps/web/src/match/protocol.js";
 
 // Stage 14 (owner decision 17 November 2026, answer 1a): ICC-standard super overs for tied T20 exhibitions.
@@ -156,5 +161,57 @@ describe("Stage 14 T20 super overs", () => {
     expect(JSON.stringify(verifySuperOverRecord(session, record))).toBe(JSON.stringify(state));
     expect(() => verifySuperOverRecord(session, { ...record, stateSha256: "0".repeat(64) })).toThrow("RECORD_STATE_MISMATCH");
     expect(() => verifySuperOverRecord(tied[1]!, record)).toThrow("RECORD_MATCH_MISMATCH");
+  });
+});
+
+describe("Stage 14 one-day super overs", () => {
+  /** Seeds whose autopilot ODI (default match id) ends in a tie, found by search. */
+  const ODI_TIED: [string, string, string, string][] = [
+    ["lc-odi-tie-8", "team-01", "team-02", "ground-01"],
+    ["lc-odi-tie-95", "team-05", "team-08", "ground-05"],
+    ["lc-odi-tie-258", "team-04", "team-07", "ground-04"],
+    ["lc-odi-tie-430", "team-04", "team-07", "ground-04"],
+  ];
+  function playODI(seed: string, a: string, b: string, ground: string): ODISession {
+    const ctl = createODIMatchController(worldBytes, manifest, () => seed);
+    const catalog = ctl.currentResponse("ui-0").catalog!;
+    const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+    const started = ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "ODI", selections: [pick(a), pick(b)], groundId: ground });
+    expect(started.error).toBeNull();
+    let s = ctl.snapshot() as ODISession;
+    while (s.core.phase !== "COMPLETE") s = executeODICommand(s, odiFixtureAutopilotStep(s)).session;
+    return s;
+  }
+  const tied = ODI_TIED.map(([seed, a, b, g]) => playODI(seed, a, b, g));
+
+  it("plays to a winner under the one-day ruleset with the same ICC rules", () => {
+    for (const session of tied) {
+      expect(isTiedLimitedOversMatch(session)).toBe(true);
+      let state = createT20SuperOver(session);
+      expect(state.rulesId).toBe("LC_ODI_SUPER_OVER_01");
+      const commands: SuperOverCommand[] = [];
+      while (state.phase !== "COMPLETE") {
+        const command = superOverAutopilotCommand(session, state)!;
+        commands.push(command);
+        state = executeSuperOverCommand(session, state, command);
+      }
+      expect(state.completionReason).toBe("WON");
+      for (const round of summariseSuperOver(state))
+        for (const innings of round.innings) {
+          expect(innings.legalBalls).toBeLessThanOrEqual(6);
+          expect(innings.wickets).toBeLessThanOrEqual(2);
+        }
+      const record = superOverRecord(state, commands);
+      expect(record.schemaId).toBe("LC_ODI_SUPER_OVER_RECORD_V1");
+      expect(JSON.stringify(verifySuperOverRecord(session, record))).toBe(JSON.stringify(state));
+    }
+  });
+
+  it("refuses a record from the other format", () => {
+    const t20 = playMatch("lc-tie-177", "team-01", "team-02", "ground-01");
+    let state = createT20SuperOver(t20);
+    state = executeSuperOverCommand(t20, state, superOverAutopilotCommand(t20, state)!);
+    const record = superOverRecord(state, [superOverAutopilotCommand(t20, createT20SuperOver(t20))!]);
+    expect(() => verifySuperOverRecord(tied[0]!, record)).toThrow("RECORD_FORMAT_MISMATCH");
   });
 });

@@ -888,6 +888,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               Scenario challenges
             </a>
           )}
+          {!inspectionOnly && (
+            <a className="button-link" href="#tournaments">
+              Tournaments
+            </a>
+          )}
           <a className="button-link" href="#roster-career">
             Imported roster career
           </a>
@@ -1125,6 +1130,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           {inspectionOnly ? "Return to match" : "Exhibition"}
         </a>
         {!inspectionOnly && <a href="#scenarios">Scenarios</a>}
+        {!inspectionOnly && <a href="#tournaments">Tournaments</a>}
         <button
           disabled={busy || inspectionOnly}
           onClick={() =>

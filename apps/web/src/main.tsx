@@ -40,6 +40,7 @@ import {
 } from "./match/protocol.js";
 import { SuperOverPanel } from "./match/SuperOverPanel.js";
 import { ScenariosApp, SCENARIO_LAUNCH_KEY } from "./scenario/ScenariosApp.js";
+import { TournamentsApp } from "./tournament/TournamentsApp.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
@@ -2054,7 +2055,8 @@ function RootApp() {
     )}
     {(hash === "#exhibition" || retainedMatch) && <div hidden={hash !== "#exhibition"}><MatchApp onInspectCareer={inspect} onReturnCareer={finish} /></div>}
     {hash === "#scenarios" && <ScenariosApp />}
-    {hash !== "#exhibition" && hash !== "#scenarios" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
+    {hash === "#tournaments" && <TournamentsApp />}
+    {hash !== "#exhibition" && hash !== "#scenarios" && hash !== "#tournaments" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
   </>;
 }
 
