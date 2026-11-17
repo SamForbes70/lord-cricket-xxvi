@@ -8,6 +8,8 @@ import {
   type ScenarioRecordLedger,
   SuperOverRecordSchema,
   type SuperOverRecord,
+  TournamentRunSchema,
+  type TournamentRun,
   type StagedRosterPack,
   type ID,
   type MatchState,
@@ -49,6 +51,9 @@ const SCENARIO_LEDGER_KEY = ["lcxxvi-scenarios", SCENARIO_RECORDS_SCOPE, "ledger
 /** Projections scope holding Stage 14 super-over records, one row per tied game (key: the game id). */
 export const SUPER_OVER_SCOPE = "SUPER_OVER_V1";
 const SUPER_OVER_OWNER = "lcxxvi-super-overs";
+/** Projections scope holding Stage 15 tournament runs, one row per run (key: the run id). */
+export const TOURNAMENT_RUNS_SCOPE = "TOURNAMENT_RUNS_V1";
+const TOURNAMENT_OWNER = "lcxxvi-tournaments";
 
 export type SaveKind = "AUTO" | "MANUAL" | "IMPORTED";
 export type SaveSummary = {
@@ -381,6 +386,60 @@ export class IndexedDbSaveRepository {
     store.put({ saveId: SUPER_OVER_OWNER, scope: SUPER_OVER_SCOPE, key: record.gameId, payload, sha256 });
     await txDone(tx);
     return record;
+  }
+
+  /** Stage 15: every stored tournament run. A damaged row is skipped and reported by id. */
+  async listTournamentRuns(): Promise<{ runs: TournamentRun[]; damaged: string[] }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const rows = (await req(
+      tx.objectStore("projections").getAll(IDBKeyRange.bound([TOURNAMENT_OWNER, TOURNAMENT_RUNS_SCOPE, ""], [TOURNAMENT_OWNER, TOURNAMENT_RUNS_SCOPE, "\uffff"])),
+    )) as { key: string; payload: string; sha256: string }[];
+    await txDone(tx);
+    const runs: TournamentRun[] = [];
+    const damaged: string[] = [];
+    for (const row of rows) {
+      try {
+        if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("hash");
+        const run = TournamentRunSchema.parse(JSON.parse(row.payload));
+        if (run.runId !== row.key) throw new Error("key");
+        runs.push(run);
+      } catch {
+        damaged.push(row.key);
+      }
+    }
+    return { runs, damaged };
+  }
+
+  /** Writes a run only if the stored one still has `expectedResults` results; results are append-only. */
+  async saveTournamentRun(runRaw: TournamentRun, expectedResults: number): Promise<TournamentRun> {
+    const run = TournamentRunSchema.parse(runRaw);
+    const payload = canonicalJson(run);
+    const sha256 = await sha256Text(payload);
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    const store = tx.objectStore("projections");
+    const existing = (await req(store.get([TOURNAMENT_OWNER, TOURNAMENT_RUNS_SCOPE, run.runId]))) as { payload: string } | undefined;
+    const stored = existing ? TournamentRunSchema.parse(JSON.parse(existing.payload)) : null;
+    const ok = stored
+      ? stored.results.length === expectedResults && stored.competitionSha256 === run.competitionSha256 && stored.seed === run.seed &&
+        canonicalJson(stored.results) === canonicalJson(run.results.slice(0, expectedResults))
+      : expectedResults === 0;
+    if (!ok) {
+      tx.abort();
+      try { await txDone(tx); } catch { /* expected abort */ }
+      throw new Error("TOURNAMENT_RUN_STALE");
+    }
+    store.put({ saveId: TOURNAMENT_OWNER, scope: TOURNAMENT_RUNS_SCOPE, key: run.runId, payload, sha256 });
+    await txDone(tx);
+    return run;
+  }
+
+  async deleteTournamentRun(runId: string): Promise<void> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    tx.objectStore("projections").delete([TOURNAMENT_OWNER, TOURNAMENT_RUNS_SCOPE, runId]);
+    await txDone(tx);
   }
 
   async activeSaveId(): Promise<string | null> {

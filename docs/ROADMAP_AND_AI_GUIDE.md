@@ -169,6 +169,16 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
 
 - **Goal**: Expand the existing World Editor and `8 MiB` roster pack importer to support custom tournament manifests (`LC_CUSTOM_COMPETITION_PACK_V1`: custom round-robin/group/knockout playoff structures, bilateral/tri-series tours, optional auction/draft rules, international call-up windows) and validated SVG/PNG crest, kit, and ground asset packs.
 
+> As built, first slice (17 November 2026; owner answer 5a, the parts that need no historical data):
+> - **Contracts.** `LC_CUSTOM_COMPETITION_PACK_V1` (`packages/contracts/src/custom-competition.ts`) defines three structures: round robins (one or two legs, with an optional top-two final), two groups then semi-finals and a final, and bilateral series of 1, 3, 5 or 7 matches.
+> - **Logic.** Fixtures, standings and knockout progression are pure functions of the manifest and the recorded results (`packages/projections/src/tournament.ts`).
+> - **Standings.** Order is points, wins, net run rate, then team id. A side bowled out is charged its full quota of balls.
+> - **Knockout ties.** A tied semi-final or final goes to the super-over winner. If the super overs stay tied, the higher-placed side goes through.
+> - **Curated pack.** Four fictional tournaments (`packages/data/src/tournament-pack.ts`). They are played match by match on the authoritative T20 and one-day engines, with the world's suggested XIs, the fixture autopilot, and a fixed seed per run and fixture.
+> - **Storage.** Runs (`LC_TOURNAMENT_RUN_V1`) are stored one hashed row per run (`lcxxvi-tournaments` / `TOURNAMENT_RUNS_V1` / run id), append-only, outside every career and match save.
+> - **Screen.** The Tournaments screen is at `#tournaments`.
+> - **Not yet built:** user-authored packs, tours with call-up windows, auctions and drafts, asset packs, and playing a tournament match yourself.
+
 ### Stage 16 — Product-quality acceptance (`Slice S16-01`)
 
 - **Goal**: Collect and store real human & reference-hardware measurements in-repo:
