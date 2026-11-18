@@ -402,7 +402,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         const requestId = auxId();
         inflight.current = requestId;
         setBusy(true);
-        w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "TOURNAMENT_START", format: launch.format, runId: launch.runId, runSeed: launch.runSeed, fixture: launch.fixture });
+        w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "TOURNAMENT_START", format: launch.format, runId: launch.runId, runSeed: launch.runSeed, fixture: launch.fixture, ...(launch.roster ? { rosterPack: launch.roster.pack, selections: launch.roster.selections } : {}) });
       } else       if (r.catalog && !r.view && !careerLaunch.current && scenarioLaunch.current && !r.error) {
         const scenarioId = scenarioLaunch.current;
         scenarioLaunch.current = null;

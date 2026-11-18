@@ -1,3 +1,4 @@
+import { strandingReasons } from "./bowler-plan.js";
 import {
   createMatchAnalyticsCache,
   projectInMatchTacticalAssistant,
@@ -176,6 +177,16 @@ export function createODIMatchController(
                   : "";
       return { id: p.playerId, name: names[p.playerId] ?? p.name, reason };
     });
+    if (c.phase === "AWAITING_BOWLER" && l && i) {
+      // Refuse a bowler whose over would leave the rest of the innings impossible to bowl (five-bowler sides).
+      const xi = s.setup.teams.find((t) => t.teamId === decisionTeamId)?.xi ?? [];
+      const stranding = strandingReasons(
+        xi.map((p) => ({ id: p.playerId, eligible: p.playerId !== l.keeperId && p.bowlingStyle !== null, legalBalls: l.bowling[p.playerId]?.legalBalls ?? 0 })),
+        Math.ceil((300 - i.legalBalls) / 6),
+        60,
+      );
+      for (const candidate of candidates) if (!candidate.reason && stranding.has(candidate.id)) candidate.reason = stranding.get(candidate.id)!;
+    }
     let advanceReason =
       c.phase === "COMPLETE"
         ? "Match complete"

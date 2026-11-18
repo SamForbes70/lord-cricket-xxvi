@@ -194,6 +194,12 @@ export const RequestSchema = z.discriminatedUnion("type", [
     runId: z.string().min(1).max(128),
     runSeed: z.string().min(1).max(128),
     fixture: TournamentFixtureSchema,
+    /**
+     * Owner direction, 18 November 2026: a tour or auctioned run's fixture is played on its generated roster, with
+     * the two XIs the tournament fields. Both are present or both absent.
+     */
+    rosterPack: StagedRosterPackSchema.optional(),
+    selections: z.tuple([T20TeamSelectionSchema, T20TeamSelectionSchema]).optional(),
   }),
   /** Stage 12: starts a curated scenario challenge from its checkpoint. Replaces a non-career active match. */
   z.strictObject({ ...base, type: z.literal("SCENARIO_START"), scenarioId: z.string().min(1).max(128) }),

@@ -3,7 +3,7 @@ import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.m
 import { viewTournament } from "@lcxxvi/projections";
 import { CompetitionSchema, TournamentResultSchema, UserTourSchema, type StagedRosterPack, type TournamentResult, type WorldPack } from "@lcxxvi/contracts";
 import { playTournamentFixture } from "./runner.js";
-import { generatedRosterPack, playGeneratedFixture, tourCompetition, tourSquads, type GeneratedSquad } from "./generated-roster.js";
+import { generatedRunRoster, playGeneratedFixture, tourCompetition, type GeneratedSquad } from "./generated-roster.js";
 
 /**
  * Stage 15 (owner decision 11a): simulates tournament fixtures off the page's main thread, so the screen stays
@@ -33,10 +33,7 @@ self.onmessage = (event: MessageEvent<TournamentWorkerRequest>) => {
       const next = viewTournament(competition, results).next;
       if (!next) throw new Error("The tour is already finished.");
       const key = JSON.stringify(tour);
-      if (cachedTour?.key !== key) {
-        const squads = tourSquads(world, tour);
-        cachedTour = { key, squads, pack: generatedRosterPack(world, tour.tourId, squads) };
-      }
+      if (cachedTour?.key !== key) cachedTour = { key, ...generatedRunRoster(world, { tour }) };
       const squads = cachedTour.squads;
       const result = playGeneratedFixture({
         world,
@@ -58,7 +55,7 @@ self.onmessage = (event: MessageEvent<TournamentWorkerRequest>) => {
     if (!next) throw new Error("The tournament is already finished.");
     if (request.squads !== undefined) {
       const key = JSON.stringify(["auction", request.runId, request.squads]);
-      if (cachedTour?.key !== key) cachedTour = { key, squads: request.squads, pack: generatedRosterPack(world, `auction-${request.runId}`, request.squads) };
+      if (cachedTour?.key !== key) cachedTour = { key, ...generatedRunRoster(world, { runId: request.runId, squads: request.squads }) };
       const result = playGeneratedFixture({
         world,
         pack: cachedTour.pack,

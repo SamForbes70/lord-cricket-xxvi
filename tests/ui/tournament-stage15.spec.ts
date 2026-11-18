@@ -148,8 +148,8 @@ test("Stage 15 a tour is arranged, simulated to a series result, and kept after 
   const card = list.locator("> li").last();
   await expect(card).toContainText("a tour you arranged");
   await expect(card).toContainText("Invitation XI, picked from the other seven clubs");
-  // A tour is simulated: there is no team to manage.
-  await expect(card.getByLabel("Your team")).toHaveCount(0);
+  // Watching is the default; either side can be picked as the player's team.
+  await expect(card.getByLabel("Your team")).toHaveValue("");
   await card.getByRole("button", { name: "Start Ridge Tour" }).click();
   const run = page.getByTestId("tournament-run");
   await expect(run).toBeVisible({ timeout: 30_000 });
@@ -201,11 +201,77 @@ test("Stage 15 a player's tournament starts after an auction, with the player bi
 
   const run = page.getByTestId("tournament-run");
   await expect(run).toContainText("Squads were rebuilt by auction");
-  await run.getByRole("button", { name: "Play all remaining" }).click();
-  await expect(page.getByTestId("tournament-champion")).toBeVisible({ timeout: 120_000 });
+  // Copper Vale is the player's team, so its matches can be played or simulated; here they are simulated.
+  const champion = page.getByTestId("tournament-champion");
+  const nextLine = run.getByText(/^Next: match \d+/);
+  for (let guard = 0; !(await champion.isVisible()); guard += 1) {
+    expect(guard).toBeLessThan(12);
+    const mine = run.getByRole("button", { name: "Simulate it instead" });
+    const others = run.getByRole("button", { name: "Play until your next match" });
+    await expect(mine.or(others).first()).toBeVisible({ timeout: 120_000 });
+    const before = await nextLine.innerText();
+    if (await mine.isVisible()) {
+      await expect(run.getByRole("button", { name: "Play this match yourself" })).toBeEnabled();
+      await mine.click();
+    } else await others.click();
+    // Wait until the run has moved on: a new next match, or the tournament is over.
+    await expect(nextLine.filter({ hasNotText: before }).or(champion).first()).toBeVisible({ timeout: 120_000 });
+  }
   // Stored with its auction: after a reload the run reopens and is still marked as auctioned.
   await page.reload();
   await page.getByRole("list", { name: "Tournaments" }).locator("> li").last().getByRole("button", { name: /Open run 1 \(finished\)/ }).click();
   await expect(page.getByTestId("tournament-run")).toContainText("Squads were rebuilt by auction");
+  expect(pageErrors).toEqual([]);
+});
+
+// Owner direction, 18 November 2026: a tour's matches are playable by the user, on the tour's generated roster.
+test("Stage 15 the player plays a tour match as the touring XI on the match screen, and it is recorded", async ({ page }) => {
+  test.setTimeout(300_000);
+  const pageErrors: string[] = [];
+  page.on("pageerror", (err) => pageErrors.push(err.message));
+  await page.goto("/#tournaments");
+  const list = page.getByRole("list", { name: "Tournaments" });
+  await expect(list.locator("> li")).toHaveCount(4, { timeout: 30_000 });
+  const form = page.getByRole("region", { name: "Arrange a tour" });
+  await form.getByLabel("Tour name").fill("Vale Tour");
+  await form.getByLabel("Host").selectOption({ label: "Copper Vale" });
+  await form.getByRole("group", { name: "Tour grounds" }).getByRole("checkbox").first().check();
+  await form.getByRole("button", { name: "Arrange tour" }).click();
+  await expect(page.getByRole("status")).toHaveText("Vale Tour is ready to start.");
+  const card = list.locator("> li").last();
+  await card.getByLabel("Your team").selectOption({ label: "Invitation XI" });
+  await card.getByRole("button", { name: "Start Vale Tour" }).click();
+  const run = page.getByTestId("tournament-run");
+  await expect(run).toBeVisible({ timeout: 30_000 });
+  await run.getByRole("button", { name: "Play this match yourself" }).click();
+
+  await expect(page).toHaveURL(/#exhibition$/);
+  await expect(page.getByTestId("tournament-banner")).toBeVisible({ timeout: 60_000 });
+  // The touring XI's own players are in the match, and the host club is the tactical captain's side.
+  await expect(page.locator("#ai-opponent-select")).toHaveValue("team-02");
+  await expect(page.locator("#ai-opponent-select option", { hasText: "Invitation XI" })).toHaveCount(1);
+  const decision = page.locator("#decision");
+  for (let steps = 0; (await decision.getAttribute("data-phase")) !== "COMPLETE"; steps += 1) {
+    expect(steps).toBeLessThan(300);
+    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
+    const phase = await decision.getAttribute("data-phase");
+    if (phase === "COMPLETE") break;
+    const candidate = page.locator("button[data-candidate]:enabled").first();
+    const bat = page.getByRole("button", { name: "Bat first" });
+    const heads = page.getByRole("button", { name: "Call heads" });
+    const finish = page.getByRole("button", { name: "Finish match", exact: true });
+    if (phase === "TOSS" && (await heads.isEnabled().catch(() => false))) await heads.click();
+    else if (phase === "AWAITING_INNINGS" && (await bat.isEnabled().catch(() => false))) await bat.click();
+    else if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click();
+    else if (phase === "READY" && (await finish.isEnabled().catch(() => false))) await finish.click();
+    else await page.waitForTimeout(200);
+  }
+  await page.getByRole("link", { name: "Back to Tournaments" }).click();
+  await page.getByRole("button", { name: /Open run 1/ }).click();
+  const fixtures = page.getByTestId("tournament-fixtures").locator("li");
+  await expect(fixtures.first()).not.toContainText("Not played yet.", { timeout: 30_000 });
+  await expect(fixtures.first()).toContainText("Invitation XI");
+  // The next match of the series is the player's again.
+  await expect(run.getByRole("button", { name: "Play this match yourself" })).toBeVisible({ timeout: 30_000 });
   expect(pageErrors).toEqual([]);
 });

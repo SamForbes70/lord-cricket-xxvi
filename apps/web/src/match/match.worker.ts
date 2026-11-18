@@ -798,9 +798,16 @@ async function startTournamentMatch(request: Extract<Request, { type: "TOURNAMEN
     const { binding } = await pendingBindingFor(String(active.setup.gameId));
     if (binding) return decorate(controller.currentResponse(request.requestId, "This match is linked to a career fixture. Finish it, or abandon the career match first."));
   }
+  if ((request.rosterPack === undefined) !== (request.selections === undefined))
+    return decorate(controller.currentResponse(request.requestId, "A generated-squad tournament match needs both its roster and its teams."));
+  const roster = request.rosterPack ?? null;
+  const sameRoster = () => canonicalJson(activeRosterPack) === canonicalJson(roster);
   const identity = tournamentMatchIdentity(request.runId, request.fixture.matchNumber);
   const saveId = `auto:${identity.gameId}`;
-  if (activeSaveId === saveId && active) return decorate(controller.currentResponse(request.requestId));
+  if (activeSaveId === saveId && active) {
+    if (!sameRoster()) return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different roster."));
+    return decorate(controller.currentResponse(request.requestId));
+  }
   if ((await repository.list()).some((save) => save.saveId === saveId)) {
     if (activeSaveId && !readOnly) {
       try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
@@ -810,6 +817,7 @@ async function startTournamentMatch(request: Extract<Request, { type: "TOURNAMEN
     } catch (error) {
       return decorate(controller.currentResponse(request.requestId, error instanceof Error ? error.message : "The tournament match could not be resumed."));
     }
+    if (!sameRoster()) return decorate(controller.currentResponse(request.requestId, "The saved match belongs to a different roster."));
     return decorate(controller.currentResponse(request.requestId));
   }
   const seed = fixtureSeed(request.runSeed, request.fixture.fixtureId);
@@ -817,19 +825,28 @@ async function startTournamentMatch(request: Extract<Request, { type: "TOURNAMEN
   const ids = () => identity;
   const candidate: MatchController =
     request.format === "ODI" ? createODIMatchController(worldBytes, manifest, fixed, ids) : createMatchController(worldBytes, manifest, fixed, ids);
-  const catalog = candidate.currentResponse(request.requestId).catalog;
-  const pick = (teamId: string) => catalog?.teams.find((t) => t.id === teamId)?.suggested;
-  const home = pick(request.fixture.homeTeamId);
-  const away = pick(request.fixture.awayTeamId);
-  if (!home || !away) return decorate(controller.currentResponse(request.requestId, "Unknown tournament team."));
+  let selections: Extract<Request, { type: "START" }>["selections"];
+  if (request.selections) {
+    selections = request.selections;
+    if (selections[0].teamId !== request.fixture.homeTeamId || selections[1].teamId !== request.fixture.awayTeamId)
+      return decorate(controller.currentResponse(request.requestId, "The teams do not match the tournament fixture."));
+  } else {
+    const catalog = candidate.currentResponse(request.requestId).catalog;
+    const pick = (teamId: string) => catalog?.teams.find((t) => t.id === teamId)?.suggested;
+    const home = pick(request.fixture.homeTeamId);
+    const away = pick(request.fixture.awayTeamId);
+    if (!home || !away) return decorate(controller.currentResponse(request.requestId, "Unknown tournament team."));
+    selections = [home, away];
+  }
   const startRequest: Extract<Request, { type: "START" }> = {
     version: UI_VERSION,
     requestId: request.requestId,
     expectedRevision: 0,
     type: "START",
     format: request.format,
-    selections: [home, away],
+    selections,
     groundId: request.fixture.groundId,
+    ...(roster ? { rosterPack: roster } : {}),
   };
   const started = candidate.handle(startRequest);
   if (started.error) return decorate(controller.currentResponse(request.requestId, started.error));
@@ -839,7 +856,7 @@ async function startTournamentMatch(request: Extract<Request, { type: "TOURNAMEN
   controller = candidate;
   activeSaveId = null;
   activeWorldCopy = null;
-  activeRosterPack = null;
+  activeRosterPack = roster;
   delegation = emptyDelegation();
   readOnly = false;
   recovered = false;
