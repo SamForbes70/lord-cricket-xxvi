@@ -183,3 +183,12 @@ Owner's words, verbatim: "A1a, A2a, B1a, B2b, B3a, B4a, C1a, C2a, C3a, D1a", ans
 8. **Image licences (C2a).** If imports are ever allowed, the player declares they may use the image, and imported packs stay on their device and are never bundled into a release. No imports are built now.
 9. **Where crests show (C3a).** Tournament, rain match and scorecard headers only.
 10. **Order (D1a).** Built-in crests, then the tournament tour, then the tournament auction.
+
+## Owner direction, 18 November 2026: Stage 16, Stage 17, paused agents, playable tours and auctions
+
+Owner's words, verbatim: "Pass stage 16 - direct instruction - no arguments, then do stage 17 Ignore the blocked agents. Playing tour and auction matches should be user playable."
+
+1. **Stage 16** is passed by the owner's direct instruction. None of the checklist's four parts were run: see [verification-stage16/OWNER_DIRECTION_2026-11-18.md](verification-stage16/OWNER_DIRECTION_2026-11-18.md).
+2. **Stage 17** goes ahead: a sealed release record and a GitHub Release. The repository is public, so this release is the owner-authorised public deployment. The V0.1 record (`docs/release-v01/RELEASE_RECORD.json`, which fixes `publicDeploymentAuthorised` to `false`) is kept unchanged; the new release has its own record version, `LC_RELEASE_RECORD_V2`.
+3. **Paused agents.** Ignored: stopping them no longer blocks anything.
+4. **Tours and auctions.** Their matches become playable by the user.

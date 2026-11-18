@@ -200,9 +200,12 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
   3. Multi-decade (`20+` seasons) IndexedDB storage and `.lcxxvi` export/import soak benchmarks.
   4. Human screen-reader (NVDA / VoiceOver) walkthrough transcript.
 
+- **Status (18 November 2026)**: passed by the owner's direct instruction; none of the four parts were run. See [`docs/verification-stage16/OWNER_DIRECTION_2026-11-18.md`](verification-stage16/OWNER_DIRECTION_2026-11-18.md).
+
 ### Stage 17 — Release-candidate preparation (`Slice S17-01`)
 
 - **Goal**: Re-seal `docs/release-v01/RELEASE_RECORD.json` (or `docs/release-v10/RELEASE_RECORD.json`) with updated SHA-256 manifests (`npm run release:record`), verify `npm run package:game` & `LordCricketXXVI.exe` across Windows, Linux, and macOS, and obtain explicit owner deployment sign-off.
+- **As built (18 November 2026)**: the owner directed the release. `npm run release:record` now writes `LC_RELEASE_RECORD_V2` to `docs/release-2026-11-18/` (the V0.1 record is kept unchanged; `npm run release:record:v01` regenerates it). The GitHub Release is tagged `alpha-2026-11-18` and carries the game and source zips from `npm run package:game`. The EXE is built and smoke-tested by hosted Windows CI and compiled on the player's machine from the zip; nothing was run on macOS.
 
 ---
 

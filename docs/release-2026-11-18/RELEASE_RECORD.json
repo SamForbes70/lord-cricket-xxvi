@@ -1,0 +1,186 @@
+{
+  "schema": "LC_RELEASE_RECORD_V2",
+  "releaseTag": "alpha-2026-11-18",
+  "generatedAtUtc": "2026-11-18T08:10:41.039Z",
+  "modelStatus": "SYNTHETIC_ALPHA",
+  "empiricallyCalibrated": false,
+  "publicDeploymentAuthorised": true,
+  "publicDeploymentAuthorisation": {
+    "date": "2026-11-18",
+    "ownerWords": "Pass stage 16 - direct instruction - no arguments, then do stage 17 Ignore the blocked agents. Playing tour and auction matches should be user playable.",
+    "scope": "A GitHub Release (alpha-2026-11-18) of the public repository, with the game and source zips built from the tagged commit."
+  },
+  "testedRevision": {
+    "commit": "43954231afde59eef8de14e028c32ead1d1dcc9c",
+    "branch": "feat/stage16-17-release",
+    "workingTreeClean": true
+  },
+  "manifests": {
+    "packageLockSha256": "110ba78c4cacaeb4df01a178358bd7714cdb88b3edf2c75eb7a555fd9aacc884",
+    "scoringKernelSha256": "970a153dcea61a326160d62038a097f84b4a17042f8d76ec797f4ea0ea354675",
+    "defaultWorldSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
+    "defaultWorldManifestSha256": "03bb21d0520237a7afed6ec99b9e4bdfc8491987e28c632114377f8ea820811a",
+    "v01BacklogSha256": "5cf7807f1b8c3f51c659a7e1e55e6042f58a3164c43a2850ce48275ec901a208",
+    "offlineAssetManifestSha256": "0ffc5af171101dfff068155bb67a8e95402afc89002a59bb1d777653d37750e9",
+    "batch7DiagnosticsSha256": "cd076eb1bd29d5596ab3dbd5d58b5b530574f9ca09a859a246e69b9ca9b7258d"
+  },
+  "externalAndOwnerGates": {
+    "v01_011_managedMatchRecoveryOwnerAcceptance": "OWNER_ACCEPTED_2026_11_13",
+    "v01_028_referenceHardwarePerformance": "OWNER_DECLARED_COMPLETE_2026_11_13_NO_REFERENCE_HOST_MEASUREMENTS_IN_REPOSITORY",
+    "ownerWindowsPcAcceptanceRun": "OWNER_DECLARED_COMPLETE_2026_11_13_NO_COLLECTOR_OUTPUT_IN_REPOSITORY",
+    "humanAssistiveTechnologyWalkthrough": "OWNER_DECLARED_COMPLETE_2026_11_13_NO_OBSERVATIONS_IN_REPOSITORY",
+    "reviewOwnersRulesDataModel": "OWNER_HOLDS_ALL_THREE_ROLES_2026_11_13",
+    "researchTrack_RES_001_002_003": "BLOCKED_EXTERNAL_DATA_AND_SEPARATE_PROMOTION_GATE",
+    "stage16ProductQualityAcceptance": "OWNER_DIRECTED_PASS_2026_11_18_NONE_OF_FOUR_PARTS_RUN",
+    "pausedAgents": "OWNER_DIRECTED_IGNORE_2026_11_18",
+    "exeCodeSigning": "UNSIGNED_BY_OWNER_DECISION_2026_11_17"
+  },
+  "capabilities": [
+    {
+      "capabilityId": "CAP-MATCH-ENGINES",
+      "advertised": "Deterministic T20, ODI, and five-day red-ball match engines with hash-chained replay",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "npm run verify:09:core",
+        "npm run smoke",
+        "docs/verification-v01-batch7-diagnostics/results.json"
+      ]
+    },
+    {
+      "capabilityId": "CAP-WORLD-EDITING-AND-ROSTER-IMPORT",
+      "advertised": "Pre-game world editing and JSON roster pack import across exhibition and T20 career play",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/ui/roster-import.spec.ts",
+        "tests/ui/roster-career.spec.ts",
+        "docs/verification-v01-world-editing/REPORT.md"
+      ]
+    },
+    {
+      "capabilityId": "CAP-TACTICAL-AI-AND-RAIN",
+      "advertised": "Cross-format T20/ODI/red-ball tactical AI profiles, reversible delegation, and deterministic red-ball weather/forecast interruptions",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/tactical-captains-v01.test.ts",
+        "tests/unit/red5-rollout-weather.test.ts",
+        "tests/ui/tactical-formats.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-CAREER-ARCHIVES-AND-REPLAY",
+      "advertised": "Completed career match event archives, replay without recomputing outcomes, and checkpoint inspection and recovery, in portable career archives",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/v01-career-event-archive-recovery.test.ts",
+        "tests/ui/career-replay-and-recovery.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-SYNTHETIC-DIAGNOSTICS",
+      "advertised": "Fixed-seed cross-format replay (100 matches per format) and release-scale synthetic diagnostics, with synthetic claims only",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/v01-batch7-diagnostics.test.ts",
+        "docs/verification-v01-batch7-diagnostics/results.json",
+        "docs/verification-v01-batch7-diagnostics/FOLLOW_UP_2026-11-13.md"
+      ]
+    },
+    {
+      "capabilityId": "CAP-OFFLINE-AND-ACCESSIBILITY",
+      "advertised": "Precached offline shell, transaction-deferred safe updates, retained engine assets (/engineering.html recovery), keyboard/contrast/150%/200%-zoom accessibility",
+      "status": "VERIFIED_BROWSER_AUTOMATION_HUMAN_AT_OWNER_DECLARED",
+      "evidence": [
+        "tests/unit/offline-safe-updates.test.ts",
+        "tests/ui/offline-assets.spec.ts",
+        "tests/ui/accessibility-release-audit.spec.ts",
+        "tests/ui/match.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-MULTI-SEASON-CAREER",
+      "advertised": "Persistent multi-season 8-club T20 career: player lifecycle and youth academy, contracts and budgets, tactical briefings, durable managed-match recovery",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/player-lifecycle-stage3.test.ts",
+        "tests/unit/squad-economy-stage4.test.ts",
+        "tests/unit/tactical-briefing-stage5.test.ts",
+        "tests/unit/world-state-v5.test.ts",
+        "tests/ui/player-lifecycle-stage3.spec.ts",
+        "tests/ui/managed-recovery.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-PRESENTATION",
+      "advertised": "Live 2D field and highlights, contextual text commentary, optional procedural sound and narration",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/field-presentation-stage6.test.ts",
+        "tests/unit/commentary-stage7.test.ts",
+        "tests/unit/audio-stage8.test.ts",
+        "tests/ui/field-presentation-stage6.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-HISTORY-AWARDS-STORIES",
+      "advertised": "Historical statistics and leaderboards, match and season awards, player and manager stories",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/historical-stats-stage9.test.ts",
+        "tests/unit/awards-stage10.test.ts",
+        "tests/unit/career-stories-stage11.test.ts",
+        "tests/ui/career-stories-stage11.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-SCENARIOS",
+      "advertised": "Fictional scenario challenges",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/scenario-mode-stage12.test.ts",
+        "tests/ui/scenario-mode-stage12.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-EXHIBITION-RULES",
+      "advertised": "Opt-in exhibition rules: ICC-style super overs, rain-shortened T20 and one-day matches with a fictional resource table, and player reviews (DRS)",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/super-over-stage14.test.ts",
+        "tests/unit/rain-match-stage14.test.ts",
+        "tests/unit/rain-targets-stage14.test.ts",
+        "tests/unit/player-reviews-stage14.test.ts",
+        "tests/ui/super-over-stage14.spec.ts",
+        "tests/ui/rain-stage14.spec.ts"
+      ]
+    },
+    {
+      "capabilityId": "CAP-TOURNAMENTS",
+      "advertised": "Fictional tournaments: built-in and user-made competitions, tours against a touring XI, squads rebuilt by auction, and built-in team crests",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/unit/tournament-stage15.test.ts",
+        "tests/unit/user-tournaments-stage15.test.ts",
+        "tests/unit/tours-stage15.test.ts",
+        "tests/unit/auction-stage15.test.ts",
+        "tests/unit/team-crests-stage15.test.ts",
+        "tests/ui/tournament-stage15.spec.ts"
+      ]
+    }
+  ],
+  "knownLimits": [
+    "Model calibration status is SYNTHETIC_ALPHA (synthetic-alpha-01): all teams, players and results are fictional, and no claim of realism or ICC certification is made.",
+    "Stage 16 was passed by the owner's direct instruction on 18 November 2026. None of its four parts (owner-PC measurements including the 768 MiB memory budget, observed playtest, screen-reader walkthrough, 20-season soak) were run, and the repository holds no results from them.",
+    "Test evidence comes from hosted CI (Linux, and Windows with Chromium and Firefox) and Linux containers only. Nothing has been run on Safari or macOS.",
+    "Rain-shortened matches and player reviews are exhibitions only and never enter career or tournament tables. Weather in careers applies to five-day red-ball matches only.",
+    "The Windows launcher EXE is unsigned (owner decision), so Windows SmartScreen may warn before it runs.",
+    "Saves live in the browser profile, tied to http://127.0.0.1:4180. Clearing browser data deletes them: export .lcxxvi backups. An older build cannot read saves written by this one.",
+    "testedRevision is the commit the record was generated on, which is the commit before the record itself: a file cannot contain its own commit hash."
+  ],
+  "recoveryInstructions": [
+    "Interrupted career fixture match: reopen #career, #roster-career, or #exhibition in the same browser profile; durable managed-binding:<matchGameId> records re-associate or settle completed results automatically.",
+    "Unwanted or stuck pending career match: open #exhibition and click \"Abandon career match\" to release the binding without corrupting the career save.",
+    "Damaged newest match or career checkpoint: open the affected save or click \"Create recovered copy\" to roll back deterministically to the newest valid hash-verified checkpoint in a fresh slot while preserving pending match bindings.",
+    "Cross-device backup or browser reset: export portable .lcxxvi archives from #exhibition, #career, or #roster-career and re-import them with full event-chain hash verification.",
+    "Staged offline update or asset trouble: updates wait until active match/save transactions finish; /engineering.html remains precached as an explicit diagnostic and recovery surface."
+  ]
+}

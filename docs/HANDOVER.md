@@ -10,6 +10,8 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 
 ## Where it stands
 
+**Update, 18 November 2026.** Stabilisation is finished (#48 to #62) and Stages 11, 12, 14 and 15 are built (scenarios, super overs, rain-shortened matches, player reviews, tournaments, tours, auctions, crests). Stage 13 is parked. Stage 16 was passed by the owner's direct instruction with none of its four parts run ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)). Stage 17 is the GitHub Release `alpha-2026-11-18`, sealed in [release-2026-11-18/RELEASE_RECORD.json](release-2026-11-18/RELEASE_RECORD.json) (`npm run release:record`). The paused agents are to be ignored. Next: tour and auction matches playable by the user. The history below is kept as written.
+
 **The project is in stabilisation.** On 16 November 2026 the owner directed: "Get what we currently have as excellent, then we will finish the full game." No new features until the phased plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md) is complete and reviewed. Decisions: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md) (16 November entry).
 
 Stages 2 to 10 were pushed straight to `main` (14 to 16 November) with hosted CI failing on every commit. The owner has confirmed their acceptance; that is not a CI pass.
