@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "pitching": {
+      "type": "string",
+      "enum": [
+        "IN",
+        "UMPIRES_CALL",
+        "OUT"
+      ]
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "IN",
+        "UMPIRES_CALL",
+        "OUT"
+      ]
+    },
+    "wickets": {
+      "type": "string",
+      "enum": [
+        "IN",
+        "UMPIRES_CALL",
+        "OUT"
+      ]
+    }
+  },
+  "required": [
+    "pitching",
+    "impact",
+    "wickets"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:BallTracking:1",
+  "title": "BallTracking"
+}
