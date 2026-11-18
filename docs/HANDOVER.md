@@ -1,4 +1,4 @@
-# Handover, 16 November 2026
+# Handover, 18 November 2026
 
 One page for a person or an AI picking this project up. It points at the evidence; it does not replace it. If this page and the repository disagree, trust the repository and fix this page.
 
@@ -10,9 +10,27 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 
 ## Where it stands
 
-**Update, 18 November 2026.** Stabilisation is finished (#48 to #62) and Stages 11, 12, 14 and 15 are built (scenarios, super overs, rain-shortened matches, player reviews, tournaments, tours, auctions, crests). Stage 13 is parked. Stage 16 was passed by the owner's direct instruction with none of its four parts run ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)). Stage 17 is the GitHub Release `alpha-2026-11-18`, sealed in [release-2026-11-18/RELEASE_RECORD.json](release-2026-11-18/RELEASE_RECORD.json) (`npm run release:record`). The paused agents are to be ignored. Next: tour and auction matches playable by the user. The history below is kept as written.
+**Feature-complete for what the roadmap allows without outside data.** Stabilisation is finished (#48 to #62); every stage since was built through its own pull request with green hosted CI and merged by the agent under the owner's 17 November authority.
 
-**The project is in stabilisation.** On 16 November 2026 the owner directed: "Get what we currently have as excellent, then we will finish the full game." No new features until the phased plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md) is complete and reviewed. Decisions: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md) (16 November entry).
+| Stage | Status | Pull requests |
+| --- | --- | --- |
+| 11 Player and manager stories | Built | #64 |
+| 12 Scenario challenges (8) | Built | #65, #72 |
+| 13 Historical scenarios | Parked: no licensed data source | |
+| 14 Rules: super overs, rain-shortened matches, player reviews (exhibitions) | Built | #67, #68, #73, #76, #78, #79, #80 |
+| 14 Empirical calibration | `BLOCKED_EXTERNAL` (`RES-001` to `RES-003`) | |
+| 15 Tournaments, user-made competitions, crests, tours, auctions, playable tour and auction matches | Built (image imports off, owner answer C1a) | #69, #74, #81, #82, #83, #84, #86 |
+| 16 Product-quality acceptance | Passed by the owner's direct instruction, none of its four parts run ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)) | #85 |
+| 17 Release | Record sealed ([release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json)); GitHub Release `alpha-2026-11-18` prepared for the owner to publish | #85, #87 |
+
+**Owner actions still open:** publish the GitHub Release (an agent session here cannot create releases: HTTP 403); turn on branch protection for `main`; decide on the stale open pull requests #44, #46 and #47, which predate stabilisation. The paused agents are to be ignored (owner direction, 18 November 2026).
+
+**Biggest risk:** nobody has played this build on the owner's PC. Every measurement is from hosted CI and Linux containers; the Stage 16 playtest, memory budget, screen-reader walkthrough and long-career soak were not run. A short playtest of the release is the most useful next step.
+
+### Stabilisation history (16 November 2026, kept as written)
+
+
+**The project was in stabilisation.** On 16 November 2026 the owner directed: "Get what we currently have as excellent, then we will finish the full game." No new features until the phased plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md) is complete and reviewed. Decisions: [OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md) (16 November entry).
 
 Stages 2 to 10 were pushed straight to `main` (14 to 16 November) with hosted CI failing on every commit. The owner has confirmed their acceptance; that is not a CI pass.
 
@@ -50,7 +68,7 @@ Each PR's description records its commands, tested revision and NOT RUN items.
 - **No rollback below the stabilisation builds.** An older build cannot read compressed archive rows, V4 to V6 exports, or world state V4 and V5 saves, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete.
 - **Career length:** measured over two contracts-era seasons, each season stores 3.3 MB of compressed match archives (14.4 MB raw), so the 128 MB per-world ceiling holds about 38 seasons. The world state grows about 0.9 MB a season (1.6 MB after one, 2.5 MB after two) and every commit rewrites and revalidates it, so commits slow as a career lengthens: measured median day advance 312, 433 and 558 ms in seasons 1 to 3 (audit item M1). World state V4 ([design](design/WORLD_STATE_HISTORY_V4.md), pull request after #54) caps the embedded roster packs at two for new careers: from season 3 the lifecycle stops growing about 420 KB a season, and the measured season-3 median fell from 576 to 539 ms. Completed seasons are now validated once instead of on every commit, which brings season 3 to 470 ms. World state V5 ([design](design/WORLD_STATE_V5_SEASON_REFS.md)) hashes and stores finished seasons by reference: about 24 ms and 333 KB less per save for each finished season. V3 and V4 careers can be copied forward into V5 from the career screen. The current season, economy and lifecycle still grow with the career.
 - **Frozen code:** the match engines still sort with `localeCompare`; changing them needs the owner's approval.
-- **Concurrent agents:** Copilot, "Agent Zero" and "Lord Cricket Engineer" have written to this repository. The owner paused them on 17 November 2026 ([decision](OWNER_DECISIONS_2026-11-13.md)); `AGENTS.md` tells any agent that reads it to stop. Stopping them where they run is an owner action: they run outside this repository.
+- **Concurrent agents:** Copilot, "Agent Zero" and "Lord Cricket Engineer" have written to this repository. The owner paused them on 17 November 2026 and on 18 November directed that they be ignored ([decision](OWNER_DECISIONS_2026-11-13.md)); `AGENTS.md` still tells any agent that reads it to stop.
 - **Branch protection:** the owner will apply it ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
 
 ## Run it
@@ -78,7 +96,7 @@ npx playwright test --config playwright.m4.config.ts     # real-IndexedDB persis
 node scripts/owner-acceptance.mjs --skip-install         # what hosted Windows runs, about an hour
 ```
 
-Last local results (Linux, Node 22, Chromium) on #52's head `582f9ce`: `verify:09:core` exit 0, 76 files, 791 tests. On #48's head: Chromium UI suite 71/71, m6g 12/12, m4 16/16. Re-run them; do not rely on these numbers. Hosted CI runs a Linux job (about 25 minutes) and a Windows job (Chromium and Firefox, about an hour) on every pull request.
+Last local results (Linux, Node 22, Chromium) on #86's head `7a2840b`, 18 November 2026: `npx vitest run --maxWorkers=2` exit 0, 884 tests; Chromium `tests/ui/tournament-stage15.spec.ts` 6/6, `match.spec.ts` and `scenario-mode-stage12.spec.ts` 9/9. Firefox is not installed in the agent's container; hosted Windows CI runs it. Re-run them; do not rely on these numbers. Hosted CI runs a Linux job (about 25 minutes) and a Windows job (Chromium and Firefox, about 60 to 80 minutes) on every pull request. In a 16 GB container a full `npx tsc -b` was killed once (exit 137, container restarted); with `NODE_OPTIONS=--max-old-space-size=4096` it has completed every time since.
 
 ## Read in this order
 
