@@ -289,7 +289,9 @@ describe("Stage 8 optional sound and narration", () => {
     } finally {
       globalThis.fetch = originalFetch;
     }
-  });
+    // Plays three whole matches (T20, one-day, five-day): about 2 s alone on Linux, over the default 5 s on the hosted
+    // Windows runner with two test workers. The same limit as the other whole-match test in this file.
+  }, 30_000);
 
   it("gates Web Audio playback behind a user gesture and plays queued cue once unlocked", async () => {
     const fake = makeFakeAudioContext();
