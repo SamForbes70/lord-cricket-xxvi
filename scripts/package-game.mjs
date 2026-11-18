@@ -177,13 +177,17 @@ const buildExeBat = [
   "",
 ].join("\r\n");
 
+// The newest release record wins: the Stage 17 record (V2), then the V0.1 record.
 let record = null;
-try {
-  record = JSON.parse(
-    readFileSync(join(root, "docs", "release-v01", "RELEASE_RECORD.json"), "utf8"),
-  );
-} catch {
-  // optional
+let recordPath = null;
+for (const candidate of [["docs", "release-2026-11-18"], ["docs", "release-v01"]]) {
+  try {
+    record = JSON.parse(readFileSync(join(root, ...candidate, "RELEASE_RECORD.json"), "utf8"));
+    recordPath = [...candidate, "RELEASE_RECORD.json"].join("/");
+    break;
+  } catch {
+    // optional
+  }
 }
 const list = (items) => (items ?? []).map((t) => `  - ${t}`).join("\n");
 const version = `Lord Cricket XXVI playable build
@@ -192,20 +196,22 @@ Commit     : ${commit}${dirty ? " (working tree had uncommitted changes when pac
 Model      : ${record?.modelStatus ?? "SYNTHETIC_ALPHA"} (not empirically calibrated)
 Packaged by: node scripts/package-game.mjs
 
-Known limits (from docs/release-v01/RELEASE_RECORD.json)
+Known limits (from ${recordPath ?? "no release record"})
 ${list(record?.knownLimits)}
 
 Recovery instructions
 ${list(record?.recoveryInstructions)}
 
-Public deployment is not authorised by this package.
+${record?.publicDeploymentAuthorised === true ? `Release ${record.releaseTag}, authorised by the owner on ${record.publicDeploymentAuthorisation?.date}.` : "Public deployment is not authorised by this package."}
 `;
-const readme = `LORD CRICKET XXVI - playable build (Stages 1-10)
-================================================
+const readme = `LORD CRICKET XXVI - playable build
+==================================
 
 Offline cricket management game: persistent multi-season 8-club T20 career world (player lifecycle, youth academy,
 contracts & budgets, tactical briefings, 2D live field, contextual commentary, optional procedural audio/narration,
-historical statistics & leaderboards, and match/season awards) plus T20, ODI, and five-day red-ball exhibitions.
+historical statistics & leaderboards, match/season awards and career stories), scenario challenges, fictional
+tournaments (user-made competitions, tours and auctions), and T20, ODI and five-day red-ball exhibitions with optional
+super overs, rain-shortened matches and player reviews.
 
 How to play on Windows (ZERO extra installs required on Windows 10/11)
   1. Extract this entire ZIP to a folder on your laptop (do not double-click inside the unextracted ZIP preview).
