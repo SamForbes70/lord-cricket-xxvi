@@ -128,3 +128,39 @@ test("Stage 15 a player makes a round robin, plays it to a winner, and saves it 
   await expect(page.getByRole("alert")).toHaveCount(0);
   expect(pageErrors).toEqual([]);
 });
+
+// Tours (owner decisions A1a and A2a): a touring XI from the other seven clubs plays a series against a host.
+test("Stage 15 a tour is arranged, simulated to a series result, and kept after a reload", async ({ page }) => {
+  test.setTimeout(300_000);
+  const pageErrors: string[] = [];
+  page.on("pageerror", (err) => pageErrors.push(err.message));
+  await page.goto("/#tournaments");
+  const list = page.getByRole("list", { name: "Tournaments" });
+  await expect(list.locator("> li")).toHaveCount(4, { timeout: 30_000 });
+  const form = page.getByRole("region", { name: "Arrange a tour" });
+  await form.getByRole("button", { name: "Arrange tour" }).click();
+  await expect(page.getByRole("alert")).toHaveText("Give the tour a name.");
+  await form.getByLabel("Tour name").fill("Ridge Tour");
+  await form.getByLabel("Host").selectOption({ label: "Northlight Ridge" });
+  await form.getByRole("group", { name: "Tour grounds" }).getByRole("checkbox").first().check();
+  await form.getByRole("button", { name: "Arrange tour" }).click();
+  await expect(page.getByRole("status")).toHaveText("Ridge Tour is ready to start.");
+  const card = list.locator("> li").last();
+  await expect(card).toContainText("a tour you arranged");
+  await expect(card).toContainText("Invitation XI, picked from the other seven clubs");
+  // A tour is simulated: there is no team to manage.
+  await expect(card.getByLabel("Your team")).toHaveCount(0);
+  await card.getByRole("button", { name: "Start Ridge Tour" }).click();
+  const run = page.getByTestId("tournament-run");
+  await expect(run).toBeVisible({ timeout: 30_000 });
+  await run.getByRole("button", { name: "Play all remaining" }).click();
+  await expect(page.getByTestId("tournament-champion")).toHaveText(/(Northlight Ridge|Invitation XI) win the Ridge Tour\. Series [23]-[01]\.|drawn/, { timeout: 120_000 });
+  await expect(page.getByTestId("tournament-fixtures")).toContainText("Invitation XI");
+  await page.reload();
+  const again = page.getByRole("list", { name: "Tournaments" }).locator("> li").last();
+  await expect(again).toContainText("Ridge Tour", { timeout: 30_000 });
+  await expect(again.getByRole("button", { name: "Delete Ridge Tour" })).toBeDisabled();
+  await again.getByRole("button", { name: /Open run 1 \(finished\)/ }).click();
+  await expect(page.getByTestId("tournament-fixtures")).toContainText("Invitation XI");
+  expect(pageErrors).toEqual([]);
+});

@@ -1,8 +1,9 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
 import { viewTournament } from "@lcxxvi/projections";
-import { CompetitionSchema, TournamentResultSchema, type TournamentResult } from "@lcxxvi/contracts";
+import { CompetitionSchema, TournamentResultSchema, UserTourSchema, type StagedRosterPack, type TournamentResult, type WorldPack } from "@lcxxvi/contracts";
 import { playTournamentFixture } from "./runner.js";
+import { generatedRosterPack, playGeneratedFixture, tourCompetition, tourSquads, type GeneratedSquad } from "./generated-roster.js";
 
 /**
  * Stage 15 (owner decision 11a): simulates tournament fixtures off the page's main thread, so the screen stays
@@ -10,20 +11,48 @@ import { playTournamentFixture } from "./runner.js";
  * and seed, and the results so far; the worker plays the next fixture and replies with its result. It keeps no state
  * between messages.
  */
-export type TournamentWorkerRequest = { id: number; competition: unknown; runId: string; runSeed: string; results: TournamentResult[] };
+/** For a tour (owner decision A1a), `tour` holds its choices and `competition` is ignored: the series is derived from it. */
+export type TournamentWorkerRequest = { id: number; competition: unknown; tour?: unknown; runId: string; runSeed: string; results: TournamentResult[] };
 export type TournamentWorkerResponse = { id: number; result: TournamentResult | null; error: string | null };
 
 const worldBytes = new TextEncoder().encode(worldText);
-const teamNames = Object.fromEntries((JSON.parse(worldText) as { teams: { teamId: string; name: string }[] }).teams.map((t) => [t.teamId, t.name]));
+const world = JSON.parse(worldText) as WorldPack;
+const teamNames = Object.fromEntries(world.teams.map((t) => [t.teamId, t.name]));
+/** Generated rosters are rebuilt from the world and a tour's choices; the last one is kept for the next fixture. */
+let cachedTour: { key: string; pack: StagedRosterPack; squads: GeneratedSquad[] } | null = null;
 
 self.onmessage = (event: MessageEvent<TournamentWorkerRequest>) => {
   const request = event.data;
   let response: TournamentWorkerResponse;
   try {
+    const results = request.results.map((r) => TournamentResultSchema.parse(r));
+    if (request.tour !== undefined) {
+      const tour = UserTourSchema.parse(request.tour);
+      const competition = tourCompetition(tour);
+      const next = viewTournament(competition, results).next;
+      if (!next) throw new Error("The tour is already finished.");
+      const key = JSON.stringify(tour);
+      if (cachedTour?.key !== key) {
+        const squads = tourSquads(world, tour);
+        cachedTour = { key, squads, pack: generatedRosterPack(world, tour.tourId, squads) };
+      }
+      const squads = cachedTour.squads;
+      const result = playGeneratedFixture({
+        world,
+        pack: cachedTour.pack,
+        squads,
+        competition,
+        fixture: next,
+        runId: request.runId,
+        runSeed: request.runSeed,
+        teamName: (id) => squads.find((s) => s.teamId === id)?.name ?? teamNames[id] ?? id,
+      });
+      (self as unknown as Worker).postMessage({ id: request.id, result, error: null } satisfies TournamentWorkerResponse);
+      return;
+    }
     const parsed = CompetitionSchema.safeParse(request.competition);
     if (!parsed.success) throw new Error("Unknown tournament.");
     const competition = parsed.data;
-    const results = request.results.map((r) => TournamentResultSchema.parse(r));
     const next = viewTournament(competition, results).next;
     if (!next) throw new Error("The tournament is already finished.");
     const result = playTournamentFixture({
