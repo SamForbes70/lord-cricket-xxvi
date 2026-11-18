@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "CALL_TOSS"
+        },
+        "teamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "call": {
+          "type": "string",
+          "enum": [
+            "HEADS",
+            "TAILS"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "teamId",
+        "call"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "CHOOSE_INNINGS"
+        },
+        "teamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "choice": {
+          "type": "string",
+          "enum": [
+            "BAT",
+            "BOWL"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "teamId",
+        "choice"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "SET_BATTER"
+        },
+        "teamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "playerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      },
+      "required": [
+        "kind",
+        "teamId",
+        "playerId"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "SET_BOWLER"
+        },
+        "teamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "playerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      },
+      "required": [
+        "kind",
+        "teamId",
+        "playerId"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "SET_AGGRESSION"
+        },
+        "playerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "aggression": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        }
+      },
+      "required": [
+        "kind",
+        "playerId",
+        "aggression"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "BOWL"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "BALL",
+            "OVER"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "scope"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$id": "urn:lcxxvi:RainCommand:1",
+  "title": "RainCommand"
+}
