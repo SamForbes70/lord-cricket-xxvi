@@ -1,3 +1,4 @@
+import { TeamCrest } from "../world/TeamCrest.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { percentageBp } from "./format.js";
@@ -28,7 +29,7 @@ export function HomeScreen(props: HomeScreenProps) {
     <section aria-labelledby="home-heading">
       <h2 id="home-heading">Home</h2>
       <div className="dashboard-grid">
-        <article className="career-panel emphasis">
+        <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"}>
           <h3>Next required action</h3>
           {state.phase === "COMPLETE" ? (
             <>
@@ -74,6 +75,16 @@ export function HomeScreen(props: HomeScreenProps) {
             </>
           ) : nextFixture ? (
             <>
+              <p className="fixture-round">Round {nextFixture.roundNumber} · T20</p>
+              <p className="fixture-opponents">
+                {[nextFixture.homeTeamId, nextFixture.awayTeamId].map((id, index) => (
+                  <span key={id}>{index === 1 && <small>v </small>}
+                    <TeamCrest teamId={id} name={service.teamName(id)} colours={displayWorld.teams.find(t => t.teamId === id)?.colours ?? []} size={34} decorative />
+                    {service.teamName(id)}
+                  </span>
+                ))}
+              </p>
+              <p className="fixture-venue">{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
               {state.careerState.currentDate < nextFixture.matchDayDate ? (
                 <button
                   className="primary"
@@ -89,7 +100,6 @@ export function HomeScreen(props: HomeScreenProps) {
               ) : (
                 <div className="action-row">
                   <button
-                    className="primary"
                     disabled={busy || inspectionOnly || service.isReadOnly()}
                     onClick={() => action(simulateMatch)}
                   >
@@ -97,6 +107,7 @@ export function HomeScreen(props: HomeScreenProps) {
                   </button>
                   <button
                     disabled={busy || inspectionOnly || service.isReadOnly()}
+                    className="primary"
                     onClick={() => void playMatch()}
                   >
                     Play match
@@ -110,15 +121,6 @@ export function HomeScreen(props: HomeScreenProps) {
                   progress. Play match resumes it.
                 </p>
               )}
-              <p className="big-stat">Round {nextFixture.roundNumber}</p>
-              <p>
-                <strong>{service.teamName(nextFixture.homeTeamId)}</strong> v{" "}
-                <strong>{service.teamName(nextFixture.awayTeamId)}</strong>
-              </p>
-              <p>
-                {nextFixture.matchDayDate} ·{" "}
-                {service.groundName(nextFixture.groundId)}
-              </p>
               <PitchInspection
                 ground={displayWorld.grounds.find(
                   (ground) => ground.groundId === nextFixture.groundId,

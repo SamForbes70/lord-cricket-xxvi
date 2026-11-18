@@ -1,3 +1,4 @@
+import { TeamCrest } from "../world/TeamCrest.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
   AudioPreferences,
@@ -859,7 +860,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   if (!state) {
     return (
       <main
-        className={`career-shell density-${density}`}
+        className={`career-shell club-selection density-${density}`}
         style={{ fontSize: `${Number(scale) / 100}rem` }}
       >
         {inspectionOnly && (
@@ -902,11 +903,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
             Imported roster career
           </a>
         </header>
-        <section className="career-disclosure" aria-label="Product status">
-          <strong>Playable alpha.</strong> Fictional eight-team dataset · SYNTHETIC_ALPHA model ·
-          persistent multi-season T20 world with fictional player lifecycle &amp; youth pathway · no
-          transfers, contracts, finances, international management or verified DLS.
-        </section>
+
         {activeError && <ErrorBanner rawError={activeError} />}
         {checkpointInspectorSection}
         {savedCareers.length > 0 && (
@@ -1020,6 +1017,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 disabled={busy || inspectionOnly || editingWorld}
                 onClick={() => createCareer(candidate.teamId)}
               >
+                <TeamCrest teamId={candidate.teamId} name={candidate.name} colours={candidate.colours} size={50} decorative />
                 <strong>{candidate.name}</strong>
                 <span>
                   {
@@ -1036,6 +1034,10 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               </button>
             ))}
           </div>
+        </section>
+        <section className="career-disclosure" aria-label="Product status">
+          <strong>Playable alpha.</strong> Fictional eight-team dataset · SYNTHETIC_ALPHA model ·
+          multi-season T20 careers with youth development, domestic contracts and club wage budgets.
         </section>
         <section className="career-panel import-panel">
           <h2>Import portable career</h2>
@@ -1078,7 +1080,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       <header className="career-masthead">
         <div>
           <p className="eyebrow">LORD CRICKET XXVI · MANAGEMENT</p>
-          <h1>{team?.name ?? "Career"}</h1>
+          <h1>{team && <TeamCrest teamId={team.teamId} name={team.name} colours={team.colours} size={38} decorative />}{team?.name ?? "Career"}</h1>
           {team && (
             <div className="team-colours" aria-hidden="true">
               {team.colours.map((colour, index) => (
@@ -1152,15 +1154,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         </button>
       </nav>
 
-      <section className="career-disclosure compact" aria-label="Model disclosure">
-        {persistentWorld
-          ? economyState && lifecycleState
-            ? `Fictional data · SYNTHETIC_ALPHA · persistent world V3 (${persistentWorld.completedSeasons.length} completed seasons) · fictional lifecycle (${lifecycleState.model.modelVersion}) · fictional domestic contracts & budgets (${economyState.model.modelVersion}, symmetrical AI caps) · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
-            : lifecycleState
-              ? `Fictional data · SYNTHETIC_ALPHA · persistent world V2 (${persistentWorld.completedSeasons.length} completed seasons) · fictional player lifecycle (${lifecycleState.model.modelVersion}) · contracts and finances deferred in V2 · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
-              : `Fictional data · SYNTHETIC_ALPHA · Stage 2 V1 persistent world (${persistentWorld.completedSeasons.length} completed seasons) · permanent ageing and contracts deferred in V1 · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
-          : "Fictional data · SYNTHETIC_ALPHA · legacy V0.1 single-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI."}
-      </section>
+
       {persistentWorld && !economyState && (
         <section className="career-panel" aria-label="Player lifecycle upgrade">
           <p>
@@ -1785,6 +1779,15 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         >
           Save career copy
         </button>
+      </section>
+          <section className="career-disclosure compact" aria-label="Model disclosure">
+        {persistentWorld
+          ? economyState && lifecycleState
+            ? `Fictional data · SYNTHETIC_ALPHA · persistent world V3 (${persistentWorld.completedSeasons.length} completed seasons) · fictional lifecycle (${lifecycleState.model.modelVersion}) · fictional domestic contracts & budgets (${economyState.model.modelVersion}, symmetrical AI caps) · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
+            : lifecycleState
+              ? `Fictional data · SYNTHETIC_ALPHA · persistent world V2 (${persistentWorld.completedSeasons.length} completed seasons) · fictional player lifecycle (${lifecycleState.model.modelVersion}) · contracts and finances deferred in V2 · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
+              : `Fictional data · SYNTHETIC_ALPHA · Stage 2 V1 persistent world (${persistentWorld.completedSeasons.length} completed seasons) · permanent ageing and contracts deferred in V1 · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
+          : "Fictional data · SYNTHETIC_ALPHA · legacy V0.1 single-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI."}
       </section>
     </main>
   );

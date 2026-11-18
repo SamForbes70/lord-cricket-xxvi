@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { CREST_OUTLINES, crestSpec } from "./crest.js";
 
 /**
@@ -10,7 +11,7 @@ import { CREST_OUTLINES, crestSpec } from "./crest.js";
 export function TeamCrest(props: { teamId: string; name: string; colours: readonly string[]; size?: number; decorative?: boolean }) {
   const spec = crestSpec(props.teamId, props.name, props.colours);
   const size = props.size ?? 24;
-  const clip = `crest-clip-${props.teamId.replace(/[^A-Za-z0-9_-]/g, "")}-${spec.shape}`;
+  const clip = `crest-clip-${useId()}`;
   const outline = CREST_OUTLINES[spec.shape];
   return (
     <svg
