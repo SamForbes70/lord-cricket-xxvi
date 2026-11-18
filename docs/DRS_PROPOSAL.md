@@ -1,6 +1,6 @@
 # Player reviews (DRS): design proposal
 
-Status: **proposal, not approved**. Owner decisions of 17 November 2026: a design proposal comes first (5a), and each side gets two unsuccessful reviews per innings (6a). Nothing here is built. Building it needs the owner's approval of this document and a new match-model version.
+Status: **approved by the owner on 18 November 2026** (B1a to B5a: new opt-in rule sets; these numbers as a starting point, tunable before release; AI captains review too; T20 and one-day only; exhibitions only). Earlier status: proposal, not approved. Owner decisions of 17 November 2026: a design proposal comes first (5a), and each side gets two unsuccessful reviews per innings (6a). Nothing here is built. Building it needs the owner's approval of this document and a new match-model version.
 
 ## Why it needs a new model version
 
@@ -59,3 +59,13 @@ As in the real system, an umpire's-call reading keeps the on-field decision, and
 ## Rough size
 
 This is about the same size as rain-adjusted targets: a new generator stage, a new engine version, kernel events, UI prompts, AI policy and tests. It would be built as three or four pull requests.
+
+## As built (18 November 2026)
+
+- **Rule sets** `LC_T20_DRS_01` and `LC_ODI_DRS_01` (`packages/contracts/src/reviews.ts`, `packages/simulation/src/umpire-reviews.ts`). They are hosted by the same wrapper engine as rain-affected matches (`rain-match.ts`), so a match can have rain, reviews or both. Exhibitions only, T20 and one-day only, on the `#rain` screen ("Rain and player reviews").
+- **Truth and ball tracking.** The frozen generator has no ball path, so the umpire layer draws the ball-tracking readings itself, from its own random stage (`MATCH_DELIVERY` domain, stage `umpire-review`), to agree with the generator's outcome. No generator draw moves.
+- **On-field error rates** are the proposal's numbers, unchanged: leg before clearly hitting given out 85%, umpire's call 50%, not out 6%; thin edge given out 80%; no edge given out 4%.
+- **Appeal frequency (tuned, decision B2a).** A first build prompted about 22 appeals per T20, too many to play. As built: 35% of keeper catches are thin enough to be in doubt (the rest are given out plainly); 20% of leg-before shouts the generator gave not out bring an appeal; 6% of balls that beat the bat bring a caught-behind appeal. This gives about 10 appeals per T20 (measured over 20 automatic matches).
+- **What a side knows.** The side entitled to review sees the on-field decision and a feeling (the batter is sure, or the bowler and keeper are convinced, or not). The feeling is drawn so a wrong decision is more often felt as wrong; it never shows the reading. The AI captain reviews when the feeling is confident.
+- **Records.** A match with reviews (or with rain off) is stored as `LC_EXTRA_RULES_RECORD_V1`. Rain-only matches keep `LC_RAIN_MATCH_RECORD_V1`, byte for byte (a fixture captured before this change, `tests/fixtures/rain/rain-match-record-v1.json`, still replays to the same state hash).
+- **Not built:** careers and tournaments (B5a), five-day matches (B4a), run-out and stumping referrals, and the no-ball check.

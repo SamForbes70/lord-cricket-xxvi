@@ -13,8 +13,8 @@ import {
   UserCompetitionRecordSchema,
   USER_COMPETITION_SCHEMA_ID,
   type UserCompetition,
-  RainMatchRecordSchema,
-  type RainMatchRecord,
+  ExhibitionRulesRecordSchema,
+  type ExhibitionRulesRecord,
   type StagedRosterPack,
   type ID,
   type MatchState,
@@ -450,20 +450,20 @@ export class IndexedDbSaveRepository {
     await txDone(tx);
   }
 
-  /** Stage 14: every stored rain-affected exhibition. A damaged row is skipped and reported by game id. */
-  async listRainMatches(): Promise<{ records: RainMatchRecord[]; damaged: string[] }> {
+  /** Stage 14: every stored rain or player-review exhibition. A damaged row is skipped and reported by game id. */
+  async listRainMatches(): Promise<{ records: ExhibitionRulesRecord[]; damaged: string[] }> {
     const db = await this.open();
     const tx = db.transaction("projections", "readonly");
     const rows = (await req(
       tx.objectStore("projections").getAll(IDBKeyRange.bound([RAIN_OWNER, RAIN_MATCHES_SCOPE, ""], [RAIN_OWNER, RAIN_MATCHES_SCOPE, "\uffff"])),
     )) as { key: string; payload: string; sha256: string }[];
     await txDone(tx);
-    const records: RainMatchRecord[] = [];
+    const records: ExhibitionRulesRecord[] = [];
     const damaged: string[] = [];
     for (const row of rows) {
       try {
         if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("hash");
-        const record = RainMatchRecordSchema.parse(JSON.parse(row.payload));
+        const record = ExhibitionRulesRecordSchema.parse(JSON.parse(row.payload));
         if (record.gameId !== row.key) throw new Error("key");
         records.push(record);
       } catch {
@@ -477,17 +477,18 @@ export class IndexedDbSaveRepository {
    * Writes a rain match record only if the stored one still has `expectedCommands` commands and the same setup:
    * commands are append-only, so a stale tab cannot overwrite newer play.
    */
-  async saveRainMatch(recordRaw: RainMatchRecord, expectedCommands: number): Promise<RainMatchRecord> {
-    const record = RainMatchRecordSchema.parse(recordRaw);
+  async saveRainMatch(recordRaw: ExhibitionRulesRecord, expectedCommands: number): Promise<ExhibitionRulesRecord> {
+    const record = ExhibitionRulesRecordSchema.parse(recordRaw);
     const payload = canonicalJson(record);
     const sha256 = await sha256Text(payload);
     const db = await this.open();
     const tx = db.transaction("projections", "readwrite");
     const store = tx.objectStore("projections");
     const existing = (await req(store.get([RAIN_OWNER, RAIN_MATCHES_SCOPE, record.gameId]))) as { payload: string } | undefined;
-    const stored = existing ? RainMatchRecordSchema.parse(JSON.parse(existing.payload)) : null;
-    const sameSetup = (a: RainMatchRecord) =>
-      canonicalJson([a.rulesId, a.matchId, a.seed, a.groundId, a.selectedTeams]) === canonicalJson([record.rulesId, record.matchId, record.seed, record.groundId, record.selectedTeams]);
+    const stored = existing ? ExhibitionRulesRecordSchema.parse(JSON.parse(existing.payload)) : null;
+    const setupOf = (a: ExhibitionRulesRecord) =>
+      canonicalJson([a.schemaId, a.rulesId, a.matchId, a.seed, a.groundId, a.selectedTeams, a.schemaId === "LC_RAIN_MATCH_RECORD_V1" ? null : [a.rain, a.reviewRulesId]]);
+    const sameSetup = (a: ExhibitionRulesRecord) => setupOf(a) === setupOf(record);
     const ok = stored
       ? stored.commands.length === expectedCommands && sameSetup(stored) && canonicalJson(stored.commands) === canonicalJson(record.commands.slice(0, expectedCommands))
       : expectedCommands === 0;

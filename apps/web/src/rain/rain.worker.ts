@@ -1,6 +1,6 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import type { RainCommand } from "@lcxxvi/contracts";
+import type { ExhibitionRuleOptions, RainCommand } from "@lcxxvi/simulation";
 import { createRainRuntime, type RainOpenMatch } from "./rain-runtime.js";
 
 /**
@@ -8,7 +8,7 @@ import { createRainRuntime, type RainOpenMatch } from "./rain-runtime.js";
  * the worker replays any record it has not got open, so a reload or a second tab is always checked on the engine.
  */
 export type RainWorkerRequest =
-  | { id: number; type: "START"; format: "T20" | "ODI"; gameId: string; matchId: string; seed: string; groundId: string; teamIds: [string, string] }
+  | { id: number; type: "START"; format: "T20" | "ODI"; gameId: string; matchId: string; seed: string; groundId: string; teamIds: [string, string]; rules: ExhibitionRuleOptions }
   | { id: number; type: "OPEN"; record: unknown }
   | { id: number; type: "COMMAND"; record: unknown; command: RainCommand }
   | { id: number; type: "AI"; record: unknown; playerTeamId: string }

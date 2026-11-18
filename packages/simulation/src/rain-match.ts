@@ -4,8 +4,18 @@ import {
   RANDOM_VERSION,
   EXP_LUT_VERSION,
   PROBABILITY_MODEL_ID,
-  RainCommandSchema,
   RainMatchRecordSchema,
+  ExtraRulesCommandSchema,
+  ExhibitionRulesRecordSchema,
+  ExtraRulesRecordSchema,
+  EXTRA_RULES_RECORD_SCHEMA_ID,
+  T20_DRS_RULES_ID,
+  ODI_DRS_RULES_ID,
+  REVIEWS_PER_INNINGS,
+  type BallTracking,
+  type DeliveryResolution,
+  type ExtraRulesCommand,
+  type ExhibitionRulesRecord,
   RainPlanSchema,
   RAIN_MATCH_RECORD_SCHEMA_ID,
   T20_RAIN_RULES_ID,
@@ -13,8 +23,6 @@ import {
   type DeliveryRecorded,
   type InningsLedger,
   type Player,
-  type RainCommand,
-  type RainMatchRecord,
   type RainPlan,
   type RainResult,
   type RainStoppageApplied,
@@ -50,6 +58,10 @@ import {
 } from "./world-setup.js";
 import { generatorRuleHash } from "./generator.js";
 import { inningsResources, parAtStoppage, revisedTarget, type RainInterruption } from "./rain-targets.js";
+import { drawAppeal, notOutResolution, outResolution, type AppealKind, type Decisive, type ReviewCue } from "./umpire-reviews.js";
+
+/** Commands the engine accepts: every rain-match command, plus the review decision when reviews are on. */
+export type RainCommand = ExtraRulesCommand;
 
 /**
  * Stage 14 rain-affected T20 and one-day exhibitions (`LC_T20_RAIN_01`, `LC_ODI_RAIN_01`; owner decisions of 17 and
@@ -112,7 +124,46 @@ function profileOf(setup: RainSetup) {
   return PROFILES[setup.format];
 }
 
-export type RainPhase = "TOSS" | "AWAITING_INNINGS" | "AWAITING_BATTER" | "AWAITING_BOWLER" | "READY" | "COMPLETE";
+export type RainPhase = "TOSS" | "AWAITING_INNINGS" | "AWAITING_BATTER" | "AWAITING_BOWLER" | "READY" | "AWAITING_REVIEW" | "COMPLETE";
+
+/** Which opt-in rules a match is played under. Rain alone is the original rain-match record. */
+export type ExhibitionRuleOptions = { rain: boolean; reviews: boolean };
+export const RAIN_ONLY: ExhibitionRuleOptions = Object.freeze({ rain: true, reviews: false });
+
+export type ReviewOutcome = "NOT_REVIEWED" | "NO_REVIEWS_LEFT" | "OVERTURNED" | "STRUCK_DOWN" | "UMPIRES_CALL";
+export type PendingReview = {
+  kind: AppealKind;
+  strikerId: string;
+  bowlerId: string;
+  onFieldOut: boolean;
+  /** Hidden from any screen until the review is decided. */
+  decisive: Decisive;
+  tracking: BallTracking | null;
+  cue: ReviewCue;
+  reviewTeamId: string;
+  outResolution: DeliveryResolution;
+  notOutResolution: DeliveryResolution;
+};
+export type ReviewLogEntry = {
+  inningsIndex: 0 | 1;
+  legalBallsBefore: number;
+  kind: AppealKind;
+  strikerId: string;
+  bowlerId: string;
+  onFieldOut: boolean;
+  reviewTeamId: string;
+  outcome: ReviewOutcome;
+  /** Shown once a review has happened (leg-before only). */
+  tracking: BallTracking | null;
+  finalOut: boolean;
+};
+export type ReviewState = {
+  rulesId: typeof T20_DRS_RULES_ID | typeof ODI_DRS_RULES_ID;
+  /** Unsuccessful reviews each side has left in the current innings. */
+  reviewsLeft: Record<string, number>;
+  pending: PendingReview | null;
+  log: ReviewLogEntry[];
+};
 
 export type RainMatchState = {
   rulesId: typeof T20_RAIN_RULES_ID | typeof ODI_RAIN_RULES_ID;
@@ -141,6 +192,10 @@ export type RainMatchState = {
   aggression: Record<string, number>;
   lastDelivery: DeliveryRecorded | null;
   result: RainResult | null;
+  /** Present (and true) only when the seeded weather is off. Absent in rain-only matches, so their state hash is unchanged. */
+  weatherOff?: true;
+  /** Present only when player reviews are on. */
+  reviews?: ReviewState;
 };
 
 type Team = RainSetup["teams"][number];
@@ -193,8 +248,9 @@ export function drawRainPlan(setup: RainSetup): RainPlan {
   return RainPlanSchema.parse({ stoppages: final });
 }
 
-export function createRainMatch(setup: RainSetup): RainMatchState {
+export function createRainMatch(setup: RainSetup, options: ExhibitionRuleOptions = RAIN_ONLY): RainMatchState {
   assert(isVerifiedFrozenT20Setup(setup) || isVerifiedFrozenODISetup(setup), "INVALID_FROZEN_SETUP");
+  assert(options.rain || options.reviews, "NO_RULES_CHOSEN");
   assert(setup.versions.rules === (setup.format === "T20" ? "LC_T20_01" : "LC_ODI_01"), "UNSUPPORTED_RULES");
   const profile = profileOf(setup);
   return {
@@ -202,7 +258,7 @@ export function createRainMatch(setup: RainSetup): RainMatchState {
     format: setup.format,
     gameId: setup.gameId,
     matchId: setup.matchId,
-    plan: drawRainPlan(setup),
+    plan: options.rain ? drawRainPlan(setup) : { stoppages: [] },
     nextStoppage: 0,
     phase: "TOSS",
     tossWinnerId: null,
@@ -219,7 +275,16 @@ export function createRainMatch(setup: RainSetup): RainMatchState {
     aggression: {},
     lastDelivery: null,
     result: null,
+    ...(options.rain ? {} : { weatherOff: true as const }),
+    ...(options.reviews
+      ? { reviews: { rulesId: setup.format === "T20" ? T20_DRS_RULES_ID : ODI_DRS_RULES_ID, reviewsLeft: {}, pending: null, log: [] } }
+      : {}),
   };
+}
+
+/** The opt-in rules a match state was created with. */
+export function exhibitionRuleOptions(state: RainMatchState): ExhibitionRuleOptions {
+  return { rain: state.weatherOff !== true, reviews: state.reviews !== undefined };
 }
 
 function newLedger(setup: RainSetup, state: RainMatchState, battingTeamId: string, index: 0 | 1, target: number | null): InningsLedger {
@@ -288,6 +353,7 @@ function startInnings(setup: RainSetup, state: RainMatchState, battingTeamId: st
     state.target = computeTarget(setup, state);
   }
   state.innings.push(newLedger(setup, state, battingTeamId, index, index === 1 ? state.target : null));
+  if (state.reviews) state.reviews.reviewsLeft = Object.fromEntries(setup.teams.map((t) => [t.teamId, REVIEWS_PER_INNINGS]));
   state.activeInningsIndex = index;
   state.phase = "AWAITING_BATTER";
   // Planned stoppages for an innings that is already over can no longer happen.
@@ -510,7 +576,75 @@ function bowlBall(setup: RainSetup, state: RainMatchState): void {
       }),
     },
   });
-  const event = scoreDelivery(context, generated.resolution);
+  if (state.reviews) {
+    const contact = generated.trace.find((t) => t.stageName === "contact")?.selectedCategoryId ?? null;
+    const appeal = drawAppeal({ seed: setup.seed, matchId: setup.matchId, attemptOrdinal: state.attemptOrdinal, context, resolution: generated.resolution, contact });
+    if (appeal) {
+      const i = ledger.innings;
+      const pending: PendingReview = {
+        kind: appeal.kind,
+        strikerId: context.strikerId,
+        bowlerId: context.bowlerId,
+        onFieldOut: appeal.onFieldOut,
+        decisive: appeal.decisive,
+        tracking: appeal.tracking,
+        cue: appeal.cue,
+        reviewTeamId: appeal.onFieldOut ? i.battingTeamId : i.bowlingTeamId,
+        outResolution: outResolution(generated.resolution, context, appeal.kind),
+        notOutResolution: notOutResolution(generated.resolution, context),
+      };
+      if ((state.reviews.reviewsLeft[pending.reviewTeamId] ?? 0) > 0) {
+        state.reviews.pending = pending;
+        state.phase = "AWAITING_REVIEW";
+        return;
+      }
+      logReview(state, pending, "NO_REVIEWS_LEFT", pending.onFieldOut);
+      commitBall(setup, state, pending.onFieldOut ? pending.outResolution : pending.notOutResolution);
+      return;
+    }
+  }
+  commitBall(setup, state, generated.resolution);
+}
+
+function logReview(state: RainMatchState, pending: PendingReview, outcome: ReviewOutcome, finalOut: boolean): void {
+  const reviewed = outcome === "OVERTURNED" || outcome === "STRUCK_DOWN" || outcome === "UMPIRES_CALL";
+  state.reviews!.log.push({
+    inningsIndex: state.activeInningsIndex,
+    legalBallsBefore: ledgerOf(state).innings.legalBalls,
+    kind: pending.kind,
+    strikerId: pending.strikerId,
+    bowlerId: pending.bowlerId,
+    onFieldOut: pending.onFieldOut,
+    reviewTeamId: pending.reviewTeamId,
+    outcome,
+    tracking: reviewed ? pending.tracking : null,
+    finalOut,
+  });
+}
+
+/** Decides a pending review, then records the ball as finally decided. */
+function decideReview(setup: RainSetup, state: RainMatchState, review: boolean): void {
+  const pending = state.reviews!.pending!;
+  state.reviews!.pending = null;
+  let finalOut = pending.onFieldOut;
+  let outcome: ReviewOutcome = "NOT_REVIEWED";
+  if (review) {
+    if (pending.decisive === "UMPIRES_CALL") outcome = "UMPIRES_CALL";
+    else {
+      finalOut = pending.decisive === "OUT";
+      outcome = finalOut !== pending.onFieldOut ? "OVERTURNED" : "STRUCK_DOWN";
+      if (outcome === "STRUCK_DOWN") state.reviews!.reviewsLeft[pending.reviewTeamId] = (state.reviews!.reviewsLeft[pending.reviewTeamId] ?? 1) - 1;
+    }
+  }
+  logReview(state, pending, outcome, finalOut);
+  commitBall(setup, state, finalOut ? pending.outResolution : pending.notOutResolution);
+}
+
+/** Scores and records one ball through the frozen kernel and ledger, then applies rain and the end of the innings. */
+function commitBall(setup: RainSetup, state: RainMatchState, resolution: DeliveryResolution): void {
+  const ledger = ledgerOf(state);
+  const context = contextFromLedger(ledger);
+  const event = scoreDelivery(context, resolution);
   const outcome = reduceInningsLedger(ledger, event);
   state.innings[state.activeInningsIndex] = outcome.ledger;
   state.attemptOrdinal += 1;
@@ -550,7 +684,8 @@ export function eligibleRainBatters(setup: RainSetup, state: RainMatchState): st
 }
 
 /** Which side must decide next, or null when the next step is a ball (or nothing). */
-export function rainPendingDecision(setup: RainSetup, state: RainMatchState): { teamId: string; decision: "TOSS" | "INNINGS" | "BATTER" | "BOWLER" } | null {
+export function rainPendingDecision(setup: RainSetup, state: RainMatchState): { teamId: string; decision: "TOSS" | "INNINGS" | "BATTER" | "BOWLER" | "REVIEW" } | null {
+  if (state.phase === "AWAITING_REVIEW") return { teamId: state.reviews!.pending!.reviewTeamId, decision: "REVIEW" };
   if (state.phase === "TOSS") return { teamId: setup.teams[0].teamId, decision: "TOSS" };
   if (state.phase === "AWAITING_INNINGS") return { teamId: state.tossWinnerId!, decision: "INNINGS" };
   if (state.phase === "AWAITING_BATTER") return { teamId: ledgerOf(state).innings.battingTeamId, decision: "BATTER" };
@@ -560,7 +695,7 @@ export function rainPendingDecision(setup: RainSetup, state: RainMatchState): { 
 
 /** Applies one command. Throws `LC_RAIN_*` on an illegal command; the input state is not changed. */
 export function executeRainCommand(setup: RainSetup, input: RainMatchState, raw: unknown): RainMatchState {
-  const command = RainCommandSchema.parse(raw);
+  const command = ExtraRulesCommandSchema.parse(raw);
   const state = clone(input);
   assert(state.phase !== "COMPLETE", "COMPLETE");
   switch (command.kind) {
@@ -610,6 +745,12 @@ export function executeRainCommand(setup: RainSetup, input: RainMatchState, raw:
       state.aggression[command.playerId] = command.aggression;
       break;
     }
+    case "REVIEW_DECISION": {
+      assert(state.phase === "AWAITING_REVIEW" && state.reviews?.pending, "WRONG_PHASE");
+      assert(command.teamId === state.reviews.pending.reviewTeamId, "NOT_REVIEWING_TEAM");
+      decideReview(setup, state, command.review);
+      break;
+    }
     case "BOWL": {
       assert(state.phase === "READY", "WRONG_PHASE");
       if (command.scope === "BALL") {
@@ -633,6 +774,8 @@ export function rainAutopilotCommand(setup: RainSetup, state: RainMatchState): R
   const pending = rainPendingDecision(setup, state)!;
   if (pending.decision === "TOSS") return { kind: "CALL_TOSS", teamId: pending.teamId, call: "HEADS" };
   if (pending.decision === "INNINGS") return { kind: "CHOOSE_INNINGS", teamId: pending.teamId, choice: "BOWL" };
+  // The AI captain reviews on what a player on the field could sense, never on the hidden reading.
+  if (pending.decision === "REVIEW") return { kind: "REVIEW_DECISION", teamId: pending.teamId, review: state.reviews!.pending!.cue === "CONFIDENT" };
   if (pending.decision === "BATTER") return { kind: "SET_BATTER", teamId: pending.teamId, playerId: eligibleRainBatters(setup, state)[0]! };
   const l = ledgerOf(state);
   const bowlers = eligibleRainBowlers(setup, state).sort(
@@ -647,15 +790,19 @@ export function rainStateSha256(state: RainMatchState): string {
 }
 
 /** Replays commands from the start. Throws if any command is illegal. */
-export function replayRainMatch(setup: RainSetup, commands: readonly RainCommand[]): RainMatchState {
-  let state = createRainMatch(setup);
+export function replayRainMatch(setup: RainSetup, commands: readonly RainCommand[], options: ExhibitionRuleOptions = RAIN_ONLY): RainMatchState {
+  let state = createRainMatch(setup, options);
   for (const command of commands) state = executeRainCommand(setup, state, command);
   return state;
 }
 
 /** Plays a whole match with the automatic captain for both sides. */
-export function runAutopilotRainMatch(setup: RainSetup, maxCommands = 4000): { state: RainMatchState; commands: RainCommand[] } {
-  let state = createRainMatch(setup);
+export function runAutopilotRainMatch(
+  setup: RainSetup,
+  options: ExhibitionRuleOptions = RAIN_ONLY,
+  maxCommands = 6000,
+): { state: RainMatchState; commands: RainCommand[] } {
+  let state = createRainMatch(setup, options);
   const commands: RainCommand[] = [];
   while (state.phase !== "COMPLETE") {
     assert(commands.length < maxCommands, "COMMAND_LIMIT");
@@ -666,36 +813,57 @@ export function runAutopilotRainMatch(setup: RainSetup, maxCommands = 4000): { s
   return { state, commands };
 }
 
-export function rainMatchRecord(setup: RainSetup, state: RainMatchState, commands: readonly RainCommand[]): RainMatchRecord {
-  return RainMatchRecordSchema.parse({
-    schemaId: RAIN_MATCH_RECORD_SCHEMA_ID,
+const selectedTeamsOf = (setup: RainSetup) =>
+  setup.teams.map((t) => ({ teamId: t.teamId, playerIds: [...t.playerIds], captainId: t.captainId, keeperId: t.keeperId }));
+
+/**
+ * The durable record of a match. A rain-only match keeps the original `LC_RAIN_MATCH_RECORD_V1`; a match with player
+ * reviews, or with the weather off, uses `LC_EXTRA_RULES_RECORD_V1`.
+ */
+export function rainMatchRecord(setup: RainSetup, state: RainMatchState, commands: readonly RainCommand[]): ExhibitionRulesRecord {
+  const options = exhibitionRuleOptions(state);
+  const common = {
     rulesId: state.rulesId,
     gameId: setup.gameId,
     matchId: setup.matchId,
     seed: setup.seed,
     groundId: setup.ground.groundId,
-    selectedTeams: setup.teams.map((t) => ({ teamId: t.teamId, playerIds: [...t.playerIds], captainId: t.captainId, keeperId: t.keeperId })),
+    selectedTeams: selectedTeamsOf(setup),
     commands: [...commands],
     stateSha256: rainStateSha256(state),
-  });
+  };
+  if (options.rain && !options.reviews) return RainMatchRecordSchema.parse({ schemaId: RAIN_MATCH_RECORD_SCHEMA_ID, ...common });
+  return ExtraRulesRecordSchema.parse({ schemaId: EXTRA_RULES_RECORD_SCHEMA_ID, ...common, rain: options.rain, reviewRulesId: state.reviews?.rulesId ?? null });
+}
+
+/** The opt-in rules a stored record was played under. */
+export function recordRuleOptions(record: ExhibitionRulesRecord): ExhibitionRuleOptions {
+  return record.schemaId === RAIN_MATCH_RECORD_SCHEMA_ID ? RAIN_ONLY : { rain: record.rain, reviews: record.reviewRulesId !== null };
 }
 
 /** Verifies a stored record against the setup it claims to belong to, and returns the replayed state. */
 export function verifyRainMatchRecord(setup: RainSetup, raw: unknown): RainMatchState {
-  const record = RainMatchRecordSchema.parse(raw);
+  const record = ExhibitionRulesRecordSchema.parse(raw);
   assert(record.rulesId === profileOf(setup).rulesId, "RECORD_FORMAT_MISMATCH");
-  const teams = setup.teams.map((t) => ({ teamId: t.teamId, playerIds: [...t.playerIds], captainId: t.captainId, keeperId: t.keeperId }));
+  if (record.schemaId === EXTRA_RULES_RECORD_SCHEMA_ID) {
+    assert(record.rain || record.reviewRulesId !== null, "RECORD_NO_RULES");
+    assert(record.reviewRulesId === null || record.reviewRulesId === (setup.format === "T20" ? T20_DRS_RULES_ID : ODI_DRS_RULES_ID), "RECORD_FORMAT_MISMATCH");
+  }
   assert(
-    record.gameId === setup.gameId && record.matchId === setup.matchId && record.seed === setup.seed && record.groundId === setup.ground.groundId && hash(record.selectedTeams) === hash(teams),
+    record.gameId === setup.gameId &&
+      record.matchId === setup.matchId &&
+      record.seed === setup.seed &&
+      record.groundId === setup.ground.groundId &&
+      hash(record.selectedTeams) === hash(selectedTeamsOf(setup)),
     "RECORD_SETUP_MISMATCH",
   );
-  const state = replayRainMatch(setup, record.commands);
+  const state = replayRainMatch(setup, record.commands, recordRuleOptions(record));
   assert(rainStateSha256(state) === record.stateSha256, "RECORD_STATE_MISMATCH");
   return state;
 }
 
 /** The choices that fix a rain-affected exhibition, as stored in its record. */
-export type RainSetupChoices = Pick<RainMatchRecord, "gameId" | "matchId" | "seed" | "groundId" | "selectedTeams"> & { format: "T20" | "ODI" };
+export type RainSetupChoices = Pick<ExhibitionRulesRecord, "gameId" | "matchId" | "seed" | "groundId" | "selectedTeams"> & { format: "T20" | "ODI" };
 
 /**
  * Builds the frozen T20 or one-day setup for a rain-affected exhibition through the same validated path as an ordinary
