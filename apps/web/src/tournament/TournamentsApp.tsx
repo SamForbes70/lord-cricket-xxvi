@@ -9,6 +9,7 @@ import { rehydrateODISession, rehydrateT20Session, verifySuperOverRecord } from 
 import { isKnockoutStage, tournamentMatchIdentity, tournamentResultFromSession } from "./runner.js";
 import type { TournamentWorkerRequest, TournamentWorkerResponse } from "./tournament.worker.js";
 import { buildUserCompetition, parseUserCompetitionPack, userCompetitionPackText, type StructureChoice, type UserCompetitionDraft } from "./user-competitions.js";
+import { TeamCrest } from "../world/TeamCrest.js";
 import "../career/career.css";
 
 /**
@@ -47,7 +48,8 @@ function simulateInWorker(worker: Worker, run: TournamentRun, competition: Compe
     worker.postMessage(request);
   });
 }
-const world = JSON.parse(worldText) as { teams: { teamId: string; name: string }[]; grounds: { groundId: string; name: string }[] };
+const world = JSON.parse(worldText) as { teams: { teamId: string; name: string; colours: string[] }[]; grounds: { groundId: string; name: string }[] };
+const teamColours = (id: string) => world.teams.find((t) => t.teamId === id)?.colours ?? [];
 const EMPTY_DRAFT: UserCompetitionDraft = { title: "", format: "T20", structure: "ROUND_ROBIN", seriesMatches: 3, teamIds: [], groundIds: [] };
 const teamNames = Object.fromEntries(world.teams.map((t) => [t.teamId, t.name]));
 const groundNames = Object.fromEntries(world.grounds.map((g) => [g.groundId, g.name]));
@@ -497,7 +499,10 @@ function TournamentRunView(props: {
           <tbody>
             {table.rows.map((row) => (
               <tr key={row.teamId}>
-                <th scope="row">{teamName(row.teamId)}</th>
+                <th scope="row">
+                  <TeamCrest teamId={row.teamId} name={teamName(row.teamId)} colours={teamColours(row.teamId)} size={18} decorative />
+                  {teamName(row.teamId)}
+                </th>
                 <td>{row.played}</td>
                 <td>{row.won}</td>
                 <td>{row.lost}</td>

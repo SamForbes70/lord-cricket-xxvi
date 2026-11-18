@@ -42,6 +42,7 @@ import { SuperOverPanel } from "./match/SuperOverPanel.js";
 import { ScenariosApp, SCENARIO_LAUNCH_KEY } from "./scenario/ScenariosApp.js";
 import { TournamentsApp, TOURNAMENT_LAUNCH_KEY, type TournamentLaunch } from "./tournament/TournamentsApp.js";
 import { RainApp } from "./rain/RainApp.js";
+import { TeamCrest } from "./world/TeamCrest.js";
 import "./styles.css";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
@@ -1392,10 +1393,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
               {view.innings.map((l, index) => (
                 <article key={index}>
-                  <h3>
-                    {tn(l.innings.battingTeamId)} · {l.innings.runs}/
-                    {l.innings.wickets} ({overs(l.innings.legalBalls)})
-                  </h3>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <TeamCrest teamId={l.innings.battingTeamId} name={tn(l.innings.battingTeamId)} colours={view.teams.find((t) => t.id === l.innings.battingTeamId)?.colours ?? []} size={22} decorative />
+                    <h3>
+                      {tn(l.innings.battingTeamId)} · {l.innings.runs}/
+                      {l.innings.wickets} ({overs(l.innings.legalBalls)})
+                    </h3>
+                  </div>
                   <table>
                     <caption>Innings {index + 1} batting</caption>
                     <thead>
