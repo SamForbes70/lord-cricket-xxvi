@@ -1,4 +1,4 @@
-import type { CustomCompetition, TournamentFixture, TournamentResult } from "@lcxxvi/contracts";
+import type { Competition, TournamentFixture, TournamentResult } from "@lcxxvi/contracts";
 import {
   createT20SuperOver,
   executeODICommand,
@@ -42,7 +42,7 @@ export function isKnockoutStage(stage: TournamentFixture["stage"]): boolean {
  * it into a result. Used for simulated matches and for matches the player played on the match screen.
  */
 export function tournamentResultFromSession(input: {
-  competition: CustomCompetition;
+  competition: Competition;
   fixture: TournamentFixture;
   runId: string;
   runSeed: string;
@@ -104,7 +104,7 @@ export function tournamentResultFromSession(input: {
 
 /** Simulates one fixture with both captains on the fixture autopilot (and super overs for a tied knockout match). */
 export function playTournamentFixture(input: {
-  competition: CustomCompetition;
+  competition: Competition;
   fixture: TournamentFixture;
   runId: string;
   runSeed: string;

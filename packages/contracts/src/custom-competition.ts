@@ -23,32 +23,40 @@ export const CustomCompetitionStructureSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("SERIES"), matches: z.union([z.literal(1), z.literal(3), z.literal(5), z.literal(7)]) }),
 ]);
 
-export const CustomCompetitionSchema = z
-  .strictObject({
+type CompetitionCheck = {
+  teamIds: string[];
+  groundIds: string[];
+  structure: z.infer<typeof CustomCompetitionStructureSchema>;
+};
+function checkCompetition(c: CompetitionCheck, ctx: z.RefinementCtx): void {
+  if (new Set(c.teamIds).size !== c.teamIds.length) ctx.addIssue({ code: "custom", message: "COMPETITION_DUPLICATE_TEAM" });
+  if (new Set(c.groundIds).size !== c.groundIds.length) ctx.addIssue({ code: "custom", message: "COMPETITION_DUPLICATE_GROUND" });
+  const s = c.structure;
+  if (s.kind === "SERIES" && c.teamIds.length !== 2) ctx.addIssue({ code: "custom", message: "SERIES_NEEDS_TWO_TEAMS" });
+  if (s.kind === "ROUND_ROBIN" && c.teamIds.length < (s.finalTopTwo ? 3 : 2))
+    ctx.addIssue({ code: "custom", message: "ROUND_ROBIN_TOO_FEW_TEAMS" });
+  if (s.kind === "GROUPS_KNOCKOUT") {
+    const grouped = [...s.groups[0], ...s.groups[1]];
+    if (new Set(grouped).size !== grouped.length || grouped.length !== c.teamIds.length || !grouped.every((t) => c.teamIds.includes(t)))
+      ctx.addIssue({ code: "custom", message: "GROUPS_MUST_PARTITION_TEAMS" });
+  }
+}
+/** One competition shape for both sources; only the source marker differs. */
+function competitionSchema<S extends "FICTIONAL_CURATED" | "USER_AUTHORED">(sourceType: S) {
+  return z.strictObject({
     competitionId: IDSchema,
     title: z.string().min(1).max(80),
     format: z.enum(["T20", "ODI"]),
-    sourceType: z.literal("FICTIONAL_CURATED"),
+    sourceType: z.literal(sourceType),
     worldPackId: z.literal("fictional-eight-01"),
     teamIds: z.array(IDSchema).min(2).max(8),
     groundIds: z.array(IDSchema).min(1).max(8),
     structure: CustomCompetitionStructureSchema,
     points: z.strictObject({ win: CounterSchema.max(10), tie: CounterSchema.max(10), loss: CounterSchema.max(10) }),
     summary: z.string().min(1).max(320),
-  })
-  .superRefine((c, ctx) => {
-    if (new Set(c.teamIds).size !== c.teamIds.length) ctx.addIssue({ code: "custom", message: "COMPETITION_DUPLICATE_TEAM" });
-    if (new Set(c.groundIds).size !== c.groundIds.length) ctx.addIssue({ code: "custom", message: "COMPETITION_DUPLICATE_GROUND" });
-    const s = c.structure;
-    if (s.kind === "SERIES" && c.teamIds.length !== 2) ctx.addIssue({ code: "custom", message: "SERIES_NEEDS_TWO_TEAMS" });
-    if (s.kind === "ROUND_ROBIN" && c.teamIds.length < (s.finalTopTwo ? 3 : 2))
-      ctx.addIssue({ code: "custom", message: "ROUND_ROBIN_TOO_FEW_TEAMS" });
-    if (s.kind === "GROUPS_KNOCKOUT") {
-      const grouped = [...s.groups[0], ...s.groups[1]];
-      if (new Set(grouped).size !== grouped.length || grouped.length !== c.teamIds.length || !grouped.every((t) => c.teamIds.includes(t)))
-        ctx.addIssue({ code: "custom", message: "GROUPS_MUST_PARTITION_TEAMS" });
-    }
   });
+}
+export const CustomCompetitionSchema = competitionSchema("FICTIONAL_CURATED").superRefine(checkCompetition);
 
 export const CustomCompetitionPackSchema = z.strictObject({
   schemaId: z.literal(CUSTOM_COMPETITION_PACK_SCHEMA_ID),
@@ -99,7 +107,36 @@ export const TournamentRunSchema = z.strictObject({
   results: z.array(TournamentResultSchema).max(64),
 });
 
+/**
+ * Stage 15, user-authored tournaments (owner decision 5a: the parts that need no historical data). A player builds a
+ * competition from the fictional world's teams and grounds. It has the same shape as a curated one, marked
+ * `USER_AUTHORED`, and its id always starts with `user-`, so it can never collide with a curated competition.
+ */
+export const USER_COMPETITION_SCHEMA_ID = "LC_USER_COMPETITION_V1" as const;
+export const USER_COMPETITION_PACK_SCHEMA_ID = "LC_USER_COMPETITION_PACK_V1" as const;
+export const UserCompetitionSchema = competitionSchema("USER_AUTHORED").superRefine((c, ctx) => {
+  checkCompetition(c, ctx);
+  if (!c.competitionId.startsWith("user-")) ctx.addIssue({ code: "custom", message: "USER_COMPETITION_ID_PREFIX" });
+});
+/** The stored row for one user-authored competition. */
+export const UserCompetitionRecordSchema = z.strictObject({
+  schemaId: z.literal(USER_COMPETITION_SCHEMA_ID),
+  competition: UserCompetitionSchema,
+});
+/** A file of user-authored competitions, for sharing between players. */
+export const UserCompetitionPackSchema = z.strictObject({
+  schemaId: z.literal(USER_COMPETITION_PACK_SCHEMA_ID),
+  competitions: z.array(UserCompetitionSchema).min(1).max(32),
+});
+/** Either kind of competition, as the tournament code receives it. */
+export const CompetitionSchema = z.union([CustomCompetitionSchema, UserCompetitionSchema]);
+
 export type CustomCompetitionStructure = z.infer<typeof CustomCompetitionStructureSchema>;
+export type UserCompetition = z.infer<typeof UserCompetitionSchema>;
+export type UserCompetitionRecord = z.infer<typeof UserCompetitionRecordSchema>;
+export type UserCompetitionPack = z.infer<typeof UserCompetitionPackSchema>;
+/** A curated or a user-authored competition. */
+export type Competition = z.infer<typeof CompetitionSchema>;
 export type CustomCompetition = z.infer<typeof CustomCompetitionSchema>;
 export type CustomCompetitionPack = z.infer<typeof CustomCompetitionPackSchema>;
 export type TournamentStage = z.infer<typeof TournamentStageSchema>;

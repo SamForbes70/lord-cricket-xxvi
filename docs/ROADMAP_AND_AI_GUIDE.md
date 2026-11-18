@@ -186,7 +186,8 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
 >   - Simulation stops before each of that team's fixtures, which can be played on the match screen against the tactical captain.
 >   - The match starts as an exhibition with the fixture's fixed seed and ids (worker request `TOURNAMENT_START`, which resumes the match if it was already started).
 >   - Back on the Tournaments screen, the finished match is rehydrated from its save on the engine. It is checked against the fixture's seed, ids, teams and ground before its result is recorded. A tied knockout match also needs its super overs, which are replayed.
-> - **Not yet built:** user-authored packs, tours with call-up windows, auctions and drafts, and asset packs.
+> - **User-authored tournaments** (18 November 2026, under answer 5a): on the Tournaments screen a player can make a tournament from the fictional world's teams and grounds (round robin, double round robin, round robin then a final, two groups then knockouts, or a series). It is stored as `LC_USER_COMPETITION_V1`, one hashed row per competition (`lcxxvi-tournaments` / `USER_COMPETITIONS_V1` / competition id), never replaced, and cannot be deleted while a run plays it. Its id always starts with `user-`, so it cannot collide with a curated competition; curated competitions keep `LC_CUSTOM_COMPETITION_PACK_V1` unchanged. Players share tournaments as `LC_USER_COMPETITION_PACK_V1` files, which are size-limited (256 KiB) and checked against the schema and the world on import; a competition the player already has is skipped. The tournament worker now receives the competition itself (checked against its schema) rather than looking up a curated id.
+> - **Not yet built:** tours with call-up windows, auctions and drafts, and asset packs.
 
 ### Stage 16 — Product-quality acceptance (`Slice S16-01`)
 

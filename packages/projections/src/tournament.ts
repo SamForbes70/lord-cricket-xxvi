@@ -1,4 +1,4 @@
-import type { CustomCompetition, TournamentFixture, TournamentResult, TournamentStage } from "@lcxxvi/contracts";
+import type { Competition, TournamentFixture, TournamentResult, TournamentStage } from "@lcxxvi/contracts";
 
 /**
  * Stage 15 tournament logic. Pure and deterministic: fixtures, standings, knockout progression and the champion all
@@ -34,7 +34,7 @@ export type TournamentOutcome =
   | { status: "CHAMPION"; teamId: string; how: string }
   | { status: "SERIES_DRAWN"; how: string };
 
-function quota(c: CustomCompetition): number {
+function quota(c: Competition): number {
   return c.format === "T20" ? 120 : 300;
 }
 
@@ -56,7 +56,7 @@ export function roundRobinPairings(teamIds: readonly string[], legs: 1 | 2): [st
   return legs === 1 ? rounds : [...rounds, ...rounds.map(([a, b]) => [b, a] as [string, string])];
 }
 
-function fixture(c: CustomCompetition, matchNumber: number, stage: TournamentStage, home: string, away: string): TournamentFixture {
+function fixture(c: Competition, matchNumber: number, stage: TournamentStage, home: string, away: string): TournamentFixture {
   return {
     fixtureId: `${c.competitionId}:m${matchNumber}`,
     matchNumber,
@@ -76,7 +76,7 @@ function isAllOut(wickets: number): boolean {
 }
 
 export function computeStandings(
-  c: CustomCompetition,
+  c: Competition,
   teamIds: readonly string[],
   fixtures: readonly TournamentFixture[],
   results: readonly TournamentResult[],
@@ -141,7 +141,7 @@ export type TournamentView = {
   next: TournamentFixture | null;
 };
 
-export function viewTournament(c: CustomCompetition, results: readonly TournamentResult[]): TournamentView {
+export function viewTournament(c: Competition, results: readonly TournamentResult[]): TournamentView {
   const s = c.structure;
   const fixtures: TournamentFixture[] = [];
   const tables: TournamentView["tables"] = [];

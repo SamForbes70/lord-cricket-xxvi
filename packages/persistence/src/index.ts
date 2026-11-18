@@ -10,6 +10,9 @@ import {
   type SuperOverRecord,
   TournamentRunSchema,
   type TournamentRun,
+  UserCompetitionRecordSchema,
+  USER_COMPETITION_SCHEMA_ID,
+  type UserCompetition,
   ExhibitionRulesRecordSchema,
   type ExhibitionRulesRecord,
   type StagedRosterPack,
@@ -56,6 +59,7 @@ const SUPER_OVER_OWNER = "lcxxvi-super-overs";
 /** Projections scope holding Stage 15 tournament runs, one row per run (key: the run id). */
 export const TOURNAMENT_RUNS_SCOPE = "TOURNAMENT_RUNS_V1";
 const TOURNAMENT_OWNER = "lcxxvi-tournaments";
+export const USER_COMPETITIONS_SCOPE = "USER_COMPETITIONS_V1";
 export const RAIN_MATCHES_SCOPE = "RAIN_MATCHES_V1";
 const RAIN_OWNER = "lcxxvi-rain-matches";
 
@@ -502,6 +506,59 @@ export class IndexedDbSaveRepository {
     const db = await this.open();
     const tx = db.transaction("projections", "readwrite");
     tx.objectStore("projections").delete([RAIN_OWNER, RAIN_MATCHES_SCOPE, gameId]);
+    await txDone(tx);
+  }
+
+  /** Stage 15: every user-authored competition. A damaged row is skipped and reported by id. */
+  async listUserCompetitions(): Promise<{ competitions: UserCompetition[]; damaged: string[] }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const rows = (await req(
+      tx.objectStore("projections").getAll(IDBKeyRange.bound([TOURNAMENT_OWNER, USER_COMPETITIONS_SCOPE, ""], [TOURNAMENT_OWNER, USER_COMPETITIONS_SCOPE, "\uffff"])),
+    )) as { key: string; payload: string; sha256: string }[];
+    await txDone(tx);
+    const competitions: UserCompetition[] = [];
+    const damaged: string[] = [];
+    for (const row of rows) {
+      try {
+        if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("hash");
+        const record = UserCompetitionRecordSchema.parse(JSON.parse(row.payload));
+        if (record.competition.competitionId !== row.key) throw new Error("key");
+        competitions.push(record.competition);
+      } catch {
+        damaged.push(row.key);
+      }
+    }
+    return { competitions, damaged };
+  }
+
+  /** Adds a user-authored competition. It never replaces one: a competition that runs refer to must not change. */
+  async addUserCompetition(competitionRaw: UserCompetition): Promise<UserCompetition> {
+    const record = UserCompetitionRecordSchema.parse({ schemaId: USER_COMPETITION_SCHEMA_ID, competition: competitionRaw });
+    const payload = canonicalJson(record);
+    const sha256 = await sha256Text(payload);
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    const store = tx.objectStore("projections");
+    const key = record.competition.competitionId;
+    const existing = await req(store.get([TOURNAMENT_OWNER, USER_COMPETITIONS_SCOPE, key]));
+    if (existing) {
+      tx.abort();
+      try { await txDone(tx); } catch { /* expected abort */ }
+      throw new Error("USER_COMPETITION_EXISTS");
+    }
+    store.put({ saveId: TOURNAMENT_OWNER, scope: USER_COMPETITIONS_SCOPE, key, payload, sha256 });
+    await txDone(tx);
+    return record.competition;
+  }
+
+  /** Removes a user-authored competition, refusing while any stored tournament run plays it. */
+  async deleteUserCompetition(competitionId: string): Promise<void> {
+    const { runs } = await this.listTournamentRuns();
+    if (runs.some((r) => r.competitionId === competitionId)) throw new Error("USER_COMPETITION_IN_USE");
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    tx.objectStore("projections").delete([TOURNAMENT_OWNER, USER_COMPETITIONS_SCOPE, competitionId]);
     await txDone(tx);
   }
 

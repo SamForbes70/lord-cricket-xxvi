@@ -79,3 +79,51 @@ test("Stage 15 the player's own tournament match is played on the match screen a
   await expect(run.getByRole("button", { name: "Play this match yourself" })).toBeVisible({ timeout: 60_000 });
   expect(pageErrors).toEqual([]);
 });
+
+// User-authored tournaments (owner decision 5a): a player makes a tournament, plays it, and shares it as a file.
+test("Stage 15 a player makes a round robin, plays it to a winner, and saves it to a file", async ({ page }) => {
+  test.setTimeout(300_000);
+  const pageErrors: string[] = [];
+  page.on("pageerror", (err) => pageErrors.push(err.message));
+  await page.goto("/#tournaments");
+  const list = page.getByRole("list", { name: "Tournaments" });
+  await expect(list.locator("> li")).toHaveCount(4, { timeout: 30_000 });
+
+  const form = page.getByRole("region", { name: "Make your own tournament" });
+  // A clear message for a choice that cannot work.
+  await form.getByRole("button", { name: "Make tournament" }).click();
+  await expect(page.getByRole("alert")).toHaveText("Give the tournament a name.");
+  await form.getByLabel("Name").fill("Harbour Three");
+  for (const team of ["Aster Harbour", "Copper Vale", "Northlight Ridge"]) await form.getByRole("checkbox", { name: team }).check();
+  await form.getByRole("group", { name: "Grounds" }).getByRole("checkbox").first().check();
+  await form.getByRole("button", { name: "Make tournament" }).click();
+  await expect(page.getByRole("status")).toHaveText("Harbour Three is ready to start.");
+  await expect(list.locator("> li")).toHaveCount(5);
+  const card = list.locator("> li").last();
+  await expect(card).toContainText("made by you");
+  await expect(card).toContainText("A T20 round robin for 3 teams.");
+
+  // Saving to a file downloads a pack.
+  const download = page.waitForEvent("download");
+  await card.getByRole("button", { name: "Save Harbour Three to a file" }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/^user-[0-9a-f]+\.json$/);
+
+  await card.getByRole("button", { name: "Start Harbour Three" }).click();
+  const run = page.getByTestId("tournament-run");
+  await expect(run).toBeVisible({ timeout: 30_000 });
+  await run.getByRole("button", { name: "Play all remaining" }).click();
+  await expect(page.getByTestId("tournament-champion")).toBeVisible({ timeout: 120_000 });
+
+  // Stored: after a reload the tournament is still there, and it cannot be deleted while it has a run.
+  await page.reload();
+  const again = page.getByRole("list", { name: "Tournaments" }).locator("> li").last();
+  await expect(again).toContainText("Harbour Three", { timeout: 30_000 });
+  await expect(again.getByRole("button", { name: "Delete Harbour Three" })).toBeDisabled();
+
+  // Loading the same file again skips the tournament the player already has.
+  await page.getByLabel("Load a tournament file").setInputFiles(await file.path());
+  await expect(page.getByRole("status")).toHaveText("Loaded 0 tournaments; skipped 1 you already have.");
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});
