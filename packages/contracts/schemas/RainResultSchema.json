@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "WIN",
+        "TIE",
+        "NO_RESULT"
+      ]
+    },
+    "winnerTeamId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(?!(?:constructor|prototype)$)[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "marginType": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "RUNS",
+            "WICKETS"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "margin": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "STANDARD",
+        "RESOURCE_TABLE"
+      ]
+    }
+  },
+  "required": [
+    "kind",
+    "winnerTeamId",
+    "marginType",
+    "margin",
+    "method"
+  ],
+  "additionalProperties": false,
+  "$id": "urn:lcxxvi:RainResult:1",
+  "title": "RainResult"
+}

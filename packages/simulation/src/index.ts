@@ -45,3 +45,4 @@ export * from "./red5-continuation.js";
 export * from "./red5-weather.js";
 export * from "./t20-super-over.js";
 export * from "./rain-targets.js";
+export * from "./rain-match.js";
