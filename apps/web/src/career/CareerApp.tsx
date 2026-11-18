@@ -893,6 +893,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               Tournaments
             </a>
           )}
+          {!inspectionOnly && (
+            <a className="button-link" href="#rain">
+              Rain-affected matches
+            </a>
+          )}
           <a className="button-link" href="#roster-career">
             Imported roster career
           </a>
@@ -1131,6 +1136,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         </a>
         {!inspectionOnly && <a href="#scenarios">Scenarios</a>}
         {!inspectionOnly && <a href="#tournaments">Tournaments</a>}
+        {!inspectionOnly && <a href="#rain">Rain matches</a>}
         <button
           disabled={busy || inspectionOnly}
           onClick={() =>

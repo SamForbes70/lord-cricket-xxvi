@@ -13,6 +13,8 @@ import {
   UserCompetitionRecordSchema,
   USER_COMPETITION_SCHEMA_ID,
   type UserCompetition,
+  RainMatchRecordSchema,
+  type RainMatchRecord,
   type StagedRosterPack,
   type ID,
   type MatchState,
@@ -58,6 +60,8 @@ const SUPER_OVER_OWNER = "lcxxvi-super-overs";
 export const TOURNAMENT_RUNS_SCOPE = "TOURNAMENT_RUNS_V1";
 const TOURNAMENT_OWNER = "lcxxvi-tournaments";
 export const USER_COMPETITIONS_SCOPE = "USER_COMPETITIONS_V1";
+export const RAIN_MATCHES_SCOPE = "RAIN_MATCHES_V1";
+const RAIN_OWNER = "lcxxvi-rain-matches";
 
 export type SaveKind = "AUTO" | "MANUAL" | "IMPORTED";
 export type SaveSummary = {
@@ -443,6 +447,64 @@ export class IndexedDbSaveRepository {
     const db = await this.open();
     const tx = db.transaction("projections", "readwrite");
     tx.objectStore("projections").delete([TOURNAMENT_OWNER, TOURNAMENT_RUNS_SCOPE, runId]);
+    await txDone(tx);
+  }
+
+  /** Stage 14: every stored rain-affected exhibition. A damaged row is skipped and reported by game id. */
+  async listRainMatches(): Promise<{ records: RainMatchRecord[]; damaged: string[] }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const rows = (await req(
+      tx.objectStore("projections").getAll(IDBKeyRange.bound([RAIN_OWNER, RAIN_MATCHES_SCOPE, ""], [RAIN_OWNER, RAIN_MATCHES_SCOPE, "\uffff"])),
+    )) as { key: string; payload: string; sha256: string }[];
+    await txDone(tx);
+    const records: RainMatchRecord[] = [];
+    const damaged: string[] = [];
+    for (const row of rows) {
+      try {
+        if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("hash");
+        const record = RainMatchRecordSchema.parse(JSON.parse(row.payload));
+        if (record.gameId !== row.key) throw new Error("key");
+        records.push(record);
+      } catch {
+        damaged.push(row.key);
+      }
+    }
+    return { records, damaged };
+  }
+
+  /**
+   * Writes a rain match record only if the stored one still has `expectedCommands` commands and the same setup:
+   * commands are append-only, so a stale tab cannot overwrite newer play.
+   */
+  async saveRainMatch(recordRaw: RainMatchRecord, expectedCommands: number): Promise<RainMatchRecord> {
+    const record = RainMatchRecordSchema.parse(recordRaw);
+    const payload = canonicalJson(record);
+    const sha256 = await sha256Text(payload);
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    const store = tx.objectStore("projections");
+    const existing = (await req(store.get([RAIN_OWNER, RAIN_MATCHES_SCOPE, record.gameId]))) as { payload: string } | undefined;
+    const stored = existing ? RainMatchRecordSchema.parse(JSON.parse(existing.payload)) : null;
+    const sameSetup = (a: RainMatchRecord) =>
+      canonicalJson([a.rulesId, a.matchId, a.seed, a.groundId, a.selectedTeams]) === canonicalJson([record.rulesId, record.matchId, record.seed, record.groundId, record.selectedTeams]);
+    const ok = stored
+      ? stored.commands.length === expectedCommands && sameSetup(stored) && canonicalJson(stored.commands) === canonicalJson(record.commands.slice(0, expectedCommands))
+      : expectedCommands === 0;
+    if (!ok) {
+      tx.abort();
+      try { await txDone(tx); } catch { /* expected abort */ }
+      throw new Error("RAIN_MATCH_STALE");
+    }
+    store.put({ saveId: RAIN_OWNER, scope: RAIN_MATCHES_SCOPE, key: record.gameId, payload, sha256 });
+    await txDone(tx);
+    return record;
+  }
+
+  async deleteRainMatch(gameId: string): Promise<void> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    tx.objectStore("projections").delete([RAIN_OWNER, RAIN_MATCHES_SCOPE, gameId]);
     await txDone(tx);
   }
 
