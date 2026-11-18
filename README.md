@@ -2,18 +2,16 @@
 
 **An evidence-based, deterministic, browser-native statistical cricket management game built as a strict TypeScript monorepo.**
 
-> **Stabilisation in progress (16 November 2026).** The owner directed: "Get what we currently have as excellent, then we will finish the full game." No new stages (including Stage 11) until the plan in [docs/AUDIT_2026-11-16.md](docs/AUDIT_2026-11-16.md) is complete and reviewed. Current state and the open pull requests: [docs/HANDOVER.md](docs/HANDOVER.md). Stages 2 to 10 landed on `main` with hosted CI failing; the stabilisation pull requests make it green.
-
-> **Quick status (16 November 2026, Australia/Brisbane):** V0.1 (`f7ee054`), **Stages 2 through 10** (`Persistent Multi-Season World`, `Player Lifecycle & Youth Pathway`, `Contracts, Budgets & Recruitment`, `Tactical Briefings & Feedback`, `Live Field & Highlight Pacing`, `Contextual Text Commentary`, `Optional Sound & Narration`, `Historical Statistics & Leaderboards`, and `Match & Season Awards`), and the **Windows Double-Click & Zero-Dependency `.NET` Portable Launcher** are **implemented, verified (`773/773` unit tests across `73/73` files, `334` strict JSON Schemas, Chromium + Firefox E2E suites), merged to `main`, and owner-accepted**. Next eligible roadmap slice: **Stage 11 (`S11-01`: Player and manager stories)**. The authoritative production gameplay model remains `synthetic-alpha-01` / `SYNTHETIC_ALPHA` (fictional teams/players, no empirical calibration claim yet).
+> **Status (18 November 2026, Australia/Brisbane).** Feature-complete for everything the roadmap allows without outside data. Built and merged: V0.1, Stages 2 to 12, Stage 14's rules (super overs, rain-shortened matches and player reviews, exhibitions only) and Stage 15's fictional parts (tournaments, your own competitions, tours, auctions, crests, with your own matches playable). Stage 13 (historical scenarios) is parked and Stage 14's empirical calibration is `BLOCKED_EXTERNAL`: the model stays a fictional synthetic alpha. Stage 16 was passed by the owner's direct instruction with none of its four parts run (no owner-PC measurements, playtest, screen-reader walkthrough or long-career soak). Stage 17: the release record is sealed and the GitHub Release `alpha-2026-11-18` is prepared for the owner to publish. One page with the details: [docs/HANDOVER.md](docs/HANDOVER.md).
 
 ---
 
 ## Table of Contents
 
 1. [Quick Start, Windows Double-Click & Packaging](#quick-start-windows-double-click--packaging)
-2. [What Has Been Built (V0.1 + Stages 2 to 10 + Windows Launcher)](#what-has-been-built-v01--stages-2-to-10--windows-launcher)
+2. [What Has Been Built](#what-has-been-built)
 3. [Architecture & Engineering Invariants](#architecture--engineering-invariants)
-4. [Full Future Roadmap (Stages 11 to 17 & Research Track)](#full-future-roadmap-stages-11-to-17--research-track)
+4. [Roadmap Status (Stages 11 to 17 & Research Track)](#roadmap-status-stages-11-to-17--research-track)
 5. [Complete Instructions for AIs to Maintain & Build Out the Roadmap](#complete-instructions-for-ais-to-maintain--build-out-the-roadmap)
 6. [Verification Gates & Evidence](#verification-gates--evidence)
 7. [Maintained Documentation Index](#maintained-documentation-index)
@@ -54,7 +52,7 @@ Then open **`http://127.0.0.1:4180/`** (or run `node start.mjs --open`). Because
 
 ---
 
-## What Has Been Built (V0.1 + Stages 2 to 10 + Windows Launcher)
+## What Has Been Built
 
 ### Core Simulation & Match Formats (Stage 1 / V0.1, `accepted`)
 
@@ -127,13 +125,22 @@ Then open **`http://127.0.0.1:4180/`** (or run `node start.mjs --open`). Because
 - **Repo-Root & Portable Batch/PowerShell Launchers (`Play-Lord-Cricket.bat`, `tools/windows/*`)**: Double-clickable Windows entry points that probe `GET /__lcxxvi-health` for running instances, auto-build stale checkouts, open Microsoft Edge / Chrome in standalone `--app=http://127.0.0.1:4180/` window mode, and cleanly shut down via `POST /__lcxxvi-shutdown`.
 - **Native `.NET Framework 4.x` C# Executable (`tools/windows/LordCricketLauncher.cs`)**: Compiles in < 2 seconds on any Windows 10/11 machine using built-in `csc.exe` (`npm run package:windows-exe` or `Build-Exe.bat`) into `LordCricketXXVI.exe`, providing a built-in `HttpListener` static server and Windows notification-area tray icon with zero external dependencies.
 
+### Built since Stage 10 (17 and 18 November 2026)
+
+- **Stage 11, player and manager stories (#64).** Story cards derived on demand from committed career facts (milestones, form streaks, youth debuts, awards, retirements, contract and board stories); nothing stored, no persisted format changed.
+- **Stage 12, scenario challenges (#65, #72).** Eight fictional challenges (four T20, two one-day, two five-day) that start at a pinned checkpoint against the tactical captain, with personal bests kept outside every save.
+- **Stage 14 rules, exhibitions only.** ICC-style super overs for tied T20 and one-day matches (#67, #68), carried in `.lcxxvi` exports (#73); rain-shortened T20 and one-day matches with revised targets from a fictional resource table (#76, #78, #79); player reviews (DRS) for T20 and one-day matches (#80). Each wraps the frozen engines under its own opt-in rule set and record version.
+- **Stage 15, fictional tournaments.** Built-in competitions played match by match in a worker, with your own matches on the match screen (#69, #74); competitions you make yourself, shared as files (#81); built-in team crests (#82); tours against a touring XI picked from the other clubs (#83); squads rebuilt by an auction with fictional budgets (#84); tour and auction matches playable by you (#86).
+- **Bowling plans (#86).** The T20 and one-day match screens refuse a bowler choice that would leave overs no one could bowl.
+- **Release (#85, #87).** Release record `LC_RELEASE_RECORD_V2` in `docs/release-2026-11-18/` and the GitHub Release `alpha-2026-11-18`.
+
 ---
 
 ## Architecture & Engineering Invariants
 
 | Package / App | Responsibility | Key Boundary Rules (`scripts/check-boundaries.mjs`) |
 | --- | --- | --- |
-| `packages/contracts` | Zod + strict AJV 2020-12 JSON Schemas (`334` schemas) & versioned protocol types | Only imports `zod`; no ambient browser/clock/RNG APIs |
+| `packages/contracts` | Zod + strict AJV 2020-12 JSON Schemas (`392` generated schema files) & versioned protocol types | Only imports `zod`; no ambient browser/clock/RNG APIs |
 | `packages/domain` | Frozen delivery scoring kernel (`scoring-kernel.ts`), resolution validator, innings ledger | Only imports `@lcxxvi/contracts` (+ `@lcxxvi/contracts/m7j`); zero ambient APIs |
 | `packages/data` | Frozen fictional 8-team/160-player/8-ground pack, probability LUTs, rules | Only imports `@lcxxvi/contracts`; zero ambient APIs |
 | `packages/simulation` | Authoritative `T20`/`ODI`/`RED_BALL` engines, splitmix/SHA-256 RNG, lifecycle, economy, rollover | Imports `@lcxxvi/contracts`, `@lcxxvi/data`, `@lcxxvi/domain`, `@noble/hashes`; deterministic only |
@@ -145,19 +152,19 @@ Then open **`http://127.0.0.1:4180/`** (or run `node start.mjs --open`). Because
 
 ---
 
-## Full Future Roadmap (Stages 11 to 17 & Research Track)
+## Roadmap Status (Stages 11 to 17 & Research Track)
 
 See [`docs/ROADMAP_AND_AI_GUIDE.md`](docs/ROADMAP_AND_AI_GUIDE.md) and [`docs/MASTER_BUILD_LEDGER.md`](docs/MASTER_BUILD_LEDGER.md) for the complete stage-by-stage technical specifications, file targets, contract schemas, and dependency graph:
 
-| Stage | Deliverable | Status | Scope & Dependencies |
+| Stage | Deliverable | Status | Notes |
 | --- | --- | --- | --- |
-| **Stage 11** | **Player & manager stories** (`S11-01`) | **Next Eligible** (`deps: 4, 9, 10` satisfied) | Event-driven career milestones, form streaks, selection/contract pressure, and board-review story cards derived deterministically from committed seasons, awards, contracts, and historical stats (`0` fabricated biographies). |
-| **Stage 12** | **Fictional scenario mode** (`S12-01`) | Planned (`deps: 5, 6, 7` satisfied) | Player-facing isolated scenario challenges (chase targets, middle-order collapses, red-ball day-5 survival) with explicit win/draw objectives, deterministic seed locks, and personal-best records stored outside career saves. |
-| **Stage 13** | **Historical scenarios & provenance** (`S13-01`) | Partial / Blocked (`deps: 12 + data review`) | Player-facing sourced historical scenarios layered over `scripts/research/m7k-historical-fixture.ts`, gated on source permissions and rules adjudication review. |
-| **Stage 14** | **Empirical evaluation & rules expansion** (`S14-01`) | Blocked (`RES-001`..`RES-003`) | Empirical calibration promotion (`M7F`–`M7K` offline research -> calibrated model version), Super Overs, DLS/rain-adjusted limited-overs targets, and DRS reviews; blocked externally on approved licensed dataset, adjudications, and untouched holdout cohort. |
-| **Stage 15** | **Custom competitions & community packs** (`S15-01`) | Partial (`deps: 4, 9, 13`) | Custom league structures, tours/bilateral series, auction/draft packs, international release rules, and validated crest/kit/ground asset packs extending existing `8 MiB` roster import & world editing. |
-| **Stage 16** | **Product-quality acceptance** (`S16-01`) | Partial | Real multi-participant observed playtests ([`docs/PLAYTEST_SCRIPT_STAGE05.md`](docs/PLAYTEST_SCRIPT_STAGE05.md)), measured reference-hardware & owner-PC runs (`<= 768 MiB`), long-career storage soak benchmarks, and formal screen-reader walkthrough transcripts. |
-| **Stage 17** | **Release-candidate preparation** (`S17-01`) | Partial | Updated post-expansion release manifest (`RELEASE_RECORD.json`), signed/reproducible `npm run package:game` Windows/Linux/macOS bundle checks, and explicit owner deployment authorisation. |
+| **Stage 11** | **Player & manager stories** (`S11-01`) | **Built** (#64) | Story cards derived from committed career facts; zero fabricated biographies. |
+| **Stage 12** | **Fictional scenario mode** (`S12-01`) | **Built** (#65, #72) | Eight challenges. Not built: a red-ball "survive day five" challenge (no fixed seed reaches that position under the current model). |
+| **Stage 13** | **Historical scenarios & provenance** (`S13-01`) | **Parked** (owner, 17 November 2026) | Needs an owner-approved, licensed historical data source. |
+| **Stage 14** | **Empirical evaluation & rules expansion** (`S14-01`) | Rules **built** (exhibitions); calibration `BLOCKED_EXTERNAL` | Super overs, rain-shortened matches and player reviews are built. Calibration (`RES-001`..`RES-003`) needs an approved dataset, adjudications and an untouched holdout cohort. |
+| **Stage 15** | **Custom competitions & community packs** (`S15-01`) | Fictional parts **built** | Tournaments, user-made competitions, tours, auctions, crests, playable generated-squad matches. Image imports are off (owner answer C1a). |
+| **Stage 16** | **Product-quality acceptance** (`S16-01`) | **Passed by owner direction** (18 November 2026) | None of the four parts were run: see [`docs/verification-stage16/OWNER_DIRECTION_2026-11-18.md`](docs/verification-stage16/OWNER_DIRECTION_2026-11-18.md). |
+| **Stage 17** | **Release-candidate preparation** (`S17-01`) | Record sealed; release prepared | GitHub Release `alpha-2026-11-18`; the owner publishes it (this agent's session cannot create releases). |
 
 ---
 

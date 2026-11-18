@@ -1,6 +1,17 @@
 # Current game and acceptance status
 
-## Current state, 13 November 2026
+## Current state, 18 November 2026
+
+- **Built and merged on `main`:** V0.1; Stages 2 to 10; Stage 11, player and manager stories (#64); Stage 12, scenario challenges (#65, #72); Stage 14's rules for exhibitions: super overs (#67, #68, #73), rain-shortened matches (#76, #78, #79) and player reviews (#80); and Stage 15's fictional parts: tournaments (#69, #74), user-made competitions (#81), crests (#82), tours (#83), auctions (#84), and tour and auction matches playable by the player (#86).
+- **Parked or blocked:** Stage 13, historical scenarios, is parked (no licensed data source). Stage 14's empirical calibration (`RES-001` to `RES-003`) stays `BLOCKED_EXTERNAL`. The model is `synthetic-alpha-01` / `SYNTHETIC_ALPHA`, with no claim of realism.
+- **Stage 16** was passed by the owner's direct instruction on 18 November 2026. None of its four parts were run: no owner-PC measurements, no observed playtest, no screen-reader walkthrough, no long-career soak ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)).
+- **Stage 17:** `LC_RELEASE_RECORD_V2` in [release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json). The GitHub Release `alpha-2026-11-18` is prepared; the owner publishes it, because the agent's session cannot create releases.
+- **Evidence:** hosted CI on every pull request (Linux, and Windows with Chromium and Firefox; the Windows job builds and smoke-tests the EXE) and Linux containers. Nothing has been run on macOS or Safari. Last full local unit run: 884 tests passed on #86's head (`7a2840b`).
+- **Owner actions still open:** publish the release; turn on branch protection for `main` ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)). The paused agents are to be ignored (owner direction, 18 November 2026).
+
+The sections below are kept as written on earlier dates.
+
+## Earlier state, 13 November 2026
 
 **V0.1 is closed (`main` `f7ee054`).** The owner accepted it; every V01 backlog item is `DONE` and RES-001 to RES-003 stay `BLOCKED_EXTERNAL`. The performance, owner-PC and screen-reader gates are **owner declared with no measurement or observation stored in this repository** ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). Five commits that reached `main` without review were reviewed afterwards ([REVIEW_2026-11-13.md](REVIEW_2026-11-13.md)). The model stays `synthetic-alpha-01` / `SYNTHETIC_ALPHA`.
 
