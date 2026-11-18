@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson, TOURNAMENT_RUN_SCHEMA_ID, type Competition, type TournamentFixture, type TournamentResult, type TournamentRun, type TournamentStage, type UserCompetition, type UserTour, UserTourSchema } from "@lcxxvi/contracts";
+import { canonicalJson, TOURNAMENT_RUN_SCHEMA_ID, type Competition, type TournamentFixture, type TournamentResult, type TournamentRun, type TournamentStage, type UserCompetition, type UserTour, UserTourSchema, TOURNAMENT_AUCTION_SCHEMA_ID, type TournamentAuctionRecord, type WorldPack } from "@lcxxvi/contracts";
 import { TOURNAMENT_PACK, competitionById } from "@lcxxvi/data";
 import { viewTournament } from "@lcxxvi/projections";
 import { IndexedDbSaveRepository, sha256Text } from "@lcxxvi/persistence";
@@ -10,7 +10,21 @@ import { isKnockoutStage, tournamentMatchIdentity, tournamentResultFromSession }
 import type { TournamentWorkerRequest, TournamentWorkerResponse } from "./tournament.worker.js";
 import { buildUserCompetition, parseUserCompetitionPack, userCompetitionPackText, type StructureChoice, type UserCompetitionDraft } from "./user-competitions.js";
 import { TeamCrest } from "../world/TeamCrest.js";
-import { tourCompetition, touringTeamId } from "./generated-roster.js";
+import { tourCompetition, touringTeamId, type GeneratedSquad } from "./generated-roster.js";
+import {
+  AUCTION_SQUAD_SIZE,
+  auctionSquads,
+  auctionSquadsSha256,
+  awaitingPlayer,
+  createAuction,
+  decideLot,
+  maxAffordable,
+  playerRating,
+  replayAuction,
+  reservePrice,
+  type AuctionDecision,
+  type AuctionState,
+} from "./auction.js";
 import "../career/career.css";
 
 /**
@@ -35,7 +49,7 @@ function readPlayerTeam(runId: string): string | null {
 
 /** Plays one fixture in the background worker (owner decision 11a). */
 let workerSerial = 0;
-function simulateInWorker(worker: Worker, run: TournamentRun, competition: Competition, tour: UserTour | null): Promise<TournamentResult> {
+function simulateInWorker(worker: Worker, run: TournamentRun, competition: Competition, tour: UserTour | null, squads: GeneratedSquad[] | null): Promise<TournamentResult> {
   const id = ++workerSerial;
   return new Promise((resolve, reject) => {
     const onMessage = (event: MessageEvent<TournamentWorkerResponse>) => {
@@ -45,11 +59,13 @@ function simulateInWorker(worker: Worker, run: TournamentRun, competition: Compe
       else reject(new Error(event.data.error ?? "The match could not be played."));
     };
     worker.addEventListener("message", onMessage);
-    const request: TournamentWorkerRequest = { id, competition, ...(tour ? { tour } : {}), runId: run.runId, runSeed: run.seed, results: run.results };
+    const request: TournamentWorkerRequest = { id, competition, ...(tour ? { tour } : {}), ...(squads ? { squads } : {}), runId: run.runId, runSeed: run.seed, results: run.results };
     worker.postMessage(request);
   });
 }
 const world = JSON.parse(worldText) as { teams: { teamId: string; name: string; colours: string[] }[]; grounds: { groundId: string; name: string }[] };
+const fullWorld = JSON.parse(worldText) as WorldPack;
+const playerNames = new Map(fullWorld.players.map((p) => [p.playerId, p.name]));
 const teamColours = (id: string) => world.teams.find((t) => t.teamId === id)?.colours ?? [];
 type TourDraft = { title: string; format: "T20" | "ODI"; hostTeamId: string; touringName: string; matches: 1 | 3 | 5 | 7; groundIds: string[] };
 const EMPTY_TOUR: TourDraft = { title: "", format: "T20", hostTeamId: world.teams[0]!.teamId, touringName: "Invitation XI", matches: 3, groundIds: [] };
@@ -87,6 +103,17 @@ export function TournamentsApp() {
   const [draft, setDraft] = useState<UserCompetitionDraft>(EMPTY_DRAFT);
   const [notice, setNotice] = useState<string | null>(null);
   const [tours, setTours] = useState<UserTour[]>([]);
+  const [auctions, setAuctions] = useState<Record<string, TournamentAuctionRecord>>({});
+  const [auction, setAuction] = useState<{ competition: Competition; state: AuctionState } | null>(null);
+  /** An auctioned run's squads, found by running its stored auction again; refused if they no longer match. */
+  const squadsFor = (run: TournamentRun, competition: Competition): GeneratedSquad[] | null => {
+    const record = auctions[run.runId];
+    if (!record) return null;
+    const state = replayAuction(fullWorld, competition, record.seed, record.playerTeamId, record.decisions);
+    const squads = auctionSquads(fullWorld, state);
+    if (auctionSquadsSha256(squads) !== record.squadsSha256 || record.competitionId !== competition.competitionId) throw new Error("This tournament's auction failed its check.");
+    return squads;
+  };
   const [tourDraft, setTourDraft] = useState<TourDraft>(EMPTY_TOUR);
   const tourFor = (competitionId: string): UserTour | null => tours.find((t) => t.tourId === competitionId) ?? null;
   /** A curated competition, one the player made, or the series a tour plays. */
@@ -110,6 +137,9 @@ export function TournamentsApp() {
       if (damaged.length) setProblem(`${damaged.length} stored tournament${damaged.length === 1 ? " is" : "s are"} damaged and not shown.`);
       const mine = await repository.current.listUserCompetitions();
       setUserCompetitions(mine.competitions.sort((a, b) => (a.competitionId < b.competitionId ? -1 : 1)));
+      const storedAuctions = await repository.current.listTournamentAuctions();
+      setAuctions(Object.fromEntries(storedAuctions.auctions.map((a) => [a.runId, a])));
+      if (storedAuctions.damaged.length) setProblem(`${storedAuctions.damaged.length} tournament auction${storedAuctions.damaged.length === 1 ? " is" : "s are"} damaged.`);
       const storedTours = await repository.current.listUserTours();
       storedTours.tours.forEach((t) => touringNames.set(touringTeamId(t), t.touringName));
       setTours(storedTours.tours.sort((a, b) => (a.tourId < b.tourId ? -1 : 1)));
@@ -150,6 +180,69 @@ export function TournamentsApp() {
     }
   }
 
+  /** Owner decision B2b: rebuild every squad by auction before one of the player's own tournaments starts. */
+  function startAuction(competition: Competition) {
+    setProblem(null);
+    try {
+      const team = chosenTeam[competition.competitionId] || null;
+      setAuction({ competition, state: createAuction(fullWorld, competition, `auction-${randomToken()}`, team) });
+    } catch (error) {
+      setProblem(error instanceof Error ? error.message : "The auction could not start.");
+    }
+  }
+
+  function decide(decision: AuctionDecision) {
+    if (!auction) return;
+    try {
+      setAuction({ ...auction, state: decideLot(fullWorld, auction.state, decision) });
+    } catch (error) {
+      setProblem(
+        error instanceof Error && error.message === "AUCTION_BID_OVER_BUDGET"
+          ? "That bid is more than you can spend: keep 1 credit for every other place still to fill."
+          : error instanceof Error && error.message === "AUCTION_BID_BELOW_RESERVE"
+            ? "Bid at least the reserve price."
+            : "That bid is not allowed.",
+      );
+    }
+  }
+
+  /** Stores the finished auction and the run that plays with its squads, together. */
+  async function startAuctioned() {
+    if (!auction?.state.complete) return;
+    setBusy(true);
+    setProblem(null);
+    try {
+      const { competition, state } = auction;
+      const run: TournamentRun = {
+        schemaId: TOURNAMENT_RUN_SCHEMA_ID,
+        runId: `run-${randomToken()}`,
+        competitionId: competition.competitionId,
+        competitionSha256: await sha256Text(canonicalJson(competition)),
+        seed: `tour-${randomToken()}`,
+        results: [],
+      };
+      await repository.current.addAuctionedTournamentRun(
+        {
+          schemaId: TOURNAMENT_AUCTION_SCHEMA_ID,
+          runId: run.runId,
+          competitionId: competition.competitionId,
+          seed: state.seed,
+          playerTeamId: state.playerTeamId,
+          decisions: state.decisions,
+          squadsSha256: auctionSquadsSha256(auctionSquads(fullWorld, state)),
+        },
+        run,
+      );
+      setAuction(null);
+      await reload();
+      setActiveRunId(run.runId);
+    } catch (error) {
+      setProblem(error instanceof Error ? error.message : "The tournament could not start.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function store(current: TournamentRun, result: TournamentResult): Promise<TournamentRun> {
     const next = { ...current, results: [...current.results, result] };
     await repository.current.saveTournamentRun(next, current.results.length);
@@ -175,7 +268,7 @@ export function TournamentsApp() {
         if (!next) break;
         const mine = team !== null && (next.homeTeamId === team || next.awayTeamId === team);
         if (mine && !(includePlayer && first)) break;
-        current = await store(current, await simulateInWorker(worker.current, current, competition, tourFor(current.competitionId)));
+        current = await store(current, await simulateInWorker(worker.current, current, competition, tourFor(current.competitionId), squadsFor(current, competition)));
         if (!all || stop.current) break;
       }
     } catch (error) {
@@ -365,14 +458,24 @@ export function TournamentsApp() {
         </a>
       </header>
       {problem && <p role="alert">{problem}</p>}
-      {runs === null ? (
+      {auction ? (
+        <AuctionPanel
+          competition={auction.competition}
+          state={auction.state}
+          busy={busy}
+          onDecide={decide}
+          onStart={() => void startAuctioned()}
+          onCancel={() => setAuction(null)}
+        />
+      ) : runs === null ? (
         <p role="status">Loading tournaments…</p>
       ) : active && activeCompetition ? (
         <TournamentRunView
           run={active}
           competition={activeCompetition}
           busy={busy}
-          playerTeamId={playerTeams[active.runId] ?? null}
+          playerTeamId={auctions[active.runId] ? null : (playerTeams[active.runId] ?? null)}
+          auctioned={!!auctions[active.runId]}
           pendingNote={pendingNote}
           onBack={() => setActiveRunId(null)}
           onPlay={(all) => void play(active, all)}
@@ -436,6 +539,9 @@ export function TournamentsApp() {
                     )}
                     {c.sourceType === "USER_AUTHORED" && !tour && (
                       <>
+                        <button type="button" disabled={busy} onClick={() => startAuction(c)}>
+                          Start {c.title} with an auction
+                        </button>
                         <button type="button" disabled={busy} onClick={() => exportPack([c])}>
                           Save {c.title} to a file
                         </button>
@@ -477,6 +583,7 @@ function TournamentRunView(props: {
   busy: boolean;
   playerTeamId: string | null;
   pendingNote: string | null;
+  auctioned?: boolean;
   onBack: () => void;
   onPlay: (all: boolean) => void;
   onSimulateMine: () => void;
@@ -490,6 +597,7 @@ function TournamentRunView(props: {
   return (
     <section aria-labelledby="tournament-run-heading" data-testid="tournament-run">
       <h2 id="tournament-run-heading">{competition.title}</h2>
+      {props.auctioned && <p>Squads were rebuilt by auction before this tournament. Its matches are simulated.</p>}
       <div className="action-row">
         <button type="button" onClick={props.onBack} disabled={busy}>
           All tournaments
@@ -717,6 +825,122 @@ function TourForm(props: { draft: TourDraft; busy: boolean; onChange: (draft: To
       <button type="button" className="primary" disabled={props.busy} onClick={props.onCreate}>
         Arrange tour
       </button>
+    </section>
+  );
+}
+
+/**
+ * Stage 15 tournament auctions (owner decisions B2b, B3a and B4a). The player bids for one team (the "Your team"
+ * choice; none means the AI bids for every team) by setting a maximum bid or passing on each player who comes up.
+ */
+function AuctionPanel(props: {
+  competition: Competition;
+  state: AuctionState;
+  busy: boolean;
+  onDecide: (decision: AuctionDecision) => void;
+  onStart: () => void;
+  onCancel: () => void;
+}) {
+  const { state, competition } = props;
+  const lotPlayer = !state.complete ? fullWorld.players.find((p) => p.playerId === state.order[state.nextLot]) ?? null : null;
+  const yours = state.playerTeamId ? state.teams.find((t) => t.teamId === state.playerTeamId)! : null;
+  const deciding = !!lotPlayer && awaitingPlayer(fullWorld, state);
+  const reserve = lotPlayer ? reservePrice(lotPlayer, state.format) : 0;
+  const [bid, setBid] = useState<string>("");
+  const roleName = (role: string) => ({ BATTER: "Batter", BOWLER: "Bowler", ALLROUNDER: "All-rounder", KEEPER: "Keeper" })[role] ?? role;
+  const recent = state.lots.slice(-8).reverse();
+  return (
+    <section className="career-panel" aria-label="Auction" data-testid="auction">
+      <h2>Auction for {competition.title}</h2>
+      <p>
+        Every team rebuilds its squad of {AUCTION_SQUAD_SIZE} from the fictional players, best rated first. The highest maximum bid wins, paying one credit more
+        than the next. Every squad must be able to field a keeper and five bowlers.
+      </p>
+      {yours ? (
+        <p data-testid="auction-yours">
+          You bid for {teamName(yours.teamId)}: {yours.budget} credits left, {AUCTION_SQUAD_SIZE - yours.squadIds.length} places to fill.
+        </p>
+      ) : (
+        <p>The AI bids for every team.</p>
+      )}
+      {deciding && lotPlayer && yours && (
+        <div data-testid="auction-lot">
+          <h3>
+            {lotPlayer.name}, {roleName(lotPlayer.role)}, rated {playerRating(lotPlayer, state.format)}. Reserve {reserve}.
+          </h3>
+          <div className="action-row">
+            <label>
+              Your maximum bid{" "}
+              <input type="number" min={reserve} max={maxAffordable(fullWorld, yours)} value={bid} placeholder={String(reserve)} onChange={(e) => setBid(e.currentTarget.value)} />
+            </label>
+            <button type="button" className="primary" disabled={props.busy} onClick={() => { props.onDecide({ kind: "BID", max: Number(bid || reserve) }); setBid(""); }}>
+              Bid
+            </button>
+            <button type="button" disabled={props.busy} onClick={() => props.onDecide({ kind: "PASS" })}>
+              Pass
+            </button>
+            <button type="button" disabled={props.busy} onClick={() => props.onDecide({ kind: "AUTO" })}>
+              Let the AI bid for me
+            </button>
+          </div>
+          <p>You can bid up to {maxAffordable(fullWorld, yours)} on this player.</p>
+        </div>
+      )}
+      <table aria-label="Auction budgets">
+        <thead>
+          <tr>
+            <th scope="col">Team</th>
+            <th scope="col">Credits left</th>
+            <th scope="col">Squad</th>
+          </tr>
+        </thead>
+        <tbody>
+          {state.teams.map((t) => (
+            <tr key={t.teamId}>
+              <th scope="row">
+                <TeamCrest teamId={t.teamId} name={teamName(t.teamId)} colours={teamColours(t.teamId)} size={18} decorative />
+                {teamName(t.teamId)}
+              </th>
+              <td>{t.budget}</td>
+              <td>
+                {t.squadIds.length} of {AUCTION_SQUAD_SIZE}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {recent.length > 0 && (
+        <>
+          <h3>Latest lots</h3>
+          <ul aria-label="Latest lots">
+            {recent.map((l) => (
+              <li key={l.playerId}>
+                {playerNames.get(l.playerId)}: {l.winnerTeamId ? `${teamName(l.winnerTeamId)} for ${l.price}` : "unsold"}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {state.complete && (
+        <>
+          <h3>Squads</h3>
+          {state.teams.map((t) => (
+            <p key={t.teamId} data-testid={`auction-squad-${t.teamId}`}>
+              <strong>{teamName(t.teamId)}:</strong> {t.squadIds.map((id) => playerNames.get(id)).join(", ")}.
+            </p>
+          ))}
+        </>
+      )}
+      <div className="action-row">
+        {state.complete && (
+          <button type="button" className="primary" disabled={props.busy} onClick={props.onStart}>
+            Start {competition.title} with these squads
+          </button>
+        )}
+        <button type="button" disabled={props.busy} onClick={props.onCancel}>
+          Cancel the auction
+        </button>
+      </div>
     </section>
   );
 }

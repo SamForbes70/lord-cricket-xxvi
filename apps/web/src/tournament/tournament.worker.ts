@@ -12,7 +12,8 @@ import { generatedRosterPack, playGeneratedFixture, tourCompetition, tourSquads,
  * between messages.
  */
 /** For a tour (owner decision A1a), `tour` holds its choices and `competition` is ignored: the series is derived from it. */
-export type TournamentWorkerRequest = { id: number; competition: unknown; tour?: unknown; runId: string; runSeed: string; results: TournamentResult[] };
+/** For an auctioned run (owner decision B2b), `squads` are the auction's squads (already checked by the page). */
+export type TournamentWorkerRequest = { id: number; competition: unknown; tour?: unknown; squads?: GeneratedSquad[]; runId: string; runSeed: string; results: TournamentResult[] };
 export type TournamentWorkerResponse = { id: number; result: TournamentResult | null; error: string | null };
 
 const worldBytes = new TextEncoder().encode(worldText);
@@ -55,6 +56,22 @@ self.onmessage = (event: MessageEvent<TournamentWorkerRequest>) => {
     const competition = parsed.data;
     const next = viewTournament(competition, results).next;
     if (!next) throw new Error("The tournament is already finished.");
+    if (request.squads !== undefined) {
+      const key = JSON.stringify(["auction", request.runId, request.squads]);
+      if (cachedTour?.key !== key) cachedTour = { key, squads: request.squads, pack: generatedRosterPack(world, `auction-${request.runId}`, request.squads) };
+      const result = playGeneratedFixture({
+        world,
+        pack: cachedTour.pack,
+        squads: cachedTour.squads,
+        competition,
+        fixture: next,
+        runId: request.runId,
+        runSeed: request.runSeed,
+        teamName: (id) => teamNames[id] ?? id,
+      });
+      (self as unknown as Worker).postMessage({ id: request.id, result, error: null } satisfies TournamentWorkerResponse);
+      return;
+    }
     const result = playTournamentFixture({
       competition,
       fixture: next,

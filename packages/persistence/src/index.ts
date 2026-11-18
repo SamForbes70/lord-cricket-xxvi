@@ -16,6 +16,8 @@ import {
   UserTourRecordSchema,
   USER_TOUR_SCHEMA_ID,
   type UserTour,
+  TournamentAuctionRecordSchema,
+  type TournamentAuctionRecord,
   ExhibitionRulesRecordSchema,
   type ExhibitionRulesRecord,
   type StagedRosterPack,
@@ -64,6 +66,7 @@ export const TOURNAMENT_RUNS_SCOPE = "TOURNAMENT_RUNS_V1";
 const TOURNAMENT_OWNER = "lcxxvi-tournaments";
 export const USER_COMPETITIONS_SCOPE = "USER_COMPETITIONS_V1";
 export const USER_TOURS_SCOPE = "USER_TOURS_V1";
+export const TOURNAMENT_AUCTIONS_SCOPE = "TOURNAMENT_AUCTIONS_V1";
 export const RAIN_MATCHES_SCOPE = "RAIN_MATCHES_V1";
 const RAIN_OWNER = "lcxxvi-rain-matches";
 
@@ -615,6 +618,57 @@ export class IndexedDbSaveRepository {
     const db = await this.open();
     const tx = db.transaction("projections", "readwrite");
     tx.objectStore("projections").delete([TOURNAMENT_OWNER, USER_TOURS_SCOPE, tourId]);
+    await txDone(tx);
+  }
+
+  /** Stage 15 tournament auctions (owner decision B2b), keyed by run id. A damaged row is skipped and reported. */
+  async listTournamentAuctions(): Promise<{ auctions: TournamentAuctionRecord[]; damaged: string[] }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const rows = (await req(
+      tx.objectStore("projections").getAll(IDBKeyRange.bound([TOURNAMENT_OWNER, TOURNAMENT_AUCTIONS_SCOPE, ""], [TOURNAMENT_OWNER, TOURNAMENT_AUCTIONS_SCOPE, "\uffff"])),
+    )) as { key: string; payload: string; sha256: string }[];
+    await txDone(tx);
+    const auctions: TournamentAuctionRecord[] = [];
+    const damaged: string[] = [];
+    for (const row of rows) {
+      try {
+        if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("hash");
+        const record = TournamentAuctionRecordSchema.parse(JSON.parse(row.payload));
+        if (record.runId !== row.key) throw new Error("key");
+        auctions.push(record);
+      } catch {
+        damaged.push(row.key);
+      }
+    }
+    return { auctions, damaged };
+  }
+
+  /**
+   * Stores a finished auction and the run that plays with its squads, together: the run is never stored without its
+   * auction. Neither may replace an existing row.
+   */
+  async addAuctionedTournamentRun(auctionRaw: TournamentAuctionRecord, runRaw: TournamentRun): Promise<void> {
+    const auction = TournamentAuctionRecordSchema.parse(auctionRaw);
+    const run = TournamentRunSchema.parse(runRaw);
+    if (auction.runId !== run.runId || auction.competitionId !== run.competitionId || run.results.length !== 0) throw new Error("TOURNAMENT_AUCTION_RUN_MISMATCH");
+    const auctionPayload = canonicalJson(auction);
+    const runPayload = canonicalJson(run);
+    const [auctionSha, runSha] = [await sha256Text(auctionPayload), await sha256Text(runPayload)];
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    const store = tx.objectStore("projections");
+    const existing = [
+      await req(store.get([TOURNAMENT_OWNER, TOURNAMENT_AUCTIONS_SCOPE, auction.runId])),
+      await req(store.get([TOURNAMENT_OWNER, TOURNAMENT_RUNS_SCOPE, run.runId])),
+    ];
+    if (existing.some(Boolean)) {
+      tx.abort();
+      try { await txDone(tx); } catch { /* expected abort */ }
+      throw new Error("TOURNAMENT_RUN_STALE");
+    }
+    store.put({ saveId: TOURNAMENT_OWNER, scope: TOURNAMENT_AUCTIONS_SCOPE, key: auction.runId, payload: auctionPayload, sha256: auctionSha });
+    store.put({ saveId: TOURNAMENT_OWNER, scope: TOURNAMENT_RUNS_SCOPE, key: run.runId, payload: runPayload, sha256: runSha });
     await txDone(tx);
   }
 

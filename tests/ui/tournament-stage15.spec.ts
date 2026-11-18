@@ -110,7 +110,7 @@ test("Stage 15 a player makes a round robin, plays it to a winner, and saves it 
   const file = await download;
   expect(file.suggestedFilename()).toMatch(/^user-[0-9a-f]+\.json$/);
 
-  await card.getByRole("button", { name: "Start Harbour Three" }).click();
+  await card.getByRole("button", { name: "Start Harbour Three", exact: true }).click();
   const run = page.getByTestId("tournament-run");
   await expect(run).toBeVisible({ timeout: 30_000 });
   await run.getByRole("button", { name: "Play all remaining" }).click();
@@ -162,5 +162,50 @@ test("Stage 15 a tour is arranged, simulated to a series result, and kept after 
   await expect(again.getByRole("button", { name: "Delete Ridge Tour" })).toBeDisabled();
   await again.getByRole("button", { name: /Open run 1 \(finished\)/ }).click();
   await expect(page.getByTestId("tournament-fixtures")).toContainText("Invitation XI");
+  expect(pageErrors).toEqual([]);
+});
+
+// Auctions (owner decisions B1a, B2b, B3a, B4a): squads rebuilt by auction before a player's own tournament starts.
+test("Stage 15 a player's tournament starts after an auction, with the player bidding for one team", async ({ page }) => {
+  test.setTimeout(300_000);
+  const pageErrors: string[] = [];
+  page.on("pageerror", (err) => pageErrors.push(err.message));
+  await page.goto("/#tournaments");
+  const list = page.getByRole("list", { name: "Tournaments" });
+  await expect(list.locator("> li")).toHaveCount(4, { timeout: 30_000 });
+  const form = page.getByRole("region", { name: "Make your own tournament" });
+  await form.getByLabel("Name").fill("Auction Three");
+  for (const team of ["Aster Harbour", "Copper Vale", "Northlight Ridge"]) await form.getByRole("checkbox", { name: team }).check();
+  await form.getByRole("group", { name: "Grounds" }).getByRole("checkbox").first().check();
+  await form.getByRole("button", { name: "Make tournament" }).click();
+  await expect(page.getByRole("status")).toHaveText("Auction Three is ready to start.");
+  const card = list.locator("> li").last();
+  await card.getByLabel("Your team").selectOption({ label: "Copper Vale" });
+  await card.getByRole("button", { name: "Start Auction Three with an auction" }).click();
+
+  const auction = page.getByTestId("auction");
+  await expect(auction).toBeVisible();
+  await expect(page.getByTestId("auction-yours")).toContainText("You bid for Copper Vale: 100 credits left, 13 places to fill.");
+  // An over-budget bid is refused with a plain message.
+  await auction.getByLabel("Your maximum bid").fill("500");
+  await auction.getByRole("button", { name: "Bid", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("more than you can spend");
+  // Bid on the first player, pass on the next, then hand over to the AI.
+  await auction.getByLabel("Your maximum bid").fill("20");
+  await auction.getByRole("button", { name: "Bid", exact: true }).click();
+  await expect(auction.getByRole("list", { name: "Latest lots" })).toContainText("Copper Vale for");
+  await auction.getByRole("button", { name: "Pass" }).click();
+  await auction.getByRole("button", { name: "Let the AI bid for me" }).click();
+  await expect(page.getByTestId("auction-squad-team-02")).toBeVisible();
+  await auction.getByRole("button", { name: "Start Auction Three with these squads" }).click();
+
+  const run = page.getByTestId("tournament-run");
+  await expect(run).toContainText("Squads were rebuilt by auction");
+  await run.getByRole("button", { name: "Play all remaining" }).click();
+  await expect(page.getByTestId("tournament-champion")).toBeVisible({ timeout: 120_000 });
+  // Stored with its auction: after a reload the run reopens and is still marked as auctioned.
+  await page.reload();
+  await page.getByRole("list", { name: "Tournaments" }).locator("> li").last().getByRole("button", { name: /Open run 1 \(finished\)/ }).click();
+  await expect(page.getByTestId("tournament-run")).toContainText("Squads were rebuilt by auction");
   expect(pageErrors).toEqual([]);
 });

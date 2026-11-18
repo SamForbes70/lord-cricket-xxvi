@@ -147,6 +147,29 @@ export const UserTourSchema = z.strictObject({
 /** The stored row for one tour. */
 export const UserTourRecordSchema = z.strictObject({ schemaId: z.literal(USER_TOUR_SCHEMA_ID), tour: UserTourSchema });
 
+/**
+ * Stage 15 tournament auctions (owner decisions B1a, B2b, B3a and B4a, 18 November 2026): before one of the player's
+ * own tournaments starts, squads are rebuilt by an auction of the fictional players. The record keeps only what fixes
+ * the result (the seed and the player's decisions); the squads are found by running the auction again, and must hash to
+ * `squadsSha256`.
+ */
+export const TOURNAMENT_AUCTION_SCHEMA_ID = "LC_TOURNAMENT_AUCTION_V1" as const;
+export const AuctionDecisionSchema = z.discriminatedUnion("kind", [
+  z.strictObject({ kind: z.literal("BID"), max: PositiveCounterSchema.max(1000) }),
+  z.strictObject({ kind: z.literal("PASS") }),
+  z.strictObject({ kind: z.literal("AUTO") }),
+]);
+export const TournamentAuctionRecordSchema = z.strictObject({
+  schemaId: z.literal(TOURNAMENT_AUCTION_SCHEMA_ID),
+  runId: IDSchema,
+  competitionId: IDSchema,
+  seed: z.string().min(1).max(160),
+  /** The team the player bid for, or null when the AI bid for every team. */
+  playerTeamId: IDSchema.nullable(),
+  decisions: z.array(AuctionDecisionSchema).max(400),
+  squadsSha256: HashSchema,
+});
+
 /** Either kind of competition, as the tournament code receives it. */
 export const CompetitionSchema = z.union([CustomCompetitionSchema, UserCompetitionSchema]);
 
@@ -155,6 +178,8 @@ export type UserCompetition = z.infer<typeof UserCompetitionSchema>;
 export type UserCompetitionRecord = z.infer<typeof UserCompetitionRecordSchema>;
 export type UserCompetitionPack = z.infer<typeof UserCompetitionPackSchema>;
 export type UserTour = z.infer<typeof UserTourSchema>;
+export type AuctionDecisionRecord = z.infer<typeof AuctionDecisionSchema>;
+export type TournamentAuctionRecord = z.infer<typeof TournamentAuctionRecordSchema>;
 export type UserTourRecord = z.infer<typeof UserTourRecordSchema>;
 /** A curated or a user-authored competition. */
 export type Competition = z.infer<typeof CompetitionSchema>;
