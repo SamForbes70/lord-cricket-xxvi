@@ -1,7 +1,7 @@
 {
   "schema": "LC_RELEASE_RECORD_V2",
   "releaseTag": "alpha-2026-11-18",
-  "generatedAtUtc": "2026-11-18T08:10:41.039Z",
+  "generatedAtUtc": "2026-11-18T10:38:16.841Z",
   "modelStatus": "SYNTHETIC_ALPHA",
   "empiricallyCalibrated": false,
   "publicDeploymentAuthorised": true,
@@ -11,8 +11,8 @@
     "scope": "A GitHub Release (alpha-2026-11-18) of the public repository, with the game and source zips built from the tagged commit."
   },
   "testedRevision": {
-    "commit": "43954231afde59eef8de14e028c32ead1d1dcc9c",
-    "branch": "feat/stage16-17-release",
+    "commit": "c451bc7fcbb0cb3b82f1e1d151d63b683d179de1",
+    "branch": "feat/release-rebuild-a5aa9f3",
     "workingTreeClean": true
   },
   "manifests": {
@@ -21,7 +21,7 @@
     "defaultWorldSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
     "defaultWorldManifestSha256": "03bb21d0520237a7afed6ec99b9e4bdfc8491987e28c632114377f8ea820811a",
     "v01BacklogSha256": "5cf7807f1b8c3f51c659a7e1e55e6042f58a3164c43a2850ce48275ec901a208",
-    "offlineAssetManifestSha256": "0ffc5af171101dfff068155bb67a8e95402afc89002a59bb1d777653d37750e9",
+    "offlineAssetManifestSha256": "0689d624af5e584204a000609859a559475aa50060674fd78b62ea4c2ff550a2",
     "batch7DiagnosticsSha256": "cd076eb1bd29d5596ab3dbd5d58b5b530574f9ca09a859a246e69b9ca9b7258d"
   },
   "externalAndOwnerGates": {
@@ -155,7 +155,7 @@
     },
     {
       "capabilityId": "CAP-TOURNAMENTS",
-      "advertised": "Fictional tournaments: built-in and user-made competitions, tours against a touring XI, squads rebuilt by auction, and built-in team crests",
+      "advertised": "Fictional tournaments: built-in and user-made competitions, tours against a touring XI, squads rebuilt by auction, and built-in team crests; the player can play their own team's matches, including tour and auction matches",
       "status": "VERIFIED_SYNTHETIC_ALPHA",
       "evidence": [
         "tests/unit/tournament-stage15.test.ts",
@@ -163,6 +163,8 @@
         "tests/unit/tours-stage15.test.ts",
         "tests/unit/auction-stage15.test.ts",
         "tests/unit/team-crests-stage15.test.ts",
+        "tests/unit/playable-generated-stage15.test.ts",
+        "tests/unit/bowler-plan.test.ts",
         "tests/ui/tournament-stage15.spec.ts"
       ]
     }
@@ -172,6 +174,7 @@
     "Stage 16 was passed by the owner's direct instruction on 18 November 2026. None of its four parts (owner-PC measurements including the 768 MiB memory budget, observed playtest, screen-reader walkthrough, 20-season soak) were run, and the repository holds no results from them.",
     "Test evidence comes from hosted CI (Linux, and Windows with Chromium and Firefox) and Linux containers only. Nothing has been run on Safari or macOS.",
     "Rain-shortened matches and player reviews are exhibitions only and never enter career or tournament tables. Weather in careers applies to five-day red-ball matches only.",
+    "Tournament matches between generated squads (tours and auctions) have no super over: a tied knockout goes to the higher-placed side.",
     "The Windows launcher EXE is unsigned (owner decision), so Windows SmartScreen may warn before it runs.",
     "Saves live in the browser profile, tied to http://127.0.0.1:4180. Clearing browser data deletes them: export .lcxxvi backups. An older build cannot read saves written by this one.",
     "testedRevision is the commit the record was generated on, which is the commit before the record itself: a file cannot contain its own commit hash."
