@@ -177,7 +177,12 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
 > - **Curated pack.** Four fictional tournaments (`packages/data/src/tournament-pack.ts`). They are played match by match on the authoritative T20 and one-day engines, with the world's suggested XIs, the fixture autopilot, and a fixed seed per run and fixture.
 > - **Storage.** Runs (`LC_TOURNAMENT_RUN_V1`) are stored one hashed row per run (`lcxxvi-tournaments` / `TOURNAMENT_RUNS_V1` / run id), append-only, outside every career and match save.
 > - **Screen.** The Tournaments screen is at `#tournaments`.
-> - **Not yet built:** user-authored packs, tours with call-up windows, auctions and drafts, asset packs, and playing a tournament match yourself.
+> - **Background worker** (owner answer 11a): simulated matches run in `apps/web/src/tournament/tournament.worker.ts`, so the page stays responsive.
+> - **Playing your own matches** (owner answer 10a): a player may choose a team ("Your team"; a per-browser preference, not part of the stored run).
+>   - Simulation stops before each of that team's fixtures, which can be played on the match screen against the tactical captain.
+>   - The match starts as an exhibition with the fixture's fixed seed and ids (worker request `TOURNAMENT_START`, which resumes the match if it was already started).
+>   - Back on the Tournaments screen, the finished match is rehydrated from its save on the engine. It is checked against the fixture's seed, ids, teams and ground before its result is recorded. A tied knockout match also needs its super overs, which are replayed.
+> - **Not yet built:** user-authored packs, tours with call-up windows, auctions and drafts, and asset packs.
 
 ### Stage 16 — Product-quality acceptance (`Slice S16-01`)
 

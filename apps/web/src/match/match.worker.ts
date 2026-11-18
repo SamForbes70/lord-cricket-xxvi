@@ -43,6 +43,7 @@ import { emptyScenarioLedger, evaluateScenarioResult, recordScenarioFinish, reco
 import type { ScenarioRecordLedger } from "@lcxxvi/contracts";
 import { scenarioResultOf, startScenarioOnController } from "./scenario-runtime.js";
 import { applySuperOverAction, loadSuperOverState, superOverEligible, superOverView, type SuperOverStore } from "./super-over-runtime.js";
+import { fixtureSeed, tournamentMatchIdentity } from "../tournament/runner.js";
 import { verifySuperOverRecord } from "@lcxxvi/simulation";
 import type { SuperOverView } from "./protocol.js";
 
@@ -790,6 +791,62 @@ async function handlePersistence(request: Request): Promise<Response | null> {
   return null;
 }
 
+/** Stage 15: starts or resumes the player's tournament fixture as an auto save with the fixture's fixed seed and ids. */
+async function startTournamentMatch(request: Extract<Request, { type: "TOURNAMENT_START" }>): Promise<Response> {
+  const active = controller.snapshot();
+  if (active) {
+    const { binding } = await pendingBindingFor(String(active.setup.gameId));
+    if (binding) return decorate(controller.currentResponse(request.requestId, "This match is linked to a career fixture. Finish it, or abandon the career match first."));
+  }
+  const identity = tournamentMatchIdentity(request.runId, request.fixture.matchNumber);
+  const saveId = `auto:${identity.gameId}`;
+  if (activeSaveId === saveId && active) return decorate(controller.currentResponse(request.requestId));
+  if ((await repository.list()).some((save) => save.saveId === saveId)) {
+    if (activeSaveId && !readOnly) {
+      try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
+    }
+    try {
+      await restoreSave(saveId);
+    } catch (error) {
+      return decorate(controller.currentResponse(request.requestId, error instanceof Error ? error.message : "The tournament match could not be resumed."));
+    }
+    return decorate(controller.currentResponse(request.requestId));
+  }
+  const seed = fixtureSeed(request.runSeed, request.fixture.fixtureId);
+  const fixed = () => seed;
+  const ids = () => identity;
+  const candidate: MatchController =
+    request.format === "ODI" ? createODIMatchController(worldBytes, manifest, fixed, ids) : createMatchController(worldBytes, manifest, fixed, ids);
+  const catalog = candidate.currentResponse(request.requestId).catalog;
+  const pick = (teamId: string) => catalog?.teams.find((t) => t.id === teamId)?.suggested;
+  const home = pick(request.fixture.homeTeamId);
+  const away = pick(request.fixture.awayTeamId);
+  if (!home || !away) return decorate(controller.currentResponse(request.requestId, "Unknown tournament team."));
+  const startRequest: Extract<Request, { type: "START" }> = {
+    version: UI_VERSION,
+    requestId: request.requestId,
+    expectedRevision: 0,
+    type: "START",
+    format: request.format,
+    selections: [home, away],
+    groundId: request.fixture.groundId,
+  };
+  const started = candidate.handle(startRequest);
+  if (started.error) return decorate(controller.currentResponse(request.requestId, started.error));
+  if (activeSaveId && !readOnly) {
+    try { await repository.releaseLease(activeSaveId, ownerId); } catch { /* best effort */ }
+  }
+  controller = candidate;
+  activeSaveId = null;
+  activeWorldCopy = null;
+  activeRosterPack = null;
+  delegation = emptyDelegation();
+  readOnly = false;
+  recovered = false;
+  recoveredFromGeneration = null;
+  bindNote = null;
+  return commitCandidate(startRequest, started);
+}
 /** Stage 12: plays the challenge to its checkpoint in memory, then commits it once as a new auto save. */
 async function startScenario(request: Extract<Request, { type: "SCENARIO_START" }>): Promise<Response> {
   const challenge = scenarioById(request.scenarioId);
@@ -1032,6 +1089,7 @@ async function handleInner(raw: unknown): Promise<Response> {
     await repository.setActiveSaveId(null);
   }
   if (request.type === "SCENARIO_START") return startScenario(request);
+  if (request.type === "TOURNAMENT_START") return startTournamentMatch(request);
   if (request.type === "SUPER_OVER") {
     const session = controller.snapshot();
     if (!superOverEligible(session, boundFixture() !== null))
