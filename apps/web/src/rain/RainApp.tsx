@@ -5,6 +5,7 @@ import { IndexedDbSaveRepository } from "@lcxxvi/persistence";
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import type { RainOpenMatch } from "./rain-runtime.js";
 import type { RainWorkerRequest, RainWorkerResponse } from "./rain.worker.js";
+import { TeamCrest } from "../world/TeamCrest.js";
 import "../career/career.css";
 
 /**
@@ -12,7 +13,8 @@ import "../career/career.css";
  * Opt-in, exhibitions only, kept apart from careers, tournaments and ordinary match saves. The player's side is the first
  * team chosen.
  */
-const world = JSON.parse(worldText) as { teams: { teamId: string; name: string }[]; grounds: { groundId: string; name: string }[] };
+const world = JSON.parse(worldText) as { teams: { teamId: string; name: string; colours: string[] }[]; grounds: { groundId: string; name: string }[] };
+const teamColours = (id: string) => world.teams.find((t) => t.teamId === id)?.colours ?? [];
 const teamName = (id: string) => world.teams.find((t) => t.teamId === id)?.name ?? id;
 
 function randomToken(): string {
@@ -143,7 +145,10 @@ export function RainApp() {
           {v.tossWinnerName && <p>{v.tossWinnerName} won the toss.</p>}
           {v.innings.map((i, index) => (
             <div key={index} data-testid={`rain-innings-${index}`}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <TeamCrest teamId={i.battingTeamId} name={i.battingName} colours={teamColours(i.battingTeamId)} size={22} decorative />
               <h3>{i.battingName}: {i.score} ({i.overs} of {i.allocationOvers} overs){i.target !== null ? `, target ${i.target}` : ""}</h3>
+              </div>
               {v.phase !== "COMPLETE" && index === v.innings.length - 1 && (
                 <p>
                   {i.batters.map((b) => `${b.name}${b.onStrike ? "*" : ""} ${b.runs} (${b.balls})`).join(", ")}

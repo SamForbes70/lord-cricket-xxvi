@@ -38,6 +38,8 @@ test("Stage 14 a rain-affected T20 is played, simulated to a result and reopened
   await page.getByTestId("rain-controls").getByRole("button", { name: "Next ball" }).click();
   await expect(page.getByTestId("rain-last-ball")).toContainText(" to ", { timeout: 30_000 });
   await expect(page.getByTestId("rain-innings-0")).toContainText("of 20 overs");
+  // Built-in crest (owner decisions C1a and C3a), decorative beside the team's name.
+  await expect(page.getByTestId("rain-innings-0").locator("svg.team-crest[aria-hidden=true]")).toHaveCount(1);
 
   await page.getByRole("button", { name: "Simulate to the end" }).click();
   const result = page.getByTestId("rain-result");

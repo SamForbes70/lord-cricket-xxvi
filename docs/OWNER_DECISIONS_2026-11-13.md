@@ -168,3 +168,18 @@ Owner's words, verbatim: "A1a, A2a, B1a, B2a, B3a, B4a, B5a, C1a", answering a l
 8. **Paused agents (C1a).** Stop them. Copilot, "Agent Zero" and "Lord Cricket Engineer" run outside this repository, so stopping them is an owner action; `AGENTS.md` tells any of them that reads it to stop.
 
 Still open: the Stage 16 measurements (`npm run owner:stage16`, the owner runs them), branch protection (owner action), and the Stage 17 release after Stage 16 passes.
+
+## Owner decisions, 18 November 2026: the rest of Stage 15
+
+Owner's words, verbatim: "A1a, A2a, B1a, B2b, B3a, B4a, C1a, C2a, C3a, D1a", answering a lettered list.
+
+1. **Tours (A1a).** A tournament-only tour: a fictional touring side plays a series against one team. No career link; no save format changes for careers.
+2. **Touring XI (A2a).** Picked automatically from the other seven teams by a fixed rating rule.
+3. **Auctions and drafts: scope (B1a).** Tournaments only: before a user-made tournament starts, squads are rebuilt from the fictional player pool. Careers are untouched.
+4. **Auctions and drafts: kind (B2b).** An auction with fictional budgets (not the recommended snake draft). It needs a bidding AI and budget rules.
+5. **Who bids (B3a).** The AI bids for the other teams, from public player ratings only; the player bids for one team.
+6. **Squad balance (B4a).** Enforced: every auctioned squad must be able to field a keeper and enough bowlers for the engines.
+7. **Asset packs (C1a).** No imports yet: built-in fictional crests and kit colours only.
+8. **Image licences (C2a).** If imports are ever allowed, the player declares they may use the image, and imported packs stay on their device and are never bundled into a release. No imports are built now.
+9. **Where crests show (C3a).** Tournament, rain match and scorecard headers only.
+10. **Order (D1a).** Built-in crests, then the tournament tour, then the tournament auction.

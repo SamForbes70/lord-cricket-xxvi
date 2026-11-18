@@ -29,6 +29,7 @@ test("Stage 15 a one-day series plays match by match to a result that survives a
   await page.getByRole("button", { name: /Open run 1 \(finished\)/ }).click();
   await expect(page.getByTestId("tournament-champion")).toHaveText(text);
   await expect(page.getByRole("table", { name: "Series table" })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Series table" }).locator("svg.team-crest")).toHaveCount(2);
   expect(pageErrors).toEqual([]);
 });
 
