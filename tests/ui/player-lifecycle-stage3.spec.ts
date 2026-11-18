@@ -1,9 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Youth prospect names come from a per-career seed, so one can share a name with an existing squad player.
-// Target the promoted youth player's own link (ids start "py-") rather than assuming names are unique.
-function youthLink(page: Page, name: string) {
-  return page.locator('button.player-link[id^="player-link-SQUAD-py-"]').and(page.getByRole("button", { name: `View ${name}`, exact: true }));
+// Youth prospect names come from a per-career seed, so one can share a name with an existing squad player or with
+// another prospect. Target the promoted player's own link by id: prospect "acad-sNNN-team-N" becomes player
+// "py-sNNN-team-N".
+function youthLink(page: Page, prospectId: string, name: string) {
+  const playerId = prospectId.replace(/^acad-/, "py-");
+  return page.locator(`button.player-link[id="player-link-SQUAD-${playerId}"]`).and(page.getByRole("button", { name: `View ${name}`, exact: true }));
 }
 
 test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/development/retirement, preserves retired alumni pages, and round-trips V2 .lcxxvi", async ({
@@ -31,6 +33,10 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   await expect(prospectRows).toHaveCount(3);
   const firstProspectName = (await prospectRows.nth(0).locator("strong").innerText()).trim();
   const secondProspectName = (await prospectRows.nth(1).locator("strong").innerText()).trim();
+  const firstProspectId = (await prospectRows.nth(0).locator("small").innerText()).trim();
+  const secondProspectId = (await prospectRows.nth(1).locator("small").innerText()).trim();
+  expect(firstProspectId).toMatch(/^acad-/);
+  expect(secondProspectId).toMatch(/^acad-/);
 
   // Update academy focus and promote first prospect directly before Round 1.
   await prospectRows.nth(0).locator("select").selectOption("BATTING_PRACTICE");
@@ -39,7 +45,7 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
   await expect(prospectRows).toHaveCount(2);
   await expect(
-    youthLink(page, firstProspectName),
+    youthLink(page, firstProspectId, firstProspectName),
   ).toBeVisible();
 
   // Queue second prospect for automatic off-season graduation.
@@ -95,7 +101,7 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   // Inspect Squad -> Retired alumni directory and open retired veteran's preserved player page.
   await page.getByRole("button", { name: "Squad", exact: true }).click();
   await expect(
-    youthLink(page, secondProspectName),
+    youthLink(page, secondProspectId, secondProspectName),
   ).toBeVisible();
   const retiredPanel = page.getByTestId("retired-players-panel");
   await expect(retiredPanel).toBeVisible();
