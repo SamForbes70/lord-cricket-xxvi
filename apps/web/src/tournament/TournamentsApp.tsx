@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson, TOURNAMENT_RUN_SCHEMA_ID, type Competition, type TournamentFixture, type TournamentResult, type TournamentRun, type TournamentStage, type UserCompetition, type UserTour, UserTourSchema, TOURNAMENT_AUCTION_SCHEMA_ID, type TournamentAuctionRecord, type WorldPack } from "@lcxxvi/contracts";
+import { canonicalJson, TOURNAMENT_RUN_SCHEMA_ID, type Competition, type TournamentFixture, type TournamentResult, type TournamentRun, type TournamentStage, type UserCompetition, type UserTour, UserTourSchema, TOURNAMENT_AUCTION_SCHEMA_ID, type TournamentAuctionRecord, type WorldPack, type StagedRosterPack } from "@lcxxvi/contracts";
 import { TOURNAMENT_PACK, competitionById } from "@lcxxvi/data";
 import { viewTournament } from "@lcxxvi/projections";
 import { IndexedDbSaveRepository, sha256Text } from "@lcxxvi/persistence";
-import { rehydrateODISession, rehydrateT20Session, verifySuperOverRecord } from "@lcxxvi/simulation";
+import { rehydrateODISession, rehydrateRosterODISession, rehydrateRosterT20Session, rehydrateT20Session, verifySuperOverRecord, type ODISession, type T20Session } from "@lcxxvi/simulation";
 import { isKnockoutStage, tournamentMatchIdentity, tournamentResultFromSession } from "./runner.js";
 import type { TournamentWorkerRequest, TournamentWorkerResponse } from "./tournament.worker.js";
 import { buildUserCompetition, parseUserCompetitionPack, userCompetitionPackText, type StructureChoice, type UserCompetitionDraft } from "./user-competitions.js";
 import { TeamCrest } from "../world/TeamCrest.js";
-import { tourCompetition, touringTeamId, type GeneratedSquad } from "./generated-roster.js";
+import { generatedRunRoster, generatedSelections, tourCompetition, touringTeamId, type GeneratedSquad } from "./generated-roster.js";
 import {
   AUCTION_SQUAD_SIZE,
   auctionSquads,
@@ -35,7 +35,15 @@ const worldBytes = new TextEncoder().encode(worldText);
 
 /** sessionStorage key the match screen reads once to start the player's tournament fixture. */
 export const TOURNAMENT_LAUNCH_KEY = "lcxxvi-tournament-launch";
-export type TournamentLaunch = { format: "T20" | "ODI"; runId: string; runSeed: string; fixture: TournamentFixture; playerTeamId: string };
+/** `roster` is set for a tour or auctioned run: the match is played on its generated roster with these XIs. */
+export type TournamentLaunch = {
+  format: "T20" | "ODI";
+  runId: string;
+  runSeed: string;
+  fixture: TournamentFixture;
+  playerTeamId: string;
+  roster?: { pack: StagedRosterPack; selections: ReturnType<typeof generatedSelections> };
+};
 
 /** The player's team in a run: a per-browser preference, not part of the stored run. */
 const teamKey = (runId: string) => `lcxxvi-tournament-team:${runId}`;
@@ -121,6 +129,14 @@ export function TournamentsApp() {
     const tour = tourFor(competitionId);
     return competitionById(competitionId) ?? userCompetitions.find((c) => c.competitionId === competitionId) ?? (tour ? tourCompetition(tour) : null);
   };
+  /** The generated roster a tour or auctioned run plays with, or null for a run between the world's own clubs. */
+  const generatedRosterFor = (run: TournamentRun): { pack: StagedRosterPack; squads: GeneratedSquad[] } | null => {
+    const tour = tourFor(run.competitionId);
+    if (tour) return generatedRunRoster(fullWorld, { tour });
+    const competition = findCompetition(run.competitionId);
+    const squads = competition ? squadsFor(run, competition) : null;
+    return squads ? generatedRunRoster(fullWorld, { runId: run.runId, squads }) : null;
+  };
   useEffect(() => {
     worker.current = new Worker(new URL("./tournament.worker.ts", import.meta.url), { type: "module" });
     return () => worker.current?.terminate();
@@ -130,15 +146,17 @@ export function TournamentsApp() {
     try {
       const { runs: stored, damaged } = await repository.current.listTournamentRuns();
       setRuns(stored);
-      setPlayerTeams(Object.fromEntries(stored.flatMap((r) => {
-        const team = readPlayerTeam(r.runId);
-        return team ? [[r.runId, team]] : [];
-      })));
       if (damaged.length) setProblem(`${damaged.length} stored tournament${damaged.length === 1 ? " is" : "s are"} damaged and not shown.`);
       const mine = await repository.current.listUserCompetitions();
       setUserCompetitions(mine.competitions.sort((a, b) => (a.competitionId < b.competitionId ? -1 : 1)));
       const storedAuctions = await repository.current.listTournamentAuctions();
       setAuctions(Object.fromEntries(storedAuctions.auctions.map((a) => [a.runId, a])));
+      // The player's team: the per-browser choice, else the team they bid for in the run's auction.
+      const auctionTeams = new Map(storedAuctions.auctions.map((a) => [a.runId, a.playerTeamId]));
+      setPlayerTeams(Object.fromEntries(stored.flatMap((r) => {
+        const team = readPlayerTeam(r.runId) ?? auctionTeams.get(r.runId) ?? null;
+        return team ? [[r.runId, team]] : [];
+      })));
       if (storedAuctions.damaged.length) setProblem(`${storedAuctions.damaged.length} tournament auction${storedAuctions.damaged.length === 1 ? " is" : "s are"} damaged.`);
       const storedTours = await repository.current.listUserTours();
       storedTours.tours.forEach((t) => touringNames.set(touringTeamId(t), t.touringName));
@@ -289,7 +307,15 @@ export function TournamentsApp() {
     const competition = findCompetition(run.competitionId);
     const team = playerTeams[run.runId];
     if (!competition || !team) return;
-    const launch: TournamentLaunch = { format: competition.format, runId: run.runId, runSeed: run.seed, fixture, playerTeamId: team };
+    let roster: TournamentLaunch["roster"];
+    try {
+      const generated = generatedRosterFor(run);
+      if (generated) roster = { pack: generated.pack, selections: generatedSelections(fullWorld, generated.squads, fixture) };
+    } catch (error) {
+      setProblem(error instanceof Error ? error.message : "This tournament's squads could not be rebuilt.");
+      return;
+    }
+    const launch: TournamentLaunch = { format: competition.format, runId: run.runId, runSeed: run.seed, fixture, playerTeamId: team, ...(roster ? { roster } : {}) };
     try {
       sessionStorage.setItem(TOURNAMENT_LAUNCH_KEY, JSON.stringify(launch));
     } catch {
@@ -310,10 +336,23 @@ export function TournamentsApp() {
     const { gameId } = tournamentMatchIdentity(run.runId, fixture.matchNumber);
     const loaded = await repository.current.load(`auto:${gameId}`);
     if (!loaded) return null;
-    const session = competition.format === "T20" ? rehydrateT20Session(loaded.session, worldBytes, worldManifest) : rehydrateODISession(loaded.session, worldBytes, worldManifest);
+    const generated = generatedRosterFor(run);
+    let session: T20Session | ODISession;
+    if (generated) {
+      // A tour or auctioned run: the match must have been played on exactly the roster this run generates.
+      if (!loaded.rosterPack || canonicalJson(loaded.rosterPack) !== canonicalJson(generated.pack)) return "Your saved match was played with different squads, so it cannot be recorded.";
+      session =
+        competition.format === "T20"
+          ? (rehydrateRosterT20Session(loaded.session, loaded.rosterPack) as unknown as T20Session)
+          : (rehydrateRosterODISession(loaded.session, loaded.rosterPack) as unknown as ODISession);
+    } else {
+      if (loaded.rosterPack) return "Your saved match was played with different squads, so it cannot be recorded.";
+      session = competition.format === "T20" ? rehydrateT20Session(loaded.session, worldBytes, worldManifest) : rehydrateODISession(loaded.session, worldBytes, worldManifest);
+    }
     if (session.core.phase !== "COMPLETE") return "Your match is not finished yet.";
     let superOverWinnerTeamId: string | null = null;
-    if (session.core.result?.kind === "TIE" && isKnockoutStage(fixture.stage)) {
+    // No super over between generated squads: a tied knockout goes to the higher-placed side.
+    if (!generated && session.core.result?.kind === "TIE" && isKnockoutStage(fixture.stage)) {
       const record = await repository.current.loadSuperOverRecord(gameId);
       const state = record ? verifySuperOverRecord(session, record) : null;
       if (!state || state.phase !== "COMPLETE") return "Your match is tied. Play the super over on the match screen, then come back.";
@@ -347,7 +386,7 @@ export function TournamentsApp() {
     return () => {
       live = false;
     };
-  }, [activeRunId, runs, playerTeams, busy, userCompetitions]);
+  }, [activeRunId, runs, playerTeams, busy, userCompetitions, tours, auctions]);
 
   async function createUserCompetition() {
     setProblem(null);
@@ -474,7 +513,7 @@ export function TournamentsApp() {
           run={active}
           competition={activeCompetition}
           busy={busy}
-          playerTeamId={auctions[active.runId] ? null : (playerTeams[active.runId] ?? null)}
+          playerTeamId={playerTeams[active.runId] ?? null}
           auctioned={!!auctions[active.runId]}
           pendingNote={pendingNote}
           onBack={() => setActiveRunId(null)}
@@ -507,7 +546,7 @@ export function TournamentsApp() {
                   </p>
                   <p>{c.summary}</p>
                   <div className="action-row">
-                    {!tour && <label>
+                    <label>
                       Your team{" "}
                       <select
                         value={chosenTeam[c.competitionId] ?? ""}
@@ -520,7 +559,7 @@ export function TournamentsApp() {
                           </option>
                         ))}
                       </select>
-                    </label>}
+                    </label>
                     <button type="button" className="primary" disabled={busy} onClick={() => void start(c)}>
                       Start {c.title}
                     </button>
@@ -597,7 +636,7 @@ function TournamentRunView(props: {
   return (
     <section aria-labelledby="tournament-run-heading" data-testid="tournament-run">
       <h2 id="tournament-run-heading">{competition.title}</h2>
-      {props.auctioned && <p>Squads were rebuilt by auction before this tournament. Its matches are simulated.</p>}
+      {props.auctioned && <p>Squads were rebuilt by auction before this tournament. You can play your team's matches or simulate them; a tied knockout match goes to the higher-placed side.</p>}
       <div className="action-row">
         <button type="button" onClick={props.onBack} disabled={busy}>
           All tournaments
@@ -770,7 +809,7 @@ function UserCompetitionForm(props: { draft: UserCompetitionDraft; busy: boolean
 
 /**
  * Stage 15 tours (owner decisions A1a and A2a): a touring side, picked automatically from the other seven clubs by a
- * fixed rating rule, plays a series against one host club. Tournament only; matches are simulated.
+ * fixed rating rule, plays a series against one host club. Tournament only; the player can play either side.
  */
 function TourForm(props: { draft: TourDraft; busy: boolean; onChange: (draft: TourDraft) => void; onCreate: () => void }) {
   const { draft, onChange } = props;
@@ -778,7 +817,7 @@ function TourForm(props: { draft: TourDraft; busy: boolean; onChange: (draft: To
   return (
     <section className="career-panel" aria-label="Arrange a tour">
       <h2>Arrange a tour</h2>
-      <p>A touring side, made of the best players from the other seven clubs, plays a series against your chosen host. Tour matches are simulated.</p>
+      <p>A touring side, made of the best players from the other seven clubs, plays a series against your chosen host. Pick either side as your team to play its matches yourself.</p>
       <div className="action-row">
         <label>
           Tour name <input value={draft.title} maxLength={80} onChange={(e) => onChange({ ...draft, title: e.currentTarget.value })} />

@@ -39,8 +39,9 @@ const bySkill = (score: (p: Player) => number) => (a: Player, b: Player) => scor
 /**
  * The touring XI (owner decision A2a): from every club except the host, by a fixed rating rule.
  * - The keeper with the best keeping plus batting (timing, defence).
- * - The five bowling-capable players with the best control plus movement.
- * - The five other players with the best batting (timing, power, defence, rotation).
+ * - The six bowling-capable players with the best control plus movement (six, like the clubs' suggested XIs, so a
+ *   person choosing bowlers can always finish an innings).
+ * - The four other players with the best batting (timing, power, defence, rotation).
  * Ties go to the lower player id. The captain is the best batter.
  */
 export function touringXI(world: WorldPack, hostTeamId: string, format: "T20" | "ODI"): { squadIds: string[]; captainId: string; keeperId: string } {
@@ -52,10 +53,10 @@ export function touringXI(world: WorldPack, hostTeamId: string, format: "T20" | 
   const batting = (p: Player) => s(p).timing + s(p).power + s(p).defence + s(p).rotation;
   const keeper = pool.filter((p) => p.role === "KEEPER").sort(bySkill((p) => s(p).keeping + s(p).timing + s(p).defence))[0];
   if (!keeper) throw new Error("No keeper is available for the touring side.");
-  const bowlers = pool.filter((p) => isBowlingCapable(p) && p.playerId !== keeper.playerId).sort(bySkill((p) => s(p).control + s(p).movement)).slice(0, 5);
+  const bowlers = pool.filter((p) => isBowlingCapable(p) && p.playerId !== keeper.playerId).sort(bySkill((p) => s(p).control + s(p).movement)).slice(0, 6);
   const chosen = new Set([keeper.playerId, ...bowlers.map((p) => p.playerId)]);
-  const batters = pool.filter((p) => !chosen.has(p.playerId) && p.role !== "KEEPER").sort(bySkill(batting)).slice(0, 5);
-  if (bowlers.length < 5 || batters.length < 5) throw new Error("Not enough players for a touring side.");
+  const batters = pool.filter((p) => !chosen.has(p.playerId) && p.role !== "KEEPER").sort(bySkill(batting)).slice(0, 4);
+  if (bowlers.length < 6 || batters.length < 4) throw new Error("Not enough players for a touring side.");
   return { squadIds: [...batters, keeper, ...bowlers].map((p) => p.playerId), captainId: batters[0]!.playerId, keeperId: keeper.playerId };
 }
 
@@ -127,6 +128,29 @@ export function tourCompetition(tour: UserTour): Competition {
   };
 }
 
+/** The two XIs a fixture between generated squads fields, home first (the same rule whether simulated or played). */
+export function generatedSelections(world: WorldPack, squads: readonly GeneratedSquad[], fixture: Pick<TournamentFixture, "homeTeamId" | "awayTeamId">) {
+  const select = (teamId: string) => {
+    const squad = squads.find((s) => s.teamId === teamId);
+    if (!squad) throw new Error("TOURNAMENT_TEAM_UNKNOWN");
+    return { teamId, ...squadXI(world, squad.squadIds) };
+  };
+  return [select(fixture.homeTeamId), select(fixture.awayTeamId)] as [ReturnType<typeof select>, ReturnType<typeof select>];
+}
+
+/**
+ * The generated roster a tour or auctioned run plays with. The source id is fixed by the tour or run, so the same
+ * choices always give the same pack: a played match is checked against it before its result is recorded.
+ */
+export function generatedRunRoster(world: WorldPack, input: { tour: UserTour } | { runId: string; squads: readonly GeneratedSquad[] }): { pack: StagedRosterPack; squads: GeneratedSquad[] } {
+  if ("tour" in input) {
+    const squads = tourSquads(world, input.tour);
+    return { squads, pack: generatedRosterPack(world, input.tour.tourId, squads) };
+  }
+  const squads = input.squads.map((s) => ({ ...s, colours: [s.colours[0], s.colours[1]] as [string, string], squadIds: [...s.squadIds] }));
+  return { squads, pack: generatedRosterPack(world, `auction-${input.runId}`, squads) };
+}
+
 /** Simulates one fixture between generated squads, both captains on the fixture autopilot. */
 export function playGeneratedFixture(input: {
   world: WorldPack;
@@ -140,17 +164,12 @@ export function playGeneratedFixture(input: {
 }): TournamentResult {
   const { fixture, competition } = input;
   const identity = tournamentMatchIdentity(input.runId, fixture.matchNumber);
-  const select = (teamId: string) => {
-    const squad = input.squads.find((s) => s.teamId === teamId);
-    if (!squad) throw new Error("TOURNAMENT_TEAM_UNKNOWN");
-    return { teamId, ...squadXI(input.world, squad.squadIds) };
-  };
   const request = {
     gameId: identity.gameId,
     matchId: identity.matchId,
     seed: fixtureSeed(input.runSeed, fixture.fixtureId),
     format: competition.format,
-    selection: { groundId: fixture.groundId, teams: [select(fixture.homeTeamId), select(fixture.awayTeamId)] },
+    selection: { groundId: fixture.groundId, teams: generatedSelections(input.world, input.squads, fixture) },
   };
   let session: T20Session | ODISession;
   if (competition.format === "T20") {
@@ -162,6 +181,7 @@ export function playGeneratedFixture(input: {
     while (s.core.phase !== "COMPLETE") s = executeRosterODICommand(s, odiFixtureAutopilotStep(s as unknown as ODISession)).session;
     session = s as unknown as ODISession;
   }
-  // A series has no knockout, so a tie stays a tie (no super over).
+  // No super over between generated squads: a tied league match is a tie, and a tied knockout match goes to the
+  // higher-placed side (knockoutWinner).
   return tournamentResultFromSession({ competition, fixture, runId: input.runId, runSeed: input.runSeed, session, superOverWinnerTeamId: null, teamName: input.teamName });
 }
