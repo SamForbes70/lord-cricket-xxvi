@@ -1,0 +1,530 @@
+{
+ "schemaId": "LC_RAIN_MATCH_RECORD_V1",
+ "rulesId": "LC_T20_RAIN_01",
+ "gameId": "rain-v1-fixture",
+ "matchId": "rain-v1-fixture-m",
+ "seed": "rain-v1-fixture-seed",
+ "groundId": "ground-02",
+ "selectedTeams": [
+  {
+   "teamId": "team-03",
+   "playerIds": [
+    "p041",
+    "p043",
+    "p044",
+    "p045",
+    "p046",
+    "p047",
+    "p048",
+    "p042",
+    "p049",
+    "p050",
+    "p051"
+   ],
+   "captainId": "p041",
+   "keeperId": "p041"
+  },
+  {
+   "teamId": "team-04",
+   "playerIds": [
+    "p061",
+    "p063",
+    "p064",
+    "p065",
+    "p066",
+    "p067",
+    "p068",
+    "p062",
+    "p069",
+    "p070",
+    "p071"
+   ],
+   "captainId": "p061",
+   "keeperId": "p061"
+  }
+ ],
+ "commands": [
+  {
+   "kind": "CALL_TOSS",
+   "teamId": "team-03",
+   "call": "HEADS"
+  },
+  {
+   "kind": "CHOOSE_INNINGS",
+   "teamId": "team-04",
+   "choice": "BOWL"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p041"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p043"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p067"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p065"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p068"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p063"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p044"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p045"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p064"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p046"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p047"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p066"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p070"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p069"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p071"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p067"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p065"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p068"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p048"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p063"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p064"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p066"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p042"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-03",
+   "playerId": "p049"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p070"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p069"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p071"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p067"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-04",
+   "playerId": "p065"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-04",
+   "playerId": "p061"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-04",
+   "playerId": "p063"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p046"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p045"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-04",
+   "playerId": "p064"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p043"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-04",
+   "playerId": "p065"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p047"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p050"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-04",
+   "playerId": "p066"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-04",
+   "playerId": "p067"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p044"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p048"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p049"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p051"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p046"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BATTER",
+   "teamId": "team-04",
+   "playerId": "p068"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p045"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p043"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p047"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p050"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p044"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p048"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p049"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p051"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  },
+  {
+   "kind": "SET_BOWLER",
+   "teamId": "team-03",
+   "playerId": "p046"
+  },
+  {
+   "kind": "BOWL",
+   "scope": "OVER"
+  }
+ ],
+ "stateSha256": "7e9086417a62cd62b3e1bc2bdcb792db4ca0d80a885e3498539a76fca865eb0f"
+}

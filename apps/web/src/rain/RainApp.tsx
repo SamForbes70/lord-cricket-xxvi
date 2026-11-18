@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import type { RainCommand, RainMatchRecord } from "@lcxxvi/contracts";
+import type { ExhibitionRulesRecord } from "@lcxxvi/contracts";
+import type { RainCommand } from "@lcxxvi/simulation";
 import { IndexedDbSaveRepository } from "@lcxxvi/persistence";
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import type { RainOpenMatch } from "./rain-runtime.js";
@@ -7,8 +8,9 @@ import type { RainWorkerRequest, RainWorkerResponse } from "./rain.worker.js";
 import "../career/career.css";
 
 /**
- * Stage 14 rain-affected exhibitions (owner decisions A1a and A2a, 18 November 2026). Opt-in, exhibitions only, kept
- * apart from careers, tournaments and ordinary match saves. The player's side is the first team chosen.
+ * Stage 14 exhibitions with rain, player reviews or both (owner decisions A1a, A2a and B1a to B5a, 18 November 2026).
+ * Opt-in, exhibitions only, kept apart from careers, tournaments and ordinary match saves. The player's side is the first
+ * team chosen.
  */
 const world = JSON.parse(worldText) as { teams: { teamId: string; name: string }[]; grounds: { groundId: string; name: string }[] };
 const teamName = (id: string) => world.teams.find((t) => t.teamId === id)?.name ?? id;
@@ -36,7 +38,7 @@ function ask(worker: Worker, call: WorkerCall): Promise<RainOpenMatch> {
 export function RainApp() {
   const repository = useRef(new IndexedDbSaveRepository());
   const worker = useRef<Worker | null>(null);
-  const [records, setRecords] = useState<RainMatchRecord[] | null>(null);
+  const [records, setRecords] = useState<ExhibitionRulesRecord[] | null>(null);
   const [match, setMatch] = useState<RainOpenMatch | null>(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
@@ -44,6 +46,8 @@ export function RainApp() {
   const [yourTeam, setYourTeam] = useState(world.teams[0]!.teamId);
   const [opponent, setOpponent] = useState(world.teams[1]!.teamId);
   const [ground, setGround] = useState(world.grounds[0]!.groundId);
+  const [rain, setRain] = useState(true);
+  const [reviews, setReviews] = useState(false);
 
   useEffect(() => {
     worker.current = new Worker(new URL("./rain.worker.ts", import.meta.url), { type: "module" });
@@ -97,11 +101,15 @@ export function RainApp() {
       setProblem("Choose two different teams.");
       return;
     }
+    if (!rain && !reviews) {
+      setProblem("Choose rain, player reviews or both.");
+      return;
+    }
     const token = randomToken();
-    await step({ type: "START", format, gameId: `rain-${Date.now().toString(36)}-${token.slice(0, 6)}`, matchId: `rain-m-${token.slice(6)}`, seed: `rain-${token}`, groundId: ground, teamIds: [yourTeam, opponent] }, null);
+    await step({ type: "START", format, gameId: `rain-${Date.now().toString(36)}-${token.slice(0, 6)}`, matchId: `rain-m-${token.slice(6)}`, seed: `rain-${token}`, groundId: ground, teamIds: [yourTeam, opponent], rules: { rain, reviews } }, null);
   }
 
-  async function openRecord(record: RainMatchRecord) {
+  async function openRecord(record: ExhibitionRulesRecord) {
     if (!worker.current) return;
     setBusy(true);
     setProblem(null);
@@ -124,7 +132,7 @@ export function RainApp() {
     const yourTurn = v.pending && v.pending.teamId === playerTeamId;
     return (
       <main className="career-shell" aria-labelledby="rain-title">
-        <h1 id="rain-title">Rain-affected {v.format === "T20" ? "T20" : "one-day"} match</h1>
+        <h1 id="rain-title">{v.format === "T20" ? "T20" : "One-day"} exhibition: {[v.rules.rain ? "rain" : null, v.rules.reviews ? "player reviews" : null].filter(Boolean).join(" and ")}</h1>
         <p>
           <button type="button" onClick={() => { setMatch(null); void reload(); }} disabled={busy}>Back to rain matches</button>
         </p>
@@ -147,10 +155,19 @@ export function RainApp() {
           {v.parNow !== null && <p data-testid="rain-par">Par score now: {v.parNow}.</p>}
           {v.lastBall && <p aria-live="polite" data-testid="rain-last-ball">{v.lastBall}</p>}
         </section>
-        <section aria-label="Rain" data-testid="rain-stoppages">
-          <h2>Weather</h2>
-          {v.stoppages.length ? <ul>{v.stoppages.map((s, index) => <li key={index}>{s}</li>)}</ul> : <p>No rain yet.</p>}
-        </section>
+        {v.rules.rain && (
+          <section aria-label="Rain" data-testid="rain-stoppages">
+            <h2>Weather</h2>
+            {v.stoppages.length ? <ul>{v.stoppages.map((s, index) => <li key={index}>{s}</li>)}</ul> : <p>No rain yet.</p>}
+          </section>
+        )}
+        {v.reviews && (
+          <section aria-label="Player reviews" data-testid="reviews">
+            <h2>Player reviews</h2>
+            <p data-testid="reviews-left">Reviews left this innings: {v.reviews.left.map((r) => `${r.teamName} ${r.left}`).join(", ")}.</p>
+            {v.reviews.log.length ? <ul data-testid="reviews-log">{v.reviews.log.map((line, index) => <li key={index}>{line}</li>)}</ul> : <p>No appeals yet.</p>}
+          </section>
+        )}
         {v.resultText && <p data-testid="rain-result"><strong>{v.resultText}</strong></p>}
         {v.phase !== "COMPLETE" && (
           <section aria-label="Your decision" data-testid="rain-controls" aria-busy={busy}>
@@ -188,6 +205,16 @@ export function RainApp() {
                 </ul>
               </div>
             )}
+            {yourTurn && v.pending!.decision === "REVIEW" && v.reviews?.appeal && (
+              <div data-testid="review-prompt">
+                <p>{v.reviews.appeal.text}</p>
+                <p>{v.reviews.appeal.feeling}</p>
+                <p>
+                  <button type="button" disabled={busy} onClick={() => send({ kind: "REVIEW_DECISION", teamId: playerTeamId!, review: true })}>Review</button>{" "}
+                  <button type="button" disabled={busy} onClick={() => send({ kind: "REVIEW_DECISION", teamId: playerTeamId!, review: false })}>Accept the decision</button>
+                </p>
+              </div>
+            )}
             {v.phase === "READY" && (
               <p>
                 <button type="button" disabled={busy} onClick={() => send({ kind: "BOWL", scope: "BALL" })}>Next ball</button>{" "}
@@ -206,10 +233,11 @@ export function RainApp() {
 
   return (
     <main className="career-shell" aria-labelledby="rain-title">
-      <h1 id="rain-title">Rain-affected matches</h1>
+      <h1 id="rain-title">Rain and player reviews</h1>
       <p className="muted">
-        Opt-in exhibitions where rain can stop play. Overs lost shorten the innings, and the target is revised with this game's fictional resource table. Not part of
-        any career or tournament.
+        Opt-in exhibitions. With rain, the weather can stop play: overs lost shorten the innings, and the target is revised with this game&apos;s fictional resource
+        table. With player reviews, umpires can get close leg-before and caught-behind decisions wrong, and each side has two unsuccessful reviews per innings. Not
+        part of any career or tournament.
       </p>
       {problem && <p role="alert">{problem}</p>}
       <section aria-label="New rain match">
@@ -220,7 +248,11 @@ export function RainApp() {
           <label>Opponent <select value={opponent} onChange={(e) => setOpponent(e.target.value)}>{world.teams.map((t) => <option key={t.teamId} value={t.teamId}>{t.name}</option>)}</select></label>{" "}
           <label>Ground <select value={ground} onChange={(e) => setGround(e.target.value)}>{world.grounds.map((g) => <option key={g.groundId} value={g.groundId}>{g.name}</option>)}</select></label>
         </p>
-        <p><button type="button" disabled={busy || records === null} onClick={() => void start()}>Start rain-affected match</button></p>
+        <p>
+          <label><input type="checkbox" checked={rain} onChange={(e) => setRain(e.target.checked)} /> Rain</label>{" "}
+          <label><input type="checkbox" checked={reviews} onChange={(e) => setReviews(e.target.checked)} /> Player reviews (DRS)</label>
+        </p>
+        <p><button type="button" disabled={busy || records === null} onClick={() => void start()}>Start match</button></p>
       </section>
       <section aria-label="Saved rain matches">
         <h2>Saved matches</h2>
@@ -228,7 +260,8 @@ export function RainApp() {
           <ul aria-label="Rain matches">
             {records.map((r) => (
               <li key={r.gameId} data-testid={`rain-record-${r.gameId}`}>
-                {r.rulesId === "LC_T20_RAIN_01" ? "T20" : "One-day"}: {r.selectedTeams.map((t) => teamName(t.teamId)).join(" v ")} ({r.commands.length} actions){" "}
+                {r.rulesId === "LC_T20_RAIN_01" ? "T20" : "One-day"}
+                {r.schemaId === "LC_RAIN_MATCH_RECORD_V1" ? " with rain" : ` with ${[r.rain ? "rain" : null, r.reviewRulesId ? "player reviews" : null].filter(Boolean).join(" and ")}`}: {r.selectedTeams.map((t) => teamName(t.teamId)).join(" v ")} ({r.commands.length} actions){" "}
                 <button type="button" disabled={busy} onClick={() => void openRecord(r)}>Open</button>{" "}
                 <button type="button" disabled={busy} onClick={() => void remove(r.gameId)}>Delete</button>
               </li>

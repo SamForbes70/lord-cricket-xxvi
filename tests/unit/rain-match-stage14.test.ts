@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { RainMatchRecordSchema, RAIN_MATCH_RECORD_SCHEMA_ID, type RainCommand } from "@lcxxvi/contracts";
+import { RainMatchRecordSchema, RAIN_MATCH_RECORD_SCHEMA_ID } from "@lcxxvi/contracts";
 import {
   buildRainSetup,
   createRainMatch,
@@ -19,6 +19,7 @@ import {
   revisedTarget,
   runAutopilotRainMatch,
   verifyRainMatchRecord,
+  type RainCommand,
   type RainMatchState,
   type RainSetup,
 } from "@lcxxvi/simulation";

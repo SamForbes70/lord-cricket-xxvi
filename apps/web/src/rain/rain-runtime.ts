@@ -1,4 +1,4 @@
-import { RainCommandSchema, RainMatchRecordSchema, type RainCommand, type RainMatchRecord } from "@lcxxvi/contracts";
+import { ExtraRulesCommandSchema, ExhibitionRulesRecordSchema, type ExhibitionRulesRecord } from "@lcxxvi/contracts";
 import {
   buildRainSetup,
   createRainMatch,
@@ -12,6 +12,9 @@ import {
   rainPendingDecision,
   rainStateSha256,
   verifyRainMatchRecord,
+  type ExhibitionRuleOptions,
+  type RainCommand,
+  type ReviewLogEntry,
   type RainMatchState,
   type RainSetup,
   type RainSetupChoices,
@@ -46,13 +49,21 @@ export type RainView = {
   target: number | null;
   /** During a chase interrupted by rain: the par score at this moment. */
   parNow: number | null;
-  pending: { teamId: string; teamName: string; decision: "TOSS" | "INNINGS" | "BATTER" | "BOWLER" } | null;
+  pending: { teamId: string; teamName: string; decision: "TOSS" | "INNINGS" | "BATTER" | "BOWLER" | "REVIEW" } | null;
+  rules: ExhibitionRuleOptions;
+  /** Present when player reviews are on. */
+  reviews: {
+    left: { teamName: string; left: number }[];
+    /** The on-field decision awaiting a review decision; never the hidden reading. */
+    appeal: { text: string; feeling: string } | null;
+    log: string[];
+  } | null;
   options: RainPlayerOption[];
   lastBall: string | null;
   resultText: string | null;
 };
 
-export type RainOpenMatch = { record: RainMatchRecord; view: RainView };
+export type RainOpenMatch = { record: ExhibitionRulesRecord; view: RainView };
 
 const oversText = (balls: number) => `${Math.floor(balls / 6)}${balls % 6 ? `.${balls % 6}` : ""}`;
 
@@ -64,7 +75,7 @@ export function createRainRuntime(worldBytes: Uint8Array, manifest: unknown) {
   const teamName = (id: string) => catalog.teams.find((t) => t.id === id)?.name ?? id;
   const playerName = (setup: RainSetup, id: string) => setup.teams.flatMap((t) => t.xi).find((p) => p.playerId === id)?.name ?? id;
 
-  function choicesFromRecord(record: RainMatchRecord): RainSetupChoices {
+  function choicesFromRecord(record: ExhibitionRulesRecord): RainSetupChoices {
     return { format: record.rulesId === "LC_T20_RAIN_01" ? "T20" : "ODI", ...record };
   }
 
@@ -92,7 +103,30 @@ export function createRainRuntime(worldBytes: Uint8Array, manifest: unknown) {
     return `${teamName(r.winnerTeamId!)} won by ${r.margin} ${r.marginType === "RUNS" ? (r.margin === 1 ? "run" : "runs") : r.margin === 1 ? "wicket" : "wickets"}${suffix}.`;
   }
 
-  function view(setup: RainSetup, state: RainMatchState, record: RainMatchRecord): RainView {
+  const kindText = (kind: ReviewLogEntry["kind"]) => (kind === "LBW" ? "leg before" : "caught behind");
+  const trackingText = (t: ReviewLogEntry["tracking"]) =>
+    t
+      ? ` Ball tracking: pitching ${t.pitching === "IN" ? "in line" : t.pitching === "OUT" ? "outside leg" : "umpire's call"}, impact ${t.impact === "IN" ? "in line" : t.impact === "OUT" ? "outside the line" : "umpire's call"}, wickets ${t.wickets === "IN" ? "hitting" : t.wickets === "OUT" ? "missing" : "umpire's call"}.`
+      : "";
+  function reviewLine(setup: RainSetup, e: ReviewLogEntry): string {
+    const who = `${playerName(setup, e.strikerId)} (${kindText(e.kind)}, off ${playerName(setup, e.bowlerId)})`;
+    const onField = e.onFieldOut ? "given out" : "given not out";
+    const by = teamName(e.reviewTeamId);
+    switch (e.outcome) {
+      case "NOT_REVIEWED":
+        return `${who}: ${onField}; ${by} did not review.`;
+      case "NO_REVIEWS_LEFT":
+        return `${who}: ${onField}; ${by} had no reviews left.`;
+      case "OVERTURNED":
+        return `${who}: ${onField}; ${by} reviewed and the decision was overturned.${trackingText(e.tracking)}`;
+      case "STRUCK_DOWN":
+        return `${who}: ${onField}; ${by} reviewed and lost the review.${trackingText(e.tracking)}`;
+      case "UMPIRES_CALL":
+        return `${who}: ${onField}; ${by} reviewed: umpire's call, so the decision stands and the review is kept.${trackingText(e.tracking)}`;
+    }
+  }
+
+  function view(setup: RainSetup, state: RainMatchState, record: ExhibitionRulesRecord): RainView {
     const innings: RainInningsView[] = state.innings.map((ledger, index) => {
       const i = ledger.innings;
       const onStrike = i.strikerEnd === "NORTH" ? i.northBatterId : i.southBatterId;
@@ -145,7 +179,26 @@ export function createRainRuntime(worldBytes: Uint8Array, manifest: unknown) {
         detail: `${oversText(l.bowling[id]!.legalBalls)} overs, ${l.bowling[id]!.runsConceded} runs, ${l.bowling[id]!.wickets} wickets`,
       }));
     }
+    let reviews: RainView["reviews"] = null;
+    if (state.reviews) {
+      const p = state.reviews.pending;
+      const reviewing = p ? state.innings[state.activeInningsIndex]!.innings.battingTeamId === p.reviewTeamId : false;
+      reviews = {
+        left: setup.teams.map((t) => ({ teamName: teamName(t.teamId), left: state.reviews!.reviewsLeft[t.teamId] ?? 0 })),
+        appeal: p
+          ? {
+              text: `Appeal for ${kindText(p.kind)} against ${playerName(setup, p.strikerId)}, off ${playerName(setup, p.bowlerId)}: ${p.onFieldOut ? "given OUT" : "given NOT OUT"}.`,
+              feeling: reviewing
+                ? p.cue === "CONFIDENT" ? `${playerName(setup, p.strikerId)} is sure it was not out.` : `${playerName(setup, p.strikerId)} is not sure.`
+                : p.cue === "CONFIDENT" ? "The bowler and keeper are convinced it was out." : "The bowler and keeper are not sure.",
+            }
+          : null,
+        log: state.reviews.log.map((e) => reviewLine(setup, e)),
+      };
+    }
     return {
+      rules: { rain: state.weatherOff !== true, reviews: state.reviews !== undefined },
+      reviews,
       gameId: record.gameId,
       format: setup.format,
       phase: state.phase,
@@ -170,7 +223,7 @@ export function createRainRuntime(worldBytes: Uint8Array, manifest: unknown) {
 
   /** Makes `record` the open match, replaying it on the engine unless it is already open at that exact state. */
   function ensure(raw: unknown): void {
-    const record = RainMatchRecordSchema.parse(raw);
+    const record = ExhibitionRulesRecordSchema.parse(raw);
     if (open && open.setup.gameId === record.gameId && open.commands.length === record.commands.length && rainStateSha256(open.state) === record.stateSha256) return;
     const setup = buildRainSetup(choicesFromRecord(record), worldBytes, manifest);
     const state = verifyRainMatchRecord(setup, record);
@@ -179,14 +232,22 @@ export function createRainRuntime(worldBytes: Uint8Array, manifest: unknown) {
 
   function apply(command: RainCommand): void {
     const o = open!;
-    o.state = executeRainCommand(o.setup, o.state, RainCommandSchema.parse(command));
+    o.state = executeRainCommand(o.setup, o.state, ExtraRulesCommandSchema.parse(command));
     o.commands.push(command);
   }
 
   return {
     teams: catalog.teams.map((t) => ({ id: t.id, name: t.name })),
     grounds: catalog.grounds.map((g) => ({ id: g.id, name: g.name })),
-    start(input: { format: "T20" | "ODI"; gameId: string; matchId: string; seed: string; groundId: string; teamIds: [string, string] }): RainOpenMatch {
+    start(input: {
+      format: "T20" | "ODI";
+      gameId: string;
+      matchId: string;
+      seed: string;
+      groundId: string;
+      teamIds: [string, string];
+      rules?: ExhibitionRuleOptions;
+    }): RainOpenMatch {
       const pick = (id: string) => {
         const team = catalog.teams.find((t) => t.id === id);
         if (!team) throw new Error("Unknown team.");
@@ -194,7 +255,9 @@ export function createRainRuntime(worldBytes: Uint8Array, manifest: unknown) {
       };
       if (input.teamIds[0] === input.teamIds[1]) throw new Error("Choose two different teams.");
       const setup = buildRainSetup({ ...input, selectedTeams: [pick(input.teamIds[0]), pick(input.teamIds[1])] }, worldBytes, manifest);
-      open = { setup, state: createRainMatch(setup), commands: [] };
+      const rules = input.rules ?? { rain: true, reviews: false };
+      if (!rules.rain && !rules.reviews) throw new Error("Choose rain, player reviews or both.");
+      open = { setup, state: createRainMatch(setup, rules), commands: [] };
       return current();
     },
     open(record: unknown): RainOpenMatch {
