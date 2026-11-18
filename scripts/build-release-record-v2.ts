@@ -100,7 +100,7 @@ export function generateReleaseRecordV2(rootDir = process.cwd()): ReleaseRecordV
     {
       capabilityId: 'CAP-TOURNAMENTS',
       advertised:
-        'Fictional tournaments: built-in and user-made competitions, tours against a touring XI, squads rebuilt by auction, and built-in team crests',
+        'Fictional tournaments: built-in and user-made competitions, tours against a touring XI, squads rebuilt by auction, and built-in team crests; the player can play their own team\'s matches, including tour and auction matches',
       status: 'VERIFIED_SYNTHETIC_ALPHA',
       evidence: [
         'tests/unit/tournament-stage15.test.ts',
@@ -108,6 +108,8 @@ export function generateReleaseRecordV2(rootDir = process.cwd()): ReleaseRecordV
         'tests/unit/tours-stage15.test.ts',
         'tests/unit/auction-stage15.test.ts',
         'tests/unit/team-crests-stage15.test.ts',
+        'tests/unit/playable-generated-stage15.test.ts',
+        'tests/unit/bowler-plan.test.ts',
         'tests/ui/tournament-stage15.spec.ts',
       ],
     },
@@ -118,6 +120,7 @@ export function generateReleaseRecordV2(rootDir = process.cwd()): ReleaseRecordV
     'Stage 16 was passed by the owner\'s direct instruction on 18 November 2026. None of its four parts (owner-PC measurements including the 768 MiB memory budget, observed playtest, screen-reader walkthrough, 20-season soak) were run, and the repository holds no results from them.',
     'Test evidence comes from hosted CI (Linux, and Windows with Chromium and Firefox) and Linux containers only. Nothing has been run on Safari or macOS.',
     'Rain-shortened matches and player reviews are exhibitions only and never enter career or tournament tables. Weather in careers applies to five-day red-ball matches only.',
+    'Tournament matches between generated squads (tours and auctions) have no super over: a tied knockout goes to the higher-placed side.',
     'The Windows launcher EXE is unsigned (owner decision), so Windows SmartScreen may warn before it runs.',
     'Saves live in the browser profile, tied to http://127.0.0.1:4180. Clearing browser data deletes them: export .lcxxvi backups. An older build cannot read saves written by this one.',
     'testedRevision is the commit the record was generated on, which is the commit before the record itself: a file cannot contain its own commit hash.',

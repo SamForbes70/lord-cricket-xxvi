@@ -8,7 +8,8 @@ An offline cricket management game in the browser. Everything in it is fictional
 - **Matches.** T20, one-day and five-day matches with a live 2D field, highlights, text commentary and optional sound and narration.
 - **Exhibition rules (opt-in).** Super overs to settle ties, rain-shortened T20 and one-day matches with revised targets from a fictional resource table, and player reviews (DRS).
 - **Scenario challenges.** Fictional match situations to win from.
-- **Tournaments.** Built-in fictional competitions, competitions you make yourself, tours against a touring XI picked from the other clubs, and tournaments whose squads are rebuilt by an auction with fictional budgets. Teams carry built-in crests.
+- **Tournaments.** Built-in fictional competitions, competitions you make yourself, tours against a touring XI picked from the other clubs, and tournaments whose squads are rebuilt by an auction with fictional budgets. Play your own team's matches on the match screen, including tour and auction matches, or simulate them. Teams carry built-in crests.
+- **Bowling plans.** On the T20 and one-day match screens, a bowler choice that would leave overs no one could bowl is refused, with the reason shown.
 
 ## How to play
 
@@ -24,6 +25,7 @@ The game opens at http://127.0.0.1:4180/. Saves live in that browser profile: us
 - Stage 16 (product-quality acceptance) was passed by the owner's direct instruction. The owner-PC measurements, observed playtest, screen-reader walkthrough and 20-season soak were not run.
 - Tested by hosted CI on Linux and on Windows (Chromium and Firefox) only. Nothing has been run on Safari or macOS.
 - Rain-shortened matches and player reviews are exhibition-only.
+- Tour and auction squads have no super over: a tied knockout match between them goes to the higher-placed side.
 - An older build cannot read saves made by this one.
 
 The full record, with SHA-256 manifests, the tested revision and every gate, is `docs/release-2026-11-18/RELEASE_RECORD.json`.
