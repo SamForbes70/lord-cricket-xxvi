@@ -128,6 +128,25 @@ export const UserCompetitionPackSchema = z.strictObject({
   schemaId: z.literal(USER_COMPETITION_PACK_SCHEMA_ID),
   competitions: z.array(UserCompetitionSchema).min(1).max(32),
 });
+/**
+ * Stage 15 tours (owner decisions A1a and A2a, 18 November 2026): a fictional touring side plays a series against one
+ * host team. Tournament only, never in a career. The touring XI is picked automatically from the other seven teams by a
+ * fixed rating rule, so a tour stores only its choices. Its id starts with `user-tour-`, so the series it plays is an
+ * ordinary user-authored competition.
+ */
+export const USER_TOUR_SCHEMA_ID = "LC_USER_TOUR_V1" as const;
+export const UserTourSchema = z.strictObject({
+  tourId: IDSchema.refine((id) => id.startsWith("user-tour-"), "USER_TOUR_ID_PREFIX"),
+  title: z.string().min(1).max(80),
+  format: z.enum(["T20", "ODI"]),
+  hostTeamId: IDSchema,
+  touringName: z.string().min(1).max(40),
+  matches: z.union([z.literal(1), z.literal(3), z.literal(5), z.literal(7)]),
+  groundIds: z.array(IDSchema).min(1).max(8),
+});
+/** The stored row for one tour. */
+export const UserTourRecordSchema = z.strictObject({ schemaId: z.literal(USER_TOUR_SCHEMA_ID), tour: UserTourSchema });
+
 /** Either kind of competition, as the tournament code receives it. */
 export const CompetitionSchema = z.union([CustomCompetitionSchema, UserCompetitionSchema]);
 
@@ -135,6 +154,8 @@ export type CustomCompetitionStructure = z.infer<typeof CustomCompetitionStructu
 export type UserCompetition = z.infer<typeof UserCompetitionSchema>;
 export type UserCompetitionRecord = z.infer<typeof UserCompetitionRecordSchema>;
 export type UserCompetitionPack = z.infer<typeof UserCompetitionPackSchema>;
+export type UserTour = z.infer<typeof UserTourSchema>;
+export type UserTourRecord = z.infer<typeof UserTourRecordSchema>;
 /** A curated or a user-authored competition. */
 export type Competition = z.infer<typeof CompetitionSchema>;
 export type CustomCompetition = z.infer<typeof CustomCompetitionSchema>;

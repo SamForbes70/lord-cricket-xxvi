@@ -13,6 +13,9 @@ import {
   UserCompetitionRecordSchema,
   USER_COMPETITION_SCHEMA_ID,
   type UserCompetition,
+  UserTourRecordSchema,
+  USER_TOUR_SCHEMA_ID,
+  type UserTour,
   ExhibitionRulesRecordSchema,
   type ExhibitionRulesRecord,
   type StagedRosterPack,
@@ -60,6 +63,7 @@ const SUPER_OVER_OWNER = "lcxxvi-super-overs";
 export const TOURNAMENT_RUNS_SCOPE = "TOURNAMENT_RUNS_V1";
 const TOURNAMENT_OWNER = "lcxxvi-tournaments";
 export const USER_COMPETITIONS_SCOPE = "USER_COMPETITIONS_V1";
+export const USER_TOURS_SCOPE = "USER_TOURS_V1";
 export const RAIN_MATCHES_SCOPE = "RAIN_MATCHES_V1";
 const RAIN_OWNER = "lcxxvi-rain-matches";
 
@@ -559,6 +563,58 @@ export class IndexedDbSaveRepository {
     const db = await this.open();
     const tx = db.transaction("projections", "readwrite");
     tx.objectStore("projections").delete([TOURNAMENT_OWNER, USER_COMPETITIONS_SCOPE, competitionId]);
+    await txDone(tx);
+  }
+
+  /** Stage 15 tours (owner decision A1a). A damaged row is skipped and reported by id. */
+  async listUserTours(): Promise<{ tours: UserTour[]; damaged: string[] }> {
+    const db = await this.open();
+    const tx = db.transaction("projections", "readonly");
+    const rows = (await req(
+      tx.objectStore("projections").getAll(IDBKeyRange.bound([TOURNAMENT_OWNER, USER_TOURS_SCOPE, ""], [TOURNAMENT_OWNER, USER_TOURS_SCOPE, "\uffff"])),
+    )) as { key: string; payload: string; sha256: string }[];
+    await txDone(tx);
+    const tours: UserTour[] = [];
+    const damaged: string[] = [];
+    for (const row of rows) {
+      try {
+        if ((await sha256Text(row.payload)) !== row.sha256) throw new Error("hash");
+        const record = UserTourRecordSchema.parse(JSON.parse(row.payload));
+        if (record.tour.tourId !== row.key) throw new Error("key");
+        tours.push(record.tour);
+      } catch {
+        damaged.push(row.key);
+      }
+    }
+    return { tours, damaged };
+  }
+
+  /** Adds a tour. It never replaces one: a tour that runs refer to must not change. */
+  async addUserTour(tourRaw: UserTour): Promise<UserTour> {
+    const record = UserTourRecordSchema.parse({ schemaId: USER_TOUR_SCHEMA_ID, tour: tourRaw });
+    const payload = canonicalJson(record);
+    const sha256 = await sha256Text(payload);
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    const store = tx.objectStore("projections");
+    const key = record.tour.tourId;
+    if (await req(store.get([TOURNAMENT_OWNER, USER_TOURS_SCOPE, key]))) {
+      tx.abort();
+      try { await txDone(tx); } catch { /* expected abort */ }
+      throw new Error("USER_TOUR_EXISTS");
+    }
+    store.put({ saveId: TOURNAMENT_OWNER, scope: USER_TOURS_SCOPE, key, payload, sha256 });
+    await txDone(tx);
+    return record.tour;
+  }
+
+  /** Removes a tour, refusing while any stored tournament run plays it. */
+  async deleteUserTour(tourId: string): Promise<void> {
+    const { runs } = await this.listTournamentRuns();
+    if (runs.some((r) => r.competitionId === tourId)) throw new Error("USER_TOUR_IN_USE");
+    const db = await this.open();
+    const tx = db.transaction("projections", "readwrite");
+    tx.objectStore("projections").delete([TOURNAMENT_OWNER, USER_TOURS_SCOPE, tourId]);
     await txDone(tx);
   }
 

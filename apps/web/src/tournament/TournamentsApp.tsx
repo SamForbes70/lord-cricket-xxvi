@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson, TOURNAMENT_RUN_SCHEMA_ID, type Competition, type TournamentFixture, type TournamentResult, type TournamentRun, type TournamentStage, type UserCompetition } from "@lcxxvi/contracts";
+import { canonicalJson, TOURNAMENT_RUN_SCHEMA_ID, type Competition, type TournamentFixture, type TournamentResult, type TournamentRun, type TournamentStage, type UserCompetition, type UserTour, UserTourSchema } from "@lcxxvi/contracts";
 import { TOURNAMENT_PACK, competitionById } from "@lcxxvi/data";
 import { viewTournament } from "@lcxxvi/projections";
 import { IndexedDbSaveRepository, sha256Text } from "@lcxxvi/persistence";
@@ -10,6 +10,7 @@ import { isKnockoutStage, tournamentMatchIdentity, tournamentResultFromSession }
 import type { TournamentWorkerRequest, TournamentWorkerResponse } from "./tournament.worker.js";
 import { buildUserCompetition, parseUserCompetitionPack, userCompetitionPackText, type StructureChoice, type UserCompetitionDraft } from "./user-competitions.js";
 import { TeamCrest } from "../world/TeamCrest.js";
+import { tourCompetition, touringTeamId } from "./generated-roster.js";
 import "../career/career.css";
 
 /**
@@ -34,7 +35,7 @@ function readPlayerTeam(runId: string): string | null {
 
 /** Plays one fixture in the background worker (owner decision 11a). */
 let workerSerial = 0;
-function simulateInWorker(worker: Worker, run: TournamentRun, competition: Competition): Promise<TournamentResult> {
+function simulateInWorker(worker: Worker, run: TournamentRun, competition: Competition, tour: UserTour | null): Promise<TournamentResult> {
   const id = ++workerSerial;
   return new Promise((resolve, reject) => {
     const onMessage = (event: MessageEvent<TournamentWorkerResponse>) => {
@@ -44,16 +45,20 @@ function simulateInWorker(worker: Worker, run: TournamentRun, competition: Compe
       else reject(new Error(event.data.error ?? "The match could not be played."));
     };
     worker.addEventListener("message", onMessage);
-    const request: TournamentWorkerRequest = { id, competition, runId: run.runId, runSeed: run.seed, results: run.results };
+    const request: TournamentWorkerRequest = { id, competition, ...(tour ? { tour } : {}), runId: run.runId, runSeed: run.seed, results: run.results };
     worker.postMessage(request);
   });
 }
 const world = JSON.parse(worldText) as { teams: { teamId: string; name: string; colours: string[] }[]; grounds: { groundId: string; name: string }[] };
 const teamColours = (id: string) => world.teams.find((t) => t.teamId === id)?.colours ?? [];
+type TourDraft = { title: string; format: "T20" | "ODI"; hostTeamId: string; touringName: string; matches: 1 | 3 | 5 | 7; groundIds: string[] };
+const EMPTY_TOUR: TourDraft = { title: "", format: "T20", hostTeamId: world.teams[0]!.teamId, touringName: "Invitation XI", matches: 3, groundIds: [] };
 const EMPTY_DRAFT: UserCompetitionDraft = { title: "", format: "T20", structure: "ROUND_ROBIN", seriesMatches: 3, teamIds: [], groundIds: [] };
 const teamNames = Object.fromEntries(world.teams.map((t) => [t.teamId, t.name]));
 const groundNames = Object.fromEntries(world.grounds.map((g) => [g.groundId, g.name]));
-const teamName = (id: string) => teamNames[id] ?? id;
+/** Touring sides are not world teams; their names come from the stored tours (set on every reload). */
+const touringNames = new Map<string, string>();
+const teamName = (id: string) => teamNames[id] ?? touringNames.get(id) ?? id;
 
 const STAGE_LABELS: Record<TournamentStage, string> = {
   LEAGUE: "League",
@@ -81,9 +86,14 @@ export function TournamentsApp() {
   const [userCompetitions, setUserCompetitions] = useState<UserCompetition[]>([]);
   const [draft, setDraft] = useState<UserCompetitionDraft>(EMPTY_DRAFT);
   const [notice, setNotice] = useState<string | null>(null);
-  /** A curated competition, or one the player made. */
-  const findCompetition = (competitionId: string): Competition | null =>
-    competitionById(competitionId) ?? userCompetitions.find((c) => c.competitionId === competitionId) ?? null;
+  const [tours, setTours] = useState<UserTour[]>([]);
+  const [tourDraft, setTourDraft] = useState<TourDraft>(EMPTY_TOUR);
+  const tourFor = (competitionId: string): UserTour | null => tours.find((t) => t.tourId === competitionId) ?? null;
+  /** A curated competition, one the player made, or the series a tour plays. */
+  const findCompetition = (competitionId: string): Competition | null => {
+    const tour = tourFor(competitionId);
+    return competitionById(competitionId) ?? userCompetitions.find((c) => c.competitionId === competitionId) ?? (tour ? tourCompetition(tour) : null);
+  };
   useEffect(() => {
     worker.current = new Worker(new URL("./tournament.worker.ts", import.meta.url), { type: "module" });
     return () => worker.current?.terminate();
@@ -100,6 +110,10 @@ export function TournamentsApp() {
       if (damaged.length) setProblem(`${damaged.length} stored tournament${damaged.length === 1 ? " is" : "s are"} damaged and not shown.`);
       const mine = await repository.current.listUserCompetitions();
       setUserCompetitions(mine.competitions.sort((a, b) => (a.competitionId < b.competitionId ? -1 : 1)));
+      const storedTours = await repository.current.listUserTours();
+      storedTours.tours.forEach((t) => touringNames.set(touringTeamId(t), t.touringName));
+      setTours(storedTours.tours.sort((a, b) => (a.tourId < b.tourId ? -1 : 1)));
+      if (storedTours.damaged.length) setProblem(`${storedTours.damaged.length} of your tours ${storedTours.damaged.length === 1 ? "is" : "are"} damaged and not shown.`);
       if (mine.damaged.length) setProblem(`${mine.damaged.length} of your tournaments ${mine.damaged.length === 1 ? "is" : "are"} damaged and not shown.`);
     } catch {
       setRuns([]);
@@ -161,7 +175,7 @@ export function TournamentsApp() {
         if (!next) break;
         const mine = team !== null && (next.homeTeamId === team || next.awayTeamId === team);
         if (mine && !(includePlayer && first)) break;
-        current = await store(current, await simulateInWorker(worker.current, current, competition));
+        current = await store(current, await simulateInWorker(worker.current, current, competition, tourFor(current.competitionId)));
         if (!all || stop.current) break;
       }
     } catch (error) {
@@ -256,6 +270,43 @@ export function TournamentsApp() {
     }
   }
 
+  async function createTour() {
+    setProblem(null);
+    setNotice(null);
+    try {
+      const title = tourDraft.title.trim();
+      const touringName = tourDraft.touringName.trim();
+      if (!title) throw new Error("Give the tour a name.");
+      if (!touringName) throw new Error("Give the touring side a name.");
+      if (tourDraft.groundIds.length === 0) throw new Error("Choose at least one ground.");
+      const tour = UserTourSchema.parse({
+        tourId: `user-tour-${randomToken()}`,
+        title,
+        format: tourDraft.format,
+        hostTeamId: tourDraft.hostTeamId,
+        touringName,
+        matches: tourDraft.matches,
+        groundIds: tourDraft.groundIds,
+      });
+      await repository.current.addUserTour(tour);
+      setTourDraft(EMPTY_TOUR);
+      await reload();
+      setNotice(`${tour.title} is ready to start.`);
+    } catch (error) {
+      setProblem(error instanceof Error && !error.message.startsWith("[") ? error.message : "The tour could not be arranged.");
+    }
+  }
+
+  async function removeTour(tour: UserTour) {
+    setProblem(null);
+    try {
+      await repository.current.deleteUserTour(tour.tourId);
+      await reload();
+    } catch (error) {
+      setProblem(error instanceof Error && error.message === "USER_TOUR_IN_USE" ? "A tour with runs cannot be deleted." : "The tour could not be deleted.");
+    }
+  }
+
   async function removeUserCompetition(competition: UserCompetition) {
     setProblem(null);
     try {
@@ -339,7 +390,8 @@ export function TournamentsApp() {
             career.
           </p>
           <ol className="career-stories" aria-label="Tournaments">
-            {[...TOURNAMENT_PACK.competitions, ...userCompetitions].map((c) => {
+            {[...TOURNAMENT_PACK.competitions, ...userCompetitions, ...tours.map(tourCompetition)].map((c) => {
+              const tour = tourFor(c.competitionId);
               const mine = (runs ?? []).filter((r) => r.competitionId === c.competitionId);
               return (
                 <li key={c.competitionId} className="career-panel" data-testid={`tournament-${c.competitionId}`}>
@@ -347,12 +399,12 @@ export function TournamentsApp() {
                   <p>
                     <small>
                       {c.format === "T20" ? "T20" : "One-day"}
-                      {c.sourceType === "USER_AUTHORED" ? " · made by you" : ""}
+                      {c.sourceType === "USER_AUTHORED" ? (tour ? " · a tour you arranged" : " · made by you") : ""}
                     </small>
                   </p>
                   <p>{c.summary}</p>
                   <div className="action-row">
-                    <label>
+                    {!tour && <label>
                       Your team{" "}
                       <select
                         value={chosenTeam[c.competitionId] ?? ""}
@@ -365,7 +417,7 @@ export function TournamentsApp() {
                           </option>
                         ))}
                       </select>
-                    </label>
+                    </label>}
                     <button type="button" className="primary" disabled={busy} onClick={() => void start(c)}>
                       Start {c.title}
                     </button>
@@ -377,7 +429,12 @@ export function TournamentsApp() {
                         </button>
                       );
                     })}
-                    {c.sourceType === "USER_AUTHORED" && (
+                    {tour && (
+                      <button type="button" disabled={busy || mine.length > 0} title={mine.length > 0 ? "A tour with runs cannot be deleted." : undefined} onClick={() => void removeTour(tour)}>
+                        Delete {c.title}
+                      </button>
+                    )}
+                    {c.sourceType === "USER_AUTHORED" && !tour && (
                       <>
                         <button type="button" disabled={busy} onClick={() => exportPack([c])}>
                           Save {c.title} to a file
@@ -393,6 +450,7 @@ export function TournamentsApp() {
             })}
           </ol>
           <UserCompetitionForm draft={draft} busy={busy} onChange={setDraft} onCreate={() => void createUserCompetition()} />
+          <TourForm draft={tourDraft} busy={busy} onChange={setTourDraft} onCreate={() => void createTour()} />
           <section className="career-panel" aria-label="Share tournaments">
             <h2>Share tournaments</h2>
             <p>Save your tournaments to a file, or load a file someone shared. A loaded tournament that you already have is skipped.</p>
@@ -597,6 +655,67 @@ function UserCompetitionForm(props: { draft: UserCompetitionDraft; busy: boolean
       </fieldset>
       <button type="button" className="primary" disabled={props.busy} onClick={props.onCreate}>
         Make tournament
+      </button>
+    </section>
+  );
+}
+
+/**
+ * Stage 15 tours (owner decisions A1a and A2a): a touring side, picked automatically from the other seven clubs by a
+ * fixed rating rule, plays a series against one host club. Tournament only; matches are simulated.
+ */
+function TourForm(props: { draft: TourDraft; busy: boolean; onChange: (draft: TourDraft) => void; onCreate: () => void }) {
+  const { draft, onChange } = props;
+  const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
+  return (
+    <section className="career-panel" aria-label="Arrange a tour">
+      <h2>Arrange a tour</h2>
+      <p>A touring side, made of the best players from the other seven clubs, plays a series against your chosen host. Tour matches are simulated.</p>
+      <div className="action-row">
+        <label>
+          Tour name <input value={draft.title} maxLength={80} onChange={(e) => onChange({ ...draft, title: e.currentTarget.value })} />
+        </label>
+        <label>
+          Touring side <input value={draft.touringName} maxLength={40} onChange={(e) => onChange({ ...draft, touringName: e.currentTarget.value })} />
+        </label>
+        <label>
+          Host{" "}
+          <select value={draft.hostTeamId} onChange={(e) => onChange({ ...draft, hostTeamId: e.currentTarget.value })}>
+            {world.teams.map((t) => (
+              <option key={t.teamId} value={t.teamId}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Format{" "}
+          <select value={draft.format} onChange={(e) => onChange({ ...draft, format: e.currentTarget.value as "T20" | "ODI" })}>
+            <option value="T20">T20</option>
+            <option value="ODI">One-day</option>
+          </select>
+        </label>
+        <label>
+          Matches{" "}
+          <select value={draft.matches} onChange={(e) => onChange({ ...draft, matches: Number(e.currentTarget.value) as 1 | 3 | 5 | 7 })}>
+            {[1, 3, 5, 7].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <fieldset>
+        <legend>Tour grounds</legend>
+        {world.grounds.map((g) => (
+          <label key={g.groundId}>
+            <input type="checkbox" checked={draft.groundIds.includes(g.groundId)} onChange={() => onChange({ ...draft, groundIds: toggle(draft.groundIds, g.groundId) })} /> {g.name}{" "}
+          </label>
+        ))}
+      </fieldset>
+      <button type="button" className="primary" disabled={props.busy} onClick={props.onCreate}>
+        Arrange tour
       </button>
     </section>
   );
