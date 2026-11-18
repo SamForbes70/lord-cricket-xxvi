@@ -696,6 +696,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const tn = (id: string) => view?.teams.find((t) => t.id === id)?.name ?? id;
   const striker =
     i?.strikerEnd === "NORTH" ? i.northBatterId : i?.southBatterId;
+  const chaseRuns = i?.targetToWin == null ? null : Math.max(0, i.targetToWin - i.runs);
+  const chaseBalls = !i || !view || view.format === "RED_BALL"
+    ? null
+    : Math.max(0, (view.format === "ODI" ? 300 : 120) - i.legalBalls);
   const preferences = (
       <div className="preferences">
         <label>
@@ -890,12 +894,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <div className="target" data-testid="target">
               <span>{view.resultText ? "Result" : i?.targetToWin != null ? "Target" : "Match phase"}</span>
               <strong>{view.resultText ?? i?.targetToWin ?? (i ? `Innings ${view.activeIndex + 1}` : "Pre-match")}</strong>
-              {i?.targetToWin != null && (
+              {!view.resultText && chaseRuns !== null && (
                 <p>
-                  {Math.max(0, i.targetToWin - i.runs)} needed ·{" "}
-                  {view.format === "RED_BALL"
-                    ? "time remaining"
-                    : `${Math.max(0, (view.format === "ODI" ? 300 : 120) - i.legalBalls)} balls left`}
+                  {chaseRuns} needed · {chaseBalls === null ? "time remaining" : `${chaseBalls} balls left`}
+                  {chaseBalls !== null && chaseBalls > 0 && (
+                    <> · Required rate {((6 * chaseRuns) / chaseBalls).toFixed(2)}</>
+                  )}
                 </p>
               )}
               {view.activeIndex === 1 && (
