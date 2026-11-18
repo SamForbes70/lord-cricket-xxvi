@@ -2,7 +2,7 @@
 
 *Last reconciled on 16 November 2026 (Australia/Brisbane) with Stages 1–10 and the Windows Double-Click / `.NET` Portable Launcher owner-accepted on `main` (`773/773` unit tests across `73/73` files, `334` strict JSON Schemas).* 
 
-> **Stabilisation in progress (16 November 2026).** The owner directed: "Get what we currently have as excellent, then we will finish the full game." No new stages (including Stage 11) until the plan in [AUDIT_2026-11-16.md](AUDIT_2026-11-16.md) is complete and reviewed. Current state and the open pull requests: [HANDOVER.md](HANDOVER.md). Stages 2 to 10 landed on `main` with hosted CI failing; the stabilisation pull requests make it green.
+> **Status (18 November 2026).** Stabilisation is finished (pull requests #48 to #62). Stages 11 and 12 are built; Stage 13 is parked (no licensed historical data source); Stage 14's rules (super overs, rain-shortened matches, player reviews) are built for exhibitions, and its empirical calibration stays `BLOCKED_EXTERNAL`; Stage 15's fictional parts are built; Stage 16 was passed by the owner's direct instruction with none of its parts run; Stage 17's release record is sealed and the GitHub Release `alpha-2026-11-18` is prepared for the owner to publish. Current state: [HANDOVER.md](HANDOVER.md).
 
 This guide gives engineers and AI coding agents a single authoritative blueprint of:
 1. **What has been built and verified (Stages 1 through 10 + Windows Native Launcher)**,
@@ -93,7 +93,7 @@ This guide gives engineers and AI coding agents a single authoritative blueprint
 
 Any AI agent or engineer implementing the next stages should follow the exact blueprints below, strictly one stage at a time, branching from `main`.
 
-### Stage 11 — Player and manager stories (`Slice S11-01`, **IN PROGRESS** on `feat/stage11-career-stories`, `deps: Stages 4, 9, 10` satisfied)
+### Stage 11 — Player and manager stories (`Slice S11-01`, **BUILT**, merged in #64, `deps: Stages 4, 9, 10` satisfied)
 
 > As built (17 November 2026): stories are derived on demand and never stored (no persisted format change). The projection takes the ordered match facts of `buildHistoricalMatchFactsFromCareer`, the awards ledger, contracts and the lifecycle. Form streaks and contract and board stories are told for the managed club; milestones, youth debuts, awards and retirements league-wide. Every number in a story's text appears in its `factProvenance`, which a unit test checks for every story.
 
@@ -120,7 +120,7 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
      - Unit suite `tests/unit/career-stories-stage11.test.ts` verifying every trigger category, fact-provenance accuracy (`0` unbacked numbers), deduplication across reloads, and rebuild parity.
      - Browser E2E suite `tests/ui/career-stories-stage11.spec.ts` on Chromium and Firefox.
 
-### Stage 12 — Fictional scenario mode (`Slice S12-01`, `deps: Stages 5, 6, 7` satisfied)
+### Stage 12 — Fictional scenario mode (`Slice S12-01`, **BUILT**, merged in #65, four more scenarios in #72, `deps: Stages 5, 6, 7` satisfied)
 
 - **Goal**: Provide a player-facing **Scenario Challenges** mode (tactical chases, middle-order collapses, death-overs defences, red-ball day-5 survival/declarations) using the authoritative `T20`, `ODI`, and `RED_BALL` engines while keeping scenario state and records strictly isolated from career saves.
 - **Implementation Plan**:
@@ -140,12 +140,12 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
 
 > As built (17 November 2026): 8 challenges (4 T20, 2 ODI, 2 five-day). Each challenge pins a seed **and a match id**, because the engines' random stream is keyed by both. The worker's new `SCENARIO_START` request plays the match to the checkpoint in memory with the engines' own fixture autopilot, refuses to start if the reached state differs from the pinned `checkpoint`, then commits once as a new auto save through the same history-command path that save import uses. Only the game id is fresh for each attempt. The opponent is the tactical captain. Results are scored once, when the managed lineage (the auto save or its recovered copy) completes; manual copies and imports are never scored. Personal bests are kept in one projections row (`lcxxvi-scenarios` / `SCENARIO_RECORDS_V1` / `ledger`) outside every save. Scenario matches are ordinary exhibition saves, so no career, statistic, award or story reads them; no existing persisted format changed. Not built: a red-ball "survive day five" challenge. In the seed search, every autopilot five-day match under the current synthetic model finished by day three, so no fixed seed reaches a day-five draw position. The `AVOID_DEFEAT` objective exists and is unit-tested for when one does.
 
-### Stage 13 — Historical scenarios and provenance (`Slice S13-01`, `deps: Stage 12 + source permissions/rules review`)
+### Stage 13 — Historical scenarios and provenance (`Slice S13-01`, **PARKED** by the owner on 17 November 2026: no historical data source approved, `deps: Stage 12 + source permissions/rules review`)
 
 - **Goal**: Layer sourced historical cricket scenarios over Stage 12's scenario runner and `scripts/research/m7k-historical-fixture.ts` with full provenance citations.
 - **Gate**: Requires explicit owner sign-off on dataset/source licensing and rare-event rule adjudications (`OWNER_DECISIONS_2026-11-13.md`). Do not bundle unlicensed third-party match data in the repository.
 
-### Stage 14 — Empirical evaluation and rules expansion (`Slice S14-01`, `BLOCKED_EXTERNAL` on `RES-001`..`RES-003`)
+### Stage 14 — Empirical evaluation and rules expansion (`Slice S14-01`, rules expansion **BUILT** for exhibitions; empirical calibration `BLOCKED_EXTERNAL` on `RES-001`..`RES-003`)
 
 - **Goal**:
   1. **Rules Expansion (can be built modularly under a new opt-in ruleset version)**:
@@ -169,7 +169,7 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
   2. **Empirical Calibration Promotion (`RES-001`..`RES-003`)**:
      - Remains `BLOCKED_EXTERNAL` until historical incident adjudications, an untouched holdout cohort, and an owner-approved dataset are provided (`docs/M7G_RESEARCH_AND_PROMOTION_GATES.md`).
 
-### Stage 15 — Custom competitions and community packs (`Slice S15-01`, `deps: Stages 4, 9, 13`)
+### Stage 15 — Custom competitions and community packs (`Slice S15-01`, fictional parts **BUILT**; image imports off by owner answer C1a, `deps: Stages 4, 9, 13`)
 
 - **Goal**: Expand the existing World Editor and `8 MiB` roster pack importer to support custom tournament manifests (`LC_CUSTOM_COMPETITION_PACK_V1`: custom round-robin/group/knockout playoff structures, bilateral/tri-series tours, optional auction/draft rules, international call-up windows) and validated SVG/PNG crest, kit, and ground asset packs.
 
@@ -192,7 +192,7 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
 > - **Tournament auctions** (18 November 2026, owner answers B1a, B2b, B3a and B4a): a player's own tournament can start with an auction (`apps/web/src/tournament/auction.ts`). Every team rebuilds a squad of 13 from the 160 fictional players with 100 fictional credits; players come up best rated first with a reserve of 1 to 4 credits by rating; the highest maximum bid wins at one credit above the next (never below the reserve). The player sets a maximum or passes for one team, or hands over to the AI; the AI bids for the other teams from public ratings and squad needs only, with a small seeded variation per team, and paces its purse. Squad balance is enforced: a team may only buy a player if it can still complete a squad with a keeper and five bowling-capable players, and it keeps 1 credit for every other place. The record (`LC_TOURNAMENT_AUCTION_V1`: seed, the player's team and decisions, and a hash of the squads) is stored with its run in one transaction (`lcxxvi-tournaments` / `TOURNAMENT_AUCTIONS_V1` / run id), and the squads are found again by re-running the auction, refused if the hash differs. Matches use the generated-roster path, like tours, and can be simulated or played by the user (see below). Tournament only; careers are untouched.
 > - **Playable tour and auction matches** (18 November 2026, owner direction "Playing tour and auction matches should be user playable"): the player picks either side of a tour as their team, and in an auctioned run their team is the one they bid for. "Play this match yourself" hands the fixture to the match screen with the run's generated roster and the same two XIs the simulator fields (`TOURNAMENT_START` takes an optional `rosterPack` and `selections`). The match is saved with that roster through the existing roster-pack save path, so it resumes after a reload. When the player returns, the Tournaments screen rehydrates the finished match from its save on the roster engine and records it only if the saved roster is exactly the one the run generates (tour choices, or the auction replayed and hash-checked) and the seed, ids, teams and ground match the fixture. There is no super over between generated squads: a tied knockout goes to the higher-placed side, as when simulated. No persisted format changed.
 > - **Bowler choices that strand an innings** (found while building the above): the rules allow an XI with five bowlers, and with five a person could pick an order that leaves one bowler with all the remaining overs. The T20 and one-day match screens now refuse such a choice with "Would leave overs that no one could bowl" (`apps/web/src/match/bowler-plan.ts`, checked against a brute-force search in `tests/unit/bowler-plan.test.ts`). It reads the ledger only; the engines and their commands are unchanged, and a choice is never refused if every choice would strand the innings.
-> - **Not built:** image imports (owner answer C1a keeps them off); playing generated-roster matches (tours, auctions) on the match screen.
+> - **Not built:** image imports (owner answer C1a keeps them off); super overs between generated squads (a tied knockout goes to the higher-placed side).
 
 ### Stage 16 — Product-quality acceptance (`Slice S16-01`)
 
