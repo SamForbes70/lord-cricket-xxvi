@@ -1,6 +1,6 @@
 # Player reviews (DRS): design proposal
 
-Status: **proposal, not approved**. Owner decisions of 17 November 2026: a design proposal comes first (5a), and each side gets two unsuccessful reviews per innings (6a). Nothing here is built. Building it needs the owner's approval of this document and a new match-model version.
+Status: **approved by the owner on 18 November 2026** (B1a to B5a: new opt-in rule sets; these numbers as a starting point, tunable before release; AI captains review too; T20 and one-day only; exhibitions only). Earlier status: proposal, not approved. Owner decisions of 17 November 2026: a design proposal comes first (5a), and each side gets two unsuccessful reviews per innings (6a). Nothing here is built. Building it needs the owner's approval of this document and a new match-model version.
 
 ## Why it needs a new model version
 

@@ -153,3 +153,18 @@ Owner's words, verbatim: "Proceed, choosing all the options you recomended as my
 16. **Branch protection (16a).** The owner turns it on (required checks `pass07a` and `windows-browser-acceptance`, no direct pushes); see [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md). This is an owner action; agents do not change repository settings.
 17. **Paused agents (17).** No option was marked recommended, so stopping them where they run remains an open owner action.
 18. **Stacked pull requests (18a).** Allowed; each merges once both hosted checks pass on its final head and the branch is clean.
+
+## Owner decisions, 18 November 2026: rain engine, player reviews, paused agents
+
+Owner's words, verbatim: "A1a, A2a, B1a, B2a, B3a, B4a, B5a, C1a", answering a lettered list. Each answer is the option marked recommended.
+
+1. **Rain-affected matches (A1a).** Decision 1a of 17 November (new ledger profiles `LC_T20_02` and `LC_ODI_02`) is withdrawn: widening the ledger's rules enum changes schemas pinned by the pass07a freeze. Instead, a separate rain-aware engine wraps the frozen generator, scoring kernel and ledger, the same way the super-over engine does. It decides when a shortened innings ends and applies the revised target from `LC_RESOURCE_TABLE_01` (`packages/simulation/src/rain-targets.ts`). It is opt-in, exhibitions only (decisions 3a and 4a stand), and its saved record has its own new version. The frozen rule sets, engines and vectors do not change.
+2. **Rain and tournaments (A2a).** Rain-shortened matches do not enter tournament tables for now. Tournament results stay on the frozen engines.
+3. **Player reviews: approach (B1a).** DRS ships as new opt-in rule sets (for example `LC_T20_03` and `LC_ODI_03`). The frozen rule sets stay untouched. [DRS_PROPOSAL.md](DRS_PROPOSAL.md) is approved with the answers below.
+4. **Player reviews: numbers (B2a).** The proposal's starting error rates and umpire's-call bands are accepted. The agent may tune them from simulated match statistics before release and must record any change.
+5. **Player reviews: who reviews (B3a).** Human players and AI captains. AI captains decide only from what a player could know, never the true outcome or a future draw.
+6. **Player reviews: formats (B4a).** T20 and one-day only.
+7. **Player reviews: scope (B5a).** Exhibitions only first. Careers are unchanged.
+8. **Paused agents (C1a).** Stop them. Copilot, "Agent Zero" and "Lord Cricket Engineer" run outside this repository, so stopping them is an owner action; `AGENTS.md` tells any of them that reads it to stop.
+
+Still open: the Stage 16 measurements (`npm run owner:stage16`, the owner runs them), branch protection (owner action), and the Stage 17 release after Stage 16 passes.
