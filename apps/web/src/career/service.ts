@@ -1001,15 +1001,20 @@ export class CareerApplicationService {
   ): Promise<ActivePersistentSeasonState> {
     const { state: before, saveId } = this.requireWritable();
     const commandId = token("career-cmd");
+    // A round can take longer than the writer lease to simulate. Recheck ownership
+    // immediately before commit as well as at entry. The commit still checks revision.
+    const renewWriter = async (repo: Pick<CareerSeasonRepository, "acquireLease">) => {
+      if (!(await repo.acquireLease(saveId, this.ownerId, Date.now()))) {
+        this.readOnly = true;
+        throw new Error("Writer lease was lost to another tab.");
+      }
+    };
     this.setStatus("Saving");
     try {
       if (this.persistentState && this.persistentRepository) {
         const beforeWorld = this.persistentState;
         const expectedRevision = beforeWorld.revision;
-        if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
-          this.readOnly = true;
-          throw new Error("Writer lease was lost to another tab.");
-        }
+        await renewWriter(this.persistentRepository);
         const currentLifecycle =
           beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION ||
           isEconomyWorld(beforeWorld)
@@ -1074,6 +1079,7 @@ export class CareerApplicationService {
                 );
         const requestCanonical = canonicalJson({ command, expectedRevision, payload });
         const title = this.saveTitle ?? this.defaultCareerTitle(nextWorld);
+        await renewWriter(this.persistentRepository);
         await this.persistentRepository.commit({
           saveId,
           kind: "AUTO",
@@ -1108,10 +1114,7 @@ export class CareerApplicationService {
         throw new Error("Single-season slot cannot store a lifecycle season state.");
       }
       const expectedRevision = before.revision;
-      if (!(await this.repository.acquireLease(saveId, this.ownerId, Date.now()))) {
-        this.readOnly = true;
-        throw new Error("Writer lease was lost to another tab.");
-      }
+      await renewWriter(this.repository);
       const builtRaw = await build(before, null);
       const builtCore =
         "core" in builtRaw && "seasonStateVersion" in builtRaw.core
@@ -1124,6 +1127,7 @@ export class CareerApplicationService {
       const next = await sealT20SeasonState({ ...builtCore, revision: expectedRevision + 1 });
       const requestCanonical = canonicalJson({ command, expectedRevision, payload });
       const title = this.saveTitle ?? `${this.teamName(next.controlledTeamId)} 2027`;
+      await renewWriter(this.repository);
       await this.repository.commit({
         saveId,
         kind: "AUTO",

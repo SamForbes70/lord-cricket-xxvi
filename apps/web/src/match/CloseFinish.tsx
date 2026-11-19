@@ -48,6 +48,9 @@ export function passageReport(passage: Passage, view: View) {
   const decisive =
     cues.find((c) => c.fieldOutcome === "DROP") ??
     [...cues].reverse().find((c) => c.dismissalKind || c.boundary !== "NONE");
+  const decisiveText = !decisive ? "" : decisive.fieldOutcome === "DROP"
+    ? `${decisive.overBallLabel} · Dropped chance off ${decisive.bowlerName}. ${decisive.runsScored} runs from the delivery.`
+    : decisive.headline.startsWith(decisive.overBallLabel) ? decisive.headline : `${decisive.overBallLabel} · ${decisive.headline}`;
   const bowler = cues.at(-1);
   const quota = view.format === "ODI" ? 60 : 24;
   const allocation =
@@ -56,7 +59,7 @@ export function passageReport(passage: Passage, view: View) {
       quota
       ? ` ${bowler.bowlerName} has completed the allocation.`
       : "";
-  return `${passage.label}: ${runs} run${runs === 1 ? "" : "s"}, ${wickets} wicket${wickets === 1 ? "" : "s"} in ${balls} legal ball${balls === 1 ? "" : "s"}. Boundaries: ${boundaryCount(view, passage.inningsIndex) - passage.boundaries}. Recorded singles: ${singles}.${decisive ? " " + decisive.overBallLabel + " · " + decisive.headline : ""}${allocation}`;
+  return `${passage.label}: ${runs} run${runs === 1 ? "" : "s"}, ${wickets} wicket${wickets === 1 ? "" : "s"} in ${balls} legal ball${balls === 1 ? "" : "s"}. Boundaries: ${boundaryCount(view, passage.inningsIndex) - passage.boundaries}. Recorded singles: ${singles}.${decisiveText ? " " + decisiveText : ""}${allocation}`;
 }
 
 export function CloseFinish({
@@ -149,7 +152,7 @@ export function CloseFinish({
             {chasing
               ? `Set the intent for ${view.names[striker ?? ""] ?? "the striker"}. The partner keeps their own plan.`
               : "Set the bowler’s line, length and effort for this spell."}{" "}
-            Play pauses at a wicket, a jump of two in the required rate, your
+            Play pauses at a wicket, the required rate reaching ten an over, your
             next selection, the final two overs or after two overs.
           </p>
           <div className="action-row">

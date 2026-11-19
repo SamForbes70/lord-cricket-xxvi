@@ -615,7 +615,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
     if (active.inningsIndex !== view.activeIndex) { endPassage(passageReport(active, view) + " Innings closed."); return; }
     if (active.stopping || view.phase === "COMPLETE" || innings.wickets !== active.wickets || innings.legalBalls >= active.stopAt ||
-        (active.requiredRate !== null && requiredRate(view) >= active.requiredRate + 2) ||
+        (active.requiredRate !== null && active.requiredRate < 10 && requiredRate(view) >= 10) ||
         (view.phase !== "READY" && view.decisionTeamId === captainedTeam)) {
       endPassage(passageReport(active, view));
     } else if (view.phase === "READY" && !view.advanceReason) {

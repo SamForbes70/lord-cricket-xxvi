@@ -6,7 +6,7 @@ Open **Scenarios → Death-overs chase** to captain Northlight Ridge. You start 
 
 Read the target, balls and wickets in the score strip. Choose a batting intent, set a bowling plan or keep the current plan. Protecting a striker displays the rate you would need if the next three balls were dots. At a wicket, compare the incoming batters’ power, rotation and defence. At a change of bowler, compare short and long workloads, allocation left and recorded deliveries. The penultimate-over choice identifies who can still bowl the last over. **Full match controls** opens the complete XI and custom tactics.
 
-A passage advances one accepted delivery at a time. You can stop after the current command. A wicket, an outstanding selection you retained, a rise of two runs per over in the required rate, the last two overs or the end of a two-over passage returns control. Choose **Choose delegated decisions** to hand individual calls to the assistant for your club. Delegation uses the match’s existing durable journal.
+A passage advances one accepted delivery at a time. You can stop after the current command. A wicket, an outstanding selection you retained, the required rate crossing ten runs per over, the last two overs or the end of a two-over passage returns control. Choose **Choose delegated decisions** to hand individual calls to the assistant for your club. Delegation uses the match’s existing durable journal.
 
 The field map shows actual placements. The delivery strip shows the latest six recorded outcomes. After a passage, the scorebook supplies the runs, wickets, legal balls and boundaries. Recorded singles, drops and decisive deliveries come from the highlight feed. A wicket can follow a defensive plan or an attacking one. The recap reports what happened.
 
