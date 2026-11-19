@@ -2,7 +2,7 @@
 
 *Last reconciled on 16 November 2026 (Australia/Brisbane) with Stages 1–10 and the Windows Double-Click / `.NET` Portable Launcher owner-accepted on `main` (`773/773` unit tests across `73/73` files, `334` strict JSON Schemas).* 
 
-> **Status (18 November 2026).** Stabilisation is finished (pull requests #48 to #62). Stages 11 and 12 are built; Stage 13 is parked (no licensed historical data source); Stage 14's rules (super overs, rain-shortened matches, player reviews) are built for exhibitions, and its empirical calibration stays `BLOCKED_EXTERNAL`; Stage 15's fictional parts are built; Stage 16 was passed by the owner's direct instruction with none of its parts run; Stage 17's release record is sealed and the GitHub Release `alpha-2026-11-18` is prepared for the owner to publish. Current state: [HANDOVER.md](HANDOVER.md).
+> **Status (18 November 2026).** Stabilisation is finished (pull requests #48 to #62). Stages 11 and 12 are built; Stage 13 is parked (no licensed historical data source); Stage 14's rules (super overs, rain-shortened matches, player reviews) are built for exhibitions, and its empirical calibration stays `BLOCKED_EXTERNAL`; Stage 15's fictional parts are built; Stage 16 was passed by the owner's direct instruction with none of its parts run; Stage 17's release record is sealed and the GitHub Release `alpha-2026-11-19` is prepared for the owner to publish. Current state: [HANDOVER.md](HANDOVER.md).
 
 This guide gives engineers and AI coding agents a single authoritative blueprint of:
 1. **What has been built and verified (Stages 1 through 10 + Windows Native Launcher)**,
@@ -207,7 +207,7 @@ Any AI agent or engineer implementing the next stages should follow the exact bl
 ### Stage 17 — Release-candidate preparation (`Slice S17-01`)
 
 - **Goal**: Re-seal `docs/release-v01/RELEASE_RECORD.json` (or `docs/release-v10/RELEASE_RECORD.json`) with updated SHA-256 manifests (`npm run release:record`), verify `npm run package:game` & `LordCricketXXVI.exe` across Windows, Linux, and macOS, and obtain explicit owner deployment sign-off.
-- **As built (18 November 2026)**: the owner directed the release. `npm run release:record` now writes `LC_RELEASE_RECORD_V2` to `docs/release-2026-11-18/` (the V0.1 record is kept unchanged; `npm run release:record:v01` regenerates it). The GitHub Release is tagged `alpha-2026-11-18` and carries the game and source zips from `npm run package:game`. The EXE is built and smoke-tested by hosted Windows CI and compiled on the player's machine from the zip; nothing was run on macOS.
+- **As built (18 November 2026)**: the owner directed the release. `npm run release:record` now writes `LC_RELEASE_RECORD_V2` to `docs/release-2026-11-18/` (the V0.1 record is kept unchanged; `npm run release:record:v01` regenerates it). The GitHub Release is tagged `alpha-2026-11-19` and carries the game and source zips from `npm run package:game`. The EXE is built and smoke-tested by hosted Windows CI and compiled on the player's machine from the zip; nothing was run on macOS.
 
 ---
 

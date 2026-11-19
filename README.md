@@ -2,7 +2,7 @@
 
 **An evidence-based, deterministic, browser-native statistical cricket management game built as a strict TypeScript monorepo.**
 
-> **Status (18 November 2026, Australia/Brisbane).** Feature-complete for everything the roadmap allows without outside data. Built and merged: V0.1, Stages 2 to 12, Stage 14's rules (super overs, rain-shortened matches and player reviews, exhibitions only) and Stage 15's fictional parts (tournaments, your own competitions, tours, auctions, crests, with your own matches playable). Stage 13 (historical scenarios) is parked and Stage 14's empirical calibration is `BLOCKED_EXTERNAL`: the model stays a fictional synthetic alpha. Stage 16 was passed by the owner's direct instruction with none of its four parts run (no owner-PC measurements, playtest, screen-reader walkthrough or long-career soak). Stage 17: the release record is sealed and the GitHub Release `alpha-2026-11-18` is prepared for the owner to publish. One page with the details: [docs/HANDOVER.md](docs/HANDOVER.md).
+> **Status (19 November 2026, Australia/Brisbane).** Feature-complete for everything the roadmap allows without outside data, plus captain's highlights, rival captains, a match-day selection room and the Pavilion redesign (#90 to #93). Built and merged: V0.1, Stages 2 to 12, Stage 14's rules (super overs, rain-shortened matches and player reviews, exhibitions only) and Stage 15's fictional parts (tournaments, your own competitions, tours, auctions, crests, with your own matches playable). Stage 13 (historical scenarios) is parked and Stage 14's empirical calibration is `BLOCKED_EXTERNAL`: the model stays a fictional synthetic alpha. Stage 16 was passed by the owner's direct instruction with none of its four parts run (no owner-PC measurements, playtest, screen-reader walkthrough or long-career soak). Stage 17: the release record is sealed and the GitHub Release `alpha-2026-11-19` is prepared for the owner to publish. One page with the details: [docs/HANDOVER.md](docs/HANDOVER.md).
 
 ---
 
@@ -134,7 +134,8 @@ Then open **`http://127.0.0.1:4180/`** (or run `node start.mjs --open`). Because
 - **Stage 14 rules, exhibitions only.** ICC-style super overs for tied T20 and one-day matches (#67, #68), carried in `.lcxxvi` exports (#73); rain-shortened T20 and one-day matches with revised targets from a fictional resource table (#76, #78, #79); player reviews (DRS) for T20 and one-day matches (#80). Each wraps the frozen engines under its own opt-in rule set and record version.
 - **Stage 15, fictional tournaments.** Built-in competitions played match by match in a worker, with your own matches on the match screen (#69, #74); competitions you make yourself, shared as files (#81); built-in team crests (#82); tours against a touring XI picked from the other clubs (#83); squads rebuilt by an auction with fictional budgets (#84); tour and auction matches playable by you (#86).
 - **Bowling plans (#86).** The T20 and one-day match screens refuse a bowler choice that would leave overs no one could bowl.
-- **Release (#85, #87).** Release record `LC_RELEASE_RECORD_V2` in `docs/release-2026-11-18/` and the GitHub Release `alpha-2026-11-18`.
+- **Captaincy and the Pavilion (#90 to #93, 19 November 2026).** Captain's highlights: limited-overs exhibitions, managed T20 fixtures and two close-finish scenarios played in bounded passages with plans. Rival captains with observable tendencies and an opt-in match-aware opponent. A match-day selection room in career. A redesign of club selection, career home and the scoreboard. [How to play it](docs/verification-captains-pavilion/PLAY.md).
+- **Release (#85, #87).** Release record `LC_RELEASE_RECORD_V2` in `docs/release-2026-11-18/` and the GitHub Release `alpha-2026-11-19`.
 
 ---
 
@@ -166,7 +167,7 @@ See [`docs/ROADMAP_AND_AI_GUIDE.md`](docs/ROADMAP_AND_AI_GUIDE.md) and [`docs/MA
 | **Stage 14** | **Empirical evaluation & rules expansion** (`S14-01`) | Rules **built** (exhibitions); calibration `BLOCKED_EXTERNAL` | Super overs, rain-shortened matches and player reviews are built. Calibration (`RES-001`..`RES-003`) needs an approved dataset, adjudications and an untouched holdout cohort. |
 | **Stage 15** | **Custom competitions & community packs** (`S15-01`) | Fictional parts **built** | Tournaments, user-made competitions, tours, auctions, crests, playable generated-squad matches. Image imports are off (owner answer C1a). |
 | **Stage 16** | **Product-quality acceptance** (`S16-01`) | **Passed by owner direction** (18 November 2026) | None of the four parts were run: see [`docs/verification-stage16/OWNER_DIRECTION_2026-11-18.md`](docs/verification-stage16/OWNER_DIRECTION_2026-11-18.md). |
-| **Stage 17** | **Release-candidate preparation** (`S17-01`) | Record sealed; release prepared | GitHub Release `alpha-2026-11-18`; the owner publishes it (this agent's session cannot create releases). |
+| **Stage 17** | **Release-candidate preparation** (`S17-01`) | Record sealed; release prepared | GitHub Release `alpha-2026-11-19`; the owner publishes it (this agent's session cannot create releases). |
 
 ---
 

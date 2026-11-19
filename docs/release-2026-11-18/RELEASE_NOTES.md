@@ -1,4 +1,4 @@
-# Lord Cricket XXVI, alpha release of 18 November 2026
+# Lord Cricket XXVI, alpha release of 19 November 2026
 
 An offline cricket management game in the browser. Everything in it is fictional: the eight clubs, the players, the grounds and every result. The match model is a synthetic alpha (`synthetic-alpha-01`). It makes no claim to match real cricket.
 
@@ -9,6 +9,9 @@ An offline cricket management game in the browser. Everything in it is fictional
 - **Exhibition rules (opt-in).** Super overs to settle ties, rain-shortened T20 and one-day matches with revised targets from a fictional resource table, and player reviews (DRS).
 - **Scenario challenges.** Fictional match situations to win from.
 - **Tournaments.** Built-in fictional competitions, competitions you make yourself, tours against a touring XI picked from the other clubs, and tournaments whose squads are rebuilt by an auction with fictional budgets. Play your own team's matches on the match screen, including tour and auction matches, or simulate them. Teams carry built-in crests.
+- **Captaincy.** Captain's highlights let you play limited-overs matches in short passages: choose a batting intent or a bowling plan, then watch a few balls play out until a wicket, a selection or a pressure point hands control back. Rival captains have tendencies you can read from scouting notes, and a match-aware opponent is optional. Try **Scenarios, Death-overs chase** or **Nineteen to defend**.
+- **Selection room.** In a career, before a match day you can choose between a regular and an available reserve, with last time out's figures to go on.
+- **The Pavilion look.** Redesigned club selection, career home and match-day scoreboard, with club crests and an illustrated home ground.
 - **Bowling plans.** On the T20 and one-day match screens, a bowler choice that would leave overs no one could bowl is refused, with the reason shown.
 
 ## How to play
@@ -27,5 +30,6 @@ The game opens at http://127.0.0.1:4180/. Saves live in that browser profile: us
 - Rain-shortened matches and player reviews are exhibition-only.
 - Tour and auction squads have no super over: a tied knockout match between them goes to the higher-placed side.
 - An older build cannot read saves made by this one.
+- The captaincy features were checked by automated browser runs only; nobody has playtested them yet.
 
 The full record, with SHA-256 manifests, the tested revision and every gate, is `docs/release-2026-11-18/RELEASE_RECORD.json`.

@@ -192,3 +192,11 @@ Owner's words, verbatim: "Pass stage 16 - direct instruction - no arguments, the
 2. **Stage 17** goes ahead: a sealed release record and a GitHub Release. The repository is public, so this release is the owner-authorised public deployment. The V0.1 record (`docs/release-v01/RELEASE_RECORD.json`, which fixes `publicDeploymentAuthorised` to `false`) is kept unchanged; the new release has its own record version, `LC_RELEASE_RECORD_V2`.
 3. **Paused agents.** Ignored: stopping them no longer blocks anything.
 4. **Tours and auctions.** Their matches become playable by the user.
+
+## Owner direction, 19 November 2026: integrate the owner's own work and finalise the build
+
+Owner's words, verbatim: "ok, I have been doing some of my my own work on this with other AI's. Sorry to be unfaithful. Please do a full review of what is what. Once you have a full understanding. Pull together a finalised working game build. Make it available for playing. Do a full update of github, its documentation and similar."
+
+1. **Review.** Pull requests #90 (Pavilion redesign), #91 (close finishes) and #92 (captaincy, which already contains #90 and #91) were reviewed against the project rules: no frozen code or persisted format changed; the AI changes are opt-in and read only public match facts. One regression was found (the scoreboard lost its team-colour stripe, failing `tests/ui/edited-world.spec.ts` in Firefox) and fixed in #93, which carries all three into `main`.
+2. **Release.** The unpublished release is renamed `alpha-2026-11-19` and rebuilt from `main` after #93. Its record stays in `docs/release-2026-11-18/`.
+3. **Superseded pull requests.** #44, #46 and #47 change nothing that is not already on `main` in newer form. Closing them is left to the owner.

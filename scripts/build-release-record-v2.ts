@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { generateReleaseRecord, type ReleaseCapabilityEntry } from './build-release-record.js';
 
-export const RELEASE_TAG = 'alpha-2026-11-18';
+export const RELEASE_TAG = 'alpha-2026-11-19';
 export const RELEASE_DIRECTORY = 'docs/release-2026-11-18';
 
 export interface ReleaseRecordV2 {
@@ -98,6 +98,19 @@ export function generateReleaseRecordV2(rootDir = process.cwd()): ReleaseRecordV
       ],
     },
     {
+      capabilityId: 'CAP-CAPTAINCY',
+      advertised:
+        "Captain's highlights: limited-overs exhibitions, managed T20 fixtures and two close-finish scenarios played in bounded passages with plans; rival captains with observable tendencies and an opt-in match-aware opponent; a match-day selection room in career; the Pavilion redesign of club selection, career home and the scoreboard",
+      status: 'VERIFIED_SYNTHETIC_ALPHA',
+      evidence: [
+        'tests/ui/scenario-mode-stage12.spec.ts',
+        'tests/ui/managed-recovery.spec.ts',
+        'tests/ui/edited-world.spec.ts',
+        'docs/verification-captains-pavilion/PLAY.md',
+        'docs/verification-close-finish/PLAYTEST.md',
+      ],
+    },
+    {
       capabilityId: 'CAP-TOURNAMENTS',
       advertised:
         'Fictional tournaments: built-in and user-made competitions, tours against a touring XI, squads rebuilt by auction, and built-in team crests; the player can play their own team\'s matches, including tour and auction matches',
@@ -123,6 +136,7 @@ export function generateReleaseRecordV2(rootDir = process.cwd()): ReleaseRecordV
     'Tournament matches between generated squads (tours and auctions) have no super over: a tied knockout goes to the higher-placed side.',
     'The Windows launcher EXE is unsigned (owner decision), so Windows SmartScreen may warn before it runs.',
     'Saves live in the browser profile, tied to http://127.0.0.1:4180. Clearing browser data deletes them: export .lcxxvi backups. An older build cannot read saves written by this one.',
+    'The close-finish and captaincy features were checked by automated browser runs only: no human playtest responses or voluntary replays were collected (docs/verification-close-finish/PLAYTEST.md).',
     'testedRevision is the commit the record was generated on, which is the commit before the record itself: a file cannot contain its own commit hash.',
   ];
 
