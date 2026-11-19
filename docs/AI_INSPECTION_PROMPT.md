@@ -2,7 +2,7 @@
 
 Paste everything below the line into another AI, or point it at this file. It is written to be checked against the repository, not trusted. The commit numbers and counts in sections 4–7 are a historical V0.1 snapshot taken on 13 November 2026. Since then, Stages 2 through 10 and the Windows double-click launcher have been implemented, verified (`773/773` unit tests across `73/73` files, `334` JSON Schemas), and merged to `main` (16 November 2026). Read `docs/ROADMAP_AND_AI_GUIDE.md` and `docs/MASTER_BUILD_LEDGER.md` first for the current post-Stage-10 state and Stage 11–17 blueprints, run `git log` to see the latest revision, and always trust the repository over this text.
 
-**Update, 18 November 2026.** Since this prompt's snapshot, Stages 11 and 12, Stage 14's rules (super overs, rain-shortened matches, player reviews) and Stage 15's fictional tournaments have been built, Stage 16 was passed by the owner's direct instruction with none of its parts run, and the Stage 17 release `alpha-2026-11-18` was prepared. Read [HANDOVER.md](HANDOVER.md) for the current state before relying on any number below.
+**Update, 18 November 2026.** Since this prompt's snapshot, Stages 11 and 12, Stage 14's rules (super overs, rain-shortened matches, player reviews) and Stage 15's fictional tournaments have been built, Stage 16 was passed by the owner's direct instruction with none of its parts run, and the Stage 17 release `alpha-2026-11-19` was prepared. Read [HANDOVER.md](HANDOVER.md) for the current state before relying on any number below.
 
 ---
 

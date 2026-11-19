@@ -1,18 +1,18 @@
 {
   "schema": "LC_RELEASE_RECORD_V2",
-  "releaseTag": "alpha-2026-11-18",
-  "generatedAtUtc": "2026-11-18T10:38:16.841Z",
+  "releaseTag": "alpha-2026-11-19",
+  "generatedAtUtc": "2026-11-19T19:30:42.461Z",
   "modelStatus": "SYNTHETIC_ALPHA",
   "empiricallyCalibrated": false,
   "publicDeploymentAuthorised": true,
   "publicDeploymentAuthorisation": {
     "date": "2026-11-18",
     "ownerWords": "Pass stage 16 - direct instruction - no arguments, then do stage 17 Ignore the blocked agents. Playing tour and auction matches should be user playable.",
-    "scope": "A GitHub Release (alpha-2026-11-18) of the public repository, with the game and source zips built from the tagged commit."
+    "scope": "A GitHub Release (alpha-2026-11-19) of the public repository, with the game and source zips built from the tagged commit."
   },
   "testedRevision": {
-    "commit": "c451bc7fcbb0cb3b82f1e1d151d63b683d179de1",
-    "branch": "feat/release-rebuild-a5aa9f3",
+    "commit": "90a8dd31e926910d4042d01b7ffa827dd61e0d8c",
+    "branch": "docs/finalised-release-2026-11-19",
     "workingTreeClean": true
   },
   "manifests": {
@@ -21,7 +21,7 @@
     "defaultWorldSha256": "0136173903ba42a199c84a17407cf711c2caf1b57c52472abb52e9be7a6d8257",
     "defaultWorldManifestSha256": "03bb21d0520237a7afed6ec99b9e4bdfc8491987e28c632114377f8ea820811a",
     "v01BacklogSha256": "5cf7807f1b8c3f51c659a7e1e55e6042f58a3164c43a2850ce48275ec901a208",
-    "offlineAssetManifestSha256": "0689d624af5e584204a000609859a559475aa50060674fd78b62ea4c2ff550a2",
+    "offlineAssetManifestSha256": "b5a0bdb957f2369b63e15e250bd0f53ed64e37cbf87ddb6fbe71a9956c6e5e6b",
     "batch7DiagnosticsSha256": "cd076eb1bd29d5596ab3dbd5d58b5b530574f9ca09a859a246e69b9ca9b7258d"
   },
   "externalAndOwnerGates": {
@@ -154,6 +154,18 @@
       ]
     },
     {
+      "capabilityId": "CAP-CAPTAINCY",
+      "advertised": "Captain's highlights: limited-overs exhibitions, managed T20 fixtures and two close-finish scenarios played in bounded passages with plans; rival captains with observable tendencies and an opt-in match-aware opponent; a match-day selection room in career; the Pavilion redesign of club selection, career home and the scoreboard",
+      "status": "VERIFIED_SYNTHETIC_ALPHA",
+      "evidence": [
+        "tests/ui/scenario-mode-stage12.spec.ts",
+        "tests/ui/managed-recovery.spec.ts",
+        "tests/ui/edited-world.spec.ts",
+        "docs/verification-captains-pavilion/PLAY.md",
+        "docs/verification-close-finish/PLAYTEST.md"
+      ]
+    },
+    {
       "capabilityId": "CAP-TOURNAMENTS",
       "advertised": "Fictional tournaments: built-in and user-made competitions, tours against a touring XI, squads rebuilt by auction, and built-in team crests; the player can play their own team's matches, including tour and auction matches",
       "status": "VERIFIED_SYNTHETIC_ALPHA",
@@ -177,6 +189,7 @@
     "Tournament matches between generated squads (tours and auctions) have no super over: a tied knockout goes to the higher-placed side.",
     "The Windows launcher EXE is unsigned (owner decision), so Windows SmartScreen may warn before it runs.",
     "Saves live in the browser profile, tied to http://127.0.0.1:4180. Clearing browser data deletes them: export .lcxxvi backups. An older build cannot read saves written by this one.",
+    "The close-finish and captaincy features were checked by automated browser runs only: no human playtest responses or voluntary replays were collected (docs/verification-close-finish/PLAYTEST.md).",
     "testedRevision is the commit the record was generated on, which is the commit before the record itself: a file cannot contain its own commit hash."
   ],
   "recoveryInstructions": [

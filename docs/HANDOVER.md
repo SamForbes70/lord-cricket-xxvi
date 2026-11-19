@@ -1,4 +1,4 @@
-# Handover, 18 November 2026
+# Handover, 19 November 2026
 
 One page for a person or an AI picking this project up. It points at the evidence; it does not replace it. If this page and the repository disagree, trust the repository and fix this page.
 
@@ -20,10 +20,11 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 | 14 Rules: super overs, rain-shortened matches, player reviews (exhibitions) | Built | #67, #68, #73, #76, #78, #79, #80 |
 | 14 Empirical calibration | `BLOCKED_EXTERNAL` (`RES-001` to `RES-003`) | |
 | 15 Tournaments, user-made competitions, crests, tours, auctions, playable tour and auction matches | Built (image imports off, owner answer C1a) | #69, #74, #81, #82, #83, #84, #86 |
+| Captaincy: captain's highlights, close finishes, rival captains, selection room, Pavilion redesign (owner's own work with other AI tools, integrated 19 November) | Built | #90, #91, #92, #93 |
 | 16 Product-quality acceptance | Passed by the owner's direct instruction, none of its four parts run ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)) | #85 |
-| 17 Release | Record sealed ([release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json)); GitHub Release `alpha-2026-11-18` prepared for the owner to publish | #85, #87 |
+| 17 Release | Record sealed ([release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json)); GitHub Release `alpha-2026-11-19` prepared for the owner to publish | #85, #87 |
 
-**Owner actions still open:** publish the GitHub Release (an agent session here cannot create releases: HTTP 403); turn on branch protection for `main`; decide on the stale open pull requests #44, #46 and #47, which predate stabilisation. The paused agents are to be ignored (owner direction, 18 November 2026).
+**Owner actions still open:** publish the GitHub Release (an agent session here cannot create releases: HTTP 403); turn on branch protection for `main`; decide on the stale open pull requests #44, #46 and #47, which predate stabilisation and are superseded (everything they change is on `main` in newer form). The paused agents are to be ignored (owner direction, 18 November 2026).
 
 **Biggest risk:** nobody has played this build on the owner's PC. Every measurement is from hosted CI and Linux containers; the Stage 16 playtest, memory budget, screen-reader walkthrough and long-career soak were not run. A short playtest of the release is the most useful next step.
 
