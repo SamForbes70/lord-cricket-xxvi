@@ -1042,6 +1042,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             className="scorestrip" data-quay={view.ground === "Aster Quay"} data-stage={view.resultText ? "result" : i?.targetToWin ? "chase" : i ? "innings" : "toss"}
             aria-label="Match scoreboard"
             data-testid="scorestrip"
+            /* Both sides' kit colours as a thin stripe along the top: the scoreboard is where edited-world colours show. */
+            style={view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : undefined}
           >
             <div>
               <p>
