@@ -175,7 +175,9 @@ export function createODIMatchController(
                 : l!.bowling[p.playerId]!.legalBalls >= 60
                   ? "Ten-over limit reached"
                   : "";
-      return { id: p.playerId, name: names[p.playerId] ?? p.name, reason };
+      const { power, rotation, defence } = p.skills.ODI;
+      return { id: p.playerId, name: names[p.playerId] ?? p.name, reason,
+        ...(c.phase === "AWAITING_BATTER" ? { batting: { power, rotation, defence } } : {}) };
     });
     if (c.phase === "AWAITING_BOWLER" && l && i) {
       // Refuse a bowler whose over would leave the rest of the innings impossible to bowl (five-bowler sides).

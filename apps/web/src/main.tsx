@@ -1,3 +1,4 @@
+import { CloseFinish, boundaryCount, requiredRate, isCloseFinish, passageReport, type Passage } from "./match/CloseFinish.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AWARDS_PROVENANCE_NOTICE, type MatchAwardCandidate } from "@lcxxvi/contracts";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
@@ -44,6 +45,7 @@ import { TournamentsApp, TOURNAMENT_LAUNCH_KEY, type TournamentLaunch } from "./
 import { RainApp } from "./rain/RainApp.js";
 import { TeamCrest } from "./world/TeamCrest.js";
 import "./styles.css";
+import "./pavilion.css";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
@@ -104,6 +106,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   })());
   const [scenario, setScenario] = useState<ScenarioStatus | null>(null);
+  const [paceOverride, setPaceOverride] = useState<boolean | null>(null);
+  const [matchAware, setMatchAware] = useState(() => localStorage.getItem("lcxxvi-captain-challenge") === "match-aware");
+  const passage = useRef<Passage | null>(null);
+  const [finishReport, setFinishReport] = useState("");
+  const [playingPassage, setPlayingPassage] = useState(false);
+  function endPassage(report: string) {
+    passage.current = null;
+    setPlayingPassage(false);
+    setFinishReport(report);
+  }
   /** Stage 15: the player's tournament fixture chosen on the Tournaments screen, started once the worker has booted. */
   const tournamentLaunch = useRef<TournamentLaunch | null>((() => {
     try {
@@ -273,6 +285,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       audioBootSyncRef.current = false;
       audioManagerRef.current?.unlockFromUserGesture();
     }
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); }
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -565,6 +578,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   }, [editingWorld, restoreWorldFocus, view]);
 
+  const captainedTeam = scenario?.playerTeamId ?? careerLaunch.current?.managedTeamId ?? view?.teams.find(t => t.id !== aiTeamId)?.id;
+  const rivalTeam = view?.teams.find(t => t.id !== captainedTeam)?.id;
+  const limitedOvers = view?.format === "T20" || view?.format === "ODI";
+  useEffect(() => {
+    const saved = persistence?.saveId && localStorage.getItem("lcxxvi-match-pace:" + persistence.saveId);
+    setPaceOverride(saved === "highlights" ? true : saved === "manual" ? false : null);
+  }, [persistence?.saveId]);
+  const highlights = paceOverride ?? (!!scenario && isCloseFinish(scenario.scenarioId));
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.
   useEffect(() => {
@@ -576,13 +597,34 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     ];
     for (const candidate of candidates) {
       const key = `${candidate.delegated ? "delegated" : "opponent"}:${candidate.teamId}`;
-      const stamp = `${view.revision}:${delegation.changes.length}`;
+      const stamp = `${view.revision}:${delegation.changes.length}:${matchAware}:${highlights}`;
       if (lastAiChecked.current[key] === stamp) continue;
       lastAiChecked.current[key] = stamp;
-      send({ type: "AI_STEP", ...candidate });
+      send({ type: "AI_STEP", ...candidate, clubStyle: highlights && !candidate.delegated, matchAware: matchAware && !candidate.delegated });
       return;
     }
-  }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly]);
+  }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly, matchAware, highlights]);
+  // Let the ordinary opponent policy finish its commands before resuming the passage.
+  useEffect(() => {
+    const active = passage.current;
+    if (!active || !view || !captainedTeam || busy || inflight.current) return;
+    const innings = view.innings[view.activeIndex]?.innings;
+    if (error || fatal || persistence?.readOnly || persistence?.saveId !== active.saveId || !innings) {
+      endPassage("");
+      return;
+    }
+    if (active.inningsIndex !== view.activeIndex) { endPassage(passageReport(active, view) + " Innings closed."); return; }
+    if (active.stopping || view.phase === "COMPLETE" || innings.wickets !== active.wickets || innings.legalBalls >= active.stopAt ||
+        (active.requiredRate !== null && active.requiredRate < 10 && requiredRate(view) >= 10) ||
+        (view.phase !== "READY" && view.decisionTeamId === captainedTeam)) {
+      endPassage(passageReport(active, view));
+    } else if (view.phase === "READY" && !view.advanceReason) {
+      const timer = window.setTimeout(() => { if (passage.current === active && !inflight.current) act({kind:"ADVANCE", payload:{scope:"DELIVERY"}}, true); }, 150);
+      return () => window.clearTimeout(timer);
+    } else if (view.phase === "READY" || aiTeamId !== rivalTeam) {
+      endPassage(passageReport(active, view));
+    }
+  }, [view, captainedTeam, rivalTeam, busy, error, fatal, persistence, aiTeamId]);
   // Stage 14: the tactical captain makes its side's super-over choices.
   const lastSuperOverAi = useRef("");
   useEffect(() => {
@@ -637,8 +679,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     const archive = new Uint8Array(await file.arrayBuffer());
     send({ type: "IMPORT_SAVE", archive });
   }
-  function act(action: Action) {
+  function act(action: Action, continuingPassage = false) {
     if (!view || inflight.current || fatal) return;
+    if (passage.current && !continuingPassage) endPassage(passageReport(passage.current, view));
     audioBootSyncRef.current = false;
     audioManagerRef.current?.unlockFromUserGesture();
     setDiagnosticPreview(null);
@@ -669,6 +712,33 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       },
     });
   }
+  function stopPassage() {
+    if (!passage.current || !view) return;
+    passage.current.stopping = true;
+    if (!inflight.current) endPassage(passageReport(passage.current, view));
+  }
+
+  function startPassage(action: Action, label: string) {
+    if (!view || !captainedTeam || inflight.current || fatal || !persistence?.saveId || persistence.readOnly) return;
+    const selectingBowler = action.kind === "SET_BOWLER" &&
+      view.phase === "AWAITING_BOWLER" && view.decisionTeamId === captainedTeam;
+    if (view.phase !== "READY" && !selectingBowler) return;
+
+    const innings = view.innings[view.activeIndex]!.innings;
+    const balls = innings.legalBalls;
+    const limit = view.format === "ODI" ? 300 : 120;
+    const twoOverBoundary = (Math.floor(balls / 6) + 2) * 6;
+    passage.current = {
+      saveId: persistence.saveId, label, runs: innings.runs, wickets: innings.wickets, balls, requiredRate: innings.targetToWin ? requiredRate(view) : null,
+      boundaries: boundaryCount(view), stopping: false,
+      inningsIndex: view.activeIndex, sequence: view.fieldPresentation?.latestHighlight?.sequence ?? 0,
+      stopAt: Math.min(balls < limit - 12 ? limit - 12 : limit, twoOverBoundary),
+    };
+    setPlayingPassage(true);
+    setFinishReport("");
+    act(action, true);
+  }
+
   function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
     if (!view || inflight.current || fatal || view.advanceReason || persistence?.readOnly) return;
     advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512, cancel: false, from: null };
@@ -695,23 +765,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const tn = (id: string) => view?.teams.find((t) => t.id === id)?.name ?? id;
   const striker =
     i?.strikerEnd === "NORTH" ? i.northBatterId : i?.southBatterId;
-  return (
-    <main
-      style={{ fontSize: `${Number(scale) / 100}rem` }}
-      className={`match-shell density-${density}`}
-    >
-      <a className="skip" href="#decision">
-        Skip to next decision
-      </a>
-      <header className="masthead">
-        <div>
-          <p className="eyebrow">THE FICTIONAL CRICKET EXHIBITION</p>
-          <h1>
-            Lord Cricket <span>XXVI</span>
-          </h1>
-        </div>
-        <span className="alpha">SYNTHETIC_ALPHA</span>
-      </header>
+  const chaseRuns = i?.targetToWin == null ? null : Math.max(0, i.targetToWin - i.runs);
+  const chaseBalls = !i || !view || view.format === "RED_BALL"
+    ? null
+    : Math.max(0, (view.format === "ODI" ? 300 : 120) - i.legalBalls);
+  const preferences = (
       <div className="preferences">
         <label>
           Text scale{" "}
@@ -771,6 +829,131 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               : "Local autosave ready"}
         </span>
       </div>
+  );
+  const pacePanel = view && limitedOvers && captainedTeam && (
+    <section className="captain-station" aria-label="Match pace">
+      <header>
+        <div>
+          <p className="eyebrow">CAPTAIN’S PAVILION</p>
+          <strong>
+            {view.teams.find((t) => t.id === captainedTeam)?.name}
+          </strong>
+        </div>
+        <button
+          type="button"
+          aria-pressed={highlights}
+          disabled={busy || !!persistence?.readOnly}
+          onClick={() => {
+            if (highlights) stopPassage();
+            else if (rivalTeam && !aiTeamId) changeAiOpponent(rivalTeam);
+            setPaceOverride(!highlights);
+            if (persistence?.saveId)
+              localStorage.setItem(
+                "lcxxvi-match-pace:" + persistence.saveId,
+                highlights ? "manual" : "highlights",
+              );
+            setDelegationTeam(captainedTeam);
+          }}
+        >
+          {highlights ? "Return to manual pace" : "Play captain’s highlights"}
+        </button>
+        {view.format === "T20" && (
+          <label>
+            Opposition{" "}
+            <select
+              aria-label="Opposition difficulty"
+              value={matchAware ? "advanced" : "standard"}
+              disabled={busy || playingPassage}
+              onChange={(e) => {
+                const enabled = e.target.value === "advanced";
+                setMatchAware(enabled);
+                lastAiChecked.current = {};
+                localStorage.setItem(
+                  "lcxxvi-captain-challenge",
+                  enabled ? "match-aware" : "standard",
+                );
+              }}
+            >
+              <option value="standard">Standard</option>
+              <option value="advanced">Match-aware</option>
+            </select>
+          </label>
+        )}
+      </header>
+      {highlights && (
+        <>
+          <CloseFinish
+            view={view}
+            playerTeamId={captainedTeam}
+            finished={view.phase === "COMPLETE"}
+            disabled={
+              busy ||
+              fatal ||
+              Boolean(persistence?.readOnly) ||
+              (view.phase === "READY" && Boolean(view.advanceReason))
+            }
+            playing={playingPassage}
+            report={finishReport}
+            stop={stopPassage}
+            replay={
+              scenario
+                ? () =>
+                    send({
+                      type: "SCENARIO_START",
+                      scenarioId: scenario.scenarioId,
+                    })
+                : undefined
+            }
+            command={startPassage}
+            select={act}
+          />
+          <a
+            href="#decision"
+            onClick={(e) => {
+              e.preventDefault();
+              document.querySelector<HTMLElement>("#decision h2")?.focus();
+            }}
+          >
+            Full match controls
+          </a>
+          <a
+            href="#captain-delegation"
+            onClick={(e) => {
+              e.preventDefault();
+              setDelegationTeam(captainedTeam);
+              const details = document.querySelector<HTMLDetailsElement>(
+                "#captain-delegation",
+              );
+              if (details) {
+                details.open = true;
+                details.querySelector("summary")?.focus();
+              }
+            }}
+          >
+            Choose delegated decisions
+          </a>
+        </>
+      )}
+    </section>
+  );
+  return (
+    <main
+      style={{ fontSize: `${Number(scale) / 100}rem` }}
+      data-motion={highlightMotion} className={`match-shell density-${density}`}
+    >
+      <a className="skip" href="#decision">
+        Skip to next decision
+      </a>
+      <header className="masthead">
+        <div>
+          <p className="eyebrow">{careerLaunch.current ? "CAREER MATCHDAY" : view?.matchId?.startsWith("tour-m") ? "TOURNAMENT MATCHDAY" : scenario ? "SCENARIO CHALLENGE" : "THE FICTIONAL CRICKET EXHIBITION"}</p>
+          <h1>
+            Lord Cricket <span>XXVI</span>
+          </h1>
+        </div>
+        <span className="alpha">SYNTHETIC_ALPHA</span>
+      </header>
+      {!view && preferences}
       {view?.matchId?.startsWith("tour-m") && (
         <section className="career-match-banner" data-testid="tournament-banner" aria-label="Tournament match">
           <strong>Tournament match</strong>
@@ -854,23 +1037,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         </>
       )}
       {view && (
-        <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
-          <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
-          <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
-            onChange={e => changeAiOpponent(e.target.value)}>
-            <option value="">Manual decisions for both teams</option>
-            {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
-          </select>
-          <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
-        </section>
-      )}
-      {view && careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
-      {view && (
         <>
           <section
-            className="scorestrip"
+            className="scorestrip" data-quay={view.ground === "Aster Quay"} data-stage={view.resultText ? "result" : i?.targetToWin ? "chase" : i ? "innings" : "toss"}
             aria-label="Match scoreboard"
             data-testid="scorestrip"
+            /* Both sides' kit colours as a thin stripe along the top: the scoreboard is where edited-world colours show. */
             style={view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : undefined}
           >
             <div>
@@ -883,9 +1055,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   ? tn(i.battingTeamId)
                   : view.teams.map((t) => t.name).join(" v ")}
               </h2>
+              <div className="broadcast-line">{view.teams.filter(team => !i || team.id === i.battingTeamId).map(team => <TeamCrest key={team.id} teamId={team.id} name={team.name} colours={team.colours ?? []} size={32} decorative />)}
               <strong className="score">
                 {i ? `${i.runs}/${i.wickets}` : "Ready for the toss"}
               </strong>
+              </div>
               {i && (
                 <span className="over">
                   {view.format === "RED_BALL"
@@ -895,14 +1069,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
             <div className="target" data-testid="target">
-              <span>Target</span>
-              <strong>{i?.targetToWin ?? "Not set"}</strong>
-              {i?.targetToWin != null && (
+              <span>{view.resultText ? "Result" : i?.targetToWin != null ? "Target" : "Match phase"}</span>
+              <strong>{view.resultText ?? i?.targetToWin ?? (i ? `Innings ${view.activeIndex + 1}` : "Pre-match")}</strong>
+              {!view.resultText && chaseRuns !== null && (
                 <p>
-                  {Math.max(0, i.targetToWin - i.runs)} needed ·{" "}
-                  {view.format === "RED_BALL"
-                    ? "time remaining"
-                    : `${Math.max(0, (view.format === "ODI" ? 300 : 120) - i.legalBalls)} balls left`}
+                  {chaseRuns} needed · {chaseBalls === null ? "time remaining" : `${chaseBalls} balls left`}
+                  {chaseBalls !== null && chaseBalls > 0 && (
+                    <> · Required rate {((6 * chaseRuns) / chaseBalls).toFixed(2)}</>
+                  )}
                 </p>
               )}
               {view.activeIndex === 1 && (
@@ -914,6 +1088,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
           </section>
+          {highlights && pacePanel}
           <section
             className="active"
             aria-label="Active players"
@@ -967,7 +1142,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       ? "Free hit pending"
                       : i && i.legalBalls < 36
                         ? "Powerplay: at most 2 outside the circle"
-                        : "Manual control of both teams")}
+                        : aiTeamId ? `${tn(aiTeamId)} controlled by AI` : "Manual control of both teams")}
               </p>
             </div>
           </section>
@@ -1178,6 +1353,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </div>
             </fieldset>
           </section>
+          {!highlights && pacePanel}
+          {preferences}
+          <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
+            <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
+            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
+              onChange={e => changeAiOpponent(e.target.value)}>
+              <option value="">Manual decisions for both teams</option>
+              {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
+            </select>
+            <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
+          </section>
+        {careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
           {(() => {
             const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
             const selected = delegationForTeam(delegation, selectedTeam.id);
@@ -1192,7 +1379,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               ...(view.format !== "T20" ? [["FIELD", "Field placement"]] as [DelegationCategory, string][] : []),
               ...(view.format === "RED_BALL" ? [["DECLARATION", "Declaration"], ["FOLLOW_ON", "Follow-on"], ["NEW_BALL", "New ball"]] as [DelegationCategory, string][] : []),
             ];
-            return <details className="career-panel">
+            return <details className="career-panel" id="captain-delegation">
               <summary>Delegate individual decisions</summary>
               <p>Choose which decisions the tactical captain may make. These choices are saved with the match.</p>
               <label>Delegation team <select value={selectedTeam.id} disabled={busy || fatal} onChange={event => setDelegationTeam(event.currentTarget.value)}>{view.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
@@ -1483,7 +1670,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     .slice()
                     .reverse()
                     .map((e) => (
-                      <li key={e.sequence} value={e.sequence} data-category={e.category}>
+                      <li key={e.sequence} value={e.sequence} data-category={e.category} data-moment={e.sequence === view.commentary.at(-1)?.sequence && (e.category === "DISMISSAL" || e.category === "MILESTONE" || e.category === "RESULT" || !!e.milestoneTags?.length)}>
                         <span>{selectCommentaryTextForMode(e, commentary)}</span>
                         {commentary !== "brief" && e.milestoneTags && e.milestoneTags.length > 0 && (
                           <span className="commentary-milestones" aria-label="Milestones">

@@ -1,3 +1,4 @@
+import { TeamCrest } from "../world/TeamCrest.js";
 import type { ReactNode } from "react";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { CareerApplicationService } from "./service.js";
@@ -72,8 +73,9 @@ export function FixturesScreen(props: FixturesScreenProps) {
                         key={fixture.fixtureId}
                         className={managed ? "managed-fixture" : ""}
                       >
-                        <td>{service.teamName(fixture.homeTeamId)}</td>
-                        <td>{service.teamName(fixture.awayTeamId)}</td>
+                        {[fixture.homeTeamId, fixture.awayTeamId].map(id => (
+                          <td key={id}><TeamCrest teamId={id} name={service.teamName(id)} colours={service.getWorld().teams.find(t => t.teamId === id)?.colours ?? []} size={20} decorative />{service.teamName(id)}</td>
+                        ))}
                         <td>{service.groundName(fixture.groundId)}</td>
                         <td>
                           {completion ? "Completed" : "Scheduled"}

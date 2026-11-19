@@ -27,6 +27,8 @@ import type {
   T20Command,
 } from "@lcxxvi/contracts";
 
+import { strandingReasons } from "./bowler-plan.js";
+
 export type DelegationCategory = DelegationCategoryValue;
 
 function slotsSignature(slots: readonly { slotId: string; playerId: string }[]): string {
@@ -40,8 +42,10 @@ export function proposeOpponentT20Command(
   session: Readonly<T20Session>,
   teamId: string,
   categories?: readonly DelegationCategory[],
+  matchAware = false,
+  clubStyle = matchAware,
 ): T20Command | null {
-  const command = proposeT20Command(session, teamId);
+  const command = proposeT20Command(session, teamId, matchAware, clubStyle);
   if (!command || !categories) return command;
   const category: Partial<Record<T20Command["kind"], DelegationCategory>> = {
     CALL_TOSS: "TOSS",
@@ -56,7 +60,7 @@ export function proposeOpponentT20Command(
   return selected && categories.includes(selected) ? command : null;
 }
 
-function proposeT20Command(session: Readonly<T20Session>, teamId: string): T20Command | null {
+function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchAware: boolean, clubStyle: boolean): T20Command | null {
   if (!session.setup.teams.some(t => t.teamId === teamId)) throw new Error("LC_T20_AI_UNKNOWN_TEAM");
   const phase = session.core.phase;
   if (phase === "COMPLETE" || phase === "SETUP") return null;
@@ -94,7 +98,67 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string): T20Co
     availableBatters: Math.max(0, 10 - i.wickets),
     bowlingCandidates: bowlers,
   };
-  const advice = adviseT20Captain(view);
+  const advice = { ...adviseT20Captain(view) };
+  // Stable captain temperament uses identity; decisions use only public match observations.
+  const bankLateOvers =
+    [...teamId].reduce((sum, c) => sum + c.charCodeAt(0), 0) % 4 < 2;
+  if (
+    (matchAware || (clubStyle && bankLateOvers)) &&
+    bowling &&
+    phase === "AWAITING_BOWLER" &&
+    bowlers.length > 1
+  ) {
+    const stranded = strandingReasons(
+      bowlingTeam.xi.map((p) => ({
+        id: p.playerId,
+        eligible: !!p.bowlingStyle && p.playerId !== bowlingTeam.keeperId,
+        legalBalls: ledger.bowling[p.playerId]?.legalBalls ?? 0,
+      })),
+      Math.ceil((120 - i.legalBalls) / 6),
+      24,
+    );
+    const ranked = bowlers
+      .filter((b) => !stranded.has(b.playerId))
+      .sort(
+        (a, b) =>
+          b.control +
+          b.movement -
+          b.fatigueBp / 250 -
+          (a.control + a.movement - a.fatigueBp / 250),
+      );
+    const reserve =
+      ranked.length > 1 &&
+      bankLateOvers &&
+      i.legalBalls >= 72 &&
+      i.legalBalls < 108 &&
+      ranked[0]!.quotaRemaining <= 12;
+    const pick = reserve
+      ? ranked[1]!
+      : matchAware
+        ? ranked[0]!
+        : (ranked.find((b) => b.playerId === advice.preferredBowlerId) ??
+          ranked[0]!);
+    return {
+      ...base,
+      actorId: `AI:${teamId}`,
+      kind: "SET_BOWLER",
+      payload: { teamId, bowlerId: pick.playerId },
+    };
+  }
+  if ((matchAware || clubStyle) && phase === "READY") {
+    const striker =
+      i.strikerEnd === "NORTH" ? i.northBatterId : i.southBatterId;
+    const ballsFaced = striker ? (ledger.batting[striker]?.ballsFaced ?? 0) : 0;
+    if (bowling && !bankLateOvers && ballsFaced < 4) {
+      advice.bowlingLength = "YORKER";
+      advice.bowlingEffort = "MAXIMUM";
+    }
+    if (matchAware && batting && i.targetToWin && 120 - i.legalBalls > 0) {
+      const rate = ((i.targetToWin - i.runs) * 6) / (120 - i.legalBalls);
+      if (rate >= 9) advice.aggression = 4;
+      else if (rate < 5 && i.wickets >= 6) advice.aggression = 1;
+    }
+  }
   if (phase === "AWAITING_BATTER" && batting) return owned(fixtureAutopilotStep(session as T20Session));
   if (phase === "AWAITING_BOWLER" && bowling) {
     if (!advice.preferredBowlerId) return owned(fixtureAutopilotStep(session as T20Session));

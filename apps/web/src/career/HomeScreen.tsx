@@ -1,7 +1,14 @@
+import { TeamCrest } from "../world/TeamCrest.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { percentageBp } from "./format.js";
 import { CareerApplicationService } from "./service.js";
+
+export const selectionNoteKey = (
+  save: string,
+  season: string,
+  fixture: string,
+) => JSON.stringify(["lcxxvi-selection-focus", save, season, fixture]);
 
 /** The career Home screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
 export function HomeScreen(props: HomeScreenProps) {
@@ -24,11 +31,44 @@ export function HomeScreen(props: HomeScreenProps) {
     tableRow,
     completedManaged,
   } = props;
+  const call = pendingMatch ? null : service.selectionCall();
+  const previous = state.completedMatches
+    .filter(
+      (m) => m.homeTeamId === controlledTeam || m.awayTeamId === controlledTeam,
+    )
+    .at(-1);
+  let backed: string | null = null;
+  try {
+    if (previous)
+      backed = localStorage.getItem(
+        selectionNoteKey(
+          service.getSaveId() ?? "",
+          state.seasonId,
+          previous.fixtureId,
+        ),
+      );
+  } catch {
+    /* portable saves still show the official result */
+  }
+  const backedXI = previous?.selectedTeams.find(
+    (t) => t.teamId === controlledTeam,
+  );
+  const backedBat = backed
+    ? previous?.scorecard.innings.find(
+        (i) => i.battingTeamId === controlledTeam,
+      )?.batting[backed]
+    : null;
+  const backedBowl = backed
+    ? previous?.scorecard.innings.find(
+        (i) => i.battingTeamId !== controlledTeam,
+      )?.bowling[backed]
+    : null;
+  const budget = call && service.managedClubBudget();
   return (
     <section aria-labelledby="home-heading">
       <h2 id="home-heading">Home</h2>
       <div className="dashboard-grid">
-        <article className="career-panel emphasis">
+        <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"}>
           <h3>Next required action</h3>
           {state.phase === "COMPLETE" ? (
             <>
@@ -74,6 +114,16 @@ export function HomeScreen(props: HomeScreenProps) {
             </>
           ) : nextFixture ? (
             <>
+              <p className="fixture-round">Round {nextFixture.roundNumber} · T20</p>
+              <p className="fixture-opponents">
+                {[nextFixture.homeTeamId, nextFixture.awayTeamId].map((id, index) => (
+                  <span key={id}>{index === 1 && <small>v </small>}
+                    <TeamCrest teamId={id} name={service.teamName(id)} colours={displayWorld.teams.find(t => t.teamId === id)?.colours ?? []} size={34} decorative />
+                    {service.teamName(id)}
+                  </span>
+                ))}
+              </p>
+              <p className="fixture-venue">{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
               {state.careerState.currentDate < nextFixture.matchDayDate ? (
                 <button
                   className="primary"
@@ -89,7 +139,6 @@ export function HomeScreen(props: HomeScreenProps) {
               ) : (
                 <div className="action-row">
                   <button
-                    className="primary"
                     disabled={busy || inspectionOnly || service.isReadOnly()}
                     onClick={() => action(simulateMatch)}
                   >
@@ -97,6 +146,7 @@ export function HomeScreen(props: HomeScreenProps) {
                   </button>
                   <button
                     disabled={busy || inspectionOnly || service.isReadOnly()}
+                    className="primary"
                     onClick={() => void playMatch()}
                   >
                     Play match
@@ -110,15 +160,64 @@ export function HomeScreen(props: HomeScreenProps) {
                   progress. Play match resumes it.
                 </p>
               )}
-              <p className="big-stat">Round {nextFixture.roundNumber}</p>
-              <p>
-                <strong>{service.teamName(nextFixture.homeTeamId)}</strong> v{" "}
-                <strong>{service.teamName(nextFixture.awayTeamId)}</strong>
-              </p>
-              <p>
-                {nextFixture.matchDayDate} ·{" "}
-                {service.groundName(nextFixture.groundId)}
-              </p>
+              {call && (
+                <section className="selection-call" aria-label="Selection call">
+                  <p className="eyebrow">
+                    SELECTION ROOM · ROUND {nextFixture.roundNumber}
+                  </p>
+                  <h3>
+                    Who takes the{" "}
+                    {call.incumbent.role.toLowerCase().replaceAll("_", " ")}{" "}
+                    spot?
+                  </h3>
+                  <div className="selection-options">
+                    {[call.incumbent, call.reserve].map((player, index) => {
+                      const deal = service.playerContract(player.playerId);
+                      const figures = call.bowled?.legalBalls
+                        ? `Took ${call.bowled.wickets}/${call.bowled.runsConceded} last match.`
+                        : call.batted.ballsFaced
+                          ? `Scored ${call.batted.runs} from ${call.batted.ballsFaced} last match.`
+                          : "Selected last match. Did not face a ball.";
+                      return (
+                        <div key={player.playerId}>
+                          <strong>{player.name}</strong>
+                          <p>
+                            {index === 0
+                              ? figures
+                              : call.reserveMatches
+                                ? `${call.reserveMatches} appearance${call.reserveMatches === 1 ? "" : "s"} this season.`
+                                : "A first appearance this season is on offer."}
+                          </p>
+                          <small>
+                            Age {service.playerAge(player.birthDate)}
+                            {deal && ` · ${deal.annualWageK}k per season`}
+                          </small>
+                          <button
+                            disabled={
+                              busy || inspectionOnly || service.isReadOnly()
+                            }
+                            onClick={() =>
+                              void playMatch({
+                                fixtureId: call.fixtureId,
+                                playerId: player.playerId,
+                              })
+                            }
+                          >
+                            {index ? "Bring in" : "Retain"} {player.name} &amp;
+                            play
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {budget && (
+                    <small>
+                      Club wages committed · {budget.committedWagesK}k of{" "}
+                      {budget.annualWageBudgetK}k
+                    </small>
+                  )}
+                </section>
+              )}
               <PitchInspection
                 ground={displayWorld.grounds.find(
                   (ground) => ground.groundId === nextFixture.groundId,
@@ -142,6 +241,25 @@ export function HomeScreen(props: HomeScreenProps) {
             <p>No remaining managed fixture.</p>
           )}
         </article>
+        {previous && (
+          <article className="career-panel score-notebook">
+            <p className="eyebrow">
+              LAST TIME OUT · ROUND {previous.roundNumber}
+            </p>
+            <h3>{service.resultText(previous)}</h3>
+            {backed && backedXI?.playerIds.includes(backed) && (
+              <p>
+                Your selection: <strong>{service.playerName(backed)}</strong>.{" "}
+                {backedBat?.ballsFaced
+                  ? `${backedBat.runs} from ${backedBat.ballsFaced} balls.`
+                  : "Did not face a ball."}{" "}
+                {backedBowl && backedBowl.legalBalls > 0
+                  ? `${backedBowl.wickets}/${backedBowl.runsConceded} with the ball.`
+                  : ""}
+              </p>
+            )}
+          </article>
+        )}
         <article className="career-panel">
           <h3>League position</h3>
           <p className="big-stat">{tableRow ? `#${tableRow.rank}` : "–"}</p>
@@ -220,7 +338,7 @@ export type HomeScreenProps = {
   action: (work: () => Promise<void>) => Promise<void>;
   nextFixture: ReturnType<CareerApplicationService["nextManagedFixture"]>;
   pendingMatch: { round: number | null } | null;
-  playMatch: () => Promise<void>;
+  playMatch: (pick?: {fixtureId:string;playerId:string}) => Promise<void>;
   /** Simulates the managed fixture and settles any pending match. */
   simulateMatch: () => Promise<void>;
   /** Closes the season and rolls over, then resets the replay and statistics scope. */

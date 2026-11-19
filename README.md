@@ -54,6 +54,8 @@ Then open **`http://127.0.0.1:4180/`** (or run `node start.mjs --open`). Because
 
 ## What Has Been Built
 
+**Play the captaincy journey** from **Scenarios → Death-overs chase** or **Nineteen to defend**. In career, take a selection decision from Home into the next fixture and bring its scorecard back to the club. [Controls, screenshots and playtest routes](docs/verification-captains-pavilion/PLAY.md)
+
 ### Core Simulation & Match Formats (Stage 1 / V0.1, `accepted`)
 
 - **Single Authoritative Cricket Truth**: Pure deterministic TypeScript engines (`@lcxxvi/domain`, `@lcxxvi/simulation`) running inside a dedicated Web Worker, while React (`apps/web`) acts strictly as a projection and command layer.

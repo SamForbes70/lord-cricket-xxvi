@@ -437,3 +437,30 @@ test("a damaged imported-roster career moves its pending match binding when crea
   await expect(fresh.getByText("0/56 fixtures")).toHaveCount(0);
   await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
 });
+
+test("A selection from Home takes the field and returns to the next matchday notebook", async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.goto("/#career");
+  await page.getByRole("button", { name: /Aster Harbour/ }).first().click();
+  const matchDay = page.getByRole("button", {name: "Advance to match day"});
+  const simulate = page.getByRole("button", {name: "Simulate match", exact:true});
+  await expect(simulate.or(matchDay)).toBeVisible();
+  if (await matchDay.isVisible()) await matchDay.click();
+  await simulate.click();
+  await expect(page.locator(".score-notebook")).toContainText("ROUND 1", {timeout:60_000});
+  if (await matchDay.isVisible()) await matchDay.click();
+  const room = page.getByRole("region", {name: "Selection call"});
+  const pick = room.getByRole("button", {name: /^Bring in /});
+  await expect(pick).toBeEnabled({timeout:60_000});
+  const player = (await pick.innerText()).replace(/^Bring in /, "").replace(/ & play$/, "");
+  await pick.click();
+  await expect(page.locator("#decision")).toBeVisible({timeout:60_000});
+  await takeManualControl(page);
+  await playToEnd(page);
+  await page.getByRole("button", {name:"Return result to career"}).click();
+  const notebook = page.locator(".score-notebook");
+  await expect(notebook).toContainText("ROUND 2", {timeout:60_000});
+  await expect(notebook.getByText(player, {exact:true})).toBeVisible();
+  await page.reload();
+  await expect(notebook.getByText(player, {exact:true})).toBeVisible({timeout:60_000});
+});
