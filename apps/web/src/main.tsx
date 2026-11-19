@@ -1,3 +1,4 @@
+import { CloseFinish, boundaryCount, isCloseFinish, passageReport, type Passage } from "./match/CloseFinish.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AWARDS_PROVENANCE_NOTICE, type MatchAwardCandidate } from "@lcxxvi/contracts";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
@@ -105,6 +106,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   })());
   const [scenario, setScenario] = useState<ScenarioStatus | null>(null);
+  const passage = useRef<Passage | null>(null);
+  const [finishReport, setFinishReport] = useState("");
+  const [playingPassage, setPlayingPassage] = useState(false);
+  function endPassage(report: string) {
+    passage.current = null;
+    setPlayingPassage(false);
+    setFinishReport(report);
+  }
   /** Stage 15: the player's tournament fixture chosen on the Tournaments screen, started once the worker has booted. */
   const tournamentLaunch = useRef<TournamentLaunch | null>((() => {
     try {
@@ -274,6 +283,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       audioBootSyncRef.current = false;
       audioManagerRef.current?.unlockFromUserGesture();
     }
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) endPassage("");
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -584,6 +594,24 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       return;
     }
   }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly]);
+  // Let the ordinary opponent policy finish its commands before resuming the passage.
+  useEffect(() => {
+    const active = passage.current;
+    if (!active || !view || !scenario || busy || inflight.current) return;
+    const innings = view.innings[view.activeIndex]?.innings;
+    if (error || fatal || persistence?.readOnly || persistence?.saveId !== active.saveId || !innings) {
+      endPassage("");
+      return;
+    }
+    if (active.stopping || view.phase === "COMPLETE" || innings.wickets !== active.wickets || innings.legalBalls >= active.stopAt ||
+        (view.phase !== "READY" && view.decisionTeamId === scenario.playerTeamId)) {
+      endPassage(passageReport(active, view));
+    } else if (view.phase === "READY" && !view.advanceReason) {
+      act({kind:"ADVANCE", payload:{scope:"OVER"}});
+    } else if (view.phase === "READY" || aiTeamId !== scenario.opponentTeamId) {
+      endPassage(passageReport(active, view));
+    }
+  }, [view, scenario, busy, error, fatal, persistence, aiTeamId]);
   // Stage 14: the tactical captain makes its side's super-over choices.
   const lastSuperOverAi = useRef("");
   useEffect(() => {
@@ -670,6 +698,31 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       },
     });
   }
+  function stopPassage() {
+    if (!passage.current || !view) return;
+    passage.current.stopping = true;
+    if (!inflight.current) endPassage(passageReport(passage.current, view));
+  }
+
+  function startPassage(action: Action, label: string) {
+    if (!view || !scenario || inflight.current || fatal || !persistence?.saveId || persistence.readOnly) return;
+    const selectingBowler = action.kind === "SET_BOWLER" &&
+      view.phase === "AWAITING_BOWLER" && view.decisionTeamId === scenario.playerTeamId;
+    if (view.phase !== "READY" && !selectingBowler) return;
+
+    const innings = view.innings[view.activeIndex]!.innings;
+    const balls = innings.legalBalls;
+    const twoOverBoundary = (Math.floor(balls / 6) + 2) * 6;
+    passage.current = {
+      saveId: persistence.saveId, label, runs: innings.runs, wickets: innings.wickets, balls,
+      boundaries: boundaryCount(view), stopping: false,
+      stopAt: Math.min(balls < 108 ? 108 : 120, twoOverBoundary),
+    };
+    setPlayingPassage(true);
+    setFinishReport("");
+    act(action);
+  }
+
   function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
     if (!view || inflight.current || fatal || view.advanceReason || persistence?.readOnly) return;
     advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512, cancel: false, from: null };
@@ -796,6 +849,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <p role="status" data-testid="scenario-outcome">
               <strong>{scenario.resultText}</strong>
             </p>
+          )}
+          {isCloseFinish(scenario.scenarioId) && (
+            <CloseFinish
+              view={view}
+              scenario={scenario}
+              disabled={busy || fatal || Boolean(persistence?.readOnly) || (view.phase === "READY" && Boolean(view.advanceReason))}
+              playing={playingPassage}
+              report={finishReport}
+              stop={stopPassage}
+              replay={() => send({ type: "SCENARIO_START", scenarioId: scenario.scenarioId })}
+              command={startPassage}
+            />
           )}
           <a href="#scenarios">Back to scenarios</a>
         </section>

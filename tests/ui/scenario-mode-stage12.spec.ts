@@ -79,3 +79,27 @@ test("Stage 12 red-ball scenario starts in the fourth innings and replaces an op
   await expect(page.getByTestId("scenario-outcome")).toHaveCount(0);
   expect(pageErrors).toEqual([]);
 });
+
+for (const challenge of [
+  { title: "Death-overs chase", startingScore: "68/5", plan: "Attack the boundary" },
+  { title: "Nineteen to defend", startingScore: "52/4", plan: "Hold the channel" },
+]) {
+  test(`Close finish: ${challenge.title} applies a captain's plan, reports the passage and replays the checkpoint`, async ({page}) => {
+    test.setTimeout(180_000);
+    await page.goto("/#scenarios");
+    await page.getByRole("button", {name: "Play " + challenge.title, exact:true}).click();
+    const panel = page.getByRole("region", {name:"Captain’s highlights"});
+    await expect(page.getByTestId("scorestrip")).toContainText(challenge.startingScore);
+    if (challenge.title === "Nineteen to defend") {
+      await page.locator("button[data-candidate]:enabled").first().click();
+    }
+    await panel.getByRole("button", {name:new RegExp(challenge.plan)}).click();
+    await expect(panel.getByRole("status")).toContainText(new RegExp(challenge.plan + ".*legal balls?\\. Boundaries:"));
+    await playToEnd(page);
+    await expect(panel).toContainText("What would you try differently?");
+    await panel.getByRole("button", {name:"Play again"}).click();
+    await expect(page.getByTestId("scorestrip")).toContainText(challenge.startingScore);
+    await expect(page.getByTestId("scenario-outcome")).toHaveCount(0);
+    await expect(panel.getByRole("status")).toHaveCount(0);
+  });
+}
