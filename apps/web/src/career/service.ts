@@ -2602,7 +2602,7 @@ export class CareerApplicationService {
     const eligible = world.players.filter((p) => availableIds.has(p.playerId));
     const reserves = eligible
       .filter((p) => !side.playerIds.includes(p.playerId))
-      .sort((a, b) => b.birthDate.localeCompare(a.birthDate));
+      .sort((a, b) => compareCodePoints(b.birthDate, a.birthDate));
     // Prefer an actual contribution from the last fixture for the selection discussion.
     const contribution = (id: string) =>
       (batting[id]?.runs ?? 0) + 15 * (bowling[id]?.wickets ?? 0);
