@@ -212,7 +212,9 @@ export function createMatchController(
                 : l!.bowling[p.playerId]!.legalBalls >= 24
                   ? "Four-over limit reached"
                   : "";
-      return { id: p.playerId, name: names[p.playerId] ?? p.name, reason };
+      const { power, rotation, defence } = p.skills.T20;
+      return { id: p.playerId, name: names[p.playerId] ?? p.name, reason,
+        ...(c.phase === "AWAITING_BATTER" ? { batting: { power, rotation, defence } } : {}) };
     });
     if (c.phase === "AWAITING_BOWLER" && l && i) {
       // Refuse a bowler whose over would leave the rest of the innings impossible to bowl (five-bowler sides).
@@ -313,6 +315,8 @@ export function createMatchController(
         : null;
     return {
       format: "T20",
+      fatigueBp: { ...c.fatigueBp },
+      captainNotes: Object.fromEntries(s.setup.teams.map(t => [t.teamId, observedCaptainChoices(s.commands, t.teamId, names)])),
       revision: s.revision,
       phase: c.phase,
       nextDecision: decision[c.phase as keyof typeof decision] ?? c.phase,
@@ -647,4 +651,22 @@ export function createMatchController(
       return response;
     },
   };
+}
+
+function observedCaptainChoices(
+  commands: readonly T20Command[],
+  teamId: string,
+  names: Record<string, string>,
+) {
+  const calls = commands.filter((c) => c.actorId === `AI:${teamId}`);
+  const plans = calls.filter((c) => c.kind === "SET_BOWLING_PLAN").slice(-5);
+  const yorkers = plans.filter((c) => c.payload.length === "YORKER").length;
+  if (yorkers >= 2)
+    return `Called for yorkers in ${yorkers} of the last ${plans.length} bowling plan changes.`;
+  const spells = calls.filter((c) => c.kind === "SET_BOWLER").slice(-6);
+  const latest = spells.at(-1)?.payload.bowlerId;
+  const count = spells.filter((c) => c.payload.bowlerId === latest).length;
+  return latest && count >= 2
+    ? `Picked ${names[latest]} for ${count} of the last ${spells.length} overs assigned.`
+    : "";
 }

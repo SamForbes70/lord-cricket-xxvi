@@ -2544,7 +2544,99 @@ export class CareerApplicationService {
     );
   }
 
-  async prepareUserMatch(): Promise<CareerUserMatchLaunch> {
+  private matchDayTeams(state: CareerActiveSeasonState, fixtureId: string) {
+    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      return selectRosterFixtureTeams(
+        this.requireActiveRosterPack(),
+        state.schedule,
+        state.careerState,
+        fixtureId,
+      );
+    }
+    return selectOffscreenFixtureTeams({
+      schedule: state.schedule,
+      careerState: state.careerState,
+      fixtureId,
+      worldBytes,
+      worldManifest,
+    });
+  }
+
+  selectionCall() {
+    const state = this.state;
+    const fixture = this.nextManagedFixture();
+    if (
+      !state?.controlledTeamId ||
+      !fixture ||
+      fixture.matchDayDate !== state.careerState.currentDate
+    )
+      return null;
+    const previous = state.completedMatches
+      .filter(
+        (m) =>
+          m.homeTeamId === state.controlledTeamId ||
+          m.awayTeamId === state.controlledTeamId,
+      )
+      .at(-1);
+    if (!previous) return null;
+    const side = this.matchDayTeams(state, fixture.fixtureId).find(
+      (t) => t.teamId === state.controlledTeamId,
+    )!;
+    const squad = this.squadView()?.players ?? [];
+    const world = this.getWorld();
+    const batting =
+      previous.scorecard.innings.find((i) => i.battingTeamId === side.teamId)
+        ?.batting ?? {};
+    const bowling =
+      previous.scorecard.innings.find((i) => i.battingTeamId !== side.teamId)
+        ?.bowling ?? {};
+    const availableIds = new Set(
+      squad
+        .filter((p) => p.availability === "AVAILABLE")
+        .map((p) => p.playerId),
+    );
+    const eligible = world.players.filter((p) => availableIds.has(p.playerId));
+    const reserves = eligible
+      .filter((p) => !side.playerIds.includes(p.playerId))
+      .sort((a, b) => b.birthDate.localeCompare(a.birthDate));
+    // Prefer an actual contribution from the last fixture for the selection discussion.
+    const contribution = (id: string) =>
+      (batting[id]?.runs ?? 0) + 15 * (bowling[id]?.wickets ?? 0);
+    const incumbents = eligible
+      .filter(
+        (p) =>
+          side.playerIds.includes(p.playerId) &&
+          p.playerId !== side.captainId &&
+          p.playerId !== side.keeperId &&
+          batting[p.playerId],
+      )
+      .sort((a, b) => contribution(b.playerId) - contribution(a.playerId));
+    for (const incumbent of incumbents) {
+      const reserve = reserves.find(
+        (p) =>
+          p.role === incumbent.role &&
+          (!isBowlingCapable(incumbent) || isBowlingCapable(p)),
+      );
+      if (reserve)
+        return {
+          fixtureId: fixture.fixtureId,
+          incumbent,
+          reserve,
+          batted: batting[incumbent.playerId]!,
+          bowled: bowling[incumbent.playerId],
+          reserveMatches:
+            state.projection.players.find(
+              (p) => p.playerId === reserve.playerId,
+            )?.matches ?? 0,
+        };
+    }
+    return null;
+  }
+
+  async prepareUserMatch(pick?: {
+    fixtureId: string;
+    playerId: string;
+  }): Promise<CareerUserMatchLaunch> {
     await this.simulateToNextUserFixture();
     const { state, saveId } = this.requireWritable();
     const fixture = this.nextManagedFixture(state);
@@ -2552,18 +2644,30 @@ export class CareerApplicationService {
     if (state.careerState.currentDate !== fixture.matchDayDate) {
       throw new Error("Managed fixture is not ready.");
     }
+    const selections = this.matchDayTeams(state, fixture.fixtureId);
+    if (pick) {
+      const call = this.selectionCall();
+      if (
+        !call ||
+        call.fixtureId !== pick.fixtureId ||
+        ![call.reserve.playerId, call.incumbent.playerId].includes(
+          pick.playerId,
+        )
+      )
+        throw new Error("Selection changed. Review the match-day XI.");
+      const side = selections.find((t) => t.teamId === state.controlledTeamId)!;
+      side.playerIds = side.playerIds.map((id) =>
+        id === call.incumbent.playerId ? pick.playerId : id,
+      );
+    }
     if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
       const pack = this.requireActiveRosterPack();
-      const selections = selectRosterFixtureTeams(
-        pack,
-        state.schedule,
-        state.careerState,
-        fixture.fixtureId,
-      );
       return {
         launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE" as const,
         rosterPack: structuredClone(pack),
-        ...(this.worldCopy ? { worldCopy: structuredClone(this.worldCopy) } : {}),
+        ...(this.worldCopy
+          ? { worldCopy: structuredClone(this.worldCopy) }
+          : {}),
         saveId,
         seasonId: state.seasonId,
         scheduleSha256: state.schedule.scheduleSha256,
@@ -2579,16 +2683,11 @@ export class CareerApplicationService {
         matchSeed: fixture.matchSeed,
         selections: [selections[0], selections[1]],
         careerStateSha256: state.careerState.stateSha256,
-        ...(state.controlledTeamId ? { managedTeamId: state.controlledTeamId } : {}),
+        ...(state.controlledTeamId
+          ? { managedTeamId: state.controlledTeamId }
+          : {}),
       };
     }
-    const selections = selectOffscreenFixtureTeams({
-      schedule: state.schedule,
-      careerState: state.careerState,
-      fixtureId: fixture.fixtureId,
-      worldBytes,
-      worldManifest,
-    });
     return {
       ...(this.worldCopy
         ? {
@@ -2611,7 +2710,9 @@ export class CareerApplicationService {
       matchSeed: fixture.matchSeed,
       selections: [selections[0], selections[1]],
       careerStateSha256: state.careerState.stateSha256,
-      ...(state.controlledTeamId ? { managedTeamId: state.controlledTeamId } : {}),
+      ...(state.controlledTeamId
+        ? { managedTeamId: state.controlledTeamId }
+        : {}),
     };
   }
 
@@ -3547,7 +3648,9 @@ export class CareerApplicationService {
     const result = completion.scorecard.result;
     if (result.kind === "TIE") return "Tied";
     if (result.kind === "NO_RESULT") return "No result";
-    return `${this.teamName(result.winnerTeamId)} won by ${result.marginRuns ?? result.marginWickets} ${result.marginType?.toLowerCase() ?? ""}`.trim();
+    const margin = result.marginRuns ?? result.marginWickets;
+    const unit = result.marginType?.toLowerCase() ?? "";
+    return `${this.teamName(result.winnerTeamId)} won by ${margin} ${margin === 1 ? unit.replace(/s$/, "") : unit}`.trim();
   }
 
   private currentArchiveCacheKey(): string | null {

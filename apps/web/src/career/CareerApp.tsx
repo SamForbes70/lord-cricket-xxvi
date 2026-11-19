@@ -42,7 +42,7 @@ import { StatisticsScreen } from "./StatisticsScreen.js";
 import { ContractsScreen } from "./ContractsScreen.js";
 import { SquadScreen } from "./SquadScreen.js";
 import { CareerScreen } from "./CareerScreen.js";
-import { HomeScreen } from "./HomeScreen.js";
+import { HomeScreen, selectionNoteKey } from "./HomeScreen.js";
 import { FixturesScreen } from "./FixturesScreen.js";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
@@ -427,10 +427,27 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     });
   }
 
-  async function playMatch() {
+  async function playMatch(pick?: { fixtureId: string; playerId: string }) {
     await action(async () => {
-      const prepared = await service.prepareUserMatch();
+      const prepared = await service.prepareUserMatch(pick);
       const launch = await recordManagedLaunch(prepared);
+      if (
+        pick &&
+        launch.selections.some(
+          (side) =>
+            side.teamId === launch.managedTeamId &&
+            side.playerIds.includes(pick.playerId),
+        )
+      ) {
+        try {
+          localStorage.setItem(
+            selectionNoteKey(launch.saveId, launch.seasonId, launch.fixtureId),
+            pick.playerId,
+          );
+        } catch {
+          /* XI remains in the binding */
+        }
+      }
       sessionStorage.setItem(LAUNCH_KEY, JSON.stringify(launch));
       window.location.hash = "#exhibition";
     });

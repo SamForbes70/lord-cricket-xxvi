@@ -1151,7 +1151,7 @@ async function handleInner(raw: unknown): Promise<Response> {
     const profile = request.redBallProfile ?? redBallProfileForTeam(delegation, request.teamId);
     const command =
       session.setup.format === "T20"
-        ? proposeOpponentT20Command(session as T20Session, request.teamId, delegatedCategories)
+        ? proposeOpponentT20Command(session as T20Session, request.teamId, delegatedCategories, !request.delegated && request.matchAware, !request.delegated && request.clubStyle)
         : session.setup.format === "ODI"
           ? proposeOpponentODICommand(session as ODISession, request.teamId, delegatedCategories)
           : proposeOpponentRed5Command(session as Red5Session, request.teamId, profile, delegatedCategories);

@@ -103,3 +103,19 @@ for (const challenge of [
     await expect(panel.getByRole("status")).toHaveCount(0);
   });
 }
+
+test("The captain can stop a passage, use manual controls and resume against a match-aware opponent", async ({page}) => {
+  await page.goto("/#scenarios");
+  await page.getByRole("button", {name:"Play Death-overs chase",exact:true}).click();
+  const station = page.getByRole("region", {name:"Match pace"});
+  await station.getByLabel("Opposition difficulty").selectOption("advanced");
+  await station.getByRole("button", {name:/Attack the boundary/}).click();
+  await station.getByRole("button", {name:"Stop after this command"}).click();
+  await expect(station.getByRole("status")).toContainText("legal ball");
+  await station.getByRole("button", {name:"Return to manual pace"}).click();
+  await expect(station.getByRole("region", {name:"Captain’s highlights"})).toHaveCount(0);
+  await station.getByRole("button", {name:"Play captain’s highlights"}).click();
+  await station.getByRole("link", {name:"Choose delegated decisions"}).click();
+  await expect(page.locator("#captain-delegation")).toHaveAttribute("open","");
+  await expect(page.getByLabel("Delegation team")).not.toHaveValue(await page.getByLabel("Tactical captain",{exact:true}).inputValue());
+});

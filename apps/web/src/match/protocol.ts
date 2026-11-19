@@ -139,7 +139,7 @@ export const RequestSchema = z.discriminatedUnion("type", [
     origin: z.enum(["HUMAN", "AI"]),
     command: z.union([T20CommandSchema, ODICommandSchema, Red5CommandSchema]),
   }),
-  z.strictObject({ ...base, type: z.literal("AI_STEP"), teamId: z.string().min(1).max(128), delegated: z.boolean().optional(), redBallProfile: RedBallTacticalProfileSchema.optional() }),
+  z.strictObject({ ...base, type: z.literal("AI_STEP"), clubStyle: z.boolean().optional(), matchAware: z.boolean().optional(), teamId: z.string().min(1).max(128), delegated: z.boolean().optional(), redBallProfile: RedBallTacticalProfileSchema.optional() }),
   z.strictObject({ ...base, type: z.literal("SET_DELEGATION"), teamId: z.string().min(1).max(128), expectedDelegationRevision: z.number().int().nonnegative(), categories: z.array(DelegationCategorySchema).max(10).refine(values => new Set(values).size === values.length), redBallProfile: RedBallTacticalProfileSchema.optional() }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
   z.strictObject({ ...base, type: z.literal("CHECK_SEEDED_WEATHER") }),
@@ -236,8 +236,10 @@ export type Catalog = {
   }[];
   grounds: { id: string; name: string; seamBp?: number; turnBp?: number }[];
 };
-export type Candidate = { id: string; name: string; reason: string };
+export type Candidate = { id: string; name: string; reason: string; batting?: { power:number; rotation:number; defence:number } };
 export type View = {
+  captainNotes?: Record<string, string>;
+  fatigueBp?: Record<string,number>;
   format: "T20" | "ODI" | "RED_BALL";
   revision: number;
   phase: string;
