@@ -44,6 +44,7 @@ import { TournamentsApp, TOURNAMENT_LAUNCH_KEY, type TournamentLaunch } from "./
 import { RainApp } from "./rain/RainApp.js";
 import { TeamCrest } from "./world/TeamCrest.js";
 import "./styles.css";
+import "./pavilion.css";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
@@ -695,23 +696,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const tn = (id: string) => view?.teams.find((t) => t.id === id)?.name ?? id;
   const striker =
     i?.strikerEnd === "NORTH" ? i.northBatterId : i?.southBatterId;
-  return (
-    <main
-      style={{ fontSize: `${Number(scale) / 100}rem` }}
-      className={`match-shell density-${density}`}
-    >
-      <a className="skip" href="#decision">
-        Skip to next decision
-      </a>
-      <header className="masthead">
-        <div>
-          <p className="eyebrow">THE FICTIONAL CRICKET EXHIBITION</p>
-          <h1>
-            Lord Cricket <span>XXVI</span>
-          </h1>
-        </div>
-        <span className="alpha">SYNTHETIC_ALPHA</span>
-      </header>
+  const chaseRuns = i?.targetToWin == null ? null : Math.max(0, i.targetToWin - i.runs);
+  const chaseBalls = !i || !view || view.format === "RED_BALL"
+    ? null
+    : Math.max(0, (view.format === "ODI" ? 300 : 120) - i.legalBalls);
+  const preferences = (
       <div className="preferences">
         <label>
           Text scale{" "}
@@ -771,6 +760,25 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               : "Local autosave ready"}
         </span>
       </div>
+  );
+  return (
+    <main
+      style={{ fontSize: `${Number(scale) / 100}rem` }}
+      data-motion={highlightMotion} className={`match-shell density-${density}`}
+    >
+      <a className="skip" href="#decision">
+        Skip to next decision
+      </a>
+      <header className="masthead">
+        <div>
+          <p className="eyebrow">{careerLaunch.current ? "CAREER MATCHDAY" : view?.matchId?.startsWith("tour-m") ? "TOURNAMENT MATCHDAY" : scenario ? "SCENARIO CHALLENGE" : "THE FICTIONAL CRICKET EXHIBITION"}</p>
+          <h1>
+            Lord Cricket <span>XXVI</span>
+          </h1>
+        </div>
+        <span className="alpha">SYNTHETIC_ALPHA</span>
+      </header>
+      {!view && preferences}
       {view?.matchId?.startsWith("tour-m") && (
         <section className="career-match-banner" data-testid="tournament-banner" aria-label="Tournament match">
           <strong>Tournament match</strong>
@@ -854,24 +862,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         </>
       )}
       {view && (
-        <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
-          <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
-          <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
-            onChange={e => changeAiOpponent(e.target.value)}>
-            <option value="">Manual decisions for both teams</option>
-            {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
-          </select>
-          <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
-        </section>
-      )}
-      {view && careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
-      {view && (
         <>
           <section
-            className="scorestrip"
+            className="scorestrip" data-quay={view.ground === "Aster Quay"} data-stage={view.resultText ? "result" : i?.targetToWin ? "chase" : i ? "innings" : "toss"}
             aria-label="Match scoreboard"
             data-testid="scorestrip"
-            style={view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : undefined}
           >
             <div>
               <p>
@@ -883,9 +878,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   ? tn(i.battingTeamId)
                   : view.teams.map((t) => t.name).join(" v ")}
               </h2>
+              <div className="broadcast-line">{view.teams.filter(team => !i || team.id === i.battingTeamId).map(team => <TeamCrest key={team.id} teamId={team.id} name={team.name} colours={team.colours ?? []} size={32} decorative />)}
               <strong className="score">
                 {i ? `${i.runs}/${i.wickets}` : "Ready for the toss"}
               </strong>
+              </div>
               {i && (
                 <span className="over">
                   {view.format === "RED_BALL"
@@ -895,14 +892,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
             <div className="target" data-testid="target">
-              <span>Target</span>
-              <strong>{i?.targetToWin ?? "Not set"}</strong>
-              {i?.targetToWin != null && (
+              <span>{view.resultText ? "Result" : i?.targetToWin != null ? "Target" : "Match phase"}</span>
+              <strong>{view.resultText ?? i?.targetToWin ?? (i ? `Innings ${view.activeIndex + 1}` : "Pre-match")}</strong>
+              {!view.resultText && chaseRuns !== null && (
                 <p>
-                  {Math.max(0, i.targetToWin - i.runs)} needed ·{" "}
-                  {view.format === "RED_BALL"
-                    ? "time remaining"
-                    : `${Math.max(0, (view.format === "ODI" ? 300 : 120) - i.legalBalls)} balls left`}
+                  {chaseRuns} needed · {chaseBalls === null ? "time remaining" : `${chaseBalls} balls left`}
+                  {chaseBalls !== null && chaseBalls > 0 && (
+                    <> · Required rate {((6 * chaseRuns) / chaseBalls).toFixed(2)}</>
+                  )}
                 </p>
               )}
               {view.activeIndex === 1 && (
@@ -1178,6 +1175,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </div>
             </fieldset>
           </section>
+          {preferences}
+          <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
+            <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
+            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
+              onChange={e => changeAiOpponent(e.target.value)}>
+              <option value="">Manual decisions for both teams</option>
+              {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
+            </select>
+            <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
+          </section>
+        {careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
           {(() => {
             const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
             const selected = delegationForTeam(delegation, selectedTeam.id);
@@ -1483,7 +1491,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     .slice()
                     .reverse()
                     .map((e) => (
-                      <li key={e.sequence} value={e.sequence} data-category={e.category}>
+                      <li key={e.sequence} value={e.sequence} data-category={e.category} data-moment={e.sequence === view.commentary.at(-1)?.sequence && (e.category === "DISMISSAL" || e.category === "MILESTONE" || e.category === "RESULT" || !!e.milestoneTags?.length)}>
                         <span>{selectCommentaryTextForMode(e, commentary)}</span>
                         {commentary !== "brief" && e.milestoneTags && e.milestoneTags.length > 0 && (
                           <span className="commentary-milestones" aria-label="Milestones">

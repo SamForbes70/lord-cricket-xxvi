@@ -1,0 +1,122 @@
+/* Pavilion paper, ink and brass are shared by career ledgers and match graphics. */
+:root {
+  --paper: #f5f1e6;
+  --ink: #132f2a;
+  --pine: #123e35;
+  --brass: #d6ad60;
+  --rule: #c7cec0;
+  --surface: #fffdf7;
+  --display: Georgia, "Times New Roman", serif;
+  --gutter: clamp(14px, 2.8vw, 40px);
+  background: var(--paper);
+  color: var(--ink);
+}
+.career-shell, .match-shell { padding-inline: var(--gutter); }
+:is(.career-shell,.match-shell) :focus-visible { outline: 3px solid #1373ad; outline-offset: 3px; box-shadow: 0 0 0 3px white; }
+:is(.career-shell,.match-shell) :is(button,.button-link) { border-radius: 4px; }
+:is(.career-shell,.match-shell) button.primary { background: var(--pine); color: white; border-color: var(--pine); }
+:is(.career-shell,.match-shell) button.primary:enabled:hover { background: #24614e; }
+.career-shell .career-masthead, .match-shell .masthead {
+  background: var(--pine); color: var(--surface); border-bottom: 3px solid var(--brass);
+  padding: 12px var(--gutter); margin-inline: calc(-1 * var(--gutter));
+}
+.career-masthead .eyebrow, .masthead .eyebrow { color: #e5c995; }
+.career-masthead h1 span, .masthead h1 span { color: #f3d79d; }
+.career-masthead .save-badge { color: var(--ink); text-align: start; }
+.career-shell .career-nav { gap: 3px; border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+.career-shell .career-nav :is(button,a) { background: transparent; border-color: transparent; min-height: 38px; padding: .4em .55em; margin-left: 0; }
+.career-shell .career-nav [aria-current="page"] { background: var(--pine); color: white; }
+.career-shell .career-nav :is(button,a):hover { text-decoration: underline; }
+.career-shell .career-disclosure { background: transparent; border: 0; border-top: 1px solid var(--rule); font-size: .86em; padding-inline: 0; }
+.career-shell.club-selection .career-masthead {
+  flex-wrap: wrap; justify-content: flex-start; gap: 7px;
+  padding-block: clamp(24px, 4vw, 58px) 20px;
+  background-position: center; background-size: cover;
+}
+.club-selection .career-masthead > div { flex-basis: 100%; }
+.club-selection .career-masthead h1 { font: clamp(2.5em,5vw,5em)/1 var(--display); margin: .12em 0 .5em; }
+.club-selection .career-masthead .button-link { background: #15372fed; color: white; border-color: #96ada2; }
+.career-shell .team-card {
+  display: grid; grid-template-columns: auto minmax(0,1fr); grid-template-rows: auto auto;
+  gap: 1px 12px; align-content: center; padding: 18px; min-height: 108px;
+  border: 1px solid var(--rule); border-bottom: 3px solid var(--pine); background: var(--surface);
+}
+.team-card .team-crest { grid-row: span 2; align-self: center; }
+.team-card strong { font: 600 1.15em/1.15 var(--display); align-self: end; }
+.team-card .team-colours { display: none; }
+.career-shell .team-card:enabled:hover { background: #e7efdf; border-color: var(--pine); }
+.career-shell section > h2:first-child { font: 600 clamp(1.45em,2.3vw,2.25em)/1.1 var(--display); margin-block: .6em; }
+#home-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+[aria-labelledby="home-heading"] .dashboard-grid { grid-template-columns: repeat(3,minmax(0,1fr)); align-items: start; }
+.fixture-lead { grid-column: 1/-1; }
+.career-shell .fixture-lead {
+  position: relative; isolation: isolate; padding: clamp(18px,2.3vw,34px);
+  background: var(--surface); overflow: hidden; border-top: 4px solid var(--brass);
+}
+.fixture-lead::before {
+  content: ""; position: absolute; inset: 0 0 auto; z-index: -1; height: 12em;
+  background: linear-gradient(105deg,#e1eadb,#f5eedc);
+}
+.fixture-lead > h3, .fixture-round { text-transform: uppercase; letter-spacing: .11em; font: 700 .76em/1.4 system-ui,sans-serif; }
+.fixture-lead > h3 { margin: 0 0 .6em; }
+.fixture-opponents { display: flex; flex-wrap: wrap; align-items: center; gap: .28em; font: 600 clamp(1.55em,3.1vw,3em)/1.12 var(--display); margin: .15em 0; }
+.fixture-opponents span { overflow-wrap: anywhere; }
+.fixture-opponents small { color: #586951; font-style: italic; }
+.fixture-venue, .fixture-round { margin: .4em 0; }
+.fixture-lead > .action-row { margin: .7em 0 1.3em; }
+.fixture-lead .pitch-inspection { max-width: 65rem; }
+.career-shell .table-wrap { background: var(--surface); border: 1px solid var(--rule); border-radius: 5px; }
+.career-shell table, .match-shell table { font-variant-numeric: tabular-nums; }
+.career-shell th, .match-shell table th { background: #e3e9df; color: var(--ink); }
+.career-shell tbody tr:nth-child(even):not(.managed-fixture) { background: #f4f5ed; }
+.career-shell tbody tr:focus-within { background: #fff1cd; }
+[aria-labelledby="squad-heading"] .table-wrap td:first-child { position: sticky; left: 0; background: var(--surface); border-right: 1px solid var(--rule); }
+.career-shell .player-link { text-align: left; font-weight: 700; text-underline-offset: .2em; }
+[data-testid="club-budget-summary"] .emphasis, .round-block, [aria-labelledby="season-history-heading"] { border-top: 3px solid var(--brass); }
+.round-block { padding-top: .45em; }
+.career-shell .managed-fixture { background: #e1eddf; box-shadow: inset 4px 0 var(--pine); }
+[data-testid="tournaments-screen"] .career-stories { grid-template-columns: repeat(auto-fit,minmax(min(100%,20rem),1fr)); }
+[data-testid="tournaments-screen"] .career-stories .career-panel { border-top: 3px solid var(--brass); padding: 18px; }
+.match-shell .masthead { padding-block: 5px; }
+.match-shell .masthead h1 { font-size: 1.55em; }
+.match-shell .masthead .alpha { color: var(--ink); background: var(--paper); }
+.match-shell .scorestrip {
+  background: var(--pine); border-top: 3px solid var(--brass); border-radius: 4px 4px 0 0;
+  grid-template-columns: minmax(0,2fr) minmax(0,1fr); gap: 10px;
+}
+.broadcast-line { display: flex; flex-wrap: wrap; align-items: center; gap: .25em; }
+.scorestrip .score, .scorestrip .target strong { font-family: system-ui,sans-serif; font-weight: 760; font-variant-numeric: tabular-nums; letter-spacing: -.045em; line-height: 1.05; }
+.scorestrip .target { min-width: 0; align-self: center; }
+.scorestrip .over { margin-left: 0; font-variant-numeric: tabular-nums; }
+.scorestrip[data-stage="result"] .target strong { font: 600 1.25em/1.15 var(--display); }
+.match-shell .active { background: #e2eade; border-radius: 0 0 4px 4px; }
+.match-shell .decision { border-left: 4px solid #bb8a38; }
+.match-shell .scorestrip[data-stage="toss"] + .active { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .match-shell[data-motion="AUTO"] :is(.commentary li[data-moment="true"],.result) { animation: pavilion-moment .65s ease-out; }
+  @keyframes pavilion-moment { from { box-shadow: inset 5px 0 #b78027; background-color: #f3dbab; } }
+}
+@media (max-width: 750px) {
+  [aria-labelledby="home-heading"] .dashboard-grid { grid-template-columns: 1fr; }
+  .match-shell .scorestrip { padding-inline: 12px; }
+  .scorestrip .target { padding-left: 8px; }
+  .career-shell .career-masthead { flex-wrap: wrap; }
+  .club-selection .career-masthead { flex-direction: row; }
+}
+.club-selection .career-masthead {
+  background-image: linear-gradient(90deg,#102f2bea 3%,#193d3260 60%,transparent), url("./art/aster-quay.webp");
+  background-position: center 58%; background-size: cover;
+}
+.fixture-lead[data-quay="true"]::before {
+  background: linear-gradient(95deg,#f5f1e6 19%,#f5f1e6f7 45%,#f5f1e67a 72%,transparent), url("./art/aster-quay.webp") center 58% / cover;
+}
+.match-shell .scorestrip[data-quay="true"] {
+  background-image: linear-gradient(95deg,#10372ff9,#133f35e6 60%,#10372ff5), url("./art/aster-quay.webp");
+  background-size: cover; background-position: center 55%;
+}
+@media (max-width: 650px) {
+  .fixture-lead[data-quay="true"]::before { background-image: linear-gradient(90deg,#f5f1e6f5,#f5f1e6d6),url("./art/aster-quay.webp"); }
+}
+.fixture-opponents small { display: inline; }
+.match-shell .decision[data-phase="TOSS"] .advance { display: none; }
+.match-shell button.primary:disabled { color: #53615b; background: #e2e5dd; border-color: #bec7bd; }
