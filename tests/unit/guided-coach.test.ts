@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coachTip } from "../../apps/web/src/match/GuidedCoach.js";
+import { coachTip } from "../../apps/web/src/match/coach-tips.js";
 
 type V = Parameters<typeof coachTip>[0];
 const at = (phase: string, extra: Partial<V> = {}): V => ({ phase, fieldPresentation: null, activeIndex: 0, innings: [], ...extra }) as V;
