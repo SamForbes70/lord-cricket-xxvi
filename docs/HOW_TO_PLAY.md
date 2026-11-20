@@ -13,6 +13,10 @@ A guide for testing the latest build on a laptop. Everything in the game is fict
 
 Saves live in that browser, tied to that address. Clearing browser data deletes them, so use **Settings, Export .lcxxvi** to keep a backup.
 
+### Installing it like a normal program (optional, Windows)
+
+Double-click **Install-Lord-Cricket.bat** in the unzipped folder. It copies the game to your user folder (`%LOCALAPPDATA%\Programs\LordCricketXXVI`), adds **Start menu** and **desktop** shortcuts with the game's icon, and lists it under **Settings > Apps**, where you can uninstall it. No administrator rights are needed. Run it again from a newer zip to update. Uninstalling leaves your saves alone: they live in your browser. The installer is not signed (the owner chose to keep everything free), so Windows may ask you to confirm the first time.
+
 ## Where everything is
 
 The game opens on the **title screen**:
