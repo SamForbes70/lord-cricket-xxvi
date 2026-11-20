@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { figurePaint, shade } from "./cricketer-paint.js";
 
 /**
  * Full-figure cricketers for menus (owner order of 20 November 2026, step 3: free, AI-made art). Original stylised
@@ -8,34 +9,13 @@ import { useId } from "react";
  */
 export type FigurePose = "batter" | "bowler";
 
-const SKINS = ["#f1c9a5", "#e0ac83", "#c68b5f", "#a86e45", "#7d4f30", "#5a3824"] as const;
-const HEX = /^#[0-9a-f]{6}$/i;
-
-function shade(hex: string, amount: number): string {
-  const n = parseInt(hex.slice(1), 16);
-  const f = (c: number) => Math.max(0, Math.min(255, Math.round(c * (1 + amount))));
-  const r = f((n >> 16) & 255), g = f((n >> 8) & 255), b = f(n & 255);
-  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
-}
-
-function seeded(seed: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < seed.length; i += 1) h = Math.imul(h ^ seed.charCodeAt(i), 0x01000193) >>> 0;
-  return h;
-}
-
 type Limb = [number, number, number, number, number];
 const limb = ([x1, y1, x2, y2, w]: Limb, colour: string, key: string) => (
   <line key={key} x1={x1} y1={y1} x2={x2} y2={y2} stroke={colour} strokeWidth={w} strokeLinecap="round" />
 );
 
 export function CricketerFigure(props: { pose: FigurePose; kit: readonly string[]; seed?: string; height?: number; className?: string }) {
-  const shirt = props.kit[0] && HEX.test(props.kit[0]) ? props.kit[0] : "#1f5a4a";
-  const trim = props.kit[1] && HEX.test(props.kit[1]) ? props.kit[1] : "#e7bb5f";
-  const skin = SKINS[seeded(props.seed ?? props.pose) % SKINS.length]!;
-  const far = shade(shirt, -0.32);
-  const trousers = shade(shirt, -0.18);
-  const trousersFar = shade(shirt, -0.42);
+  const { shirt, trim, skin, far, trousers, trousersFar } = figurePaint(props.kit, props.seed ?? props.pose);
   const id = useId();
   const glow = `cf-glow-${id}`;
   const height = props.height ?? 360;
