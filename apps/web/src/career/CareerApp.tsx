@@ -912,6 +912,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
             </a>
           )}
           {!inspectionOnly && (
+            <a className="button-link" href="#title">
+              Title screen
+            </a>
+          )}
+          {!inspectionOnly && (
             <a className="button-link" href="#rain">
               Rain-affected matches
             </a>

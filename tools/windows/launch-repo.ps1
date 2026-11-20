@@ -127,7 +127,7 @@ if ($Stop) {
 
 if ($BrowserOnly) {
   if (Get-ServerHealth) {
-    Open-GameWindow $BaseUrl
+    Open-GameWindow "$BaseUrl/#title"
     exit 0
   }
 }
@@ -175,7 +175,7 @@ if ($running) {
     Stop-RunningServer | Out-Null
   } else {
     Write-Host "Lord Cricket XXVI is already running at $BaseUrl - opening window."
-    Open-GameWindow $BaseUrl
+    Open-GameWindow "$BaseUrl/#title"
     exit 0
   }
 }
@@ -204,6 +204,6 @@ if (-not $ready) {
   throw "Server did not become ready on $BaseUrl. Check port $Port or $LogErr. $errText"
 }
 
-Open-GameWindow $BaseUrl
+Open-GameWindow "$BaseUrl/#title"
 Write-Host "Opened Lord Cricket XXVI at $BaseUrl."
 Write-Host "To stop the background server later, run tools\windows\Stop-Lord-Cricket.bat."

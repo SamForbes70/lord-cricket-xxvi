@@ -131,7 +131,7 @@ const startSh = `#!/usr/bin/env bash
 # Starts Lord Cricket XXVI on http://127.0.0.1:4180/ and opens it in your browser if it can.
 cd "$(dirname "$0")" || exit 1
 PORT="\${PORT:-4180}"
-URL="http://127.0.0.1:\${PORT}/"
+URL="http://127.0.0.1:\${PORT}/#title"
 (sleep 1; (command -v open >/dev/null && open "$URL") || (command -v xdg-open >/dev/null && xdg-open "$URL") || true) &
 if command -v node >/dev/null 2>&1; then exec node serve.mjs "$PORT"
 elif command -v python3 >/dev/null 2>&1; then echo "Serving $URL (Ctrl+C to stop)"; exec python3 -m http.server "$PORT" --bind 127.0.0.1

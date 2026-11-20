@@ -56,6 +56,8 @@ import "./floodlit.css";
 import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
 import { BroadcastStage } from "./match/BroadcastStage.js";
+import { GuidedCoach } from "./match/GuidedCoach.js";
+import { GUIDED_MATCH_KEY, QUICK_MATCH_KEY, TitleScreen } from "./TitleScreen.js";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
@@ -95,6 +97,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     currentRevision = useRef(0);
   const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number; cancel: boolean; from: number | null } | null>(null);
   const [batchState, setBatchState] = useState<"idle" | "running" | "stopping">("idle");
+  const [guided, setGuided] = useState(() => { try { return localStorage.getItem(GUIDED_MATCH_KEY) === "1"; } catch { return false; } });
   const [batchProgress, setBatchProgress] = useState<{ from: number; to: number } | null>(null);
   const careerLaunch = useRef<CareerUserMatchLaunch | null>((() => {
     try {
@@ -1160,6 +1163,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </p>
             </div>
           </section>
+          {guided && <GuidedCoach view={view} onEnd={() => { try { localStorage.removeItem(GUIDED_MATCH_KEY); } catch { /* ignore */ } setGuided(false); }} />}
           <section
             className="decision"
             id="decision"
@@ -1877,6 +1881,15 @@ function Setup({
     .filter(Boolean);
   if (teams[0].teamId === teams[1].teamId)
     reasons.push("Choose two different teams.");
+  // Quick match from the title screen: start with the suggested XIs once, if they are valid (owner order, step 2).
+  const quickStarted = useRef(false);
+  useEffect(() => {
+    if (quickStarted.current || busy) return;
+    let at = 0;
+    try { at = Number(sessionStorage.getItem(QUICK_MATCH_KEY) ?? 0); sessionStorage.removeItem(QUICK_MATCH_KEY); } catch { /* ignore */ }
+    quickStarted.current = true;
+    if (at > 0 && Date.now() - at < 60_000 && reasons.length === 0) start(format, teams, ground);
+  }, [busy]);
   const selectedGround =
     world.grounds.find((item) => item.groundId === ground) ?? world.grounds[0]!;
   const preMatchBriefing = useMemo(() => {
@@ -2302,10 +2315,11 @@ function RootApp() {
       </section>
     )}
     {(hash === "#exhibition" || retainedMatch) && <div hidden={hash !== "#exhibition"}><MatchApp onInspectCareer={inspect} onReturnCareer={finish} /></div>}
+    {hash === "#title" && <TitleScreen />}
     {hash === "#scenarios" && <ScenariosApp />}
     {hash === "#tournaments" && <TournamentsApp />}
     {hash === "#rain" && <RainApp />}
-    {hash !== "#exhibition" && hash !== "#scenarios" && hash !== "#tournaments" && hash !== "#rain" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
+    {hash !== "#exhibition" && hash !== "#title" && hash !== "#scenarios" && hash !== "#tournaments" && hash !== "#rain" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
   </>;
 }
 

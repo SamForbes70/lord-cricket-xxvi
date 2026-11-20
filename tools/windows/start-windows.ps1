@@ -63,7 +63,7 @@ if ($Stop) {
 
 if (Get-ServerHealth) {
   Write-Host "Lord Cricket XXVI is already running at $BaseUrl - opening window."
-  Open-GameWindow "$BaseUrl/"
+  Open-GameWindow "$BaseUrl/#title"
   exit 0
 }
 
@@ -88,7 +88,7 @@ if ($nodeOk -and (Test-Path (Join-Path $GameRoot 'serve.mjs'))) {
   for ($i = 0; $i -lt 30; $i++) {
     Start-Sleep -Milliseconds 200
     if (Get-ServerHealth) {
-      Open-GameWindow "$BaseUrl/"
+      Open-GameWindow "$BaseUrl/#title"
       Write-Host "Opened Lord Cricket XXVI at $BaseUrl (Node.js server)."
       exit 0
     }
@@ -114,7 +114,7 @@ if ($pythonReal) {
     -RedirectStandardOutput $LogOut `
     -RedirectStandardError $LogErr | Out-Null
   Start-Sleep -Milliseconds 700
-  Open-GameWindow "$BaseUrl/"
+  Open-GameWindow "$BaseUrl/#title"
   Write-Host "Opened Lord Cricket XXVI at $BaseUrl (Python server)."
   exit 0
 }

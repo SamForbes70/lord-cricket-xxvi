@@ -62,7 +62,7 @@ namespace LordCricketLauncher
             string baseUrl = "http://127.0.0.1:" + _port;
             if (IsGameHealthy(baseUrl))
             {
-                OpenGameWindow(baseUrl + "/");
+                OpenGameWindow(baseUrl + "/#title");
                 return 0;
             }
 
@@ -102,7 +102,7 @@ namespace LordCricketLauncher
             serverThread.IsBackground = true;
             serverThread.Start();
 
-            OpenGameWindow(baseUrl + "/");
+            OpenGameWindow(baseUrl + "/#title");
 
             using (NotifyIcon tray = new NotifyIcon())
             {
@@ -111,12 +111,12 @@ namespace LordCricketLauncher
                 tray.Visible = true;
 
                 ContextMenuStrip menu = new ContextMenuStrip();
-                menu.Items.Add("Open Lord Cricket XXVI", null, delegate { OpenGameWindow(baseUrl + "/"); });
+                menu.Items.Add("Open Lord Cricket XXVI", null, delegate { OpenGameWindow(baseUrl + "/#title"); });
                 menu.Items.Add("Open Recovery Build", null, delegate { OpenGameWindow(baseUrl + "/engineering.html"); });
                 menu.Items.Add(new ToolStripSeparator());
                 menu.Items.Add("Quit Server", null, delegate { ShutdownApp(); });
                 tray.ContextMenuStrip = menu;
-                tray.DoubleClick += delegate { OpenGameWindow(baseUrl + "/"); };
+                tray.DoubleClick += delegate { OpenGameWindow(baseUrl + "/#title"); };
                 tray.ShowBalloonTip(3000, "Lord Cricket XXVI", "Running locally on " + baseUrl + ". Right-click the tray icon to quit.", ToolTipIcon.Info);
 
                 Application.Run();
