@@ -1,15 +1,17 @@
 # Current game and acceptance status
 
-## Current state, 19 November 2026
+## Current state, 20 November 2026
+
+- **Latest playable build:** `main` at `ff8284a`, published as the GitHub Release `alpha-2026-11-19`. A review on 20 November found no newer work on any branch (see [HANDOVER.md](HANDOVER.md)). How to play it: [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
 
 - **Added on 19 November:** captain's highlights (bounded passages with plans in limited-overs exhibitions, managed T20 fixtures and two close-finish scenarios), rival captains with observable tendencies and an opt-in match-aware opponent, a match-day selection room in career, and the Pavilion redesign. This is the owner's own work with other AI tools (#90, #91, #92), reviewed and integrated with one fix in #93. Checked by automated browser runs only; no human playtest yet.
 
 - **Built and merged on `main`:** V0.1; Stages 2 to 10; Stage 11, player and manager stories (#64); Stage 12, scenario challenges (#65, #72); Stage 14's rules for exhibitions: super overs (#67, #68, #73), rain-shortened matches (#76, #78, #79) and player reviews (#80); and Stage 15's fictional parts: tournaments (#69, #74), user-made competitions (#81), crests (#82), tours (#83), auctions (#84), and tour and auction matches playable by the player (#86).
 - **Parked or blocked:** Stage 13, historical scenarios, is parked (no licensed data source). Stage 14's empirical calibration (`RES-001` to `RES-003`) stays `BLOCKED_EXTERNAL`. The model is `synthetic-alpha-01` / `SYNTHETIC_ALPHA`, with no claim of realism.
 - **Stage 16** was passed by the owner's direct instruction on 18 November 2026. None of its four parts were run: no owner-PC measurements, no observed playtest, no screen-reader walkthrough, no long-career soak ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)).
-- **Stage 17:** `LC_RELEASE_RECORD_V2` in [release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json) (the folder keeps its first date). The GitHub Release `alpha-2026-11-19` is prepared; the owner publishes it, because the agent's session cannot create releases.
+- **Stage 17:** released by the owner on 19 November 2026 as `alpha-2026-11-19`; record `LC_RELEASE_RECORD_V2` in [release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json) (the folder keeps its first date).
 - **Evidence:** hosted CI on every pull request (Linux, and Windows with Chromium and Firefox; the Windows job builds and smoke-tests the EXE) and Linux containers. Nothing has been run on macOS or Safari. Last full local unit run: 884 tests passed on #86's head (`7a2840b`).
-- **Owner actions still open:** publish the release; turn on branch protection for `main` ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)). The paused agents are to be ignored (owner direction, 18 November 2026).
+- **Owner actions still open:** finish branch protection (required checks and no admin bypass are still off) and close #92; see [HANDOVER.md](HANDOVER.md). The paused agents are to be ignored (owner direction, 18 November 2026).
 
 The sections below are kept as written on earlier dates.
 

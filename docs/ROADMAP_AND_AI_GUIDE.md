@@ -2,7 +2,7 @@
 
 *Last reconciled on 16 November 2026 (Australia/Brisbane) with Stages 1–10 and the Windows Double-Click / `.NET` Portable Launcher owner-accepted on `main` (`773/773` unit tests across `73/73` files, `334` strict JSON Schemas).* 
 
-> **Status (18 November 2026).** Stabilisation is finished (pull requests #48 to #62). Stages 11 and 12 are built; Stage 13 is parked (no licensed historical data source); Stage 14's rules (super overs, rain-shortened matches, player reviews) are built for exhibitions, and its empirical calibration stays `BLOCKED_EXTERNAL`; Stage 15's fictional parts are built; Stage 16 was passed by the owner's direct instruction with none of its parts run; Stage 17's release record is sealed and the GitHub Release `alpha-2026-11-19` is prepared for the owner to publish. Current state: [HANDOVER.md](HANDOVER.md).
+> **Status (18 November 2026).** Stabilisation is finished (pull requests #48 to #62). Stages 11 and 12 are built; Stage 13 is parked (no licensed historical data source); Stage 14's rules (super overs, rain-shortened matches, player reviews) are built for exhibitions, and its empirical calibration stays `BLOCKED_EXTERNAL`; Stage 15's fictional parts are built; Stage 16 was passed by the owner's direct instruction with none of its parts run; Stage 17's GitHub Release `alpha-2026-11-19` was published by the owner on 19 November 2026. Current state: [HANDOVER.md](HANDOVER.md).
 
 This guide gives engineers and AI coding agents a single authoritative blueprint of:
 1. **What has been built and verified (Stages 1 through 10 + Windows Native Launcher)**,
