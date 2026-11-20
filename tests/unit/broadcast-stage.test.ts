@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ballCall } from "../../apps/web/src/match/BroadcastStage.js";
+import { ballCall } from "../../apps/web/src/match/ball-call.js";
 
 const base = { dismissalKind: null, boundary: "NONE", legality: "LEGAL", runsScored: 0 } as const;
 
