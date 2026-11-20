@@ -53,29 +53,29 @@ function Stop-RunningServer {
 }
 
 function Open-GameWindow([string]$Url) {
-  $edgeCandidates = @(
-    (Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'),
-    (Join-Path $env:ProgramFiles 'Microsoft\Edge\Application\msedge.exe'),
-    (Join-Path $env:LOCALAPPDATA 'Microsoft\Edge\Application\msedge.exe')
-  ) | Where-Object { $_ -and (Test-Path $_) }
-
-  if ($edgeCandidates.Count -gt 0) {
-    Start-Process -FilePath $edgeCandidates[0] -ArgumentList "--app=$Url" | Out-Null
-    return
+  # Each candidate is checked before use, and the list is always an array: with a single match PowerShell would
+  # otherwise return a string, and $list[0] would be its first character ("C"), which fails to start.
+  $roots = @(${env:ProgramFiles(x86)}, $env:ProgramFiles, $env:LOCALAPPDATA) | Where-Object { $_ }
+  $browsers = @()
+  foreach ($relative in @('Microsoft\Edge\Application\msedge.exe', 'Google\Chrome\Application\chrome.exe')) {
+    foreach ($root in $roots) {
+      $candidate = Join-Path $root $relative
+      if (Test-Path -LiteralPath $candidate) { $browsers += $candidate }
+    }
   }
-
-  $chromeCandidates = @(
-    (Join-Path $env:ProgramFiles 'Google\Chrome\Application\chrome.exe'),
-    (Join-Path ${env:ProgramFiles(x86)} 'Google\Chrome\Application\chrome.exe'),
-    (Join-Path $env:LOCALAPPDATA 'Google\Chrome\Application\chrome.exe')
-  ) | Where-Object { $_ -and (Test-Path $_) }
-
-  if ($chromeCandidates.Count -gt 0) {
-    Start-Process -FilePath $chromeCandidates[0] -ArgumentList "--app=$Url" | Out-Null
-    return
+  foreach ($browser in $browsers) {
+    try {
+      Start-Process -FilePath $browser -ArgumentList "--app=$Url" -ErrorAction Stop | Out-Null
+      return
+    } catch {
+      Write-Host "Could not open $browser ($($_.Exception.Message)); trying the next browser."
+    }
   }
-
-  Start-Process $Url | Out-Null
+  try {
+    Start-Process $Url -ErrorAction Stop | Out-Null
+  } catch {
+    Write-Host "The game is running. Open $Url in your web browser."
+  }
 }
 
 function Get-LocalBuildId {

@@ -9,6 +9,8 @@ A guide for testing the latest build on a laptop. Everything in the game is fict
 3. **Mac or Linux:** open a terminal in the folder and run `bash start-game.sh` (needs Node.js 18 or later, or Python 3).
 4. The game opens at **http://127.0.0.1:4180/** in its own window. To stop it on Windows, double-click `Stop-Lord-Cricket.bat`, or right-click the tray icon and choose Quit Server.
 
+**If the game window does not open,** the game is usually already running: open **http://127.0.0.1:4180/** in Edge or Chrome yourself. (Builds before 20 November 2026 could stop with "Start-Process : The system cannot find the file specified" on a laptop with one Edge install; that is fixed.)
+
 Saves live in that browser, tied to that address. Clearing browser data deletes them, so use **Settings, Export .lcxxvi** to keep a backup.
 
 ## Where everything is
