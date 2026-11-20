@@ -1,4 +1,5 @@
 import { TeamCrest } from "./world/TeamCrest.js";
+import { CricketerFigure } from "./world/CricketerFigure.js";
 import { careerWorld } from "./career/world-state.js";
 
 /** Session flag read by the exhibition setup: start a T20 with the suggested XIs straight away (valid for a minute). */
@@ -36,6 +37,8 @@ export function TitleScreen() {
   return (
     <main className="title-screen" data-testid="title-screen">
       <div className="title-hero">
+        <CricketerFigure className="title-figure title-figure-left" pose="batter" kit={teams[0]?.colours ?? []} seed="title-batter" height={380} />
+        <CricketerFigure className="title-figure title-figure-right" pose="bowler" kit={teams[7]?.colours ?? teams[1]?.colours ?? []} seed="title-bowler" height={380} />
         <div className="title-crests" aria-hidden="true">
           {teams.map((team) => (
             <TeamCrest key={team.teamId} teamId={team.teamId} name={team.name} colours={team.colours ?? []} size={40} decorative />

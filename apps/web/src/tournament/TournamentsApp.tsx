@@ -10,6 +10,7 @@ import { isKnockoutStage, tournamentMatchIdentity, tournamentResultFromSession }
 import type { TournamentWorkerRequest, TournamentWorkerResponse } from "./tournament.worker.js";
 import { buildUserCompetition, parseUserCompetitionPack, userCompetitionPackText, type StructureChoice, type UserCompetitionDraft } from "./user-competitions.js";
 import { TeamCrest } from "../world/TeamCrest.js";
+import { CricketerFigure } from "../world/CricketerFigure.js";
 import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.js";
 import { playerStrengths } from "../world/player-visuals.js";
 import { generatedRunRoster, generatedSelections, tourCompetition, touringTeamId, type GeneratedSquad } from "./generated-roster.js";
@@ -944,6 +945,7 @@ function AuctionPanel(props: {
           <h3>Current player</h3>
           {lotPlayer && strengths ? (
             <div className="auction-lot-card">
+              <CricketerFigure className="auction-lot-figure" pose={lotPlayer.role === "BOWLER" ? "bowler" : "batter"} kit={lotTeamKit} seed={lotPlayer.playerId} height={300} />
               <div className="auction-lot-top">
                 <RatingBadge rating={playerRating(lotPlayer, state.format)} decorative />
                 <PlayerPortrait playerId={lotPlayer.playerId} role={lotPlayer.role} kit={lotTeamKit} size={124} />
