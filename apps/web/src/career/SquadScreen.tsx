@@ -6,6 +6,8 @@ import type {
 import {
   CareerApplicationService,
 } from "./service.js";
+import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.js";
+import { overallRating } from "../world/player-visuals.js";
 
 
 /** The career Squad screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
@@ -61,27 +63,37 @@ export function SquadScreen(props: SquadScreenProps) {
                         ledger.lastSeasonDelta.bowlingDelta +
                         ledger.lastSeasonDelta.fieldingDelta
                       : 0;
+                  const kit =
+                    displayWorld.teams.find((team) => team.squadIds.includes(player.playerId))?.colours ??
+                    displayWorld.teams.find((team) => team.teamId === controlledTeam)?.colours ??
+                    [];
                   return (
                     <tr key={condition.playerId}>
-                      <td>
-                        <button
-                          type="button"
-                          className="player-link"
-                          id={`player-link-SQUAD-${player.playerId}`}
-                          aria-label={`View ${player.name}`}
-                          onClick={() => openPlayer(player.playerId, "SQUAD")}
-                        >
-                          {player.name}
-                        </button>
-                        <small>
-                          {player.playerId}
-                          {lastNetDelta !== 0
-                            ? ` · Off-season ${lastNetDelta > 0 ? `+${lastNetDelta}` : lastNetDelta}`
-                            : ""}
-                        </small>
+                      <td className="player-cell">
+                        <div className="player-cell-inner">
+                        <PlayerPortrait playerId={player.playerId} role={player.role} kit={kit} size={46} />
+                        <span className="player-cell-name">
+                          <button
+                            type="button"
+                            className="player-link"
+                            id={`player-link-SQUAD-${player.playerId}`}
+                            aria-label={`View ${player.name}`}
+                            onClick={() => openPlayer(player.playerId, "SQUAD")}
+                          >
+                            {player.name}
+                          </button>
+                          <small>
+                            {player.playerId}
+                            {lastNetDelta !== 0
+                              ? ` · Off-season ${lastNetDelta > 0 ? `+${lastNetDelta}` : lastNetDelta}`
+                              : ""}
+                          </small>
+                        </span>
+                        <RatingBadge rating={overallRating(player, "T20")} label="T20" />
+                        </div>
                       </td>
                       {lifecycleState && <td>{age ?? "–"}</td>}
-                      <td>{player.role}</td>
+                      <td><RoleChip role={player.role} /></td>
                       {economyState && (
                         <td>
                           {contract ? (

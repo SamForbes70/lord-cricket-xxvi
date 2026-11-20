@@ -232,3 +232,88 @@ body .pitch-inspection, body .captain-station .field-read {
 body .pitch-inspection h3 { color: var(--fl-gold-hi); }
 body .pitch-inspection :is(dt, dd, p, strong, span) { color: inherit; }
 body .captain-station .field-read { color: var(--fl-muted); }
+
+/* Phase 2: player identity. */
+.player-portrait { flex: none; border-radius: 50%; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4); background-color: var(--fl-surface-3); }
+.rating-badge {
+  display: inline-grid; place-items: center; min-width: 3.1em; padding: 0.15em 0.45em 0.2em; border-radius: 8px;
+  background-color: #2a2414; background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--fl-gold); color: var(--fl-gold-hi); line-height: 1; flex: none;
+}
+.rating-badge strong { font: 700 1.55em/1 var(--fl-display); font-variant-numeric: tabular-nums; color: inherit; }
+.rating-badge small { font: 600 0.62em/1.2 var(--fl-display); letter-spacing: 0.14em; color: inherit; opacity: 0.85; }
+.rating-badge[data-tier="ELITE"] { background-color: #3a2c08; border-color: #ffd877; color: #ffe39a; box-shadow: 0 0 14px rgba(255, 216, 119, 0.28); }
+.rating-badge[data-tier="STRONG"] { background-color: #1f3524; border-color: #79d79e; color: #a7f0c3; }
+.rating-badge[data-tier="SOLID"] { background-color: #1a2c36; border-color: #7fb6d9; color: #bfe2f7; }
+.rating-badge[data-tier="DEVELOPING"] { background-color: #262a2c; border-color: #8fa0a6; color: #d3dde0; }
+.role-chip {
+  display: inline-flex; align-items: center; gap: 0.35em; padding: 0.2em 0.6em 0.2em 0.45em; border-radius: 999px;
+  background-color: var(--fl-surface-3); border: 1px solid var(--fl-edge); color: var(--fl-text);
+  font: 600 0.92em/1.2 var(--fl-display); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+}
+.role-chip[data-role="BOWLER"] { border-color: rgba(240, 122, 108, 0.5); }
+.role-chip[data-role="KEEPER"] { border-color: rgba(231, 187, 95, 0.55); }
+.role-chip[data-role="ALLROUNDER"] { border-color: rgba(143, 211, 255, 0.5); }
+.career-shell td.player-cell { width: 330px; min-width: 280px; vertical-align: middle; }
+.career-shell td:has(> strong + small) { min-width: 8.5em; }
+.career-shell td select { max-width: 11em; }
+.player-cell-inner { display: flex; align-items: center; gap: 12px; }
+.career-shell td { vertical-align: middle; }
+.career-shell td strong { white-space: nowrap; }
+.career-shell td select { min-width: 9em; }
+.player-cell-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.player-cell-name .player-link { font-size: 1.05em; }
+.career-shell td small { display: block; color: var(--fl-muted); }
+
+/* Phase 3: the auction room. */
+.auction-room { padding: clamp(14px, 2vw, 26px); border-color: var(--fl-edge-strong); }
+.auction-room-head p:not(.eyebrow) { color: var(--fl-muted); max-width: 70ch; }
+.auction-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.1fr) minmax(0, 0.95fr); gap: 16px; margin: 14px 0; align-items: start; }
+.auction-col { background-color: #0c2224; border: 1px solid var(--fl-edge); border-radius: var(--fl-radius); padding: 12px; min-width: 0; }
+.auction-col > h3 { margin: 0 0 10px; padding: 6px 10px; text-align: center; border-radius: 6px; background-color: #123630; color: var(--fl-gold-hi); }
+.auction-block > h3 { background-color: var(--fl-gold); color: var(--fl-gold-ink); }
+.auction-teams table { min-width: 0; width: 100%; font-size: 0.95em; }
+.auction-teams th[scope="row"] { color: var(--fl-text); font-family: var(--fl-body); text-transform: none; letter-spacing: 0; font-weight: 600; white-space: nowrap; border-bottom-width: 1px; }
+.auction-teams tr[data-mine="true"] :is(th, td) { background-color: rgba(231, 187, 95, 0.16); }
+.auction-mine-tag { display: block; font: 600 0.72em/1.2 var(--fl-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fl-gold-hi); }
+.auction-wallet { font: 700 1.2em var(--fl-display); color: var(--fl-gold-hi); font-variant-numeric: tabular-nums; }
+.auction-lot-card {
+  text-align: center; padding: 14px 12px 16px; border-radius: 12px;
+  background-color: #10302b; background-image: radial-gradient(120% 80% at 50% 0%, rgba(231, 187, 95, 0.22), transparent 60%);
+  border: 1px solid var(--fl-edge-strong);
+}
+.auction-lot-top { display: grid; grid-template-columns: auto auto auto; align-items: center; justify-content: center; gap: 14px; }
+.auction-lot-top .rating-badge { font-size: 1.35em; }
+.auction-lot-stats { display: grid; gap: 6px; }
+.auction-lot-stats span { display: flex; flex-direction: column; align-items: center; font: 600 0.7em/1 var(--fl-display); letter-spacing: 0.12em; color: var(--fl-muted); }
+.auction-lot-stats strong { font: 700 1.9em/1 var(--fl-display); color: var(--fl-text); }
+.auction-lot-name { margin: 10px 0 6px; font: 700 2em/1.05 var(--fl-display); text-transform: uppercase; letter-spacing: 0.02em; }
+.auction-reserve { margin: 10px 0 0; color: var(--fl-muted); font-family: var(--fl-display); letter-spacing: 0.08em; text-transform: uppercase; }
+.auction-reserve strong { color: var(--fl-gold-hi); font-size: 1.4em; }
+.auction-last { margin: 10px 0 0; text-align: center; color: var(--fl-muted); font-size: 0.92em; }
+.auction-done { text-align: center; color: var(--fl-muted); padding: 30px 8px; }
+.auction-bid { margin-top: 12px; display: grid; gap: 8px; }
+.auction-bid-field { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--fl-display); letter-spacing: 0.06em; text-transform: uppercase; }
+.auction-bid-field input { width: 7em; font: 700 1.3em var(--fl-display); text-align: center; }
+.auction-bid .action-row button { flex: 1 1 8rem; }
+.auction-bid-button { font-size: 1.45em; letter-spacing: 0.12em; min-height: 52px; }
+.auction-purse { display: flex; align-items: center; gap: 14px; padding: 8px 10px; border-radius: 8px; background-color: #123630; margin: 8px 0; }
+.auction-purse span { display: flex; flex-direction: column; font: 600 0.72em/1.1 var(--fl-display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--fl-muted); }
+.auction-purse strong { font: 700 2.1em/1 var(--fl-display); color: var(--fl-gold-hi); }
+.auction-makeup { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 8px 0 12px; }
+.auction-makeup dt { color: var(--fl-muted); font-family: var(--fl-display); letter-spacing: 0.06em; text-transform: uppercase; }
+.auction-makeup dd { margin: 0; text-align: right; font: 700 1.1em var(--fl-display); }
+.auction-makeup dt:last-of-type, .auction-makeup dd:last-of-type { border-top: 1px solid var(--fl-edge); padding-top: 4px; color: var(--fl-gold-hi); }
+.auction-lots { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 0.9em; color: var(--fl-muted); }
+.auction-lots li { padding: 4px 6px; border-radius: 6px; background-color: rgba(255, 255, 255, 0.03); }
+@media (max-width: 1050px) { .auction-grid { grid-template-columns: 1fr; } }
+
+/* The start screen keeps the Aster Quay painting behind the title, under a night wash. */
+.career-shell.club-selection .career-masthead {
+  background-color: #0b2a27;
+  background-image: linear-gradient(90deg, rgba(6, 24, 22, 0.94) 4%, rgba(8, 30, 27, 0.55) 55%, rgba(8, 30, 27, 0.25)),
+    linear-gradient(0deg, rgba(6, 20, 20, 0.85), transparent 45%), url("./art/aster-quay.webp");
+  background-position: center 58%; background-size: cover;
+  min-height: 300px;
+}
+.club-selection .career-masthead .button-link { background-color: rgba(10, 34, 31, 0.86); color: var(--fl-text); border-color: rgba(231, 187, 95, 0.55); }

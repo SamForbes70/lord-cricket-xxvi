@@ -10,8 +10,11 @@ import { isKnockoutStage, tournamentMatchIdentity, tournamentResultFromSession }
 import type { TournamentWorkerRequest, TournamentWorkerResponse } from "./tournament.worker.js";
 import { buildUserCompetition, parseUserCompetitionPack, userCompetitionPackText, type StructureChoice, type UserCompetitionDraft } from "./user-competitions.js";
 import { TeamCrest } from "../world/TeamCrest.js";
+import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.js";
+import { playerStrengths } from "../world/player-visuals.js";
 import { generatedRunRoster, generatedSelections, tourCompetition, touringTeamId, type GeneratedSquad } from "./generated-roster.js";
 import {
+  AUCTION_BUDGET,
   AUCTION_SQUAD_SIZE,
   auctionSquads,
   auctionSquadsSha256,
@@ -888,78 +891,136 @@ function AuctionPanel(props: {
   const [bid, setBid] = useState<string>("");
   const roleName = (role: string) => ({ BATTER: "Batter", BOWLER: "Bowler", ALLROUNDER: "All-rounder", KEEPER: "Keeper" })[role] ?? role;
   const recent = state.lots.slice(-8).reverse();
+  const strengths = lotPlayer ? playerStrengths(lotPlayer, state.format) : null;
+  const lotTeamKit = lotPlayer ? (fullWorld.teams.find((t) => t.squadIds.includes(lotPlayer.playerId))?.colours ?? []) : [];
+  const myPlayers = yours ? yours.squadIds.map((id) => fullWorld.players.find((p) => p.playerId === id)!).filter(Boolean) : [];
+  const roleCount = (role: string) => myPlayers.filter((p) => p.role === role).length;
+  const mySpend = yours ? AUCTION_BUDGET - yours.budget : 0;
+  const lastLot = recent[0];
   return (
-    <section className="career-panel" aria-label="Auction" data-testid="auction">
-      <h2>Auction for {competition.title}</h2>
-      <p>
-        Every team rebuilds its squad of {AUCTION_SQUAD_SIZE} from the fictional players, best rated first. The highest maximum bid wins, paying one credit more
-        than the next. Every squad must be able to field a keeper and five bowlers.
-      </p>
-      {yours ? (
-        <p data-testid="auction-yours">
-          You bid for {teamName(yours.teamId)}: {yours.budget} credits left, {AUCTION_SQUAD_SIZE - yours.squadIds.length} places to fill.
+    <section className="career-panel auction-room" aria-label="Auction" data-testid="auction">
+      <header className="auction-room-head">
+        <p className="eyebrow">Auction room</p>
+        <h2>Auction for {competition.title}</h2>
+        <p>
+          Every team rebuilds its squad of {AUCTION_SQUAD_SIZE} from the fictional players, best rated first. The highest maximum bid wins, paying one credit more
+          than the next. Every squad must be able to field a keeper and five bowlers.
         </p>
-      ) : (
-        <p>The AI bids for every team.</p>
-      )}
-      {deciding && lotPlayer && yours && (
-        <div data-testid="auction-lot">
-          <h3>
-            {lotPlayer.name}, {roleName(lotPlayer.role)}, rated {playerRating(lotPlayer, state.format)}. Reserve {reserve}.
-          </h3>
-          <div className="action-row">
-            <label>
-              Your maximum bid{" "}
-              <input type="number" min={reserve} max={maxAffordable(fullWorld, yours)} value={bid} placeholder={String(reserve)} onChange={(e) => setBid(e.currentTarget.value)} />
-            </label>
-            <button type="button" className="primary" disabled={props.busy} onClick={() => { props.onDecide({ kind: "BID", max: Number(bid || reserve) }); setBid(""); }}>
-              Bid
-            </button>
-            <button type="button" disabled={props.busy} onClick={() => props.onDecide({ kind: "PASS" })}>
-              Pass
-            </button>
-            <button type="button" disabled={props.busy} onClick={() => props.onDecide({ kind: "AUTO" })}>
-              Let the AI bid for me
-            </button>
-          </div>
-          <p>You can bid up to {maxAffordable(fullWorld, yours)} on this player.</p>
+      </header>
+      <div className="auction-grid">
+        <div className="auction-col auction-teams">
+          <h3>Teams</h3>
+          <table aria-label="Auction budgets">
+            <thead>
+              <tr>
+                <th scope="col">Team</th>
+                <th scope="col">Credits left</th>
+                <th scope="col">Squad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {state.teams.map((t) => (
+                <tr key={t.teamId} data-mine={t.teamId === state.playerTeamId ? "true" : undefined}>
+                  <th scope="row">
+                    <TeamCrest teamId={t.teamId} name={teamName(t.teamId)} colours={teamColours(t.teamId)} size={22} decorative />
+                    {teamName(t.teamId)}
+                    {t.teamId === state.playerTeamId && <span className="auction-mine-tag">Your team</span>}
+                  </th>
+                  <td className="auction-wallet">{t.budget}</td>
+                  <td>
+                    {t.squadIds.length} of {AUCTION_SQUAD_SIZE}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
-      <table aria-label="Auction budgets">
-        <thead>
-          <tr>
-            <th scope="col">Team</th>
-            <th scope="col">Credits left</th>
-            <th scope="col">Squad</th>
-          </tr>
-        </thead>
-        <tbody>
-          {state.teams.map((t) => (
-            <tr key={t.teamId}>
-              <th scope="row">
-                <TeamCrest teamId={t.teamId} name={teamName(t.teamId)} colours={teamColours(t.teamId)} size={18} decorative />
-                {teamName(t.teamId)}
-              </th>
-              <td>{t.budget}</td>
-              <td>
-                {t.squadIds.length} of {AUCTION_SQUAD_SIZE}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {recent.length > 0 && (
-        <>
-          <h3>Latest lots</h3>
-          <ul aria-label="Latest lots">
-            {recent.map((l) => (
-              <li key={l.playerId}>
-                {playerNames.get(l.playerId)}: {l.winnerTeamId ? `${teamName(l.winnerTeamId)} for ${l.price}` : "unsold"}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+        <div className="auction-col auction-block">
+          <h3>Current player</h3>
+          {lotPlayer && strengths ? (
+            <div className="auction-lot-card">
+              <div className="auction-lot-top">
+                <RatingBadge rating={playerRating(lotPlayer, state.format)} decorative />
+                <PlayerPortrait playerId={lotPlayer.playerId} role={lotPlayer.role} kit={lotTeamKit} size={124} />
+                <div className="auction-lot-stats" aria-hidden="true">
+                  <span><strong>{strengths.batting}</strong>BAT</span>
+                  <span><strong>{strengths.bowling || "–"}</strong>BOWL</span>
+                  <span><strong>{strengths.fielding}</strong>FIELD</span>
+                </div>
+              </div>
+              <p className="auction-lot-name">{lotPlayer.name}</p>
+              <RoleChip role={lotPlayer.role} />
+              <p className="auction-reserve">Reserve <strong>{reserve}</strong></p>
+            </div>
+          ) : (
+            <p className="auction-done">{state.complete ? "Every player has gone under the hammer." : "Waiting for the next lot."}</p>
+          )}
+          {lastLot && (
+            <p className="auction-last">
+              Last lot: {playerNames.get(lastLot.playerId)}, {lastLot.winnerTeamId ? `${teamName(lastLot.winnerTeamId)} for ${lastLot.price}` : "unsold"}
+            </p>
+          )}
+          {deciding && lotPlayer && yours && (
+            <div data-testid="auction-lot" className="auction-bid">
+              <h3 className="sr-only">
+                {lotPlayer.name}, {roleName(lotPlayer.role)}, rated {playerRating(lotPlayer, state.format)}. Reserve {reserve}.
+              </h3>
+              <label className="auction-bid-field">
+                Your maximum bid{" "}
+                <input type="number" min={reserve} max={maxAffordable(fullWorld, yours)} value={bid} placeholder={String(reserve)} onChange={(e) => setBid(e.currentTarget.value)} />
+              </label>
+              <div className="action-row">
+                <button type="button" className="primary auction-bid-button" disabled={props.busy} onClick={() => { props.onDecide({ kind: "BID", max: Number(bid || reserve) }); setBid(""); }}>
+                  Bid
+                </button>
+                <button type="button" disabled={props.busy} onClick={() => props.onDecide({ kind: "PASS" })}>
+                  Pass
+                </button>
+                <button type="button" disabled={props.busy} onClick={() => props.onDecide({ kind: "AUTO" })}>
+                  Let the AI bid for me
+                </button>
+              </div>
+              <p>You can bid up to {maxAffordable(fullWorld, yours)} on this player.</p>
+            </div>
+          )}
+        </div>
+        <div className="auction-col auction-mine">
+          <h3>Your squad</h3>
+          {yours ? (
+            <>
+              <p data-testid="auction-yours">
+                You bid for {teamName(yours.teamId)}: {yours.budget} credits left, {AUCTION_SQUAD_SIZE - yours.squadIds.length} places to fill.
+              </p>
+              <div className="auction-purse" aria-hidden="true">
+                <TeamCrest teamId={yours.teamId} name={teamName(yours.teamId)} colours={teamColours(yours.teamId)} size={40} decorative />
+                <span><strong>{yours.budget}</strong>credits left</span>
+                <span><strong>{mySpend}</strong>spent</span>
+              </div>
+              <dl className="auction-makeup">
+                <dt>Batters</dt><dd>{roleCount("BATTER")}</dd>
+                <dt>All-rounders</dt><dd>{roleCount("ALLROUNDER")}</dd>
+                <dt>Keepers</dt><dd>{roleCount("KEEPER")}</dd>
+                <dt>Bowlers</dt><dd>{roleCount("BOWLER")}</dd>
+                <dt>Total</dt><dd>{myPlayers.length} of {AUCTION_SQUAD_SIZE}</dd>
+              </dl>
+            </>
+          ) : (
+            <p>The AI bids for every team.</p>
+          )}
+          {recent.length > 0 && (
+            <>
+              <h3>Latest lots</h3>
+              <ul aria-label="Latest lots" className="auction-lots">
+                {recent.map((l) => (
+                  <li key={l.playerId}>
+                    {playerNames.get(l.playerId)}: {l.winnerTeamId ? `${teamName(l.winnerTeamId)} for ${l.price}` : "unsold"}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      </div>
       {state.complete && (
         <>
           <h3>Squads</h3>
