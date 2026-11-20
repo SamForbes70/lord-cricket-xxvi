@@ -57,9 +57,16 @@ test("Stage 14 a rain-affected T20 is played, simulated to a result and reopened
   expect(pageErrors).toEqual([]);
 });
 
+/** A seed whose match offers the player a review in the first innings (found by trying seeds; see the test). */
+const RAIN_TEST_SEED = 2;
+
 // Player reviews (owner decisions B1a to B5a): the player reviews an on-field decision and sees the reading afterwards.
 test("Stage 14 player reviews: a reviewed decision shows the review outcome and the reviews left", async ({ page }) => {
   test.setTimeout(300_000);
+  // The match seed comes from crypto.getRandomValues, so without this every run played a different match, and some
+  // matches never offer the player's side a review: the test failed at random (seen in Chromium and Firefox on hosted
+  // Windows CI). A seeded generator makes it the same match every run, one that is known to offer a review.
+  await page.addInitScript({ content: `(() => { let s = ${process.env.LCXXVI_RAIN_SEED ?? RAIN_TEST_SEED} >>> 0; crypto.getRandomValues = (a) => { for (let i = 0; i < a.length; i += 1) { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; a[i] = s >>> 24; } return a; }; })();` });
   const pageErrors: string[] = [];
   page.on("pageerror", (err) => pageErrors.push(err.message));
   await page.goto("/#rain");
