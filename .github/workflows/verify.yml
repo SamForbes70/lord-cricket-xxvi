@@ -58,7 +58,8 @@ jobs:
           retention-days: 7
   windows-browser-acceptance:
     runs-on: windows-latest
-    timeout-minutes: 120
+    # About 25 minutes of steps around the 100-minute UI suite budget in scripts/owner-acceptance.mjs.
+    timeout-minutes: 150
     permissions:
       contents: read
     steps:
