@@ -1,11 +1,17 @@
-import { useId } from "react";
+import { memo, useId } from "react";
 import { portraitSpec, ratingTier, ROLE_LABEL } from "./player-visuals.js";
 
 /**
  * A fictional player's portrait (visual overhaul phase 2): head and shoulders in the club's kit, drawn as inline SVG
  * from the player's id. Always decorative: the player's name is written next to it, so screen readers skip it.
  */
-export function PlayerPortrait(props: { playerId: string; role: string; kit: readonly string[]; size?: number }) {
+type PortraitProps = { playerId: string; role: string; kit: readonly string[]; size?: number };
+
+/** Memoised on its inputs: the match screen re-renders every ball, and a portrait only changes when the player does. */
+export const PlayerPortrait = memo(PlayerPortraitSvg, (a, b) =>
+  a.playerId === b.playerId && a.role === b.role && a.size === b.size && a.kit[0] === b.kit[0] && a.kit[1] === b.kit[1]);
+
+function PlayerPortraitSvg(props: PortraitProps) {
   const s = portraitSpec(props.playerId, props.role, props.kit);
   const size = props.size ?? 48;
   const id = useId();

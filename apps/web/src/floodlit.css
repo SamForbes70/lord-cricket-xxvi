@@ -386,8 +386,7 @@ body .captain-station .field-read { color: var(--fl-muted); }
 /* Screens with a masthead and an intro line: breathing room under the gold rule. */
 .career-shell > .career-masthead + p { margin-top: 14px; }
 
-/* The base stylesheet gives every table a fixed layout with a 48% first column, which suits the batting scorecard
-   but squashes career tables (results, fixtures, contracts). Career tables size their columns to their content. */
-.career-shell table { table-layout: auto; }
+/* The base stylesheet gives every table's first column 48%, which suits the batting scorecard but squashes career
+   tables (results, fixtures, contracts). Career tables keep the cheap fixed layout with the width shared out evenly. */
 .career-shell th:first-child { width: auto; }
 .career-shell .league-table th:first-child { width: 3.5em; }

@@ -122,17 +122,48 @@ ${pavilion}
 }
 
 const cache = new Map<string, string>();
+const rasters = new Map<string, string>();
+const rastering = new Set<string>();
 
-/** The backdrop image URL for a ground: its painting if it has one, else its procedural stadium. */
+/**
+ * Turns a procedural stadium into a small WebP once, in the browser, so screens that re-render every ball paint a
+ * bitmap rather than re-rasterising a vector image with gradients. Falls back silently (the SVG keeps working) where
+ * there is no canvas, as in unit tests, or if the browser refuses to export the canvas.
+ */
+function rasterise(slug: string, svgUrl: string): void {
+  if (rastering.has(slug) || typeof document === "undefined" || typeof Image === "undefined") return;
+  rastering.add(slug);
+  const img = new Image();
+  img.onload = () => {
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 960;
+      canvas.height = 540;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const url = canvas.toDataURL("image/webp", 0.82);
+      if (url.startsWith("data:image/")) rasters.set(slug, url);
+    } catch {
+      /* Keep the SVG. */
+    }
+  };
+  img.src = svgUrl;
+}
+
+/** The backdrop image URL for a ground: its painting if it has one, else its procedural stadium (as a bitmap once ready). */
 export function groundArtUrl(name: string): string {
   const slug = groundSlug(name);
   const painted = PAINTINGS[slug];
   if (painted) return painted;
+  const raster = rasters.get(slug);
+  if (raster) return raster;
   let svg = cache.get(slug);
   if (!svg) {
     svg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(stadiumSvg(name))}`;
     cache.set(slug, svg);
   }
+  rasterise(slug, svg);
   return svg;
 }
 
