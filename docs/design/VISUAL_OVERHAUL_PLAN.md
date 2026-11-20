@@ -48,3 +48,15 @@ Each phase ships through its own pull request with green hosted CI. Phase 1 and 
 - Consistent type scale, spacing and colour across all screens; nothing in the original light theme left behind.
 - Passes contrast, zoom, reduced-motion and keyboard checks; plays offline.
 - A person who has not seen it before describes it as a game, not a tool. (Needs a playtest to establish.)
+
+## Progress
+
+| Phase | State | Where |
+| --- | --- | --- |
+| 1 Design system | Done | #98 (`floodlit.css`, bundled fonts) |
+| 2 Player identity | Done for Squad, Auction, match screen and exhibition XI picker | #98 and the ground-art pull request |
+| 3 Hero screens | Auction, Squad and Career home done; match screen has player faces and ground art | as above |
+| 4 Remaining screens | Exhibition setup has a match-up banner; Tournaments, Scenarios, Statistics, Contracts and Settings still to do | |
+| 5 Art | Owner chose AI generation (20 November). Every ground now has a backdrop: Aster Quay's painting or a procedural floodlit stadium. AI paintings for the other seven wait on the image service sign-in; prompts in `GROUND_ART_PROMPTS.md` | |
+| 6 Motion and sound | Not started | |
+| 7 Quality | Running per pull request | |

@@ -548,7 +548,12 @@ export function TournamentsApp() {
                     </small>
                   </p>
                   <p>{c.summary}</p>
-                  <div className="action-row">
+                  <div className="tournament-crests" aria-hidden="true">
+                    {c.teamIds.map((id) => (
+                      <TeamCrest key={id} teamId={id} name={teamName(id)} colours={teamColours(id)} size={30} decorative />
+                    ))}
+                  </div>
+                  <div className="action-row tournament-start">
                     <label>
                       Your team{" "}
                       <select

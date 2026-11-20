@@ -1,3 +1,4 @@
+import { TeamCrest } from "../world/TeamCrest.js";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { StatsScope } from "./CareerApp.js";
 import { metric } from "./format.js";
@@ -228,7 +229,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                       : "League table"}
                   </h3>
                   <div className="table-wrap">
-                    <table>
+                    <table className="league-table">
                       <thead>
                         <tr>
                           <th>Pos</th>
@@ -249,7 +250,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                             className={row.teamId === controlledTeam ? "managed-fixture" : ""}
                           >
                             <td>{row.rank}</td>
-                            <td>{service.teamName(row.teamId)}</td>
+                            <td className="league-team"><TeamCrest teamId={row.teamId} name={service.teamName(row.teamId)} colours={service.getWorld().teams.find((t) => t.teamId === row.teamId)?.colours ?? []} size={22} decorative />{service.teamName(row.teamId)}</td>
                             <td>{row.played}</td>
                             <td>{row.wins}</td>
                             <td>{row.losses}</td>

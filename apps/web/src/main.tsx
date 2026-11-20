@@ -53,6 +53,8 @@ import "@fontsource/barlow-condensed/latin-500.css";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-700.css";
 import "./floodlit.css";
+import { groundArtStyle } from "./world/ground-art.js";
+import { PlayerPortrait } from "./world/PlayerPortrait.js";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
@@ -1050,7 +1052,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             aria-label="Match scoreboard"
             data-testid="scorestrip"
             /* Both sides' kit colours as a thin stripe along the top: the scoreboard is where edited-world colours show. */
-            style={view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : undefined}
+            style={{ ...groundArtStyle(view.ground), ...(view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : {}) }}
+            data-art="true"
           >
             <div>
               <p>
@@ -1105,9 +1108,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               <span>Batters</span>
               {i ? (
                 [i.northBatterId, i.southBatterId].map((id, n) => (
-                  <p key={n}>
+                  <p key={n} className={id ? "active-player" : undefined}>
                     {id ? (
                       <>
+                        <PlayerPortrait playerId={id} role={activeRole(view, id)} kit={activeKit(view, id)} size={44} />
                         <strong>
                           {view.names[id]}
                           {id === striker ? " *" : ""}
@@ -1126,7 +1130,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             </div>
             <div>
               <span>Bowler</span>
-              <p>
+              <p className={i?.bowlerId ? "active-player" : undefined}>
+                {i?.bowlerId && <PlayerPortrait playerId={i.bowlerId} role="BOWLER" kit={activeKit(view, i.bowlerId)} size={44} />}
                 <strong>
                   {i?.bowlerId ? view.names[i.bowlerId] : "Awaiting selection"}
                 </strong>
@@ -1913,6 +1918,18 @@ function Setup({
   }
   return (
     <section className="setup">
+      {/* The match-up banner: both crests over the chosen ground's art. Decorative: the selects below carry the names. */}
+      <div className="setup-hero" aria-hidden="true" data-art="true" style={groundArtStyle(selectedGround.name)}>
+        {teams.map((sel, index) => {
+          const team = world.teams.find((candidate) => candidate.teamId === sel.teamId);
+          return (
+            <React.Fragment key={index}>
+              {index === 1 && <span className="setup-hero-v">v</span>}
+              <TeamCrest teamId={sel.teamId} name={team?.name ?? sel.teamId} colours={team?.colours ?? []} size={88} decorative />
+            </React.Fragment>
+          );
+        })}
+      </div>
       <fieldset disabled={busy}>
         <legend>Choose teams and XIs</legend>
         <label>
@@ -1995,6 +2012,7 @@ function Setup({
                           })
                         }
                       />
+                      <PlayerPortrait playerId={p.id} role={p.role} kit={world.teams.find((team) => team.teamId === s.teamId)?.colours ?? []} size={30} />
                       <span>
                         {p.name}
                         <small>
@@ -2292,3 +2310,13 @@ function RootApp() {
 const root = document.getElementById("root");
 if (!root) throw new Error("Root missing");
 createRoot(root).render(<RootApp />);
+
+/** Kit colours of the side a player is in, for their portrait on the match screen. */
+function activeKit(view: View, playerId: string): readonly string[] {
+  return view.teams.find((team) => team.playerIds.includes(playerId))?.colours ?? [];
+}
+/** A player's role for their portrait: the keeper from the team sheet, otherwise the approved world's record. */
+function activeRole(view: View, playerId: string): string {
+  if (view.teams.some((team) => team.keeperId === playerId)) return "KEEPER";
+  return careerWorld.players.find((player) => player.playerId === playerId)?.role ?? "BATTER";
+}
