@@ -29,10 +29,9 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 **Owner actions still open:**
 
 - **Branch protection is partly on** (checked 20 November 2026): pull requests are required and force pushes and deletion are blocked, but no status checks are required and admins can bypass it. Add `pass07a` and `windows-browser-acceptance` as required checks and turn on "Do not allow bypassing" ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
-- **#92** (`feat/captains-pavilion`) is still open. All of its code is on `main` through #93; the branch also carries an equivalent copy of the scoreboard fix and older documentation, so it conflicts. Close it as merged by #93, and start any new work from `main`.
-- **Leftover branches:** `feat/windows-native-portable-verified` (an older Windows launcher that `main` has replaced; merging it would remove newer launcher code), `audit/2026-11-16` and `docs/reconcile-stage5-documentation` (their pull requests are closed). They can be deleted.
+- **Leftover branches:** `feat/captains-pavilion` (#92, closed: its code is on `main` through #93), `feat/windows-native-portable-verified` (an older Windows launcher that `main` has replaced; merging it would remove newer launcher code), `audit/2026-11-16` and `docs/reconcile-stage5-documentation` (their pull requests are closed). They can be deleted.
 
-Done: the release is published (19 November); #44, #46 and #47 are closed as superseded (19 November). The paused agents are to be ignored (owner direction, 18 November 2026).
+Done: the release is published (19 November); #44, #46 and #47 are closed as superseded (19 November); #92 is closed, its work being on `main` through #93 (20 November). Start new work from `main`. The paused agents are to be ignored (owner direction, 18 November 2026).
 
 **Biggest risk:** nobody has played this build on the owner's PC. Every measurement is from hosted CI and Linux containers; the Stage 16 playtest, memory budget, screen-reader walkthrough and long-career soak were not run. A short playtest of the release is the most useful next step.
 

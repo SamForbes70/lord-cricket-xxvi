@@ -11,7 +11,7 @@
 - **Stage 16** was passed by the owner's direct instruction on 18 November 2026. None of its four parts were run: no owner-PC measurements, no observed playtest, no screen-reader walkthrough, no long-career soak ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)).
 - **Stage 17:** released by the owner on 19 November 2026 as `alpha-2026-11-19`; record `LC_RELEASE_RECORD_V2` in [release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json) (the folder keeps its first date).
 - **Evidence:** hosted CI on every pull request (Linux, and Windows with Chromium and Firefox; the Windows job builds and smoke-tests the EXE) and Linux containers. Nothing has been run on macOS or Safari. Last full local unit run: 884 tests passed on #86's head (`7a2840b`).
-- **Owner actions still open:** finish branch protection (required checks and no admin bypass are still off) and close #92; see [HANDOVER.md](HANDOVER.md). The paused agents are to be ignored (owner direction, 18 November 2026).
+- **Owner actions still open:** finish branch protection (required checks and no admin bypass are still off); see [HANDOVER.md](HANDOVER.md). The paused agents are to be ignored (owner direction, 18 November 2026).
 
 The sections below are kept as written on earlier dates.
 
