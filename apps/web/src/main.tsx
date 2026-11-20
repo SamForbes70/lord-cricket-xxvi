@@ -53,7 +53,7 @@ import "@fontsource/barlow-condensed/latin-500.css";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-700.css";
 import "./floodlit.css";
-import { groundArtStyle } from "./world/ground-art.js";
+import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
@@ -1052,7 +1052,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             aria-label="Match scoreboard"
             data-testid="scorestrip"
             /* Both sides' kit colours as a thin stripe along the top: the scoreboard is where edited-world colours show. */
-            style={{ ...groundArtStyle(view.ground), ...(view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : {}) }}
+            style={{ ...groundArtBackground(view.ground, ART_WASH.scoreboard), ...(view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : {}) }}
             data-art="true"
           >
             <div>
@@ -1919,7 +1919,7 @@ function Setup({
   return (
     <section className="setup">
       {/* The match-up banner: both crests over the chosen ground's art. Decorative: the selects below carry the names. */}
-      <div className="setup-hero" aria-hidden="true" data-art="true" style={groundArtStyle(selectedGround.name)}>
+      <div className="setup-hero" aria-hidden="true" data-art="true" style={groundArtBackground(selectedGround.name, ART_WASH.banner)}>
         {teams.map((sel, index) => {
           const team = world.teams.find((candidate) => candidate.teamId === sel.teamId);
           return (

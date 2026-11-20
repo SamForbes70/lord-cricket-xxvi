@@ -1,5 +1,5 @@
 import { TeamCrest } from "../world/TeamCrest.js";
-import { groundArtStyle } from "../world/ground-art.js";
+import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { percentageBp } from "./format.js";
@@ -69,7 +69,7 @@ export function HomeScreen(props: HomeScreenProps) {
     <section aria-labelledby="home-heading">
       <h2 id="home-heading">Home</h2>
       <div className="dashboard-grid">
-        <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"} data-art={nextFixture ? "true" : undefined} style={nextFixture ? groundArtStyle(service.groundName(nextFixture.groundId)) : undefined}>
+        <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"} data-art={nextFixture ? "true" : undefined} style={nextFixture ? groundArtBackground(service.groundName(nextFixture.groundId), ART_WASH.fixture) : undefined}>
           <h3>Next required action</h3>
           {state.phase === "COMPLETE" ? (
             <>

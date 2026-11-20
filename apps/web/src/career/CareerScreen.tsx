@@ -235,7 +235,7 @@ export function CareerScreen(props: CareerScreenProps) {
                     <code>{inspectedCompletedSeason.finalSeasonStateSha256.slice(0, 16)}…</code>
                   </p>
                   <div className="table-wrap">
-                    <table>
+                    <table className="round-table">
                       <thead>
                         <tr>
                           <th>Rnd</th>
@@ -284,7 +284,7 @@ export function CareerScreen(props: CareerScreenProps) {
           )}
           <h3>Managed-team results (active season)</h3>
           <div className="table-wrap">
-            <table>
+            <table className="round-table">
               <thead>
                 <tr>
                   <th>Rnd</th>

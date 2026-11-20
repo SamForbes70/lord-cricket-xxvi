@@ -318,20 +318,17 @@ body .captain-station .field-read { color: var(--fl-muted); }
 }
 .club-selection .career-masthead .button-link { background-color: rgba(10, 34, 31, 0.86); color: var(--fl-text); border-color: rgba(231, 187, 95, 0.55); }
 
-/* Phase 5: every ground has a backdrop (its painting, or a procedural floodlit stadium), passed in as --ground-art.
-   A heavy night wash sits on the text side, and the solid background-color underneath keeps the contrast audit honest. */
-.career-shell .fixture-lead[data-art="true"]::before {
-  height: 100%;
-  background: linear-gradient(95deg, #0f2526 22%, rgba(15, 37, 38, 0.93) 45%, rgba(15, 37, 38, 0.5) 75%, rgba(15, 37, 38, 0.2)),
-    var(--ground-art) center 58% / cover !important;
-}
+/* Phase 5: every ground has a backdrop (its painting, or a procedural floodlit stadium). The image and its night wash
+   are set inline (see ground-art.ts); these rules only place it. Each surface keeps a solid background-color underneath
+   for the contrast audit. */
+.career-shell .fixture-lead[data-art="true"] { background-size: cover; background-position: center 58%; }
+.career-shell .fixture-lead[data-art="true"]::before { display: none; }
 .scorestrip[data-art="true"], .match-shell .scorestrip[data-art="true"] {
-  background-color: #0b2622;
-  background-image: linear-gradient(95deg, rgba(11, 38, 34, 0.97) 28%, rgba(11, 38, 34, 0.78) 55%, rgba(11, 38, 34, 0.35)), var(--ground-art);
-  background-size: cover; background-position: center 36%;
+  background-color: #0b2622; background-size: cover; background-position: center 36%;
 }
 @media (max-width: 650px) {
-  .career-shell .fixture-lead[data-art="true"]::before { background: linear-gradient(90deg, rgba(15, 37, 38, 0.96), rgba(15, 37, 38, 0.88)), var(--ground-art) center / cover !important; }
+  /* Text runs the full width on a phone, so the whole panel gets a heavier wash. */
+  .career-shell .fixture-lead[data-art="true"]::before { display: block; height: 100%; background: rgba(15, 37, 38, 0.85) !important; }
 }
 
 /* Match screen: the batters and bowler with their faces, like a broadcast lower third. */
@@ -344,7 +341,6 @@ body .captain-station .field-read { color: var(--fl-muted); }
   display: flex; align-items: center; justify-content: center; gap: clamp(16px, 5vw, 56px);
   min-height: 190px; margin-bottom: 14px; border-radius: var(--fl-radius); border: 1px solid var(--fl-edge-strong);
   background-color: #0b2622;
-  background-image: linear-gradient(0deg, rgba(8, 23, 26, 0.75), rgba(8, 23, 26, 0.25)), var(--ground-art);
   background-size: cover; background-position: center 34%; box-shadow: var(--fl-shadow);
 }
 .setup-hero svg { filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55)); }
@@ -364,7 +360,7 @@ body .captain-station .field-read { color: var(--fl-muted); }
 .scenario-card > .primary { margin-top: auto; align-self: flex-start; }
 .scenario-art {
   margin: 0 -16px 12px; height: 120px; position: relative;
-  background-color: #0b2622; background-image: linear-gradient(0deg, var(--fl-surface) 0%, rgba(16, 41, 43, 0) 70%), var(--ground-art);
+  background-color: #0b2622;
   background-size: cover; background-position: center 38%;
 }
 .scenario-difficulty {
@@ -386,7 +382,8 @@ body .captain-station .field-read { color: var(--fl-muted); }
 /* Screens with a masthead and an intro line: breathing room under the gold rule. */
 .career-shell > .career-masthead + p { margin-top: 14px; }
 
-/* The base stylesheet gives every table's first column 48%, which suits the batting scorecard but squashes career
-   tables (results, fixtures, contracts). Career tables keep the cheap fixed layout with the width shared out evenly. */
-.career-shell th:first-child { width: auto; }
+/* The base stylesheet gives every table's first column 48%, which suits the batting scorecard and the Squad table's
+   player column but squashes tables that start with a round number (career results, contract history). Those get a
+   narrow first column; every other table keeps the base layout. */
+.career-shell .round-table th:first-child { width: 4em; }
 .career-shell .league-table th:first-child { width: 3.5em; }

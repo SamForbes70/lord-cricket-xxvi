@@ -171,7 +171,24 @@ export function hasPainting(name: string): boolean {
   return groundSlug(name) in PAINTINGS;
 }
 
-/** A style object that exposes the art to CSS as `--ground-art` (React sets it through the CSSOM, which the CSP allows). */
-export function groundArtStyle(name: string | undefined): Record<string, string> | undefined {
-  return name ? { "--ground-art": `url("${groundArtUrl(name)}")` } : undefined;
+/** Night washes laid over the art so text on top keeps its contrast. */
+export const ART_WASH = {
+  /** Career fixture panel: dark on the text side, the ground showing on the right. */
+  fixture: "linear-gradient(95deg, #0f2526 22%, rgba(15, 37, 38, 0.93) 45%, rgba(15, 37, 38, 0.5) 75%, rgba(15, 37, 38, 0.2))",
+  /** Match scoreboard. */
+  scoreboard: "linear-gradient(95deg, rgba(11, 38, 34, 0.97) 28%, rgba(11, 38, 34, 0.78) 55%, rgba(11, 38, 34, 0.35))",
+  /** Exhibition match-up banner. */
+  banner: "linear-gradient(0deg, rgba(8, 23, 26, 0.75), rgba(8, 23, 26, 0.25))",
+  /** Scenario card header, fading into the card. */
+  card: "linear-gradient(0deg, #10292b 0%, rgba(16, 41, 43, 0) 70%)",
+} as const;
+
+/**
+ * The art as an inline background-image (React sets it through the CSSOM, which the CSP allows). It is set directly
+ * rather than through a CSS custom property: a url() reached through var() is re-resolved on every style recalculation,
+ * which on the match screen means every ball, and hosted Windows CI showed the match tests running far slower that way.
+ * The string is stable between renders, so React leaves the declaration alone once it is set.
+ */
+export function groundArtBackground(name: string | undefined, wash: string): { backgroundImage: string } | undefined {
+  return name ? { backgroundImage: `${wash}, url("${groundArtUrl(name)}")` } : undefined;
 }
