@@ -1,0 +1,234 @@
+/*
+ * Floodlit: the game's night-match broadcast look (docs/design/VISUAL_OVERHAUL_PLAN.md, phase 1).
+ * Loaded last, so it re-themes every screen. Every surface keeps a solid background colour under any gradient, so
+ * contrast checks measure against a real colour. Fonts are bundled (SIL Open Font Licence) so the game stays offline.
+ */
+:root {
+  --fl-bg: #08171a;
+  --fl-bg-2: #0c2226;
+  --fl-surface: #10292b;
+  --fl-surface-2: #163536;
+  --fl-surface-3: #1d4342;
+  --fl-raise: #23504d;
+  --fl-edge: rgba(214, 236, 226, 0.14);
+  --fl-edge-strong: rgba(228, 184, 96, 0.55);
+  --fl-text: #eef4ef;
+  --fl-muted: #b6c8bf;
+  --fl-faint: #8fa79c;
+  --fl-gold: #e7bb5f;
+  --fl-gold-hi: #f6d58d;
+  --fl-gold-ink: #1b1305;
+  --fl-red: #f07a6c;
+  --fl-green: #79d79e;
+  --fl-link: #8fd3ff;
+  --fl-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --fl-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --fl-radius: 10px;
+  --fl-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* Pavilion tokens follow the night palette, so screens styled with them change together. */
+  --paper: var(--fl-bg);
+  --ink: var(--fl-text);
+  --pine: #0e3a33;
+  --brass: var(--fl-gold);
+  --rule: var(--fl-edge);
+  --surface: var(--fl-surface);
+  --display: var(--fl-display);
+  color-scheme: dark;
+  color: var(--fl-text);
+  background-color: var(--fl-bg);
+  font-family: var(--fl-body);
+}
+
+/* Backdrop: a night ground under floodlights. */
+html, body { background-color: var(--fl-bg); color: var(--fl-text); }
+body {
+  min-height: 100vh;
+  background-image:
+    radial-gradient(60vw 40vh at 12% -8%, rgba(255, 246, 214, 0.16), transparent 70%),
+    radial-gradient(60vw 40vh at 88% -8%, rgba(255, 246, 214, 0.16), transparent 70%),
+    radial-gradient(120vw 60vh at 50% 120%, rgba(46, 140, 92, 0.32), transparent 70%),
+    linear-gradient(180deg, #0a1d22 0%, #08171a 55%, #0a201a 100%);
+  background-attachment: fixed;
+}
+main, .career-shell, .match-shell { background-color: transparent; color: var(--fl-text); }
+
+/* Type. */
+h1, h2, h3, h4, .career-shell section > h2:first-child, .club-selection .career-masthead h1, .team-card strong {
+  font-family: var(--fl-display);
+  letter-spacing: 0.01em;
+  color: var(--fl-text);
+}
+h1 { font-weight: 700; font-size: 2.3em; text-transform: uppercase; }
+h2 { font-weight: 700; font-size: 1.45em; text-transform: uppercase; letter-spacing: 0.03em; }
+h3 { font-weight: 600; font-size: 1.2em; text-transform: uppercase; letter-spacing: 0.04em; }
+h4 { font-weight: 600; font-size: 1.05em; }
+h1 span, .career-masthead h1 span, .masthead h1 span { color: var(--fl-gold-hi); }
+p, li, dd, dt, label, td, th, legend, summary { color: inherit; }
+small, .muted, footer p, .preferences > span, .replay-meta, .historical-rule-meta, .award-notice,
+.live-field-subtitle, .live-field-legend, .highlight-disclaimer, .strip-label, .keyboard-help, .tactical-empty,
+.legality-phase, .legality-counts, .match-award-explain, .match-award-breakdown, .team-card span { color: var(--fl-muted); }
+.eyebrow, .career-masthead .eyebrow, .masthead .eyebrow, .fixture-lead > h3, .fixture-round {
+  color: var(--fl-gold-hi); font-family: var(--fl-display); letter-spacing: 0.16em; text-transform: uppercase;
+}
+a { color: var(--fl-link); }
+.big-stat, .score, .scorestrip .score, .scorestrip .target strong {
+  font-family: var(--fl-display); font-variant-numeric: tabular-nums; color: var(--fl-text);
+}
+.big-stat { font-size: 2.4em; font-weight: 700; color: var(--fl-gold-hi); }
+
+/* Surfaces: dark glass panels with a light edge. */
+.panel, .career-panel, .decision, .recovery, .save-card, .tactical-card, .tactical-preset-card, .tactical-subdisclosure,
+.live-field-card, .match-award-box, .career-disclosure, .audio-presentation-bar, .import-control, .checkpoint-inspector,
+.replay-viewer, .tactical-situation-bar, .legality-box, .highlight-fallback-note, .audio-fallback-note,
+.audio-caption-banner, .result, .active, .career-shell .fixture-lead, .career-shell .team-card {
+  background-color: var(--fl-surface);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  color: var(--fl-text);
+  border: 1px solid var(--fl-edge);
+  border-radius: var(--fl-radius);
+  box-shadow: var(--fl-shadow);
+}
+.career-panel.emphasis, .tactical-preset-card.contextual, .legality-box.legal { border-color: rgba(121, 215, 158, 0.45); }
+.legality-box.illegal, .error, .career-error { background-color: #3a1915; border-color: #8c3a30; color: #ffd9d2; }
+.career-warning, .highlight-fallback-note, .audio-fallback-note { background-color: #3a2c10; border-color: #8a6a24; color: #ffe6b0; }
+.career-disclosure { box-shadow: none; }
+.career-disclosure.compact { background-color: transparent; border: 0; border-top: 1px solid var(--fl-edge); border-radius: 0; }
+.fixture-lead::before { background: linear-gradient(105deg, #10312c, #0f2526) !important; }
+.career-shell .fixture-lead { border-top: 3px solid var(--fl-gold); }
+
+/* Mastheads: broadcast bars with a gold rule. */
+.career-shell .career-masthead, .match-shell .masthead, .masthead {
+  background-color: #0b2a27;
+  background-image: linear-gradient(90deg, #0d3530 0%, #0b2a27 55%, #10251f 100%);
+  color: var(--fl-text);
+  border-bottom: 3px solid var(--fl-gold);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+.club-selection .career-masthead h1 { font-size: clamp(2.8em, 6vw, 5.6em); text-transform: uppercase; }
+
+/* Navigation: pill tabs. */
+.career-shell .career-nav { border-bottom: 1px solid var(--fl-edge); gap: 6px; }
+.career-shell .career-nav :is(button, a), .career-nav button, .career-nav a {
+  background-color: transparent; color: var(--fl-muted); border: 1px solid transparent; border-radius: 999px;
+  font-family: var(--fl-display); font-size: 1.08em; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.career-shell .career-nav :is(button, a):hover { color: var(--fl-text); text-decoration: none; background-color: var(--fl-surface-2); }
+.career-shell .career-nav [aria-current="page"], .career-nav button[aria-current="page"] {
+  background-color: var(--fl-gold); color: var(--fl-gold-ink); border-color: var(--fl-gold);
+}
+
+/* Buttons. Primary is gold; others are glass. */
+button, .button-link, .career-nav a {
+  font-family: var(--fl-display); font-weight: 600; font-size: 1.05em; letter-spacing: 0.04em;
+}
+button, .button-link, .save-file-actions button, .skip {
+  background-color: var(--fl-surface-2); color: var(--fl-text); border: 1px solid rgba(214, 236, 226, 0.28);
+  border-radius: 8px; transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+button:hover:enabled, .button-link:hover { background-color: var(--fl-surface-3); border-color: var(--fl-gold); }
+button.primary, :is(.career-shell, .match-shell) button.primary, .tactical-badge.fit, .highlight-chip.active,
+.replay-viewer button[aria-pressed="true"], .scope-bar button[aria-pressed="true"], .career-panel button[aria-pressed="true"] {
+  background-color: var(--fl-gold);
+  background-image: linear-gradient(180deg, var(--fl-gold-hi), var(--fl-gold));
+  color: var(--fl-gold-ink); border-color: var(--fl-gold);
+  box-shadow: 0 4px 14px rgba(231, 187, 95, 0.25);
+}
+button.primary:hover:enabled, :is(.career-shell, .match-shell) button.primary:enabled:hover {
+  background-color: var(--fl-gold-hi); background-image: none; color: var(--fl-gold-ink); transform: translateY(-1px);
+}
+button:disabled { background-color: #1a2b2a; background-image: none; color: #8ea097; border-color: rgba(214, 236, 226, 0.12); box-shadow: none; }
+.career-shell .player-link { color: var(--fl-link); background: none; border: 0; font-family: var(--fl-body); font-weight: 600; text-decoration: none; }
+.career-shell .player-link:hover { text-decoration: underline; }
+:focus-visible, :is(.career-shell, .match-shell) :focus-visible { outline: 3px solid var(--fl-gold-hi); outline-offset: 3px; box-shadow: none; }
+
+/* Inputs. */
+select, input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea {
+  background-color: #0b1f21; color: var(--fl-text); border: 1px solid rgba(214, 236, 226, 0.3); border-radius: 8px;
+}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--fl-gold); }
+input[type="file"] { color: var(--fl-muted); }
+
+/* Tables: dark ledger with a sticky gold-ruled header. */
+table, .career-shell table { background-color: var(--fl-surface); color: var(--fl-text); border-radius: var(--fl-radius); overflow: hidden; }
+th, .career-shell th {
+  background-color: #0c2224; color: var(--fl-gold-hi); font-family: var(--fl-display); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--fl-gold);
+}
+td, .career-shell td, .career-shell th { border-bottom: 1px solid var(--fl-edge); }
+tbody tr:nth-child(even) td { background-color: rgba(255, 255, 255, 0.025); }
+tbody tr:hover td { background-color: rgba(231, 187, 95, 0.07); }
+.managed-fixture, .career-shell .managed-fixture { background-color: #133a2f; box-shadow: inset 4px 0 var(--fl-gold); }
+
+/* Chips and badges. */
+.tactical-badge, .award-provenance-tag, .commentary-milestone-badge, .audio-status-pill, .highlight-chip, .badge {
+  background-color: var(--fl-surface-3); color: var(--fl-text); border: 1px solid var(--fl-edge); border-radius: 999px;
+}
+.tactical-badge.active { background-color: #4a3812; color: var(--fl-gold-hi); }
+.tactical-context-reason, .legality-ok, .season-award-stat, .close-finish .passage-report { color: var(--fl-green); }
+.legality-violations, .season-award-unavailable { color: var(--fl-red); }
+.highlight-headline, .tactical-subdisclosure > summary { color: var(--fl-text); }
+.save-badge { background-color: var(--fl-surface-2); color: var(--fl-text); border: 1px solid var(--fl-edge); }
+.career-masthead .save-badge { color: var(--fl-text); }
+.save-badge[data-status="saving"] { background-color: #3a2c10; }
+.save-badge[data-status="read-only"], .save-badge[data-status="error"] { background-color: #3a1915; }
+.team-colours i { border-color: rgba(255, 255, 255, 0.35); }
+.analytics-sector-track { background-color: #21403c; }
+.live-field-svg { background-color: #0f2a22; }
+
+/* Scoreboard: broadcast score bug. */
+.scorestrip, .match-shell .scorestrip {
+  background-color: #0b2622; background-image: linear-gradient(100deg, #0e3a33 0%, #0b2622 60%, #10301f 100%);
+  color: var(--fl-text); border: 1px solid var(--fl-edge-strong); border-radius: var(--fl-radius);
+}
+.scorestrip p { color: var(--fl-muted); }
+.scorestrip .score { font-size: 3.1em; font-weight: 700; letter-spacing: -0.01em; }
+.scorestrip h2 { color: var(--fl-text); }
+
+/* Club cards on the start screen lift on hover. */
+.career-shell .team-card { border-bottom: 3px solid var(--fl-gold); }
+.career-shell .team-card:enabled:hover { background-color: var(--fl-surface-2); border-color: var(--fl-gold); transform: translateY(-2px); }
+.career-shell .team-card strong { font-size: 1.45em; text-transform: uppercase; }
+
+/* Print keeps black on white. */
+@media print {
+  html, body { background: #fff !important; color: #000 !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button, .career-shell .team-card { transition: none; transform: none !important; }
+}
+
+/* Component stylesheets and the Pavilion pass set their own light surfaces; these follow the night palette too. */
+.pitch-inspection, .tactical-disclosure, .career-match-banner, .captain-station, .captain-station .close-finish,
+.close-finish .passage-report, .match-shell .active, .live-field-card {
+  background-color: var(--fl-surface); background-image: none; color: var(--fl-text);
+  border-color: var(--fl-edge);
+}
+.career-match-banner { border-left: 4px solid var(--fl-gold); box-shadow: var(--fl-shadow); }
+.tactical-disclosure > summary, .tactical-subdisclosure > summary { color: var(--fl-text); }
+.captain-station { border: 1px solid var(--fl-edge-strong); border-radius: var(--fl-radius); box-shadow: var(--fl-shadow); }
+.captain-station > header { background-color: #0b2a27; background-image: linear-gradient(90deg, #0e3a33, #0b2a27); color: var(--fl-text); }
+.captain-station .eyebrow { color: var(--fl-gold-hi); }
+.captain-station > a, .match-shell a { color: var(--fl-link); }
+.close-finish .passage-report { border-left: 3px solid var(--fl-gold); background-color: var(--fl-surface-2); }
+.close-finish .action-row button { border-top: 3px solid var(--fl-green); }
+.close-finish .action-row button:hover:enabled { border-top-color: var(--fl-gold); }
+.field-read { border-left-color: var(--fl-edge); color: var(--fl-muted); }
+.delivery-strip span { background-color: var(--fl-surface-3); color: var(--fl-text); border: 1px solid var(--fl-edge); }
+.career-shell th, .match-shell table th { background-color: #0c2224; color: var(--fl-gold-hi); }
+.career-shell tbody tr:nth-child(even):not(.managed-fixture) { background-color: rgba(255, 255, 255, 0.025); }
+.career-shell tbody tr:focus-within { background-color: rgba(231, 187, 95, 0.12); }
+.match-shell button.primary:disabled { background-color: #1a2b2a; background-image: none; color: #8ea097; border-color: rgba(214, 236, 226, 0.12); }
+.fixture-lead[data-quay="true"]::before {
+  background: linear-gradient(95deg, #0f2526 19%, rgba(15, 37, 38, 0.92) 45%, rgba(15, 37, 38, 0.45) 72%, transparent),
+    url("./art/aster-quay.webp") center 58% / cover !important;
+}
+.analytics-pitch text { fill: var(--fl-text); }
+.career-match-banner a, .career-match-banner button { color: var(--fl-text); }
+.career-match-banner a { color: var(--fl-link); }
+/* These component stylesheets load after this one, so their overrides carry an extra element in the selector. */
+body .pitch-inspection, body .captain-station .field-read {
+  background-color: var(--fl-surface-2); background-image: none; color: var(--fl-text); border: 1px solid var(--fl-edge);
+}
+body .pitch-inspection h3 { color: var(--fl-gold-hi); }
+body .pitch-inspection :is(dt, dd, p, strong, span) { color: inherit; }
+body .captain-station .field-read { color: var(--fl-muted); }
