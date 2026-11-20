@@ -176,7 +176,7 @@ export const ART_WASH = {
   /** Career fixture panel: dark on the text side, the ground showing on the right. */
   fixture: "linear-gradient(95deg, #0f2526 22%, rgba(15, 37, 38, 0.93) 45%, rgba(15, 37, 38, 0.5) 75%, rgba(15, 37, 38, 0.2))",
   /** Match scoreboard. */
-  scoreboard: "linear-gradient(95deg, rgba(11, 38, 34, 0.97) 28%, rgba(11, 38, 34, 0.78) 55%, rgba(11, 38, 34, 0.35))",
+  scoreboard: "linear-gradient(95deg, rgba(11, 38, 34, 0.97) 28%, rgba(11, 38, 34, 0.84) 55%, rgba(11, 38, 34, 0.66))",
   /** Exhibition match-up banner. */
   banner: "linear-gradient(0deg, rgba(8, 23, 26, 0.75), rgba(8, 23, 26, 0.25))",
   /** Scenario card header, fading into the card. */
