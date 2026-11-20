@@ -43,7 +43,7 @@ export function FixturesScreen(props: FixturesScreenProps) {
             Round {round.roundNumber} · {round.matchDayDate}
           </h3>
           <div className="table-wrap">
-            <table>
+            <table className="fixtures-table">
               <thead>
                 <tr>
                   <th>Home</th>

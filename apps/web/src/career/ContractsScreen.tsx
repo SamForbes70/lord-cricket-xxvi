@@ -206,7 +206,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   free agency at rollover unless renewed during the open negotiation window.
                 </p>
                 <div className="table-wrap">
-                  <table>
+                  <table className="contracts-table">
                     <thead>
                       <tr>
                         <th>Player</th>
@@ -379,7 +379,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   hidden future ceilings.
                 </p>
                 <div className="table-wrap">
-                  <table>
+                  <table className="contracts-table">
                     <thead>
                       <tr>
                         <th>Free agent</th>
