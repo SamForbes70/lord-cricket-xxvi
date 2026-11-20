@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { TeamCrest } from "./world/TeamCrest.js";
+import { playUiClick, setSoundOn, soundOn } from "./ui-sound.js";
 import { CricketerFigure } from "./world/CricketerFigure.js";
 import { careerWorld } from "./career/world-state.js";
 
@@ -8,6 +10,7 @@ export const QUICK_MATCH_KEY = "lcxxvi-quick-match";
 export const GUIDED_MATCH_KEY = "lcxxvi-guided-match";
 
 function launchQuickMatch(guided: boolean) {
+  playUiClick();
   try {
     sessionStorage.setItem(QUICK_MATCH_KEY, String(Date.now()));
     if (guided) localStorage.setItem(GUIDED_MATCH_KEY, "1");
@@ -34,6 +37,7 @@ const MODES: { href: string; title: string; text: string; icon: string }[] = [
  */
 export function TitleScreen() {
   const teams = careerWorld.teams;
+  const [sound, setSound] = useState(() => soundOn());
   return (
     <main className="title-screen" data-testid="title-screen">
       <div className="title-hero">
@@ -62,7 +66,7 @@ export function TitleScreen() {
       </div>
       <nav className="title-modes" aria-label="Game modes">
         {MODES.map((mode) => (
-          <a key={mode.href} className="title-mode" href={mode.href}>
+          <a key={mode.href} className="title-mode" href={mode.href} onClick={() => playUiClick()}>
             <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d={mode.icon} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -71,6 +75,11 @@ export function TitleScreen() {
           </a>
         ))}
       </nav>
+      <div className="title-sound">
+        <button type="button" aria-pressed={sound} onClick={() => setSound(!setSoundOn(!sound).muted)}>
+          Sound: {sound ? "on" : "off"}
+        </button>
+      </div>
       <p className="title-footer">Plays offline. Saves stay in this browser; use Export in the game to keep a copy.</p>
     </main>
   );
