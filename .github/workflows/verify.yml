@@ -73,6 +73,14 @@ jobs:
           git rev-parse HEAD
       - name: Record evidence boundary
         run: node -e "require('fs').appendFileSync(process.env.GITHUB_ENV, 'LCXXVI_CI_STARTED_AT=' + Date.now() + '\n')"
+      # The launcher scripts parse, and open the browser they find, under both Windows PowerShell 5.1 (used by the
+      # .bat launchers) and PowerShell 7.
+      - name: Check the Windows launcher scripts (Windows PowerShell 5.1)
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tools/windows/test-launcher-scripts.ps1
+      - name: Check the Windows launcher scripts (PowerShell 7)
+        shell: pwsh
+        run: pwsh -NoProfile -File tools/windows/test-launcher-scripts.ps1
       - run: npm ci
       - name: Collect hosted Windows build and browser evidence
         run: node scripts/owner-acceptance.mjs --skip-install
