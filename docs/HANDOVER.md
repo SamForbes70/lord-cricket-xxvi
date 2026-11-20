@@ -1,4 +1,6 @@
-# Handover, 19 November 2026
+# Handover, 20 November 2026
+
+**To play the latest build:** [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
 
 One page for a person or an AI picking this project up. It points at the evidence; it does not replace it. If this page and the repository disagree, trust the repository and fix this page.
 
@@ -22,9 +24,14 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 | 15 Tournaments, user-made competitions, crests, tours, auctions, playable tour and auction matches | Built (image imports off, owner answer C1a) | #69, #74, #81, #82, #83, #84, #86 |
 | Captaincy: captain's highlights, close finishes, rival captains, selection room, Pavilion redesign (owner's own work with other AI tools, integrated 19 November) | Built | #90, #91, #92, #93 |
 | 16 Product-quality acceptance | Passed by the owner's direct instruction, none of its four parts run ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)) | #85 |
-| 17 Release | Record sealed ([release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json)); GitHub Release `alpha-2026-11-19` prepared for the owner to publish | #85, #87 |
+| 17 Release | Published by the owner on 19 November 2026: [`alpha-2026-11-19`](https://github.com/SamForbes70/lord-cricket-xxvi/releases/tag/alpha-2026-11-19), from `main` at `ff8284a`; record in [release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json) | #85, #87, #94 |
 
-**Owner actions still open:** publish the GitHub Release (an agent session here cannot create releases: HTTP 403); turn on branch protection for `main`; decide on the stale open pull requests #44, #46 and #47, which predate stabilisation and are superseded (everything they change is on `main` in newer form). The paused agents are to be ignored (owner direction, 18 November 2026).
+**Owner actions still open:**
+
+- **Branch protection is partly on** (checked 20 November 2026): pull requests are required and force pushes and deletion are blocked, but no status checks are required and admins can bypass it. Add `pass07a` and `windows-browser-acceptance` as required checks and turn on "Do not allow bypassing" ([BRANCH_PROTECTION.md](BRANCH_PROTECTION.md)).
+- **Leftover branches:** `feat/captains-pavilion` (#92, closed: its code is on `main` through #93), `feat/windows-native-portable-verified` (an older Windows launcher that `main` has replaced; merging it would remove newer launcher code), `audit/2026-11-16` and `docs/reconcile-stage5-documentation` (their pull requests are closed). They can be deleted.
+
+Done: the release is published (19 November); #44, #46 and #47 are closed as superseded (19 November); #92 is closed, its work being on `main` through #93 (20 November). Start new work from `main`. The paused agents are to be ignored (owner direction, 18 November 2026).
 
 **Biggest risk:** nobody has played this build on the owner's PC. Every measurement is from hosted CI and Linux containers; the Stage 16 playtest, memory budget, screen-reader walkthrough and long-career soak were not run. A short playtest of the release is the most useful next step.
 

@@ -225,6 +225,8 @@ How to play on Windows (ZERO extra installs required on Windows 10/11)
 How to play on Mac/Linux (needs Node.js 18+ or Python 3)
   Run ./start-game.sh (or: bash start-game.sh)
 
+Where everything is, and a 30-minute test session: HOW-TO-PLAY.md in this folder.
+
 Your saves live in your browser (IndexedDB), tied to http://127.0.0.1:4180. Use the game's Export buttons to keep
 .lcxxvi backups.
 `;
@@ -241,6 +243,10 @@ for (const [name, text, mode] of [
   ["LordCricketLauncher.cs", launcherCs, 0o644],
   ["README.txt", readme, 0o644],
   ["VERSION.txt", version, 0o644],
+  // The player's guide to every feature, when the checkout has it.
+  ...(existsSync(join(root, "docs", "HOW_TO_PLAY.md"))
+    ? [["HOW-TO-PLAY.md", readFileSync(join(root, "docs", "HOW_TO_PLAY.md"), "utf8"), 0o644]]
+    : []),
 ]) {
   files.push({ name: `${folder}/${name}`, data: Buffer.from(text, "utf8"), mode });
 }
