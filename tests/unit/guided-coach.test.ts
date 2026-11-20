@@ -15,9 +15,9 @@ describe("guided first match coach", () => {
     expect(coachTip(at("READY")).title).toBe("Play the first ball");
   });
   it("reacts to a wicket and a boundary", () => {
-    const wicket = { latestHighlight: { dismissalKind: "CAUGHT", boundary: "NONE" } } as unknown as V["fieldPresentation"];
+    const wicket = { latestHighlight: { dismissalKind: "CAUGHT", boundary: "NONE" } } as unknown as NonNullable<V["fieldPresentation"]>;
     expect(coachTip(at("AWAITING_BATTER", { fieldPresentation: wicket })).title).toMatch(/Wicket/);
-    const six = { latestHighlight: { dismissalKind: null, boundary: "SIX" } } as unknown as V["fieldPresentation"];
+    const six = { latestHighlight: { dismissalKind: null, boundary: "SIX" } } as unknown as NonNullable<V["fieldPresentation"]>;
     expect(coachTip(at("READY", { fieldPresentation: six })).title).toBe("Boundary!");
   });
 });
