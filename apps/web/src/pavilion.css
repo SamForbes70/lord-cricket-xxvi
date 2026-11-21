@@ -155,3 +155,8 @@
 .captain-station .field-read {background:#edf2e9;border:1px solid #c6d3c3;border-radius:5px;padding:.8em;}
 .close-finish .passage-report,.close-finish .action-row {overflow:hidden;}
 .match-shell:has(.scorestrip[data-stage="toss"]) .active {display:none;}
+/* E10 training presets: one choice for the squad, with the per-player control as the override. */
+.training-presets h3 {font:600 1.2em var(--display);margin:.2em 0;}
+.training-preset-options {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:.8em;margin:.6em 0;}
+.training-preset-options > div {display:flex;flex-direction:column;gap:.35em;align-items:flex-start;}
+.training-preset-options > div[data-active="true"] button {outline:2px solid var(--brass);}
