@@ -165,3 +165,7 @@
 .match-report-facts dt {font-size:.8em;letter-spacing:.08em;text-transform:uppercase;color:#e6d7af;}
 .match-report-facts dd {margin:.15em 0 0;}
 .match-report-bowling-label {margin:.5em 0 0;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;color:#e6d7af;}
+/* E2 board card: the season objective and the club's standing against it. */
+.board-card {border-top:3px solid var(--brass);}
+.board-card h3 {font:600 1.35em var(--display);margin:.3em 0;}
+.board-card small {color:#e6d7af;}

@@ -25,3 +25,4 @@ export * from "./career-stories.js";
 export * from "./scenario-mode.js";
 export * from "./tournament.js";
 export * from "./match-report.js";
+export * from "./season-objective.js";

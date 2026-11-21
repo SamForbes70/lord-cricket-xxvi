@@ -3,7 +3,8 @@ import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { useState } from "react";
-import { buildMatchReport, computeMatchAwardFromCompletion } from "@lcxxvi/projections";
+import { buildMatchReport, computeMatchAwardFromCompletion, rankClubStrength, seasonObjective, seasonObjectiveStatus } from "@lcxxvi/projections";
+import { overallRating } from "../world/player-visuals.js";
 import { percentageBp } from "./format.js";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
 import { CareerApplicationService } from "./service.js";
@@ -81,6 +82,25 @@ export function HomeScreen(props: HomeScreenProps) {
         teamName: (teamId) => service.teamName(teamId),
         playerName: (playerId) => service.playerName(playerId),
       })
+    : null;
+  // E2: the board's objective, from each club's best eleven, and the club's standing against it.
+  const playersById = new Map(displayWorld.players.map((player) => [player.playerId, player]));
+  const objective = controlledTeam
+    ? seasonObjective(
+        rankClubStrength(
+          displayWorld.teams.map((team) => ({
+            teamId: team.teamId,
+            ratings: team.squadIds.flatMap((id) => {
+              const player = playersById.get(id);
+              return player ? [overallRating(player, "T20")] : [];
+            }),
+          })),
+        ),
+        controlledTeam,
+      )
+    : null;
+  const objectiveStatus = objective && controlledTeam
+    ? seasonObjectiveStatus({ objective, table: state.projection.table, teamId: controlledTeam, totalRounds: 14, seasonComplete: state.phase === "COMPLETE" })
     : null;
   const reportKey = previous ? matchReportSeenKey(service.getSaveId() ?? "", state.seasonId, previous.fixtureId) : "";
   // Dismissals made in this session are remembered here as well, so the report closes even when storage is unavailable.
@@ -289,6 +309,16 @@ export function HomeScreen(props: HomeScreenProps) {
           )}
         </article>
         {!reportOpen && reportPanel}
+        {objective && objectiveStatus && (
+          <article className="career-panel board-card" data-testid="board-card" data-status={objectiveStatus.kind}>
+            <p className="eyebrow">THE BOARD · SEASON OBJECTIVE</p>
+            <h3 data-testid="board-objective">{objective.label}</h3>
+            <p>
+              <strong data-testid="board-status">{objectiveStatus.label}</strong> · {objectiveStatus.sentence}
+            </p>
+            <small>{objective.reason}</small>
+          </article>
+        )}
         <article className="career-panel">
           <h3>League position</h3>
           <p className="big-stat">{tableRow ? `#${tableRow.rank}` : "–"}</p>
