@@ -387,3 +387,51 @@ body .captain-station .field-read { color: var(--fl-muted); }
    narrow first column; every other table keeps the base layout. */
 .career-shell .round-table th:first-child { width: 4em; }
 .career-shell .league-table th:first-child { width: 3.5em; }
+
+/* Broadcast "this ball" stage: the latest delivery called big, recent balls as a strip, and a short moment for
+   boundaries and wickets. Only transform and opacity animate, so a moment costs no layout or repaint of the page. */
+.broadcast-stage {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: grid; grid-template-columns: minmax(16rem, 1fr) minmax(0, 1.4fr); align-items: center; gap: 12px 24px;
+  margin: 10px 0; padding: 14px 20px; border-radius: var(--fl-radius);
+  background-color: #0a1f22; border: 1px solid var(--fl-edge-strong); box-shadow: var(--fl-shadow);
+}
+.stage-glow {
+  position: absolute; inset: 0; z-index: -1; opacity: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 18% 50%, var(--stage-glow, transparent), transparent 62%);
+}
+.broadcast-stage[data-moment="SIX"] { --stage-glow: rgba(231, 187, 95, 0.55); border-color: rgba(231, 187, 95, 0.7); }
+.broadcast-stage[data-moment="FOUR"] { --stage-glow: rgba(121, 215, 158, 0.45); border-color: rgba(121, 215, 158, 0.6); }
+.broadcast-stage[data-moment="WICKET"] { --stage-glow: rgba(214, 82, 64, 0.55); border-color: rgba(214, 82, 64, 0.75); }
+.stage-call { display: grid; gap: 2px; grid-column: 1; }
+.stage-balls { grid-column: 2; }
+.stage-over { font: 600 0.8em var(--fl-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fl-muted); }
+.stage-word {
+  font: 700 clamp(2.2em, 4.5vw, 3.4em)/1 var(--fl-display); text-transform: uppercase; letter-spacing: 0.02em;
+  color: var(--fl-text);
+}
+.stage-call[data-kind="SIX"] .stage-word { color: var(--fl-gold-hi); }
+.stage-call[data-kind="FOUR"] .stage-word { color: #9fe8bb; }
+.stage-call[data-kind="WICKET"] .stage-word { color: #ff9a8a; }
+.stage-call[data-kind="DOT"] .stage-word, .stage-call[data-kind="EXTRA"] .stage-word { color: var(--fl-muted); }
+.stage-line { color: var(--fl-muted); }
+.stage-balls { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.stage-balls li {
+  min-width: 2.1em; height: 2.1em; padding: 0 6px; display: grid; place-items: center; border-radius: 999px;
+  font: 700 1em var(--fl-display); background-color: var(--fl-surface-3); color: var(--fl-text); border: 1px solid var(--fl-edge);
+}
+.stage-balls li[data-kind="FOUR"] { background-color: #1d5a3a; border-color: #79d79e; }
+.stage-balls li[data-kind="SIX"] { background-color: var(--fl-gold); color: var(--fl-gold-ink); border-color: var(--fl-gold-hi); }
+.stage-balls li[data-kind="WICKET"] { background-color: #8c2f24; border-color: #ff9a8a; color: #fff; }
+.stage-balls li[data-kind="EXTRA"] { color: var(--fl-gold-hi); }
+.stage-balls li:last-child { box-shadow: 0 0 0 2px var(--fl-gold); }
+@media (prefers-reduced-motion: no-preference) {
+  .broadcast-stage[data-moment="SIX"] .stage-glow, .broadcast-stage[data-moment="FOUR"] .stage-glow, .broadcast-stage[data-moment="WICKET"] .stage-glow {
+    animation: fl-stage-glow 1.6s ease-out 1;
+  }
+  .stage-call[data-kind="SIX"], .stage-call[data-kind="FOUR"], .stage-call[data-kind="WICKET"] { animation: fl-stage-pop 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) 1; }
+}
+@keyframes fl-stage-glow { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0.25; } }
+@keyframes fl-stage-pop { 0% { transform: scale(0.86); opacity: 0.4; } 60% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
+@media (max-width: 700px) { .broadcast-stage { grid-template-columns: 1fr; } .stage-balls { grid-column: 1; justify-content: flex-start; } }
+@media print { .broadcast-stage { display: none; } }

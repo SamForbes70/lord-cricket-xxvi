@@ -6,7 +6,7 @@ Owner direction, 20 November 2026: "generate the ground art with AI".
 
 - **Aster Quay** has its painting (`apps/web/src/art/aster-quay.webp`).
 - The other seven grounds show a **procedural floodlit stadium** drawn in SVG from the ground's name (`apps/web/src/world/ground-art.ts`). It works offline, and it covers grounds renamed in an edited world.
-- The AI paintings for the seven are **not generated yet**. The session's image service (Abracadabrax, model GPT Image 2, 158 credits an image at the time of writing) asked for the owner to sign in again, and this session cannot sign in for the owner. The prompts below are ready to use.
+- **Superseded 20 November 2026:** the owner wants the art free and AI-made in the project, so no paid image service is used (see `docs/OWNER_DECISIONS_2026-11-13.md`). The prompts below stay as a brief for that work. Earlier note: the AI paintings for the seven are **not generated yet**. The session's image service (Abracadabrax, model GPT Image 2, 158 credits an image at the time of writing) asked for the owner to sign in again, and this session cannot sign in for the owner. The prompts below are ready to use.
 
 ## Licence check before an image goes in the game
 

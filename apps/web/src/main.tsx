@@ -55,6 +55,7 @@ import "@fontsource/barlow-condensed/latin-700.css";
 import "./floodlit.css";
 import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
+import { BroadcastStage } from "./match/BroadcastStage.js";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
@@ -1098,6 +1099,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
           </section>
+          <BroadcastStage view={view} />
           {highlights && pacePanel}
           <section
             className="active"

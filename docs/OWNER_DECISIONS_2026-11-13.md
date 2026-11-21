@@ -200,3 +200,19 @@ Owner's words, verbatim: "ok, I have been doing some of my my own work on this w
 1. **Review.** Pull requests #90 (Pavilion redesign), #91 (close finishes) and #92 (captaincy, which already contains #90 and #91) were reviewed against the project rules: no frozen code or persisted format changed; the AI changes are opt-in and read only public match facts. One regression was found (the scoreboard lost its team-colour stripe, failing `tests/ui/edited-world.spec.ts` in Firefox) and fixed in #93, which carries all three into `main`.
 2. **Release.** The unpublished release is renamed `alpha-2026-11-19` and rebuilt from `main` after #93. Its record stays in `docs/release-2026-11-18/`.
 3. **Superseded pull requests.** #44, #46 and #47 change nothing that is not already on `main` in newer form. Closing them is left to the owner.
+
+## Owner direction, 20 November 2026: polish towards a studio standard, free and AI-made
+
+Owner's words, verbatim, answering three questions:
+
+- Audience: "This is for me only however it is also a test on how good one person and AI could do it on its own."
+- The reference image (a mobile cricket auction screen): "Just for styled menu, we need some more art I see."
+- Budget: "This is to see what an AI can maximise, it should be free."
+
+And the order of work: merge #99 and fix the CI time budget; then (1) a broadcast-style match screen with wicket and boundary moments; (2) a title screen, a guided first match and a quick-match default; (3) art; (4) motion and sound; (5) the remaining screens; (6) an installer, then a playtest.
+
+1. **Everything stays free.** No paid image credits, no commissioned art, no paid audio and no code-signing certificate. Art and sound are made in the project (procedural SVG, canvas and Web Audio) and committed under the project's own licence. An earlier note in `docs/design/GROUND_ART_PROMPTS.md` that waited on a paid image service is superseded.
+2. **The reference sets the bar for styled menus,** not for match play. Genre conventions only: no copied layout, art, names, logos or trade dress.
+3. **The installer is unsigned.** It is for the owner's own machine; Windows may warn on first run.
+4. **The playtest is the owner.**
+5. **CI time budget.** The Windows `match-ui` budget goes from 75 to 100 minutes and the job timeout from 120 to 150 (#100). No test is skipped or changed.
