@@ -130,6 +130,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   // buttons disabled for that step). Only the latest click is kept.
   const aiStepRequest = useRef<string | null>(null);
   const [aiStepping, setAiStepping] = useState(false);
+  // Replies received from the worker, and the count whose view has been drawn; they differ only in the moment
+  // between a reply arriving and React drawing it.
+  const repliesReceived = useRef(0);
+  const repliesDrawn = useRef(0);
   const heldPanelClick = useRef<{ kind: "plan"; action: Action; label: string } | { kind: "select"; action: Action } | { kind: "replay" } | null>(null);
   function endPassage(report: string) {
     passage.current = null;
@@ -372,6 +376,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
       if (r.requestId !== inflight.current) return;
       inflight.current = null;
+      repliesReceived.current += 1;
       if (aiStepRequest.current === r.requestId) { aiStepRequest.current = null; setAiStepping(false); }
       currentRevision.current = r.revision;
       serial.current = Math.max(serial.current, 10000 + r.revision, r.commandIdFloor ?? 0);
@@ -623,6 +628,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   // Apply a captain's-panel click held during the computer side's step, before that side is asked to act again.
   // It runs against the fresh view, so its command carries the current revision.
   useEffect(() => {
+    repliesDrawn.current = repliesReceived.current;
     const held = heldPanelClick.current;
     if (!held || !view || busy || inflight.current) return;
     heldPanelClick.current = null;
@@ -661,7 +667,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         (view.phase !== "READY" && view.decisionTeamId === captainedTeam)) {
       endPassage(passageReport(active, view));
     } else if (view.phase === "READY" && !view.advanceReason) {
-      const timer = window.setTimeout(() => { if (passage.current === active && !inflight.current) act({kind:"ADVANCE", payload:{scope:"DELIVERY"}}, true); }, 150);
+      // Step only from a drawn view: a reply that has arrived but is not yet drawn re-runs this effect with a new timer.
+      const timer = window.setTimeout(() => { if (passage.current === active && !inflight.current && repliesDrawn.current === repliesReceived.current) act({kind:"ADVANCE", payload:{scope:"DELIVERY"}}, true); }, 150);
       return () => window.clearTimeout(timer);
     } else if (view.phase === "READY" || aiTeamId !== rivalTeam) {
       endPassage(passageReport(active, view));
@@ -779,6 +786,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     setPlayingPassage(true);
     setFinishReport("");
     act(action, true);
+  }
+
+  // A panel click must wait while a request is in flight, and also in the moment after a reply has arrived but
+  // before its view is drawn: a command sent from the older drawn view would carry a stale revision and be
+  // rejected (seen locally once in 100 runs before this check).
+  function panelMustWait() {
+    return inflight.current !== null || repliesDrawn.current !== repliesReceived.current;
   }
 
   function replayScenario() {
@@ -941,11 +955,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             playing={playingPassage}
             report={finishReport}
             stop={stopPassage}
-            replay={scenario ? () => (inflight.current ? (heldPanelClick.current = { kind: "replay" }) : replayScenario()) : undefined}
+            replay={scenario ? () => (panelMustWait() ? (heldPanelClick.current = { kind: "replay" }) : replayScenario()) : undefined}
             command={(action: Action, label: string) =>
-              inflight.current ? (heldPanelClick.current = { kind: "plan", action, label }) : startPassage(action, label)
+              panelMustWait() ? (heldPanelClick.current = { kind: "plan", action, label }) : startPassage(action, label)
             }
-            select={(action: Action) => (inflight.current ? (heldPanelClick.current = { kind: "select", action }) : act(action))}
+            select={(action: Action) => (panelMustWait() ? (heldPanelClick.current = { kind: "select", action }) : act(action))}
           />
           <a
             href="#decision"
