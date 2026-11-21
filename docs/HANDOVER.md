@@ -24,7 +24,7 @@ Repository (public): https://github.com/SamForbes70/lord-cricket-xxvi. Default b
 | 15 Tournaments, user-made competitions, crests, tours, auctions, playable tour and auction matches | Built (image imports off, owner answer C1a) | #69, #74, #81, #82, #83, #84, #86 |
 | Captaincy: captain's highlights, close finishes, rival captains, selection room, Pavilion redesign (owner's own work with other AI tools, integrated 19 November) | Built | #90, #91, #92, #93 |
 | 16 Product-quality acceptance | Passed by the owner's direct instruction, none of its four parts run ([record](verification-stage16/OWNER_DIRECTION_2026-11-18.md)) | #85 |
-| 17 Release | Published by the owner on 19 November 2026: [`alpha-2026-11-19`](https://github.com/SamForbes70/lord-cricket-xxvi/releases/tag/alpha-2026-11-19), from `main` at `ff8284a`; record in [release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json) | #85, #87, #94 |
+| 17 Release | Published by the owner on 19 November 2026: [`alpha-2026-11-19`](https://github.com/SamForbes70/lord-cricket-xxvi/releases/tag/alpha-2026-11-19), from `main` at `ff8284a` (`main` has moved on since: see [CURRENT_STATUS.md](CURRENT_STATUS.md)); record in [release-2026-11-18/](release-2026-11-18/RELEASE_RECORD.json) | #85, #87, #94 |
 
 **Owner actions still open:**
 

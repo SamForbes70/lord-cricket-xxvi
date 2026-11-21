@@ -2,7 +2,9 @@
 
 ## Current state, 20 November 2026
 
-- **Latest playable build:** `main` at `ff8284a`, published as the GitHub Release `alpha-2026-11-19`. A review on 20 November found no newer work on any branch (see [HANDOVER.md](HANDOVER.md)). How to play it: [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
+- **Latest playable build:** the GitHub Release `alpha-2026-11-19` was published from `main` at `ff8284a`. `main` has since moved: at 22 November 2026 it was `d938f62` (merge of #108), after ten further merges (#99 to #108: visual grounds, broadcast match screens, guided title screen, free art, motion and sound, remaining screens, a Windows installer and EXE zip, and two fixes for a lost captain's-panel click). That later work is on `main` but is not in the release. The 20 November statement that no newer work existed on any branch is out of date. How to play it: [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
+- **Backlog wording:** in `V01_BACKLOG.json`, `DONE` records owner acceptance. For V01-028 (reference-hardware performance acceptance) it is the owner's declaration with no measurement stored in the repository ([OWNER_DECISIONS_2026-11-13.md](OWNER_DECISIONS_2026-11-13.md)). It must not be read as measured.
+- **Local verification at `d938f62` (22 November 2026, Linux container, not hosted CI):** `npm run verify:09:core` PASS (102 test files, 897 tests); `npm run smoke` PASS (23 of 23); `npm run management:acceptance` PASS (14 rounds, 56 fixtures); `tests/ui/managed-recovery.spec.ts` PASS 11 of 11 in Chromium and in Firefox 142. Hosted CI and Windows results for that commit were not read.
 
 - **Added on 19 November:** captain's highlights (bounded passages with plans in limited-overs exhibitions, managed T20 fixtures and two close-finish scenarios), rival captains with observable tendencies and an opt-in match-aware opponent, a match-day selection room in career, and the Pavilion redesign. This is the owner's own work with other AI tools (#90, #91, #92), reviewed and integrated with one fix in #93. Checked by automated browser runs only; no human playtest yet.
 
