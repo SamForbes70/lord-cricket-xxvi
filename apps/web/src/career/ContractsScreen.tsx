@@ -102,7 +102,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                 >
                   <h3 id="active-offers-heading">Negotiation offers (Season {persistentWorld.currentSeasonNumber})</h3>
                   <div className="table-wrap">
-                    <table>
+                    <table className="round-table">
                       <thead>
                         <tr>
                           <th>Rnd</th>

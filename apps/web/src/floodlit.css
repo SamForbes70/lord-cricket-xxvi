@@ -317,3 +317,73 @@ body .captain-station .field-read { color: var(--fl-muted); }
   min-height: 300px;
 }
 .club-selection .career-masthead .button-link { background-color: rgba(10, 34, 31, 0.86); color: var(--fl-text); border-color: rgba(231, 187, 95, 0.55); }
+
+/* Phase 5: every ground has a backdrop (its painting, or a procedural floodlit stadium). The image and its night wash
+   are set inline (see ground-art.ts); these rules only place it. Each surface keeps a solid background-color underneath
+   for the contrast audit. */
+.career-shell .fixture-lead[data-art="true"] { background-size: cover; background-position: center 58%; }
+.career-shell .fixture-lead[data-art="true"]::before { display: none; }
+.scorestrip[data-art="true"], .match-shell .scorestrip[data-art="true"] {
+  background-color: #0b2622; background-size: cover; background-position: center 36%;
+}
+@media (max-width: 650px) {
+  /* Text runs the full width on a phone, so the whole panel gets a heavier wash. */
+  .career-shell .fixture-lead[data-art="true"]::before { display: block; height: 100%; background: rgba(15, 37, 38, 0.85) !important; }
+}
+
+/* Match screen: the batters and bowler with their faces, like a broadcast lower third. */
+.active .active-player { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.active .active-player .player-portrait { flex: none; border-radius: 50%; box-shadow: 0 0 0 2px rgba(231, 187, 95, 0.35); }
+.active .active-player strong { font-family: var(--fl-display); font-size: 1.12em; letter-spacing: 0.02em; }
+
+/* Exhibition setup: a match-up banner over the chosen ground, and faces in the XI picker. */
+.setup-hero {
+  display: flex; align-items: center; justify-content: center; gap: clamp(16px, 5vw, 56px);
+  min-height: 190px; margin-bottom: 14px; border-radius: var(--fl-radius); border: 1px solid var(--fl-edge-strong);
+  background-color: #0b2622;
+  background-size: cover; background-position: center 34%; box-shadow: var(--fl-shadow);
+}
+.setup-hero svg { filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55)); }
+.setup-hero-v { font: 700 2.4em var(--fl-display); color: var(--fl-gold-hi); text-transform: uppercase; text-shadow: 0 2px 8px #000; }
+.player-choice { display: flex; align-items: center; gap: 8px; }
+.player-choice .player-portrait { flex: none; }
+
+/* League table: a narrow position column, the team with its crest, numbers in the display face. */
+.league-table th:first-child, .league-table td:first-child { width: 3.5em; text-align: center; font: 700 1.15em var(--fl-display); color: var(--fl-gold-hi); }
+.league-table td.league-team { width: 40%; font-weight: 600; white-space: nowrap; }
+.league-table td.league-team svg { vertical-align: middle; margin-right: 8px; }
+.league-table td:nth-child(n + 3) { font-variant-numeric: tabular-nums; }
+.league-table td:nth-child(8) { font: 700 1.15em var(--fl-display); color: var(--fl-text); }
+
+/* Scenario challenges: cards with the ground as an art header and a difficulty tag. */
+.career-stories .scenario-card { padding: 0 16px 16px; overflow: hidden; display: flex; flex-direction: column; }
+.scenario-card > .primary { margin-top: auto; align-self: flex-start; }
+.scenario-art {
+  margin: 0 -16px 12px; height: 120px; position: relative;
+  background-color: #0b2622;
+  background-size: cover; background-position: center 38%;
+}
+.scenario-difficulty {
+  position: absolute; top: 10px; right: 12px; padding: 3px 10px; border-radius: 999px;
+  font: 700 0.8em var(--fl-display); letter-spacing: 0.08em; text-transform: uppercase;
+  background-color: var(--fl-gold); color: var(--fl-gold-ink);
+}
+.scenario-card[data-difficulty="ELITE"] .scenario-difficulty { background-color: #c94a3a; color: #fff; }
+.scenario-card[data-difficulty="STANDARD"] .scenario-difficulty { background-color: #79d79e; color: #08240f; }
+[data-testid="scenarios-screen"] .career-stories { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+
+/* Tournament cards: the competing sides' crests, and a tidy start row pinned to the bottom. */
+[data-testid="tournaments-screen"] .career-stories > .career-panel { display: flex; flex-direction: column; }
+.tournament-crests { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.tournament-crests svg { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45)); }
+.tournament-start { margin-top: auto; align-items: flex-end; }
+.tournament-start label { display: grid; gap: 4px; }
+.tournament-start .primary { align-self: flex-end; }
+/* Screens with a masthead and an intro line: breathing room under the gold rule. */
+.career-shell > .career-masthead + p { margin-top: 14px; }
+
+/* The base stylesheet gives every table's first column 48%, which suits the batting scorecard and the Squad table's
+   player column but squashes tables that start with a round number (career results, contract history). Those get a
+   narrow first column; every other table keeps the base layout. */
+.career-shell .round-table th:first-child { width: 4em; }
+.career-shell .league-table th:first-child { width: 3.5em; }
