@@ -125,6 +125,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const passage = useRef<Passage | null>(null);
   const [finishReport, setFinishReport] = useState("");
   const [playingPassage, setPlayingPassage] = useState(false);
+  // While the computer side takes its automatic step, the captain's panel stays usable: a click there is held and
+  // applied once the step returns, against the view it produces (run 44839086294 lost a plan click that landed on
+  // buttons disabled for that step). Only the latest click is kept.
+  const aiStepRequest = useRef<string | null>(null);
+  const [aiStepping, setAiStepping] = useState(false);
+  const heldPanelClick = useRef<{ kind: "plan"; action: Action; label: string } | { kind: "select"; action: Action } | { kind: "replay" } | null>(null);
   function endPassage(report: string) {
     passage.current = null;
     setPlayingPassage(false);
@@ -308,7 +314,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       audioBootSyncRef.current = false;
       audioManagerRef.current?.unlockFromUserGesture();
     }
-    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); }
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); heldPanelClick.current = null; }
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -318,6 +324,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
     const requestId = `ui-${++serial.current}`;
     if (body.type === "REBUILD_ANALYTICS") { rebuildRequest.current = requestId; setAnalyticsRebuild({ state: "RUNNING", applied: 0, total: 0 }); }
+    aiStepRequest.current = body.type === "AI_STEP" ? requestId : null;
+    setAiStepping(body.type === "AI_STEP");
     inflight.current = requestId;
     setBusy(true);
     setError("");
@@ -364,6 +372,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
       if (r.requestId !== inflight.current) return;
       inflight.current = null;
+      if (aiStepRequest.current === r.requestId) { aiStepRequest.current = null; setAiStepping(false); }
       currentRevision.current = r.revision;
       serial.current = Math.max(serial.current, 10000 + r.revision, r.commandIdFloor ?? 0);
       if (r.careerFixture && !careerLaunch.current) {
@@ -611,8 +620,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const highlights = paceOverride ?? (!!scenario && isCloseFinish(scenario.scenarioId));
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.
+  // Apply a captain's-panel click held during the computer side's step, before that side is asked to act again.
+  // It runs against the fresh view, so its command carries the current revision.
   useEffect(() => {
-    if (!view || busy || fatal || error || persistence?.readOnly) return;
+    const held = heldPanelClick.current;
+    if (!held || !view || busy || inflight.current) return;
+    heldPanelClick.current = null;
+    if (held.kind === "plan") startPassage(held.action, held.label);
+    else if (held.kind === "select") act(held.action);
+    else replayScenario();
+  }, [view, busy]);
+  useEffect(() => {
+    if (!view || busy || inflight.current || heldPanelClick.current || fatal || error || persistence?.readOnly) return;
     if (view.phase === "COMPLETE") return;
     const candidates = [
       ...(aiTeamId && view.teams.some(team => team.id === aiTeamId) ? [{ teamId: aiTeamId, delegated: false }] : []),
@@ -760,6 +779,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     setPlayingPassage(true);
     setFinishReport("");
     act(action, true);
+  }
+
+  function replayScenario() {
+    if (scenario) send({ type: "SCENARIO_START", scenarioId: scenario.scenarioId });
   }
 
   function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
@@ -910,7 +933,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             playerTeamId={captainedTeam}
             finished={view.phase === "COMPLETE"}
             disabled={
-              busy ||
+              (busy && !aiStepping) ||
               fatal ||
               Boolean(persistence?.readOnly) ||
               (view.phase === "READY" && Boolean(view.advanceReason))
@@ -918,17 +941,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             playing={playingPassage}
             report={finishReport}
             stop={stopPassage}
-            replay={
-              scenario
-                ? () =>
-                    send({
-                      type: "SCENARIO_START",
-                      scenarioId: scenario.scenarioId,
-                    })
-                : undefined
+            replay={scenario ? () => (inflight.current ? (heldPanelClick.current = { kind: "replay" }) : replayScenario()) : undefined}
+            command={(action: Action, label: string) =>
+              inflight.current ? (heldPanelClick.current = { kind: "plan", action, label }) : startPassage(action, label)
             }
-            command={startPassage}
-            select={act}
+            select={(action: Action) => (inflight.current ? (heldPanelClick.current = { kind: "select", action }) : act(action))}
           />
           <a
             href="#decision"
