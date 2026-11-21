@@ -86,11 +86,18 @@ foreach ($folder in $ShortcutFolders) {
   $link.Save()
 }
 
+# The Apps list shows the build's commit (VERSION.txt's "Commit : <hash>" line, shortened to seven characters). An
+# older or hand-made VERSION.txt without that line falls back to its first line.
 $version = 'local build'
 $versionFile = Join-Path $Destination 'VERSION.txt'
 if (Test-Path -LiteralPath $versionFile) {
-  $first = Get-Content -LiteralPath $versionFile -TotalCount 1
-  if ($first) { $version = $first.Trim() }
+  $lines = @(Get-Content -LiteralPath $versionFile)
+  $commitLine = $lines | Where-Object { $_ -match '^\s*Commit\s*:\s*([0-9a-fA-F]{7,40})\s*$' } | Select-Object -First 1
+  if ($commitLine -and $commitLine -match '^\s*Commit\s*:\s*([0-9a-fA-F]{7,40})') {
+    $version = $Matches[1].Substring(0, 7).ToLowerInvariant()
+  } elseif ($lines.Count -gt 0 -and $lines[0].Trim()) {
+    $version = $lines[0].Trim()
+  }
 }
 $installer = Join-Path $Destination 'install-windows.ps1'
 New-Item -Path $RegistryKey -Force | Out-Null

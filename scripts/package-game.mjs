@@ -8,6 +8,9 @@
  * Output (default: release-packages/):
  *   lord-cricket-xxvi-game-<commit>.zip     the built game, local servers, and double-click Windows/POSIX launchers
  *   lord-cricket-xxvi-source-<commit>.zip   git archive of the tested commit (needs a git checkout)
+ *
+ * With LCXXVI_PACKAGE_EXE set to a compiled LordCricketXXVI.exe (the Windows CI job builds one), the game zip also
+ * holds that EXE and is named lord-cricket-xxvi-windows-<commit>.zip, so it runs on Windows with a double-click.
  */
 import { iconIco } from "./make-icon.mjs";
 import { Buffer } from "node:buffer";
@@ -275,8 +278,18 @@ for (const [name, text, mode] of [
 // The game's icon, drawn in code (scripts/make-icon.mjs), for the installer's shortcuts and Apps entry.
 files.push({ name: `${folder}/lord-cricket.ico`, data: iconIco(), mode: 0o644 });
 
+// A compiled launcher, when the caller supplies one (Windows CI). The installer's shortcuts prefer it.
+const exePath = process.env.LCXXVI_PACKAGE_EXE;
+if (exePath) {
+  if (!existsSync(exePath)) {
+    console.error(`LCXXVI_PACKAGE_EXE points at a missing file: ${exePath}`);
+    process.exit(1);
+  }
+  files.push({ name: `${folder}/LordCricketXXVI.exe`, data: readFileSync(exePath), mode: 0o755 });
+}
+
 mkdirSync(outDir, { recursive: true });
-const gameZip = join(outDir, `lord-cricket-xxvi-game-${short}.zip`);
+const gameZip = join(outDir, `lord-cricket-xxvi-${exePath ? "windows" : "game"}-${short}.zip`);
 writeFileSync(gameZip, zip(files));
 console.log(`Wrote ${gameZip}`);
 
