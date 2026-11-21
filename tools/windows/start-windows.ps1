@@ -129,7 +129,10 @@ $exePath = Join-Path $GameRoot 'LordCricketXXVI.exe'
 
 if ((Test-Path $csPath) -and $csc -and -not (Test-Path $exePath)) {
   Write-Host 'Building native Windows launcher LordCricketXXVI.exe (first run only)...'
-  & $csc /nologo /optimize+ /target:winexe /out:$exePath /r:System.Windows.Forms.dll /r:System.Drawing.dll $csPath
+  $iconPath = Join-Path $GameRoot 'lord-cricket.ico'
+  $iconArgs = @()
+  if (Test-Path $iconPath) { $iconArgs = @("/win32icon:$iconPath") }
+  & $csc /nologo /optimize+ /target:winexe /out:$exePath @iconArgs /r:System.Windows.Forms.dll /r:System.Drawing.dll $csPath
 }
 
 if (Test-Path $exePath) {
