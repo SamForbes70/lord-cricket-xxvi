@@ -155,3 +155,13 @@
 .captain-station .field-read {background:#edf2e9;border:1px solid #c6d3c3;border-radius:5px;padding:.8em;}
 .close-finish .passage-report,.close-finish .action-row {overflow:hidden;}
 .match-shell:has(.scorestrip[data-stage="toss"]) .active {display:none;}
+/* E1 match report: the first panel on Home after a managed fixture. */
+.match-report {grid-column:1 / -1;}
+.match-report-result {font-weight:600;margin:.2em 0 .8em;}
+.match-report-innings {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1em;}
+.match-report-innings h4 {margin:.2em 0;font:600 1.05em var(--display);}
+.match-report-innings ul {list-style:none;margin:.3em 0;padding:0;}
+.match-report-facts {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:.6em 1.4em;margin:.9em 0;}
+.match-report-facts dt {font-size:.8em;letter-spacing:.08em;text-transform:uppercase;color:#e6d7af;}
+.match-report-facts dd {margin:.15em 0 0;}
+.match-report-bowling-label {margin:.5em 0 0;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;color:#e6d7af;}

@@ -2,7 +2,10 @@ import { TeamCrest } from "../world/TeamCrest.js";
 import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
+import { useState } from "react";
+import { buildMatchReport, computeMatchAwardFromCompletion } from "@lcxxvi/projections";
 import { percentageBp } from "./format.js";
+import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
 import { CareerApplicationService } from "./service.js";
 
 export const selectionNoteKey = (
@@ -65,10 +68,53 @@ export function HomeScreen(props: HomeScreenProps) {
       )?.bowling[backed]
     : null;
   const budget = call && service.managedClubBudget();
+  const report = previous && controlledTeam
+    ? buildMatchReport({
+        completion: previous,
+        focusTeamId: controlledTeam,
+        appliedMatches: state.projection.appliedMatches,
+        teamIds: state.projection.table.map((row) => row.teamId),
+        // The saved awards ledger loads lazily; until it has, the same award formula runs on the scorecard alone.
+        award:
+          service.getMatchAwardForFixture(persistentWorld?.currentSeasonNumber ?? 1, previous.fixtureId) ??
+          computeMatchAwardFromCompletion(previous, { seasonNumber: persistentWorld?.currentSeasonNumber ?? 1 }),
+        teamName: (teamId) => service.teamName(teamId),
+        playerName: (playerId) => service.playerName(playerId),
+      })
+    : null;
+  const reportKey = previous ? matchReportSeenKey(service.getSaveId() ?? "", state.seasonId, previous.fixtureId) : "";
+  // Dismissals made in this session are remembered here as well, so the report closes even when storage is unavailable.
+  const [closedReports, setClosedReports] = useState<readonly string[]>([]);
+  const [reopened, setReopened] = useState<string | null>(null);
+  const reportOpen = !!previous && (reopened === reportKey || (!closedReports.includes(reportKey) && !readReportSeen(reportKey)));
+  const selectionNote = backed && backedXI?.playerIds.includes(backed) ? (
+    <p>
+      Your selection: <strong>{service.playerName(backed)}</strong>.{" "}
+      {backedBat?.ballsFaced
+        ? `${backedBat.runs} from ${backedBat.ballsFaced} balls.`
+        : "Did not face a ball."}{" "}
+      {backedBowl && backedBowl.legalBalls > 0
+        ? `${backedBowl.wickets}/${backedBowl.runsConceded} with the ball.`
+        : ""}
+    </p>
+  ) : null;
+  const reportPanel = report ? (
+    <MatchReportPanel
+      report={report}
+      open={reportOpen}
+      onClose={() => { writeReportSeen(reportKey); setClosedReports((keys) => [...keys, reportKey]); setReopened(null); }}
+      onOpen={() => setReopened(reportKey)}
+      teamName={(teamId) => service.teamName(teamId)}
+      playerName={(playerId) => service.playerName(playerId)}
+    >
+      {selectionNote}
+    </MatchReportPanel>
+  ) : null;
   return (
     <section aria-labelledby="home-heading">
       <h2 id="home-heading">Home</h2>
       <div className="dashboard-grid">
+        {reportOpen && reportPanel}
         <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"} data-art={nextFixture ? "true" : undefined} style={nextFixture ? groundArtBackground(service.groundName(nextFixture.groundId), ART_WASH.fixture) : undefined}>
           <h3>Next required action</h3>
           {state.phase === "COMPLETE" ? (
@@ -242,25 +288,7 @@ export function HomeScreen(props: HomeScreenProps) {
             <p>No remaining managed fixture.</p>
           )}
         </article>
-        {previous && (
-          <article className="career-panel score-notebook">
-            <p className="eyebrow">
-              LAST TIME OUT · ROUND {previous.roundNumber}
-            </p>
-            <h3>{service.resultText(previous)}</h3>
-            {backed && backedXI?.playerIds.includes(backed) && (
-              <p>
-                Your selection: <strong>{service.playerName(backed)}</strong>.{" "}
-                {backedBat?.ballsFaced
-                  ? `${backedBat.runs} from ${backedBat.ballsFaced} balls.`
-                  : "Did not face a ball."}{" "}
-                {backedBowl && backedBowl.legalBalls > 0
-                  ? `${backedBowl.wickets}/${backedBowl.runsConceded} with the ball.`
-                  : ""}
-              </p>
-            )}
-          </article>
-        )}
+        {!reportOpen && reportPanel}
         <article className="career-panel">
           <h3>League position</h3>
           <p className="big-stat">{tableRow ? `#${tableRow.rank}` : "–"}</p>
