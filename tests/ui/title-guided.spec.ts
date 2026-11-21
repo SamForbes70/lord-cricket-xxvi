@@ -7,6 +7,14 @@ test("the title screen starts a quick match in one click and the career from its
   await page.goto("/#title");
   await expect(page.getByRole("heading", { name: /Lord Cricket/ })).toBeVisible({ timeout: 30_000 });
   await expect(page.getByRole("navigation", { name: "Game modes" }).getByRole("link")).toHaveCount(5);
+  // One switch turns all game sound on; it is stored with the match audio preferences.
+  const sound = page.getByRole("button", { name: /^Sound:/ });
+  await expect(sound).toHaveAttribute("aria-pressed", "false");
+  await sound.click();
+  await expect(sound).toHaveAttribute("aria-pressed", "true");
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lcxxvi-audio-preferences") ?? "{}").muted)).toBe(false);
+  await sound.click();
+  await expect(sound).toHaveAttribute("aria-pressed", "false");
   await page.getByRole("button", { name: /Quick match/ }).click();
   // The exhibition starts by itself with the suggested XIs: the toss is the first decision.
   await expect(page.locator("#decision")).toHaveAttribute("data-phase", "TOSS", { timeout: 30_000 });

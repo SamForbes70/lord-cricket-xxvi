@@ -57,6 +57,7 @@ import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
 import { BroadcastStage } from "./match/BroadcastStage.js";
 import { GuidedCoach } from "./match/GuidedCoach.js";
+import { CrowdAmbience } from "./ui-sound.js";
 import { GUIDED_MATCH_KEY, QUICK_MATCH_KEY, TitleScreen } from "./TitleScreen.js";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
@@ -274,6 +275,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     saveStoredAudioPreferences(audioPrefs);
     audioManagerRef.current?.setPreferences(audioPrefs);
   }, [audioPrefs]);
+  // A soft crowd murmur under a live match when sound is on (owner order, step 4). Stops at the result.
+  const ambience = useRef<CrowdAmbience | null>(null);
+  const matchLive = !!view && view.phase !== "COMPLETE";
+  useEffect(() => {
+    ambience.current ??= new CrowdAmbience();
+    if (matchLive) ambience.current.start(audioPrefs);
+    else ambience.current.stop();
+  }, [matchLive, audioPrefs]);
+  useEffect(() => () => ambience.current?.stop(), []);
   useEffect(() => {
     const manager = audioManagerRef.current;
     if (!manager || !view?.matchId || !view.audioCues) return;
@@ -1070,7 +1080,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   : view.teams.map((t) => t.name).join(" v ")}
               </h2>
               <div className="broadcast-line">{view.teams.filter(team => !i || team.id === i.battingTeamId).map(team => <TeamCrest key={team.id} teamId={team.id} name={team.name} colours={team.colours ?? []} size={32} decorative />)}
-              <strong className="score">
+              <strong className="score" key={i ? `${i.runs}/${i.wickets}` : "toss"}>
                 {i ? `${i.runs}/${i.wickets}` : "Ready for the toss"}
               </strong>
               </div>

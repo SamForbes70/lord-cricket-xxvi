@@ -944,7 +944,7 @@ function AuctionPanel(props: {
         <div className="auction-col auction-block">
           <h3>Current player</h3>
           {lotPlayer && strengths ? (
-            <div className="auction-lot-card">
+            <div className="auction-lot-card" key={lotPlayer.playerId}>
               <CricketerFigure className="auction-lot-figure" pose={lotPlayer.role === "BOWLER" ? "bowler" : "batter"} kit={lotTeamKit} seed={lotPlayer.playerId} height={300} />
               <div className="auction-lot-top">
                 <RatingBadge rating={playerRating(lotPlayer, state.format)} decorative />
