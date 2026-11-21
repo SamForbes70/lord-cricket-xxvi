@@ -93,8 +93,13 @@ for (const challenge of [
     if (challenge.title === "Nineteen to defend") {
       await page.locator("button[data-candidate]:enabled").first().click();
     }
-    await panel.getByRole("button", {name:new RegExp(challenge.plan)}).click();
-    await expect(panel.getByRole("status")).toContainText(new RegExp(challenge.plan + ".*legal balls?\\. Boundaries:"));
+    // The AI opponent's automatic step can start in the instant after the bowler choice commits, briefly disabling
+    // the plan buttons; a click landing in that instant hits a disabled button and is lost (seen once on hosted
+    // Windows CI, reproduced locally about 1 run in 8). Like a player would, click again if the passage did not start.
+    await expect(async () => {
+      if ((await panel.getByRole("status").count()) === 0) await panel.getByRole("button", {name:new RegExp(challenge.plan)}).click();
+      await expect(panel.getByRole("status")).toContainText(new RegExp(challenge.plan + ".*legal balls?\\. Boundaries:"), {timeout: 5_000});
+    }).toPass({timeout: 30_000});
     await playToEnd(page);
     await expect(panel).toContainText("What would you try differently?");
     await panel.getByRole("button", {name:"Play again"}).click();
