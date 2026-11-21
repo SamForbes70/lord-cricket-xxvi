@@ -514,3 +514,37 @@ body .captain-station .field-read { color: var(--fl-muted); }
 @keyframes fl-lot-in { 0% { transform: translateY(14px) scale(0.96); opacity: 0; } 100% { transform: none; opacity: 1; } }
 @keyframes fl-score-pulse { 0% { transform: scale(1.12); color: var(--fl-gold-hi); } 100% { transform: scale(1); } }
 .scorestrip .score { display: inline-block; transform-origin: left center; }
+
+/* Remaining screens (owner order, step 5). */
+input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color: var(--fl-gold); }
+.career-shell .fixtures-table th:first-child { width: auto; }
+.career-shell .contracts-table th:first-child { width: 24%; }
+.career-shell .contracts-table th:last-child { width: 15rem; }
+.contracts-table td:last-child input, .contracts-table td:last-child select { max-width: 100%; }
+.stats-grid ol:empty::after { content: "No matches played yet."; color: var(--fl-muted); font-size: 0.92em; }
+
+/* Player page: a hero card with face, rating, role and strengths, and bars behind every skill. */
+.player-hero {
+  display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "face main ovr" "face bars bars";
+  align-items: center; gap: 8px 18px; margin: 6px 0 14px; padding: 16px 20px; border-radius: var(--fl-radius);
+  background-color: var(--fl-surface); background-image: linear-gradient(100deg, rgba(231, 187, 95, 0.1), transparent 45%);
+  border: 1px solid var(--fl-edge-strong); border-top: 3px solid var(--fl-gold); box-shadow: var(--fl-shadow);
+}
+.player-hero > .player-portrait { grid-area: face; }
+.player-hero-main { grid-area: main; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.player-hero-name { font: 700 2em/1 var(--fl-display); text-transform: uppercase; letter-spacing: 0.02em; }
+.player-hero > .rating-badge { grid-area: ovr; }
+.player-hero-bars { grid-area: bars; display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 6px 18px; }
+.player-hero-bar { display: grid; grid-template-columns: 5.5em 1fr 2.2em; align-items: center; gap: 8px; color: var(--fl-muted); font-size: 0.92em; }
+.player-hero-bar b { font: 700 1.15em var(--fl-display); color: var(--fl-text); text-align: right; }
+.skill-bar {
+  display: inline-block; position: relative; height: 6px; border-radius: 3px; background-color: rgba(255, 255, 255, 0.08); overflow: hidden;
+}
+.skill-bar::before {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: calc(var(--v, 0) * 1%); border-radius: 3px;
+  background-image: linear-gradient(90deg, #4f9e72, var(--fl-gold));
+}
+.player-details dd .skill-bar { width: 6em; margin-right: 10px; vertical-align: middle; }
+@media (max-width: 640px) {
+  .player-hero { grid-template-columns: auto 1fr; grid-template-areas: "face main" "ovr ovr" "bars bars"; }
+}
