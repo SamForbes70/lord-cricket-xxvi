@@ -489,3 +489,12 @@ body .captain-station .field-read { color: var(--fl-muted); }
 .guided-step { font: 700 0.75em var(--fl-display); letter-spacing: 0.18em; text-transform: uppercase; color: #ffe6b0; }
 .guided-actions { display: flex; gap: 10px; align-items: center; }
 .title-actions .title-play small { color: var(--fl-gold-ink); opacity: 0.8; }
+
+/* Full-figure cricketers (owner order, step 3): original, code-drawn art in club kits for the menus. */
+.title-figure { position: absolute; bottom: -6px; z-index: -1; filter: drop-shadow(0 0 18px rgba(231, 187, 95, 0.28)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)); }
+.title-figure-left { left: 3%; }
+.title-figure-right { right: 3%; }
+@media (max-width: 980px) { .title-figure { opacity: 0.35; } }
+@media (max-width: 640px) { .title-figure { display: none; } }
+.auction-lot-card { position: relative; isolation: isolate; overflow: hidden; }
+.auction-lot-figure { position: absolute; right: -70px; bottom: -14px; z-index: -1; opacity: 0.22; pointer-events: none; }

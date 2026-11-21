@@ -36,6 +36,7 @@ function rng(seed: number): () => number {
   };
 }
 
+const CROWD = ["#c94a3a", "#e7bb5f", "#3d6fa8", "#e8e2d0", "#5aa36b", "#8a5fb0", "#d9773f", "#2f3e46"] as const;
 const ROOFS = ["#7a4a2a", "#3d5a6b", "#6b2f2f", "#4b5b3a", "#5a4a6b", "#8a6a2a"] as const;
 const SKIES = [["#04101a", "#0c2b33"], ["#060f14", "#13302c"], ["#07121f", "#1a2c3d"], ["#050d10", "#162b25"]] as const;
 
@@ -55,8 +56,13 @@ export function stadiumSvg(name: string): string {
     const tall = 40 + Math.round(r() * 90);
     const top = horizon - tall;
     stands += `<path d="M${x} ${horizon + 6} L${x} ${top + 14} L${x + 14} ${top} L${x + w - 10} ${top} L${x + w} ${top + 12} L${x + w} ${horizon + 6} Z" fill="#0a1a1f"/>`;
-    for (let row = top + 18; row < horizon - 6; row += 14) {
-      if (r() < 0.55) windows += `<rect x="${x + 10}" y="${row}" width="${w - 20}" height="3" fill="#f4d58d" opacity="${(0.12 + r() * 0.22).toFixed(2)}"/>`;
+    // A roof canopy, then the crowd: rows of tiny figures in muted shirt colours, thinning towards the back.
+    stands += `<rect x="${x - 2}" y="${top - 5}" width="${w + 4}" height="7" rx="2" fill="#132a30"/>`;
+    for (let row = top + 12; row < horizon - 2; row += 7) {
+      const density = 0.35 + 0.5 * ((row - top) / Math.max(1, horizon - top));
+      for (let cx2 = x + 5; cx2 < x + w - 5; cx2 += 5) {
+        if (r() < density) windows += `<rect x="${cx2}" y="${row}" width="3" height="4" fill="${CROWD[Math.floor(r() * CROWD.length)]}" opacity="${(0.35 + r() * 0.45).toFixed(2)}"/>`;
+      }
     }
     x += w + 4;
   }
@@ -81,6 +87,10 @@ export function stadiumSvg(name: string): string {
   // Floodlights: four towers with lamp heads and glows.
   let lights = "";
   let glows = "";
+  let beams = "";
+  // Stars in the upper sky, faint behind the light haze.
+  let stars = "";
+  for (let k = 0; k < 46; k += 1) stars += `<circle cx="${Math.round(r() * 1600)}" cy="${Math.round(r() * 260)}" r="${(0.6 + r() * 1.1).toFixed(1)}" fill="#ffffff" opacity="${(0.15 + r() * 0.45).toFixed(2)}"/>`;
   const towers = [80 + r() * 120, 420 + r() * 120, 1060 + r() * 120, 1360 + r() * 140];
   towers.forEach((tx, i) => {
     const top = 70 + Math.round(r() * 70);
@@ -90,6 +100,8 @@ export function stadiumSvg(name: string): string {
     for (let k = 0; k < 4; k += 1) lights += `<rect x="${(tx - 30 + k * 19).toFixed(0)}" y="${top + 4}" width="15" height="11" fill="#fffbe8"/><rect x="${(tx - 30 + k * 19).toFixed(0)}" y="${top + 19}" width="15" height="11" fill="#fffbe8"/>`;
     lights += `</g>`;
     glows += `<circle cx="${(tx + 6).toFixed(0)}" cy="${top + 17}" r="260" fill="url(#glow)"/>`;
+    // A soft cone of light from the lamps down onto the field.
+    beams += `<path d="M${(tx - 20).toFixed(0)} ${top + 20} L${(tx + 32).toFixed(0)} ${top + 20} L${(800 + (tx - 800) * 0.35 + 260).toFixed(0)} 900 L${(800 + (tx - 800) * 0.35 - 260).toFixed(0)} 900 Z" fill="url(#beam)"/>`;
   });
 
   // The playing area: an oval outfield with mowing stripes, the boundary rope and the square.
@@ -107,9 +119,11 @@ export function stadiumSvg(name: string): string {
 <radialGradient id="glow"><stop offset="0" stop-color="#fff6d8" stop-opacity="0.42"/><stop offset="0.35" stop-color="#d9e8e0" stop-opacity="0.10"/><stop offset="1" stop-color="#d9e8e0" stop-opacity="0"/></radialGradient>
 <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f5a3a"/><stop offset="0.45" stop-color="#2c7a48"/><stop offset="1" stop-color="#1a4a30"/></linearGradient>
 <radialGradient id="pool" cx="0.5" cy="0.25" r="0.75"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+<linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff8e0" stop-opacity="0.1"/><stop offset="1" stop-color="#fff8e0" stop-opacity="0"/></linearGradient>
 <clipPath id="oval"><ellipse cx="${cx}" cy="${fieldTop + 480}" rx="1150" ry="500"/></clipPath>
 </defs>
 <rect width="1600" height="900" fill="url(#sky)"/>
+${stars}
 ${glows}
 ${lights}
 ${stands}${windows}
@@ -118,6 +132,7 @@ ${pavilion}
 <ellipse cx="${cx}" cy="${fieldTop + 480}" rx="1100" ry="468" fill="none" stroke="#f3f0e2" stroke-opacity="0.55" stroke-width="3"/>
 <path d="M${cx - 22} ${fieldTop + 150} L${cx + 22} ${fieldTop + 150} L${cx + 60} 900 L${cx - 60} 900 Z" fill="#cdbb8a" opacity="0.85"/>
 <path d="M${cx - 28} ${fieldTop + 175} L${cx + 28} ${fieldTop + 175}" stroke="#ffffff" stroke-width="2" opacity="0.8"/>
+${beams}
 </svg>`;
 }
 
