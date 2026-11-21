@@ -73,7 +73,7 @@ try {
   New-Item -ItemType Directory -Force -Path $game, (Join-Path $game 'assets') | Out-Null
   Set-Content -LiteralPath (Join-Path $game 'index.html') -Value '<!doctype html>'
   Set-Content -LiteralPath (Join-Path $game 'assets\app.js') -Value '//'
-  Set-Content -LiteralPath (Join-Path $game 'VERSION.txt') -Value "abc1234 test build`nsecond line"
+  Set-Content -LiteralPath (Join-Path $game 'VERSION.txt') -Value "Lord Cricket XXVI playable build`nRepository : https://example.invalid/repo`nCommit     : ABC1234def5678abc1234def5678abc1234def56`nModel      : test"
   Set-Content -LiteralPath (Join-Path $game 'Play-Lord-Cricket.bat') -Value '@echo off'
   Copy-Item -LiteralPath (Join-Path $here 'install-windows.ps1') -Destination $game
   & (Join-Path $game 'install-windows.ps1') -Destination $dest -ShortcutFolders @($links) -RegistryKey $testKey -Quiet
@@ -81,7 +81,7 @@ try {
     'copied the game' = (Test-Path -LiteralPath (Join-Path $dest 'assets\app.js'))
     'created the shortcut' = (Test-Path -LiteralPath (Join-Path $links 'Lord Cricket XXVI.lnk'))
     'registered the app' = ((Get-ItemProperty -LiteralPath $testKey).DisplayName -eq 'Lord Cricket XXVI')
-    'recorded the version' = ((Get-ItemProperty -LiteralPath $testKey).DisplayVersion -eq 'abc1234 test build')
+    'recorded the version' = ((Get-ItemProperty -LiteralPath $testKey).DisplayVersion -eq 'abc1234')
     'points the uninstaller at the copy' = ((Get-ItemProperty -LiteralPath $testKey).UninstallString -like "*$dest*install-windows.ps1*-Uninstall*")
   }
   & (Join-Path $dest 'install-windows.ps1') -Uninstall -Destination $dest -ShortcutFolders @($links) -RegistryKey $testKey -Quiet

@@ -1,5 +1,7 @@
 param(
-  [string]$OutFile = ""
+  [string]$OutFile = "",
+  # Optional .ico to embed as the EXE's icon (scripts/make-icon.mjs draws the game's icon).
+  [string]$Icon = ""
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,7 +30,13 @@ if ($OutDir -and -not (Test-Path $OutDir)) {
 }
 
 Write-Host "Compiling $OutFile using $Csc..."
-& $Csc /nologo /optimize+ /target:winexe /out:$OutFile /r:System.Windows.Forms.dll /r:System.Drawing.dll $SourceCs
+$cscArgs = @('/nologo', '/optimize+', '/target:winexe', "/out:$OutFile")
+if (-not [string]::IsNullOrWhiteSpace($Icon)) {
+  if (-not (Test-Path -LiteralPath $Icon)) { throw "Icon not found: $Icon" }
+  $cscArgs += "/win32icon:$((Resolve-Path -LiteralPath $Icon).Path)"
+}
+$cscArgs += @('/r:System.Windows.Forms.dll', '/r:System.Drawing.dll', $SourceCs)
+& $Csc @cscArgs
 if ($LASTEXITCODE -ne 0) {
   throw 'csc.exe failed to compile LordCricketXXVI.exe'
 }

@@ -93,7 +93,10 @@ jobs:
           # Audit 16 Nov 2026, Phase 6: compile the EXE from source, start it, and check its local-only
           # shutdown guard. The runner is an administrator, so the standard-user http.sys path is not covered.
           npm run build
-          powershell -NoProfile -ExecutionPolicy Bypass -File tools/windows/build-exe.ps1
+          # Embed the game's icon (drawn in code by scripts/make-icon.mjs) so the packaged EXE matches the shortcuts.
+          $icon = Join-Path $env:RUNNER_TEMP 'lord-cricket.ico'
+          node --input-type=module -e "import { iconIco } from './scripts/make-icon.mjs'; import { writeFileSync } from 'node:fs'; writeFileSync(process.argv[1], iconIco());" $icon
+          powershell -NoProfile -ExecutionPolicy Bypass -File tools/windows/build-exe.ps1 -Icon $icon
           $env:PORT = "4381"
           $exe = Start-Process -FilePath (Join-Path $PWD 'LordCricketXXVI.exe') -PassThru
           $base = $null
@@ -115,6 +118,17 @@ jobs:
           Invoke-RestMethod "$base/__lcxxvi-shutdown" -Method Post -Headers @{ 'X-LCXXVI-Shutdown' = '1' } | Out-Null
           if (-not $exe.WaitForExit(15000)) { Stop-Process -Id $exe.Id -Force; throw 'EXE did not exit after an authorised shutdown' }
           Write-Host 'EXE launcher: built, served, refused bare and foreign-origin shutdown, stopped on the launcher request'
+          # Package the tested EXE with the built game, for the owner to download and play on Windows.
+          $env:LCXXVI_PACKAGE_EXE = (Join-Path $PWD 'LordCricketXXVI.exe')
+          node scripts/package-game.mjs windows-package
+          if ($LASTEXITCODE -ne 0) { throw 'Packaging the Windows game zip failed' }
+      - uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: windows-game
+          path: windows-package/lord-cricket-xxvi-windows-*.zip
+          if-no-files-found: warn
+          retention-days: 30
       - name: Retain structured verification evidence
         if: always()
         run: node scripts/ci-evidence.mjs --kind=windows
