@@ -76,6 +76,27 @@ describe("managed match bindings", () => {
     expect(kv.rows.has(managedBindingKey("career-match-f1"))).toBe(true);
   });
 
+  test("a storage quota failure on the first write leaves no binding behind", async () => {
+    const { kv, store } = make();
+    kv.compareAndPut = async () => { throw new DOMException("The quota has been exceeded.", "QuotaExceededError"); };
+    await expect(store.create(input())).rejects.toMatchObject({ name: "QuotaExceededError" });
+    const { bindings, damaged } = await store.list();
+    expect(bindings).toEqual([]);
+    expect(damaged).toEqual([]);
+  });
+
+  test("an interrupted resolve keeps the binding pending and a later resolve completes it once", async () => {
+    const { kv, store } = make();
+    await store.create(input());
+    const original = kv.compareAndPut.bind(kv);
+    kv.compareAndPut = async () => { throw new Error("The tab closed before the binding was settled."); };
+    await expect(store.resolve("career-match-f1", "APPLIED", "RESULT_APPLIED")).rejects.toThrow(/tab closed/);
+    expect((await store.get("career-match-f1"))?.status).toBe("PENDING");
+    kv.compareAndPut = original;
+    expect((await store.resolve("career-match-f1", "APPLIED", "RESULT_APPLIED")).status).toBe("APPLIED");
+    expect((await store.resolve("career-match-f1", "APPLIED", "RESULT_APPLIED")).status).toBe("APPLIED");
+  });
+
   test("a concurrent write is detected instead of overwritten", async () => {
     const { kv, store } = make();
     await store.create(input());

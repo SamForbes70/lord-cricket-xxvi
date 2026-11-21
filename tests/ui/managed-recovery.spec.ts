@@ -160,6 +160,22 @@ test("a match completed in a lost tab is applied when the career opens, with no 
   await expect(fresh.getByRole("alert")).toHaveCount(0);
 });
 
+test("two windows opening the same career with a completed match apply its result once", async ({ page, context }) => {
+  test.setTimeout(600_000);
+  await startStandardMatch(page);
+  await playToEnd(page);
+  await page.close();
+  const first = await context.newPage();
+  const second = await context.newPage();
+  await Promise.all([first.goto("/#career"), second.goto("/#career")]);
+  await expect.poll(async () => (await bindingStates(first)).join(","), { timeout: 90_000 }).toBe("APPLIED");
+  await first.reload();
+  await second.reload();
+  await expect(first.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(second.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
+  expect(await bindingStates(first)).toEqual(["APPLIED"]);
+});
+
 test("abandoning a career match keeps it as an exhibition, and playing the fixture again resumes it", async ({ page, context }) => {
   test.setTimeout(600_000);
   await startStandardMatch(page);
