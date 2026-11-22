@@ -7,10 +7,11 @@ import {
   CareerApplicationService,
 } from "./service.js";
 import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.js";
-import { overallRating } from "../world/player-visuals.js";
+import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { useMemo } from "react";
 import { isBowlingCapable } from "@lcxxvi/data";
 import { playerForm, playerMilestones, squadPlayerTags } from "@lcxxvi/projections";
+import { TRAINING_PRESETS, matchingPreset, planTrainingPreset, type TrainingPresetPlayer } from "./training-presets.js";
 
 
 /** The career Squad screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
@@ -44,6 +45,17 @@ export function SquadScreen(props: SquadScreenProps) {
   }, [service, state]);
   const trendMark = { UP: "\u25B2", LEVEL: "\u25B6", DOWN: "\u25BC" } as const;
   const trendWord = { UP: "Form rising", LEVEL: "Form steady", DOWN: "Form falling" } as const;
+  const presetPlayers: TrainingPresetPlayer[] = (service.squadView()?.players ?? []).flatMap((condition) => {
+    const player = displayWorld.players.find((candidate) => candidate.playerId === condition.playerId);
+    if (!player) return [];
+    const strengths = playerStrengths(player, "T20");
+    return [{
+      playerId: condition.playerId, role: player.role, bowlingCapable: isBowlingCapable(player),
+      battingStrength: strengths.batting, bowlingStrength: strengths.bowling, fatigueBp: condition.fatigueBp, directive: condition.directive,
+    }];
+  });
+  const activePreset = matchingPreset(presetPlayers);
+  const trainingLocked = busy || inspectionOnly || service.isReadOnly() || state.phase === "COMPLETE";
   return (
         <section aria-labelledby="squad-heading">
           <h2 id="squad-heading">Squad</h2>
@@ -52,6 +64,36 @@ export function SquadScreen(props: SquadScreenProps) {
               ? "Daily training directives affect temporary readiness, daily fatigue recovery, and accumulated season exposure used for off-season fictional skill progression."
               : "Training changes affect temporary readiness and daily recovery only."}
           </p>
+          <div className="training-presets" role="group" aria-labelledby="training-presets-heading" data-testid="training-presets">
+            <h3 id="training-presets-heading">Squad training</h3>
+            <p>Set everyone at once, then change any player in the table below.</p>
+            <div className="training-preset-options">
+              {TRAINING_PRESETS.map((preset) => {
+                const plan = planTrainingPreset(preset.id, presetPlayers);
+                return (
+                  <div key={preset.id} data-active={activePreset === preset.id}>
+                    <button
+                      type="button"
+                      data-testid={`training-preset-${preset.id}`}
+                      aria-pressed={activePreset === preset.id}
+                      disabled={trainingLocked || plan.changes.length === 0}
+                      onClick={() =>
+                        void action(async () => {
+                          for (const change of plan.changes) await service.setTraining(change.playerId, change.directive);
+                        })
+                      }
+                    >
+                      {preset.label}
+                    </button>
+                    <small>{preset.description} {plan.summary}</small>
+                  </div>
+                );
+              })}
+            </div>
+            <p data-testid="training-preset-current">
+              {activePreset ? `Current plan: ${TRAINING_PRESETS.find((preset) => preset.id === activePreset)!.label}.` : "Current plan: your own mix."}
+            </p>
+          </div>
           <div className="table-wrap">
             <table>
               <thead>
