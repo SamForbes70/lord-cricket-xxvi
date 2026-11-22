@@ -6,6 +6,7 @@ import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
+import { matchSituation } from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -90,6 +91,21 @@ type Body = Request extends infer R
 const overs = (balls: number) => `${Math.floor(balls / 6)}.${balls % 6}`;
 /** Commentary entries rendered by default; a red-ball match records thousands. */
 const COMMENTARY_WINDOW = 150;
+
+/** E3: the groups of panels below the decision, reachable in one click from the jump bar. */
+const DUGOUT_SECTIONS = [
+  { key: "tactics", label: "Tactics" },
+  { key: "scorecard", label: "Scorecard" },
+  { key: "captain", label: "Captain" },
+  { key: "tools", label: "Tools" },
+] as const;
+function jumpToDugout(key: string) {
+  const target = document.getElementById(`dugout-${key}`);
+  if (!target) return;
+  const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  target.focus({ preventScroll: true });
+}
 
 export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?: (roster: boolean) => void; onReturnCareer?: (roster: boolean) => void } = {}) {
   const worker = useRef<Worker | null>(null),
@@ -825,6 +841,21 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const tn = (id: string) => view?.teams.find((t) => t.id === id)?.name ?? id;
   const striker =
     i?.strikerEnd === "NORTH" ? i.northBatterId : i?.southBatterId;
+  // E4: the situation in plain words, read from the board only.
+  const situationInnings = view?.scorecard?.innings[view.activeIndex];
+  const situationFalls: { runs: number; legalBalls: number }[] | null =
+    situationInnings && "fallOfWickets" in situationInnings ? situationInnings.fallOfWickets : null;
+  const situationLastFall = situationFalls && situationFalls.length > 0
+    ? situationFalls.reduce((last, fall) => (fall.legalBalls >= last.legalBalls ? fall : last))
+    : null;
+  const situation = view && i
+    ? matchSituation({
+        format: view.format, runs: i.runs, wickets: i.wickets, legalBalls: i.legalBalls, targetToWin: i.targetToWin ?? null,
+        lastWicket: situationLastFall ? { runs: situationLastFall.runs, legalBalls: situationLastFall.legalBalls } : null,
+        partnershipKnown: situationFalls !== null && situationFalls.length === i.wickets,
+        matchComplete: view.resultText !== null,
+      })
+    : null;
   const chaseRuns = i?.targetToWin == null ? null : Math.max(0, i.targetToWin - i.runs);
   const chaseBalls = !i || !view || view.format === "RED_BALL"
     ? null
@@ -995,7 +1026,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       style={{ fontSize: `${Number(scale) / 100}rem` }}
       data-motion={highlightMotion} className={`match-shell density-${density}`}
     >
-      <a className="skip" href="#decision">
+      <a
+        className="skip"
+        href="#decision"
+        onClick={(event) => {
+          // The app routes on the URL hash, so following this link as a plain anchor would leave the match screen.
+          event.preventDefault();
+          document.getElementById("decision")?.scrollIntoView({ block: "start" });
+          decisionRef.current?.focus({ preventScroll: true });
+        }}
+      >
         Skip to next decision
       </a>
       <header className="masthead">
@@ -1142,6 +1182,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
           </section>
+          {situation && (
+            <section className="situation-strip" aria-label="Match situation" data-testid="situation-strip" data-pressure={situation.pressure?.level}>
+              <strong data-testid="situation-headline">{situation.headline}</strong>
+              {situation.pressure && <span className="situation-pressure" data-testid="situation-pressure">{situation.pressure.label}</span>}
+              {situation.facts.map((fact) => <span key={fact}>{fact}</span>)}
+            </section>
+          )}
           <BroadcastStage view={view} />
           {highlights && pacePanel}
           <section
@@ -1425,6 +1472,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </div>
             </fieldset>
           </section>
+          {/* E3: one click from the decision to each group of panels below, and back again. */}
+          <nav className="dugout-jump" aria-label="Match sections" data-testid="dugout-jump">
+            <span aria-hidden="true">Go to</span>
+            {DUGOUT_SECTIONS.map((section) => (
+              <button key={section.key} type="button" className="secondary" onClick={() => jumpToDugout(section.key)}>{section.label}</button>
+            ))}
+          </nav>
+          <span id="dugout-captain" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Captain: pace, delegation and briefings" />
           {!highlights && pacePanel}
           {preferences}
           <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
@@ -1507,6 +1562,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </details>
           )}
+          <span id="dugout-tactics" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tactics: plans and field" />
           {view.phase === "READY" && (
             <Tactics
               key={`${view.revision}`}
@@ -1642,6 +1698,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </section>
           )}
+          <span id="dugout-scorecard" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Scorecard: analytics, scorecard and commentary" />
           {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} hands={view.hands} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
@@ -1769,6 +1826,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           </div>
         </>
       )}
+      {view && <span id="dugout-tools" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tools: sound, diagnostic and saves" />}
       <AudioControlsPanel
         preferences={audioPrefs}
         snapshot={audioSnapshot}
