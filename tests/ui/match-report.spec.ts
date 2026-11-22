@@ -14,6 +14,8 @@ test("a simulated career match is followed by a match report that can be closed 
   await expect(page.getByTestId("match-report-headline")).not.toBeEmpty();
   await expect(page.getByTestId("match-report-result")).toContainText(/won by \d+ (run|wicket)s?|Match tied|No result/);
   await expect(page.getByTestId("match-report-potm")).toContainText("Player of the match");
+  // Team scores read runs/wickets, as on the match scoreboard.
+  await expect(report.locator(".match-report-innings h4").first()).toHaveText(/ \d{2,3}\/\d{1,2} \(/);
   await expect(page.getByTestId("match-report-table")).toContainText(/on the table after round 1/);
   // The report is the first panel on Home, ahead of the next fixture.
   expect(await page.locator(".dashboard-grid > article").first().getAttribute("data-testid")).toBe("match-report");
