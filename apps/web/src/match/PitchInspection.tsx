@@ -1,5 +1,6 @@
 import React from "react";
 import type { WorldPack } from "@lcxxvi/contracts";
+import { pitchVerdict } from "@lcxxvi/projections";
 import "./pitch-inspection.css";
 
 export type PitchInspectionProps = {
@@ -12,6 +13,10 @@ export function PitchInspection({ ground, format }: PitchInspectionProps) {
     <h3>Pitch and conditions</h3>
     {ground ? <>
       <p><strong>{ground.name}</strong> · fictional ground</p>
+      {(() => {
+        const verdict = pitchVerdict(ground.pitchPrior.seamBp, ground.pitchPrior.turnBp);
+        return <p className="pitch-verdict" data-testid="pitch-verdict" data-tendency={verdict.tendency}><strong>{verdict.headline}.</strong> {verdict.detail}</p>;
+      })()}
       <dl className="pitch-inspection-values">
         <div><dt>Seam assistance</dt><dd>{(ground.pitchPrior.seamBp / 100).toFixed(2)} / 100</dd></div>
         <div><dt>Spin assistance</dt><dd>{(ground.pitchPrior.turnBp / 100).toFixed(2)} / 100</dd></div>

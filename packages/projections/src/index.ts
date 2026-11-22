@@ -29,3 +29,4 @@ export * from "./season-objective.js";
 export * from "./player-identity.js";
 export * from "./fixture-preview.js";
 export * from "./match-situation.js";
+export * from "./pitch-verdict.js";

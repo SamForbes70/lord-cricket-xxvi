@@ -5,7 +5,7 @@ import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { useState } from "react";
 import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, rankClubStrength, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
-import { percentageBp } from "./format.js";
+import { percentageBp, formatGameDate } from "./format.js";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
 import { SeasonFinale, readFinaleSeen, seasonFinaleSeenKey, writeFinaleSeen } from "./SeasonFinale.js";
 import { CareerApplicationService } from "./service.js";
@@ -241,7 +241,7 @@ export function HomeScreen(props: HomeScreenProps) {
                   </span>
                 ))}
               </p>
-              <p className="fixture-venue">{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
+              <p className="fixture-venue">{formatGameDate(nextFixture.matchDayDate)} · {service.groundName(nextFixture.groundId)}</p>
               {state.careerState.currentDate < nextFixture.matchDayDate ? (
                 <button
                   className="primary"

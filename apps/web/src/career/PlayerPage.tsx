@@ -361,7 +361,7 @@ export function PlayerPage({
             Historical batting, bowling, fielding &amp; contributing matches
           </h3>
           <p>
-            Career T20 records (<code>{historicalRecord.playerId}</code>) ·{" "}
+            Career T20 records ·{" "}
             {historicalRecord.status === "RETIRED"
               ? "Retired alumni record preserved"
               : "Active career record"}{" "}

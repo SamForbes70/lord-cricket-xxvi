@@ -81,7 +81,7 @@ test("cancellation waits for the current command to commit", async ({ page }) =>
   await expect(page.getByText("Stopping after this commit…")).toBeVisible();
   await settle(page);
   await expect(page.getByRole("button", { name: "Stop simulation" })).toHaveCount(0);
-  await expect(page.getByText(/^Committed events \d+–\d+\.$/)).toBeVisible();
+  await expect(page.getByText(/^Saved match events \d+ to \d+\.$/)).toBeVisible();
   await expect(page.locator("#decision")).toHaveAttribute("data-revision", String(before + 1));
   await page.reload();
   await settle(page);
@@ -307,7 +307,7 @@ test("selection validity, tactics acceptance and explicit rejection of invalid n
   );
   await expect(page.getByLabel("Variation", { exact: true })).toBeDisabled();
   await expect(
-    page.getByText("Only stock is supported by this model."),
+    page.getByText("Only the stock ball is available for now."),
   ).toBeVisible();
   await page
     .locator(".tactic-grid>div")

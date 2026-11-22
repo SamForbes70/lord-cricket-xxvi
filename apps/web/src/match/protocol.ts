@@ -236,7 +236,7 @@ export type Catalog = {
   }[];
   grounds: { id: string; name: string; seamBp?: number; turnBp?: number }[];
 };
-export type Candidate = { id: string; name: string; reason: string; batting?: { power:number; rotation:number; defence:number } };
+export type Candidate = { id: string; name: string; reason: string; batting?: { power:number; rotation:number; defence:number }; recommended?: true };
 export type View = {
   captainNotes?: Record<string, string>;
   fatigueBp?: Record<string,number>;

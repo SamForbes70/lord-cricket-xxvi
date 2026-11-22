@@ -310,6 +310,16 @@ label {
 .candidates small {
   margin-top: 3px;
 }
+/* E5: the computer captain's choice. The word carries the meaning; the outline is extra. */
+.candidates button[data-recommended="true"] {
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+.candidates .recommended-tag {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 .tactics {
   margin-bottom: 20px;
 }
@@ -1114,3 +1124,21 @@ code {
 .close-finish { flex: 1 1 100%; border-inline-start: 4px solid #946d28; }
 .close-finish .action-row { margin-top: .65em; }
 .close-finish .passage-report { font-weight: 650; color: #164935; }
+
+/* E5: collapsed "About" notes for technical detail. */
+.about-details .about-toggle {
+  padding: 0 6px;
+  min-height: 0;
+  font-size: 0.85em;
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+}
+.about-details small[hidden] {
+  display: none;
+}
+.about-panel summary {
+  cursor: pointer;
+}

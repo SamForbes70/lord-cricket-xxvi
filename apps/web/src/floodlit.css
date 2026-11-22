@@ -503,6 +503,11 @@ body .captain-station .field-read { color: var(--fl-muted); }
    block and a changed score pop once; buttons give under the press. All of it is off under reduced motion. */
 .title-sound { display: flex; justify-content: center; margin-top: 14px; }
 .title-sound button[aria-pressed="true"] { border-color: var(--fl-gold); color: var(--fl-gold-hi); }
+/* E5: the first-run sound question, in the page flow so it never covers another control. */
+.title-sound-question { max-width: 560px; margin: 18px auto 0; padding: 14px 18px; border: 1px solid var(--fl-gold); border-radius: 12px; text-align: center; }
+.title-sound-question h2 { margin: 0 0 4px; font-size: 1.1rem; }
+.title-sound-question p { margin: 0 0 10px; }
+.title-sound-question-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 @media (prefers-reduced-motion: no-preference) {
   .title-screen, .career-shell, [data-testid="scenarios-screen"], [data-testid="tournaments-screen"], .broadcast-stage { animation: fl-fade-in 0.3s ease-out both; }
   .auction-lot-card { animation: fl-lot-in 0.5s cubic-bezier(0.2, 1.3, 0.4, 1) both; }

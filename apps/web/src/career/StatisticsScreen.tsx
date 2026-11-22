@@ -1,3 +1,4 @@
+import { AboutDetails } from "../AboutDetails.js";
 import { TeamCrest } from "../world/TeamCrest.js";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { StatsScope } from "./CareerApp.js";
@@ -369,10 +370,12 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                 className="career-disclosure compact"
                 data-testid="historical-stats-provenance"
               >
-                {historicalProjection.separationNotice} (<code>{historicalProjection.projectionVersion}</code>{" "}
-                · {historicalProjection.filteredMatchesCount}/
+                {historicalProjection.separationNotice} ({historicalProjection.filteredMatchesCount}/
                 {historicalProjection.totalSourceMatches} career fixtures matched).{" "}
                 {historicalProjection.filterSupport.fielding.note}
+                <AboutDetails summary="About these statistics">
+                  Statistics projection <code>{historicalProjection.projectionVersion}</code>.
+                </AboutDetails>
               </p>
               <div className="stats-filter-grid" data-testid="historical-stats-filters">
                 <label>

@@ -1045,7 +1045,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             Lord Cricket <span>XXVI</span>
           </h1>
         </div>
-        <span className="alpha">SYNTHETIC_ALPHA</span>
       </header>
       {!view && preferences}
       {view?.matchId?.startsWith("tour-m") && (
@@ -1096,7 +1095,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <p>
               Select your side and an opponent. You make decisions for{" "}
               <strong>both teams</strong> initially. After starting a match, you can optionally
-              delegate either team or individual decisions to the deterministic tactical captain.
+              delegate either team or individual decisions to the computer captain.
             </p>
           </section>
           {displayCatalog ? (
@@ -1271,7 +1270,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
-            {batchProgress && <p role="status">Committed events {batchProgress.from}–{batchProgress.to}.</p>}
+            {batchProgress && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
             <fieldset disabled={busy || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
@@ -1372,8 +1371,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       <button
                         data-candidate={p.id}
                         disabled={!!p.reason}
+                        data-recommended={p.recommended ? "true" : undefined}
                         aria-describedby={
-                          p.reason ? `reason-${p.id}` : undefined
+                          p.reason
+                            ? `reason-${p.id}`
+                            : p.recommended
+                              ? `recommended-${p.id}`
+                              : undefined
                         }
                         onClick={() =>
                           act(
@@ -1399,6 +1403,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       </button>
                       {p.reason && (
                         <small id={`reason-${p.id}`}>{p.reason}</small>
+                      )}
+                      {p.recommended && (
+                        <small
+                          id={`recommended-${p.id}`}
+                          className="recommended-tag"
+                          title="The computer captain's choice. You decide."
+                        >
+                          Recommended
+                        </small>
                       )}
                     </div>
                   ))}
@@ -1476,7 +1489,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               <option value="">Manual decisions for both teams</option>
               {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
             </select>
-            <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
+            <span>The computer picks this team's batters, bowlers and tactics. You still play each ball.</span>
           </section>
         {careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
           {(() => {
@@ -1524,7 +1537,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <details className="career-panel" data-testid="redball-conditions-panel">
               <summary>Red-ball pitch wear and weather controls</summary>
               <p data-testid="redball-conditions-summary">
-                Day {view.redBall.day} · Phase: {view.redBall.clockPhase ?? "PLAY"} · Weather delay today: {Math.round((view.redBall.delaySecondsToday ?? 0) / 60)} min · Pitch wear: {view.redBall.pitchWearPoints ?? 0} pts · Seam: {((view.redBall.seamBp ?? 5000) / 100).toFixed(1)}% · Turn: {((view.redBall.turnBp ?? 5000) / 100).toFixed(1)}%
+                Day {view.redBall.day} · Session: {(view.redBall.clockPhase ?? "PLAY").toLowerCase().replaceAll("_", " ")} · Weather delay today: {Math.round((view.redBall.delaySecondsToday ?? 0) / 60)} min · Pitch wear: {view.redBall.pitchWearPoints ?? 0} pts · Seam: {((view.redBall.seamBp ?? 5000) / 100).toFixed(1)}% · Turn: {((view.redBall.turnBp ?? 5000) / 100).toFixed(1)}%
               </p>
               {view.redBall.forecast && (
                 <p data-testid="redball-uncertain-forecast">
@@ -1924,17 +1937,25 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       </section>
       <footer>
         <p>
-          Autosaves and manual copies are stored locally in this browser.
-          Portable .lcxxvi exports include the deterministic match history and
-          pinned engine/model/rules identity required for validated resume.
+          Your matches save automatically in this browser. Use Export to keep a
+          copy you can load again later.
         </p>
-        <p>
-          Original world: 160 fictional players, 8 squads. T20, ODI and five-day
-          red-ball exhibitions use custom game rules; no certified ICC
-          compliance or empirical realism. A one-season T20 career, optional
-          T20/ODI/red-ball tactical captaincy, and explicit deterministic
-          red-ball weather delays are available. DLS remains disabled.
-        </p>
+        <details className="about-panel" data-testid="about-panel">
+          <summary>About this game</summary>
+          <p>
+            Lord Cricket XXVI is fictional: 160 invented players in 8 squads.
+            Matches use the game's own rules, which are not certified against
+            ICC playing conditions and make no claim to match real cricket.
+          </p>
+          <p>
+            Model: synthetic-alpha-01 (SYNTHETIC_ALPHA), not empirically
+            calibrated. Every result is deterministic: the same match history
+            always produces the same scorecard. Exports carry that history and
+            the pinned engine, model and rules identity needed to resume a
+            match and check it. Red-ball weather delays are deterministic, and
+            the Duckworth-Lewis-Stern method is not used.
+          </p>
+        </details>
       </footer>
     </main>
   );
@@ -2270,7 +2291,7 @@ function Tactics({
                 <option>stock</option>
               </select>
             </label>
-            <small>Only stock is supported by this model.</small>
+            <small>Only the stock ball is available for now.</small>
             <label>
               Effort
               <select

@@ -1,3 +1,5 @@
+import { proposeOpponentRed5Command } from "./ai-opponent.js";
+import { withRecommendation } from "./recommendation.js";
 import {
   createMatchAnalyticsCache,
   projectInMatchTacticalAssistant,
@@ -287,7 +289,9 @@ export function createRed5MatchController(
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
-      candidates,
+      candidates: withRecommendation(c.phase, candidates, () =>
+        decisionTeamId ? proposeOpponentRed5Command(s, decisionTeamId) : null,
+      ),
       bowlingPlan: structuredClone(c.bowlingPlan),
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),
