@@ -29,6 +29,25 @@ export function soundOn(prefs: AudioPreferences = loadStoredAudioPreferences()):
   return !prefs.muted;
 }
 
+/** Per-browser flag: the player has answered the first-run sound question (E5). Never part of a save. */
+export const SOUND_ASKED_KEY = "lcxxvi-sound-asked";
+
+export function soundQuestionAnswered(): boolean {
+  try {
+    return localStorage.getItem(SOUND_ASKED_KEY) === "1";
+  } catch {
+    return true; // Storage blocked: do not keep asking.
+  }
+}
+
+export function markSoundQuestionAnswered(): void {
+  try {
+    localStorage.setItem(SOUND_ASKED_KEY, "1");
+  } catch {
+    /* Storage blocked: the question shows again next time, which is harmless. */
+  }
+}
+
 /** Turns all game sound on or off and returns the new preferences. */
 export function setSoundOn(on: boolean): AudioPreferences {
   const next = { ...loadStoredAudioPreferences(), muted: !on };

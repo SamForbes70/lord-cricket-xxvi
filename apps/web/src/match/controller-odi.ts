@@ -1,3 +1,5 @@
+import { proposeOpponentODICommand } from "./ai-opponent.js";
+import { withRecommendation } from "./recommendation.js";
 import { strandingReasons } from "./bowler-plan.js";
 import {
   createMatchAnalyticsCache,
@@ -295,7 +297,9 @@ export function createODIMatchController(
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
-      candidates,
+      candidates: withRecommendation(c.phase, candidates, () =>
+        decisionTeamId ? proposeOpponentODICommand(s, decisionTeamId) : null,
+      ),
       bowlingPlan: structuredClone(c.bowlingPlan),
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),

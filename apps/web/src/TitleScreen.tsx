@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TeamCrest } from "./world/TeamCrest.js";
-import { playUiClick, setSoundOn, soundOn } from "./ui-sound.js";
+import { markSoundQuestionAnswered, playUiClick, setSoundOn, soundOn, soundQuestionAnswered } from "./ui-sound.js";
 import { CricketerFigure } from "./world/CricketerFigure.js";
 import { careerWorld } from "./career/world-state.js";
 
@@ -38,6 +38,12 @@ const MODES: { href: string; title: string; text: string; icon: string }[] = [
 export function TitleScreen() {
   const teams = careerWorld.teams;
   const [sound, setSound] = useState(() => soundOn());
+  const [asked, setAsked] = useState(() => soundQuestionAnswered());
+  const chooseSound = (on: boolean) => {
+    setSound(!setSoundOn(on).muted);
+    markSoundQuestionAnswered();
+    setAsked(true);
+  };
   return (
     <main className="title-screen" data-testid="title-screen">
       <div className="title-hero">
@@ -75,8 +81,22 @@ export function TitleScreen() {
           </a>
         ))}
       </nav>
+      {!asked && (
+        <section className="title-sound-question" aria-labelledby="sound-question-heading" data-testid="sound-question">
+          <h2 id="sound-question-heading">Play with sound?</h2>
+          <p>Crowd, bat and ball, and menu sounds. You can change this at any time.</p>
+          <div className="title-sound-question-actions">
+            <button type="button" className="primary" onClick={() => chooseSound(true)}>
+              Turn sound on
+            </button>
+            <button type="button" onClick={() => chooseSound(false)}>
+              Keep sound off
+            </button>
+          </div>
+        </section>
+      )}
       <div className="title-sound">
-        <button type="button" aria-pressed={sound} onClick={() => setSound(!setSoundOn(!sound).muted)}>
+        <button type="button" aria-pressed={sound} onClick={() => chooseSound(!sound)}>
           Sound: {sound ? "on" : "off"}
         </button>
       </div>

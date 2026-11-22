@@ -1,3 +1,4 @@
+import { AboutDetails } from "../AboutDetails.js";
 import { academyFocusOptions, directives, percentageBp } from "./format.js";
 import type {
   AcademyTrainingFocus,
@@ -213,9 +214,12 @@ export function SquadScreen(props: SquadScreenProps) {
             >
               <h3 id="youth-academy-heading">Youth academy pathway</h3>
               <p>
-                Academy prospects use fictional ceiling tiers (
-                <code>{lifecycleState.model.modelVersion}</code>). Set training focus, queue
-                prospects for automatic off-season promotion, or promote directly before Round 1.
+                Set each prospect's training focus, queue them for promotion at the end of the season,
+                or promote them now, before Round 1.
+                <AboutDetails summary="About the player model">
+                  Academy prospects use fictional ceiling tiers (
+                  <code>{lifecycleState.model.modelVersion}</code>).
+                </AboutDetails>
               </p>
               {service.managedYouthAcademyProspects().length === 0 ? (
                 <p>No active academy prospects remain for {service.teamName(controlledTeam)} this season.</p>
