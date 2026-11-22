@@ -6,6 +6,7 @@ import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
+import { matchSituation } from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -825,6 +826,21 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const tn = (id: string) => view?.teams.find((t) => t.id === id)?.name ?? id;
   const striker =
     i?.strikerEnd === "NORTH" ? i.northBatterId : i?.southBatterId;
+  // E4: the situation in plain words, read from the board only.
+  const situationInnings = view?.scorecard?.innings[view.activeIndex];
+  const situationFalls: { runs: number; legalBalls: number }[] | null =
+    situationInnings && "fallOfWickets" in situationInnings ? situationInnings.fallOfWickets : null;
+  const situationLastFall = situationFalls && situationFalls.length > 0
+    ? situationFalls.reduce((last, fall) => (fall.legalBalls >= last.legalBalls ? fall : last))
+    : null;
+  const situation = view && i
+    ? matchSituation({
+        format: view.format, runs: i.runs, wickets: i.wickets, legalBalls: i.legalBalls, targetToWin: i.targetToWin ?? null,
+        lastWicket: situationLastFall ? { runs: situationLastFall.runs, legalBalls: situationLastFall.legalBalls } : null,
+        partnershipKnown: situationFalls !== null && situationFalls.length === i.wickets,
+        matchComplete: view.resultText !== null,
+      })
+    : null;
   const chaseRuns = i?.targetToWin == null ? null : Math.max(0, i.targetToWin - i.runs);
   const chaseBalls = !i || !view || view.format === "RED_BALL"
     ? null
@@ -1143,6 +1159,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
           </section>
+          {situation && (
+            <section className="situation-strip" aria-label="Match situation" data-testid="situation-strip" data-pressure={situation.pressure?.level}>
+              <strong data-testid="situation-headline">{situation.headline}</strong>
+              {situation.pressure && <span className="situation-pressure" data-testid="situation-pressure">{situation.pressure.label}</span>}
+              {situation.facts.map((fact) => <span key={fact}>{fact}</span>)}
+            </section>
+          )}
           <BroadcastStage view={view} />
           {highlights && pacePanel}
           <section

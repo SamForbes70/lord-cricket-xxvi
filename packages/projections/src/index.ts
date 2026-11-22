@@ -24,3 +24,4 @@ export * from "./awards.js";
 export * from "./career-stories.js";
 export * from "./scenario-mode.js";
 export * from "./tournament.js";
+export * from "./match-situation.js";
