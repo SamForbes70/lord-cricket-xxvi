@@ -63,6 +63,8 @@ export function seasonObjective(strengths: readonly ClubStrength[], teamId: stri
 }
 
 const TARGET_PHRASE: Record<SeasonObjectiveKind, string> = { WIN_TITLE: "top spot", TOP_FOUR: "the top four", SIXTH_OR_BETTER: "sixth place" };
+/** The objective's target as it reads inside a sentence: "top spot", "the top four", "sixth place". */
+export const seasonObjectivePhrase = (kind: SeasonObjectiveKind): string => TARGET_PHRASE[kind];
 
 export function seasonObjectiveStatus(input: {
   objective: SeasonObjective;

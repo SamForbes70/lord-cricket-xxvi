@@ -27,3 +27,4 @@ export * from "./tournament.js";
 export * from "./match-report.js";
 export * from "./season-objective.js";
 export * from "./player-identity.js";
+export * from "./fixture-preview.js";

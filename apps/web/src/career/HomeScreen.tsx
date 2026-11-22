@@ -3,8 +3,8 @@ import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { useState } from "react";
-import { buildMatchReport, computeMatchAwardFromCompletion, rankClubStrength, seasonObjective, seasonObjectiveStatus } from "@lcxxvi/projections";
-import { overallRating } from "../world/player-visuals.js";
+import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, rankClubStrength, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
+import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { percentageBp } from "./format.js";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
 import { CareerApplicationService } from "./service.js";
@@ -102,6 +102,31 @@ export function HomeScreen(props: HomeScreenProps) {
   const objectiveStatus = objective && controlledTeam
     ? seasonObjectiveStatus({ objective, table: state.projection.table, teamId: controlledTeam, totalRounds: 14, seasonComplete: state.phase === "COMPLETE" })
     : null;
+  // E7: the fixture preview, from recorded results in this and past seasons.
+  const opponentId = nextFixture && controlledTeam
+    ? (nextFixture.homeTeamId === controlledTeam ? nextFixture.awayTeamId : nextFixture.homeTeamId)
+    : null;
+  const preview = opponentId && controlledTeam
+    ? buildFixturePreview({
+        focusTeamId: controlledTeam,
+        opponentTeamId: opponentId,
+        meetings: [
+          ...(persistentWorld?.completedSeasons ?? []).flatMap((season) => season.completedMatches.map((completion) => ({ seasonNumber: season.seasonNumber, completion }))),
+          ...state.completedMatches.map((completion) => ({ seasonNumber: persistentWorld?.currentSeasonNumber ?? 1, completion })),
+        ],
+        table: state.projection.table,
+        appliedMatches: state.projection.appliedMatches,
+        seasonPlayers: state.projection.players,
+        opponentRatings: (displayWorld.teams.find((team) => team.teamId === opponentId)?.squadIds ?? []).flatMap((id) => {
+          const player = playersById.get(id);
+          if (!player) return [];
+          const strengths = playerStrengths(player, "T20");
+          return [{ playerId: id, batting: strengths.batting, bowling: strengths.bowling }];
+        }),
+        objective: objective ? { targetPosition: objective.targetPosition, phrase: seasonObjectivePhrase(objective.kind) } : null,
+        teamName: (teamId) => service.teamName(teamId),
+      })
+    : null;
   const reportKey = previous ? matchReportSeenKey(service.getSaveId() ?? "", state.seasonId, previous.fixtureId) : "";
   // Dismissals made in this session are remembered here as well, so the report closes even when storage is unavailable.
   const [closedReports, setClosedReports] = useState<readonly string[]>([]);
@@ -191,6 +216,41 @@ export function HomeScreen(props: HomeScreenProps) {
                 ))}
               </p>
               <p className="fixture-venue">{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
+              {preview && (
+                <div className="fixture-preview" data-testid="fixture-preview">
+                  <p className="fixture-meaning" data-testid="fixture-meaning">
+                    {preview.rivalry && <span className="rival-mark" data-testid="fixture-rival" title={preview.rivalry.reason}>Rival</span>}
+                    {preview.meaning}
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>{service.teamName(preview.opponentTeamId)}</dt>
+                      <dd>
+                        {preview.opponentPosition !== null && state.projection.table.some((row) => row.played > 0) ? `${preview.opponentPosition}${["th","st","nd","rd","th","th","th","th","th","th"][preview.opponentPosition % 10]} on the table` : "Yet to play"}
+                        {preview.opponentForm.length > 0 && <> · Form <span aria-label={`Recent results, oldest first: ${preview.opponentForm.join(" ")}`}>{preview.opponentForm.join(" ")}</span></>}
+                      </dd>
+                    </div>
+                    <div data-testid="fixture-head-to-head">
+                      <dt>Head to head</dt>
+                      <dd>
+                        {preview.headToHead.played === 0
+                          ? "First meeting on record."
+                          : `Played ${preview.headToHead.played}: won ${preview.headToHead.won}, lost ${preview.headToHead.lost}${preview.headToHead.other ? `, other ${preview.headToHead.other}` : ""}. ${preview.headToHead.lastMeeting ?? ""}`}
+                        {preview.rivalry && <> {preview.rivalry.reason}</>}
+                      </dd>
+                    </div>
+                    {(preview.dangerBatter || preview.dangerBowler) && (
+                      <div data-testid="fixture-danger">
+                        <dt>Players to watch</dt>
+                        <dd>
+                          {preview.dangerBatter && <>{service.playerName(preview.dangerBatter.playerId)}, {preview.dangerBatter.text}. </>}
+                          {preview.dangerBowler && <>{service.playerName(preview.dangerBowler.playerId)}, {preview.dangerBowler.text}.</>}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+              )}
               {state.careerState.currentDate < nextFixture.matchDayDate ? (
                 <button
                   className="primary"

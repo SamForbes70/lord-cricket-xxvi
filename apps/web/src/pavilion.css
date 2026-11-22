@@ -174,3 +174,10 @@
 .identity-milestone {display:block;font-style:italic;}
 .identity-trend[data-trend="UP"] {color:#9fd6a3;}
 .identity-trend[data-trend="DOWN"] {color:#f0b0a0;}
+/* E7 fixture preview: the opponent, the history and what the match means. */
+.fixture-preview {margin:.6em 0 .9em;}
+.fixture-meaning {font:600 1.1em var(--display);margin:.2em 0 .5em;}
+.rival-mark {display:inline-block;margin-right:.6em;padding:.05em .6em;border:1px solid currentColor;border-radius:999px;font:600 .75em var(--body, inherit);letter-spacing:.08em;text-transform:uppercase;}
+.fixture-preview dl {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:.5em 1.4em;margin:0;}
+.fixture-preview dt {font-size:.8em;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}
+.fixture-preview dd {margin:.1em 0 0;}
