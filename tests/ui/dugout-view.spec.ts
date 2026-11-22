@@ -19,6 +19,14 @@ test("the decision fits the first screen and the jump bar reaches each group of 
   }
   await decision.getByRole("button", { name: "Next delivery" }).click();
   await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
+  // Match seeds vary, so that ball can be a wicket and leave a batter to choose (seen on hosted Windows CI, run
+  // 45009992794). Answer any such question so the screen is measured in its usual state: the next ball is ready.
+  for (let n = 0; n < 20; n += 1) {
+    if (await decision.getByRole("button", { name: "Next delivery" }).isEnabled().catch(() => false)) break;
+    await decision.locator("button:not([disabled])").first().click();
+    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
+  }
+  await expect(decision.getByRole("button", { name: "Next delivery" })).toBeEnabled();
   await page.evaluate(() => window.scrollTo(0, 0));
 
   // Everything the captain needs for the next ball is inside the first screen.
