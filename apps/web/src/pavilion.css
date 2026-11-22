@@ -155,3 +155,7 @@
 .captain-station .field-read {background:#edf2e9;border:1px solid #c6d3c3;border-radius:5px;padding:.8em;}
 .close-finish .passage-report,.close-finish .action-row {overflow:hidden;}
 .match-shell:has(.scorestrip[data-stage="toss"]) .active {display:none;}
+/* E4 situation strip: what the game needs now, under the scoreboard. */
+.situation-strip {display:flex;flex-wrap:wrap;gap:.4em 1.2em;align-items:baseline;padding:.55em 1em;border-left:3px solid var(--brass);}
+.situation-strip strong {font:600 1.05em var(--display);}
+.situation-pressure {padding:.1em .6em;border:1px solid currentColor;border-radius:999px;font-size:.85em;font-weight:600;}
