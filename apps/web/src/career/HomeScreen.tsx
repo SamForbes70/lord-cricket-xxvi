@@ -7,6 +7,7 @@ import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion,
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { percentageBp } from "./format.js";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
+import { SeasonFinale, readFinaleSeen, seasonFinaleSeenKey, writeFinaleSeen } from "./SeasonFinale.js";
 import { CareerApplicationService } from "./service.js";
 
 export const selectionNoteKey = (
@@ -127,6 +128,12 @@ export function HomeScreen(props: HomeScreenProps) {
         teamName: (teamId) => service.teamName(teamId),
       })
     : null;
+  // E9: the season finale, shown once per browser when the last fixture is complete.
+  const finaleKey = seasonFinaleSeenKey(service.getSaveId() ?? "", state.seasonId);
+  const [finaleClosed, setFinaleClosed] = useState<readonly string[]>([]);
+  const [finaleReplay, setFinaleReplay] = useState<string | null>(null);
+  const [, setAwardsTick] = useState(0);
+  const finaleOpen = state.phase === "COMPLETE" && (finaleReplay === finaleKey || (!finaleClosed.includes(finaleKey) && !readFinaleSeen(finaleKey)));
   const reportKey = previous ? matchReportSeenKey(service.getSaveId() ?? "", state.seasonId, previous.fixtureId) : "";
   // Dismissals made in this session are remembered here as well, so the report closes even when storage is unavailable.
   const [closedReports, setClosedReports] = useState<readonly string[]>([]);
@@ -159,12 +166,31 @@ export function HomeScreen(props: HomeScreenProps) {
     <section aria-labelledby="home-heading">
       <h2 id="home-heading">Home</h2>
       <div className="dashboard-grid">
-        {reportOpen && reportPanel}
+        {finaleOpen && (
+          <SeasonFinale
+            seasonLabel={`SEASON ${persistentWorld?.currentSeasonNumber ?? 1}`}
+            table={state.projection.table}
+            focusTeamId={controlledTeam ?? null}
+            objective={objective}
+            objectiveStatus={objectiveStatus}
+            awards={service.getSeasonAwards(persistentWorld?.currentSeasonNumber ?? 1)}
+            requestAwards={() => void service.syncAwardsLedger().then(() => setAwardsTick((tick) => tick + 1)).catch(() => undefined)}
+            teamName={(teamId) => service.teamName(teamId)}
+            playerName={(playerId) => service.playerName(playerId)}
+            onDone={() => { writeFinaleSeen(finaleKey); setFinaleClosed((keys) => [...keys, finaleKey]); setFinaleReplay(null); }}
+          />
+        )}
+        {!finaleOpen && reportOpen && reportPanel}
         <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"} data-art={nextFixture ? "true" : undefined} style={nextFixture ? groundArtBackground(service.groundName(nextFixture.groundId), ART_WASH.fixture) : undefined}>
           <h3>Next required action</h3>
           {state.phase === "COMPLETE" ? (
             <>
               <p className="big-stat">Season complete</p>
+              {!finaleOpen && (
+                <button type="button" data-testid="season-finale-replay" onClick={() => setFinaleReplay(finaleKey)}>
+                  See the season finale again
+                </button>
+              )}
               <p>
                 Champion:{" "}
                 <strong>
@@ -368,7 +394,7 @@ export function HomeScreen(props: HomeScreenProps) {
             <p>No remaining managed fixture.</p>
           )}
         </article>
-        {!reportOpen && reportPanel}
+        {(finaleOpen || !reportOpen) && reportPanel}
         {objective && objectiveStatus && (
           <article className="career-panel board-card" data-testid="board-card" data-status={objectiveStatus.kind}>
             <p className="eyebrow">THE BOARD · SEASON OBJECTIVE</p>

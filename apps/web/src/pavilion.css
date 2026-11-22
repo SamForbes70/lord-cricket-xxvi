@@ -185,3 +185,10 @@
 .career-shell .career-nav-modes {border-bottom:0;padding-top:2px;opacity:.85;font-size:.88em;align-items:center;}
 .career-shell .career-nav-modes :is(button,a) {min-height:30px;}
 .career-nav-label {font-size:.8em;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-right:.6em;}
+/* E9 season finale: a stepped presentation before the end-of-season action. */
+.season-finale {grid-column:1 / -1;border-top:3px solid var(--brass);}
+.season-finale h3 {font:600 1.7em var(--display);margin:.2em 0 .4em;}
+.season-finale tr[data-own] {outline:1px solid var(--brass);}
+.season-finale-awards {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:.6em 1.4em;}
+.season-finale-awards dt {font-size:.8em;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}
+.season-finale-awards dd {margin:.15em 0 0;}
