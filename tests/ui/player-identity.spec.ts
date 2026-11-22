@@ -20,7 +20,7 @@ test("the squad list shows tags and form without player ids", async ({ page }) =
   // Before a match, nobody has form.
   await expect(table.locator("[data-testid^='player-form-']").first()).toHaveText("No innings or spell yet");
 
-  await page.getByRole("button", { name: "Home", exact: true }).click();
+  await page.getByRole("button", { name: "Clubhouse", exact: true }).click();
   await page.getByRole("button", { name: "Simulate match" }).click();
   await expect(page.getByTestId("match-report")).toBeVisible({ timeout: 60_000 });
   await page.getByRole("button", { name: "Squad", exact: true }).click();

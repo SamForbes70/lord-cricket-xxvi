@@ -140,6 +140,16 @@ function ErrorBanner({ rawError }: { rawError: string }) {
   );
 }
 
+/** E8: the club's five places and the screens inside each. */
+const CLUB_PLACES: readonly { id: string; label: string; screens: readonly Screen[] }[] = [
+  { id: "CLUBHOUSE", label: "Clubhouse", screens: ["HOME"] },
+  { id: "SQUAD", label: "Squad", screens: ["SQUAD"] },
+  { id: "OFFICE", label: "Office", screens: ["CONTRACTS"] },
+  { id: "SEASON", label: "Season", screens: ["FIXTURES", "STATISTICS", "CAREER"] },
+  { id: "SETTINGS", label: "Settings", screens: ["SETTINGS"] },
+];
+const SECTION_LABEL: Partial<Record<Screen, string>> = { FIXTURES: "Fixtures", STATISTICS: "Statistics", CAREER: "Stories" };
+
 export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean } = {}) {
   const [, redraw] = useState(0);
   const [screen, setScreen] = useState<Screen>("HOME");
@@ -1127,17 +1137,27 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         </div>
       </header>
 
+      {/* E8: five places in the club. A place with more than one screen shows its screens in a second row. */}
       <nav className="career-nav" aria-label="Career navigation">
-        {([
-          "HOME",
-          "CAREER",
-          "SQUAD",
-          ...(persistentWorld ? (["CONTRACTS"] as Screen[]) : []),
-          "FIXTURES",
-          "STATISTICS",
-          "SETTINGS",
-        ] as Screen[]).map(
-          (item) => (
+        {CLUB_PLACES.filter((place) => place.id !== "OFFICE" || persistentWorld).map((place) => {
+          const current = place.screens.includes(screen);
+          return (
+            <button
+              key={place.id}
+              aria-current={current ? (place.screens.length === 1 ? "page" : "true") : undefined}
+              onClick={() => {
+                setActiveReplay(null);
+                if (!current) setScreen(place.screens[0]!);
+              }}
+            >
+              {place.label}
+            </button>
+          );
+        })}
+      </nav>
+      {CLUB_PLACES.filter((place) => place.screens.length > 1 && place.screens.includes(screen)).map((place) => (
+        <nav key={place.id} className="career-nav career-nav-sections" aria-label={`${place.label} sections`} data-testid="career-nav-sections">
+          {place.screens.map((item) => (
             <button
               key={item}
               aria-current={screen === item ? "page" : undefined}
@@ -1146,11 +1166,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 setScreen(item);
               }}
             >
-              {item[0] + item.slice(1).toLowerCase()}
+              {SECTION_LABEL[item] ?? item}
             </button>
-          ),
-        )}
-      </nav>
+          ))}
+        </nav>
+      ))}
       {/* E8: other game modes sit apart from the club's own screens, so the career reads as one place. */}
       <nav className="career-nav career-nav-modes" aria-label="Other ways to play" data-testid="career-nav-modes">
         <span className="career-nav-label" aria-hidden="true">Away from the club</span>

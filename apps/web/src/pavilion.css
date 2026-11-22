@@ -192,3 +192,6 @@
 .season-finale-awards {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:.6em 1.4em;}
 .season-finale-awards dt {font-size:.8em;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}
 .season-finale-awards dd {margin:.15em 0 0;}
+/* E8: the screens inside a place (Season: fixtures, statistics, stories) sit in a second row. */
+.career-shell .career-nav-sections {border-bottom:0;padding:2px 0 4px 12px;font-size:.92em;}
+.career-shell .career-nav [aria-current="true"] {background:var(--pine);color:white;}

@@ -164,7 +164,7 @@ export function HomeScreen(props: HomeScreenProps) {
   ) : null;
   return (
     <section aria-labelledby="home-heading">
-      <h2 id="home-heading">Home</h2>
+      <h2 id="home-heading">Clubhouse</h2>
       <div className="dashboard-grid">
         {finaleOpen && (
           <SeasonFinale
@@ -242,41 +242,6 @@ export function HomeScreen(props: HomeScreenProps) {
                 ))}
               </p>
               <p className="fixture-venue">{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
-              {preview && (
-                <div className="fixture-preview" data-testid="fixture-preview">
-                  <p className="fixture-meaning" data-testid="fixture-meaning">
-                    {preview.rivalry && <span className="rival-mark" data-testid="fixture-rival" title={preview.rivalry.reason}>Rival</span>}
-                    {preview.meaning}
-                  </p>
-                  <dl>
-                    <div>
-                      <dt>{service.teamName(preview.opponentTeamId)}</dt>
-                      <dd>
-                        {preview.opponentPosition !== null && state.projection.table.some((row) => row.played > 0) ? `${preview.opponentPosition}${["th","st","nd","rd","th","th","th","th","th","th"][preview.opponentPosition % 10]} on the table` : "Yet to play"}
-                        {preview.opponentForm.length > 0 && <> · Form <span aria-label={`Recent results, oldest first: ${preview.opponentForm.join(" ")}`}>{preview.opponentForm.join(" ")}</span></>}
-                      </dd>
-                    </div>
-                    <div data-testid="fixture-head-to-head">
-                      <dt>Head to head</dt>
-                      <dd>
-                        {preview.headToHead.played === 0
-                          ? "First meeting on record."
-                          : `Played ${preview.headToHead.played}: won ${preview.headToHead.won}, lost ${preview.headToHead.lost}${preview.headToHead.other ? `, other ${preview.headToHead.other}` : ""}. ${preview.headToHead.lastMeeting ?? ""}`}
-                        {preview.rivalry && <> {preview.rivalry.reason}</>}
-                      </dd>
-                    </div>
-                    {(preview.dangerBatter || preview.dangerBowler) && (
-                      <div data-testid="fixture-danger">
-                        <dt>Players to watch</dt>
-                        <dd>
-                          {preview.dangerBatter && <>{service.playerName(preview.dangerBatter.playerId)}, {preview.dangerBatter.text}. </>}
-                          {preview.dangerBowler && <>{service.playerName(preview.dangerBowler.playerId)}, {preview.dangerBowler.text}.</>}
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-              )}
               {state.careerState.currentDate < nextFixture.matchDayDate ? (
                 <button
                   className="primary"
@@ -370,6 +335,42 @@ export function HomeScreen(props: HomeScreenProps) {
                     </small>
                   )}
                 </section>
+              )}
+              {/* The preview sits below the match action so the action stays in view at 150% text scale. */}
+              {preview && (
+                <div className="fixture-preview" data-testid="fixture-preview">
+                  <p className="fixture-meaning" data-testid="fixture-meaning">
+                    {preview.rivalry && <span className="rival-mark" data-testid="fixture-rival" title={preview.rivalry.reason}>Rival</span>}
+                    {preview.meaning}
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>{service.teamName(preview.opponentTeamId)}</dt>
+                      <dd>
+                        {preview.opponentPosition !== null && state.projection.table.some((row) => row.played > 0) ? `${preview.opponentPosition}${["th","st","nd","rd","th","th","th","th","th","th"][preview.opponentPosition % 10]} on the table` : "Yet to play"}
+                        {preview.opponentForm.length > 0 && <> · Form <span aria-label={`Recent results, oldest first: ${preview.opponentForm.join(" ")}`}>{preview.opponentForm.join(" ")}</span></>}
+                      </dd>
+                    </div>
+                    <div data-testid="fixture-head-to-head">
+                      <dt>Head to head</dt>
+                      <dd>
+                        {preview.headToHead.played === 0
+                          ? "First meeting on record."
+                          : `Played ${preview.headToHead.played}: won ${preview.headToHead.won}, lost ${preview.headToHead.lost}${preview.headToHead.other ? `, other ${preview.headToHead.other}` : ""}. ${preview.headToHead.lastMeeting ?? ""}`}
+                        {preview.rivalry && <> {preview.rivalry.reason}</>}
+                      </dd>
+                    </div>
+                    {(preview.dangerBatter || preview.dangerBowler) && (
+                      <div data-testid="fixture-danger">
+                        <dt>Players to watch</dt>
+                        <dd>
+                          {preview.dangerBatter && <>{service.playerName(preview.dangerBatter.playerId)}, {preview.dangerBatter.text}. </>}
+                          {preview.dangerBowler && <>{service.playerName(preview.dangerBowler.playerId)}, {preview.dangerBowler.text}.</>}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
               )}
               <PitchInspection
                 ground={displayWorld.grounds.find(

@@ -16,7 +16,7 @@ test("Stage 4 squad economy manages contracts, free-agent offers across reloads,
   await expect(page.getByTestId("career-masthead-subtitle")).toContainText("Season 1 (2027)");
 
   // Navigate to Contracts screen and verify club budget, negotiation window, league caps, and ledger.
-  await page.getByRole("button", { name: "Contracts", exact: true }).click();
+  await page.getByRole("button", { name: "Office", exact: true }).click();
   await expect(page.getByTestId("contracts-screen")).toBeVisible();
   await expect(page.getByTestId("club-budget-summary")).toContainText("$2500k");
   await expect(page.getByTestId("negotiation-window-panel")).toContainText("Open · Round 1 of 3");
@@ -40,7 +40,7 @@ test("Stage 4 squad economy manages contracts, free-agent offers across reloads,
   await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible({
     timeout: 30_000,
   });
-  await page.getByRole("button", { name: "Contracts", exact: true }).click();
+  await page.getByRole("button", { name: "Office", exact: true }).click();
   await expect(page.getByTestId("contract-offers-panel")).toContainText(firstFaName);
   await expect(page.getByTestId("contract-offers-panel")).toContainText("PENDING_ROUND");
 
@@ -63,7 +63,7 @@ test("Stage 4 squad economy manages contracts, free-agent offers across reloads,
   await expect(page.getByTestId("player-contract-summary")).toContainText(/\$\d+k\s*\/\s*yr/);
 
   // Return Home and simulate all 14 rounds of Season 1.
-  await page.getByRole("button", { name: "Home", exact: true }).click();
+  await page.getByRole("button", { name: "Clubhouse", exact: true }).click();
   for (let round = 1; round <= 14; round += 1) {
     const advance = page.getByRole("button", { name: "Advance to match day" });
     if (await advance.isVisible().catch(() => false)) {
@@ -83,7 +83,8 @@ test("Stage 4 squad economy manages contracts, free-agent offers across reloads,
     timeout: 30_000,
   });
 
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   const economyReport = page.getByTestId("offseason-economy-report");
   await expect(economyReport).toBeVisible();
   await expect(economyReport).toContainText(
@@ -91,7 +92,7 @@ test("Stage 4 squad economy manages contracts, free-agent offers across reloads,
   );
   await expect(economyReport).toContainText(/contracts expired to free agency/);
 
-  await page.getByRole("button", { name: "Contracts", exact: true }).click();
+  await page.getByRole("button", { name: "Office", exact: true }).click();
   await expect(page.getByTestId("negotiation-window-panel")).toContainText("Open · Round 1 of 3");
 
   // Export V3 .lcxxvi portable archive and verify clean import in an isolated browser context.
@@ -117,7 +118,7 @@ test("Stage 4 squad economy manages contracts, free-agent offers across reloads,
     await expect(importedPage.getByTestId("career-masthead-subtitle")).toContainText(
       "Season 2 (2028)",
     );
-    await importedPage.getByRole("button", { name: "Contracts", exact: true }).click();
+    await importedPage.getByRole("button", { name: "Office", exact: true }).click();
     await expect(importedPage.getByTestId("club-budget-summary")).toContainText("$2500k");
     await expect(importedPage.getByTestId("economy-ledger-panel")).toBeVisible();
   } finally {

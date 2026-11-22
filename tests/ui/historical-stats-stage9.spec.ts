@@ -47,6 +47,7 @@ test("Stage 9 historical statistics, filters, qualified leaderboards, fielding r
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
 
   // Open Statistics and verify historical records panel + separation disclosure.
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
   await page.getByTestId("statistics-scope-bar").getByRole("button", { name: /All-time career/i }).click();
 
@@ -117,6 +118,7 @@ test("Stage 9 historical statistics, filters, qualified leaderboards, fielding r
   // Check 150% text scale has zero horizontal overflow on Statistics.
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await page.getByLabel("Text scale").selectOption("150");
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
   await expect(page.getByTestId("historical-records-panel")).toBeVisible();
   const overflow = await page.evaluate(() => {

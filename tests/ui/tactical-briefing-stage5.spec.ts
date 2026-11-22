@@ -146,12 +146,13 @@ test("Stage 5 career fixture briefing surfaces squad fatigue/readiness and respe
   await toggle.click();
   await expect(toggle).not.toBeChecked();
 
-  await page.getByRole("button", { name: "Home", exact: true }).click();
+  await page.getByRole("button", { name: "Clubhouse", exact: true }).click();
   await expect(careerBriefing).toHaveCount(0);
 
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await toggle.click();
   await expect(toggle).toBeChecked();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Fixtures", exact: true }).click();
   await expect(careerBriefing).toBeVisible();
 });

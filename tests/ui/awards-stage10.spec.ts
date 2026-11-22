@@ -93,12 +93,14 @@ test("Stage 10 career season awards, roll of honour, player honours, replay awar
   });
 
   // Career Roll of Honour shows Season 1 awards
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   const s1AwardsCell = page.getByTestId("season-awards-cell-1");
   await expect(s1AwardsCell).toBeVisible({ timeout: 30_000 });
   await expect(s1AwardsCell).toContainText("Player of the Season", { timeout: 30_000 });
 
   // Statistics Season Awards panel renders all 5 categories with resolved names and provenance
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
   const seasonAwardsPanel = page.getByTestId("season-awards-panel");
   await expect(seasonAwardsPanel).toBeVisible({ timeout: 30_000 });
@@ -150,6 +152,7 @@ test("Stage 10 career season awards, roll of honour, player honours, replay awar
   await expect(page.getByTestId("career-masthead-subtitle")).toContainText("Season 2 (2028)", {
     timeout: 30_000,
   });
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
   await expect(page.getByTestId("season-awards-panel")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("season-award-card-PLAYER_OF_THE_SEASON")).toContainText(
@@ -184,6 +187,7 @@ test("Stage 10 career season awards, roll of honour, player honours, replay awar
       "Season 2 (2028)",
       { timeout: 30_000 },
     );
+    await importedPage.getByRole("button", { name: "Season", exact: true }).click();
     await importedPage.getByRole("button", { name: "Statistics", exact: true }).click();
     await expect(importedPage.getByTestId("season-awards-panel")).toBeVisible({ timeout: 30_000 });
     await expect(

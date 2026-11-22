@@ -12,9 +12,10 @@ test("Stage 11 career stories show a mid-season board review, filter by category
   await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible({ timeout: 30_000 });
 
   // Before any match there are no stories.
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   await expect(page.getByTestId("career-stories")).toContainText("No stories yet");
-  await page.getByRole("button", { name: "Home", exact: true }).click();
+  await page.getByRole("button", { name: "Clubhouse", exact: true }).click();
 
   // Play seven rounds: the board reviews the club after round 7.
   for (let round = 1; round <= 7; round += 1) {
@@ -28,7 +29,8 @@ test("Stage 11 career stories show a mid-season board review, filter by category
     await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
   }
 
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   const panel = page.getByTestId("career-stories");
   await expect(panel.locator('li[data-category="CLUB_BOARD_REVIEW"]')).toHaveCount(1);
   await expect(panel.locator('li[data-category="CLUB_BOARD_REVIEW"]')).toContainText("After round 7 of season 1");
@@ -46,7 +48,8 @@ test("Stage 11 career stories show a mid-season board review, filter by category
   await expect(panel).toContainText("Stories are switched off.");
   await page.reload();
   await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   await expect(page.getByTestId("career-stories")).toContainText("Stories are switched off.");
 
   expect(pageErrors).toEqual([]);
