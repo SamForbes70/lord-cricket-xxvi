@@ -92,6 +92,21 @@ const overs = (balls: number) => `${Math.floor(balls / 6)}.${balls % 6}`;
 /** Commentary entries rendered by default; a red-ball match records thousands. */
 const COMMENTARY_WINDOW = 150;
 
+/** E3: the groups of panels below the decision, reachable in one click from the jump bar. */
+const DUGOUT_SECTIONS = [
+  { key: "tactics", label: "Tactics" },
+  { key: "scorecard", label: "Scorecard" },
+  { key: "captain", label: "Captain" },
+  { key: "tools", label: "Tools" },
+] as const;
+function jumpToDugout(key: string) {
+  const target = document.getElementById(`dugout-${key}`);
+  if (!target) return;
+  const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  target.focus({ preventScroll: true });
+}
+
 export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?: (roster: boolean) => void; onReturnCareer?: (roster: boolean) => void } = {}) {
   const worker = useRef<Worker | null>(null),
     serial = useRef(0),
@@ -1011,7 +1026,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       style={{ fontSize: `${Number(scale) / 100}rem` }}
       data-motion={highlightMotion} className={`match-shell density-${density}`}
     >
-      <a className="skip" href="#decision">
+      <a
+        className="skip"
+        href="#decision"
+        onClick={(event) => {
+          // The app routes on the URL hash, so following this link as a plain anchor would leave the match screen.
+          event.preventDefault();
+          document.getElementById("decision")?.scrollIntoView({ block: "start" });
+          decisionRef.current?.focus({ preventScroll: true });
+        }}
+      >
         Skip to next decision
       </a>
       <header className="masthead">
@@ -1435,6 +1459,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </div>
             </fieldset>
           </section>
+          {/* E3: one click from the decision to each group of panels below, and back again. */}
+          <nav className="dugout-jump" aria-label="Match sections" data-testid="dugout-jump">
+            <span aria-hidden="true">Go to</span>
+            {DUGOUT_SECTIONS.map((section) => (
+              <button key={section.key} type="button" className="secondary" onClick={() => jumpToDugout(section.key)}>{section.label}</button>
+            ))}
+          </nav>
+          <span id="dugout-captain" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Captain: pace, delegation and briefings" />
           {!highlights && pacePanel}
           {preferences}
           <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
@@ -1517,6 +1549,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </details>
           )}
+          <span id="dugout-tactics" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tactics: plans and field" />
           {view.phase === "READY" && (
             <Tactics
               key={`${view.revision}`}
@@ -1652,6 +1685,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </section>
           )}
+          <span id="dugout-scorecard" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Scorecard: analytics, scorecard and commentary" />
           {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} hands={view.hands} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
@@ -1779,6 +1813,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           </div>
         </>
       )}
+      {view && <span id="dugout-tools" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tools: sound, diagnostic and saves" />}
       <AudioControlsPanel
         preferences={audioPrefs}
         snapshot={audioSnapshot}

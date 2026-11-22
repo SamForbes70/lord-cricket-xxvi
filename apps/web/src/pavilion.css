@@ -159,3 +159,8 @@
 .situation-strip {display:flex;flex-wrap:wrap;gap:.4em 1.2em;align-items:baseline;padding:.55em 1em;border-left:3px solid var(--brass);}
 .situation-strip strong {font:600 1.05em var(--display);}
 .situation-pressure {padding:.1em .6em;border:1px solid currentColor;border-radius:999px;font-size:.85em;font-weight:600;}
+/* E3 jump bar: from the decision to each group of panels below. */
+.dugout-jump {display:flex;flex-wrap:wrap;gap:.4em .6em;align-items:center;padding:.4em 0;}
+.dugout-jump span {font-size:.8em;letter-spacing:.1em;text-transform:uppercase;opacity:.75;}
+.dugout-anchor {display:block;height:0;scroll-margin-top:12px;}
+.dugout-anchor:focus-visible {outline:2px solid var(--brass);outline-offset:4px;height:2px;}
