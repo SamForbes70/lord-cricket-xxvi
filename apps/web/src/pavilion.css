@@ -169,3 +169,8 @@
 .board-card {border-top:3px solid var(--brass);}
 .board-card h3 {font:600 1.35em var(--display);margin:.3em 0;}
 .board-card small {color:#e6d7af;}
+/* E6 player identity: tags, form and milestones on the squad list. */
+.identity-tag {display:inline-block;margin:0 .35em .15em 0;padding:.05em .5em;border:1px solid currentColor;border-radius:999px;font-size:.92em;}
+.identity-milestone {display:block;font-style:italic;}
+.identity-trend[data-trend="UP"] {color:#9fd6a3;}
+.identity-trend[data-trend="DOWN"] {color:#f0b0a0;}
