@@ -1150,6 +1150,10 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
             </button>
           ),
         )}
+      </nav>
+      {/* E8: other game modes sit apart from the club's own screens, so the career reads as one place. */}
+      <nav className="career-nav career-nav-modes" aria-label="Other ways to play" data-testid="career-nav-modes">
+        <span className="career-nav-label" aria-hidden="true">Away from the club</span>
         <a
           href="#exhibition"
           onClick={() => {
