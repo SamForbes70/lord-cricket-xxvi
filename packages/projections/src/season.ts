@@ -55,6 +55,17 @@ function equalNrr(a: SeasonTeamTableRow, b: SeasonTeamTableRow): boolean {
   return an * bd === bn * ad;
 }
 
+/**
+ * The league table after exactly the given applied matches, ranked by the same rules as the live table.
+ * Read-only: used to show a team's position before and after a round.
+ */
+export function seasonTableAfter(
+  teamIds: readonly string[],
+  appliedMatches: readonly AppliedSeasonMatch[],
+): SeasonTeamTableRow[] {
+  return recomputeTable({ teamIds: [...teamIds] } as Pick<T20LeagueCompetitionManifest, "teamIds" | "points">, appliedMatches);
+}
+
 function recomputeTable(
   competition: Pick<T20LeagueCompetitionManifest, "teamIds" | "points">,
   appliedMatches: readonly AppliedSeasonMatch[],

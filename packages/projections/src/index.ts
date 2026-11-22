@@ -24,4 +24,8 @@ export * from "./awards.js";
 export * from "./career-stories.js";
 export * from "./scenario-mode.js";
 export * from "./tournament.js";
+export * from "./match-report.js";
+export * from "./season-objective.js";
+export * from "./player-identity.js";
+export * from "./fixture-preview.js";
 export * from "./match-situation.js";
