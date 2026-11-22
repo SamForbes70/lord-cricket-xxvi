@@ -59,7 +59,7 @@ export function MatchReportPanel({ report, open, onClose, onOpen, teamName, play
           <section key={innings.battingTeamId} aria-label={`${teamName(innings.battingTeamId)} innings`}>
             <h4>
               {teamName(innings.battingTeamId)}{" "}
-              <strong>{innings.wickets}/{innings.runs}</strong> <small>({innings.overs} overs)</small>
+              <strong>{innings.runs}/{innings.wickets}</strong> <small>({innings.overs} overs)</small>
             </h4>
             <ul aria-label="Leading batters">
               {innings.topBatters.map((batter) => (
