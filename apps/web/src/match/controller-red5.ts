@@ -1,5 +1,5 @@
 import { proposeOpponentRed5Command } from "./ai-opponent.js";
-import { withRecommendation } from "./recommendation.js";
+import { recommendDecisions, withRecommendation } from "./recommendation.js";
 import {
   createMatchAnalyticsCache,
   projectInMatchTacticalAssistant,
@@ -292,6 +292,16 @@ export function createRed5MatchController(
       candidates: withRecommendation(c.phase, candidates, () =>
         decisionTeamId ? proposeOpponentRed5Command(s, decisionTeamId) : null,
       ),
+      recommendation: recommendDecisions({
+        phase: c.phase,
+        decisionTeamId,
+        innings: i,
+        battingPlans: c.battingPlans,
+        bowlingPlan: c.bowlingPlan,
+        redBall: true,
+        newBallAvailable: c.phase === "READY" && !!i && i.ballAgeLegalBalls >= 480 && i.legalBalls % 6 === 0,
+        propose: (teamId, categories) => proposeOpponentRed5Command(s, teamId, "BALANCED", categories),
+      }),
       bowlingPlan: structuredClone(c.bowlingPlan),
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),

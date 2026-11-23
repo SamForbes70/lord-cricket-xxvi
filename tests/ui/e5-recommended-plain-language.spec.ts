@@ -28,6 +28,37 @@ test("batter and bowler questions mark the computer captain's choice, which the 
   await expect(about.locator("summary")).toHaveText("About this game");
 });
 
+test("every decision marks the computer captain's choice: bat or bowl, and the batting and bowling plans", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/#title");
+  await page.getByRole("button", { name: /Quick match/ }).click();
+  await expect(page.getByTestId("scorestrip")).toBeVisible({ timeout: 60_000 });
+  const decision = page.locator("#decision");
+  // A coin call has no better side, so the toss says so instead of marking one.
+  await expect(decision.getByText("A coin toss: neither call is better, so no choice is recommended.")).toBeVisible();
+  await expect(decision.locator('[data-recommended="true"]')).toHaveCount(0);
+  await page.getByRole("button", { name: "Call heads" }).click();
+  await expect(decision).toHaveAttribute("data-phase", "AWAITING_INNINGS");
+  const marked = decision.locator('.actions button[data-recommended="true"]');
+  await expect(marked).toHaveCount(1);
+  await expect(marked).toHaveText(/^(Bat|Bowl) first$/);
+  const markedId = await marked.getAttribute("aria-describedby");
+  await expect(decision.locator(`#${markedId}`)).toHaveText("Recommended");
+  await marked.click();
+  // Answer batter and bowler questions until the next ball is ready, then read the plan recommendations.
+  for (let n = 0; n < 10; n += 1) {
+    if (await decision.getByRole("button", { name: "Next delivery" }).isEnabled().catch(() => false)) break;
+    await decision.locator("button[data-candidate]:enabled").first().click();
+    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
+  }
+  await expect(decision.getByRole("button", { name: "Next delivery" })).toBeEnabled();
+  const tactics = page.locator(".tactics");
+  await expect(tactics.getByTestId("recommended-aggression")).toHaveText(/^Recommended: (Defend|Cautious|Balanced|Positive|Attack)$/);
+  await expect(tactics.getByTestId("recommended-bowling")).toHaveText(/^Recommended: (yorker|full|good|short) length, (conserve|normal|maximum) effort$/);
+  await expect(tactics.getByLabel("Length").locator("option", { hasText: "(recommended)" })).toHaveCount(1);
+  await expect(tactics.getByLabel("Effort", { exact: true }).locator("option", { hasText: "(recommended)" })).toHaveCount(1);
+});
+
 test("the pitch inspection gives a verdict in plain words", async ({ page }) => {
   await page.goto("/#exhibition");
   await expect(page.getByRole("button", { name: "Confirm XIs and start" })).toBeEnabled({ timeout: 30_000 });
