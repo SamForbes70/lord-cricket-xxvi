@@ -1,5 +1,5 @@
 import { proposeOpponentT20Command } from "./ai-opponent.js";
-import { withRecommendation } from "./recommendation.js";
+import { recommendDecisions, withRecommendation } from "./recommendation.js";
 import { strandingReasons } from "./bowler-plan.js";
 import {
   createMatchAnalyticsCache,
@@ -339,6 +339,14 @@ export function createMatchController(
       candidates: withRecommendation(c.phase, candidates, () =>
         decisionTeamId ? proposeOpponentT20Command(s, decisionTeamId) : null,
       ),
+      recommendation: recommendDecisions({
+        phase: c.phase,
+        decisionTeamId,
+        innings: i,
+        battingPlans: c.battingPlans,
+        bowlingPlan: c.bowlingPlan,
+        propose: (teamId, categories) => proposeOpponentT20Command(s, teamId, categories),
+      }),
       bowlingPlan: structuredClone(c.bowlingPlan),
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),

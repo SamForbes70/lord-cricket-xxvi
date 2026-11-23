@@ -1301,11 +1301,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Call tails
                   </button>
+                  <small className="recommended-note">A coin toss: neither call is better, so no choice is recommended.</small>
                 </div>
               )}
               {view.phase === "AWAITING_INNINGS" && (
                 <div className="actions">
                   <button
+                    data-recommended={view.recommendation?.innings === "BAT" ? "true" : undefined}
+                    aria-describedby={view.recommendation?.innings === "BAT" ? "recommended-bat-first" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_INNINGS",
@@ -1318,7 +1321,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Bat first
                   </button>
+                  {view.recommendation?.innings === "BAT" && <RecommendedTag id="recommended-bat-first" />}
                   <button
+                    data-recommended={view.recommendation?.innings === "BOWL" ? "true" : undefined}
+                    aria-describedby={view.recommendation?.innings === "BOWL" ? "recommended-bowl-first" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_INNINGS",
@@ -1331,11 +1337,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Bowl first
                   </button>
+                  {view.recommendation?.innings === "BOWL" && <RecommendedTag id="recommended-bowl-first" />}
                 </div>
               )}
               {view.phase === "AWAITING_FOLLOW_ON" && (
                 <div className="actions">
                   <button
+                    data-recommended={view.recommendation?.followOn === true ? "true" : undefined}
+                    aria-describedby={view.recommendation?.followOn === true ? "recommended-enforce" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_FOLLOW_ON",
@@ -1348,7 +1357,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Enforce follow-on
                   </button>
+                  {view.recommendation?.followOn === true && <RecommendedTag id="recommended-enforce" />}
                   <button
+                    data-recommended={view.recommendation?.followOn === false ? "true" : undefined}
+                    aria-describedby={view.recommendation?.followOn === false ? "recommended-bat-again" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_FOLLOW_ON",
@@ -1361,6 +1373,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Bat again
                   </button>
+                  {view.recommendation?.followOn === false && <RecommendedTag id="recommended-bat-again" />}
                 </div>
               )}
               {(view.phase === "AWAITING_BATTER" ||
@@ -1420,6 +1433,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               {view.phase === "READY" && view.format === "RED_BALL" && i && (
                 <div className="actions redball-actions">
                   <button
+                    data-recommended={view.recommendation?.declare ? "true" : undefined}
+                    aria-describedby={view.recommendation?.declare ? "recommended-declare" : undefined}
                     onClick={() =>
                       act({
                         kind: "DECLARE",
@@ -1429,8 +1444,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Declare innings
                   </button>
+                  {view.recommendation?.declare && <RecommendedTag id="recommended-declare" />}
                   <button
                     disabled={!view.redBall?.newBallAvailable}
+                    data-recommended={view.recommendation?.newBall ? "true" : undefined}
+                    aria-describedby={view.recommendation?.newBall ? "recommended-new-ball" : undefined}
                     onClick={() =>
                       act({
                         kind: "TAKE_NEW_BALL",
@@ -1440,6 +1458,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Take new ball
                   </button>
+                  {view.recommendation?.newBall && <RecommendedTag id="recommended-new-ball" />}
                 </div>
               )}
               <div className="advance">
@@ -2229,6 +2248,14 @@ function Setup({
     </section>
   );
 }
+/** Marks the computer captain's choice. The player's own click is still the command that is sent. */
+function RecommendedTag({ id }: { id: string }) {
+  return (
+    <small id={id} className="recommended-tag" title="The computer captain's choice. You decide.">
+      Recommended
+    </small>
+  );
+}
 function Tactics({
   view,
   disabled,
@@ -2277,9 +2304,15 @@ function Tactics({
                     ].map((name, n) => (
                       <option key={n} value={n}>
                         {name}
+                        {view.recommendation?.aggression?.playerId === id && view.recommendation.aggression.level === n ? " (recommended)" : ""}
                       </option>
                     ))}
                   </select>
+                  {view.recommendation?.aggression?.playerId === id && (
+                    <small className="recommended-tag" data-testid="recommended-aggression" title="The computer captain's choice. You decide.">
+                      Recommended: {["Defend", "Cautious", "Balanced", "Positive", "Attack"][view.recommendation.aggression.level] ?? view.recommendation.aggression.level}
+                    </small>
+                  )}
                 </label>
               ))}
           </div>
@@ -2305,7 +2338,7 @@ function Tactics({
                 }
               >
                 {["CONSERVE", "NORMAL", "MAXIMUM"].map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>{v}{view.recommendation?.bowling?.effort === v ? " (recommended)" : ""}</option>
                 ))}
               </select>
             </label>
@@ -2339,10 +2372,15 @@ function Tactics({
                 }
               >
                 {["YORKER", "FULL", "GOOD", "SHORT"].map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>{v}{view.recommendation?.bowling?.length === v ? " (recommended)" : ""}</option>
                 ))}
               </select>
             </label>
+            {view.recommendation?.bowling && (
+              <small className="recommended-tag" data-testid="recommended-bowling" title="The computer captain's choice. You decide.">
+                Recommended: {view.recommendation.bowling.length.toLowerCase()} length, {view.recommendation.bowling.effort.toLowerCase()} effort
+              </small>
+            )}
             <button
               onClick={() =>
                 act({ kind: "SET_BOWLING_PLAN", payload: bowling })
