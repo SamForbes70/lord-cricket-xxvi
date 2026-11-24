@@ -34,7 +34,8 @@ test("full time replaces the advance buttons with the result, both scores and wh
   await expect(moment).toBeVisible();
   await expect(decision.locator(".eyebrow").first()).toHaveText("FULL TIME");
   // The heading is the result, and the advance buttons are gone.
-  const result = (await page.locator("section.result h2").textContent())!;
+  // A tied exhibition also shows the super-over panel, which shares the result styling; read the match result itself.
+  const result = (await page.locator("section.result:not([data-testid='super-over-panel']) h2").textContent())!;
   await expect(decision.getByRole("heading", { level: 2 })).toHaveText(result);
   for (const name of ["Next delivery", "Finish over", "Next decision", "Finish innings", "Finish match"])
     await expect(decision.getByRole("button", { name, exact: true })).toHaveCount(0);
