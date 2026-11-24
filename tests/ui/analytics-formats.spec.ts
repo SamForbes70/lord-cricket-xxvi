@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 
+// Pavilion B2: these checks drive whole matches with their own loop, so routine picks (which can restart an advance
+// the loop is about to press) are turned off here; tests/ui/pavilion-routine-picks.spec.ts covers routine picks.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => { try { localStorage.setItem("lcxxvi-routine-picks", "off"); } catch { /* storage blocked */ } });
+});
+
 const world = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.json", "utf8")) as { players: { playerId: string; batHand: string }[] };
 const leftHanders = world.players.filter(player => player.batHand === "L").map(player => player.playerId);
 
