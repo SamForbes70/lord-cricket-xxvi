@@ -1,0 +1,43 @@
+{
+  "policy": "over",
+  "clicks": 112,
+  "decisions": {
+    "AWAITING_BATTER": 19,
+    "AWAITING_BOWLER": 38
+  },
+  "timings": {
+    "toTossMs": 1874,
+    "toFirstBallMs": 2550,
+    "totalMs": 17293
+  },
+  "notes": [],
+  "titleChoices": [
+    "QUICK MATCH T20 · suggested XIs · one click",
+    "GUIDED FIRST MATCH Learn each decision as it comes",
+    "CAREER Manage a club through seasons, contracts and a growing record.",
+    "TOURNAMENTS Cups, series, tours and auctions.",
+    "SCENARIOS Take over a match at the crunch.",
+    "RAIN AND REVIEWS Weather stoppages and player reviews.",
+    "CUSTOM MATCH Pick the format, ground and both XIs.",
+    "Turn sound on",
+    "Keep sound off",
+    "Sound: off"
+  ],
+  "matchPageScrollHeightPx": 1706,
+  "matchPageScreens": 2.2,
+  "matchPageRegions": 15,
+  "matchPageButtons": 16,
+  "clicksBeforeFirstBall": 7,
+  "finalPhase": "COMPLETE",
+  "scorestrip": "Aster Quay · T20 · Innings 2 ASTER HARBOUR AH 78/7 20.0 / 20 overs Result Copper Vale won by 19 runs Copper Vale 97/10",
+  "endPageScreens": 15.4,
+  "promptCounts": {
+    "sound question": 1,
+    "quick match": 1,
+    "toss call": 1,
+    "bat/bowl": 1,
+    "AWAITING_BATTER": 19,
+    "AWAITING_BOWLER": 38,
+    "Finish over": 51
+  }
+}

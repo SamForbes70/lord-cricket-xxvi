@@ -1172,6 +1172,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 start={(format, selections, groundId) =>
                   send({ type: "START", format, selections, groundId, ...(stagedWorld ? { worldCopy: stagedWorld } : {}), ...(stagedRoster ? { rosterPack: stagedRoster } : {}) })
                 }
+                // Pavilion P03a: a quick or guided match is the player against the computer, not a hot seat for both XIs.
+                onQuickStart={(opponentTeamId) => changeAiOpponent(opponentTeamId)}
               />
             </>
           ) : (
@@ -2062,6 +2064,7 @@ function Setup({
   busy,
   showBriefings,
   start,
+  onQuickStart,
 }: {
   catalog: Catalog;
   world: WorldPack;
@@ -2072,6 +2075,8 @@ function Setup({
     teams: [Selection, Selection],
     ground: string,
   ) => void;
+  /** Called once, just before a quick or guided match starts, with the side the computer should captain. */
+  onQuickStart?: (opponentTeamId: string) => void;
 }) {
   const [teams, setTeams] = useState<[Selection, Selection]>([
     structuredClone(catalog.teams[0]!.suggested),
@@ -2104,7 +2109,11 @@ function Setup({
     let at = 0;
     try { at = Number(sessionStorage.getItem(QUICK_MATCH_KEY) ?? 0); sessionStorage.removeItem(QUICK_MATCH_KEY); } catch { /* ignore */ }
     quickStarted.current = true;
-    if (at > 0 && Date.now() - at < 60_000 && reasons.length === 0) start(format, teams, ground);
+    if (at > 0 && Date.now() - at < 60_000 && reasons.length === 0) {
+      // The player captains the first side; the tactical captain plays the second (the player can change this in the match).
+      onQuickStart?.(teams[1].teamId);
+      start(format, teams, ground);
+    }
   }, [busy]);
   const selectedGround =
     world.grounds.find((item) => item.groundId === ground) ?? world.grounds[0]!;
