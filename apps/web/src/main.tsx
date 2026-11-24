@@ -1865,7 +1865,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       {view && (
         <>
           {/* Pavilion B4: settings live together at the foot of the match, out of the play column. */}
-          <span id="dugout-settings" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Settings: display, tactical captain and delegation" />
+          <span id="dugout-settings" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Settings group" />
           <section className="match-settings" aria-labelledby="match-settings-heading">
             <h2 id="match-settings-heading">Match settings</h2>
           {preferences}
