@@ -58,13 +58,13 @@ export function overContext(input: OverContextInput): OverContext | null {
     return { slot: "bowledOut", text: `${input.bowlerName} bowls out: ${input.bowlerFigures}.` };
 
   if (last.wickets > 0) {
-    const window = input.overs.slice(-COLLAPSE_WINDOW_OVERS);
-    const wickets = window.reduce((n, o) => n + o.wickets, 0);
-    const runs = window.reduce((n, o) => n + o.runs, 0);
+    const recent = input.overs.slice(-COLLAPSE_WINDOW_OVERS);
+    const wickets = recent.reduce((n, o) => n + o.wickets, 0);
+    const runs = recent.reduce((n, o) => n + o.runs, 0);
     // Called once, when the window first reaches three wickets, not again on every over it stays there.
     const previous = input.overs.slice(-COLLAPSE_WINDOW_OVERS - 1, -1).reduce((n, o) => n + o.wickets, 0);
     if (wickets >= COLLAPSE_WICKETS && previous < COLLAPSE_WICKETS)
-      return { slot: "collapse", text: `${wickets} wickets for ${runs} run${runs === 1 ? "" : "s"} in the last ${window.length} overs.` };
+      return { slot: "collapse", text: `${wickets} wickets for ${runs} run${runs === 1 ? "" : "s"} in the last ${recent.length} overs.` };
   }
 
   if (input.legalBalls === shape.deathFrom) return { slot: "deathOvers", text: "Into the death overs." };
