@@ -93,8 +93,8 @@ test("pitch inspection keeps the primary match action in view at 150 percent", a
   expect(ground).toBeDefined();
   const pitch = page.getByRole("region", { name: "Pitch and conditions" });
   await expect(pitch).toContainText(ground!.name);
-  await expect(pitch).toContainText(`${(ground!.pitchPrior.seamBp / 100).toFixed(2)} / 100`);
-  await expect(pitch).toContainText(`${(ground!.pitchPrior.turnBp / 100).toFixed(2)} / 100`);
+  await expect(pitch).toContainText(`${Math.round(ground!.pitchPrior.seamBp / 100)} / 100`);
+  await expect(pitch).toContainText(`${Math.round(ground!.pitchPrior.turnBp / 100)} / 100`);
 });
 
 test("player profiles fit a narrow viewport at 150 percent text scale", async ({ page }) => {
