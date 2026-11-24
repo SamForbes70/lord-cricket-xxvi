@@ -107,6 +107,17 @@ A run multiplier would raise totals but keep the wrong mix (too many dots, too f
 
 Until these are answered, no authoritative simulation code is changed.
 
+### Owner decisions, 24 November 2026
+
+The owner answered in the session: "Q 1. Yes  Q2. Yes  Q3.  Yes  Q.4  as you recommend".
+
+1. Stage A: **approved.**
+2. Stage B: **approved**, as a versioned policy that is measured but not tuned to a target total.
+3. Stage C: **approved to start.** This covers the licence position, the data split and the acceptance gates as proposed in section 5. Building and validating the model does not change the game. Making it selectable in the game is a separate owner decision, taken on the validation results.
+4. Existing careers: **stay on `synthetic-alpha-01`**, and only new careers use a new model.
+
+Stages are delivered as separate pull requests, in the order A, B, C. Each is merged only with owner approval.
+
 ## 7. Verification of this branch
 
 Recorded in the pull request with revision and exit codes: `npx tsc -b`, `npm run lint`, the script run above, and the unit suite. The script reads the frozen corpus and world data only and writes one JSON file.
