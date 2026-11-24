@@ -1617,7 +1617,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 <button disabled={!!view.advanceReason} onClick={() => advanceTo("MATCH")}>Finish match</button>
                 <span id="advance-reason">
                   {view.advanceReason ||
-                    "All options stop at required decisions, including batter or bowler selection."}
+                    "Each option stops at your own decisions."}
                 </span>
               </div>
             </fieldset>
