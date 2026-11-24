@@ -423,6 +423,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         if (restored.managedTeamId) setAiTeamId(restored.homeTeamId === restored.managedTeamId ? restored.awayTeamId : restored.homeTeamId);
       }
       const batch = advanceBatch.current;
+      // A routine pick never follows a stop the player asked for.
+      const stoppedByPlayer = Boolean(batch?.cancel);
       let batchError = "";
       if (batch) {
         const acknowledged = r.acknowledgement?.commandId === r.requestId && r.acknowledgement.committedRevision === r.revision;
@@ -476,7 +478,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             command: { kind: "ADVANCE", payload: { scope: resume.scope === "KEY" ? "DELIVERY" : "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
         } else if (r.view.decisionTeamId !== routineContext.current.aiTeamId) resumeAfterAi.current = null;
       }
-      if (!advanceBatch.current && !inflight.current && r.view && !r.error && !r.persistence?.readOnly) {
+      if (!stoppedByPlayer && !advanceBatch.current && !inflight.current && r.view && !r.error && !r.persistence?.readOnly) {
         const routine = routinePickFor(r.view);
         if (routine) sendRoutinePick(w, r.view, r.revision, routine);
       }
