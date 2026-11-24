@@ -22,7 +22,8 @@ test("routine picks are made for the player, key moments are asked, and the swit
   await expect(decision).toHaveAttribute("data-phase", "AWAITING_BATTER");
   await expect(routine.getByTestId("routine-key")).toHaveText("Key moment: your openers. Your choice.");
   // Play on, answering whatever is asked, until a routine pick has been made for the player.
-  const note = routine.getByTestId("routine-note");
+  // The note shows in the decision panel: in the routine box, or on the advance hint's line when play can go on.
+  const note = decision.getByTestId("routine-note");
   for (let n = 0; n < 120 && (await note.count()) === 0; n += 1) {
     await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
     const enabled = decision.locator("button[data-candidate]:enabled");
