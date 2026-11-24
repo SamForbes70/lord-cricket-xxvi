@@ -1557,7 +1557,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     Computer makes routine batter and bowler picks; you choose at key moments
                   </label>
                   {routineDecision?.moment.key && routinePicks && <p className="routine-key" data-testid="routine-key">{routineDecision.moment.reason} Your choice.</p>}
-                  {routineNote && <p role="status" className="routine-note" data-testid="routine-note">{routineNote}</p>}
+                  {/* When play is ready to go on, the note takes the advance hint's line instead (below), so the decision
+                      still fits the first screen at 1366 by 768 (dugout-view.spec, hosted Windows run 45466265308). */}
+                  {routineNote && view.advanceReason && <p role="status" className="routine-note" data-testid="routine-note">{routineNote}</p>}
                 </div>
               )}
               {(view.phase === "AWAITING_BATTER" ||
@@ -1689,7 +1691,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 <button disabled={!!view.advanceReason} onClick={() => advanceTo("MATCH")}>Finish match</button>
                 <span id="advance-reason">
                   {view.advanceReason ||
-                    "Each option stops at your own decisions."}
+                    (routineNote ? <span role="status" className="routine-note" data-testid="routine-note">{routineNote}</span> : "Each option stops at your own decisions.")}
                 </span>
               </div>
               )}
