@@ -16,6 +16,35 @@ export const MATCH_SITUATION_RULES = {
   underPressureFrom: 3,
 } as const;
 
+import { T20_EXPECTATION_TABLE } from "./t20-expectation-table.js";
+
+/** Cells with fewer innings than this fall back to every wicket band at that over. */
+const MIN_CELL_INNINGS = 5;
+
+/**
+ * Pavilion B7: the likely T20 first-innings total from the game's own model: runs so far plus the mean runs that
+ * innings in the model's 100-match corpus went on to add from the same over and wicket band, interpolated within
+ * the over and rounded to the nearest 5. Null before the first ball or once ten wickets are down.
+ */
+export function likelyT20Total(runs: number, wickets: number, legalBalls: number): number | null {
+  if (wickets >= 10 || legalBalls >= 120) return runs;
+  const band = wickets >= 6 ? 3 : Math.floor(wickets / 2);
+  const remainingAt = (over: number): number | null => {
+    if (over >= 20) return 0;
+    const row = T20_EXPECTATION_TABLE.rows[over]!;
+    const cell = row[band]!;
+    if (cell.n >= MIN_CELL_INNINGS && cell.meanX10 !== null) return cell.meanX10 / 10;
+    let n = 0, sumX10 = 0;
+    for (const c of row) if (c.meanX10 !== null) { n += c.n; sumX10 += c.meanX10 * c.n; }
+    return n >= MIN_CELL_INNINGS ? sumX10 / n / 10 : null;
+  };
+  const over = Math.floor(legalBalls / 6);
+  const from = remainingAt(over), to = remainingAt(over + 1);
+  if (from === null || to === null) return null;
+  const within = (legalBalls % 6) / 6;
+  return Math.round((runs + from + (to - from) * within) / 5) * 5;
+}
+
 export type PressureLevel = "IN_CONTROL" | "IN_THE_BALANCE" | "UNDER_PRESSURE";
 
 export interface MatchSituationInput {
@@ -65,8 +94,11 @@ export function matchSituation(input: MatchSituationInput): MatchSituation | nul
   if (currentRateX100 !== null) facts.push(`Run rate ${rate(currentRateX100)}`);
 
   if (input.targetToWin === null) {
-    const projectedTotal = steady && wicketsInHand > 0 ? Math.round((input.runs * inningsBalls) / input.legalBalls) : null;
-    if (projectedTotal !== null) facts.push(`On course for ${projectedTotal} at this rate`);
+    // T20 reads the model's own scoring; a one-day innings still reads the current rate, and says so.
+    const projectedTotal = !steady || wicketsInHand === 0 ? null
+      : input.format === "T20" ? likelyT20Total(input.runs, input.wickets, input.legalBalls)
+      : Math.round((input.runs * inningsBalls) / input.legalBalls);
+    if (projectedTotal !== null) facts.push(input.format === "T20" ? `Likely total about ${projectedTotal}` : `On course for ${projectedTotal} at this rate`);
     if (partnership && partnership.balls > 0) facts.push(`Partnership ${partnership.runs} from ${plural(partnership.balls, "ball")}`);
     return {
       kind: "FIRST_INNINGS", currentRateX100, projectedTotal, partnership, runsNeeded: null, ballsLeft, wicketsInHand, requiredRateX100: null, pressure: null,
