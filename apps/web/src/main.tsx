@@ -6,7 +6,7 @@ import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
-import { matchSituation } from "@lcxxvi/projections";
+import { matchSituation, t20ChaseWinChance } from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -1344,6 +1344,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               {situation.facts.map((fact) => <span key={fact}>{fact}</span>)}
             </section>
           )}
+          {/* Pavilion B9: a T20 chase's win chance, from the game's own simulated matches. Kept out of the situation
+              strip, which states only what is on the board. */}
+          {view && i && view.format === "T20" && i.targetToWin != null && !view.resultText && (() => {
+            const chance = t20ChaseWinChance(Math.max(0, i.targetToWin - i.runs), i.wickets, i.legalBalls);
+            if (chance === null || chance === 0 || chance === 100) return null;
+            return (
+              <p className="win-chance" data-testid="win-chance">
+                <span>Win chance (game model estimate):</span>{" "}
+                <strong>{tn(i.battingTeamId)} about {chance}%</strong>{" · "}
+                <strong>{tn(i.bowlingTeamId)} about {100 - chance}%</strong>
+                <small> From this game&apos;s own simulated matches, not real cricket.</small>
+              </p>
+            );
+          })()}
           <BroadcastStage view={view} />
           {highlights && pacePanel}
           <section
