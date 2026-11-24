@@ -18,7 +18,8 @@ test("a T20 chase shows each side's win chance from the game model, adding to 10
     if (phase === "COMPLETE") break;
     const candidates = decision.locator("button[data-candidate]:enabled");
     if (phase === "TOSS") await decision.getByRole("button", { name: "Call heads" }).click();
-    else if (phase === "AWAITING_INNINGS" && (await decision.getByRole("button", { name: "Bat first" }).count()) > 0) await decision.getByRole("button", { name: "Bat first" }).click();
+    // "Bat first" can show for a moment while the computer makes its own choice, so a missed click is fine.
+    else if (phase === "AWAITING_INNINGS") await decision.getByRole("button", { name: "Bat first" }).click({ timeout: 2_000 }).catch(() => undefined);
     else if ((await candidates.count()) > 0) await candidates.first().click();
     else if (await decision.getByRole("button", { name: "Finish over", exact: true }).isEnabled().catch(() => false)) await decision.getByRole("button", { name: "Finish over", exact: true }).click();
     else await page.waitForTimeout(200);
