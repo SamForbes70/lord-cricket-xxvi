@@ -98,6 +98,7 @@ const DUGOUT_SECTIONS = [
   { key: "tactics", label: "Tactics" },
   { key: "scorecard", label: "Scorecard" },
   { key: "captain", label: "Captain" },
+  { key: "settings", label: "Settings" },
   { key: "tools", label: "Tools" },
 ] as const;
 function jumpToDugout(key: string) {
@@ -106,6 +107,55 @@ function jumpToDugout(key: string) {
   const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   target.focus({ preventScroll: true });
+}
+
+/**
+ * Pavilion B3: the result as a moment. At full time the decision panel shows the result, both scores, the player of
+ * the match and what to do next, in place of five disabled advance buttons. Reads the view only.
+ */
+function ResultMoment({ view, superOverPending, hasOwnExit, onNewMatch }: {
+  view: View;
+  superOverPending: boolean;
+  hasOwnExit: boolean;
+  onNewMatch: () => void;
+}) {
+  const teamName = (id: string) => view.teams.find((t) => t.id === id)?.name ?? id;
+  const award = view.matchAward;
+  const winner = award?.status === "AWARDED" && award.winnerPlayerId ? award.winnerPlayerId : null;
+  const winnerLine = winner ? award?.candidates.find((c) => c.playerId === winner)?.summaryLine : undefined;
+  const tournament = view.matchId?.startsWith("tour-m");
+  return (
+    <div className="result-moment" data-testid="result-moment">
+      <ul className="result-scores" aria-label="Final scores">
+        {view.innings.map((ledger, n) => (
+          <li key={n}>
+            <strong>{teamName(ledger.innings.battingTeamId)}</strong>{" "}
+            {ledger.innings.runs}
+            {ledger.innings.wickets < 10 ? `/${ledger.innings.wickets}` : " all out"}{" "}
+            <span>({overs(ledger.innings.legalBalls)} overs)</span>
+          </li>
+        ))}
+      </ul>
+      {winner && (
+        <p className="result-award" data-testid="result-player-of-match">
+          Player of the match: <strong>{view.names[winner] ?? winner}</strong>
+          {award?.winnerTeamId ? ` (${teamName(award.winnerTeamId)})` : ""}
+          {winnerLine ? `. ${winnerLine}` : ""}
+        </p>
+      )}
+      {superOverPending && <p className="result-note">The scores are level: a super over decides it, below.</p>}
+      <div className="actions result-actions">
+        {/* Career and tournament matches keep their own "return" control in the banner above. */}
+        <button type="button" className="primary" onClick={() => jumpToDugout("scorecard")}>Scorecard and match report</button>
+        {!hasOwnExit && !tournament && (
+          <>
+            <button type="button" onClick={onNewMatch}>New match</button>
+            <a className="button-link" href="#title">Title screen</a>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?: (roster: boolean) => void; onReturnCareer?: (roster: boolean) => void } = {}) {
@@ -1269,7 +1319,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         {ledger!.batting[id]!.ballsFaced})
                       </>
                     ) : (
-                      "Awaiting selection"
+                      view.resultText ? "Innings closed" : "Awaiting selection"
                     )}
                   </p>
                 ))
@@ -1282,7 +1332,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               <p className={i?.bowlerId ? "active-player" : undefined}>
                 {i?.bowlerId && <PlayerPortrait playerId={i.bowlerId} role="BOWLER" kit={activeKit(view, i.bowlerId)} size={44} />}
                 <strong>
-                  {i?.bowlerId ? view.names[i.bowlerId] : "Awaiting selection"}
+                  {i?.bowlerId ? view.names[i.bowlerId] : view.resultText ? "Innings closed" : "Awaiting selection"}
                 </strong>
               </p>
               {i?.bowlerId && (
@@ -1317,9 +1367,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           >
             <div className="decision-top">
               <div>
-                <p className="eyebrow">NEXT DECISION</p>
+                <p className="eyebrow">{view.phase === "COMPLETE" && view.resultText ? "FULL TIME" : "NEXT DECISION"}</p>
                 <h2 ref={decisionRef} tabIndex={-1}>
-                  {view.nextDecision}
+                  {view.phase === "COMPLETE" && view.resultText ? view.resultText : view.nextDecision}
                 </h2>
               </div>
               <span role="status" className="working">
@@ -1327,7 +1377,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
-            {batchProgress && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
+            {batchProgress && !(view.phase === "COMPLETE" && view.resultText) && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
             <fieldset disabled={busy || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
@@ -1532,6 +1582,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   {view.recommendation?.newBall && <RecommendedTag id="recommended-new-ball" />}
                 </div>
               )}
+              {view.phase === "COMPLETE" && view.resultText ? (
+                <ResultMoment
+                  view={view}
+                  superOverPending={Boolean(superOver && superOver.phase !== "COMPLETE")}
+                  hasOwnExit={Boolean(careerLaunch.current) || Boolean(scenario)}
+                  onNewMatch={() => send({ type: "BOOT", fresh: true })}
+                />
+              ) : (
               <div className="advance">
                 <button
                   disabled={!!view.advanceReason}
@@ -1560,6 +1618,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     "All options stop at required decisions, including batter or bowler selection."}
                 </span>
               </div>
+              )}
             </fieldset>
           </section>
           {/* E3: one click from the decision to each group of panels below, and back again. */}
@@ -1569,60 +1628,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               <button key={section.key} type="button" className="secondary" onClick={() => jumpToDugout(section.key)}>{section.label}</button>
             ))}
           </nav>
-          <span id="dugout-captain" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Captain: pace, delegation and briefings" />
+          <span id="dugout-captain" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Captain: pace and briefings" />
           {!highlights && pacePanel}
-          {preferences}
-          <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
-            <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
-            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
-              onChange={e => changeAiOpponent(e.target.value)}>
-              <option value="">Manual decisions for both teams</option>
-              {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
-            </select>
-            <span>The computer picks this team's batters, bowlers and tactics. You still play each ball.</span>
-          </section>
         {careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
-          {(() => {
-            const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
-            const selected = delegationForTeam(delegation, selectedTeam.id);
-            const currentProfile = redBallProfileForTeam(delegation, selectedTeam.id);
-            const choices: [DelegationCategory, string][] = [
-              ["TOSS", "Toss call"],
-              ["INNINGS", "Bat or bowl"],
-              ["BATTER", "Batter selection"],
-              ["BOWLER", "Bowler selection"],
-              ["BATTING_PLAN", "Batting plan"],
-              ["BOWLING_PLAN", "Bowling plan"],
-              ...(view.format !== "T20" ? [["FIELD", "Field placement"]] as [DelegationCategory, string][] : []),
-              ...(view.format === "RED_BALL" ? [["DECLARATION", "Declaration"], ["FOLLOW_ON", "Follow-on"], ["NEW_BALL", "New ball"]] as [DelegationCategory, string][] : []),
-            ];
-            return <details className="career-panel" id="captain-delegation">
-              <summary>Delegate individual decisions</summary>
-              <p>Choose which decisions the tactical captain may make. These choices are saved with the match.</p>
-              <label>Delegation team <select value={selectedTeam.id} disabled={busy || fatal} onChange={event => setDelegationTeam(event.currentTarget.value)}>{view.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
-              {view.format === "RED_BALL" && (
-                <div>
-                  <label>Red-ball tactical profile <select aria-label="Red-ball tactical profile" value={currentProfile} disabled={busy || fatal || Boolean(persistence?.readOnly)} onChange={event => {
-                    const redBallProfile = event.currentTarget.value as RedBallTacticalProfile;
-                    send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories: [...selected], redBallProfile });
-                  }}>
-                    <option value="CONSERVATIVE">Conservative</option>
-                    <option value="BALANCED">Balanced</option>
-                    <option value="AGGRESSIVE">Aggressive</option>
-                  </select></label>
-                  <p data-testid="redball-profile-posture">{RED_BALL_PROFILE_DESCRIPTIONS[currentProfile]}</p>
-                </div>
-              )}
-              {aiTeamId === selectedTeam.id && <p>The tactical captain controls this team until you change the opponent setting.</p>}
-              <fieldset disabled={busy || fatal || Boolean(persistence?.readOnly) || aiTeamId === selectedTeam.id}>
-                <legend>Delegated decisions</legend>
-                {choices.map(([category, label]) => <label key={category}><input type="checkbox" checked={selected.includes(category)} onChange={event => {
-                  const categories = event.currentTarget.checked ? [...selected, category] : selected.filter(value => value !== category);
-                  send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories, ...(view.format === "RED_BALL" ? { redBallProfile: currentProfile } : {}) });
-                }} /> {label}</label>)}
-              </fieldset>
-            </details>;
-          })()}
           {view.format === "RED_BALL" && view.redBall && (
             <details className="career-panel" data-testid="redball-conditions-panel">
               <summary>Red-ball pitch wear and weather controls</summary>
@@ -1707,7 +1715,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 {view.format === "RED_BALL"
                   ? "five-day red-ball match"
                   : view.format}
-                . Review the innings below.
+                . The scorecard and match report follow.
               </p>
               {view.matchAward && (
                 <div
@@ -1716,9 +1724,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 >
                   <div className="match-award-head">
                     <strong>Player of the Match</strong>
-                    <span className="award-provenance-tag" data-testid="match-award-provenance">
-                      Game award · {view.matchAward.awardVersion}
-                    </span>
                   </div>
                   {view.matchAward.status === "AWARDED" && view.matchAward.winnerPlayerId ? (
                     <>
@@ -1730,7 +1735,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         {view.teams.find((t) => t.id === view.matchAward?.winnerTeamId)?.name ??
                           view.matchAward.winnerTeamId}
                         {view.matchAward.fromLosingTeam ? " · losing side" : ""}) ·{" "}
-                        {((view.matchAward.scoreTotalX100 ?? 0) / 100).toFixed(2)} pts
+                        {((view.matchAward.scoreTotalX100 ?? 0) / 100).toFixed(1)} pts
                       </p>
                       <p className="match-award-explain">{view.matchAward.explanationText}</p>
                       {view.matchAward.components && (
@@ -1747,7 +1752,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                             <li key={cand.playerId}>
                               {view.names[cand.playerId] ?? cand.playerId} (
                               {view.teams.find((t) => t.id === cand.teamId)?.name ?? cand.teamId}):{" "}
-                              {(cand.totalPointsX100 / 100).toFixed(2)} pts — {cand.summaryLine}
+                              {(cand.totalPointsX100 / 100).toFixed(1)} pts: {cand.summaryLine}
                             </li>
                           ))}
                         </ol>
@@ -1756,9 +1761,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   ) : (
                     <p data-testid="match-award-winner">{view.matchAward.explanationText}</p>
                   )}
-                  <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+                  <details className="technical-details">
+                    <summary>How this award is worked out</summary>
+                    <p>
+                      <span className="award-provenance-tag" data-testid="match-award-provenance">
+                        Game award · {view.matchAward.awardVersion}
+                      </span>
+                    </p>
+                    <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+                  </details>
                 </div>
               )}
+              {/* Pavilion B3: the engineering check sits behind a closed disclosure, apart from the result. */}
+              <details className="technical-details" data-testid="replay-check">
+              <summary>Replay check (technical)</summary>
               <button
                 disabled={busy || fatal}
                 onClick={() => send({ type: "VERIFY" })}
@@ -1786,6 +1802,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   </p>
                 </div>
               )}
+              </details>
             </section>
           )}
           <span id="dugout-scorecard" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Scorecard: analytics, scorecard and commentary" />
@@ -1914,6 +1931,66 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </section>
           </div>
+        </>
+      )}
+      {view && (
+        <>
+          {/* Pavilion B4: settings live together at the foot of the match, out of the play column. */}
+          <span id="dugout-settings" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Settings group" />
+          <section className="match-settings" aria-labelledby="match-settings-heading">
+            <h2 id="match-settings-heading">Match settings</h2>
+          {preferences}
+          <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
+            <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
+            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
+              onChange={e => changeAiOpponent(e.target.value)}>
+              <option value="">Manual decisions for both teams</option>
+              {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
+            </select>
+            <span>The computer picks this team's batters, bowlers and tactics. You still play each ball.</span>
+          </section>
+          {(() => {
+            const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
+            const selected = delegationForTeam(delegation, selectedTeam.id);
+            const currentProfile = redBallProfileForTeam(delegation, selectedTeam.id);
+            const choices: [DelegationCategory, string][] = [
+              ["TOSS", "Toss call"],
+              ["INNINGS", "Bat or bowl"],
+              ["BATTER", "Batter selection"],
+              ["BOWLER", "Bowler selection"],
+              ["BATTING_PLAN", "Batting plan"],
+              ["BOWLING_PLAN", "Bowling plan"],
+              ...(view.format !== "T20" ? [["FIELD", "Field placement"]] as [DelegationCategory, string][] : []),
+              ...(view.format === "RED_BALL" ? [["DECLARATION", "Declaration"], ["FOLLOW_ON", "Follow-on"], ["NEW_BALL", "New ball"]] as [DelegationCategory, string][] : []),
+            ];
+            return <details className="career-panel" id="captain-delegation">
+              <summary>Delegate individual decisions</summary>
+              <p>Choose which decisions the tactical captain may make. These choices are saved with the match.</p>
+              <label>Delegation team <select value={selectedTeam.id} disabled={busy || fatal} onChange={event => setDelegationTeam(event.currentTarget.value)}>{view.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
+              {view.format === "RED_BALL" && (
+                <div>
+                  <label>Red-ball tactical profile <select aria-label="Red-ball tactical profile" value={currentProfile} disabled={busy || fatal || Boolean(persistence?.readOnly)} onChange={event => {
+                    const redBallProfile = event.currentTarget.value as RedBallTacticalProfile;
+                    send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories: [...selected], redBallProfile });
+                  }}>
+                    <option value="CONSERVATIVE">Conservative</option>
+                    <option value="BALANCED">Balanced</option>
+                    <option value="AGGRESSIVE">Aggressive</option>
+                  </select></label>
+                  <p data-testid="redball-profile-posture">{RED_BALL_PROFILE_DESCRIPTIONS[currentProfile]}</p>
+                </div>
+              )}
+              {aiTeamId === selectedTeam.id && <p>The tactical captain controls this team until you change the opponent setting.</p>}
+              <fieldset disabled={busy || fatal || Boolean(persistence?.readOnly) || aiTeamId === selectedTeam.id}>
+                <legend>Delegated decisions</legend>
+                {choices.map(([category, label]) => <label key={category}><input type="checkbox" checked={selected.includes(category)} onChange={event => {
+                  const categories = event.currentTarget.checked ? [...selected, category] : selected.filter(value => value !== category);
+                  send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories, ...(view.format === "RED_BALL" ? { redBallProfile: currentProfile } : {}) });
+                }} /> {label}</label>)}
+              </fieldset>
+            </details>;
+          })()}
+          </section>
         </>
       )}
       {view && <span id="dugout-tools" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tools: sound, diagnostic and saves" />}

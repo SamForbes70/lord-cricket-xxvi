@@ -70,6 +70,8 @@ test("an imported roster completes a T20 match and verifies its replay", async (
     await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
     await expect(page.getByRole("alert")).toHaveCount(0);
   }
+  // Pavilion B3: the replay check is a technical disclosure under the result.
+  if ((await page.getByTestId("replay-check").getAttribute("open")) === null) await page.getByTestId("replay-check").locator("summary").click();
   await page.getByRole("button", { name: "Verify replay and scorecard" }).click();
   await expect(page.getByTestId("verification")).toBeVisible({ timeout: 60_000 });
 });
