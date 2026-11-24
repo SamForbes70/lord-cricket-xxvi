@@ -30,6 +30,12 @@ test("the opposition watch reports their bowling or batting from this match, in 
     await expect(watch.getByTestId("opposition-headline")).toHaveText(/^(Most dangerous today: .+, \d+(\.\d)?-\d+-\d+-\d+, \d+ overs? left\.|No wickets for their bowlers yet\.|.+ has bowled out .+)$/);
   } else {
     // With two batters in, the batters still to come are the wickets in hand less one (the partner at the crease).
+    // The player's side is bowling, so the next step may be choosing a bowler: answer it first.
+    for (let n = 0; n < 5 && (await decision.getAttribute("data-phase")) !== "READY"; n += 1) {
+      const pick = decision.locator("button[data-candidate]:enabled");
+      if ((await pick.count()) > 0) await pick.first().click();
+      await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
+    }
     await expect(decision).toHaveAttribute("data-phase", "READY");
     const inHand = Number(/(\d+) wickets? in hand/.exec((await page.getByTestId("situation-headline").textContent())!)![1]);
     await expect(watch).toContainText(inHand - 1 === 0 ? "No batters left to come" : `${inHand - 1} batter${inHand - 1 === 1 ? "" : "s"} still to come`);
