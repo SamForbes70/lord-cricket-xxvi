@@ -12,8 +12,12 @@ test("routine picks are made for the player, key moments are asked, and the swit
   const routine = decision.getByTestId("routine-picks");
   const toggle = routine.getByRole("checkbox", { name: /routine batter and bowler picks/ });
   await expect(toggle).toBeChecked();
+  // The side calling the toss is the player's own; make sure that side bats first, whichever way the coin falls.
+  const playerSide = (await decision.getByRole("heading", { level: 2 }).textContent())!.replace(/: call the toss$/i, "");
   await decision.getByRole("button", { name: "Call heads" }).click();
-  await decision.getByRole("button", { name: "Bat first" }).click();
+  await expect(decision).toHaveAttribute("data-phase", "AWAITING_INNINGS");
+  const tossWinner = (await decision.getByRole("heading", { level: 2 }).textContent())!.replace(/ won the toss.*$/i, "");
+  await decision.getByRole("button", { name: tossWinner.toLowerCase() === playerSide.toLowerCase() ? "Bat first" : "Bowl first" }).click();
   // Choosing the openers is a key moment, so the player is asked.
   await expect(decision).toHaveAttribute("data-phase", "AWAITING_BATTER");
   await expect(routine.getByTestId("routine-key")).toHaveText("Key moment: your openers. Your choice.");

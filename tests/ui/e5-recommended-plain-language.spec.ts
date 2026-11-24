@@ -7,6 +7,8 @@ test("batter and bowler questions mark the computer captain's choice, which the 
   await page.goto("/#title");
   await page.getByRole("button", { name: /Quick match/ }).click();
   await expect(page.getByTestId("scorestrip")).toBeVisible({ timeout: 60_000 });
+  // These checks cover the player answering every question, so take back the side the quick match gives the computer.
+  await page.locator("#ai-opponent-select").selectOption("");
   await page.getByRole("button", { name: "Call heads" }).click();
   await page.getByRole("button", { name: "Bat first" }).click();
   const decision = page.locator("#decision");
@@ -33,6 +35,8 @@ test("every decision marks the computer captain's choice: bat or bowl, and the b
   await page.goto("/#title");
   await page.getByRole("button", { name: /Quick match/ }).click();
   await expect(page.getByTestId("scorestrip")).toBeVisible({ timeout: 60_000 });
+  // These checks cover the player answering every question, so take back the side the quick match gives the computer.
+  await page.locator("#ai-opponent-select").selectOption("");
   const decision = page.locator("#decision");
   // A coin call has no better side, so the toss says so instead of marking one.
   await expect(decision.getByText("A coin toss: neither call is better, so no choice is recommended.")).toBeVisible();
