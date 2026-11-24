@@ -14,7 +14,8 @@ async function playToTheEnd(page: Page) {
     if (phase === "TOSS") await decision.getByRole("button", { name: "Call heads" }).click();
     // "Bat first" can show for a moment while the computer makes its own choice, so a missed click is fine.
     else if (phase === "AWAITING_INNINGS") await decision.getByRole("button", { name: "Bat first" }).click({ timeout: 2_000 }).catch(() => undefined);
-    else if ((await candidate.count()) > 0) await candidate.first().click();
+    // A routine pick (Pavilion B2) can make this choice between the count and the click; the loop then reads the new phase.
+    else if ((await candidate.count()) > 0) await candidate.first().click({ timeout: 2_000 }).catch(() => undefined);
     else if (await decision.getByRole("button", { name: "Finish match", exact: true }).isEnabled().catch(() => false))
       await decision.getByRole("button", { name: "Finish match", exact: true }).click();
     else await page.waitForTimeout(200);
