@@ -1,0 +1,39 @@
+{
+  "version": "LC_PAVILION_P04A_MEASURE_V1",
+  "model": "synthetic-alpha-01",
+  "innings": "first innings of the 100-seed Pass 07B corpus",
+  "results": [
+    {
+      "setUp": "corpus eleven, fixture autopilot",
+      "runs": 83.2,
+      "wickets": 8.18,
+      "allOutOf100": 33,
+      "dotPercent": 60,
+      "boundaryPercent": 8.2
+    },
+    {
+      "setUp": "suggested eleven, fixture autopilot",
+      "runs": 103.8,
+      "wickets": 7.17,
+      "allOutOf100": 20,
+      "dotPercent": 55.1,
+      "boundaryPercent": 11
+    },
+    {
+      "setUp": "corpus eleven, tactical captain",
+      "runs": 84.9,
+      "wickets": 8.26,
+      "allOutOf100": 36,
+      "dotPercent": 60.1,
+      "boundaryPercent": 8.4
+    },
+    {
+      "setUp": "suggested eleven, tactical captain",
+      "runs": 104.2,
+      "wickets": 7.55,
+      "allOutOf100": 27,
+      "dotPercent": 55.1,
+      "boundaryPercent": 11.1
+    }
+  ]
+}

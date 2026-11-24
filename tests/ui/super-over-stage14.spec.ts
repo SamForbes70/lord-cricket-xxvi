@@ -13,6 +13,16 @@ import { ARCHIVE_PINS, ODI_ARCHIVE_PINS, UI_VERSION } from "../../apps/web/src/m
 // overs under the autopilot; see the unit test) in Node and loads it through the ordinary "Import saved game" control.
 const root = resolve(import.meta.dirname, "../..");
 
+// The tied seeds below were found with the suggested eleven of Stage 14 (keeper, the first six bowling-capable players,
+// then squad order). Pavilion P04 stage A changed the suggested eleven, so these tests field that original eleven
+// explicitly: they test super-over rules, not team selection.
+const stage14Eleven = (team: { id: string; players: readonly { id: string; role: string; canBowl: boolean }[] }) => {
+  const keeper = team.players.find((p) => p.role === "KEEPER")!;
+  const bowlers = team.players.filter((p) => p.id !== keeper.id && p.canBowl).slice(0, 6);
+  const xi = [keeper, ...bowlers, ...team.players.filter((p) => p !== keeper && !bowlers.includes(p))].slice(0, 11);
+  return { teamId: team.id, playerIds: xi.map((p) => p.id), captainId: keeper.id, keeperId: keeper.id };
+};
+
 async function tiedArchive(format: "T20" | "ODI" = "T20"): Promise<string> {
   const worldBytes = new Uint8Array(readFileSync(resolve(root, "packages/data/worlds/fictional-eight-01.json")));
   const manifest = JSON.parse(readFileSync(resolve(root, "packages/data/worlds/fictional-eight-01.manifest.json"), "utf8"));
@@ -20,7 +30,7 @@ async function tiedArchive(format: "T20" | "ODI" = "T20"): Promise<string> {
   if (format === "T20") {
     const ctl = createMatchController(worldBytes, manifest, () => "lc-tie-469", () => ({ gameId: "game-super-over-spec", matchId: "human-t20" }));
     const catalog = ctl.currentResponse("ui-0").catalog!;
-    const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+    const pick = (id: string) => stage14Eleven(catalog.teams.find((t) => t.id === id)!);
     ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "T20", selections: [pick("team-03"), pick("team-06")], groundId: "ground-03" });
     let t = ctl.snapshot()!;
     while (t.core.phase !== "COMPLETE") t = executeT20Command(t, fixtureAutopilotStep(t)).session;
@@ -28,7 +38,7 @@ async function tiedArchive(format: "T20" | "ODI" = "T20"): Promise<string> {
   } else {
     const ctl = createODIMatchController(worldBytes, manifest, () => "lc-odi-tie-8", () => ({ gameId: "game-odi-super-over-spec", matchId: "human-odi" }));
     const catalog = ctl.currentResponse("ui-0").catalog!;
-    const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+    const pick = (id: string) => stage14Eleven(catalog.teams.find((t) => t.id === id)!);
     ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "ODI", selections: [pick("team-01"), pick("team-02")], groundId: "ground-01" });
     let o = ctl.snapshot() as ODISession;
     while (o.core.phase !== "COMPLETE") o = executeODICommand(o, odiFixtureAutopilotStep(o)).session;
