@@ -42,3 +42,45 @@ test("the guided first match explains each decision and can be ended", async ({ 
   await expect(page.locator("#decision")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("guided-coach")).toHaveCount(0);
 });
+
+// Pavilion P03a: a quick match is the player's side against the computer captain, not a hot seat for both XIs.
+test("a quick match gives the second side to the computer captain, which the player can change", async ({ page }) => {
+  await page.goto("/#title");
+  await page.getByRole("button", { name: /Quick match/ }).click();
+  const decision = page.locator("#decision");
+  await expect(decision).toHaveAttribute("data-phase", "TOSS", { timeout: 30_000 });
+  const opponent = page.locator("#ai-opponent-select");
+  await expect(opponent.locator("option:checked")).toHaveText(/ controlled by AI$/);
+  const aiName = (await opponent.locator("option:checked").innerText()).replace(/ controlled by AI$/, "");
+  const names = await opponent.locator("option").allInnerTexts();
+  const playerName = names.map((t) => t.replace(/ controlled by AI$/, "")).find((t) => t !== aiName && !t.startsWith("Manual"))!;
+  // The toss is the player's call.
+  await expect(decision).toContainText(`${playerName}: call the toss`, { ignoreCase: true });
+  await page.getByRole("button", { name: "Call heads" }).click();
+  await expect(decision).not.toHaveAttribute("data-phase", "TOSS", { timeout: 30_000 });
+  // Whoever wins the toss makes the bat-or-bowl choice: the player if they won it, otherwise the computer.
+  if ((await decision.getAttribute("data-phase")) === "AWAITING_INNINGS" && (await decision.getByRole("button", { name: "Bat first" }).count()) > 0) {
+    await expect(decision).toContainText(`${playerName} won the toss`, { ignoreCase: true });
+    await decision.getByRole("button", { name: "Bat first" }).click();
+  }
+  await expect(decision).not.toHaveAttribute("data-phase", /^(TOSS|AWAITING_INNINGS)$/, { timeout: 30_000 });
+  // Every selection the player is offered is for the player's own side.
+  let offered = 0;
+  for (let n = 0; n < 40 && offered < 3; n += 1) {
+    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
+    const phase = await decision.getAttribute("data-phase");
+    const enabled = decision.locator("button[data-candidate]:enabled");
+    if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await enabled.count()) > 0) {
+      await expect(decision).toContainText(playerName, { ignoreCase: true });
+      await expect(decision).not.toContainText(`${aiName}:`, { ignoreCase: true });
+      offered += 1;
+      await enabled.first().click();
+    } else if (phase === "READY") {
+      await decision.getByRole("button", { name: "Finish over", exact: true }).click();
+    } else await page.waitForTimeout(200);
+  }
+  expect(offered).toBeGreaterThan(0);
+  // The setting stays the player's to change.
+  await opponent.selectOption("");
+  await expect(opponent.locator("option:checked")).toHaveText("Manual decisions for both teams");
+});
