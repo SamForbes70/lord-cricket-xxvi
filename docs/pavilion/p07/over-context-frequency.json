@@ -1,0 +1,19 @@
+{
+  "overs": 3570,
+  "withContext": 752,
+  "share": 0.211,
+  "slots": {
+    "collapse": 274,
+    "boundaryDrought": 201,
+    "deathOvers": 155,
+    "expensiveOver": 87,
+    "askingRate": 35
+  },
+  "examples": {
+    "collapse": "After 2 overs, Aster Harbour move to 13/4 (1 from Rilan Rookfield's over). 4 wickets for 13 runs in the last 2 overs.",
+    "boundaryDrought": "End of over 7 (3 runs, 1 wkt): Aster Harbour 31/6. No boundary for 25 balls.",
+    "deathOvers": "Over 15 complete — 7 off it. Aster Harbour are 67/9. Into the death overs.",
+    "expensiveOver": "End of over 3 (14 runs, 1 wkt): Silver Fen 21/1. The most expensive over of the innings.",
+    "askingRate": "After 18 overs, Copper Vale move to 41/9 (1 from Ari Ashford's over) (33 needed from 12 balls). The asking rate is up to 16.5 an over."
+  }
+}
