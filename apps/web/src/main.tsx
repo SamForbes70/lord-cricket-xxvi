@@ -80,6 +80,7 @@ import {
 } from "@lcxxvi/contracts";
 import { RED_BALL_PROFILE_DESCRIPTIONS } from "@lcxxvi/ai";
 import type { DelegationCategory } from "./match/ai-opponent.js";
+import { readRoutinePicks, routinePickMoment, writeRoutinePicks } from "./match/routine-picks.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
@@ -668,6 +669,33 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       return;
     }
   }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly, matchAware, highlights]);
+  // Pavilion B2: the computer makes the player's routine batter and bowler picks (the "Recommended" choice, sent as
+  // the same command a click sends) and leaves key moments to the player. Never in scenarios or red-ball matches.
+  const [routinePicks, setRoutinePicks] = useState(readRoutinePicks);
+  const [routineNote, setRoutineNote] = useState("");
+  const lastRoutineRevision = useRef(-1);
+  const routineDecision = view && (view.phase === "AWAITING_BATTER" || view.phase === "AWAITING_BOWLER") && captainedTeam &&
+    view.decisionTeamId === captainedTeam && aiTeamId !== captainedTeam && !scenario && view.format !== "RED_BALL"
+    ? (() => {
+        const inn = view.innings[view.activeIndex]?.innings;
+        const decision = view.phase === "AWAITING_BATTER" ? "BATTER" as const : "BOWLER" as const;
+        const runsNeeded = inn?.targetToWin == null ? null : Math.max(0, inn.targetToWin - inn.runs);
+        return { decision, moment: routinePickMoment({ format: view.format, decision, legalBalls: inn?.legalBalls ?? 0, wickets: inn?.wickets ?? 0, runsNeeded }) };
+      })()
+    : null;
+  useEffect(() => {
+    if (!routinePicks || !view || !routineDecision || routineDecision.moment.key) return;
+    if (busy || inflight.current || heldPanelClick.current || fatal || error || persistence?.readOnly) return;
+    if (delegationForTeam(delegation, view.decisionTeamId!).includes(routineDecision.decision)) return;
+    if (lastRoutineRevision.current === view.revision) return;
+    const pick = view.candidates.find((c) => c.recommended && !c.reason);
+    if (!pick) return;
+    lastRoutineRevision.current = view.revision;
+    setRoutineNote(routineDecision.decision === "BOWLER" ? `Routine pick: ${pick.name} bowls the next over.` : `Routine pick: ${pick.name} comes in to bat.`);
+    act(routineDecision.decision === "BATTER"
+      ? { kind: "SET_BATTER", payload: { teamId: view.decisionTeamId!, playerId: pick.id } }
+      : { kind: "SET_BOWLER", payload: { teamId: view.decisionTeamId!, bowlerId: pick.id } });
+  }, [view, busy, fatal, error, persistence?.readOnly, routinePicks, delegation]);
   // Let the ordinary opponent policy finish its commands before resuming the passage.
   useEffect(() => {
     const active = passage.current;
@@ -1374,6 +1402,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     Bat again
                   </button>
                   {view.recommendation?.followOn === false && <RecommendedTag id="recommended-bat-again" />}
+                </div>
+              )}
+              {limitedOvers && !scenario && captainedTeam && (
+                <div className="routine-picks" data-testid="routine-picks">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={routinePicks}
+                      onChange={(e) => { setRoutinePicks(e.currentTarget.checked); writeRoutinePicks(e.currentTarget.checked); }}
+                    />{" "}
+                    Computer makes routine batter and bowler picks; you choose at key moments
+                  </label>
+                  {routineDecision?.moment.key && routinePicks && <p className="routine-key" data-testid="routine-key">{routineDecision.moment.reason} Your choice.</p>}
+                  {routineNote && <p role="status" className="routine-note" data-testid="routine-note">{routineNote}</p>}
                 </div>
               )}
               {(view.phase === "AWAITING_BATTER" ||
