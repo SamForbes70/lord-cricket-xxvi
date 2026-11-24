@@ -12,7 +12,8 @@ async function playToEnd(page: Page) {
     if (phase === "COMPLETE") break;
     const candidate = page.locator("button[data-candidate]:enabled").first();
     const finishOver = page.getByRole("button", { name: "Finish over", exact: true });
-    if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click();
+    // A routine pick (Pavilion B2) can make this choice between the count and the click; the loop then reads the new phase.
+    if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click({ timeout: 2_000 }).catch(() => undefined);
     else if (phase === "READY" && (await finishOver.isEnabled().catch(() => false))) await finishOver.click();
     // Otherwise the tactical captain is choosing for its own side; give it a moment.
     else await page.waitForTimeout(200);

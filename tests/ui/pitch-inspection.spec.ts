@@ -15,8 +15,8 @@ test("shows the selected ground's effective pitch before the toss in every forma
     for (const format of ["T20", "ODI", "RED_BALL"]) {
       await page.getByLabel("Format", { exact: true }).selectOption(format);
       await expect(panel).toContainText(ground.name);
-      await expect(panel).toContainText(`${(ground.pitchPrior.seamBp / 100).toFixed(2)} / 100`);
-      await expect(panel).toContainText(`${(ground.pitchPrior.turnBp / 100).toFixed(2)} / 100`);
+      await expect(panel).toContainText(`${Math.round(ground.pitchPrior.seamBp / 100)} / 100`);
+      await expect(panel).toContainText(`${Math.round(ground.pitchPrior.turnBp / 100)} / 100`);
       await expect(panel).toContainText("Moisture, bounce variability and outfield speed have no effect");
       await expect(panel).toContainText(format === "RED_BALL" ? "delays are not scheduled automatically" : "Rain interruptions are disabled");
       await expect(panel).toContainText("no forecast is available");

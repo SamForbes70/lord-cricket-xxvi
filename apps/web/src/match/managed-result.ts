@@ -38,12 +38,10 @@ export function regenerateManagedResult(
     throw new Error("The saved match belongs to an imported roster, not this career.");
   }
   const copy = saved.worldCopy ?? null;
-  const expectedCopy =
-    launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2"
-      ? launch.worldCopy
-      : launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE"
-        ? (launch.worldCopy ?? null)
-        : null;
+  // A roster-pack match (V3, V4) stores no world copy: persistence keeps one world type per save, and the names come
+  // from the hash-checked launch, which the BOOT below binds. This is the same rule the match worker applies when it
+  // rebinds a saved match. Only a V2 launch (an edited world without a roster pack) stores its copy with the match.
+  const expectedCopy = roster ? null : launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V2" ? launch.worldCopy : null;
   if (canonicalJson(copy) !== canonicalJson(expectedCopy)) throw new Error("The saved match belongs to a different world copy.");
 
   const controller = createMatchController(worldBytes, manifest, () => "regeneration-never-draws");
