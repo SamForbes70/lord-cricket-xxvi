@@ -59,10 +59,11 @@ test("a quick match gives the second side to the computer captain, which the pla
   await page.getByRole("button", { name: "Call heads" }).click();
   await expect(decision).not.toHaveAttribute("data-phase", "TOSS", { timeout: 30_000 });
   // Whoever wins the toss makes the bat-or-bowl choice: the player if they won it, otherwise the computer.
-  if ((await decision.getAttribute("data-phase")) === "AWAITING_INNINGS" && (await decision.getByRole("button", { name: "Bat first" }).count()) > 0) {
-    await expect(decision).toContainText(`${playerName} won the toss`, { ignoreCase: true });
+  // The "Bat first" button shows for whichever side won, even for a moment while the computer decides, so read the
+  // toss heading rather than the button (seen on hosted Windows CI, run 45344271062).
+  const tossHeading = (await decision.getByRole("heading", { level: 2 }).textContent()) ?? "";
+  if ((await decision.getAttribute("data-phase")) === "AWAITING_INNINGS" && tossHeading.toLowerCase().startsWith(`${playerName.toLowerCase()} won the toss`))
     await decision.getByRole("button", { name: "Bat first" }).click();
-  }
   await expect(decision).not.toHaveAttribute("data-phase", /^(TOSS|AWAITING_INNINGS)$/, { timeout: 30_000 });
   // Every selection the player is offered is for the player's own side.
   let offered = 0;
