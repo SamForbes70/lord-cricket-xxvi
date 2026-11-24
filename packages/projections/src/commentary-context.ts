@@ -92,3 +92,68 @@ export function overContext(input: OverContextInput): OverContext | null {
 
   return null;
 }
+
+/**
+ * Pavilion P07 (second slice): one line of context when a wicket falls in a T20 or one-day innings, by priority:
+ * the partnership it breaks (when worth 30 or more), the equation the new batter walks into in a tight chase (the
+ * last 36 balls of a T20 or 60 of a one-day innings, or an asking rate of 9 or more), or how many
+ * wickets are left once seven are down. Null when none applies, or when the innings or match is over.
+ */
+export interface WicketContextInput {
+  format: "T20" | "ODI" | "RED_BALL";
+  /** The partnership the wicket ended. */
+  standRuns: number;
+  standBalls: number;
+  /** Innings totals after the wicket. */
+  runs: number;
+  wickets: number;
+  legalBalls: number;
+  targetToWin: number | null;
+}
+
+const BIG_STAND_RUNS = 30;
+const TAIL_FROM_WICKETS = 7;
+
+export function wicketContext(input: WicketContextInput): { slot: "standBroken" | "newBatterTask" | "wicketsLeft"; text: string } | null {
+  if (input.format === "RED_BALL" || input.wickets >= 10) return null;
+  const balls = SHAPE[input.format].balls;
+  if (input.legalBalls >= balls || (input.targetToWin !== null && input.runs >= input.targetToWin)) return null;
+  if (input.standRuns >= BIG_STAND_RUNS)
+    return { slot: "standBroken", text: `That breaks a stand of ${input.standRuns} from ${input.standBalls} ball${input.standBalls === 1 ? "" : "s"}.` };
+  if (input.targetToWin !== null) {
+    const needed = input.targetToWin - input.runs, left = balls - input.legalBalls;
+    // Only when the chase is at its business end or the asking rate is 9 or more: early in a chase it adds little.
+    const businessEnd = left <= (input.format === "T20" ? 36 : 60);
+    if (businessEnd || needed * 600 >= 900 * left)
+      return { slot: "newBatterTask", text: `The new batter comes in with ${needed} needed from ${left} ball${left === 1 ? "" : "s"}.` };
+  }
+  if (input.wickets >= TAIL_FROM_WICKETS) {
+    const left = 10 - input.wickets;
+    return { slot: "wicketsLeft", text: `${left} wicket${left === 1 ? "" : "s"} left.` };
+  }
+  return null;
+}
+
+/**
+ * Pavilion P07 (second slice): the close of a T20 or one-day innings in one line: the top score and the best
+ * bowling. (The target is left to the next innings' opening line, which already states it.) Ties go to fewer balls (batting) or fewer runs (bowling), then
+ * the id, so the line never depends on locale. Null in red-ball matches or when nobody scored or took a wicket.
+ */
+export interface InningsSummaryInput {
+  format: "T20" | "ODI" | "RED_BALL";
+  batters: ReadonlyMap<string, { runs: number; ballsFaced: number }>;
+  bowlers: ReadonlyMap<string, { wickets: number; runsConceded: number; legalBalls: number }>;
+  names: Readonly<Record<string, string>>;
+}
+
+const byId = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+
+export function inningsSummary(input: InningsSummaryInput): string | null {
+  if (input.format === "RED_BALL") return null;
+  const parts: string[] = [];
+  const top = [...input.batters].filter(([, b]) => b.runs > 0).sort(([ia, a], [ib, b]) => b.runs - a.runs || a.ballsFaced - b.ballsFaced || byId(ia, ib))[0];
+  if (top) parts.push(`Top score: ${input.names[top[0]] ?? "a batter"} ${top[1].runs} (${top[1].ballsFaced}).`);
+  const best = [...input.bowlers].filter(([, b]) => b.wickets > 0).sort(([ia, a], [ib, b]) => b.wickets - a.wickets || a.runsConceded - b.runsConceded || byId(ia, ib))[0];
+  if (best) parts.push(`Best bowling: ${input.names[best[0]] ?? "a bowler"} ${best[1].wickets}-${best[1].runsConceded}.`);
+  return parts.length > 0 ? parts.join(" ") : null;
+}

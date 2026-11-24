@@ -10,7 +10,7 @@ import {
   type MatchCommentaryFeed,
   type MatchResult,
 } from "@lcxxvi/contracts";
-import { overContext, type OverRecord } from "./commentary-context.js";
+import { inningsSummary, overContext, wicketContext, type OverRecord } from "./commentary-context.js";
 
 export const DEFAULT_REPETITION_COOLDOWN_WINDOW = 3 as const;
 
@@ -994,8 +994,14 @@ export function projectMatchCommentary(
       const milestoneSuffix =
         milestoneNotes.length > 0 ? ` ${milestoneNotes.join(" ")}` : "";
 
+      // Pavilion P07: at a wicket, one line on the stand it broke, the new batter's task or the wickets left.
+      const wicketLine = d.dismissal
+        ? wicketContext({ format: input.format, standRuns: standBeforeWicket.runs, standBalls: standBeforeWicket.balls,
+            runs: inn.runs, wickets: inn.wickets, legalBalls: inn.legalBalls, targetToWin: inn.targetToWin })
+        : null;
+      if (wicketLine) factSlots.push({ slot: wicketLine.slot, value: wicketLine.text, sourceKind: "PARTNERSHIP_PROJECTION", sourceRef: "innings.partnership" });
       // Keep `Innings X, ...` prefix strictly on DELIVERY_RECORDED for match-ui invariant compatibility
-      const standardText = `Innings ${d.inningsIndex + 1}, ${coord}: ${picked.selected.render()}${dropNotice}${milestoneSuffix}`;
+      const standardText = `Innings ${d.inningsIndex + 1}, ${coord}: ${picked.selected.render()}${dropNotice}${milestoneSuffix}${wicketLine ? ` ${wicketLine.text}` : ""}`;
 
       const techParts: string[] = [];
       if (wasFreeHit) techParts.push("free-hit delivery");
@@ -1241,9 +1247,12 @@ export function projectMatchCommentary(
       const teamName = tName(inn.battingTeamId);
       const oversStr = formatOvers(inn.legalBalls);
       const allOut = inn.wickets >= 10;
-      const standardText = allOut
+      // Pavilion P07: the innings in one more line, its top score and best bowling.
+      const summary = inningsSummary({ format: input.format, batters: inn.batters, bowlers: inn.bowlers, names: input.playerNames });
+      const closeText = allOut
         ? `End of innings ${p.inningsIndex + 1}: ${teamName} all out for ${inn.runs} in ${oversStr} overs.`
         : `End of innings ${p.inningsIndex + 1}: ${teamName} close on ${inn.runs}/${inn.wickets} (${oversStr} overs).`;
+      const standardText = summary ? `${closeText} ${summary}` : closeText;
       entries.push({
         adapterVersion: COMMENTARY_ADAPTER_VERSION,
         sequence: ev.sequence,
@@ -1276,6 +1285,7 @@ export function projectMatchCommentary(
             sourceKind: "INNINGS_PROJECTION",
             sourceRef: "innings.legalBalls",
           },
+          ...(summary ? [{ slot: "inningsSummary", value: summary.slice(0, 160), sourceKind: "INNINGS_PROJECTION" as const, sourceRef: "innings.batters+bowlers" }] : []),
         ],
       });
       continue;
