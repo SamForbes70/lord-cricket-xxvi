@@ -553,3 +553,7 @@ input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color:
 @media (max-width: 640px) {
   .player-hero { grid-template-columns: auto 1fr; grid-template-areas: "face main" "ovr ovr" "bars bars"; }
 }
+
+/* Project Pavilion B9: opposition watch at the top of the tactics group. */
+.opposition-watch ul { margin: 0.25rem 0 0; padding-left: 1.1rem; color: var(--fl-muted); }
+.opposition-watch p { margin: 0.25rem 0; }
