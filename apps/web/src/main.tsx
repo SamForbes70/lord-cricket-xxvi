@@ -115,7 +115,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     currentRevision = useRef(0);
   const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number; cancel: boolean; from: number | null } | null>(null);
   const [batchState, setBatchState] = useState<"idle" | "running" | "stopping">("idle");
-  const resumeAfterRoutine = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number } | null>(null);
   const [guided, setGuided] = useState(() => { try { return localStorage.getItem(GUIDED_MATCH_KEY) === "1"; } catch { return false; } });
   const [batchProgress, setBatchProgress] = useState<{ from: number; to: number } | null>(null);
   const careerLaunch = useRef<CareerUserMatchLaunch | null>((() => {
@@ -414,9 +413,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           batch.from ??= r.acknowledgement.fromSequence;
           setBatchProgress({ from: batch.from, to: r.acknowledgement.toSequence });
         }
-        const continueBatch = !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
+        const routineInBatch = !batch.cancel && acknowledged && !r.error && r.view && !r.persistence?.readOnly && batch.remaining > 1 &&
+          (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) ? routinePickFor(r.view) : null;
+        const continueBatch = !routineInBatch && !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
           !r.persistence?.readOnly && (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) && --batch.remaining > 0;
-        if (continueBatch) {
+        if (routineInBatch && r.view) {
+          batch.remaining -= 1;
+          sendRoutinePick(w, r.view, r.revision, routineInBatch);
+        } else if (continueBatch) {
           const requestId = `ui-${++serial.current}`;
           inflight.current = requestId;
           w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
@@ -424,12 +428,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         } else {
           if (!r.error && !acknowledged) batchError = "Simulation stopped because the last command was not acknowledged.";
           else if (!r.error && batch.remaining <= 0) batchError = "Simulation stopped at its command limit.";
-          // Pavilion B2: if the stop is a batter or bowler choice, a routine pick may answer it; then the batch carries on.
-          if (!batch.cancel && acknowledged && !r.error && (r.view?.phase === "AWAITING_BATTER" || r.view?.phase === "AWAITING_BOWLER"))
-            resumeAfterRoutine.current = { scope: batch.scope, innings: batch.innings };
           advanceBatch.current = null;
           setBatchState("idle");
         }
+      }
+      if (!advanceBatch.current && !inflight.current && r.view && !r.error && !r.persistence?.readOnly) {
+        const routine = routinePickFor(r.view);
+        if (routine) sendRoutinePick(w, r.view, r.revision, routine);
       }
       setBusy(inflight.current !== null);
       setError(r.error ?? batchError);
@@ -677,7 +682,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   // the same command a click sends) and leaves key moments to the player. Never in scenarios or red-ball matches.
   const [routinePicks, setRoutinePicks] = useState(readRoutinePicks);
   const [routineNote, setRoutineNote] = useState("");
-  const lastRoutineRevision = useRef(-1);
   // Routine picks only follow the player's own play in this page: a reload or recovery never moves the match on.
   const routineArmed = useRef(false);
   const routineDecision = view && (view.phase === "AWAITING_BATTER" || view.phase === "AWAITING_BOWLER") && captainedTeam &&
@@ -689,29 +693,33 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         return { decision, moment: routinePickMoment({ format: view.format, decision, legalBalls: inn?.legalBalls ?? 0, wickets: inn?.wickets ?? 0, runsNeeded }) };
       })()
     : null;
-  useEffect(() => {
-    if (!view || busy || inflight.current) return;
-    const resume = resumeAfterRoutine.current;
-    if (resume && view.phase === "READY") {
-      // The routine pick has been made: carry on with the advance the player asked for.
-      resumeAfterRoutine.current = null;
-      if (resume.scope !== "INNINGS" || view.activeIndex === resume.innings) advanceTo(resume.scope);
-      return;
-    }
-    const stopHere = () => { resumeAfterRoutine.current = null; };
-    if (!routinePicks || !routineDecision || routineDecision.moment.key) return stopHere();
-    if (heldPanelClick.current || fatal || error || persistence?.readOnly) return stopHere();
-    if (delegationForTeam(delegation, view.decisionTeamId!).includes(routineDecision.decision)) return stopHere();
-    if (!routineArmed.current) return stopHere();
-    if (lastRoutineRevision.current === view.revision) return;
-    const pick = view.candidates.find((c) => c.recommended && !c.reason);
-    if (!pick) return stopHere();
-    lastRoutineRevision.current = view.revision;
-    setRoutineNote(routineDecision.decision === "BOWLER" ? `Routine pick: ${pick.name} bowls the next over.` : `Routine pick: ${pick.name} comes in to bat.`);
-    act(routineDecision.decision === "BATTER"
-      ? { kind: "SET_BATTER", payload: { teamId: view.decisionTeamId!, playerId: pick.id } }
-      : { kind: "SET_BOWLER", payload: { teamId: view.decisionTeamId!, bowlerId: pick.id } });
-  }, [view, busy, fatal, error, persistence?.readOnly, routinePicks, delegation]);
+  // The worker reply handler is created once, so it reads the current routine-pick context through a ref.
+  const routineContext = useRef({ on: routinePicks, captainedTeam, aiTeamId, scenario: Boolean(scenario), delegation });
+  routineContext.current = { on: routinePicks, captainedTeam, aiTeamId, scenario: Boolean(scenario), delegation };
+  function routinePickFor(v: View): { decision: "BATTER" | "BOWLER"; playerId: string; name: string } | null {
+    const ctx = routineContext.current;
+    if (!ctx.on || !routineArmed.current || ctx.scenario || v.format === "RED_BALL") return null;
+    if (v.phase !== "AWAITING_BATTER" && v.phase !== "AWAITING_BOWLER") return null;
+    if (!ctx.captainedTeam || v.decisionTeamId !== ctx.captainedTeam || ctx.aiTeamId === ctx.captainedTeam) return null;
+    const decision = v.phase === "AWAITING_BATTER" ? "BATTER" as const : "BOWLER" as const;
+    if (delegationForTeam(ctx.delegation, v.decisionTeamId).includes(decision)) return null;
+    const inn = v.innings[v.activeIndex]?.innings;
+    const runsNeeded = inn?.targetToWin == null ? null : Math.max(0, inn.targetToWin - inn.runs);
+    if (routinePickMoment({ format: v.format, decision, legalBalls: inn?.legalBalls ?? 0, wickets: inn?.wickets ?? 0, runsNeeded }).key) return null;
+    const pick = v.candidates.find((c) => c.recommended && !c.reason);
+    return pick ? { decision, playerId: pick.id, name: pick.name } : null;
+  }
+  /** Sends the routine pick as the same command the player's click would send, keeping the panel busy meanwhile. */
+  function sendRoutinePick(w: Worker, v: View, revision: number, routine: { decision: "BATTER" | "BOWLER"; playerId: string; name: string }) {
+    const requestId = `ui-${++serial.current}`;
+    inflight.current = requestId;
+    const teamId = v.decisionTeamId!;
+    setRoutineNote(routine.decision === "BOWLER" ? `Routine pick: ${routine.name} bowls the next over.` : `Routine pick: ${routine.name} comes in to bat.`);
+    w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: revision, origin: "HUMAN",
+      command: routine.decision === "BATTER"
+        ? { kind: "SET_BATTER", payload: { teamId, playerId: routine.playerId }, commandId: requestId, expectedRevision: revision, actorId: `USER:${teamId}` }
+        : { kind: "SET_BOWLER", payload: { teamId, bowlerId: routine.playerId }, commandId: requestId, expectedRevision: revision, actorId: `USER:${teamId}` } });
+  }
   // Let the ordinary opponent policy finish its commands before resuming the passage.
   useEffect(() => {
     const active = passage.current;
@@ -873,7 +881,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     worker.current?.postMessage({ version: UI_VERSION, type: "CANCEL_ANALYTICS", requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, targetRequestId: rebuildRequest.current });
   }
   function stopAdvance() {
-    resumeAfterRoutine.current = null;
     setCancelSignal(current => current + 1);
     if (!advanceBatch.current) return;
     advanceBatch.current.cancel = true;

@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-// Pavilion B2: these checks drive whole matches with their own loop, so routine picks (which can restart an advance
-// the loop is about to press) are turned off here; tests/ui/pavilion-routine-picks.spec.ts covers routine picks.
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => { try { localStorage.setItem("lcxxvi-routine-picks", "off"); } catch { /* storage blocked */ } });
-});
-
 test("Stage 10 exhibition match award displays Player of the Match, formula breakdown, and Game award provenance", async ({
   page,
 }) => {

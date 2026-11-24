@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-// Pavilion B2: these checks drive whole matches with their own loop, so routine picks (which can restart an advance
-// the loop is about to press) are turned off here; tests/ui/pavilion-routine-picks.spec.ts covers routine picks.
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => { try { localStorage.setItem("lcxxvi-routine-picks", "off"); } catch { /* storage blocked */ } });
-});
-
 // Stage 15 first slice (owner decision 17 November 2026, answer 5a): fictional tournaments played on the engines.
 test("Stage 15 a one-day series plays match by match to a result that survives a reload", async ({ page }) => {
   test.setTimeout(240_000);
