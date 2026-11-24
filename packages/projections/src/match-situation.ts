@@ -45,6 +45,63 @@ export function likelyT20Total(runs: number, wickets: number, legalBalls: number
   return Math.round((runs + from + (to - from) * within) / 5) * 5;
 }
 
+/** Standard normal cumulative distribution (Abramowitz and Stegun 7.1.26; error below 1.5e-7). Deterministic. */
+function normalCdf(z: number): number {
+  const t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2);
+  const poly = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))));
+  const erf = 1 - poly * Math.exp(-(z * z) / 2);
+  return z >= 0 ? (1 + erf) / 2 : (1 - erf) / 2;
+}
+
+/** Mean and spread of the runs still to come from a point in a T20 innings, from the model's own table. */
+function t20RemainingRuns(wickets: number, legalBalls: number): { mean: number; sd: number } | null {
+  const band = wickets >= 6 ? 3 : Math.floor(wickets / 2);
+  const at = (over: number): { mean: number; sd: number } | null => {
+    if (over >= 20) return { mean: 0, sd: 0 };
+    const row = T20_EXPECTATION_TABLE.rows[over]!;
+    const cell = row[band]!;
+    if (cell.n >= MIN_CELL_INNINGS && cell.meanX10 !== null && cell.sdX10 !== null) return { mean: cell.meanX10 / 10, sd: cell.sdX10 / 10 };
+    let n = 0, mean = 0, square = 0;
+    for (const c of row) if (c.meanX10 !== null && c.sdX10 !== null) {
+      n += c.n; mean += (c.meanX10 / 10) * c.n; square += ((c.sdX10 / 10) ** 2 + (c.meanX10 / 10) ** 2) * c.n;
+    }
+    if (n < MIN_CELL_INNINGS) return null;
+    mean /= n;
+    return { mean, sd: Math.sqrt(Math.max(0, square / n - mean * mean)) };
+  };
+  const over = Math.floor(legalBalls / 6);
+  const from = at(over), to = at(over + 1);
+  if (!from || !to) return null;
+  const within = (legalBalls % 6) / 6;
+  return { mean: from.mean + (to.mean - from.mean) * within, sd: from.sd + (to.sd - from.sd) * within };
+}
+
+/**
+ * Pavilion B9: the chasing side's chance of winning a T20, in percent, from the game's own model: the runs still
+ * needed against the spread of runs the model's first innings went on to add from the same over and wicket band.
+ * Returns 100 or 0 once the chase is decided, otherwise a multiple of 5 from 5 to 95. Null when the table has too
+ * few innings at that point. It describes this synthetic model, not real cricket.
+ */
+export function t20ChaseWinChance(runsNeeded: number, wickets: number, legalBalls: number): number | null {
+  if (runsNeeded <= 0) return 100;
+  if (wickets >= 10 || legalBalls >= 120) return 0;
+  const raw = t20ChaseWinChanceRaw(runsNeeded, wickets, legalBalls);
+  if (raw === null) return null;
+  // Nearest 5, and never 0 or 100 while the chase is open: on the corpus the estimate is off by up to about 14
+  // points in the middle range (docs/pavilion/b9), so more precision would be false.
+  return Math.min(95, Math.max(5, Math.round(raw * 20) * 5));
+}
+
+/** The unrounded chance as a probability (0 to 1), or null where the table is too thin. Used by the evaluation script. */
+export function t20ChaseWinChanceRaw(runsNeeded: number, wickets: number, legalBalls: number): number | null {
+  if (runsNeeded <= 0) return 1;
+  if (wickets >= 10 || legalBalls >= 120) return 0;
+  const remaining = t20RemainingRuns(wickets, legalBalls);
+  if (!remaining) return null;
+  // Needing r runs means scoring at least r: the continuity correction takes the half run below.
+  return remaining.sd > 0 ? 1 - normalCdf((runsNeeded - 0.5 - remaining.mean) / remaining.sd) : remaining.mean >= runsNeeded ? 1 : 0;
+}
+
 export type PressureLevel = "IN_CONTROL" | "IN_THE_BALANCE" | "UNDER_PRESSURE";
 
 export interface MatchSituationInput {

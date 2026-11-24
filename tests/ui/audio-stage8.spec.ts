@@ -90,7 +90,9 @@ test("Stage 8 optional sound and narration supports gesture gating, mixer contro
   if (phaseBefore === "AWAITING_BATTER" || phaseBefore === "AWAITING_BOWLER") {
     await page.locator("#decision button[data-candidate]:not([disabled])").first().click();
   } else {
-    await page.getByRole("button", { name: "Next ball", exact: true }).click();
+    // The match screen's single-ball control is "Next delivery" ("Next ball" is the rain-match screen's). This branch
+    // only ran once routine picks (Pavilion B2) left the match ready instead of at a bowler choice.
+    await page.getByRole("button", { name: "Next delivery", exact: true }).click();
   }
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
   await expect(page.getByTestId("audio-caption-banner")).toBeVisible();
