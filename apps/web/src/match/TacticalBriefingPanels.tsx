@@ -54,8 +54,8 @@ export function PreMatchBriefingPanel({
             <h3>Pitch &amp; format playing conditions</h3>
             <p>
               <strong>{TENDENCY_LABEL[briefing.ground.pitchTendency]}</strong> · Seam{" "}
-              {(briefing.ground.seamBp / 100).toFixed(2)}/100 · Spin{" "}
-              {(briefing.ground.turnBp / 100).toFixed(2)}/100
+              {Math.round(briefing.ground.seamBp / 100)}/100 · Spin{" "}
+              {Math.round(briefing.ground.turnBp / 100)}/100
             </p>
             <p>{briefing.ground.pitchSummary}</p>
             <p>{briefing.ground.formatRulesSummary}</p>
