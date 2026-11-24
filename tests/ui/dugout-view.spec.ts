@@ -42,12 +42,14 @@ test("the decision fits the first screen and the jump bar reaches each group of 
   const groups: [button: string, anchor: string, panel: ReturnType<typeof page.locator>][] = [
     ["Tactics", "dugout-tactics", page.getByRole("heading", { name: "Tactics", exact: true })],
     ["Scorecard", "dugout-scorecard", page.getByRole("heading", { name: "Scorecard", exact: true })],
-    ["Captain", "dugout-captain", page.getByRole("region", { name: "Opponent captain control" })],
+    ["Captain", "dugout-captain", page.getByRole("region", { name: "Match pace" })],
+    ["Settings", "dugout-settings", page.getByRole("region", { name: "Opponent captain control" })],
     ["Tools", "dugout-tools", page.getByRole("region", { name: "Match diagnostic export" })],
   ];
   for (const [button, anchor, panel] of groups) {
     await page.evaluate(() => window.scrollTo(0, 0));
-    await expect(panel).not.toBeInViewport();
+    // The captain's pace panel now sits directly under the jump bar, so it can already be partly on the first screen.
+    if (button !== "Captain") await expect(panel).not.toBeInViewport();
     await jump.getByRole("button", { name: button, exact: true }).click();
     await expect(page.locator(`#${anchor}`)).toBeFocused();
     await expect(panel).toBeInViewport({ timeout: 10_000 });
