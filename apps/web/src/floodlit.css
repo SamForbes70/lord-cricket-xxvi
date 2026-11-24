@@ -554,6 +554,15 @@ input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color:
   .player-hero { grid-template-columns: auto 1fr; grid-template-areas: "face main" "ovr ovr" "bars bars"; }
 }
 
+/* Project Pavilion B2: routine picks switch and notes in the decision panel. */
+.routine-picks { display: grid; gap: 0.25rem; margin: 0.25rem 0 0.5rem; color: var(--fl-muted); font-size: 0.92em; }
+.routine-picks label { display: inline-flex; gap: 0.4rem; align-items: center; }
+.routine-picks .routine-key { margin: 0; color: var(--fl-gold-hi); }
+.routine-picks .routine-note { margin: 0; }
+
+/* Project Pavilion B6: why "Next key moment" stopped. */
+.decision .key-moment { margin: 0.25rem 0 0.5rem; color: var(--fl-gold-hi); font-weight: 600; }
+
 /* Project Pavilion B9: the chase's win chance, under the situation strip. */
 .win-chance { margin: 0.25rem 0 0.5rem; color: var(--fl-muted); font-size: 0.95em; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; }
 .win-chance strong { color: var(--fl-text); }

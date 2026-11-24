@@ -65,7 +65,8 @@ test("Stage 15 the player's own tournament match is played on the match screen a
     const finish = page.getByRole("button", { name: "Finish match", exact: true });
     if (phase === "TOSS" && (await heads.isEnabled().catch(() => false))) await heads.click();
     else if (phase === "AWAITING_INNINGS" && (await bat.isEnabled().catch(() => false))) await bat.click();
-    else if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click();
+    // A routine pick (Pavilion B2) can make this choice between the count and the click; the loop then reads the new phase.
+    else if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click({ timeout: 2_000 }).catch(() => undefined);
     else if (phase === "READY" && (await finish.isEnabled().catch(() => false))) await finish.click();
     else await page.waitForTimeout(200);
   }
@@ -262,7 +263,7 @@ test("Stage 15 the player plays a tour match as the touring XI on the match scre
     const finish = page.getByRole("button", { name: "Finish match", exact: true });
     if (phase === "TOSS" && (await heads.isEnabled().catch(() => false))) await heads.click();
     else if (phase === "AWAITING_INNINGS" && (await bat.isEnabled().catch(() => false))) await bat.click();
-    else if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click();
+    else if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click({ timeout: 2_000 }).catch(() => undefined);
     else if (phase === "READY" && (await finish.isEnabled().catch(() => false))) await finish.click();
     else await page.waitForTimeout(200);
   }
