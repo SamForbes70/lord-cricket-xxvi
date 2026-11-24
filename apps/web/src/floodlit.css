@@ -553,3 +553,8 @@ input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color:
 @media (max-width: 640px) {
   .player-hero { grid-template-columns: auto 1fr; grid-template-areas: "face main" "ovr ovr" "bars bars"; }
 }
+
+/* Project Pavilion B9: the chase's win chance, under the situation strip. */
+.win-chance { margin: 0.25rem 0 0.5rem; color: var(--fl-muted); font-size: 0.95em; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; }
+.win-chance strong { color: var(--fl-text); }
+.win-chance small { color: var(--fl-faint); }
