@@ -16,7 +16,8 @@ test("the opposition watch reports their bowling or batting from this match, in 
     const phase = await decision.getAttribute("data-phase");
     const candidates = decision.locator("button[data-candidate]:enabled");
     if (phase === "TOSS") await decision.getByRole("button", { name: "Call heads" }).click();
-    else if (phase === "AWAITING_INNINGS" && (await decision.getByRole("button", { name: "Bat first" }).count()) > 0) await decision.getByRole("button", { name: "Bat first" }).click();
+    // "Bat first" can show for a moment while the computer makes its own choice, so a missed click is fine.
+    else if (phase === "AWAITING_INNINGS") await decision.getByRole("button", { name: "Bat first" }).click({ timeout: 2_000 }).catch(() => undefined);
     else if ((await candidates.count()) > 0) await candidates.first().click();
     else if (await decision.getByRole("button", { name: "Finish over", exact: true }).isEnabled().catch(() => false)) { await decision.getByRole("button", { name: "Finish over", exact: true }).click(); overs += 1; }
     else await page.waitForTimeout(200);
