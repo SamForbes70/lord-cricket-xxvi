@@ -559,3 +559,6 @@ input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color:
 .routine-picks label { display: inline-flex; gap: 0.4rem; align-items: center; }
 .routine-picks .routine-key { margin: 0; color: var(--fl-gold-hi); }
 .routine-picks .routine-note { margin: 0; }
+
+/* Project Pavilion B6: why "Next key moment" stopped. */
+.decision .key-moment { margin: 0.25rem 0 0.5rem; color: var(--fl-gold-hi); font-weight: 600; }

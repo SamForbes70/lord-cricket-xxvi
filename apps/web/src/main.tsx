@@ -81,6 +81,7 @@ import {
 import { RED_BALL_PROFILE_DESCRIPTIONS } from "@lcxxvi/ai";
 import type { DelegationCategory } from "./match/ai-opponent.js";
 import { readRoutinePicks, routinePickMoment, writeRoutinePicks } from "./match/routine-picks.js";
+import { keyMomentBetween, type KeyMomentSnapshot } from "./match/key-moments.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
@@ -108,12 +109,27 @@ function jumpToDugout(key: string) {
   target.focus({ preventScroll: true });
 }
 
+/** Pavilion B6: the board facts "Next key moment" compares from one ball to the next. */
+function keySnapshot(v: View): KeyMomentSnapshot | null {
+  const ledger = v.innings[v.activeIndex];
+  if (!ledger) return null;
+  const inn = ledger.innings;
+  return {
+    format: v.format, inningsIndex: v.activeIndex, runs: inn.runs, wickets: inn.wickets, legalBalls: inn.legalBalls,
+    targetToWin: inn.targetToWin ?? null,
+    batterRuns: Object.fromEntries(Object.entries(ledger.batting).map(([id, b]) => [id, b.runs])),
+  };
+}
+
 export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?: (roster: boolean) => void; onReturnCareer?: (roster: boolean) => void } = {}) {
   const worker = useRef<Worker | null>(null),
     serial = useRef(0),
     inflight = useRef<string | null>(null),
     currentRevision = useRef(0);
-  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number; cancel: boolean; from: number | null } | null>(null);
+  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH" | "KEY"; innings: number; remaining: number; cancel: boolean; from: number | null; last?: KeyMomentSnapshot | null } | null>(null);
+  const [keyMoment, setKeyMoment] = useState("");
+  // Pavilion B6: an advance that stopped only for the computer captain's own choice carries on once it has chosen.
+  const resumeAfterAi = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH" | "KEY"; innings: number; remaining: number; last?: KeyMomentSnapshot | null } | null>(null);
   const [batchState, setBatchState] = useState<"idle" | "running" | "stopping">("idle");
   const [guided, setGuided] = useState(() => { try { return localStorage.getItem(GUIDED_MATCH_KEY) === "1"; } catch { return false; } });
   const [batchProgress, setBatchProgress] = useState<{ from: number; to: number } | null>(null);
@@ -394,7 +410,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       if (r.requestId !== inflight.current) return;
       inflight.current = null;
       repliesReceived.current += 1;
-      if (aiStepRequest.current === r.requestId) { aiStepRequest.current = null; setAiStepping(false); }
+      const wasAiStep = aiStepRequest.current === r.requestId;
+      if (wasAiStep) { aiStepRequest.current = null; setAiStepping(false); }
       currentRevision.current = r.revision;
       serial.current = Math.max(serial.current, 10000 + r.revision, r.commandIdFloor ?? 0);
       if (r.careerFixture && !careerLaunch.current) {
@@ -413,9 +430,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           batch.from ??= r.acknowledgement.fromSequence;
           setBatchProgress({ from: batch.from, to: r.acknowledgement.toSequence });
         }
-        const routineInBatch = !batch.cancel && acknowledged && !r.error && r.view && !r.persistence?.readOnly && batch.remaining > 1 &&
+        // Pavilion B6: "Next key moment" stops when something worth the player's attention has happened.
+        const nextSnapshot = r.view ? keySnapshot(r.view) : null;
+        const moment = batch.scope === "KEY" && acknowledged && !r.error && batch.last && nextSnapshot && r.view
+          ? keyMomentBetween(batch.last, nextSnapshot, r.view.names) : null;
+        if (acknowledged && nextSnapshot) batch.last = nextSnapshot;
+        if (moment && r.view) {
+          const latest = r.view.fieldPresentation?.latestHighlight?.headline;
+          setKeyMoment(moment === "Wicket." && latest ? `Wicket: ${latest}` : moment);
+        }
+        const routineInBatch = !moment && !batch.cancel && acknowledged && !r.error && r.view && !r.persistence?.readOnly && batch.remaining > 1 &&
           (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) ? routinePickFor(r.view) : null;
-        const continueBatch = !routineInBatch && !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
+        const continueBatch = !moment && !routineInBatch && !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
           !r.persistence?.readOnly && (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) && --batch.remaining > 0;
         if (routineInBatch && r.view) {
           batch.remaining -= 1;
@@ -424,13 +450,31 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           const requestId = `ui-${++serial.current}`;
           inflight.current = requestId;
           w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
-            command: { kind: "ADVANCE", payload: { scope: "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
+            command: { kind: "ADVANCE", payload: { scope: batch.scope === "KEY" ? "DELIVERY" : "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
         } else {
           if (!r.error && !acknowledged) batchError = "Simulation stopped because the last command was not acknowledged.";
           else if (!r.error && batch.remaining <= 0) batchError = "Simulation stopped at its command limit.";
+          // The computer captain is about to answer its own question: carry the advance on after it has.
+          const aiTeam = routineContext.current.aiTeamId;
+          if (!moment && !batch.cancel && acknowledged && !r.error && r.view && aiTeam && r.view.phase !== "READY" && r.view.phase !== "COMPLETE" &&
+            r.view.decisionTeamId === aiTeam && batch.remaining > 1)
+            resumeAfterAi.current = { scope: batch.scope, innings: batch.innings, remaining: batch.remaining, last: batch.last ?? null };
           advanceBatch.current = null;
           setBatchState("idle");
         }
+      }
+      const resume = resumeAfterAi.current;
+      if (wasAiStep && resume && !inflight.current && r.view) {
+        if (r.error || r.persistence?.readOnly || r.view.phase === "COMPLETE" || (resume.scope === "INNINGS" && r.view.activeIndex !== resume.innings)) resumeAfterAi.current = null;
+        else if (r.view.phase === "READY" && !r.view.advanceReason) {
+          resumeAfterAi.current = null;
+          advanceBatch.current = { scope: resume.scope, innings: resume.innings, remaining: resume.remaining - 1, cancel: false, from: null, last: resume.last ?? null };
+          setBatchState("running");
+          const requestId = `ui-${++serial.current}`;
+          inflight.current = requestId;
+          w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
+            command: { kind: "ADVANCE", payload: { scope: resume.scope === "KEY" ? "DELIVERY" : "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
+        } else if (r.view.decisionTeamId !== routineContext.current.aiTeamId) resumeAfterAi.current = null;
       }
       if (!advanceBatch.current && !inflight.current && r.view && !r.error && !r.persistence?.readOnly) {
         const routine = routinePickFor(r.view);
@@ -799,6 +843,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   function act(action: Action, continuingPassage = false) {
     if (!view || inflight.current || fatal) return;
     if (action.kind === "ADVANCE") routineArmed.current = true;
+    if (action.kind === "ADVANCE" && !advanceBatch.current) setKeyMoment("");
+    if (!advanceBatch.current) resumeAfterAi.current = null;
     if (passage.current && !continuingPassage) endPassage(passageReport(passage.current, view));
     audioBootSyncRef.current = false;
     audioManagerRef.current?.unlockFromUserGesture();
@@ -868,12 +914,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     if (scenario) send({ type: "SCENARIO_START", scenarioId: scenario.scenarioId });
   }
 
-  function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
+  function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH" | "KEY") {
     if (!view || inflight.current || fatal || view.advanceReason || persistence?.readOnly) return;
-    advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512, cancel: false, from: null };
+    advanceBatch.current = { scope, innings: view.activeIndex, remaining: scope === "KEY" ? 1500 : 512, cancel: false, from: null, last: keySnapshot(view) };
     setBatchProgress(null);
     setBatchState("running");
-    act({ kind: "ADVANCE", payload: { scope: "OVER" } });
+    setKeyMoment("");
+    act({ kind: "ADVANCE", payload: { scope: scope === "KEY" ? "DELIVERY" : "OVER" } });
   }
   function cancelAnalyticsRebuild() {
     if (!rebuildRequest.current) return;
@@ -881,6 +928,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     worker.current?.postMessage({ version: UI_VERSION, type: "CANCEL_ANALYTICS", requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, targetRequestId: rebuildRequest.current });
   }
   function stopAdvance() {
+    resumeAfterAi.current = null;
     setCancelSignal(current => current + 1);
     if (!advanceBatch.current) return;
     advanceBatch.current.cancel = true;
@@ -1323,6 +1371,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
+            {keyMoment && !batchState.startsWith("run") && <p role="status" className="key-moment" data-testid="key-moment">Key moment: {keyMoment}</p>}
             {batchProgress && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
             <fieldset disabled={busy || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
@@ -1538,8 +1587,19 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 >
                   Next delivery
                 </button>
+                {limitedOvers && (
+                  <button
+                    className="primary"
+                    data-testid="next-key-moment"
+                    disabled={!!view.advanceReason}
+                    aria-describedby="advance-reason"
+                    onClick={() => advanceTo("KEY")}
+                  >
+                    Next key moment
+                  </button>
+                )}
                 <button
-                  className="primary"
+                  className={limitedOvers ? undefined : "primary"}
                   disabled={!!view.advanceReason}
                   aria-describedby="advance-reason"
                   onClick={() =>
