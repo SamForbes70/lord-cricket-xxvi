@@ -101,8 +101,9 @@ function formatPitchSummary(
   seamBp: number,
   turnBp: number,
 ): string {
-  const seam = (seamBp / 100).toFixed(2);
-  const turn = (turnBp / 100).toFixed(2);
+  // Pavilion B5: whole numbers on screen; the model keeps its basis points.
+  const seam = Math.round(seamBp / 100);
+  const turn = Math.round(turnBp / 100);
   switch (tendency) {
     case "SEAM_FRIENDLY":
       return `Seam-leaning surface (seam ${seam}/100, spin ${turn}/100): pace movement gets above-neutral assistance while spin starts closer to neutral.`;
@@ -1112,7 +1113,7 @@ export function projectInMatchTacticalAssistant(
     scoreContextLabel = `${runs}/${wickets} (${formatOvers(legalBalls)} ov) · batting side ${diff >= 0 ? `leads by ${diff}` : `trails by ${Math.abs(diff)}`} overall.`;
   }
 
-  const pitchSummaryLabel = `Seam ${(input.pitch.seamBp / 100).toFixed(2)}/100 · Spin ${(input.pitch.turnBp / 100).toFixed(2)}/100 · Wear ${input.pitch.wearPoints} pts.`;
+  const pitchSummaryLabel = `Seam ${Math.round(input.pitch.seamBp / 100)}/100 · Spin ${Math.round(input.pitch.turnBp / 100)}/100 · Pitch wear ${input.pitch.wearPoints}.`;
 
   let activeBowlerWorkloadLabel = "No active bowler selected.";
   const activeBowlerId = inn?.bowlerId ?? input.activeBowlingPlan?.bowlerId ?? null;
