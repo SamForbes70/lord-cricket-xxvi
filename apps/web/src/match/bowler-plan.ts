@@ -7,6 +7,8 @@
  * that makes the remaining overs impossible to bowl. It reads the ledger only; the frozen engines are unchanged.
  */
 
+import { canCompleteBowling } from "@lcxxvi/ai";
+
 export type BowlerState = { id: string; eligible: boolean; legalBalls: number };
 
 /**
@@ -19,14 +21,9 @@ export function leavesInningsFinishable(choiceId: string, bowlers: readonly Bowl
   if (!choice || left(choice) < 1) return false;
   const n = oversRemaining - 1;
   if (n <= 0) return true;
-  // The overs after this one must not start with the chosen bowler, so they bowl at most floor(n / 2) of them; any
-  // other bowler can bowl at most ceil(n / 2) without two in a row. If the capped counts cover n overs, an order exists.
-  let cover = 0;
-  for (const b of bowlers) {
-    const capacity = b.id === choiceId ? left(b) - 1 : left(b);
-    cover += Math.min(capacity, b.id === choiceId ? Math.floor(n / 2) : Math.ceil(n / 2));
-  }
-  return cover >= n;
+  // The same rule the computer captains use (packages/ai bowling-plan.ts): the overs after this one must not start
+  // with the chosen bowler.
+  return canCompleteBowling(n, bowlers.map((b) => ({ playerId: b.id, oversLeft: left(b) - (b.id === choiceId ? 1 : 0) })), choiceId);
 }
 
 /** The reason to refuse each eligible bowler that would strand the innings; none if every choice would. */

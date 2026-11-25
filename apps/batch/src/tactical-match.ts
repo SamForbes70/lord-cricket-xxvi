@@ -61,6 +61,7 @@ export function publicT20CaptainView(session: Readonly<T20Session>): T20Tactical
     targetToWin: i.targetToWin,
     availableBatters: Math.max(0, 10 - i.wickets),
     bowlingCandidates: candidates,
+    previousOverBowler: i.previousOverBowlerId ? { playerId: i.previousOverBowlerId, quotaRemaining: 24 - (ledger.bowling[i.previousOverBowlerId]?.legalBalls ?? 0) } : null,
   };
 }
 
@@ -134,6 +135,7 @@ export function publicODICaptainView(session: Readonly<ODISession>): ODITactical
     strikerHand,
     outfieldIds,
     bowlingCandidates: candidates,
+    previousOverBowler: i.previousOverBowlerId ? { playerId: i.previousOverBowlerId, quotaRemaining: 60 - (ledger.bowling[i.previousOverBowlerId]?.legalBalls ?? 0) } : null,
   };
 }
 

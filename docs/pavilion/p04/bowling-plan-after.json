@@ -1,0 +1,9 @@
+{
+  "version": "LC_PAVILION_P04_BOWLING_PLAN_MEASURE_V1",
+  "corpus": "100-seed Pass 07B T20 corpus",
+  "elevens": "five bowling-capable players each",
+  "captain": "tacticalT20Step, both sides",
+  "completed": 100,
+  "stranded": 0,
+  "strandedCases": []
+}

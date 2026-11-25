@@ -1,4 +1,6 @@
-/** LC_T20_TACTICAL_CAPTAIN_V1. Pure deterministic, public-observation-only choices.
+/** LC_T20_TACTICAL_CAPTAIN_V2. Pure deterministic, public-observation-only choices.
+ * V2 (Pavilion P04, 25 November 2026): never picks a bowler after whom the rest of the innings cannot be bowled
+ * (bowling-plan.ts); otherwise the same choices as V1.
  * The caller owns legality; candidates here are already filtered by the cricket engine.
  * No match seed, random counter, hidden player attributes or opponent future actions occur in this DTO.
  */
@@ -19,9 +21,11 @@ export interface T20TacticalPublicView {
   readonly targetToWin: number | null;
   readonly availableBatters: number;
   readonly bowlingCandidates: readonly TacticalBowlerCandidate[];
+  /** The bowler of the previous over (not a candidate for this one) and the balls left in their quota. */
+  readonly previousOverBowler?: { readonly playerId: string; readonly quotaRemaining: number } | null;
 }
 export type T20TacticalAdvice = Readonly<{
-  policyId: "LC_T20_TACTICAL_CAPTAIN_V1";
+  policyId: "LC_T20_TACTICAL_CAPTAIN_V2";
   aggression: 0 | 1 | 2 | 3 | 4;
   preferredBowlerId: string | null;
   bowlingEffort: "CONSERVE" | "NORMAL" | "MAXIMUM";
@@ -29,6 +33,17 @@ export type T20TacticalAdvice = Readonly<{
   fieldIntent: "ATTACK" | "BALANCED" | "DEFEND";
   reason: string;
 }>;
+
+import { feasibleBowlerChoice, type BowlerOvers } from "./bowling-plan.js";
+
+/** Every bowling-capable player with overs left, the previous over's bowler included, in whole overs. */
+export function bowlersWithOversLeft(
+  view: { readonly bowlingCandidates: readonly { readonly playerId: string; readonly quotaRemaining: number }[]; readonly previousOverBowler?: { readonly playerId: string; readonly quotaRemaining: number } | null },
+  ballsPerOver: number,
+): BowlerOvers[] {
+  const all = [...view.bowlingCandidates, ...(view.previousOverBowler ? [view.previousOverBowler] : [])];
+  return all.map(p => ({ playerId: p.playerId, oversLeft: Math.floor(p.quotaRemaining / ballsPerOver) }));
+}
 
 function assertFiniteNonnegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) throw new Error(`LC_T20_AI_INVALID_${name}`);
@@ -65,10 +80,11 @@ export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20Tact
       - (phase !== "DEATH" && p.quotaRemaining <= 6 ? 30 : 0),
   }));
   scores.sort((a,b) => b.score - a.score || a.id.localeCompare(b.id));
-  const chosen = valid.find(p => p.playerId === scores[0]?.id);
+  const chosenId = feasibleBowlerChoice(scores.map(s => s.id), Math.ceil(remaining / 6), bowlersWithOversLeft(view, 6), view.previousOverBowler?.playerId ?? null);
+  const chosen = valid.find(p => p.playerId === chosenId);
   const bowlingEffort = chosen && chosen.fatigueBp >= 7000 ? "CONSERVE" : phase === "DEATH" && chosen && chosen.fatigueBp < 4000 ? "MAXIMUM" : "NORMAL";
   return {
-    policyId: "LC_T20_TACTICAL_CAPTAIN_V1",
+    policyId: "LC_T20_TACTICAL_CAPTAIN_V2",
     aggression,
     preferredBowlerId: chosen?.playerId ?? null,
     bowlingEffort,
