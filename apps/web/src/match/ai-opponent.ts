@@ -192,7 +192,10 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
   if (bowling && session.core.bowlingPlan) {
     const current = session.core.bowlingPlan;
     if (current.effort !== advice.bowlingEffort || current.length !== advice.bowlingLength) {
-      return { ...base, actorId: `AI:${teamId}`, kind: "SET_BOWLING_PLAN", payload: { ...current, length: advice.bowlingLength, effort: advice.bowlingEffort } };
+      // The plan's own fields only: after a change within the over the engine's copy also carries the event's
+      // `type`, which the command schema refuses (a second change in one over used to fail).
+      const payload = { bowlerId: current.bowlerId, line: current.line, length: advice.bowlingLength, variationId: current.variationId, effort: advice.bowlingEffort };
+      return { ...base, actorId: `AI:${teamId}`, kind: "SET_BOWLING_PLAN", payload };
     }
   }
   // Human owns clock/ADVANCE, even when AI decisions are enabled. No automated ball execution.
