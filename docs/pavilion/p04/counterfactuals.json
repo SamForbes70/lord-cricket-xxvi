@@ -1,0 +1,149 @@
+{
+  "version": "LC_PAVILION_P04_COUNTERFACTUALS_V1",
+  "model": "synthetic-alpha-01",
+  "innings": "first innings of the 100-seed Pass 07B corpus",
+  "results": [
+    {
+      "setUp": "corpus XI, fixture autopilot",
+      "runs": 83.2,
+      "runsPerOver": 4.34,
+      "wickets": 8.18,
+      "allOutPercent": 33,
+      "fromOver11ByWicketsDown": {
+        "0-1": {
+          "innings": 9,
+          "meanRuns": 41.4
+        },
+        "2-3": {
+          "innings": 25,
+          "meanRuns": 43.2
+        },
+        "4-5": {
+          "innings": 50,
+          "meanRuns": 42
+        },
+        "6+": {
+          "innings": 16,
+          "meanRuns": 33.9
+        }
+      }
+    },
+    {
+      "setUp": "corpus XI, tactical captain",
+      "runs": 84.9,
+      "runsPerOver": 4.38,
+      "wickets": 8.26,
+      "allOutPercent": 36,
+      "fromOver11ByWicketsDown": {
+        "0-1": {
+          "innings": 8,
+          "meanRuns": 39.3
+        },
+        "2-3": {
+          "innings": 26,
+          "meanRuns": 43
+        },
+        "4-5": {
+          "innings": 46,
+          "meanRuns": 45.2
+        },
+        "6+": {
+          "innings": 20,
+          "meanRuns": 40.1
+        }
+      }
+    },
+    {
+      "setUp": "balanced XI, fixture autopilot",
+      "runs": 108.7,
+      "runsPerOver": 5.53,
+      "wickets": 6.96,
+      "allOutPercent": 18,
+      "fromOver11ByWicketsDown": {
+        "0-1": {
+          "innings": 20,
+          "meanRuns": 51.7
+        },
+        "2-3": {
+          "innings": 47,
+          "meanRuns": 53.1
+        },
+        "4-5": {
+          "innings": 27,
+          "meanRuns": 48.4
+        },
+        "6+": {
+          "innings": 6,
+          "meanRuns": 33
+        }
+      }
+    },
+    {
+      "setUp": "balanced XI, tactical captain",
+      "runs": 111,
+      "runsPerOver": 5.65,
+      "wickets": 7.14,
+      "allOutPercent": 19,
+      "fromOver11ByWicketsDown": {
+        "0-1": {
+          "innings": 19,
+          "meanRuns": 58.2
+        },
+        "2-3": {
+          "innings": 43,
+          "meanRuns": 56.3
+        },
+        "4-5": {
+          "innings": 32,
+          "meanRuns": 49.8
+        },
+        "6+": {
+          "innings": 6,
+          "meanRuns": 30.8
+        }
+      }
+    }
+  ],
+  "frozenCorpusOutcomeMixPercentPerLegalBall": {
+    "powerplay": {
+      "1": 19.2,
+      "2": 5.6,
+      "3": 0.7,
+      "byes": 0.4,
+      "dot": 60,
+      "four": 4.8,
+      "six": 3.3,
+      "wicket": 5.9
+    },
+    "all": {
+      "1": 18.2,
+      "2": 5.3,
+      "3": 0.6,
+      "byes": 0.6,
+      "dot": 60,
+      "four": 4.9,
+      "six": 3.3,
+      "wicket": 7.1
+    },
+    "middle": {
+      "1": 17.8,
+      "2": 5,
+      "3": 0.4,
+      "byes": 0.5,
+      "dot": 62.2,
+      "four": 4.3,
+      "six": 2.7,
+      "wicket": 7
+    },
+    "death": {
+      "1": 17.6,
+      "2": 5.5,
+      "3": 0.6,
+      "byes": 0.9,
+      "dot": 55.5,
+      "four": 6.4,
+      "six": 4.4,
+      "wicket": 9.1
+    }
+  }
+}
