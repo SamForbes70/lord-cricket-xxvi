@@ -40,6 +40,7 @@ import {
   type T20Session,
 } from "./t20-match.js";
 import { validateSeasonSchedule } from "./season-scheduler.js";
+import { selectSeasonXIV2 } from "./fixture-policy-v2.js";
 import { validateT20MatchSetup, verifyFrozenWorldBytes } from "./world-setup.js";
 
 const hasher = createStateHasher();
@@ -354,6 +355,38 @@ export function selectOffscreenFixtureTeams(input: {
     selectBaselineXI(context.verified, context.state, context.availabilityPack, fixture!.homeTeamId),
     selectBaselineXI(context.verified, context.state, context.availabilityPack, fixture!.awayTeamId),
   ];
+}
+
+/**
+ * The same fixture's teams under `LC_SEASON_XI_BASELINE_V2` (fixture-policy-v2.ts). Additive: V1 seasons keep
+ * `selectOffscreenFixtureTeams`.
+ */
+export function selectOffscreenFixtureTeamsV2(input: {
+  schedule: unknown;
+  careerState: unknown;
+  availabilityPack?: unknown;
+  fixtureId: string;
+  worldBytes: Readonly<Uint8Array>;
+  worldManifest: unknown;
+}): readonly [T20TeamSelection, T20TeamSelection] {
+  const context = prepareContext(input);
+  const fixture = context.schedule.fixtures.find((entry) => entry.fixtureId === input.fixtureId);
+  assertOffscreen(Boolean(fixture), `UNKNOWN_FIXTURE:${input.fixtureId}`);
+  assertFixtureBinding(context.schedule, context.state, fixture!);
+  const select = (teamId: string): T20TeamSelection => {
+    const team = context.verified.world.teams.find((candidate) => candidate.teamId === teamId);
+    assertOffscreen(Boolean(team), `UNKNOWN_TEAM:${teamId}`);
+    const conditionView = projectSquadTrainingCondition(context.state, teamId, context.availabilityPack);
+    const conditionById = new Map(conditionView.players.map((entry) => [entry.playerId, entry]));
+    const playerById = new Map(context.verified.world.players.map((player) => [player.playerId, player]));
+    return selectSeasonXIV2(teamId, team!.squadIds.map((playerId) => {
+      const player = playerById.get(playerId);
+      const condition = conditionById.get(playerId);
+      assertOffscreen(Boolean(player) && Boolean(condition), `MISSING_SELECTION_PLAYER:${playerId}`);
+      return { player: player!, condition: condition! };
+    }));
+  };
+  return [select(fixture!.homeTeamId), select(fixture!.awayTeamId)];
 }
 
 export function simulateOffscreenFixture(input: {

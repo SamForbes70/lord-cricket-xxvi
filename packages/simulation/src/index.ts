@@ -29,6 +29,7 @@ export * from "./season-scheduler.js";
 export * from "./career-condition.js";
 
 export * from "./offscreen-fixture.js";
+export * from "./fixture-policy-v2.js";
 
 export * from "./roster-import.js";
 export * from "./roster-t20-match.js";

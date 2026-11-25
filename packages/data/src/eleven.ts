@@ -39,8 +39,26 @@ export function suggestedEleven(
   squad: readonly Player[],
   format: ElevenFormat,
 ): { playerIds: string[]; captainId: string; keeperId: string } {
-  const bat = (a: Player, b: Player) => battingScore(b, format) - battingScore(a, format) || byId(a, b);
-  const bowl = (a: Player, b: Player) => bowlingScore(b, format) - bowlingScore(a, format) || byId(a, b);
+  return rankedEleven(squad, (p) => battingScore(p, format), (p) => bowlingScore(p, format), byId);
+}
+
+/** What `rankedEleven` needs of a player: its id, its role and whether it bowls. */
+export type ElevenCandidate = Pick<Player, "playerId" | "role" | "bowlingStyle">;
+
+/**
+ * The suggested-eleven rule with the scores and the tie-break supplied by the caller, so a selector that also weighs
+ * condition (readiness, fatigue) applies exactly the approved stage A rule. `suggestedEleven` is this rule with raw
+ * skills and a playerId tie-break. `tieBreak` must order any two distinct players (end on playerId) so the result
+ * never depends on squad order.
+ */
+export function rankedEleven<P extends ElevenCandidate>(
+  squad: readonly P[],
+  batting: (p: P) => number,
+  bowling: (p: P) => number,
+  tieBreak: (a: P, b: P) => number,
+): { playerIds: string[]; captainId: string; keeperId: string } {
+  const bat = (a: P, b: P) => batting(b) - batting(a) || tieBreak(a, b);
+  const bowl = (a: P, b: P) => bowling(b) - bowling(a) || tieBreak(a, b);
   const keeper = squad.filter((p) => p.role === "KEEPER").sort(bat)[0];
   if (!keeper) throw new Error("A squad needs a keeper.");
   const rest = squad.filter((p) => p.playerId !== keeper.playerId);

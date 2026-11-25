@@ -9,6 +9,7 @@ import { applyRosterMatchCondition, validateRosterCareerDayState } from "./roste
 import { validateRosterSeasonSchedule } from "./roster-season-schedule.js";
 import { createRosterT20Session, executeRosterT20Command, type RosterT20Session } from "./roster-t20-match.js";
 import { eventChainManifest, fixtureAutopilotStep, projectT20Scorecard, type T20Session } from "./t20-match.js";
+import { selectSeasonXIV2 } from "./fixture-policy-v2.js";
 
 const hash = createStateHasher().hash;
 export function validateRosterOffscreenFixtureOutcome(raw: unknown): RosterOffscreenFixtureOutcome {
@@ -44,6 +45,24 @@ export function selectRosterFixtureTeams(pack: StagedRosterPack, scheduleInput: 
     for (const item of ranked) if (xi.length < 11 && !required.has(item.player.playerId)) { xi.push(item); required.add(item.player.playerId); }
     xi.sort((a, b) => b.score - a.score || a.fatigue - b.fatigue || a.player.playerId.localeCompare(b.player.playerId));
     return { teamId, playerIds: xi.map(item => item.player.playerId), captainId: xi[0]!.player.playerId, keeperId: keeper.player.playerId };
+  };
+  return [select(fixture.homeTeamId), select(fixture.awayTeamId)];
+}
+/** The same fixture's teams under `LC_SEASON_XI_BASELINE_V2` (fixture-policy-v2.ts). Additive: V1 seasons keep `selectRosterFixtureTeams`. */
+export function selectRosterFixtureTeamsV2(pack: StagedRosterPack, scheduleInput: RosterSeasonSchedule, stateInput: RosterCareerDayState, fixtureId: string): readonly [T20TeamSelection, T20TeamSelection] {
+  const schedule = validateRosterSeasonSchedule(scheduleInput, pack);
+  const state = validateRosterCareerDayState(stateInput, schedule, pack);
+  const fixture = schedule.fixtures.find(item => item.fixtureId === fixtureId);
+  if (!fixture || fixture.matchDayDate !== state.currentDate || state.appliedMatchConditions.some(item => item.matchId === fixture.matchId)) throw new Error("ROSTER_OFFSCREEN_FIXTURE_MISMATCH");
+  const byId = new Map(pack.world.players.map(player => [player.playerId, player]));
+  const condition = new Map(state.playerConditions.map(item => [item.playerId, item]));
+  const readiness = new Map(state.playerReadiness.map(item => [item.playerId, item]));
+  const select = (teamId: string): T20TeamSelection => {
+    const team = pack.world.teams.find(item => item.teamId === teamId)!;
+    return selectSeasonXIV2(teamId, team.squadIds.map(id => ({
+      player: byId.get(id)!,
+      condition: { fatigueBp: condition.get(id)!.fatigueBp, availability: "AVAILABLE" as const, battingReadiness: readiness.get(id)!.batting, bowlingReadiness: readiness.get(id)!.bowling },
+    })));
   };
   return [select(fixture.homeTeamId), select(fixture.awayTeamId)];
 }
