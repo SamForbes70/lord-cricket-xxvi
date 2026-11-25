@@ -4,6 +4,8 @@ import {
   PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION,
   PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION,
   PersistentWorldPortableV3ManifestSchema,
 } from "./squad-economy.js";
 
@@ -50,3 +52,18 @@ export const PersistentWorldPortableV6ManifestSchema = PersistentWorldPortableV4
   ]),
 });
 export type PersistentWorldPortableV6Manifest = z.infer<typeof PersistentWorldPortableV6ManifestSchema>;
+
+/**
+ * Export of a world state V6 save (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md): the V6 export layout with a V6 save
+ * schema and `game.json` holding the full V6 state. A new version, so a V6 reader never meets a V6 world state.
+ */
+export const PERSISTENT_WORLD_PORTABLE_V7_ARCHIVE_VERSION = "LC_PERSISTENT_WORLD_PORTABLE_V7_WORLD_V6" as const;
+
+export const PersistentWorldPortableV7ManifestSchema = PersistentWorldPortableV4ManifestSchema.extend({
+  archiveVersion: z.literal(PERSISTENT_WORLD_PORTABLE_V7_ARCHIVE_VERSION),
+  saveSchema: z.enum([
+    PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION,
+    PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION,
+  ]),
+});
+export type PersistentWorldPortableV7Manifest = z.infer<typeof PersistentWorldPortableV7ManifestSchema>;

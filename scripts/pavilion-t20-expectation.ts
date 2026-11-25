@@ -2,7 +2,7 @@
  * Project Pavilion B7: the T20 runs-still-to-come table, measured from the game's own model.
  *
  * Runs the frozen 100-match Pass 07B corpus seeds with both sides fielding the suggested eleven (Pavilion P04 stage A;
- * V3), fixture autopilot, synthetic-alpha-01, in memory, reads each first
+ * V4: all-rounders preferred when topping up the bowling), fixture autopilot, synthetic-alpha-01, in memory, reads each first
  * innings ball by ball, and records, at the start of every over, the runs the innings went on to add. First innings
  * only: a chase stops when the target is reached, so its remaining runs are not the side's scoring power.
  *
@@ -88,7 +88,7 @@ const body = `/**
  * It describes this synthetic model, not real cricket.
  */
 export const T20_EXPECTATION_TABLE = {
-  version: "LC_T20_EXPECTATION_TABLE_V3",
+  version: "LC_T20_EXPECTATION_TABLE_V4",
   inputCorpusSha256: "${corpusSha256}",
   innings: ${innings},
   /** rows[over][band] */

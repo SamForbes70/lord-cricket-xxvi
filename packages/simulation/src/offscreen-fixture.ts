@@ -2,6 +2,8 @@ import {
   MatchConditionDeltaSchema,
   OffscreenFixtureOutcomeCoreSchema,
   OffscreenFixtureOutcomeSchema,
+  OffscreenFixtureOutcomeV2CoreSchema,
+  OffscreenFixtureOutcomeV2Schema,
   OffscreenRoundExecutionCoreSchema,
   OffscreenRoundExecutionSchema,
   T20MatchSetupRequestSchema,
@@ -9,6 +11,7 @@ import {
   type CareerDayStateV2,
   type OffscreenFixtureOutcome,
   type OffscreenFixtureOutcomeCore,
+  type OffscreenFixtureOutcomeV2,
   type OffscreenRoundExecution,
   type OffscreenRoundExecutionCore,
   type Player,
@@ -33,6 +36,8 @@ import {
 import { createStateHasher } from "./determinism.js";
 import { generatorRuleHash } from "./generator.js";
 import {
+  createT20Session,
+  executeT20Command,
   eventChainManifest,
   fixtureAutopilotStep,
   projectT20Scorecard,
@@ -40,6 +45,7 @@ import {
   type T20Session,
 } from "./t20-match.js";
 import { validateSeasonSchedule } from "./season-scheduler.js";
+import { fixtureAutopilotStepV2, selectSeasonXIV2 } from "./fixture-policy-v2.js";
 import { validateT20MatchSetup, verifyFrozenWorldBytes } from "./world-setup.js";
 
 const hasher = createStateHasher();
@@ -356,6 +362,38 @@ export function selectOffscreenFixtureTeams(input: {
   ];
 }
 
+/**
+ * The same fixture's teams under `LC_SEASON_XI_BASELINE_V2` (fixture-policy-v2.ts). Additive: V1 seasons keep
+ * `selectOffscreenFixtureTeams`.
+ */
+export function selectOffscreenFixtureTeamsV2(input: {
+  schedule: unknown;
+  careerState: unknown;
+  availabilityPack?: unknown;
+  fixtureId: string;
+  worldBytes: Readonly<Uint8Array>;
+  worldManifest: unknown;
+}): readonly [T20TeamSelection, T20TeamSelection] {
+  const context = prepareContext(input);
+  const fixture = context.schedule.fixtures.find((entry) => entry.fixtureId === input.fixtureId);
+  assertOffscreen(Boolean(fixture), `UNKNOWN_FIXTURE:${input.fixtureId}`);
+  assertFixtureBinding(context.schedule, context.state, fixture!);
+  const select = (teamId: string): T20TeamSelection => {
+    const team = context.verified.world.teams.find((candidate) => candidate.teamId === teamId);
+    assertOffscreen(Boolean(team), `UNKNOWN_TEAM:${teamId}`);
+    const conditionView = projectSquadTrainingCondition(context.state, teamId, context.availabilityPack);
+    const conditionById = new Map(conditionView.players.map((entry) => [entry.playerId, entry]));
+    const playerById = new Map(context.verified.world.players.map((player) => [player.playerId, player]));
+    return selectSeasonXIV2(teamId, team!.squadIds.map((playerId) => {
+      const player = playerById.get(playerId);
+      const condition = conditionById.get(playerId);
+      assertOffscreen(Boolean(player) && Boolean(condition), `MISSING_SELECTION_PLAYER:${playerId}`);
+      return { player: player!, condition: condition! };
+    }));
+  };
+  return [select(fixture!.homeTeamId), select(fixture!.awayTeamId)];
+}
+
 export function simulateOffscreenFixture(input: {
   schedule: unknown;
   careerState: unknown;
@@ -369,6 +407,84 @@ export function simulateOffscreenFixture(input: {
   assertOffscreen(Boolean(fixture), `UNKNOWN_FIXTURE:${input.fixtureId}`);
   const simulated = simulateOne(context, fixture!);
   return { outcome: simulated.outcome, session: simulated.session, careerState: simulated.state };
+}
+
+/** Checks a policy V2 off-screen outcome as `validateOffscreenFixtureOutcome` checks a V1 one. */
+export function validateOffscreenFixtureOutcomeV2(input: unknown): OffscreenFixtureOutcomeV2 {
+  const outcome = OffscreenFixtureOutcomeV2Schema.parse(input);
+  const { outcomeSha256, ...core } = outcome;
+  assertOffscreen(hasher.hash(OffscreenFixtureOutcomeV2CoreSchema.parse(core)) === outcomeSha256, "OUTCOME_HASH_MISMATCH");
+  assertOffscreen(outcome.matchId === outcome.scorecard.matchId, "OUTCOME_SCORECARD_MATCH_ID");
+  assertOffscreen(outcome.selectedTeams[0].teamId === outcome.homeTeamId && outcome.selectedTeams[1].teamId === outcome.awayTeamId, "OUTCOME_TEAM_ORDER");
+  assertOffscreen(outcome.matchId === outcome.conditionDelta.matchId && outcome.matchDayDate === outcome.conditionDelta.matchDayDate, "OUTCOME_CONDITION_BINDING");
+  assertOffscreen(outcome.scorecardSha256 === hasher.hash(outcome.scorecard), "OUTCOME_SCORECARD_HASH");
+  assertOffscreen(outcome.conditionDeltaSha256 === hasher.hash(outcome.conditionDelta), "OUTCOME_CONDITION_HASH");
+  assertOffscreen(outcome.careerRevisionAfter === outcome.careerRevisionBefore + 1, "OUTCOME_CAREER_REVISION");
+  return outcome;
+}
+
+/**
+ * One off-screen fixture under career fixture policy V2 (season state V2 only): `selectOffscreenFixtureTeamsV2` and
+ * `fixtureAutopilotStepV2` on the same frozen engine, seed and condition rules as V1.
+ */
+export function simulateOffscreenFixtureV2(input: {
+  schedule: unknown;
+  careerState: unknown;
+  availabilityPack?: unknown;
+  fixtureId: string;
+  worldBytes: Readonly<Uint8Array>;
+  worldManifest: unknown;
+}): { outcome: OffscreenFixtureOutcomeV2; session: T20Session; careerState: CareerDayStateV2 } {
+  const context = prepareContext(input);
+  const fixture = context.schedule.fixtures.find((entry) => entry.fixtureId === input.fixtureId);
+  assertOffscreen(Boolean(fixture), `UNKNOWN_FIXTURE:${input.fixtureId}`);
+  const { schedule, verified, worldBytes } = context;
+  const before = validateCareerDayStateV2(context.state);
+  assertFixtureBinding(schedule, before, fixture!);
+  const selectedTeams = selectOffscreenFixtureTeamsV2(input);
+  const setup = buildFixtureSetup(verified, schedule, fixture!, selectedTeams, worldBytes);
+  let session = createT20Session(setup);
+  while (session.core.phase !== "COMPLETE") {
+    assertOffscreen(session.revision < 400, "FIXTURE_COMMAND_LIMIT");
+    session = executeT20Command(session, fixtureAutopilotStepV2(session)).session;
+  }
+  const scorecard = projectT20Scorecard(session);
+  const conditionDelta = conditionDeltaFromCompletedT20Session({
+    seasonId: schedule.seasonId, fixtureId: fixture!.fixtureId, matchId: fixture!.matchId,
+    matchDayDate: fixture!.matchDayDate, session,
+  });
+  const after = applyMatchConditionDeltaV2(before, conditionDelta, schedule);
+  const core = OffscreenFixtureOutcomeV2CoreSchema.parse({
+    executionVersion: "LC_T20_OFFSCREEN_FIXTURE_V2",
+    policyVersion: "LC_T20_OFFSCREEN_POLICY_V2",
+    fixtureId: fixture!.fixtureId,
+    matchId: fixture!.matchId,
+    roundNumber: fixture!.roundNumber,
+    roundFixtureIndex: fixture!.roundFixtureIndex,
+    matchDayDate: fixture!.matchDayDate,
+    homeTeamId: fixture!.homeTeamId,
+    awayTeamId: fixture!.awayTeamId,
+    groundId: fixture!.groundId,
+    scheduleSha256: schedule.scheduleSha256,
+    matchSeedHash: hasher.hash({ matchSeed: fixture!.matchSeed }),
+    careerRevisionBefore: before.revision,
+    careerRevisionAfter: after.revision,
+    careerStateSha256Before: before.stateSha256,
+    careerStateSha256After: after.stateSha256,
+    selectionPolicyId: "LC_SEASON_XI_BASELINE_V2",
+    captainPolicyId: "LC_FIXTURE_CAPTAIN_V2",
+    conditionDeltaPolicyId: T20_OFFSCREEN_FIXTURE_POLICY.conditionDeltaPolicyId,
+    selectedTeams,
+    eventChain: eventChainManifest(session),
+    eventLogSha256: hasher.hash(session.events),
+    commandLogSha256: hasher.hash(session.commands),
+    scorecard,
+    scorecardSha256: hasher.hash(scorecard),
+    conditionDelta,
+    conditionDeltaSha256: hasher.hash(conditionDelta),
+  });
+  const outcome = validateOffscreenFixtureOutcomeV2({ ...core, outcomeSha256: hasher.hash(core) });
+  return { outcome, session, careerState: after };
 }
 
 export function simulateOffscreenRound(input: {

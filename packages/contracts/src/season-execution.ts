@@ -56,6 +56,24 @@ export const OffscreenFixtureOutcomeSchema = z.strictObject({
   outcomeSha256: HashSchema,
 });
 
+/**
+ * An off-screen fixture run under career fixture policy V2 (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md): the V1 record
+ * with new execution, policy, selection and captain identifiers. Used only by season states V2; V1 records keep V1.
+ */
+const OffscreenFixtureOutcomeV2CoreShape = {
+  ...OffscreenFixtureOutcomeCoreShape,
+  executionVersion: z.literal("LC_T20_OFFSCREEN_FIXTURE_V2"),
+  policyVersion: z.literal("LC_T20_OFFSCREEN_POLICY_V2"),
+  selectionPolicyId: z.literal("LC_SEASON_XI_BASELINE_V2"),
+  captainPolicyId: z.literal("LC_FIXTURE_CAPTAIN_V2"),
+} as const;
+
+export const OffscreenFixtureOutcomeV2CoreSchema = z.strictObject(OffscreenFixtureOutcomeV2CoreShape);
+export const OffscreenFixtureOutcomeV2Schema = z.strictObject({
+  ...OffscreenFixtureOutcomeV2CoreShape,
+  outcomeSha256: HashSchema,
+});
+
 const OffscreenRoundExecutionCoreShape = {
   executionVersion: z.literal("LC_T20_OFFSCREEN_ROUND_V1"),
   seasonId: IDSchema,
@@ -81,5 +99,7 @@ export const OffscreenRoundExecutionSchema = z.strictObject({
 export type T20OffscreenFixturePolicy = z.infer<typeof T20OffscreenFixturePolicySchema>;
 export type OffscreenFixtureOutcomeCore = z.infer<typeof OffscreenFixtureOutcomeCoreSchema>;
 export type OffscreenFixtureOutcome = z.infer<typeof OffscreenFixtureOutcomeSchema>;
+export type OffscreenFixtureOutcomeV2Core = z.infer<typeof OffscreenFixtureOutcomeV2CoreSchema>;
+export type OffscreenFixtureOutcomeV2 = z.infer<typeof OffscreenFixtureOutcomeV2Schema>;
 export type OffscreenRoundExecutionCore = z.infer<typeof OffscreenRoundExecutionCoreSchema>;
 export type OffscreenRoundExecution = z.infer<typeof OffscreenRoundExecutionSchema>;

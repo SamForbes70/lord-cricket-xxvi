@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { SUGGESTED_ELEVEN_MIN_BOWLERS, isBowlingCapable, suggestedEleven } from "@lcxxvi/data";
+import { ELEVEN_ALL_ROUND_BATTING_WEIGHT, ELEVEN_ALL_ROUND_BOWLING_WEIGHT, SUGGESTED_ELEVEN_MIN_BOWLERS, isBowlingCapable, suggestedEleven } from "@lcxxvi/data";
 import type { WorldPack } from "@lcxxvi/contracts";
 
 const world = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.json", "utf8")) as WorldPack;
@@ -45,6 +45,26 @@ describe("Pavilion P04 stage A: the suggested eleven", () => {
     const bowlers = squad.filter(isBowlingCapable).slice(0, 6);
     const xi = suggestedEleven([...keepers, ...batters, ...bowlers], "T20");
     expect(xi.playerIds.map((id) => byId.get(id)!).filter(isBowlingCapable).length).toBe(6);
+  });
+
+  test("tops up the bowling with the player who adds most in all, so an all-rounder beats a slightly better bowler", () => {
+    // Owner decision, 25 November 2026: 3 x batting + 4 x bowling (batting and bowling per skill) picks the top-up.
+    expect([ELEVEN_ALL_ROUND_BATTING_WEIGHT, ELEVEN_ALL_ROUND_BOWLING_WEIGHT]).toEqual([3, 4]);
+    const bowlingOf = (id: string) => { const k = byId.get(id)!.skills.T20; return k.control + k.movement + k.variation; };
+    const allRound = (id: string) => 3 * batting(id, "T20") + 4 * bowlingOf(id);
+    let allRoundersPicked = 0;
+    for (const team of world.teams) {
+      const squad = squadOf(team.teamId);
+      const xi = suggestedEleven(squad, "T20");
+      const inXI = new Set(xi.playerIds);
+      const attack = squad.filter(isBowlingCapable).sort((a, b) => bowlingOf(b.playerId) - bowlingOf(a.playerId) || (a.playerId < b.playerId ? -1 : 1)).slice(0, 4);
+      const toppedUp = xi.playerIds.filter((id) => isBowlingCapable(byId.get(id)!) && !attack.some((p) => p.playerId === id));
+      const benched = squad.filter((p) => isBowlingCapable(p) && !inXI.has(p.playerId));
+      // No bowling-capable player left out adds more in all than one brought in to top up the bowling.
+      for (const id of toppedUp) for (const out of benched) expect(allRound(id)).toBeGreaterThanOrEqual(allRound(out.playerId));
+      allRoundersPicked += xi.playerIds.filter((id) => byId.get(id)!.role === "ALLROUNDER").length;
+    }
+    expect(allRoundersPicked).toBeGreaterThan(0);
   });
 
   test("a squad without a keeper is refused", () => {

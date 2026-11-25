@@ -5,8 +5,14 @@ import {
   CompletedLifecycleMatchEventArchiveSchema,
   LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION,
   LIFECYCLE_SEASON_STATE_VERSION,
-  LifecycleSeasonStateCoreSchema,
-  LifecycleSeasonStateSchema,
+  AnyLifecycleSeasonStateCoreSchema,
+  AnyLifecycleSeasonStateSchema,
+  LIFECYCLE_SEASON_STATE_V2_VERSION,
+  T20_SEASON_STATE_V2_VERSION,
+  T20SeasonStateV2CoreSchema,
+  T20SeasonStateV2Schema,
+  type T20SeasonStateV2,
+  type T20SeasonStateV2Core,
   MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
   MAX_SEASON_EVENT_ARCHIVES_TOTAL_BYTES,
   SeasonCheckpointGenerationOptionSchema,
@@ -217,6 +223,26 @@ export async function validateT20SeasonState(raw: unknown): Promise<T20SeasonSta
   const state = T20SeasonStateSchema.parse(raw);
   const expectedHash = await seasonSha256Text(canonicalJson(stateCore(state)));
   assertSeason(state.stateSha256 === expectedHash, "HASH_MISMATCH");
+  return checkT20SeasonStateBindings(state);
+}
+
+/**
+ * Frozen-world season state V2 (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md): V1's shape and checks, a fixture policy V2
+ * version. Only world state V6 holds one; single-season saves stay V1 (`validateT20SeasonState`).
+ */
+export async function sealT20SeasonStateV2(raw: T20SeasonStateV2Core): Promise<T20SeasonStateV2> {
+  const core = T20SeasonStateV2CoreSchema.parse(raw);
+  return validateT20SeasonStateV2({ ...core, stateSha256: await seasonSha256Text(canonicalJson(core)) });
+}
+
+export async function validateT20SeasonStateV2(raw: unknown): Promise<T20SeasonStateV2> {
+  const state = T20SeasonStateV2Schema.parse(raw);
+  const { stateSha256, ...core } = state;
+  assertSeason(stateSha256 === await seasonSha256Text(canonicalJson(T20SeasonStateV2CoreSchema.parse(core))), "HASH_MISMATCH");
+  return checkT20SeasonStateBindings(state);
+}
+
+async function checkT20SeasonStateBindings<S extends T20SeasonState | T20SeasonStateV2>(state: S): Promise<S> {
   const { scheduleSha256, ...scheduleCore } = state.schedule;
   assertSeason(scheduleSha256 === await seasonSha256Text(canonicalJson(scheduleCore)), "SCHEDULE_HASH_MISMATCH");
   const { stateSha256: careerSha256, ...careerCore } = state.careerState;
@@ -263,11 +289,12 @@ export async function validateT20SeasonArchive(raw: unknown): Promise<SeasonArch
 function lifecycleSeasonCore(state: LifecycleSeasonState): LifecycleSeasonStateCore {
   const { stateSha256, ...core } = state;
   void stateSha256;
-  return LifecycleSeasonStateCoreSchema.parse(core);
+  return AnyLifecycleSeasonStateCoreSchema.parse(core);
 }
 
+/** Either lifecycle season state version; the world state's own schema decides which it may hold. */
 export async function validateLifecycleSeasonState(raw: unknown): Promise<LifecycleSeasonState> {
-  const state = LifecycleSeasonStateSchema.parse(raw);
+  const state = AnyLifecycleSeasonStateSchema.parse(raw);
   const expectedHash = await seasonSha256Text(canonicalJson(lifecycleSeasonCore(state)));
   assertSeason(state.stateSha256 === expectedHash, "LIFECYCLE_SEASON_HASH_MISMATCH");
   const { scheduleSha256, ...scheduleCore } = state.schedule;
@@ -310,8 +337,11 @@ export async function validateActivePersistentSeasonState(
     typeof raw === "object" && raw !== null
       ? (raw as { seasonStateVersion?: unknown }).seasonStateVersion
       : undefined;
-  if (version === LIFECYCLE_SEASON_STATE_VERSION) {
+  if (version === LIFECYCLE_SEASON_STATE_VERSION || version === LIFECYCLE_SEASON_STATE_V2_VERSION) {
     return validateLifecycleSeasonState(raw);
+  }
+  if (version === T20_SEASON_STATE_V2_VERSION) {
+    return validateT20SeasonStateV2(raw);
   }
   return validateT20SeasonState(raw);
 }

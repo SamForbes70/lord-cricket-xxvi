@@ -3,6 +3,9 @@ import {
   canonicalJson,
   PERSISTENT_WORLD_STATE_V4_VERSION,
   PERSISTENT_WORLD_STATE_V5_VERSION,
+  PERSISTENT_WORLD_STATE_V6_VERSION,
+  LIFECYCLE_SEASON_STATE_VERSION,
+  LIFECYCLE_SEASON_STATE_V2_VERSION,
   PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION,
   StagedRosterPackSchema,
   type NewGameWorldCopy,
@@ -197,7 +200,7 @@ class InMemoryPersistentWorldRepo implements CareerPersistentWorldRepository {
     };
     for (const raw of input.seasonRosterPacks ?? []) await add(raw);
     if ("lifecycle" in state && state.lifecycle.activeRosterPack) await add(state.lifecycle.activeRosterPack);
-    if ((state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION || state.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V5") && input.expectedRevision === null) {
+    if ((state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION || state.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V5" || state.worldStateVersion === "LC_PERSISTENT_WORLD_STATE_V6") && input.expectedRevision === null) {
       for (const pack of state.lifecycle.historicalRosterPacks) await add(pack);
     }
     return packs;
@@ -362,6 +365,7 @@ function newService(owner: string) {
   return { service: new CareerApplicationService(owner, seasonRepo, undefined, persistentRepo), persistentRepo };
 }
 
+/** Plays the current season out and rolls over; returns the world just before the rollover. */
 async function playSeasonAndRollOver(service: CareerApplicationService) {
   for (let guard = 0; guard < 400; guard++) {
     const state = service.getState()!;
@@ -370,7 +374,9 @@ async function playSeasonAndRollOver(service: CareerApplicationService) {
     if (next && state.careerState.currentDate >= next.matchDayDate) await service.simulateManagedFixture();
     else await service.advanceDay();
   }
+  const beforeRollover = service.getPersistentState()!;
   await service.closeSeasonAndAdvance();
+  return beforeRollover;
 }
 
 async function rowsFor(state: { completedSeasons: { seasonId: string }[] }) {
@@ -384,7 +390,11 @@ async function rowsFor(state: { completedSeasons: { seasonId: string }[] }) {
 
 describe("world state V5", () => {
   const options = { seed: "v5-seed", worldId: "world-v5", careerId: "career-v5", startDate: "2026-04-04" };
+  let v4BeforeRollover: NonNullable<ReturnType<CareerApplicationService["getPersistentState"]>>;
   let v4: NonNullable<ReturnType<CareerApplicationService["getPersistentState"]>>;
+  let v5BeforeRollover: NonNullable<ReturnType<CareerApplicationService["getPersistentState"]>>;
+  let v6AfterRollover: NonNullable<ReturnType<CareerApplicationService["getPersistentState"]>>;
+  /** A V5 career with a finished season: the V4 career copied forward, the route an older career takes into V5. */
   let v5: NonNullable<ReturnType<CareerApplicationService["getPersistentState"]>>;
   let v5Service: CareerApplicationService;
 
@@ -392,21 +402,55 @@ describe("world state V5", () => {
     const a = newService("v5-compare-v4");
     await a.service.boot();
     await a.service.createCareer(careerWorld.teams[0]!.teamId, null, { ...options, worldStateVersion: PERSISTENT_WORLD_STATE_V4_VERSION });
-    await playSeasonAndRollOver(a.service);
+    v4BeforeRollover = await playSeasonAndRollOver(a.service);
     v4 = a.service.getPersistentState()!;
     const b = newService("v5-compare-v5");
     await b.service.boot();
-    await b.service.createCareer(careerWorld.teams[0]!.teamId, null, options);
-    await playSeasonAndRollOver(b.service);
-    v5 = b.service.getPersistentState()!;
-    v5Service = b.service;
+    // New careers default to V6 (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md); an existing V5 career is created as V5.
+    await b.service.createCareer(careerWorld.teams[0]!.teamId, null, { ...options, worldStateVersion: PERSISTENT_WORLD_STATE_V5_VERSION });
+    v5BeforeRollover = await playSeasonAndRollOver(b.service);
+    v6AfterRollover = b.service.getPersistentState()!;
+    await a.service.copyForwardToWorldStateV5();
+    v5 = a.service.getPersistentState()!;
+    v5Service = a.service;
   }, 600_000);
 
-  it("is the default for new careers and plays out exactly as V4", () => {
-    expect(v5.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V5_VERSION);
-    expect(v4.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V4_VERSION);
-    expect(v5.completedSeasons).toHaveLength(1);
+  it("plays its season exactly as V4", () => {
+    expect(v5BeforeRollover.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V5_VERSION);
+    expect(v4BeforeRollover.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V4_VERSION);
+    expect(v5BeforeRollover.currentSeason.seasonStateVersion).toBe(LIFECYCLE_SEASON_STATE_VERSION);
     // Everything but the version and the state hash is the same.
+    const { worldStateVersion: _a, stateSha256: hash4, ...rest4 } = v4BeforeRollover;
+    const { worldStateVersion: _b, stateSha256: hash5, ...rest5 } = v5BeforeRollover;
+    void _a; void _b;
+    expect(canonicalJson(rest5)).toBe(canonicalJson(rest4));
+    expect(hash5).not.toBe(hash4);
+  });
+
+  it("becomes world state V6 when it starts its next season, its finished season unchanged", () => {
+    // Owner decision, 25 November 2026: a V5 career moves to V6 at rollover; V4 stays V4.
+    expect(v4.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V4_VERSION);
+    expect(v6AfterRollover.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V6_VERSION);
+    expect(v6AfterRollover.currentSeason.seasonStateVersion).toBe(LIFECYCLE_SEASON_STATE_V2_VERSION);
+    expect(v4.currentSeason.seasonStateVersion).toBe(LIFECYCLE_SEASON_STATE_VERSION);
+    expect(canonicalJson(v6AfterRollover.completedSeasons)).toBe(canonicalJson(v4.completedSeasons));
+    expect(v6AfterRollover.completedSeasons[0]!.finalSeasonStateSha256).toBe(v5BeforeRollover.currentSeason.stateSha256);
+    // The new season differs from V4's only in its version (and so its hash).
+    const strip = (season: typeof v4.currentSeason) => {
+      const { seasonStateVersion: _v, stateSha256: _h, ...rest } = season;
+      void _v; void _h;
+      return rest;
+    };
+    expect(canonicalJson(strip(v6AfterRollover.currentSeason))).toBe(canonicalJson(strip(v4.currentSeason)));
+    if ("lifecycle" in v6AfterRollover && "lifecycle" in v4 && "economy" in v6AfterRollover && "economy" in v4) {
+      expect(canonicalJson(v6AfterRollover.lifecycle)).toBe(canonicalJson(v4.lifecycle));
+      expect(canonicalJson(v6AfterRollover.economy)).toBe(canonicalJson(v4.economy));
+    } else throw new Error("expected economy worlds");
+  });
+
+  it("copied forward from V4 is V5 with the same seasons", () => {
+    expect(v5.worldStateVersion).toBe(PERSISTENT_WORLD_STATE_V5_VERSION);
+    expect(v5.completedSeasons).toHaveLength(1);
     const { worldStateVersion: _a, stateSha256: hash4, ...rest4 } = v4;
     const { worldStateVersion: _b, stateSha256: hash5, ...rest5 } = v5;
     void _a; void _b;

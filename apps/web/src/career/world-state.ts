@@ -6,6 +6,12 @@ import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?
 import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
 import {
   LIFECYCLE_SEASON_STATE_VERSION,
+  LIFECYCLE_SEASON_STATE_V2_VERSION,
+  PERSISTENT_WORLD_STATE_V6_VERSION,
+  usesFixturePolicyV2,
+  type ActivePersistentSeasonStateV1,
+  type ActivePersistentSeasonStateV2,
+  type PersistentWorldStateV6,
   PERSISTENT_WORLD_ROLLOVER_RECEIPT_VERSION,
   PERSISTENT_WORLD_STATE_V2_VERSION,
   PERSISTENT_WORLD_STATE_V3_VERSION,
@@ -75,6 +81,7 @@ import {
   sealT20SeasonState,
   sealPersistentWorldStateV4,
   sealPersistentWorldStateV5,
+  sealPersistentWorldStateV6,
   type AnyPersistentWorldState,
 } from "@lcxxvi/persistence";
 
@@ -123,8 +130,21 @@ export type CreateCareerOptions = {
     | typeof PERSISTENT_WORLD_STATE_V2_VERSION
     | typeof PERSISTENT_WORLD_STATE_V3_VERSION
     | typeof PERSISTENT_WORLD_STATE_V4_VERSION
-    | typeof PERSISTENT_WORLD_STATE_V5_VERSION;
+    | typeof PERSISTENT_WORLD_STATE_V5_VERSION
+    | typeof PERSISTENT_WORLD_STATE_V6_VERSION;
 };
+
+/** World states V2 to V5 hold only season states V1 (career fixture policy V1). */
+export function expectSeasonPolicyV1(season: ActivePersistentSeasonState): ActivePersistentSeasonStateV1 {
+  if (usesFixturePolicyV2(season)) throw new Error("A world state V2 to V5 holds only season states V1.");
+  return season as ActivePersistentSeasonStateV1;
+}
+
+/** World state V6 holds only season states V2 (career fixture policy V2). docs/pavilion/CAREER_FIXTURE_POLICY_V2.md */
+export function expectSeasonPolicyV2(season: ActivePersistentSeasonState): ActivePersistentSeasonStateV2 {
+  if (!usesFixturePolicyV2(season)) throw new Error("A world state V6 holds only season states V2.");
+  return season as ActivePersistentSeasonStateV2;
+}
 
 export async function createInitialSeasonState(input: {
   seasonId: string;
@@ -476,6 +496,8 @@ export async function createLifecycleSeasonStateForWorld(input: {
   startDate: string;
   priorSeasonFinalStateSha256: string | null;
   carryForwardDirectives?: readonly PlayerTrainingAssignment[];
+  /** V1 (fixture policy V1) unless the world is V6. docs/pavilion/CAREER_FIXTURE_POLICY_V2.md */
+  seasonStateVersion?: typeof LIFECYCLE_SEASON_STATE_VERSION | typeof LIFECYCLE_SEASON_STATE_V2_VERSION;
 }): Promise<LifecycleSeasonState> {
   const built = createPersistentLifecycleSeasonScheduleAndDayState({
     worldIdentity: input.worldIdentity,
@@ -489,7 +511,7 @@ export async function createLifecycleSeasonStateForWorld(input: {
   });
   const projection = createRosterSeasonProjection(built.schedule);
   return sealLifecycleSeasonState({
-    seasonStateVersion: LIFECYCLE_SEASON_STATE_VERSION,
+    seasonStateVersion: input.seasonStateVersion ?? LIFECYCLE_SEASON_STATE_VERSION,
     seasonId: built.seasonId,
     gameId: built.gameId,
     careerId: input.careerId,
@@ -600,7 +622,7 @@ export async function rebuildPersistentWorldStateV2(
     controlledTeamId: worldState.controlledTeamId,
     currentSeasonNumber: worldState.currentSeasonNumber,
     currentCalendarYear: worldState.currentCalendarYear,
-    currentSeason: nextSeason,
+    currentSeason: expectSeasonPolicyV1(nextSeason),
     completedSeasons: worldState.completedSeasons,
     careerProjection,
     lifecycle: expectLifecycleV1(nextLifecycle),
@@ -654,7 +676,7 @@ export async function rolloverPersistentWorldCareerSeasonV2(
     controlledTeamId: worldState.controlledTeamId,
     currentSeasonNumber: nextSeasonNumber,
     currentCalendarYear: nextCalendarYear,
-    currentSeason: nextCurrentSeason,
+    currentSeason: expectSeasonPolicyV1(nextCurrentSeason),
     completedSeasons,
     careerProjection,
     lifecycle: expectLifecycleV1(nextLifecycle),
@@ -770,7 +792,7 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV2(input: {
     controlledTeamId: sourceState.controlledTeamId,
     currentSeasonNumber: 2,
     currentCalendarYear: nextCalendarYear,
-    currentSeason,
+    currentSeason: expectSeasonPolicyV1(currentSeason),
     completedSeasons,
     careerProjection,
     lifecycle: expectLifecycleV1(nextLifecycle),
@@ -779,7 +801,7 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV2(input: {
   });
 }
 
-type EconomyWorldState = PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5;
+type EconomyWorldState = PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 | PersistentWorldStateV6;
 type EconomyWorldVersion = EconomyWorldState["worldStateVersion"];
 
 /**
@@ -788,14 +810,40 @@ type EconomyWorldVersion = EconomyWorldState["worldStateVersion"];
  */
 async function sealEconomyWorld(
   worldStateVersion: EconomyWorldVersion,
-  core: Omit<PersistentWorldStateV3Core, "worldStateVersion" | "lifecycle"> & { lifecycle: PlayerLifecycleState },
+  input: Omit<PersistentWorldStateV3Core, "worldStateVersion" | "lifecycle" | "currentSeason"> & {
+    lifecycle: PlayerLifecycleState;
+    currentSeason: ActivePersistentSeasonState;
+  },
 ): Promise<EconomyWorldState> {
+  const { currentSeason, ...rest } = input;
+  if (worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION) {
+    return sealPersistentWorldStateV6({
+      ...rest,
+      worldStateVersion,
+      currentSeason: expectSeasonPolicyV2(currentSeason),
+      lifecycle: expectLifecycleV2(rest.lifecycle),
+    });
+  }
+  const core = { ...rest, currentSeason: expectSeasonPolicyV1(currentSeason) };
   if (worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION) {
     return sealPersistentWorldStateV5({ ...core, worldStateVersion, lifecycle: expectLifecycleV2(core.lifecycle) });
   }
   return worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION
     ? sealPersistentWorldStateV4({ ...core, worldStateVersion, lifecycle: expectLifecycleV2(core.lifecycle) })
     : sealPersistentWorldStateV3({ ...core, worldStateVersion, lifecycle: expectLifecycleV1(core.lifecycle) });
+}
+
+/** The season state version a world's lifecycle seasons are created with: V2 only in world state V6. */
+export function lifecycleSeasonVersionFor(worldStateVersion: string) {
+  return worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION ? LIFECYCLE_SEASON_STATE_V2_VERSION : LIFECYCLE_SEASON_STATE_VERSION;
+}
+
+/**
+ * The world version a season rollover writes: a V5 career becomes V6 when it starts its next season
+ * (owner decision, 25 November 2026; docs/pavilion/CAREER_FIXTURE_POLICY_V2.md). V3 and V4 stay as they are.
+ */
+export function worldVersionAfterRollover(worldStateVersion: EconomyWorldVersion): EconomyWorldVersion {
+  return worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION ? PERSISTENT_WORLD_STATE_V6_VERSION : worldStateVersion;
 }
 
 export async function createInitialPersistentWorldCareerStateV3(input: {
@@ -838,6 +886,7 @@ export async function createInitialPersistentWorldCareerStateV3(input: {
     calendarYear,
     startDate,
     priorSeasonFinalStateSha256: null,
+    seasonStateVersion: lifecycleSeasonVersionFor(worldStateVersion),
   });
   const economy = createInitialSquadEconomyState({
     worldIdentity,
@@ -927,6 +976,7 @@ export async function rolloverPersistentWorldCareerSeasonV3(
     seasonPlayerStats,
     controlledTeamId: worldState.controlledTeamId,
   });
+  const nextWorldStateVersion = worldVersionAfterRollover(worldState.worldStateVersion);
   const nextCurrentSeason = await createLifecycleSeasonStateForWorld({
     worldIdentity: worldState.worldIdentity,
     rosterPack: advanced.lifecycle.activeRosterPack!,
@@ -937,13 +987,14 @@ export async function rolloverPersistentWorldCareerSeasonV3(
     startDate: nextStartDate,
     priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
     carryForwardDirectives: worldState.currentSeason.careerState.trainingAssignments,
+    seasonStateVersion: lifecycleSeasonVersionFor(nextWorldStateVersion),
   });
   const { careerProjection, receipt } = await rolloverProjectionAndReceipt(
     worldState,
     { closedRecord, completedSeasons, nextSeasonNumber },
     nextCurrentSeason,
   );
-  const nextState = await sealEconomyWorld(worldState.worldStateVersion, {
+  const nextState = await sealEconomyWorld(nextWorldStateVersion, {
     worldIdentity: worldState.worldIdentity,
     careerId: worldState.careerId,
     controlledTeamId: worldState.controlledTeamId,
@@ -1055,6 +1106,7 @@ export async function copyCompletedSingleSeasonToPersistentWorldStateV3(input: {
     startDate: nextStartDate,
     priorSeasonFinalStateSha256: closedRecord.finalSeasonStateSha256,
     carryForwardDirectives: sourceState.careerState.trainingAssignments,
+    seasonStateVersion: lifecycleSeasonVersionFor(worldStateVersion),
   });
   const careerProjection = await sealPersistentCareerProjection(
     rebuildPersistentCareerProjectionCore({
@@ -1115,6 +1167,7 @@ export async function copyEconomyWorldForwardToV5(
   void _version;
   const state = await sealPersistentWorldStateV5({
     ...core,
+    currentSeason: expectSeasonPolicyV1(core.currentSeason),
     worldStateVersion: PERSISTENT_WORLD_STATE_V5_VERSION,
     lifecycle: expectLifecycleV2(lifecycle),
   });

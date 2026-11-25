@@ -1,5 +1,5 @@
 import {
-  ActivePersistentSeasonStateSchema,
+  AnyActivePersistentSeasonStateSchema,
   CompletedSeasonRecordSchema,
   PERSISTENT_CAREER_PROJECTION_VERSION,
   PersistentCareerProjectionCoreSchema,
@@ -360,7 +360,7 @@ export function rebuildPersistentCareerProjectionCore(input: {
   const completedSeasons: CompletedSeasonRecord[] = input.completedSeasons.map((item) =>
     CompletedSeasonRecordSchema.parse(item),
   );
-  const activeSeason: ActivePersistentSeasonState = ActivePersistentSeasonStateSchema.parse(
+  const activeSeason: ActivePersistentSeasonState = AnyActivePersistentSeasonStateSchema.parse(
     input.activeSeason,
   );
 
