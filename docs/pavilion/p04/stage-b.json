@@ -1,0 +1,70 @@
+{
+  "version": "LC_PAVILION_P04B_MEASURE_V1",
+  "model": "synthetic-alpha-01",
+  "corpus": "100-seed Pass 07B T20 corpus, suggested elevens, bowling on the tactical captain",
+  "firstInnings": [
+    {
+      "batting": "old rule (captain V2 batting)",
+      "runs": 104.2,
+      "wickets": 7.55,
+      "allOutOf100": 27,
+      "runsPerOver": {
+        "powerplay": 6.09,
+        "middle": 4.75,
+        "death": 5.55
+      },
+      "wicketsPerPhase": {
+        "powerplay": 1.72,
+        "middle": 3.13,
+        "death": 2.7
+      },
+      "runsAddedFromOver11ByWicketsDownAtOver10": {
+        "0-1": 54.6,
+        "2-3": 49.7,
+        "4-5": 44,
+        "6+": 26.4,
+        "counts": [
+          19,
+          42,
+          31,
+          8
+        ]
+      }
+    },
+    {
+      "batting": "captain V3 (LC_T20_BATTING_POLICY_V1)",
+      "runs": 106.4,
+      "wickets": 8.09,
+      "allOutOf100": 34,
+      "runsPerOver": {
+        "powerplay": 6.59,
+        "middle": 4.8,
+        "death": 5.68
+      },
+      "wicketsPerPhase": {
+        "powerplay": 2.07,
+        "middle": 3.3,
+        "death": 2.72
+      },
+      "runsAddedFromOver11ByWicketsDownAtOver10": {
+        "0-1": 61.6,
+        "2-3": 50,
+        "4-5": 44.2,
+        "6+": 19.9,
+        "counts": [
+          9,
+          40,
+          44,
+          7
+        ]
+      }
+    }
+  ],
+  "headToHead": {
+    "matches": 200,
+    "newPolicyWins": 104,
+    "oldRuleWins": 94,
+    "noResultOrTie": 2,
+    "newPolicyChasesWon": "53 of 100"
+  }
+}

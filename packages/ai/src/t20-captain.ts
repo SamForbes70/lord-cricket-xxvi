@@ -1,6 +1,8 @@
-/** LC_T20_TACTICAL_CAPTAIN_V2. Pure deterministic, public-observation-only choices.
+/** LC_T20_TACTICAL_CAPTAIN_V3. Pure deterministic, public-observation-only choices.
  * V2 (Pavilion P04, 25 November 2026): never picks a bowler after whom the rest of the innings cannot be bowled
  * (bowling-plan.ts); otherwise the same choices as V1.
+ * V3 (Pavilion P04 stage B): batting aggression and intent come from LC_T20_BATTING_POLICY_V1 (batting-policy.ts),
+ * which also reads the skill of the two batters at the crease; bowling and field choices are V2's.
  * The caller owns legality; candidates here are already filtered by the cricket engine.
  * No match seed, random counter, hidden player attributes or opponent future actions occur in this DTO.
  */
@@ -23,10 +25,14 @@ export interface T20TacticalPublicView {
   readonly bowlingCandidates: readonly TacticalBowlerCandidate[];
   /** The bowler of the previous over (not a candidate for this one) and the balls left in their quota. */
   readonly previousOverBowler?: { readonly playerId: string; readonly quotaRemaining: number } | null;
+  /** The batter about to face and the one at the other end (public batting skills), when known. */
+  readonly striker?: BatterSkills | null;
+  readonly partner?: BatterSkills | null;
 }
 export type T20TacticalAdvice = Readonly<{
-  policyId: "LC_T20_TACTICAL_CAPTAIN_V2";
+  policyId: "LC_T20_TACTICAL_CAPTAIN_V3";
   aggression: 0 | 1 | 2 | 3 | 4;
+  battingIntent: BattingIntent;
   preferredBowlerId: string | null;
   bowlingEffort: "CONSERVE" | "NORMAL" | "MAXIMUM";
   bowlingLength: "GOOD" | "FULL" | "YORKER";
@@ -35,6 +41,7 @@ export type T20TacticalAdvice = Readonly<{
 }>;
 
 import { feasibleBowlerChoice, type BowlerOvers } from "./bowling-plan.js";
+import { adviseT20Batting, type BatterSkills, type BattingIntent } from "./batting-policy.js";
 
 /** Every bowling-capable player with overs left, the previous over's bowler included, in whole overs. */
 export function bowlersWithOversLeft(
@@ -60,13 +67,10 @@ export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20Tact
   const remaining = Math.max(1, 120 - view.inningsLegalBalls);
   const requiredRate = view.targetToWin === null ? null : Math.max(0, view.targetToWin - view.inningsRuns) * 6 / remaining;
   const phase = view.inningsLegalBalls < 36 ? "EARLY" : view.inningsLegalBalls < 90 ? "MIDDLE" : "DEATH";
-  let aggression: 0 | 1 | 2 | 3 | 4 = phase === "EARLY" ? 2 : phase === "MIDDLE" ? 2 : 3;
-  if (requiredRate !== null) {
-    aggression = requiredRate > 12 ? 4 : requiredRate > 9 ? 3 : requiredRate < 5 ? 1 : 2;
-  }
-  if (view.wicketsLost >= 7 && remaining > 24 && (requiredRate === null || requiredRate <= 9)) {
-    aggression = Math.min(aggression, 1) as 0 | 1;
-  }
+  const batting = adviseT20Batting({
+    inningsLegalBalls: view.inningsLegalBalls, inningsRuns: view.inningsRuns, wicketsLost: view.wicketsLost,
+    targetToWin: view.targetToWin, striker: view.striker ?? null, partner: view.partner ?? null,
+  });
   const valid = view.bowlingCandidates.filter(p => {
     for (const [name, value] of Object.entries(p)) {
       if (name !== "playerId") assertFiniteNonnegative(value as number, name);
@@ -84,8 +88,9 @@ export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20Tact
   const chosen = valid.find(p => p.playerId === chosenId);
   const bowlingEffort = chosen && chosen.fatigueBp >= 7000 ? "CONSERVE" : phase === "DEATH" && chosen && chosen.fatigueBp < 4000 ? "MAXIMUM" : "NORMAL";
   return {
-    policyId: "LC_T20_TACTICAL_CAPTAIN_V2",
-    aggression,
+    policyId: "LC_T20_TACTICAL_CAPTAIN_V3",
+    aggression: batting.aggression,
+    battingIntent: batting.intent,
     preferredBowlerId: chosen?.playerId ?? null,
     bowlingEffort,
     bowlingLength: phase === "DEATH" ? "YORKER" : phase === "MIDDLE" ? "FULL" : "GOOD",

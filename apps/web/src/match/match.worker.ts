@@ -56,6 +56,10 @@ let activeSaveId: string | null = null;
 let activeWorldCopy: NewGameWorldCopy | null = null;
 let activeRosterPack: StagedRosterPack | null = null;
 let readOnly = false;
+/**
+ * True while the open match is the one this worker recovered from an older checkpoint into a new slot. It stays true
+ * as that match is played on, and is cleared only when another match is opened, started, imported or deleted.
+ */
 let recovered = false;
 let recoveredFromGeneration: number | null = null;
 const emptyDelegation = (): DelegationJournal => ({ version: "LC_DELEGATION_JOURNAL_V1", changes: [] });
@@ -438,6 +442,8 @@ async function initialise(): Promise<void> {
     activeRosterPack = null;
     delegation = emptyDelegation();
     readOnly = false;
+    recovered = false;
+    recoveredFromGeneration = null;
     controller = makeController();
     await repository.setActiveSaveId(null);
   }
@@ -548,9 +554,13 @@ async function commitCandidate(
       updatedAt: nowIso(),
     });
     await repository.setActiveSaveId(saveId);
-    if (request.type === "START") delegation = emptyDelegation();
-    recovered = false;
-    recoveredFromGeneration = null;
+    // A new match has no recovery to report. A command in the recovered slot keeps the notice: the first command
+    // after a recovery can be the tactical captain's own, committed as the page opens, before the player has seen it.
+    if (request.type === "START") {
+      delegation = emptyDelegation();
+      recovered = false;
+      recoveredFromGeneration = null;
+    }
     return {
       ...response,
       persistence: {
@@ -1069,6 +1079,8 @@ async function handleInner(raw: unknown): Promise<Response> {
           activeSaveId = null;
           activeWorldCopy = null;
           activeRosterPack = null;
+          recovered = false;
+          recoveredFromGeneration = null;
           controller = makeController("T20");
           return decorate(controller.currentResponse(request.requestId, `The saved match for this fixture could not be resumed. ${error instanceof Error ? error.message : ""}`.trim()));
         }

@@ -318,6 +318,7 @@ export type PersistenceView = {
   durableRevision: number | null;
   savedAt: string | null;
   readOnly: boolean;
+  /** The open match was recovered from an older checkpoint into a new slot; stays true while it is played on. */
   recovered: boolean;
   recoveredFromGeneration: number | null;
   saves: SaveSummary[];
