@@ -1,7 +1,9 @@
 import type { FieldSlot } from "@lcxxvi/contracts";
-import type { TacticalBowlerCandidate } from "./t20-captain.js";
+import { bowlersWithOversLeft, type TacticalBowlerCandidate } from "./t20-captain.js";
+import { feasibleBowlerChoice } from "./bowling-plan.js";
 
-/** LC_ODI_TACTICAL_CAPTAIN_V1. Pure deterministic, public-observation-only choices for 50-over ODI matches.
+/** LC_ODI_TACTICAL_CAPTAIN_V2. V2 (Pavilion P04, 25 November 2026): never picks a bowler after whom the rest of the
+ * innings cannot be bowled (bowling-plan.ts); otherwise the same choices as V1. Pure deterministic, public-observation-only choices for 50-over ODI matches.
  * Respects the 60-ball bowler quota, three ODI field-restriction phases (0..59, 60..239, 240..299),
  * striker handedness leg-side / behind-square limits, and remaining batting resources.
  */
@@ -14,10 +16,12 @@ export interface ODITacticalPublicView {
   readonly strikerHand: "R" | "L";
   readonly outfieldIds: readonly string[];
   readonly bowlingCandidates: readonly TacticalBowlerCandidate[];
+  /** The bowler of the previous over (not a candidate for this one) and the balls left in their quota. */
+  readonly previousOverBowler?: { readonly playerId: string; readonly quotaRemaining: number } | null;
 }
 
 export type ODITacticalAdvice = Readonly<{
-  policyId: "LC_ODI_TACTICAL_CAPTAIN_V1";
+  policyId: "LC_ODI_TACTICAL_CAPTAIN_V2";
   aggression: 0 | 1 | 2 | 3 | 4;
   battingIntent: "NORMAL" | "ROTATE" | "PROTECT";
   preferredBowlerId: string | null;
@@ -132,7 +136,8 @@ export function adviseODICaptain(view: Readonly<ODITacticalPublicView>): ODITact
     };
   });
   scores.sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
-  const chosen = valid.find(p => p.playerId === scores[0]?.id);
+  const chosenId = feasibleBowlerChoice(scores.map(s => s.id), Math.ceil(remaining / 6), bowlersWithOversLeft(view, 6), view.previousOverBowler?.playerId ?? null);
+  const chosen = valid.find(p => p.playerId === chosenId);
 
   const bowlingEffort =
     chosen && chosen.fatigueBp >= 6500
@@ -154,7 +159,7 @@ export function adviseODICaptain(view: Readonly<ODITacticalPublicView>): ODITact
   );
 
   return {
-    policyId: "LC_ODI_TACTICAL_CAPTAIN_V1",
+    policyId: "LC_ODI_TACTICAL_CAPTAIN_V2",
     aggression,
     battingIntent,
     preferredBowlerId: chosen?.playerId ?? null,
