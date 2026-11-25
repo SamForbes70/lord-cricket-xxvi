@@ -1345,17 +1345,21 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             </section>
           )}
           {/* Pavilion B9: a T20 chase's win chance, from the game's own simulated matches. Kept out of the situation
-              strip, which states only what is on the board. */}
+              strip, which states only what is on the board. Owner direction of 25 November 2026: its calibration is
+              uneven in some probability bands, so it is labelled experimental and stays closed until the player opens
+              it (no setting is stored). */}
           {view && i && view.format === "T20" && i.targetToWin != null && !view.resultText && (() => {
             const chance = t20ChaseWinChance(Math.max(0, i.targetToWin - i.runs), i.wickets, i.legalBalls);
             if (chance === null || chance === 0 || chance === 100) return null;
             return (
-              <p className="win-chance" data-testid="win-chance">
-                <span>Win chance (game model estimate):</span>{" "}
-                <strong>{tn(i.battingTeamId)} about {chance}%</strong>{" · "}
-                <strong>{tn(i.bowlingTeamId)} about {100 - chance}%</strong>
-                <small> From this game&apos;s own simulated matches, not real cricket.</small>
-              </p>
+              <details className="win-chance" data-testid="win-chance">
+                <summary>Win chance (experimental)</summary>
+                <span data-testid="win-chance-detail">
+                  <strong>{tn(i.battingTeamId)} about {chance}%</strong>{" · "}
+                  <strong>{tn(i.bowlingTeamId)} about {100 - chance}%</strong>
+                  <small> An estimate from this game&apos;s own simulated matches, not real cricket. Less reliable in some ranges.</small>
+                </span>
+              </details>
             );
           })()}
           <BroadcastStage view={view} />

@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-/** Project Pavilion B9: in a T20 chase, the win chance sits under the situation strip, never inside it. */
-test("a T20 chase shows each side's win chance from the game model, adding to 100", async ({ page }) => {
+/** Project Pavilion B9: in a T20 chase, the win chance sits under the situation strip, never inside it. Labelled
+ * experimental and closed until the player opens it (owner direction of 25 November 2026). */
+test("a T20 chase offers each side's experimental win chance, closed until opened, adding to 100", async ({ page }) => {
   test.setTimeout(240_000);
   await page.goto("/#title");
   await page.getByRole("button", { name: /Quick match/ }).click();
@@ -25,8 +26,13 @@ test("a T20 chase shows each side's win chance from the game model, adding to 10
     else await page.waitForTimeout(200);
   }
   await expect(chance).toBeVisible();
-  const text = (await chance.textContent())!;
-  expect(text).toMatch(/^Win chance \(game model estimate\): .+ about \d{1,2}% · .+ about \d{1,2}% From this game's own simulated matches, not real cricket\.$/);
+  await expect(chance.locator("summary")).toHaveText("Win chance (experimental)");
+  const detail = page.getByTestId("win-chance-detail");
+  await expect(detail).toBeHidden();
+  await chance.locator("summary").click();
+  await expect(detail).toBeVisible();
+  const text = (await detail.textContent())!;
+  expect(text).toMatch(/^.+ about \d{1,2}% · .+ about \d{1,2}% An estimate from this game's own simulated matches, not real cricket\. Less reliable in some ranges\.$/);
   const [a, b] = [...text.matchAll(/about (\d+)%/g)].map((m) => Number(m[1]));
   expect(a! + b!).toBe(100);
   expect(a! % 5).toBe(0);
