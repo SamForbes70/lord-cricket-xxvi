@@ -5,7 +5,6 @@ import {
   GenerateDeliveryRequestSchema,
   GeneratedDeliverySchema,
   PROBABILITY_VERSION,
-  PROBABILITY_MODEL_ID,
   EXP_LUT_VERSION,
   RANDOM_VERSION,
   type GenerateDeliveryRequest,
@@ -19,7 +18,6 @@ import {
   DELIVERY_STAGE_PACK,
   DELIVERY_STAGE_PACK_SHA256,
   EXP_LUT_SHA256,
-  MODEL_PACK_SHA256,
   RULE_MANIFESTS,
 } from "@lcxxvi/data";
 import { validateDeliveryResolution } from "@lcxxvi/domain";
@@ -28,6 +26,8 @@ import {
   chooseCategoricalMass, contactCategories, createProbabilityService,
   legalityCategories, roundDivTiesAway,
 } from "./probability.js";
+import { registeredModel, type RegisteredModel } from "./model-registry.js";
+import type { CalibratedSkill, CalibratedTerms } from "@lcxxvi/data";
 
 /** Addresses are frozen protocol. Each distinct variable owns one unique (stage, drawIndex). */
 export const DELIVERY_DRAW_REGISTRY = Object.freeze({
@@ -82,13 +82,15 @@ function validateRequest(raw: unknown): GenerateDeliveryRequest {
   const req = GenerateDeliveryRequestSchema.parse(raw);
   if (req.stagePackHash !== DELIVERY_STAGE_PACK_SHA256 ||
       sha256Hex(canonicalStateBytes(DELIVERY_STAGE_PACK)) !== DELIVERY_STAGE_PACK_SHA256 ||
-      req.modelHash !== MODEL_PACK_SHA256 || req.lutHash !== EXP_LUT_SHA256 ||
+      !registeredModel(req.modelId, req.modelHash) || req.lutHash !== EXP_LUT_SHA256 ||
       req.stagePackId !== DELIVERY_STAGE_PACK_ID || req.generatorVersion !== DELIVERY_GENERATOR_VERSION ||
-      req.probabilityVersion !== PROBABILITY_VERSION || req.modelId !== PROBABILITY_MODEL_ID ||
+      req.probabilityVersion !== PROBABILITY_VERSION ||
       req.lutVersion !== EXP_LUT_VERSION || req.randomVersion !== RANDOM_VERSION) {
     throw new Error("UNSUPPORTED_GENERATOR_PACK_OR_VERSION");
   }
   if (req.rulesHash !== generatorRuleHash(req.context.rulesId)) throw new Error("UNSUPPORTED_RULES_HASH");
+  // The variation rating is read only by a model with a skill pack (calibrated-t20-01), and that model requires it.
+  if ((skillPackOf(req) === null) !== (req.bowling.variationRating === undefined)) throw new Error("UNSUPPORTED_GENERATOR_PACK_OR_VERSION");
   const format = req.context.rulesId === "LC_T20_01" ? "T20" :
     req.context.rulesId === "LC_ODI_01" ? "ODI" : "RED_BALL";
   if (req.format !== format || req.phase !== expectedGeneratorPhase(format, req.context.legalBalls)) {
@@ -143,6 +145,31 @@ export function executedLengthCategories(req: GenerateDeliveryRequest): Probabil
   return [...LENGTHS, "FULL_TOSS"].filter((id) => (weighted.get(id) ?? 0) > 0)
     .map((id) => cat(id, weighted.get(id)!, 0, id === intent ? scaleTerm : []));
 }
+/** The calibrated-t20-01 skill pack of a request's model, or null for synthetic-alpha-01. */
+function skillPackOf(req: Pick<GenerateDeliveryRequest, "modelId" | "modelHash">): RegisteredModel["skillPack"] {
+  return registeredModel(req.modelId, req.modelHash)?.skillPack ?? null;
+}
+function skillRating(req: GenerateDeliveryRequest, skill: CalibratedSkill): number {
+  switch (skill) {
+    case "TIMING": return req.batting.timingRating;
+    case "POWER": return req.batting.powerRating;
+    case "DEFENCE": return req.batting.defenceRating;
+    case "ROTATION": return req.batting.rotationRating;
+    case "CONTROL": return req.bowling.controlRating;
+    case "MOVEMENT": return req.bowling.movementRating;
+    case "VARIATION": return req.bowling.variationRating ?? 0;
+  }
+}
+/** Additive skill terms for one category from a calibrated pack stage; none for synthetic-alpha-01. */
+function skillTerms(req: GenerateDeliveryRequest, stage: "contact" | "runs", categoryId: string): Array<{coefficientBp:number;featureBp:number}> {
+  const pack = skillPackOf(req);
+  if (!pack) return [];
+  const row = (pack[stage] as CalibratedTerms)[categoryId];
+  if (!row) return [];
+  return (Object.keys(row) as CalibratedSkill[]).sort().map((skill) => ({
+    coefficientBp: row[skill]!, featureBp: (skillRating(req, skill) - pack.centres[skill]) * 200,
+  }));
+}
 export function conditionedContactCategories(req: GenerateDeliveryRequest, executed: string, noBallOrFreeHit: boolean): ProbabilityCategory[] {
   const base = contactCategories({
     phase: req.phase, defenceRating: req.batting.defenceRating,
@@ -160,7 +187,7 @@ export function conditionedContactCategories(req: GenerateDeliveryRequest, execu
     if (executed === "SHORT" && (row.id === "AERIAL" || row.id === "EDGE")) add(1500);
     if (row.id === "MISS" || row.id === "EDGE") extra.push({coefficientBp:-2000,featureBp:matchup});
     if (row.id === "GROUND") extra.push({coefficientBp:2000,featureBp:matchup});
-    return {...row, allowed: !(noBallOrFreeHit && row.id === "HIT_WICKET"), terms:[...row.terms,...extra]};
+    return {...row, allowed: !(noBallOrFreeHit && row.id === "HIT_WICKET"), terms:[...row.terms,...extra,...skillTerms(req,"contact",row.id)]};
   });
 }
 /** Eight sectors are a V0.1 derived geometry: 0..2 off, 3..4 straight, 5..7 leg. */
@@ -192,10 +219,17 @@ function missDismissalCategories(req: GenerateDeliveryRequest, contact: "MISS"|"
   const isMiss = contact === "MISS";
   const base = isMiss ? DELIVERY_STAGE_PACK.bowled : DELIVERY_STAGE_PACK.lbw;
   const allowed = !forbidden && (isMiss || req.bowling.line !== "LEG");
+  // calibrated-t20-01 has no separate dismissal skill (owner decision 2): it cancels these two skill terms exactly
+  // (ties round away from zero symmetrically, so each pair sums to zero).
+  const cancel = skillPackOf(req)?.cancelMissDismissalSkill === true ? [
+    {coefficientBp:-base.controlBp, featureBp:rating(req.bowling.controlRating)},
+    {coefficientBp:-base.defenceBp, featureBp:rating(req.batting.defenceRating)},
+  ] : [];
   return [cat(isMiss ? "BOWLED" : "LBW",1,base.interceptBp,[
     {coefficientBp:base.controlBp, featureBp:rating(req.bowling.controlRating)},
     {coefficientBp:base.defenceBp, featureBp:rating(req.batting.defenceRating)},
     ...(isMiss && req.bowling.line === "STUMPS" ? [{coefficientBp:DELIVERY_STAGE_PACK.bowled.stumpsBp,featureBp:10000}] : []),
+    ...cancel,
   ],allowed),cat("NONE",1)];
 }
 function runningCategories(req: GenerateDeliveryRequest, contact: "GROUND"|"AERIAL"|"EDGE", coverageBp:number): ProbabilityCategory[] {
@@ -206,6 +240,7 @@ function runningCategories(req: GenerateDeliveryRequest, contact: "GROUND"|"AERI
     if (id === "0") terms.push({coefficientBp:5000,featureBp:coverageBp},{coefficientBp:-3000,featureBp:rotation});
     if (id === "1" && req.batting.intent !== "NORMAL") terms.push({coefficientBp:req.batting.intent === "ROTATE" ? 3500:-5000,featureBp:10000});
     if (id === "4" || id === "6") terms.push({coefficientBp:4000,featureBp:timing},{coefficientBp:5000,featureBp:power},{coefficientBp:-7000,featureBp:coverageBp});
+    terms.push(...skillTerms(req,"runs",id));
     const runs = Number(id);
     // An attempted physical run cannot overrun a winning target; boundaries may fully score.
     const remaining = req.context.targetToWin === null ? null : req.context.targetToWin - req.context.runs;
@@ -235,7 +270,7 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
     if (seen.has(serial)) throw new Error("DUPLICATE_DELIVERY_DRAW_ADDRESS");
     seen.add(serial);
     const distribution = probability.normalise({probabilityVersion:PROBABILITY_VERSION,
-      modelId:PROBABILITY_MODEL_ID,modelHash:MODEL_PACK_SHA256,lutVersion:EXP_LUT_VERSION,
+      modelId:req.modelId,modelHash:req.modelHash,lutVersion:EXP_LUT_VERSION,
       lutHash:EXP_LUT_SHA256,categories});
     const draw = random.uint32(address);
     const selected = chooseCategoricalMass(distribution.categories,draw);
@@ -254,7 +289,7 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
   function finish(r: DeliveryResolution):GeneratedDelivery {
     const validated = validateDeliveryResolution(c,r).resolution;
     return frozenDeep(GeneratedDeliverySchema.parse({kind:"GENERATED_DELIVERY",generatorVersion:DELIVERY_GENERATOR_VERSION,
-      modelHash:MODEL_PACK_SHA256,stagePackHash:DELIVERY_STAGE_PACK_SHA256,internalOnly:true,trace,resolution:validated}));
+      modelHash:req.modelHash,stagePackHash:DELIVERY_STAGE_PACK_SHA256,internalOnly:true,trace,resolution:validated}));
   }
   if (legality === "WIDE") extras.wides=1;
   if (legality === "NO_BALL") extras.noBalls=1;
@@ -346,8 +381,8 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
   if ((contact==="MISS" && legality==="LEGAL" || wide) && spin && !forbidden &&
       req.batting.aggression>2 && base.completedRuns===0 && base.boundary==="NONE") {
     // Multiply sigmoid(keeping) by 0.003 in exact integer space, then feed its fixed mass to the categorical model.
-    const sigmoid=probability.normalise({probabilityVersion:PROBABILITY_VERSION,modelId:PROBABILITY_MODEL_ID,
-      modelHash:MODEL_PACK_SHA256,lutVersion:EXP_LUT_VERSION,lutHash:EXP_LUT_SHA256,
+    const sigmoid=probability.normalise({probabilityVersion:PROBABILITY_VERSION,modelId:req.modelId,
+      modelHash:req.modelHash,lutVersion:EXP_LUT_VERSION,lutHash:EXP_LUT_SHA256,
       categories:[cat("SUCCESS",1,0,[{coefficientBp:10000,featureBp:rating(req.field.keeper.keepingRating)}]),cat("FAILURE",1)]});
     const successMass=BigInt(sigmoid.categories[0]!.mass);
     const fraction=successMass*BigInt(DELIVERY_STAGE_PACK.stumping.numerator)/BigInt(DELIVERY_STAGE_PACK.stumping.denominator);

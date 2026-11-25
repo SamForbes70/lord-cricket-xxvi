@@ -1,0 +1,407 @@
+{
+ "version": "LC_STAGE_C_C1_PROTOTYPE_FIT_V1",
+ "researchOnly": true,
+ "gameplayIntegrationPermitted": false,
+ "attribution": {
+  "source": "Cricsheet, https://cricsheet.org/",
+  "sourceURL": "https://cricsheet.org/downloads/t20s_json.zip",
+  "licence": "Open Data Commons Attribution License (ODC-By) 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "archiveSha256": "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "retrievedAtUTC": "2026-11-25T12:57:47.048656+00:00",
+  "note": "Derived aggregates only (no ball-by-ball records). Contains information from Cricsheet, made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/."
+ },
+ "subSplits": {
+  "fit": "calibration dates <= 2023-08-31",
+  "validation": "2023-09-01 to 2025-08-24",
+  "holdout": "not read"
+ },
+ "matches": {
+  "fit": 1816,
+  "validation": 1077
+ },
+ "varianceComponents": {
+  "fit": {
+   "dismissal": {
+    "phaseBaseline": [
+     0.045772639691714835,
+     0.04804450529528592,
+     0.08671830040283905
+    ],
+    "dispersion": 0.9445903328349396,
+    "batter": {
+     "players": 914,
+     "observedRelativeSD": 0.3925772006718182,
+     "trueRelativeSD": 0.22954266177208563,
+     "adjustedTrueSkillRatio": 0.5482612252799736
+    },
+    "bowler": {
+     "players": 964,
+     "observedRelativeSD": 0.3473059353895204,
+     "trueRelativeSD": 0.21178860264819743,
+     "adjustedTrueSkillRatio": 1.7367436996628185
+    }
+   },
+   "boundary": {
+    "phaseBaseline": [
+     0.16789210019267822,
+     0.11510549984576837,
+     0.16353347400728946
+    ],
+    "dispersion": 0.8575330761788691,
+    "batter": {
+     "players": 914,
+     "observedRelativeSD": 0.3558122932272432,
+     "trueRelativeSD": 0.32036097018398507,
+     "adjustedTrueSkillRatio": 2.3738807969514832
+    },
+    "bowler": {
+     "players": 964,
+     "observedRelativeSD": 0.33313807253405064,
+     "trueRelativeSD": 0.270684844257376,
+     "adjustedTrueSkillRatio": 0.48802049879413584
+    }
+   },
+   "nonDot": {
+    "phaseBaseline": [
+     0.48673603082851635,
+     0.6239129375984241,
+     0.656279973144063
+    ],
+    "dispersion": 0.41402957695158876,
+    "batter": {
+     "players": 914,
+     "observedRelativeSD": 0.15570915690299741,
+     "trueRelativeSD": 0.14576567084760444,
+     "adjustedTrueSkillRatio": 1.4548393762342173
+    },
+    "bowler": {
+     "players": 964,
+     "observedRelativeSD": 0.12645359633011308,
+     "trueRelativeSD": 0.11122274993769862,
+     "adjustedTrueSkillRatio": 0.7522721138366714
+    }
+   },
+   "runs": {
+    "phaseBaseline": [
+     1.1225125240847784,
+     1.1321954466493855,
+     1.3869413005946671
+    ],
+    "dispersion": 2.054583287456032,
+    "batter": {
+     "players": 914,
+     "observedRelativeSD": 0.23409529742813115,
+     "trueRelativeSD": 0.21836442145552964,
+     "adjustedTrueSkillRatio": 1.7684075491771942
+    },
+    "bowler": {
+     "players": 964,
+     "observedRelativeSD": 0.20069956961486796,
+     "trueRelativeSD": 0.1747811184274344,
+     "adjustedTrueSkillRatio": 0.6364412160698977
+    }
+   }
+  },
+  "validation": {
+   "dismissal": {
+    "phaseBaseline": [
+     0.048869096449080045,
+     0.05206122013849619,
+     0.0907573812580231
+    ],
+    "dispersion": 0.9411823170995203,
+    "batter": {
+     "players": 698,
+     "observedRelativeSD": 0.392563652684696,
+     "trueRelativeSD": 0.23977926292085022,
+     "adjustedTrueSkillRatio": 0.532821438147873
+    },
+    "bowler": {
+     "players": 735,
+     "observedRelativeSD": 0.39127726316620076,
+     "trueRelativeSD": 0.25040423030497266,
+     "adjustedTrueSkillRatio": 1.9337937388840518
+    }
+   },
+   "boundary": {
+    "phaseBaseline": [
+     0.16759769261820123,
+     0.11541349549933719,
+     0.1558836114676936
+    ],
+    "dispersion": 0.8590942483038762,
+    "batter": {
+     "players": 698,
+     "observedRelativeSD": 0.46643815543888406,
+     "trueRelativeSD": 0.4308902915160162,
+     "adjustedTrueSkillRatio": 3.4218893649746747
+    },
+    "bowler": {
+     "players": 735,
+     "observedRelativeSD": 0.3299958029646241,
+     "trueRelativeSD": 0.26189244462376526,
+     "adjustedTrueSkillRatio": 0.5004972426224339
+    }
+   },
+   "nonDot": {
+    "phaseBaseline": [
+     0.47345599437478025,
+     0.5927803991731017,
+     0.6239409499358152
+    ],
+    "dispersion": 0.4405254742664536,
+    "batter": {
+     "players": 698,
+     "observedRelativeSD": 0.19224069318358375,
+     "trueRelativeSD": 0.1814563411152341,
+     "adjustedTrueSkillRatio": 1.5995942078909586
+    },
+    "bowler": {
+     "players": 735,
+     "observedRelativeSD": 0.13597191026823682,
+     "trueRelativeSD": 0.11886588002001966,
+     "adjustedTrueSkillRatio": 0.7374829683993351
+    }
+   },
+   "runs": {
+    "phaseBaseline": [
+     1.117791059546597,
+     1.1031954242488853,
+     1.327492511767223
+    ],
+    "dispersion": 2.181126059071502,
+    "batter": {
+     "players": 698,
+     "observedRelativeSD": 0.3107332764009777,
+     "trueRelativeSD": 0.29466786842409765,
+     "adjustedTrueSkillRatio": 2.197709557664494
+    },
+    "bowler": {
+     "players": 735,
+     "observedRelativeSD": 0.21122525097025616,
+     "trueRelativeSD": 0.18269539795904002,
+     "adjustedTrueSkillRatio": 0.6230813591271389
+    }
+   }
+  }
+ },
+ "outOfSample": {
+  "dismissal": {
+   "metric": "logLoss",
+   "phaseOnly": 0.22171418696483922,
+   "withPlayerEffects": 0.22185487914952,
+   "difference": 0.00014069218468082102,
+   "difference95": [
+    5.723037658110419e-07,
+    0.0002840572428561413
+   ],
+   "validationBallsWithBatterSeenInFit": 0.7188107687653947
+  },
+  "boundary": {
+   "metric": "logLoss",
+   "phaseOnly": 0.4042159155560903,
+   "withPlayerEffects": 0.4032734850908551,
+   "difference": -0.0009424304652351766,
+   "difference95": [
+    -0.0015519634931260567,
+    -0.00029763025240929
+   ],
+   "validationBallsWithBatterSeenInFit": 0.7186724860636965
+  },
+  "nonDot": {
+   "metric": "logLoss",
+   "phaseOnly": 0.6798685013677329,
+   "withPlayerEffects": 0.6786465644461551,
+   "difference": -0.0012219369215778519,
+   "difference95": [
+    -0.00226669814547727,
+    -0.0002275127323346713
+   ],
+   "validationBallsWithBatterSeenInFit": 0.7188107687653947
+  },
+  "runs": {
+   "metric": "meanSquaredError",
+   "phaseOnly": 2.508981386337174,
+   "withPlayerEffects": 2.500367549299403,
+   "difference": -0.00861383703777111,
+   "difference95": [
+    -0.012934209809282973,
+    -0.003634579886037471
+   ],
+   "validationBallsWithBatterSeenInFit": 0.7188107687653947
+  }
+ },
+ "outOfSampleNote": "Negative difference = player effects estimated on the fit period predict the validation period better than the phase baseline alone.",
+ "impliedCoefficients": {
+  "worldRatingSD": {
+   "battingMeanRating": 7.653551664473125,
+   "bowlingMeanRating": 7.5230460849382705,
+   "battingPlayers": 112,
+   "bowlingPlayers": 72
+  },
+  "all": {
+   "dismissal.batter": {
+    "realTrueRelativeSD": 0.2979312971354014,
+    "logEffectPerRatingPoint": 0.03892719487585914,
+    "coefficientBpOnGameFeatureScale": 19464
+   },
+   "dismissal.bowler": {
+    "realTrueRelativeSD": 0.21543617296937465,
+    "logEffectPerRatingPoint": 0.028636827494742428,
+    "coefficientBpOnGameFeatureScale": 14318
+   },
+   "boundary.batter": {
+    "realTrueRelativeSD": 0.3635017371471885,
+    "logEffectPerRatingPoint": 0.047494516674463735,
+    "coefficientBpOnGameFeatureScale": 23747
+   },
+   "boundary.bowler": {
+    "realTrueRelativeSD": 0.30245240030160586,
+    "logEffectPerRatingPoint": 0.040203449093199006,
+    "coefficientBpOnGameFeatureScale": 20102
+   },
+   "nonDot.batter": {
+    "realTrueRelativeSD": 0.17162438923707551,
+    "logEffectPerRatingPoint": 0.022424149827554637,
+    "coefficientBpOnGameFeatureScale": 11212
+   },
+   "nonDot.bowler": {
+    "realTrueRelativeSD": 0.1268958829193349,
+    "logEffectPerRatingPoint": 0.016867620042018677,
+    "coefficientBpOnGameFeatureScale": 8434
+   },
+   "runs.batter": {
+    "realTrueRelativeSD": 0.255720065289665,
+    "logEffectPerRatingPoint": 0.03341194735467549,
+    "coefficientBpOnGameFeatureScale": 16706
+   },
+   "runs.bowler": {
+    "realTrueRelativeSD": 0.2029850181081704,
+    "logEffectPerRatingPoint": 0.026981759225769248,
+    "coefficientBpOnGameFeatureScale": 13491
+   }
+  },
+  "fullMembersOnly": {
+   "dismissal.batter": {
+    "realTrueRelativeSD": 0.14682687199875605,
+    "logEffectPerRatingPoint": 0.019184148541168004,
+    "coefficientBpOnGameFeatureScale": 9592
+   },
+   "dismissal.bowler": {
+    "realTrueRelativeSD": 0.07623884835263992,
+    "logEffectPerRatingPoint": 0.010134039788122006,
+    "coefficientBpOnGameFeatureScale": 5067
+   },
+   "boundary.batter": {
+    "realTrueRelativeSD": 0.20047194433441698,
+    "logEffectPerRatingPoint": 0.026193322149373324,
+    "coefficientBpOnGameFeatureScale": 13097
+   },
+   "boundary.bowler": {
+    "realTrueRelativeSD": 0.1600926693161109,
+    "logEffectPerRatingPoint": 0.021280298898690653,
+    "coefficientBpOnGameFeatureScale": 10640
+   },
+   "nonDot.batter": {
+    "realTrueRelativeSD": 0.08003089210902731,
+    "logEffectPerRatingPoint": 0.010456699793446378,
+    "coefficientBpOnGameFeatureScale": 5228
+   },
+   "nonDot.bowler": {
+    "realTrueRelativeSD": 0.05751840085869641,
+    "logEffectPerRatingPoint": 0.007645626546652794,
+    "coefficientBpOnGameFeatureScale": 3823
+   },
+   "runs.batter": {
+    "realTrueRelativeSD": 0.12770717613812738,
+    "logEffectPerRatingPoint": 0.016686001707015174,
+    "coefficientBpOnGameFeatureScale": 8343
+   },
+   "runs.bowler": {
+    "realTrueRelativeSD": 0.08795278656112254,
+    "logEffectPerRatingPoint": 0.011691113621809513,
+    "coefficientBpOnGameFeatureScale": 5846
+   }
+  }
+ },
+ "impliedNote": "Linear mapping of rating to log rate, at one world-rating SD = one real true-skill SD. The game's feature is (rating - 50) x 200 bp and a term adds coefficientBp x featureBp / 10000 bp of logit, so one rating point is coefficientBp x 2e-6 natural logit units; synthetic-alpha-01 uses 2500 to 5000 bp (0.005 to 0.010 a point).",
+ "gameDoseResponse": {
+  "conditions": {
+   "bat30": {
+    "condition": "bat30",
+    "battingSkills": 30,
+    "bowlingSkills": 50,
+    "matches": 100,
+    "ballsFaced": 21767,
+    "runsPerBall": 0.6243855377406166,
+    "strikerDismissalPerBall": 0.0696467129140442,
+    "boundaryPerBall": 0.06551201359856663,
+    "dotPerBall": 0.6809390361556484,
+    "firstInningsBatRuns": 72.86,
+    "firstInningsWickets": 8.8
+   },
+   "bat50": {
+    "condition": "bat50",
+    "battingSkills": 50,
+    "bowlingSkills": 50,
+    "matches": 100,
+    "ballsFaced": 22721,
+    "runsPerBall": 0.8163813212446636,
+    "strikerDismissalPerBall": 0.062497249240790455,
+    "boundaryPerBall": 0.09695876061793055,
+    "dotPerBall": 0.6203072047885216,
+    "firstInningsBatRuns": 98.04,
+    "firstInningsWickets": 8.28
+   },
+   "bat70": {
+    "condition": "bat70",
+    "battingSkills": 70,
+    "bowlingSkills": 50,
+    "matches": 100,
+    "ballsFaced": 23125,
+    "runsPerBall": 1.0479567567567567,
+    "strikerDismissalPerBall": 0.05725405405405405,
+    "boundaryPerBall": 0.14023783783783783,
+    "dotPerBall": 0.5546378378378378,
+    "firstInningsBatRuns": 128.18,
+    "firstInningsWickets": 7.22
+   },
+   "bowl30": {
+    "condition": "bowl30",
+    "battingSkills": 50,
+    "bowlingSkills": 30,
+    "matches": 100,
+    "ballsFaced": 22804,
+    "runsPerBall": 0.8381862831082266,
+    "strikerDismissalPerBall": 0.06174355376249781,
+    "boundaryPerBall": 0.0998070513944922,
+    "dotPerBall": 0.610901596211191,
+    "firstInningsBatRuns": 101.48,
+    "firstInningsWickets": 8.08
+   },
+   "bowl70": {
+    "condition": "bowl70",
+    "battingSkills": 50,
+    "bowlingSkills": 70,
+    "matches": 100,
+    "ballsFaced": 22433,
+    "runsPerBall": 0.7880800606249722,
+    "strikerDismissalPerBall": 0.06517184504970357,
+    "boundaryPerBall": 0.0931663174787144,
+    "dotPerBall": 0.6300093612089332,
+    "firstInningsBatRuns": 93.83,
+    "firstInningsWickets": 8.49
+   }
+  },
+  "perPoint": {
+   "batting.runsPerBall.logChangePerPoint": 0.012945739371758292,
+   "batting.strikerDismissalPerBall.logChangePerPoint": -0.004898426291778812,
+   "batting.boundaryPerBall.logChangePerPoint": 0.0190276570841822,
+   "bowling.runsPerBall.logChangePerPoint": -0.0015410171545483721,
+   "bowling.strikerDismissalPerBall.logChangePerPoint": 0.001350949343247584,
+   "bowling.boundaryPerBall.logChangePerPoint": -0.0017213145037299426
+  }
+ }
+}

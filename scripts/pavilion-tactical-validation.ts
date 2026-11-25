@@ -17,7 +17,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { isBowlingCapable, suggestedEleven } from "@lcxxvi/data";
 import { adviseT20Captain, feasibleBowlerChoice, bowlersWithOversLeft, T20_TACTICAL_CAPTAIN_ID } from "@lcxxvi/ai";
 import {
-  createT20CorpusRequest, createT20Session, executeT20Command, fixtureAutopilotStep, validateT20MatchSetup,
+  createT20CorpusRequest, createT20Session, executeT20Command, validateT20ResearchMatchSetup, fixtureAutopilotStep, validateT20MatchSetup,
   type T20Session,
 } from "@lcxxvi/simulation";
 import type { T20Command, WorldPack } from "@lcxxvi/contracts";
@@ -31,6 +31,13 @@ const manifest = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-0
 const base = JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json", "utf8"));
 const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "utf8")) as { cases: unknown[] };
 const byId = new Map(world.players.map((p) => [p.playerId, p]));
+/** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
+const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
+if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
+const ARGS = process.argv.filter((a) => !a.startsWith("--model="));
+const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
+  ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
+  : validateT20MatchSetup(request, bytes, manifest);
 const squadOf = (teamId: string) => world.teams.find((t) => t.teamId === teamId)!.squadIds.map((id) => byId.get(id)!);
 const bat = (p: Player) => { const s = p.skills.T20; return s.timing + s.power + s.defence + s.rotation; };
 const bowl = (p: Player) => { const s = p.skills.T20; return s.control + s.movement + s.variation; };
@@ -158,7 +165,7 @@ function experiment(name: string) {
       const teams = request.selectedTeams.map((t) => t.teamId);
       const managers = new Map(teams.map((t, n) => [t, n === poorSide ? management : {}] as const));
       request.selectedTeams = teams.map((teamId) => ({ teamId, ...(managers.get(teamId)!.eleven ?? good)(squadOf(teamId)) }));
-      let session: T20Session = createT20Session(validateT20MatchSetup(request, bytes, manifest));
+      let session: T20Session = createT20Session(setupFor(request));
       for (let n = 0; session.core.phase !== "COMPLETE"; n += 1) {
         if (n > 3000) throw new Error("NO_PROGRESS");
         session = executeT20Command(session, step(session, managers)).session;
@@ -187,14 +194,14 @@ function experiment(name: string) {
   };
 }
 
-const chosen = process.argv.slice(3).length ? process.argv.slice(3) : Object.keys(EXPERIMENTS);
+const chosen = ARGS.slice(3).length ? ARGS.slice(3) : Object.keys(EXPERIMENTS);
 const results = chosen.map((name) => { const r = experiment(name); console.error(JSON.stringify(r)); return r; });
 const output = {
   version: "LC_PAVILION_TACTICAL_VALIDATION_V1",
-  model: "synthetic-alpha-01",
+  model: MODEL,
   captain: T20_TACTICAL_CAPTAIN_ID,
   design: "100 frozen corpus seeds, each played twice with the poor management on each side; good = the tactical captain named in `captain`, suggested eleven, engine default field",
   note: "Second-innings runs stop when the target is reached, so the run difference understates the gap in matches the chasing side wins.",
   results,
 };
-if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(output, null, 2) + "\n");
+if (ARGS[2]) writeFileSync(ARGS[2], JSON.stringify(output, null, 2) + "\n");

@@ -8,7 +8,10 @@
     },
     "modelId": {
       "type": "string",
-      "const": "synthetic-alpha-01"
+      "enum": [
+        "synthetic-alpha-01",
+        "calibrated-t20-01"
+      ]
     },
     "modelHash": {
       "type": "string",

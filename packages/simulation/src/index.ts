@@ -13,6 +13,7 @@ export interface SimulationEngine {
 
 export * from "./determinism.js";
 export * from "./probability.js";
+export * from "./model-registry.js";
 
 export * from "./generator.js";
 export * from "./world-setup.js";

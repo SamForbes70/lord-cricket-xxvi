@@ -9,7 +9,7 @@ import {
   RatingSchema,
 } from "./core.js";
 import { RandomAddressSchema } from "./determinism.js";
-import { PROBABILITY_MODEL_ID, PROBABILITY_VERSION, EXP_LUT_VERSION } from "./probability.js";
+import { PROBABILITY_MODEL_IDS, PROBABILITY_VERSION, EXP_LUT_VERSION } from "./probability.js";
 import { DeliveryResolutionSchema, ScoringContextSchema } from "./scoring.js";
 
 /** Separate orchestration identifier. Pinned existing probability/model/random semantics are unchanged. */
@@ -36,7 +36,7 @@ export const GenerateDeliveryRequestSchema = z.strictObject({
   stagePackHash: HashSchema,
   randomVersion: z.literal("SHA256_COUNTER_V1"),
   probabilityVersion: z.literal(PROBABILITY_VERSION),
-  modelId: z.literal(PROBABILITY_MODEL_ID),
+  modelId: z.enum(PROBABILITY_MODEL_IDS),
   modelHash: HashSchema,
   lutVersion: z.literal(EXP_LUT_VERSION),
   lutHash: HashSchema,
@@ -60,6 +60,8 @@ export const GenerateDeliveryRequestSchema = z.strictObject({
     intendedLength: Length,
     effort: Effort,
     variationId: z.literal("stock"),
+    /** calibrated-t20-01 only (Stage C owner decision 3); absent for synthetic-alpha-01, which never reads it. */
+    variationRating: RatingSchema.optional(),
   }),
   batting: z.strictObject({
     defenceRating: RatingSchema,

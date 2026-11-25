@@ -1,0 +1,291 @@
+{
+ "version": "LC_STAGE_C_C2_HOLDOUT_V1",
+ "researchOnly": true,
+ "readOnce": true,
+ "attribution": {
+  "source": "Cricsheet, https://cricsheet.org/",
+  "sourceURL": "https://cricsheet.org/downloads/t20s_json.zip",
+  "licence": "Open Data Commons Attribution License (ODC-By) 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "archiveSha256": "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "retrievedAtUTC": "2026-11-25T12:57:47.048656+00:00",
+  "note": "Derived aggregates only (no ball-by-ball records). Contains information from Cricsheet, made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/."
+ },
+ "holdout": "2025-08-30 to 2026-10-14",
+ "matches": {
+  "all": 724,
+  "fullMembersOnly": 131
+ },
+ "model": "calibrated-t20-01",
+ "criterion1Raw": {
+  "batting.strikeRate": {
+   "game": 1.3399806759778168,
+   "realTrueSkill": 1.4036939911999655,
+   "realP10P90": [
+    1.3499992221976496,
+    1.5250156187783248
+   ],
+   "realBracket": [
+    1.2004733358134545,
+    1.4938694356789164
+   ],
+   "verdict": "UNCLEAR"
+  },
+  "batting.average": {
+   "game": 2.2915183613995858,
+   "realTrueSkill": null,
+   "realP10P90": null,
+   "realBracket": [
+    1.2785851744299568,
+    2.3740729170552175
+   ],
+   "verdict": "UNCLEAR"
+  },
+  "batting.dismissalRate": {
+   "game": 0.5847566829704126,
+   "realTrueSkill": 1.0,
+   "realP10P90": [
+    1.0,
+    1.0
+   ],
+   "realBracket": [
+    0.49701530995684,
+    0.8683534570600596
+   ],
+   "verdict": "UNCLEAR"
+  },
+  "batting.dotPercent": {
+   "game": 0.8381839247987709,
+   "realTrueSkill": 0.7122800175294284,
+   "realP10P90": [
+    0.6374951487873921,
+    0.7234634913304088
+   ],
+   "realBracket": [
+    0.6676544017571959,
+    0.8584415432251238
+   ],
+   "verdict": "UNCLEAR"
+  },
+  "batting.boundaryPercent": {
+   "game": 1.4353783957334318,
+   "realTrueSkill": 1.9005861675617386,
+   "realP10P90": [
+    1.7518342445600403,
+    2.1249311299916376
+   ],
+   "realBracket": [
+    1.5765653078491269,
+    2.067868304708101
+   ],
+   "verdict": "FAIL"
+  },
+  "bowling.economy": {
+   "game": 0.7981751724861084,
+   "realTrueSkill": 0.8104844811429415,
+   "realP10P90": [
+    0.7180895439255797,
+    0.8119112228869129
+   ],
+   "realBracket": [
+    0.7500319565294726,
+    0.9415977111365166
+   ],
+   "verdict": "PASS"
+  },
+  "bowling.wicketRate": {
+   "game": 0.6091907917382262,
+   "realTrueSkill": 1.2007138638821242,
+   "realP10P90": [
+    1.0,
+    1.6303839471670662
+   ],
+   "realBracket": [
+    0.9864614252492456,
+    2.1054864670148836
+   ],
+   "verdict": "FAIL (inverted)"
+  },
+  "bowling.dotPercent": {
+   "game": 0.998145400589862,
+   "realTrueSkill": 1.4177945105779908,
+   "realP10P90": [
+    1.389055801911514,
+    1.5896293085919517
+   ],
+   "realBracket": [
+    1.1734505224880518,
+    1.4895854609297252
+   ],
+   "verdict": "FAIL (inverted)"
+  },
+  "bowling.boundaryPercent": {
+   "game": 0.665387534088642,
+   "realTrueSkill": 0.6413068078309621,
+   "realP10P90": [
+    0.5482424497553539,
+    0.6709572411449599
+   ],
+   "realBracket": [
+    0.5663109872782107,
+    0.8509456832496488
+   ],
+   "verdict": "PASS"
+  }
+ },
+ "criterion1Adjusted": {
+  "runs.batter": {
+   "game": 1.7549660295533474,
+   "real": 1.468451241546206,
+   "realRange": [
+    1.391710613055071,
+    1.5871352152716045
+   ],
+   "verdict": "FAIL"
+  },
+  "runs.bowler": {
+   "game": 0.7168323623332138,
+   "real": 0.8470957258991773,
+   "realRange": [
+    0.7489035671695801,
+    0.8806114305761567
+   ],
+   "verdict": "FAIL"
+  },
+  "boundary.batter": {
+   "game": 2.2638500555044607,
+   "real": 1.845814918055236,
+   "realRange": [
+    1.674121100559359,
+    2.0793514536863125
+   ],
+   "verdict": "FAIL"
+  },
+  "boundary.bowler": {
+   "game": 0.6120305180198643,
+   "real": 0.7233026077629918,
+   "realRange": [
+    0.6119505905745531,
+    0.7792195282460056
+   ],
+   "verdict": "PASS"
+  },
+  "nonDot.batter": {
+   "game": 1.472314567145317,
+   "real": 1.2423207975296346,
+   "realRange": [
+    1.2143994232823843,
+    1.318394340621665
+   ],
+   "verdict": "FAIL"
+  },
+  "nonDot.bowler": {
+   "game": 0.7957875404222396,
+   "real": 0.8576375205564097,
+   "realRange": [
+    0.7993013935493505,
+    0.8759131504524333
+   ],
+   "verdict": "FAIL"
+  },
+  "dismissal.batter": {
+   "game": 0.805313053700135,
+   "real": 1.0,
+   "realRange": [
+    0.7850460451478931,
+    1.0
+   ],
+   "verdict": "PASS"
+  },
+  "dismissal.bowler": {
+   "game": 1.1417741235892631,
+   "real": 1.3962329150372055,
+   "realRange": [
+    1.0,
+    1.940948800537562
+   ],
+   "verdict": "PASS"
+  }
+ },
+ "specialisation": {
+  "averageRatio": {
+   "game": 1.804365870010095,
+   "real": 2.4032471083958082,
+   "relative": 0.750803304290472,
+   "verdict": "FAIL"
+  },
+  "strikeRateRatio": {
+   "game": 1.2432999320888902,
+   "real": 1.2731437545491238,
+   "relative": 0.976558953100467,
+   "verdict": "PASS"
+  },
+  "economyRatioPartTimeOverFrontline": {
+   "game": 1.219062673343965,
+   "real": 1.0708441997801823,
+   "relative": 1.1384127341719814,
+   "verdict": "PASS"
+  }
+ },
+ "firstInnings": {
+  "holdoutAll": {
+   "matches": 724,
+   "runs": 147.55248618784532,
+   "wickets": 7.06767955801105,
+   "dotPercent": 41.11583947149522,
+   "boundaryPercent": 14.715916625477691,
+   "p10": 78.0,
+   "p50": 149.0,
+   "p90": 211.0
+  },
+  "holdoutFullMembers": {
+   "matches": 131,
+   "runs": 169.0381679389313,
+   "wickets": 6.679389312977099,
+   "dotPercent": 34.74030331499127,
+   "boundaryPercent": 18.641793047913033,
+   "p10": 114.0,
+   "p50": 169.0,
+   "p90": 223.0
+  },
+  "M7E": {
+   "runs": 150.55,
+   "wickets": 7.24,
+   "dotPercent": 39.32,
+   "boundaryPercent": 14.02
+  },
+  "synthetic-alpha-01": {
+   "matches": 2000,
+   "runs": 111.66,
+   "wickets": 7.891,
+   "dotPercent": 58.723185291205255,
+   "boundaryPercent": 12.094887638748958,
+   "p10": 78.0,
+   "p50": 112.0,
+   "p90": 144.0,
+   "againstM7E": {
+    "runsWithin5pc": false,
+    "wicketsWithin0.5": false,
+    "dotsWithin2pp": false,
+    "boundariesWithin2pp": true
+   }
+  },
+  "calibrated-t20-01": {
+   "matches": 2000,
+   "runs": 106.1945,
+   "wickets": 8.019,
+   "dotPercent": 60.13485260296885,
+   "boundaryPercent": 11.41238065370409,
+   "p10": 70.0,
+   "p50": 107.0,
+   "p90": 140.0,
+   "againstM7E": {
+    "runsWithin5pc": false,
+    "wicketsWithin0.5": false,
+    "dotsWithin2pp": false,
+    "boundariesWithin2pp": false
+   }
+  }
+ }
+}
