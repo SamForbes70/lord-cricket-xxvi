@@ -1,7 +1,13 @@
 import { TeamCrest } from "../world/TeamCrest.js";
+import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
-import { percentageBp } from "./format.js";
+import { useState } from "react";
+import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, rankClubStrength, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
+import { overallRating, playerStrengths } from "../world/player-visuals.js";
+import { percentageBp, formatGameDate } from "./format.js";
+import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
+import { SeasonFinale, readFinaleSeen, seasonFinaleSeenKey, writeFinaleSeen } from "./SeasonFinale.js";
 import { CareerApplicationService } from "./service.js";
 
 export const selectionNoteKey = (
@@ -64,15 +70,127 @@ export function HomeScreen(props: HomeScreenProps) {
       )?.bowling[backed]
     : null;
   const budget = call && service.managedClubBudget();
+  const report = previous && controlledTeam
+    ? buildMatchReport({
+        completion: previous,
+        focusTeamId: controlledTeam,
+        appliedMatches: state.projection.appliedMatches,
+        teamIds: state.projection.table.map((row) => row.teamId),
+        // The saved awards ledger loads lazily; until it has, the same award formula runs on the scorecard alone.
+        award:
+          service.getMatchAwardForFixture(persistentWorld?.currentSeasonNumber ?? 1, previous.fixtureId) ??
+          computeMatchAwardFromCompletion(previous, { seasonNumber: persistentWorld?.currentSeasonNumber ?? 1 }),
+        teamName: (teamId) => service.teamName(teamId),
+        playerName: (playerId) => service.playerName(playerId),
+      })
+    : null;
+  // E2: the board's objective, from each club's best eleven, and the club's standing against it.
+  const playersById = new Map(displayWorld.players.map((player) => [player.playerId, player]));
+  const objective = controlledTeam
+    ? seasonObjective(
+        rankClubStrength(
+          displayWorld.teams.map((team) => ({
+            teamId: team.teamId,
+            ratings: team.squadIds.flatMap((id) => {
+              const player = playersById.get(id);
+              return player ? [overallRating(player, "T20")] : [];
+            }),
+          })),
+        ),
+        controlledTeam,
+      )
+    : null;
+  const objectiveStatus = objective && controlledTeam
+    ? seasonObjectiveStatus({ objective, table: state.projection.table, teamId: controlledTeam, totalRounds: 14, seasonComplete: state.phase === "COMPLETE" })
+    : null;
+  // E7: the fixture preview, from recorded results in this and past seasons.
+  const opponentId = nextFixture && controlledTeam
+    ? (nextFixture.homeTeamId === controlledTeam ? nextFixture.awayTeamId : nextFixture.homeTeamId)
+    : null;
+  const preview = opponentId && controlledTeam
+    ? buildFixturePreview({
+        focusTeamId: controlledTeam,
+        opponentTeamId: opponentId,
+        meetings: [
+          ...(persistentWorld?.completedSeasons ?? []).flatMap((season) => season.completedMatches.map((completion) => ({ seasonNumber: season.seasonNumber, completion }))),
+          ...state.completedMatches.map((completion) => ({ seasonNumber: persistentWorld?.currentSeasonNumber ?? 1, completion })),
+        ],
+        table: state.projection.table,
+        appliedMatches: state.projection.appliedMatches,
+        seasonPlayers: state.projection.players,
+        opponentRatings: (displayWorld.teams.find((team) => team.teamId === opponentId)?.squadIds ?? []).flatMap((id) => {
+          const player = playersById.get(id);
+          if (!player) return [];
+          const strengths = playerStrengths(player, "T20");
+          return [{ playerId: id, batting: strengths.batting, bowling: strengths.bowling }];
+        }),
+        objective: objective ? { targetPosition: objective.targetPosition, phrase: seasonObjectivePhrase(objective.kind) } : null,
+        teamName: (teamId) => service.teamName(teamId),
+      })
+    : null;
+  // E9: the season finale, shown once per browser when the last fixture is complete.
+  const finaleKey = seasonFinaleSeenKey(service.getSaveId() ?? "", state.seasonId);
+  const [finaleClosed, setFinaleClosed] = useState<readonly string[]>([]);
+  const [finaleReplay, setFinaleReplay] = useState<string | null>(null);
+  const [, setAwardsTick] = useState(0);
+  const finaleOpen = state.phase === "COMPLETE" && (finaleReplay === finaleKey || (!finaleClosed.includes(finaleKey) && !readFinaleSeen(finaleKey)));
+  const reportKey = previous ? matchReportSeenKey(service.getSaveId() ?? "", state.seasonId, previous.fixtureId) : "";
+  // Dismissals made in this session are remembered here as well, so the report closes even when storage is unavailable.
+  const [closedReports, setClosedReports] = useState<readonly string[]>([]);
+  const [reopened, setReopened] = useState<string | null>(null);
+  const reportOpen = !!previous && (reopened === reportKey || (!closedReports.includes(reportKey) && !readReportSeen(reportKey)));
+  const selectionNote = backed && backedXI?.playerIds.includes(backed) ? (
+    <p>
+      Your selection: <strong>{service.playerName(backed)}</strong>.{" "}
+      {backedBat?.ballsFaced
+        ? `${backedBat.runs} from ${backedBat.ballsFaced} balls.`
+        : "Did not face a ball."}{" "}
+      {backedBowl && backedBowl.legalBalls > 0
+        ? `${backedBowl.wickets}/${backedBowl.runsConceded} with the ball.`
+        : ""}
+    </p>
+  ) : null;
+  const reportPanel = report ? (
+    <MatchReportPanel
+      report={report}
+      open={reportOpen}
+      onClose={() => { writeReportSeen(reportKey); setClosedReports((keys) => [...keys, reportKey]); setReopened(null); }}
+      onOpen={() => setReopened(reportKey)}
+      teamName={(teamId) => service.teamName(teamId)}
+      playerName={(playerId) => service.playerName(playerId)}
+    >
+      {selectionNote}
+    </MatchReportPanel>
+  ) : null;
   return (
     <section aria-labelledby="home-heading">
-      <h2 id="home-heading">Home</h2>
+      <h2 id="home-heading">Clubhouse</h2>
       <div className="dashboard-grid">
-        <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"}>
+        {finaleOpen && (
+          <SeasonFinale
+            seasonLabel={`SEASON ${persistentWorld?.currentSeasonNumber ?? 1}`}
+            table={state.projection.table}
+            focusTeamId={controlledTeam ?? null}
+            objective={objective}
+            objectiveStatus={objectiveStatus}
+            awards={service.getSeasonAwards(persistentWorld?.currentSeasonNumber ?? 1)}
+            requestAwards={() => void service.syncAwardsLedger().then(() => setAwardsTick((tick) => tick + 1)).catch(() => undefined)}
+            teamName={(teamId) => service.teamName(teamId)}
+            playerName={(playerId) => service.playerName(playerId)}
+            onDone={() => { writeFinaleSeen(finaleKey); setFinaleClosed((keys) => [...keys, finaleKey]); setFinaleReplay(null); }}
+          />
+        )}
+        {!finaleOpen && reportOpen && reportPanel}
+        <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"} data-art={nextFixture ? "true" : undefined} style={nextFixture ? groundArtBackground(service.groundName(nextFixture.groundId), ART_WASH.fixture) : undefined}>
           <h3>Next required action</h3>
           {state.phase === "COMPLETE" ? (
             <>
               <p className="big-stat">Season complete</p>
+              {!finaleOpen && (
+                <button type="button" data-testid="season-finale-replay" onClick={() => setFinaleReplay(finaleKey)}>
+                  See the season finale again
+                </button>
+              )}
               <p>
                 Champion:{" "}
                 <strong>
@@ -123,7 +241,7 @@ export function HomeScreen(props: HomeScreenProps) {
                   </span>
                 ))}
               </p>
-              <p className="fixture-venue">{nextFixture.matchDayDate} · {service.groundName(nextFixture.groundId)}</p>
+              <p className="fixture-venue">{formatGameDate(nextFixture.matchDayDate)} · {service.groundName(nextFixture.groundId)}</p>
               {state.careerState.currentDate < nextFixture.matchDayDate ? (
                 <button
                   className="primary"
@@ -218,6 +336,42 @@ export function HomeScreen(props: HomeScreenProps) {
                   )}
                 </section>
               )}
+              {/* The preview sits below the match action so the action stays in view at 150% text scale. */}
+              {preview && (
+                <div className="fixture-preview" data-testid="fixture-preview">
+                  <p className="fixture-meaning" data-testid="fixture-meaning">
+                    {preview.rivalry && <span className="rival-mark" data-testid="fixture-rival" title={preview.rivalry.reason}>Rival</span>}
+                    {preview.meaning}
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>{service.teamName(preview.opponentTeamId)}</dt>
+                      <dd>
+                        {preview.opponentPosition !== null && state.projection.table.some((row) => row.played > 0) ? `${preview.opponentPosition}${["th","st","nd","rd","th","th","th","th","th","th"][preview.opponentPosition % 10]} on the table` : "Yet to play"}
+                        {preview.opponentForm.length > 0 && <> · Form <span aria-label={`Recent results, oldest first: ${preview.opponentForm.join(" ")}`}>{preview.opponentForm.join(" ")}</span></>}
+                      </dd>
+                    </div>
+                    <div data-testid="fixture-head-to-head">
+                      <dt>Head to head</dt>
+                      <dd>
+                        {preview.headToHead.played === 0
+                          ? "First meeting on record."
+                          : `Played ${preview.headToHead.played}: won ${preview.headToHead.won}, lost ${preview.headToHead.lost}${preview.headToHead.other ? `, other ${preview.headToHead.other}` : ""}. ${preview.headToHead.lastMeeting ?? ""}`}
+                        {preview.rivalry && <> {preview.rivalry.reason}</>}
+                      </dd>
+                    </div>
+                    {(preview.dangerBatter || preview.dangerBowler) && (
+                      <div data-testid="fixture-danger">
+                        <dt>Players to watch</dt>
+                        <dd>
+                          {preview.dangerBatter && <>{service.playerName(preview.dangerBatter.playerId)}, {preview.dangerBatter.text}. </>}
+                          {preview.dangerBowler && <>{service.playerName(preview.dangerBowler.playerId)}, {preview.dangerBowler.text}.</>}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+              )}
               <PitchInspection
                 ground={displayWorld.grounds.find(
                   (ground) => ground.groundId === nextFixture.groundId,
@@ -241,23 +395,15 @@ export function HomeScreen(props: HomeScreenProps) {
             <p>No remaining managed fixture.</p>
           )}
         </article>
-        {previous && (
-          <article className="career-panel score-notebook">
-            <p className="eyebrow">
-              LAST TIME OUT · ROUND {previous.roundNumber}
+        {(finaleOpen || !reportOpen) && reportPanel}
+        {objective && objectiveStatus && (
+          <article className="career-panel board-card" data-testid="board-card" data-status={objectiveStatus.kind}>
+            <p className="eyebrow">THE BOARD · SEASON OBJECTIVE</p>
+            <h3 data-testid="board-objective">{objective.label}</h3>
+            <p>
+              <strong data-testid="board-status">{objectiveStatus.label}</strong> · {objectiveStatus.sentence}
             </p>
-            <h3>{service.resultText(previous)}</h3>
-            {backed && backedXI?.playerIds.includes(backed) && (
-              <p>
-                Your selection: <strong>{service.playerName(backed)}</strong>.{" "}
-                {backedBat?.ballsFaced
-                  ? `${backedBat.runs} from ${backedBat.ballsFaced} balls.`
-                  : "Did not face a ball."}{" "}
-                {backedBowl && backedBowl.legalBalls > 0
-                  ? `${backedBowl.wickets}/${backedBowl.runsConceded} with the ball.`
-                  : ""}
-              </p>
-            )}
+            <small>{objective.reason}</small>
           </article>
         )}
         <article className="career-panel">

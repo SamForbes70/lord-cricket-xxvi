@@ -6,6 +6,7 @@ import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
+import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -46,6 +47,19 @@ import { RainApp } from "./rain/RainApp.js";
 import { TeamCrest } from "./world/TeamCrest.js";
 import "./styles.css";
 import "./pavilion.css";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-600.css";
+import "@fontsource/inter/latin-700.css";
+import "@fontsource/barlow-condensed/latin-500.css";
+import "@fontsource/barlow-condensed/latin-600.css";
+import "@fontsource/barlow-condensed/latin-700.css";
+import "./floodlit.css";
+import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
+import { PlayerPortrait } from "./world/PlayerPortrait.js";
+import { BroadcastStage } from "./match/BroadcastStage.js";
+import { GuidedCoach } from "./match/GuidedCoach.js";
+import { CrowdAmbience } from "./ui-sound.js";
+import { GUIDED_MATCH_KEY, QUICK_MATCH_KEY, TitleScreen } from "./TitleScreen.js";
 import { CareerApp } from "./career/CareerApp.js";
 import { RosterCareerApp } from "./career/RosterCareerApp.js";
 import { careerWorld, type CareerUserMatchLaunch } from "./career/service.js";
@@ -66,6 +80,8 @@ import {
 } from "@lcxxvi/contracts";
 import { RED_BALL_PROFILE_DESCRIPTIONS } from "@lcxxvi/ai";
 import type { DelegationCategory } from "./match/ai-opponent.js";
+import { readRoutinePicks, routinePickMoment, writeRoutinePicks } from "./match/routine-picks.js";
+import { keyMomentBetween, type KeyMomentSnapshot } from "./match/key-moments.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
@@ -78,13 +94,94 @@ const overs = (balls: number) => `${Math.floor(balls / 6)}.${balls % 6}`;
 /** Commentary entries rendered by default; a red-ball match records thousands. */
 const COMMENTARY_WINDOW = 150;
 
+/** E3: the groups of panels below the decision, reachable in one click from the jump bar. */
+const DUGOUT_SECTIONS = [
+  { key: "tactics", label: "Tactics" },
+  { key: "scorecard", label: "Scorecard" },
+  { key: "captain", label: "Captain" },
+  { key: "settings", label: "Settings" },
+  { key: "tools", label: "Tools" },
+] as const;
+function jumpToDugout(key: string) {
+  const target = document.getElementById(`dugout-${key}`);
+  if (!target) return;
+  const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  target.focus({ preventScroll: true });
+}
+
+/** Pavilion B6: the board facts "Next key moment" compares from one ball to the next. */
+function keySnapshot(v: View): KeyMomentSnapshot | null {
+  const ledger = v.innings[v.activeIndex];
+  if (!ledger) return null;
+  const inn = ledger.innings;
+  return {
+    format: v.format, inningsIndex: v.activeIndex, runs: inn.runs, wickets: inn.wickets, legalBalls: inn.legalBalls,
+    targetToWin: inn.targetToWin ?? null,
+    batterRuns: Object.fromEntries(Object.entries(ledger.batting).map(([id, b]) => [id, b.runs])),
+  };
+}
+
+/**
+ * Pavilion B3: the result as a moment. At full time the decision panel shows the result, both scores, the player of
+ * the match and what to do next, in place of five disabled advance buttons. Reads the view only.
+ */
+function ResultMoment({ view, superOverPending, hasOwnExit, onNewMatch }: {
+  view: View;
+  superOverPending: boolean;
+  hasOwnExit: boolean;
+  onNewMatch: () => void;
+}) {
+  const teamName = (id: string) => view.teams.find((t) => t.id === id)?.name ?? id;
+  const award = view.matchAward;
+  const winner = award?.status === "AWARDED" && award.winnerPlayerId ? award.winnerPlayerId : null;
+  const winnerLine = winner ? award?.candidates.find((c) => c.playerId === winner)?.summaryLine : undefined;
+  const tournament = view.matchId?.startsWith("tour-m");
+  return (
+    <div className="result-moment" data-testid="result-moment">
+      <ul className="result-scores" aria-label="Final scores">
+        {view.innings.map((ledger, n) => (
+          <li key={n}>
+            <strong>{teamName(ledger.innings.battingTeamId)}</strong>{" "}
+            {ledger.innings.runs}
+            {ledger.innings.wickets < 10 ? `/${ledger.innings.wickets}` : " all out"}{" "}
+            <span>({overs(ledger.innings.legalBalls)} overs)</span>
+          </li>
+        ))}
+      </ul>
+      {winner && (
+        <p className="result-award" data-testid="result-player-of-match">
+          Player of the match: <strong>{view.names[winner] ?? winner}</strong>
+          {award?.winnerTeamId ? ` (${teamName(award.winnerTeamId)})` : ""}
+          {winnerLine ? `. ${winnerLine}` : ""}
+        </p>
+      )}
+      {superOverPending && <p className="result-note">The scores are level: a super over decides it, below.</p>}
+      <div className="actions result-actions">
+        {/* Career and tournament matches keep their own "return" control in the banner above. */}
+        <button type="button" className="primary" onClick={() => jumpToDugout("scorecard")}>Scorecard and match report</button>
+        {!hasOwnExit && !tournament && (
+          <>
+            <button type="button" onClick={onNewMatch}>New match</button>
+            <a className="button-link" href="#title">Title screen</a>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?: (roster: boolean) => void; onReturnCareer?: (roster: boolean) => void } = {}) {
   const worker = useRef<Worker | null>(null),
     serial = useRef(0),
     inflight = useRef<string | null>(null),
     currentRevision = useRef(0);
-  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH"; innings: number; remaining: number; cancel: boolean; from: number | null } | null>(null);
+  const advanceBatch = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH" | "KEY"; innings: number; remaining: number; cancel: boolean; from: number | null; last?: KeyMomentSnapshot | null } | null>(null);
+  const [keyMoment, setKeyMoment] = useState("");
+  // Pavilion B6: an advance that stopped only for the computer captain's own choice carries on once it has chosen.
+  const resumeAfterAi = useRef<{ scope: "DECISION" | "INNINGS" | "MATCH" | "KEY"; innings: number; remaining: number; last?: KeyMomentSnapshot | null } | null>(null);
   const [batchState, setBatchState] = useState<"idle" | "running" | "stopping">("idle");
+  const [guided, setGuided] = useState(() => { try { return localStorage.getItem(GUIDED_MATCH_KEY) === "1"; } catch { return false; } });
   const [batchProgress, setBatchProgress] = useState<{ from: number; to: number } | null>(null);
   const careerLaunch = useRef<CareerUserMatchLaunch | null>((() => {
     try {
@@ -111,6 +208,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const passage = useRef<Passage | null>(null);
   const [finishReport, setFinishReport] = useState("");
   const [playingPassage, setPlayingPassage] = useState(false);
+  // While the computer side takes its automatic step, the captain's panel stays usable: a click there is held and
+  // applied once the step returns, against the view it produces (run 44839086294 lost a plan click that landed on
+  // buttons disabled for that step). Only the latest click is kept.
+  const aiStepRequest = useRef<string | null>(null);
+  const [aiStepping, setAiStepping] = useState(false);
+  // Replies received from the worker, and the count whose view has been drawn; they differ only in the moment
+  // between a reply arriving and React drawing it.
+  const repliesReceived = useRef(0);
+  const repliesDrawn = useRef(0);
+  const heldPanelClick = useRef<{ kind: "plan"; action: Action; label: string } | { kind: "select"; action: Action } | { kind: "replay" } | null>(null);
   function endPassage(report: string) {
     passage.current = null;
     setPlayingPassage(false);
@@ -261,6 +368,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     saveStoredAudioPreferences(audioPrefs);
     audioManagerRef.current?.setPreferences(audioPrefs);
   }, [audioPrefs]);
+  // A soft crowd murmur under a live match when sound is on (owner order, step 4). Stops at the result.
+  const ambience = useRef<CrowdAmbience | null>(null);
+  const matchLive = !!view && view.phase !== "COMPLETE";
+  useEffect(() => {
+    ambience.current ??= new CrowdAmbience();
+    if (matchLive) ambience.current.start(audioPrefs);
+    else ambience.current.stop();
+  }, [matchLive, audioPrefs]);
+  useEffect(() => () => ambience.current?.stop(), []);
   useEffect(() => {
     const manager = audioManagerRef.current;
     if (!manager || !view?.matchId || !view.audioCues) return;
@@ -285,7 +401,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       audioBootSyncRef.current = false;
       audioManagerRef.current?.unlockFromUserGesture();
     }
-    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); }
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); heldPanelClick.current = null; }
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -295,6 +411,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
     const requestId = `ui-${++serial.current}`;
     if (body.type === "REBUILD_ANALYTICS") { rebuildRequest.current = requestId; setAnalyticsRebuild({ state: "RUNNING", applied: 0, total: 0 }); }
+    aiStepRequest.current = body.type === "AI_STEP" ? requestId : null;
+    setAiStepping(body.type === "AI_STEP");
     inflight.current = requestId;
     setBusy(true);
     setError("");
@@ -341,6 +459,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       }
       if (r.requestId !== inflight.current) return;
       inflight.current = null;
+      repliesReceived.current += 1;
+      const wasAiStep = aiStepRequest.current === r.requestId;
+      if (wasAiStep) { aiStepRequest.current = null; setAiStepping(false); }
       currentRevision.current = r.revision;
       serial.current = Math.max(serial.current, 10000 + r.revision, r.commandIdFloor ?? 0);
       if (r.careerFixture && !careerLaunch.current) {
@@ -352,6 +473,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         if (restored.managedTeamId) setAiTeamId(restored.homeTeamId === restored.managedTeamId ? restored.awayTeamId : restored.homeTeamId);
       }
       const batch = advanceBatch.current;
+      // A routine pick never follows a stop the player asked for.
+      const stoppedByPlayer = Boolean(batch?.cancel);
       let batchError = "";
       if (batch) {
         const acknowledged = r.acknowledgement?.commandId === r.requestId && r.acknowledgement.committedRevision === r.revision;
@@ -359,19 +482,55 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           batch.from ??= r.acknowledgement.fromSequence;
           setBatchProgress({ from: batch.from, to: r.acknowledgement.toSequence });
         }
-        const continueBatch = !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
+        // Pavilion B6: "Next key moment" stops when something worth the player's attention has happened.
+        const nextSnapshot = r.view ? keySnapshot(r.view) : null;
+        const moment = batch.scope === "KEY" && acknowledged && !r.error && batch.last && nextSnapshot && r.view
+          ? keyMomentBetween(batch.last, nextSnapshot, r.view.names) : null;
+        if (acknowledged && nextSnapshot) batch.last = nextSnapshot;
+        if (moment && r.view) {
+          const latest = r.view.fieldPresentation?.latestHighlight?.headline;
+          setKeyMoment(moment === "Wicket." && latest ? `Wicket: ${latest}` : moment);
+        }
+        const routineInBatch = !moment && !batch.cancel && acknowledged && !r.error && r.view && !r.persistence?.readOnly && batch.remaining > 1 &&
+          (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) ? routinePickFor(r.view) : null;
+        const continueBatch = !moment && !routineInBatch && !batch.cancel && acknowledged && !r.error && r.view?.phase === "READY" && !r.view.advanceReason &&
           !r.persistence?.readOnly && (batch.scope !== "INNINGS" || r.view.activeIndex === batch.innings) && --batch.remaining > 0;
-        if (continueBatch) {
+        if (routineInBatch && r.view) {
+          batch.remaining -= 1;
+          sendRoutinePick(w, r.view, r.revision, routineInBatch);
+        } else if (continueBatch) {
           const requestId = `ui-${++serial.current}`;
           inflight.current = requestId;
           w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
-            command: { kind: "ADVANCE", payload: { scope: "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
+            command: { kind: "ADVANCE", payload: { scope: batch.scope === "KEY" ? "DELIVERY" : "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
         } else {
           if (!r.error && !acknowledged) batchError = "Simulation stopped because the last command was not acknowledged.";
           else if (!r.error && batch.remaining <= 0) batchError = "Simulation stopped at its command limit.";
+          // The computer captain is about to answer its own question: carry the advance on after it has.
+          const aiTeam = routineContext.current.aiTeamId;
+          if (!moment && !batch.cancel && acknowledged && !r.error && r.view && aiTeam && r.view.phase !== "READY" && r.view.phase !== "COMPLETE" &&
+            r.view.decisionTeamId === aiTeam && batch.remaining > 1)
+            resumeAfterAi.current = { scope: batch.scope, innings: batch.innings, remaining: batch.remaining, last: batch.last ?? null };
           advanceBatch.current = null;
           setBatchState("idle");
         }
+      }
+      const resume = resumeAfterAi.current;
+      if (wasAiStep && resume && !inflight.current && r.view) {
+        if (r.error || r.persistence?.readOnly || r.view.phase === "COMPLETE" || (resume.scope === "INNINGS" && r.view.activeIndex !== resume.innings)) resumeAfterAi.current = null;
+        else if (r.view.phase === "READY" && !r.view.advanceReason) {
+          resumeAfterAi.current = null;
+          advanceBatch.current = { scope: resume.scope, innings: resume.innings, remaining: resume.remaining - 1, cancel: false, from: null, last: resume.last ?? null };
+          setBatchState("running");
+          const requestId = `ui-${++serial.current}`;
+          inflight.current = requestId;
+          w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
+            command: { kind: "ADVANCE", payload: { scope: resume.scope === "KEY" ? "DELIVERY" : "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
+        } else if (r.view.decisionTeamId !== routineContext.current.aiTeamId) resumeAfterAi.current = null;
+      }
+      if (!stoppedByPlayer && !advanceBatch.current && !inflight.current && r.view && !r.error && !r.persistence?.readOnly) {
+        const routine = routinePickFor(r.view);
+        if (routine) sendRoutinePick(w, r.view, r.revision, routine);
       }
       setBusy(inflight.current !== null);
       setError(r.error ?? batchError);
@@ -588,8 +747,19 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const highlights = paceOverride ?? (!!scenario && isCloseFinish(scenario.scenarioId));
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.
+  // Apply a captain's-panel click held during the computer side's step, before that side is asked to act again.
+  // It runs against the fresh view, so its command carries the current revision.
   useEffect(() => {
-    if (!view || busy || fatal || error || persistence?.readOnly) return;
+    repliesDrawn.current = repliesReceived.current;
+    const held = heldPanelClick.current;
+    if (!held || !view || busy || inflight.current) return;
+    heldPanelClick.current = null;
+    if (held.kind === "plan") startPassage(held.action, held.label);
+    else if (held.kind === "select") act(held.action);
+    else replayScenario();
+  }, [view, busy]);
+  useEffect(() => {
+    if (!view || busy || inflight.current || heldPanelClick.current || fatal || error || persistence?.readOnly) return;
     if (view.phase === "COMPLETE") return;
     const candidates = [
       ...(aiTeamId && view.teams.some(team => team.id === aiTeamId) ? [{ teamId: aiTeamId, delegated: false }] : []),
@@ -604,6 +774,48 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       return;
     }
   }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly, matchAware, highlights]);
+  // Pavilion B2: the computer makes the player's routine batter and bowler picks (the "Recommended" choice, sent as
+  // the same command a click sends) and leaves key moments to the player. Never in scenarios or red-ball matches.
+  const [routinePicks, setRoutinePicks] = useState(readRoutinePicks);
+  const [routineNote, setRoutineNote] = useState("");
+  // Routine picks only follow the player's own play in this page: a reload or recovery never moves the match on.
+  const routineArmed = useRef(false);
+  const routineDecision = view && (view.phase === "AWAITING_BATTER" || view.phase === "AWAITING_BOWLER") && captainedTeam &&
+    view.decisionTeamId === captainedTeam && aiTeamId !== captainedTeam && !scenario && view.format !== "RED_BALL"
+    ? (() => {
+        const inn = view.innings[view.activeIndex]?.innings;
+        const decision = view.phase === "AWAITING_BATTER" ? "BATTER" as const : "BOWLER" as const;
+        const runsNeeded = inn?.targetToWin == null ? null : Math.max(0, inn.targetToWin - inn.runs);
+        return { decision, moment: routinePickMoment({ format: view.format, decision, legalBalls: inn?.legalBalls ?? 0, wickets: inn?.wickets ?? 0, runsNeeded }) };
+      })()
+    : null;
+  // The worker reply handler is created once, so it reads the current routine-pick context through a ref.
+  const routineContext = useRef({ on: routinePicks, captainedTeam, aiTeamId, scenario: Boolean(scenario), delegation });
+  routineContext.current = { on: routinePicks, captainedTeam, aiTeamId, scenario: Boolean(scenario), delegation };
+  function routinePickFor(v: View): { decision: "BATTER" | "BOWLER"; playerId: string; name: string } | null {
+    const ctx = routineContext.current;
+    if (!ctx.on || !routineArmed.current || ctx.scenario || v.format === "RED_BALL") return null;
+    if (v.phase !== "AWAITING_BATTER" && v.phase !== "AWAITING_BOWLER") return null;
+    if (!ctx.captainedTeam || v.decisionTeamId !== ctx.captainedTeam || ctx.aiTeamId === ctx.captainedTeam) return null;
+    const decision = v.phase === "AWAITING_BATTER" ? "BATTER" as const : "BOWLER" as const;
+    if (delegationForTeam(ctx.delegation, v.decisionTeamId).includes(decision)) return null;
+    const inn = v.innings[v.activeIndex]?.innings;
+    const runsNeeded = inn?.targetToWin == null ? null : Math.max(0, inn.targetToWin - inn.runs);
+    if (routinePickMoment({ format: v.format, decision, legalBalls: inn?.legalBalls ?? 0, wickets: inn?.wickets ?? 0, runsNeeded }).key) return null;
+    const pick = v.candidates.find((c) => c.recommended && !c.reason);
+    return pick ? { decision, playerId: pick.id, name: pick.name } : null;
+  }
+  /** Sends the routine pick as the same command the player's click would send, keeping the panel busy meanwhile. */
+  function sendRoutinePick(w: Worker, v: View, revision: number, routine: { decision: "BATTER" | "BOWLER"; playerId: string; name: string }) {
+    const requestId = `ui-${++serial.current}`;
+    inflight.current = requestId;
+    const teamId = v.decisionTeamId!;
+    setRoutineNote(routine.decision === "BOWLER" ? `Routine pick: ${routine.name} bowls the next over.` : `Routine pick: ${routine.name} comes in to bat.`);
+    w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: revision, origin: "HUMAN",
+      command: routine.decision === "BATTER"
+        ? { kind: "SET_BATTER", payload: { teamId, playerId: routine.playerId }, commandId: requestId, expectedRevision: revision, actorId: `USER:${teamId}` }
+        : { kind: "SET_BOWLER", payload: { teamId, bowlerId: routine.playerId }, commandId: requestId, expectedRevision: revision, actorId: `USER:${teamId}` } });
+  }
   // Let the ordinary opponent policy finish its commands before resuming the passage.
   useEffect(() => {
     const active = passage.current;
@@ -619,7 +831,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         (view.phase !== "READY" && view.decisionTeamId === captainedTeam)) {
       endPassage(passageReport(active, view));
     } else if (view.phase === "READY" && !view.advanceReason) {
-      const timer = window.setTimeout(() => { if (passage.current === active && !inflight.current) act({kind:"ADVANCE", payload:{scope:"DELIVERY"}}, true); }, 150);
+      // Step only from a drawn view: a reply that has arrived but is not yet drawn re-runs this effect with a new timer.
+      const timer = window.setTimeout(() => { if (passage.current === active && !inflight.current && repliesDrawn.current === repliesReceived.current) act({kind:"ADVANCE", payload:{scope:"DELIVERY"}}, true); }, 150);
       return () => window.clearTimeout(timer);
     } else if (view.phase === "READY" || aiTeamId !== rivalTeam) {
       endPassage(passageReport(active, view));
@@ -681,6 +894,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   }
   function act(action: Action, continuingPassage = false) {
     if (!view || inflight.current || fatal) return;
+    if (action.kind === "ADVANCE") routineArmed.current = true;
+    if (action.kind === "ADVANCE" && !advanceBatch.current) setKeyMoment("");
+    if (!advanceBatch.current) resumeAfterAi.current = null;
     if (passage.current && !continuingPassage) endPassage(passageReport(passage.current, view));
     audioBootSyncRef.current = false;
     audioManagerRef.current?.unlockFromUserGesture();
@@ -739,12 +955,24 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     act(action, true);
   }
 
-  function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH") {
+  // A panel click must wait while a request is in flight, and also in the moment after a reply has arrived but
+  // before its view is drawn: a command sent from the older drawn view would carry a stale revision and be
+  // rejected (seen locally once in 100 runs before this check).
+  function panelMustWait() {
+    return inflight.current !== null || repliesDrawn.current !== repliesReceived.current;
+  }
+
+  function replayScenario() {
+    if (scenario) send({ type: "SCENARIO_START", scenarioId: scenario.scenarioId });
+  }
+
+  function advanceTo(scope: "DECISION" | "INNINGS" | "MATCH" | "KEY") {
     if (!view || inflight.current || fatal || view.advanceReason || persistence?.readOnly) return;
-    advanceBatch.current = { scope, innings: view.activeIndex, remaining: 512, cancel: false, from: null };
+    advanceBatch.current = { scope, innings: view.activeIndex, remaining: scope === "KEY" ? 1500 : 512, cancel: false, from: null, last: keySnapshot(view) };
     setBatchProgress(null);
     setBatchState("running");
-    act({ kind: "ADVANCE", payload: { scope: "OVER" } });
+    setKeyMoment("");
+    act({ kind: "ADVANCE", payload: { scope: scope === "KEY" ? "DELIVERY" : "OVER" } });
   }
   function cancelAnalyticsRebuild() {
     if (!rebuildRequest.current) return;
@@ -752,6 +980,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     worker.current?.postMessage({ version: UI_VERSION, type: "CANCEL_ANALYTICS", requestId: `ui-${++serial.current}`, expectedRevision: currentRevision.current, targetRequestId: rebuildRequest.current });
   }
   function stopAdvance() {
+    resumeAfterAi.current = null;
     setCancelSignal(current => current + 1);
     if (!advanceBatch.current) return;
     advanceBatch.current.cancel = true;
@@ -765,6 +994,21 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const tn = (id: string) => view?.teams.find((t) => t.id === id)?.name ?? id;
   const striker =
     i?.strikerEnd === "NORTH" ? i.northBatterId : i?.southBatterId;
+  // E4: the situation in plain words, read from the board only.
+  const situationInnings = view?.scorecard?.innings[view.activeIndex];
+  const situationFalls: { runs: number; legalBalls: number }[] | null =
+    situationInnings && "fallOfWickets" in situationInnings ? situationInnings.fallOfWickets : null;
+  const situationLastFall = situationFalls && situationFalls.length > 0
+    ? situationFalls.reduce((last, fall) => (fall.legalBalls >= last.legalBalls ? fall : last))
+    : null;
+  const situation = view && i
+    ? matchSituation({
+        format: view.format, runs: i.runs, wickets: i.wickets, legalBalls: i.legalBalls, targetToWin: i.targetToWin ?? null,
+        lastWicket: situationLastFall ? { runs: situationLastFall.runs, legalBalls: situationLastFall.legalBalls } : null,
+        partnershipKnown: situationFalls !== null && situationFalls.length === i.wickets,
+        matchComplete: view.resultText !== null,
+      })
+    : null;
   const chaseRuns = i?.targetToWin == null ? null : Math.max(0, i.targetToWin - i.runs);
   const chaseBalls = !i || !view || view.format === "RED_BALL"
     ? null
@@ -887,7 +1131,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             playerTeamId={captainedTeam}
             finished={view.phase === "COMPLETE"}
             disabled={
-              busy ||
+              (busy && !aiStepping) ||
               fatal ||
               Boolean(persistence?.readOnly) ||
               (view.phase === "READY" && Boolean(view.advanceReason))
@@ -895,17 +1139,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             playing={playingPassage}
             report={finishReport}
             stop={stopPassage}
-            replay={
-              scenario
-                ? () =>
-                    send({
-                      type: "SCENARIO_START",
-                      scenarioId: scenario.scenarioId,
-                    })
-                : undefined
+            replay={scenario ? () => (panelMustWait() ? (heldPanelClick.current = { kind: "replay" }) : replayScenario()) : undefined}
+            command={(action: Action, label: string) =>
+              panelMustWait() ? (heldPanelClick.current = { kind: "plan", action, label }) : startPassage(action, label)
             }
-            command={startPassage}
-            select={act}
+            select={(action: Action) => (panelMustWait() ? (heldPanelClick.current = { kind: "select", action }) : act(action))}
           />
           <a
             href="#decision"
@@ -941,7 +1179,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       style={{ fontSize: `${Number(scale) / 100}rem` }}
       data-motion={highlightMotion} className={`match-shell density-${density}`}
     >
-      <a className="skip" href="#decision">
+      <a
+        className="skip"
+        href="#decision"
+        onClick={(event) => {
+          // The app routes on the URL hash, so following this link as a plain anchor would leave the match screen.
+          event.preventDefault();
+          document.getElementById("decision")?.scrollIntoView({ block: "start" });
+          decisionRef.current?.focus({ preventScroll: true });
+        }}
+      >
         Skip to next decision
       </a>
       <header className="masthead">
@@ -951,7 +1198,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             Lord Cricket <span>XXVI</span>
           </h1>
         </div>
-        <span className="alpha">SYNTHETIC_ALPHA</span>
       </header>
       {!view && preferences}
       {view?.matchId?.startsWith("tour-m") && (
@@ -1002,7 +1248,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             <p>
               Select your side and an opponent. You make decisions for{" "}
               <strong>both teams</strong> initially. After starting a match, you can optionally
-              delegate either team or individual decisions to the deterministic tactical captain.
+              delegate either team or individual decisions to the computer captain.
             </p>
           </section>
           {displayCatalog ? (
@@ -1029,6 +1275,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 start={(format, selections, groundId) =>
                   send({ type: "START", format, selections, groundId, ...(stagedWorld ? { worldCopy: stagedWorld } : {}), ...(stagedRoster ? { rosterPack: stagedRoster } : {}) })
                 }
+                // Pavilion P03a: a quick or guided match is the player against the computer, not a hot seat for both XIs.
+                onQuickStart={(opponentTeamId) => changeAiOpponent(opponentTeamId)}
               />
             </>
           ) : (
@@ -1043,7 +1291,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             aria-label="Match scoreboard"
             data-testid="scorestrip"
             /* Both sides' kit colours as a thin stripe along the top: the scoreboard is where edited-world colours show. */
-            style={view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : undefined}
+            style={{ ...groundArtBackground(view.ground, ART_WASH.scoreboard), ...(view.teams[0]?.colours && view.teams[1]?.colours ? { boxShadow: `inset 0 2px 0 ${view.teams[0].colours[0]}, inset 0 4px 0 ${view.teams[0].colours[1]}, inset 0 6px 0 ${view.teams[1].colours[0]}, inset 0 8px 0 ${view.teams[1].colours[1]}` } : {}) }}
+            data-art="true"
           >
             <div>
               <p>
@@ -1056,7 +1305,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   : view.teams.map((t) => t.name).join(" v ")}
               </h2>
               <div className="broadcast-line">{view.teams.filter(team => !i || team.id === i.battingTeamId).map(team => <TeamCrest key={team.id} teamId={team.id} name={team.name} colours={team.colours ?? []} size={32} decorative />)}
-              <strong className="score">
+              <strong className="score" key={i ? `${i.runs}/${i.wickets}` : "toss"}>
                 {i ? `${i.runs}/${i.wickets}` : "Ready for the toss"}
               </strong>
               </div>
@@ -1088,6 +1337,28 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
           </section>
+          {situation && (
+            <section className="situation-strip" aria-label="Match situation" data-testid="situation-strip" data-pressure={situation.pressure?.level}>
+              <strong data-testid="situation-headline">{situation.headline}</strong>
+              {situation.pressure && <span className="situation-pressure" data-testid="situation-pressure">{situation.pressure.label}</span>}
+              {situation.facts.map((fact) => <span key={fact}>{fact}</span>)}
+            </section>
+          )}
+          {/* Pavilion B9: a T20 chase's win chance, from the game's own simulated matches. Kept out of the situation
+              strip, which states only what is on the board. */}
+          {view && i && view.format === "T20" && i.targetToWin != null && !view.resultText && (() => {
+            const chance = t20ChaseWinChance(Math.max(0, i.targetToWin - i.runs), i.wickets, i.legalBalls);
+            if (chance === null || chance === 0 || chance === 100) return null;
+            return (
+              <p className="win-chance" data-testid="win-chance">
+                <span>Win chance (game model estimate):</span>{" "}
+                <strong>{tn(i.battingTeamId)} about {chance}%</strong>{" · "}
+                <strong>{tn(i.bowlingTeamId)} about {100 - chance}%</strong>
+                <small> From this game&apos;s own simulated matches, not real cricket.</small>
+              </p>
+            );
+          })()}
+          <BroadcastStage view={view} />
           {highlights && pacePanel}
           <section
             className="active"
@@ -1098,9 +1369,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               <span>Batters</span>
               {i ? (
                 [i.northBatterId, i.southBatterId].map((id, n) => (
-                  <p key={n}>
+                  <p key={n} className={id ? "active-player" : undefined}>
                     {id ? (
                       <>
+                        <PlayerPortrait playerId={id} role={activeRole(view, id)} kit={activeKit(view, id)} size={44} />
                         <strong>
                           {view.names[id]}
                           {id === striker ? " *" : ""}
@@ -1109,7 +1381,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         {ledger!.batting[id]!.ballsFaced})
                       </>
                     ) : (
-                      "Awaiting selection"
+                      view.resultText ? "Innings closed" : "Awaiting selection"
                     )}
                   </p>
                 ))
@@ -1119,9 +1391,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             </div>
             <div>
               <span>Bowler</span>
-              <p>
+              <p className={i?.bowlerId ? "active-player" : undefined}>
+                {i?.bowlerId && <PlayerPortrait playerId={i.bowlerId} role="BOWLER" kit={activeKit(view, i.bowlerId)} size={44} />}
                 <strong>
-                  {i?.bowlerId ? view.names[i.bowlerId] : "Awaiting selection"}
+                  {i?.bowlerId ? view.names[i.bowlerId] : view.resultText ? "Innings closed" : "Awaiting selection"}
                 </strong>
               </p>
               {i?.bowlerId && (
@@ -1146,6 +1419,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </p>
             </div>
           </section>
+          {guided && <GuidedCoach view={view} onEnd={() => { try { localStorage.removeItem(GUIDED_MATCH_KEY); } catch { /* ignore */ } setGuided(false); }} />}
           <section
             className="decision"
             id="decision"
@@ -1155,9 +1429,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           >
             <div className="decision-top">
               <div>
-                <p className="eyebrow">NEXT DECISION</p>
+                <p className="eyebrow">{view.phase === "COMPLETE" && view.resultText ? "FULL TIME" : "NEXT DECISION"}</p>
                 <h2 ref={decisionRef} tabIndex={-1}>
-                  {view.nextDecision}
+                  {view.phase === "COMPLETE" && view.resultText ? view.resultText : view.nextDecision}
                 </h2>
               </div>
               <span role="status" className="working">
@@ -1165,7 +1439,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
-            {batchProgress && <p role="status">Committed events {batchProgress.from}–{batchProgress.to}.</p>}
+            {keyMoment && !batchState.startsWith("run") && <p role="status" className="key-moment" data-testid="key-moment">Key moment: {keyMoment}</p>}
+            {batchProgress && !(view.phase === "COMPLETE" && view.resultText) && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
             <fieldset disabled={busy || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
@@ -1196,11 +1471,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Call tails
                   </button>
+                  <small className="recommended-note">A coin toss: neither call is better, so no choice is recommended.</small>
                 </div>
               )}
               {view.phase === "AWAITING_INNINGS" && (
                 <div className="actions">
                   <button
+                    data-recommended={view.recommendation?.innings === "BAT" ? "true" : undefined}
+                    aria-describedby={view.recommendation?.innings === "BAT" ? "recommended-bat-first" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_INNINGS",
@@ -1213,7 +1491,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Bat first
                   </button>
+                  {view.recommendation?.innings === "BAT" && <RecommendedTag id="recommended-bat-first" />}
                   <button
+                    data-recommended={view.recommendation?.innings === "BOWL" ? "true" : undefined}
+                    aria-describedby={view.recommendation?.innings === "BOWL" ? "recommended-bowl-first" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_INNINGS",
@@ -1226,11 +1507,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Bowl first
                   </button>
+                  {view.recommendation?.innings === "BOWL" && <RecommendedTag id="recommended-bowl-first" />}
                 </div>
               )}
               {view.phase === "AWAITING_FOLLOW_ON" && (
                 <div className="actions">
                   <button
+                    data-recommended={view.recommendation?.followOn === true ? "true" : undefined}
+                    aria-describedby={view.recommendation?.followOn === true ? "recommended-enforce" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_FOLLOW_ON",
@@ -1243,7 +1527,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Enforce follow-on
                   </button>
+                  {view.recommendation?.followOn === true && <RecommendedTag id="recommended-enforce" />}
                   <button
+                    data-recommended={view.recommendation?.followOn === false ? "true" : undefined}
+                    aria-describedby={view.recommendation?.followOn === false ? "recommended-bat-again" : undefined}
                     onClick={() =>
                       act({
                         kind: "CHOOSE_FOLLOW_ON",
@@ -1256,6 +1543,23 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Bat again
                   </button>
+                  {view.recommendation?.followOn === false && <RecommendedTag id="recommended-bat-again" />}
+                </div>
+              )}
+              {limitedOvers && !scenario && captainedTeam && (
+                <div className="routine-picks" data-testid="routine-picks">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={routinePicks}
+                      onChange={(e) => { setRoutinePicks(e.currentTarget.checked); writeRoutinePicks(e.currentTarget.checked); }}
+                    />{" "}
+                    Computer makes routine batter and bowler picks; you choose at key moments
+                  </label>
+                  {routineDecision?.moment.key && routinePicks && <p className="routine-key" data-testid="routine-key">{routineDecision.moment.reason} Your choice.</p>}
+                  {/* When play is ready to go on, the note takes the advance hint's line instead (below), so the decision
+                      still fits the first screen at 1366 by 768 (dugout-view.spec, hosted Windows run 45466265308). */}
+                  {routineNote && view.advanceReason && <p role="status" className="routine-note" data-testid="routine-note">{routineNote}</p>}
                 </div>
               )}
               {(view.phase === "AWAITING_BATTER" ||
@@ -1266,8 +1570,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       <button
                         data-candidate={p.id}
                         disabled={!!p.reason}
+                        data-recommended={p.recommended ? "true" : undefined}
                         aria-describedby={
-                          p.reason ? `reason-${p.id}` : undefined
+                          p.reason
+                            ? `reason-${p.id}`
+                            : p.recommended
+                              ? `recommended-${p.id}`
+                              : undefined
                         }
                         onClick={() =>
                           act(
@@ -1294,6 +1603,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       {p.reason && (
                         <small id={`reason-${p.id}`}>{p.reason}</small>
                       )}
+                      {p.recommended && (
+                        <small
+                          id={`recommended-${p.id}`}
+                          className="recommended-tag"
+                          title="The computer captain's choice. You decide."
+                        >
+                          Recommended
+                        </small>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1301,6 +1619,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               {view.phase === "READY" && view.format === "RED_BALL" && i && (
                 <div className="actions redball-actions">
                   <button
+                    data-recommended={view.recommendation?.declare ? "true" : undefined}
+                    aria-describedby={view.recommendation?.declare ? "recommended-declare" : undefined}
                     onClick={() =>
                       act({
                         kind: "DECLARE",
@@ -1310,8 +1630,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Declare innings
                   </button>
+                  {view.recommendation?.declare && <RecommendedTag id="recommended-declare" />}
                   <button
                     disabled={!view.redBall?.newBallAvailable}
+                    data-recommended={view.recommendation?.newBall ? "true" : undefined}
+                    aria-describedby={view.recommendation?.newBall ? "recommended-new-ball" : undefined}
                     onClick={() =>
                       act({
                         kind: "TAKE_NEW_BALL",
@@ -1321,8 +1644,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   >
                     Take new ball
                   </button>
+                  {view.recommendation?.newBall && <RecommendedTag id="recommended-new-ball" />}
                 </div>
               )}
+              {view.phase === "COMPLETE" && view.resultText ? (
+                <ResultMoment
+                  view={view}
+                  superOverPending={Boolean(superOver && superOver.phase !== "COMPLETE")}
+                  hasOwnExit={Boolean(careerLaunch.current) || Boolean(scenario)}
+                  onNewMatch={() => send({ type: "BOOT", fresh: true })}
+                />
+              ) : (
               <div className="advance">
                 <button
                   disabled={!!view.advanceReason}
@@ -1333,8 +1665,19 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 >
                   Next delivery
                 </button>
+                {limitedOvers && (
+                  <button
+                    className="primary"
+                    data-testid="next-key-moment"
+                    disabled={!!view.advanceReason}
+                    aria-describedby="advance-reason"
+                    onClick={() => advanceTo("KEY")}
+                  >
+                    Next key moment
+                  </button>
+                )}
                 <button
-                  className="primary"
+                  className={limitedOvers ? undefined : "primary"}
                   disabled={!!view.advanceReason}
                   aria-describedby="advance-reason"
                   onClick={() =>
@@ -1348,69 +1691,27 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 <button disabled={!!view.advanceReason} onClick={() => advanceTo("MATCH")}>Finish match</button>
                 <span id="advance-reason">
                   {view.advanceReason ||
-                    "All options stop at required decisions, including batter or bowler selection."}
+                    (routineNote ? <span role="status" className="routine-note" data-testid="routine-note">{routineNote}</span> : "Each option stops at your own decisions.")}
                 </span>
               </div>
+              )}
             </fieldset>
           </section>
+          {/* E3: one click from the decision to each group of panels below, and back again. */}
+          <nav className="dugout-jump" aria-label="Match sections" data-testid="dugout-jump">
+            <span aria-hidden="true">Go to</span>
+            {DUGOUT_SECTIONS.map((section) => (
+              <button key={section.key} type="button" className="secondary" onClick={() => jumpToDugout(section.key)}>{section.label}</button>
+            ))}
+          </nav>
+          <span id="dugout-captain" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Captain: pace and briefings" />
           {!highlights && pacePanel}
-          {preferences}
-          <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
-            <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
-            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
-              onChange={e => changeAiOpponent(e.target.value)}>
-              <option value="">Manual decisions for both teams</option>
-              {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
-            </select>
-            <span>AI chooses its team's batters, bowlers and tactics through accepted commands. You still advance deliveries.</span>
-          </section>
         {careerLaunch.current && !view.resultText && onInspectCareer && <button type="button" disabled={busy || fatal} onClick={() => onInspectCareer(careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER")}>Inspect career</button>}
-          {(() => {
-            const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
-            const selected = delegationForTeam(delegation, selectedTeam.id);
-            const currentProfile = redBallProfileForTeam(delegation, selectedTeam.id);
-            const choices: [DelegationCategory, string][] = [
-              ["TOSS", "Toss call"],
-              ["INNINGS", "Bat or bowl"],
-              ["BATTER", "Batter selection"],
-              ["BOWLER", "Bowler selection"],
-              ["BATTING_PLAN", "Batting plan"],
-              ["BOWLING_PLAN", "Bowling plan"],
-              ...(view.format !== "T20" ? [["FIELD", "Field placement"]] as [DelegationCategory, string][] : []),
-              ...(view.format === "RED_BALL" ? [["DECLARATION", "Declaration"], ["FOLLOW_ON", "Follow-on"], ["NEW_BALL", "New ball"]] as [DelegationCategory, string][] : []),
-            ];
-            return <details className="career-panel" id="captain-delegation">
-              <summary>Delegate individual decisions</summary>
-              <p>Choose which decisions the tactical captain may make. These choices are saved with the match.</p>
-              <label>Delegation team <select value={selectedTeam.id} disabled={busy || fatal} onChange={event => setDelegationTeam(event.currentTarget.value)}>{view.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
-              {view.format === "RED_BALL" && (
-                <div>
-                  <label>Red-ball tactical profile <select aria-label="Red-ball tactical profile" value={currentProfile} disabled={busy || fatal || Boolean(persistence?.readOnly)} onChange={event => {
-                    const redBallProfile = event.currentTarget.value as RedBallTacticalProfile;
-                    send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories: [...selected], redBallProfile });
-                  }}>
-                    <option value="CONSERVATIVE">Conservative</option>
-                    <option value="BALANCED">Balanced</option>
-                    <option value="AGGRESSIVE">Aggressive</option>
-                  </select></label>
-                  <p data-testid="redball-profile-posture">{RED_BALL_PROFILE_DESCRIPTIONS[currentProfile]}</p>
-                </div>
-              )}
-              {aiTeamId === selectedTeam.id && <p>The tactical captain controls this team until you change the opponent setting.</p>}
-              <fieldset disabled={busy || fatal || Boolean(persistence?.readOnly) || aiTeamId === selectedTeam.id}>
-                <legend>Delegated decisions</legend>
-                {choices.map(([category, label]) => <label key={category}><input type="checkbox" checked={selected.includes(category)} onChange={event => {
-                  const categories = event.currentTarget.checked ? [...selected, category] : selected.filter(value => value !== category);
-                  send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories, ...(view.format === "RED_BALL" ? { redBallProfile: currentProfile } : {}) });
-                }} /> {label}</label>)}
-              </fieldset>
-            </details>;
-          })()}
           {view.format === "RED_BALL" && view.redBall && (
             <details className="career-panel" data-testid="redball-conditions-panel">
               <summary>Red-ball pitch wear and weather controls</summary>
               <p data-testid="redball-conditions-summary">
-                Day {view.redBall.day} · Phase: {view.redBall.clockPhase ?? "PLAY"} · Weather delay today: {Math.round((view.redBall.delaySecondsToday ?? 0) / 60)} min · Pitch wear: {view.redBall.pitchWearPoints ?? 0} pts · Seam: {((view.redBall.seamBp ?? 5000) / 100).toFixed(1)}% · Turn: {((view.redBall.turnBp ?? 5000) / 100).toFixed(1)}%
+                Day {view.redBall.day} · Session: {(view.redBall.clockPhase ?? "PLAY").toLowerCase().replaceAll("_", " ")} · Weather delay today: {Math.round((view.redBall.delaySecondsToday ?? 0) / 60)} min · Pitch wear: {view.redBall.pitchWearPoints ?? 0} pts · Seam: {((view.redBall.seamBp ?? 5000) / 100).toFixed(1)}% · Turn: {((view.redBall.turnBp ?? 5000) / 100).toFixed(1)}%
               </p>
               {view.redBall.forecast && (
                 <p data-testid="redball-uncertain-forecast">
@@ -1435,6 +1736,28 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </details>
           )}
+          <span id="dugout-tactics" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tactics: plans and field" />
+          {/* Pavilion B9: what the other side has done in this match and what it still has, from the ledger only. */}
+          {limitedOvers && captainedTeam && i && ledger && !view.resultText && (() => {
+            const playerSide = i.battingTeamId === captainedTeam ? "BATTING" as const : "BOWLING" as const;
+            const watch = oppositionWatch({
+              format: view.format === "ODI" ? "ODI" : "T20",
+              playerSide,
+              batting: ledger.batting,
+              bowling: ledger.bowling,
+              atCrease: [i.northBatterId ?? null, i.southBatterId ?? null],
+              battingElevenSize: view.teams.find((t) => t.id === i.battingTeamId)?.playerIds.length ?? 11,
+              names: view.names,
+            });
+            if (!watch.headline && watch.facts.length === 0) return null;
+            return (
+              <section className="panel opposition-watch" aria-labelledby="opposition-watch-heading" data-testid="opposition-watch">
+                <h2 id="opposition-watch-heading">Opposition: {watch.heading.toLowerCase()}</h2>
+                {watch.headline && <p data-testid="opposition-headline"><strong>{watch.headline}</strong></p>}
+                {watch.facts.length > 0 && <ul>{watch.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul>}
+              </section>
+            );
+          })()}
           {view.phase === "READY" && (
             <Tactics
               key={`${view.revision}`}
@@ -1489,7 +1812,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 {view.format === "RED_BALL"
                   ? "five-day red-ball match"
                   : view.format}
-                . Review the innings below.
+                . The scorecard and match report follow.
               </p>
               {view.matchAward && (
                 <div
@@ -1498,9 +1821,6 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 >
                   <div className="match-award-head">
                     <strong>Player of the Match</strong>
-                    <span className="award-provenance-tag" data-testid="match-award-provenance">
-                      Game award · {view.matchAward.awardVersion}
-                    </span>
                   </div>
                   {view.matchAward.status === "AWARDED" && view.matchAward.winnerPlayerId ? (
                     <>
@@ -1512,7 +1832,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         {view.teams.find((t) => t.id === view.matchAward?.winnerTeamId)?.name ??
                           view.matchAward.winnerTeamId}
                         {view.matchAward.fromLosingTeam ? " · losing side" : ""}) ·{" "}
-                        {((view.matchAward.scoreTotalX100 ?? 0) / 100).toFixed(2)} pts
+                        {((view.matchAward.scoreTotalX100 ?? 0) / 100).toFixed(1)} pts
                       </p>
                       <p className="match-award-explain">{view.matchAward.explanationText}</p>
                       {view.matchAward.components && (
@@ -1529,7 +1849,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                             <li key={cand.playerId}>
                               {view.names[cand.playerId] ?? cand.playerId} (
                               {view.teams.find((t) => t.id === cand.teamId)?.name ?? cand.teamId}):{" "}
-                              {(cand.totalPointsX100 / 100).toFixed(2)} pts — {cand.summaryLine}
+                              {(cand.totalPointsX100 / 100).toFixed(1)} pts: {cand.summaryLine}
                             </li>
                           ))}
                         </ol>
@@ -1538,9 +1858,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   ) : (
                     <p data-testid="match-award-winner">{view.matchAward.explanationText}</p>
                   )}
-                  <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+                  <details className="technical-details">
+                    <summary>How this award is worked out</summary>
+                    <p>
+                      <span className="award-provenance-tag" data-testid="match-award-provenance">
+                        Game award · {view.matchAward.awardVersion}
+                      </span>
+                    </p>
+                    <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+                  </details>
                 </div>
               )}
+              {/* Pavilion B3: the engineering check sits behind a closed disclosure, apart from the result. */}
+              <details className="technical-details" data-testid="replay-check">
+              <summary>Replay check (technical)</summary>
               <button
                 disabled={busy || fatal}
                 onClick={() => send({ type: "VERIFY" })}
@@ -1568,8 +1899,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   </p>
                 </div>
               )}
+              </details>
             </section>
           )}
+          <span id="dugout-scorecard" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Scorecard: analytics, scorecard and commentary" />
           {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} hands={view.hands} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
@@ -1697,6 +2030,67 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           </div>
         </>
       )}
+      {view && (
+        <>
+          {/* Pavilion B4: settings live together at the foot of the match, out of the play column. */}
+          <span id="dugout-settings" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Settings group" />
+          <section className="match-settings" aria-labelledby="match-settings-heading">
+            <h2 id="match-settings-heading">Match settings</h2>
+          {preferences}
+          <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
+            <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
+            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
+              onChange={e => changeAiOpponent(e.target.value)}>
+              <option value="">Manual decisions for both teams</option>
+              {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
+            </select>
+            <span>The computer picks this team's batters, bowlers and tactics. You still play each ball.</span>
+          </section>
+          {(() => {
+            const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
+            const selected = delegationForTeam(delegation, selectedTeam.id);
+            const currentProfile = redBallProfileForTeam(delegation, selectedTeam.id);
+            const choices: [DelegationCategory, string][] = [
+              ["TOSS", "Toss call"],
+              ["INNINGS", "Bat or bowl"],
+              ["BATTER", "Batter selection"],
+              ["BOWLER", "Bowler selection"],
+              ["BATTING_PLAN", "Batting plan"],
+              ["BOWLING_PLAN", "Bowling plan"],
+              ...(view.format !== "T20" ? [["FIELD", "Field placement"]] as [DelegationCategory, string][] : []),
+              ...(view.format === "RED_BALL" ? [["DECLARATION", "Declaration"], ["FOLLOW_ON", "Follow-on"], ["NEW_BALL", "New ball"]] as [DelegationCategory, string][] : []),
+            ];
+            return <details className="career-panel" id="captain-delegation">
+              <summary>Delegate individual decisions</summary>
+              <p>Choose which decisions the tactical captain may make. These choices are saved with the match.</p>
+              <label>Delegation team <select value={selectedTeam.id} disabled={busy || fatal} onChange={event => setDelegationTeam(event.currentTarget.value)}>{view.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
+              {view.format === "RED_BALL" && (
+                <div>
+                  <label>Red-ball tactical profile <select aria-label="Red-ball tactical profile" value={currentProfile} disabled={busy || fatal || Boolean(persistence?.readOnly)} onChange={event => {
+                    const redBallProfile = event.currentTarget.value as RedBallTacticalProfile;
+                    send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories: [...selected], redBallProfile });
+                  }}>
+                    <option value="CONSERVATIVE">Conservative</option>
+                    <option value="BALANCED">Balanced</option>
+                    <option value="AGGRESSIVE">Aggressive</option>
+                  </select></label>
+                  <p data-testid="redball-profile-posture">{RED_BALL_PROFILE_DESCRIPTIONS[currentProfile]}</p>
+                </div>
+              )}
+              {aiTeamId === selectedTeam.id && <p>The tactical captain controls this team until you change the opponent setting.</p>}
+              <fieldset disabled={busy || fatal || Boolean(persistence?.readOnly) || aiTeamId === selectedTeam.id}>
+                <legend>Delegated decisions</legend>
+                {choices.map(([category, label]) => <label key={category}><input type="checkbox" checked={selected.includes(category)} onChange={event => {
+                  const categories = event.currentTarget.checked ? [...selected, category] : selected.filter(value => value !== category);
+                  send({ type: "SET_DELEGATION", teamId: selectedTeam.id, expectedDelegationRevision: delegation.changes.length, categories, ...(view.format === "RED_BALL" ? { redBallProfile: currentProfile } : {}) });
+                }} /> {label}</label>)}
+              </fieldset>
+            </details>;
+          })()}
+          </section>
+        </>
+      )}
+      {view && <span id="dugout-tools" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tools: sound, diagnostic and saves" />}
       <AudioControlsPanel
         preferences={audioPrefs}
         snapshot={audioSnapshot}
@@ -1807,17 +2201,25 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       </section>
       <footer>
         <p>
-          Autosaves and manual copies are stored locally in this browser.
-          Portable .lcxxvi exports include the deterministic match history and
-          pinned engine/model/rules identity required for validated resume.
+          Your matches save automatically in this browser. Use Export to keep a
+          copy you can load again later.
         </p>
-        <p>
-          Original world: 160 fictional players, 8 squads. T20, ODI and five-day
-          red-ball exhibitions use custom game rules; no certified ICC
-          compliance or empirical realism. A one-season T20 career, optional
-          T20/ODI/red-ball tactical captaincy, and explicit deterministic
-          red-ball weather delays are available. DLS remains disabled.
-        </p>
+        <details className="about-panel" data-testid="about-panel">
+          <summary>About this game</summary>
+          <p>
+            Lord Cricket XXVI is fictional: 160 invented players in 8 squads.
+            Matches use the game's own rules, which are not certified against
+            ICC playing conditions and make no claim to match real cricket.
+          </p>
+          <p>
+            Model: synthetic-alpha-01 (SYNTHETIC_ALPHA), not empirically
+            calibrated. Every result is deterministic: the same match history
+            always produces the same scorecard. Exports carry that history and
+            the pinned engine, model and rules identity needed to resume a
+            match and check it. Red-ball weather delays are deterministic, and
+            the Duckworth-Lewis-Stern method is not used.
+          </p>
+        </details>
       </footer>
     </main>
   );
@@ -1828,6 +2230,7 @@ function Setup({
   busy,
   showBriefings,
   start,
+  onQuickStart,
 }: {
   catalog: Catalog;
   world: WorldPack;
@@ -1838,6 +2241,8 @@ function Setup({
     teams: [Selection, Selection],
     ground: string,
   ) => void;
+  /** Called once, just before a quick or guided match starts, with the side the computer should captain. */
+  onQuickStart?: (opponentTeamId: string) => void;
 }) {
   const [teams, setTeams] = useState<[Selection, Selection]>([
     structuredClone(catalog.teams[0]!.suggested),
@@ -1863,6 +2268,19 @@ function Setup({
     .filter(Boolean);
   if (teams[0].teamId === teams[1].teamId)
     reasons.push("Choose two different teams.");
+  // Quick match from the title screen: start with the suggested XIs once, if they are valid (owner order, step 2).
+  const quickStarted = useRef(false);
+  useEffect(() => {
+    if (quickStarted.current || busy) return;
+    let at = 0;
+    try { at = Number(sessionStorage.getItem(QUICK_MATCH_KEY) ?? 0); sessionStorage.removeItem(QUICK_MATCH_KEY); } catch { /* ignore */ }
+    quickStarted.current = true;
+    if (at > 0 && Date.now() - at < 60_000 && reasons.length === 0) {
+      // The player captains the first side; the tactical captain plays the second (the player can change this in the match).
+      onQuickStart?.(teams[1].teamId);
+      start(format, teams, ground);
+    }
+  }, [busy]);
   const selectedGround =
     world.grounds.find((item) => item.groundId === ground) ?? world.grounds[0]!;
   const preMatchBriefing = useMemo(() => {
@@ -1906,6 +2324,18 @@ function Setup({
   }
   return (
     <section className="setup">
+      {/* The match-up banner: both crests over the chosen ground's art. Decorative: the selects below carry the names. */}
+      <div className="setup-hero" aria-hidden="true" data-art="true" style={groundArtBackground(selectedGround.name, ART_WASH.banner)}>
+        {teams.map((sel, index) => {
+          const team = world.teams.find((candidate) => candidate.teamId === sel.teamId);
+          return (
+            <React.Fragment key={index}>
+              {index === 1 && <span className="setup-hero-v">v</span>}
+              <TeamCrest teamId={sel.teamId} name={team?.name ?? sel.teamId} colours={team?.colours ?? []} size={88} decorative />
+            </React.Fragment>
+          );
+        })}
+      </div>
       <fieldset disabled={busy}>
         <legend>Choose teams and XIs</legend>
         <label>
@@ -1988,6 +2418,7 @@ function Setup({
                           })
                         }
                       />
+                      <PlayerPortrait playerId={p.id} role={p.role} kit={world.teams.find((team) => team.teamId === s.teamId)?.colours ?? []} size={30} />
                       <span>
                         {p.name}
                         <small>
@@ -2069,6 +2500,14 @@ function Setup({
     </section>
   );
 }
+/** Marks the computer captain's choice. The player's own click is still the command that is sent. */
+function RecommendedTag({ id }: { id: string }) {
+  return (
+    <small id={id} className="recommended-tag" title="The computer captain's choice. You decide.">
+      Recommended
+    </small>
+  );
+}
 function Tactics({
   view,
   disabled,
@@ -2117,9 +2556,15 @@ function Tactics({
                     ].map((name, n) => (
                       <option key={n} value={n}>
                         {name}
+                        {view.recommendation?.aggression?.playerId === id && view.recommendation.aggression.level === n ? " (recommended)" : ""}
                       </option>
                     ))}
                   </select>
+                  {view.recommendation?.aggression?.playerId === id && (
+                    <small className="recommended-tag" data-testid="recommended-aggression" title="The computer captain's choice. You decide.">
+                      Recommended: {["Defend", "Cautious", "Balanced", "Positive", "Attack"][view.recommendation.aggression.level] ?? view.recommendation.aggression.level}
+                    </small>
+                  )}
                 </label>
               ))}
           </div>
@@ -2131,7 +2576,7 @@ function Tactics({
                 <option>stock</option>
               </select>
             </label>
-            <small>Only stock is supported by this model.</small>
+            <small>Only the stock ball is available for now.</small>
             <label>
               Effort
               <select
@@ -2145,7 +2590,7 @@ function Tactics({
                 }
               >
                 {["CONSERVE", "NORMAL", "MAXIMUM"].map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>{v}{view.recommendation?.bowling?.effort === v ? " (recommended)" : ""}</option>
                 ))}
               </select>
             </label>
@@ -2179,10 +2624,15 @@ function Tactics({
                 }
               >
                 {["YORKER", "FULL", "GOOD", "SHORT"].map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>{v}{view.recommendation?.bowling?.length === v ? " (recommended)" : ""}</option>
                 ))}
               </select>
             </label>
+            {view.recommendation?.bowling && (
+              <small className="recommended-tag" data-testid="recommended-bowling" title="The computer captain's choice. You decide.">
+                Recommended: {view.recommendation.bowling.length.toLowerCase()} length, {view.recommendation.bowling.effort.toLowerCase()} effort
+              </small>
+            )}
             <button
               onClick={() =>
                 act({ kind: "SET_BOWLING_PLAN", payload: bowling })
@@ -2275,13 +2725,24 @@ function RootApp() {
       </section>
     )}
     {(hash === "#exhibition" || retainedMatch) && <div hidden={hash !== "#exhibition"}><MatchApp onInspectCareer={inspect} onReturnCareer={finish} /></div>}
+    {hash === "#title" && <TitleScreen />}
     {hash === "#scenarios" && <ScenariosApp />}
     {hash === "#tournaments" && <TournamentsApp />}
     {hash === "#rain" && <RainApp />}
-    {hash !== "#exhibition" && hash !== "#scenarios" && hash !== "#tournaments" && hash !== "#rain" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
+    {hash !== "#exhibition" && hash !== "#title" && hash !== "#scenarios" && hash !== "#tournaments" && hash !== "#rain" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
   </>;
 }
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root missing");
 createRoot(root).render(<RootApp />);
+
+/** Kit colours of the side a player is in, for their portrait on the match screen. */
+function activeKit(view: View, playerId: string): readonly string[] {
+  return view.teams.find((team) => team.playerIds.includes(playerId))?.colours ?? [];
+}
+/** A player's role for their portrait: the keeper from the team sheet, otherwise the approved world's record. */
+function activeRole(view: View, playerId: string): string {
+  if (view.teams.some((team) => team.keeperId === playerId)) return "KEEPER";
+  return careerWorld.players.find((player) => player.playerId === playerId)?.role ?? "BATTER";
+}

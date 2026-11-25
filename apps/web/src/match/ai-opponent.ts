@@ -97,6 +97,7 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
     targetToWin: i.targetToWin,
     availableBatters: Math.max(0, 10 - i.wickets),
     bowlingCandidates: bowlers,
+    previousOverBowler: i.previousOverBowlerId ? { playerId: i.previousOverBowlerId, quotaRemaining: 24 - (ledger.bowling[i.previousOverBowlerId]?.legalBalls ?? 0) } : null,
   };
   const advice = { ...adviseT20Captain(view) };
   // Stable captain temperament uses identity; decisions use only public match observations.
@@ -236,6 +237,7 @@ export function proposeOpponentODICommand(
     strikerHand,
     outfieldIds,
     bowlingCandidates: bowlers,
+    previousOverBowler: i.previousOverBowlerId ? { playerId: i.previousOverBowlerId, quotaRemaining: 60 - (ledger.bowling[i.previousOverBowlerId]?.legalBalls ?? 0) } : null,
   });
 
   if (phase === "AWAITING_BATTER") {

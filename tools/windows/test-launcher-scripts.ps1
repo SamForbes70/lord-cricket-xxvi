@@ -64,5 +64,39 @@ try {
   ${env:ProgramFiles(x86)} = $saved.PF86; $env:ProgramFiles = $saved.PF; $env:LOCALAPPDATA = $saved.LAD
   Remove-Item -Recurse -Force $fake -ErrorAction SilentlyContinue
 }
+# 4. The installer: a full per-user install and uninstall into temporary folders and a test registry key, so the
+#    runner's real desktop, Start menu and Apps list are not touched.
+$work = Join-Path ([System.IO.Path]::GetTempPath()) ("lcxxvi-install-test-" + [guid]::NewGuid().ToString('N'))
+$testKey = 'HKCU:\Software\LordCricketXXVI-InstallerTest'
+try {
+  $game = Join-Path $work 'game'; $dest = Join-Path $work 'installed'; $links = Join-Path $work 'links'
+  New-Item -ItemType Directory -Force -Path $game, (Join-Path $game 'assets') | Out-Null
+  Set-Content -LiteralPath (Join-Path $game 'index.html') -Value '<!doctype html>'
+  Set-Content -LiteralPath (Join-Path $game 'assets\app.js') -Value '//'
+  Set-Content -LiteralPath (Join-Path $game 'VERSION.txt') -Value "Lord Cricket XXVI playable build`nRepository : https://example.invalid/repo`nCommit     : ABC1234def5678abc1234def5678abc1234def56`nModel      : test"
+  Set-Content -LiteralPath (Join-Path $game 'Play-Lord-Cricket.bat') -Value '@echo off'
+  Copy-Item -LiteralPath (Join-Path $here 'install-windows.ps1') -Destination $game
+  & (Join-Path $game 'install-windows.ps1') -Destination $dest -ShortcutFolders @($links) -RegistryKey $testKey -Quiet
+  $checks = [ordered]@{
+    'copied the game' = (Test-Path -LiteralPath (Join-Path $dest 'assets\app.js'))
+    'created the shortcut' = (Test-Path -LiteralPath (Join-Path $links 'Lord Cricket XXVI.lnk'))
+    'registered the app' = ((Get-ItemProperty -LiteralPath $testKey).DisplayName -eq 'Lord Cricket XXVI')
+    'recorded the version' = ((Get-ItemProperty -LiteralPath $testKey).DisplayVersion -eq 'abc1234')
+    'points the uninstaller at the copy' = ((Get-ItemProperty -LiteralPath $testKey).UninstallString -like "*$dest*install-windows.ps1*-Uninstall*")
+  }
+  & (Join-Path $dest 'install-windows.ps1') -Uninstall -Destination $dest -ShortcutFolders @($links) -RegistryKey $testKey -Quiet
+  $checks['removed the program'] = -not (Test-Path -LiteralPath $dest)
+  $checks['removed the shortcut'] = -not (Test-Path -LiteralPath (Join-Path $links 'Lord Cricket XXVI.lnk'))
+  $checks['removed the Apps entry'] = -not (Test-Path -LiteralPath $testKey)
+  foreach ($name in $checks.Keys) {
+    if ($checks[$name]) { Write-Host "ok installer $name" } else { Write-Host "FAIL installer $name"; $failures++ }
+  }
+} catch {
+  Write-Host "FAIL installer: $($_.Exception.Message)"; $failures++
+} finally {
+  Remove-Item -LiteralPath $testKey -Recurse -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 if ($failures -gt 0) { Write-Host "$failures launcher check(s) failed"; exit 1 }
 Write-Host 'Launcher script checks passed'

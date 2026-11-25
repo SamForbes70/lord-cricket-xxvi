@@ -14,7 +14,8 @@ test("V01-018 completed career match event archives replay in UI, survive .lcxxv
   await expect(page.getByText("1/14 managed-team fixtures complete.", { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
 
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   const replayButton = page.getByRole("button", { name: /View replay for Round 1/i }).first();
   await expect(replayButton).toBeVisible();
   await replayButton.click();
@@ -51,7 +52,8 @@ test("V01-018 completed career match event archives replay in UI, survive .lcxxv
     await importedPage.goto("/#career");
     await importedPage.getByLabel("Choose .lcxxvi archive").setInputFiles(archivePath!);
     await expect(importedPage.getByRole("navigation", { name: "Career navigation" })).toBeVisible({ timeout: 30_000 });
-    await importedPage.getByRole("button", { name: "Career", exact: true }).click();
+    await importedPage.getByRole("button", { name: "Season", exact: true }).click();
+    await importedPage.getByRole("button", { name: "Stories", exact: true }).click();
     await importedPage.getByRole("button", { name: /View replay for Round 1/i }).first().click();
     await expect(importedPage.getByTestId("replay-archive-meta")).toHaveText(metaText!);
   } finally {
@@ -59,6 +61,7 @@ test("V01-018 completed career match event archives replay in UI, survive .lcxxv
   }
 
   // Legacy v1 state (completed match without stored event archive) reports explicit unavailability.
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Fixtures", exact: true }).click();
   const fixtureArchives = await page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {

@@ -57,7 +57,7 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
 
   // Return to Home and simulate all 14 rounds of Season 1.
-  await page.getByRole("button", { name: "Home", exact: true }).click();
+  await page.getByRole("button", { name: "Clubhouse", exact: true }).click();
   for (let round = 1; round <= 14; round += 1) {
     const advance = page.getByRole("button", { name: "Advance to match day" });
     if (await advance.isVisible().catch(() => false)) {
@@ -80,7 +80,8 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   });
 
   // Inspect Off-season lifecycle report and Season 1 lifecycle replay on Career tab.
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   const transitionPanel = page.getByTestId("offseason-lifecycle-report");
   await expect(transitionPanel).toBeVisible();
   await expect(transitionPanel).toContainText("Off-season lifecycle report · Season 1 to Season 2 (2028)");

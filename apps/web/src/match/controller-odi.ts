@@ -1,3 +1,5 @@
+import { proposeOpponentODICommand } from "./ai-opponent.js";
+import { recommendDecisions, withRecommendation } from "./recommendation.js";
 import { strandingReasons } from "./bowler-plan.js";
 import {
   createMatchAnalyticsCache,
@@ -28,6 +30,7 @@ import {
   ODI_FIELD_REGISTRY,
   FROZEN_WORLD_PINS,
   isBowlingCapable,
+  suggestedEleven,
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
@@ -70,15 +73,7 @@ export function createODIMatchController(
       const players = t.squadIds.map(
         (id) => world.players.find((p) => p.playerId === id)!,
       );
-      const keeper = players.find((p) => p.role === "KEEPER")!;
-      const bowlers = players
-        .filter((p) => p.playerId !== keeper.playerId && isBowlingCapable(p))
-        .slice(0, 6);
-      const xi = [
-        keeper,
-        ...bowlers,
-        ...players.filter((p) => p !== keeper && !bowlers.includes(p)),
-      ].slice(0, 11);
+      const eleven = suggestedEleven(players, "ODI");
       return {
         id: t.teamId,
         name: t.name,
@@ -90,12 +85,7 @@ export function createODIMatchController(
           canBowl: isBowlingCapable(p),
           batHand: p.batHand,
         })),
-        suggested: {
-          teamId: t.teamId,
-          playerIds: xi.map((p) => p.playerId),
-          captainId: xi[0]!.playerId,
-          keeperId: keeper.playerId,
-        },
+        suggested: { teamId: t.teamId, ...eleven },
       };
     }),
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name, seamBp: g.pitchPrior.seamBp, turnBp: g.pitchPrior.turnBp })),
@@ -295,7 +285,17 @@ export function createODIMatchController(
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
-      candidates,
+      candidates: withRecommendation(c.phase, candidates, () =>
+        decisionTeamId ? proposeOpponentODICommand(s, decisionTeamId) : null,
+      ),
+      recommendation: recommendDecisions({
+        phase: c.phase,
+        decisionTeamId,
+        innings: i,
+        battingPlans: c.battingPlans,
+        bowlingPlan: c.bowlingPlan,
+        propose: (teamId, categories) => proposeOpponentODICommand(s, teamId, categories),
+      }),
       bowlingPlan: structuredClone(c.bowlingPlan),
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),

@@ -32,6 +32,16 @@ const worldBytes = new Uint8Array(readFileSync(resolve(root, "packages/data/worl
 const manifest = JSON.parse(readFileSync(resolve(root, "packages/data/worlds/fictional-eight-01.manifest.json"), "utf8"));
 
 /** Seeds whose autopilot T20 (default match id) ends in a tie, found by search. */
+// The tied seeds below were found with the suggested eleven of Stage 14 (keeper, the first six bowling-capable players,
+// then squad order). Pavilion P04 stage A changed the suggested eleven, so these tests field that original eleven
+// explicitly: they test super-over rules, not team selection.
+const stage14Eleven = (team: { id: string; players: readonly { id: string; role: string; canBowl: boolean }[] }) => {
+  const keeper = team.players.find((p) => p.role === "KEEPER")!;
+  const bowlers = team.players.filter((p) => p.id !== keeper.id && p.canBowl).slice(0, 6);
+  const xi = [keeper, ...bowlers, ...team.players.filter((p) => p !== keeper && !bowlers.includes(p))].slice(0, 11);
+  return { teamId: team.id, playerIds: xi.map((p) => p.id), captainId: keeper.id, keeperId: keeper.id };
+};
+
 const TIED: [string, string, string, string][] = [
   ["lc-tie-177", "team-01", "team-02", "ground-01"],
   ["lc-tie-181", "team-03", "team-06", "ground-03"],
@@ -43,7 +53,7 @@ const TIED: [string, string, string, string][] = [
 function playMatch(seed: string, a: string, b: string, ground: string): T20Session {
   const ctl = createMatchController(worldBytes, manifest, () => seed);
   const catalog = ctl.currentResponse("ui-0").catalog!;
-  const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+  const pick = (id: string) => stage14Eleven(catalog.teams.find((t) => t.id === id)!);
   const started = ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "T20", selections: [pick(a), pick(b)], groundId: ground });
   expect(started.error).toBeNull();
   let s = ctl.snapshot()!;
@@ -175,7 +185,7 @@ describe("Stage 14 one-day super overs", () => {
   function playODI(seed: string, a: string, b: string, ground: string): ODISession {
     const ctl = createODIMatchController(worldBytes, manifest, () => seed);
     const catalog = ctl.currentResponse("ui-0").catalog!;
-    const pick = (id: string) => catalog.teams.find((t) => t.id === id)!.suggested;
+    const pick = (id: string) => stage14Eleven(catalog.teams.find((t) => t.id === id)!);
     const started = ctl.handle({ version: UI_VERSION, requestId: "ui-1", expectedRevision: 0, type: "START", format: "ODI", selections: [pick(a), pick(b)], groundId: ground });
     expect(started.error).toBeNull();
     let s = ctl.snapshot() as ODISession;

@@ -67,6 +67,8 @@ for (const format of ["T20", "ODI", "RED_BALL"]) test(`${format} completed match
   });
   await expect(analytics.getByRole("status")).toContainText(/Analytics rebuild (cancelled|complete)/, { timeout: 60_000 });
   await expect(page.locator("#decision")).toHaveAttribute("data-revision", revision!);
+  // Pavilion B3: the replay check is a technical disclosure under the result.
+  if ((await page.getByTestId("replay-check").getAttribute("open")) === null) await page.getByTestId("replay-check").locator("summary").click();
   await page.getByRole("button", { name: "Verify replay and scorecard" }).click();
   await expect(page.getByTestId("verification")).toBeVisible({ timeout: 60_000 });
 });

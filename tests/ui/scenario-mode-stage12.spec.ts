@@ -12,7 +12,8 @@ async function playToEnd(page: Page) {
     if (phase === "COMPLETE") break;
     const candidate = page.locator("button[data-candidate]:enabled").first();
     const finishOver = page.getByRole("button", { name: "Finish over", exact: true });
-    if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click();
+    // A routine pick (Pavilion B2) can make this choice between the count and the click; the loop then reads the new phase.
+    if ((phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER") && (await candidate.count()) > 0) await candidate.click({ timeout: 2_000 }).catch(() => undefined);
     else if (phase === "READY" && (await finishOver.isEnabled().catch(() => false))) await finishOver.click();
     // Otherwise the tactical captain is choosing for its own side; give it a moment.
     else await page.waitForTimeout(200);
@@ -93,8 +94,18 @@ for (const challenge of [
     if (challenge.title === "Nineteen to defend") {
       await page.locator("button[data-candidate]:enabled").first().click();
     }
-    await panel.getByRole("button", {name:new RegExp(challenge.plan)}).click();
-    await expect(panel.getByRole("status")).toContainText(new RegExp(challenge.plan + ".*legal balls?\\. Boundaries:"));
+    // The match screen holds a plan clicked during the computer side's automatic step and applies it afterwards.
+    // Before that fix a click could land on buttons disabled for the step and be lost (run 44839086294's trace showed
+    // the button carrying `disabled` at the click). Should a click still be lost, click again, but only while no
+    // passage has started, so a long passage is never followed by a second one.
+    const planButton = panel.getByRole("button", {name:new RegExp(challenge.plan)});
+    const started = panel.getByRole("button", {name:"Stop after this command"}).or(panel.getByRole("status"));
+    await expect(async () => {
+      if ((await started.count()) === 0) await planButton.click({timeout: 2_000});
+      await expect(started.first()).toBeVisible({timeout: 3_000});
+    }).toPass({timeout: 30_000});
+    // The report appears when the passage ends: up to two overs stepped at 150 ms each, plus worker time.
+    await expect(panel.getByRole("status")).toContainText(new RegExp(challenge.plan + ".*legal balls?\\. Boundaries:"), {timeout: 60_000});
     await playToEnd(page);
     await expect(panel).toContainText("What would you try differently?");
     await panel.getByRole("button", {name:"Play again"}).click();

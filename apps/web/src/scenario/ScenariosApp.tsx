@@ -3,6 +3,8 @@ import { canonicalJson, type ScenarioChallenge, type ScenarioRecordLedger } from
 import { SCENARIO_PACK } from "@lcxxvi/data";
 import { IndexedDbSaveRepository, sha256Text } from "@lcxxvi/persistence";
 import "../career/career.css";
+import { careerWorld } from "../career/world-state.js";
+import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 
 /** sessionStorage key the match screen reads once to start a chosen scenario. */
 export const SCENARIO_LAUNCH_KEY = "lcxxvi-scenario-launch";
@@ -96,7 +98,10 @@ export function ScenariosApp() {
           {SCENARIO_PACK.map((challenge) => {
             const best = bests[challenge.scenarioId];
             return (
-              <li key={challenge.scenarioId} className="career-panel" data-testid={`scenario-${challenge.scenarioId}`}>
+              <li key={challenge.scenarioId} className="career-panel scenario-card" data-difficulty={challenge.difficulty} data-testid={`scenario-${challenge.scenarioId}`}>
+                <div className="scenario-art" aria-hidden="true" style={groundArtBackground(careerWorld.grounds.find((ground) => ground.groundId === challenge.groundId)?.name ?? challenge.groundId, ART_WASH.card)}>
+                  <span className="scenario-difficulty">{DIFFICULTY_LABELS[challenge.difficulty]}</span>
+                </div>
                 <h2>{challenge.title}</h2>
                 <p>
                   <small>

@@ -7,15 +7,25 @@ A guide for testing the latest build on a laptop. Everything in the game is fict
 1. Download `lord-cricket-xxvi-game-<commit>.zip` and **extract the whole folder** (do not run it from inside the zip preview).
 2. **Windows 10 or 11:** double-click `Play-Lord-Cricket.bat`. Nothing needs installing: it uses Node.js or Python if you have them, or builds a small launcher (`LordCricketXXVI.exe`) with Windows' own .NET compiler. The launcher is unsigned, so Windows SmartScreen may ask you to confirm ("More info", then "Run anyway").
 3. **Mac or Linux:** open a terminal in the folder and run `bash start-game.sh` (needs Node.js 18 or later, or Python 3).
-4. The game opens at **http://127.0.0.1:4180/** in its own window. To stop it on Windows, double-click `Stop-Lord-Cricket.bat`, or right-click the tray icon and choose Quit Server.
+4. The game opens on its title screen at **http://127.0.0.1:4180/#title** in its own window. To stop it on Windows, double-click `Stop-Lord-Cricket.bat`, or right-click the tray icon and choose Quit Server.
 
 **If the game window does not open,** the game is usually already running: open **http://127.0.0.1:4180/** in Edge or Chrome yourself. (Builds before 20 November 2026 could stop with "Start-Process : The system cannot find the file specified" on a laptop with one Edge install; that is fixed.)
 
 Saves live in that browser, tied to that address. Clearing browser data deletes them, so use **Settings, Export .lcxxvi** to keep a backup.
 
+### Installing it like a normal program (optional, Windows)
+
+Double-click **Install-Lord-Cricket.bat** in the unzipped folder. It copies the game to your user folder (`%LOCALAPPDATA%\Programs\LordCricketXXVI`), adds **Start menu** and **desktop** shortcuts with the game's icon, and lists it under **Settings > Apps**, where you can uninstall it. No administrator rights are needed. Run it again from a newer zip to update. Uninstalling leaves your saves alone: they live in your browser. The installer is not signed (the owner chose to keep everything free), so Windows may ask you to confirm the first time.
+
 ## Where everything is
 
-The game opens on **Start a Career**, the club selection screen. Pick a club to start a career; the buttons at the top lead to exhibitions, scenarios, tournaments and rain matches without one. Inside a career, the tabs are Home, Career, Squad, Contracts, Fixtures, Statistics, Settings, Exhibition, Scenarios, Tournaments, Rain matches and Choose career.
+The game opens on the **title screen**:
+
+- **Quick match** starts a T20 straight away with the suggested XIs.
+- **Guided first match** is the same match with a coach above the decisions explaining each one (toss, bat or bowl, batters, bowlers, playing on). Press **End the guide** when you no longer need it.
+- The cards below lead to **Career**, **Tournaments**, **Scenarios**, **Rain and reviews** and **Custom match** (pick the format, ground and both XIs).
+
+**Career** opens **Start a Career**, the club selection screen (also the page at the plain address with no `#title`). Pick a club to start a career; the buttons at the top lead to exhibitions, scenarios, tournaments, rain matches and back to the title screen. Inside a career, the tabs are Home, Career, Squad, Contracts, Fixtures, Statistics, Settings, Exhibition, Scenarios, Tournaments, Rain matches and Choose career.
 
 | You want to | Go to | Notes |
 | --- | --- | --- |

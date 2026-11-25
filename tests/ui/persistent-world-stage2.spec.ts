@@ -42,7 +42,8 @@ test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserve
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
 
   // Inspect Roll of Honour & archived Season 1 table + historical replay on Career tab.
-  await page.getByRole("button", { name: "Career", exact: true }).click();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
+  await page.getByRole("button", { name: "Stories", exact: true }).click();
   const historyPanel = page.getByTestId("completed-seasons-history");
   await expect(historyPanel).toBeVisible();
   await expect(historyPanel).toContainText("2027");
@@ -56,6 +57,7 @@ test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserve
   await page.getByTestId("career-replay-viewer").getByRole("button", { name: "Close replay" }).click();
 
   // Inspect All-time career statistics & archived Season 1 scope.
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
   const scopeBar = page.getByTestId("statistics-scope-bar");
   await expect(scopeBar).toBeVisible();
@@ -94,7 +96,8 @@ test("Stage 2 persistent world completes Season 1, rolls into Season 2, preserve
     await importedPage.getByLabel("Choose .lcxxvi archive").setInputFiles(archivePath!);
     await expect(importedPage.getByRole("navigation", { name: "Career navigation" })).toBeVisible({ timeout: 30_000 });
     await expect(importedPage.getByTestId("career-masthead-subtitle")).toContainText("Season 2 (2028)");
-    await importedPage.getByRole("button", { name: "Career", exact: true }).click();
+    await importedPage.getByRole("button", { name: "Season", exact: true }).click();
+    await importedPage.getByRole("button", { name: "Stories", exact: true }).click();
     await expect(importedPage.getByTestId("completed-seasons-history")).toContainText("2027");
   } finally {
     await importedContext.close();

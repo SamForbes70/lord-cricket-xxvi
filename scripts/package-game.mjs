@@ -8,7 +8,11 @@
  * Output (default: release-packages/):
  *   lord-cricket-xxvi-game-<commit>.zip     the built game, local servers, and double-click Windows/POSIX launchers
  *   lord-cricket-xxvi-source-<commit>.zip   git archive of the tested commit (needs a git checkout)
+ *
+ * With LCXXVI_PACKAGE_EXE set to a compiled LordCricketXXVI.exe (the Windows CI job builds one), the game zip also
+ * holds that EXE and is named lord-cricket-xxvi-windows-<commit>.zip, so it runs on Windows with a double-click.
  */
+import { iconIco } from "./make-icon.mjs";
 import { Buffer } from "node:buffer";
 import { spawnSync } from "node:child_process";
 import {
@@ -122,6 +126,17 @@ const startWindowsPs1 = readFileSync(
   join(root, "tools", "windows", "start-windows.ps1"),
   "utf8",
 ).replace(/\r?\n/g, "\r\n");
+const installPs1 = readFileSync(
+  join(root, "tools", "windows", "install-windows.ps1"),
+  "utf8",
+).replace(/\r?\n/g, "\r\n");
+const installBat = [
+  "@echo off",
+  "rem Installs Lord Cricket XXVI for this Windows user: Start menu and desktop shortcuts, and an entry in Settings > Apps.",
+  'powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0install-windows.ps1" %*',
+  "pause",
+  "",
+].join("\r\n");
 const launcherCs = readFileSync(
   join(root, "tools", "windows", "LordCricketLauncher.cs"),
   "utf8",
@@ -131,7 +146,7 @@ const startSh = `#!/usr/bin/env bash
 # Starts Lord Cricket XXVI on http://127.0.0.1:4180/ and opens it in your browser if it can.
 cd "$(dirname "$0")" || exit 1
 PORT="\${PORT:-4180}"
-URL="http://127.0.0.1:\${PORT}/"
+URL="http://127.0.0.1:\${PORT}/#title"
 (sleep 1; (command -v open >/dev/null && open "$URL") || (command -v xdg-open >/dev/null && xdg-open "$URL") || true) &
 if command -v node >/dev/null 2>&1; then exec node serve.mjs "$PORT"
 elif command -v python3 >/dev/null 2>&1; then echo "Serving $URL (Ctrl+C to stop)"; exec python3 -m http.server "$PORT" --bind 127.0.0.1
@@ -171,7 +186,9 @@ const buildExeBat = [
   'set "CSC=%WINDIR%\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe"',
   'if not exist "%CSC%" set "CSC=%WINDIR%\\Microsoft.NET\\Framework\\v4.0.30319\\csc.exe"',
   'if not exist "%CSC%" ( echo .NET Framework 4.x csc.exe not found. & pause & exit /b 1 )',
-  '"%CSC%" /nologo /optimize+ /target:winexe /out:"%~dp0LordCricketXXVI.exe" /r:System.Windows.Forms.dll /r:System.Drawing.dll "%~dp0LordCricketLauncher.cs"',
+  'set "ICON="',
+  'if exist "%~dp0lord-cricket.ico" set "ICON=/win32icon:%~dp0lord-cricket.ico"',
+  '"%CSC%" /nologo /optimize+ /target:winexe /out:"%~dp0LordCricketXXVI.exe" %ICON% /r:System.Windows.Forms.dll /r:System.Drawing.dll "%~dp0LordCricketLauncher.cs"',
   "if errorlevel 1 ( pause & exit /b 1 )",
   "echo Built LordCricketXXVI.exe successfully. Double-click LordCricketXXVI.exe to play.",
   "",
@@ -218,9 +235,14 @@ How to play on Windows (ZERO extra installs required on Windows 10/11)
   2. Double-click Play-Lord-Cricket.bat (or start-game.bat).
      - Uses Node.js 18+ if installed, real Python 3 if installed, or automatically compiles and launches
        LordCricketXXVI.exe using Windows' built-in .NET Framework 4.x compiler (no downloads needed).
-     - Opens http://127.0.0.1:4180/ in a standalone Edge/Chrome app window.
+     - Opens the title screen (http://127.0.0.1:4180/#title) in a standalone Edge/Chrome app window.
      - To stop a background server later, double-click Stop-Lord-Cricket.bat (or right-click the tray icon -> Quit Server).
      - Optional: double-click Build-Exe.bat to create LordCricketXXVI.exe directly.
+
+Install it like a normal program (optional, Windows, no administrator rights)
+  Double-click Install-Lord-Cricket.bat. It copies the game to your user folder, adds Start menu and desktop
+  shortcuts with the game's icon, and lists it under Settings > Apps, where you can uninstall it. Uninstalling does
+  not delete your saves (they live in your browser). The installer is not signed, so Windows may ask you to confirm.
 
 How to play on Mac/Linux (needs Node.js 18+ or Python 3)
   Run ./start-game.sh (or: bash start-game.sh)
@@ -240,6 +262,8 @@ for (const [name, text, mode] of [
   ["Stop-Lord-Cricket.bat", stopBat, 0o644],
   ["Build-Exe.bat", buildExeBat, 0o644],
   ["start-windows.ps1", startWindowsPs1, 0o644],
+  ["install-windows.ps1", installPs1, 0o644],
+  ["Install-Lord-Cricket.bat", installBat, 0o644],
   ["LordCricketLauncher.cs", launcherCs, 0o644],
   ["README.txt", readme, 0o644],
   ["VERSION.txt", version, 0o644],
@@ -251,8 +275,21 @@ for (const [name, text, mode] of [
   files.push({ name: `${folder}/${name}`, data: Buffer.from(text, "utf8"), mode });
 }
 
+// The game's icon, drawn in code (scripts/make-icon.mjs), for the installer's shortcuts and Apps entry.
+files.push({ name: `${folder}/lord-cricket.ico`, data: iconIco(), mode: 0o644 });
+
+// A compiled launcher, when the caller supplies one (Windows CI). The installer's shortcuts prefer it.
+const exePath = process.env.LCXXVI_PACKAGE_EXE;
+if (exePath) {
+  if (!existsSync(exePath)) {
+    console.error(`LCXXVI_PACKAGE_EXE points at a missing file: ${exePath}`);
+    process.exit(1);
+  }
+  files.push({ name: `${folder}/LordCricketXXVI.exe`, data: readFileSync(exePath), mode: 0o755 });
+}
+
 mkdirSync(outDir, { recursive: true });
-const gameZip = join(outDir, `lord-cricket-xxvi-game-${short}.zip`);
+const gameZip = join(outDir, `lord-cricket-xxvi-${exePath ? "windows" : "game"}-${short}.zip`);
 writeFileSync(gameZip, zip(files));
 console.log(`Wrote ${gameZip}`);
 

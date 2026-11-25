@@ -1,3 +1,5 @@
+import { proposeOpponentRed5Command } from "./ai-opponent.js";
+import { recommendDecisions, withRecommendation } from "./recommendation.js";
 import {
   createMatchAnalyticsCache,
   projectInMatchTacticalAssistant,
@@ -29,6 +31,7 @@ import {
   FIELD_REGISTRY,
   FROZEN_WORLD_PINS,
   isBowlingCapable,
+  suggestedEleven,
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
@@ -71,15 +74,7 @@ export function createRed5MatchController(
       const players = t.squadIds.map(
         (id) => world.players.find((p) => p.playerId === id)!,
       );
-      const keeper = players.find((p) => p.role === "KEEPER")!;
-      const bowlers = players
-        .filter((p) => p.playerId !== keeper.playerId && isBowlingCapable(p))
-        .slice(0, 6);
-      const xi = [
-        keeper,
-        ...bowlers,
-        ...players.filter((p) => p !== keeper && !bowlers.includes(p)),
-      ].slice(0, 11);
+      const eleven = suggestedEleven(players, "RED_BALL");
       return {
         id: t.teamId,
         name: t.name,
@@ -91,12 +86,7 @@ export function createRed5MatchController(
           canBowl: isBowlingCapable(p),
           batHand: p.batHand,
         })),
-        suggested: {
-          teamId: t.teamId,
-          playerIds: xi.map((p) => p.playerId),
-          captainId: xi[0]!.playerId,
-          keeperId: keeper.playerId,
-        },
+        suggested: { teamId: t.teamId, ...eleven },
       };
     }),
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name, seamBp: g.pitchPrior.seamBp, turnBp: g.pitchPrior.turnBp })),
@@ -287,7 +277,19 @@ export function createRed5MatchController(
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,
-      candidates,
+      candidates: withRecommendation(c.phase, candidates, () =>
+        decisionTeamId ? proposeOpponentRed5Command(s, decisionTeamId) : null,
+      ),
+      recommendation: recommendDecisions({
+        phase: c.phase,
+        decisionTeamId,
+        innings: i,
+        battingPlans: c.battingPlans,
+        bowlingPlan: c.bowlingPlan,
+        redBall: true,
+        newBallAvailable: c.phase === "READY" && !!i && i.ballAgeLegalBalls >= 480 && i.legalBalls % 6 === 0,
+        propose: (teamId, categories) => proposeOpponentRed5Command(s, teamId, "BALANCED", categories),
+      }),
       bowlingPlan: structuredClone(c.bowlingPlan),
       battingPlans: structuredClone(c.battingPlans),
       fieldSlots: structuredClone(c.fieldSlots),

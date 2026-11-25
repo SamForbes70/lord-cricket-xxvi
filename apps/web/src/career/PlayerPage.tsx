@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import type { CareerStoryCard } from "@lcxxvi/contracts";
 import { CareerStoriesPanel } from "./CareerStoriesPanel.js";
+import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.js";
+import { overallRating, playerStrengths } from "../world/player-visuals.js";
+import { careerWorld } from "./world-state.js";
 import {
   AWARDS_PROVENANCE_NOTICE,
   type HistoricalPlayerRecord,
@@ -121,6 +124,7 @@ export function PlayerPage({
         {age !== null ? ` · Age ${age}` : ""}
         {skillLedgerEntry ? ` · Debut Season ${skillLedgerEntry.debutSeasonNumber}` : ""}
       </p>
+      <PlayerHero player={player} format={format} />
       {retiredRecord && (
         <div
           className="career-panel retired-banner"
@@ -195,6 +199,7 @@ export function PlayerPage({
                 <React.Fragment key={key}>
                   <dt>{label}</dt>
                   <dd>
+                    <span className="skill-bar" aria-hidden="true" style={{ "--v": String(currentRating) } as React.CSSProperties} />
                     {currentRating}
                     {seasonDelta !== 0 && (
                       <small style={{ marginLeft: "6px" }}>
@@ -356,7 +361,7 @@ export function PlayerPage({
             Historical batting, bowling, fielding &amp; contributing matches
           </h3>
           <p>
-            Career T20 records (<code>{historicalRecord.playerId}</code>) ·{" "}
+            Career T20 records ·{" "}
             {historicalRecord.status === "RETIRED"
               ? "Retired alumni record preserved"
               : "Active career record"}{" "}
@@ -549,3 +554,32 @@ export function PlayerPage({
   );
 }
 export type PlayerFormat = Format;
+
+/**
+ * The player page's hero card (owner order of 20 November 2026, step 5): face, overall rating, role and the four
+ * strengths as bars, for the chosen format. Decorative: every figure on it is also written in the panels below.
+ */
+function PlayerHero({ player, format }: { player: WorldPack["players"][number]; format: Format }) {
+  const kit = careerWorld.teams.find((team) => team.squadIds.includes(player.playerId))?.colours ?? [];
+  const s = playerStrengths(player, format);
+  const bars: [string, number][] = [["Batting", s.batting], ["Bowling", s.bowling], ["Fielding", s.fielding], ...(player.role === "KEEPER" ? [["Keeping", s.keeping] as [string, number]] : [])];
+  return (
+    <div className="player-hero" aria-hidden="true">
+      <PlayerPortrait playerId={player.playerId} role={player.role} kit={kit} size={112} />
+      <div className="player-hero-main">
+        <strong className="player-hero-name">{player.name}</strong>
+        <RoleChip role={player.role} decorative />
+      </div>
+      <RatingBadge rating={overallRating(player, format)} label={`${format === "RED_BALL" ? "RED" : format} OVR`} decorative />
+      <div className="player-hero-bars">
+        {bars.map(([label, value]) => (
+          <div key={label} className="player-hero-bar">
+            <span>{label}</span>
+            <span className="skill-bar" style={{ "--v": String(value) } as React.CSSProperties} />
+            <b>{value || "–"}</b>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

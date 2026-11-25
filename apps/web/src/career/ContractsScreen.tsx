@@ -1,3 +1,5 @@
+import { formatGameDate } from "./format.js";
+import { AboutDetails } from "../AboutDetails.js";
 import type { Dispatch, SetStateAction } from "react";
 import {
   MAX_ACTIVE_TEAM_SQUAD_SIZE,
@@ -36,8 +38,11 @@ export function ContractsScreen(props: ContractsScreenProps) {
           {!economyState || !persistentWorld ? (
             <div className="career-panel">
               <p>
-                Domestic contracts, club wage budgets, and free-agent negotiations require a Stage 4
-                (<code>LC_PERSISTENT_WORLD_V3_ECONOMY</code>) persistent world career.
+                Contracts, wage budgets and free agents need a career with contracts. Start a new career,
+                or make a contracts copy of this one from the Career screen.
+                <AboutDetails summary="About this save">
+                  Requires save format <code>LC_PERSISTENT_WORLD_V3_ECONOMY</code> (Stage 4).
+                </AboutDetails>
               </p>
             </div>
           ) : (
@@ -102,7 +107,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                 >
                   <h3 id="active-offers-heading">Negotiation offers (Season {persistentWorld.currentSeasonNumber})</h3>
                   <div className="table-wrap">
-                    <table>
+                    <table className="round-table">
                       <thead>
                         <tr>
                           <th>Rnd</th>
@@ -206,7 +211,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   free agency at rollover unless renewed during the open negotiation window.
                 </p>
                 <div className="table-wrap">
-                  <table>
+                  <table className="contracts-table">
                     <thead>
                       <tr>
                         <th>Player</th>
@@ -379,7 +384,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   hidden future ceilings.
                 </p>
                 <div className="table-wrap">
-                  <table>
+                  <table className="contracts-table">
                     <thead>
                       <tr>
                         <th>Free agent</th>
@@ -612,7 +617,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                           <tr key={entry.sequence}>
                             <td>#{entry.sequence}</td>
                             <td>
-                              S{entry.seasonNumber} ({entry.date})
+                              S{entry.seasonNumber} ({formatGameDate(entry.date)})
                             </td>
                             <td>{entry.type.replaceAll("_", " ")}</td>
                             <td>{entry.teamId ? service.teamName(entry.teamId) : "League"}</td>

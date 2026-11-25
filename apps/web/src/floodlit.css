@@ -1,0 +1,592 @@
+/*
+ * Floodlit: the game's night-match broadcast look (docs/design/VISUAL_OVERHAUL_PLAN.md, phase 1).
+ * Loaded last, so it re-themes every screen. Every surface keeps a solid background colour under any gradient, so
+ * contrast checks measure against a real colour. Fonts are bundled (SIL Open Font Licence) so the game stays offline.
+ */
+:root {
+  --fl-bg: #08171a;
+  --fl-bg-2: #0c2226;
+  --fl-surface: #10292b;
+  --fl-surface-2: #163536;
+  --fl-surface-3: #1d4342;
+  --fl-raise: #23504d;
+  --fl-edge: rgba(214, 236, 226, 0.14);
+  --fl-edge-strong: rgba(228, 184, 96, 0.55);
+  --fl-text: #eef4ef;
+  --fl-muted: #b6c8bf;
+  --fl-faint: #8fa79c;
+  --fl-gold: #e7bb5f;
+  --fl-gold-hi: #f6d58d;
+  --fl-gold-ink: #1b1305;
+  --fl-red: #f07a6c;
+  --fl-green: #79d79e;
+  --fl-link: #8fd3ff;
+  --fl-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --fl-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --fl-radius: 10px;
+  --fl-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* Pavilion tokens follow the night palette, so screens styled with them change together. */
+  --paper: var(--fl-bg);
+  --ink: var(--fl-text);
+  --pine: #0e3a33;
+  --brass: var(--fl-gold);
+  --rule: var(--fl-edge);
+  --surface: var(--fl-surface);
+  --display: var(--fl-display);
+  color-scheme: dark;
+  color: var(--fl-text);
+  background-color: var(--fl-bg);
+  font-family: var(--fl-body);
+}
+
+/* Backdrop: a night ground under floodlights. */
+html, body { background-color: var(--fl-bg); color: var(--fl-text); }
+body {
+  min-height: 100vh;
+  background-image:
+    radial-gradient(60vw 40vh at 12% -8%, rgba(255, 246, 214, 0.16), transparent 70%),
+    radial-gradient(60vw 40vh at 88% -8%, rgba(255, 246, 214, 0.16), transparent 70%),
+    radial-gradient(120vw 60vh at 50% 120%, rgba(46, 140, 92, 0.32), transparent 70%),
+    linear-gradient(180deg, #0a1d22 0%, #08171a 55%, #0a201a 100%);
+  background-attachment: fixed;
+}
+main, .career-shell, .match-shell { background-color: transparent; color: var(--fl-text); }
+
+/* Type. */
+h1, h2, h3, h4, .career-shell section > h2:first-child, .club-selection .career-masthead h1, .team-card strong {
+  font-family: var(--fl-display);
+  letter-spacing: 0.01em;
+  color: var(--fl-text);
+}
+h1 { font-weight: 700; font-size: 2.3em; text-transform: uppercase; }
+h2 { font-weight: 700; font-size: 1.45em; text-transform: uppercase; letter-spacing: 0.03em; }
+h3 { font-weight: 600; font-size: 1.2em; text-transform: uppercase; letter-spacing: 0.04em; }
+h4 { font-weight: 600; font-size: 1.05em; }
+h1 span, .career-masthead h1 span, .masthead h1 span { color: var(--fl-gold-hi); }
+p, li, dd, dt, label, td, th, legend, summary { color: inherit; }
+small, .muted, footer p, .preferences > span, .replay-meta, .historical-rule-meta, .award-notice,
+.live-field-subtitle, .live-field-legend, .highlight-disclaimer, .strip-label, .keyboard-help, .tactical-empty,
+.legality-phase, .legality-counts, .match-award-explain, .match-award-breakdown, .team-card span { color: var(--fl-muted); }
+.eyebrow, .career-masthead .eyebrow, .masthead .eyebrow, .fixture-lead > h3, .fixture-round {
+  color: var(--fl-gold-hi); font-family: var(--fl-display); letter-spacing: 0.16em; text-transform: uppercase;
+}
+a { color: var(--fl-link); }
+.big-stat, .score, .scorestrip .score, .scorestrip .target strong {
+  font-family: var(--fl-display); font-variant-numeric: tabular-nums; color: var(--fl-text);
+}
+.big-stat { font-size: 2.4em; font-weight: 700; color: var(--fl-gold-hi); }
+
+/* Surfaces: dark glass panels with a light edge. */
+.panel, .career-panel, .decision, .recovery, .save-card, .tactical-card, .tactical-preset-card, .tactical-subdisclosure,
+.live-field-card, .match-award-box, .career-disclosure, .audio-presentation-bar, .import-control, .checkpoint-inspector,
+.replay-viewer, .tactical-situation-bar, .legality-box, .highlight-fallback-note, .audio-fallback-note,
+.audio-caption-banner, .result, .active, .career-shell .fixture-lead, .career-shell .team-card {
+  background-color: var(--fl-surface);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  color: var(--fl-text);
+  border: 1px solid var(--fl-edge);
+  border-radius: var(--fl-radius);
+  box-shadow: var(--fl-shadow);
+}
+.career-panel.emphasis, .tactical-preset-card.contextual, .legality-box.legal { border-color: rgba(121, 215, 158, 0.45); }
+.legality-box.illegal, .error, .career-error { background-color: #3a1915; border-color: #8c3a30; color: #ffd9d2; }
+.career-warning, .highlight-fallback-note, .audio-fallback-note { background-color: #3a2c10; border-color: #8a6a24; color: #ffe6b0; }
+.career-disclosure { box-shadow: none; }
+.career-disclosure.compact { background-color: transparent; border: 0; border-top: 1px solid var(--fl-edge); border-radius: 0; }
+.fixture-lead::before { background: linear-gradient(105deg, #10312c, #0f2526) !important; }
+.career-shell .fixture-lead { border-top: 3px solid var(--fl-gold); }
+
+/* Mastheads: broadcast bars with a gold rule. */
+.career-shell .career-masthead, .match-shell .masthead, .masthead {
+  background-color: #0b2a27;
+  background-image: linear-gradient(90deg, #0d3530 0%, #0b2a27 55%, #10251f 100%);
+  color: var(--fl-text);
+  border-bottom: 3px solid var(--fl-gold);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+.club-selection .career-masthead h1 { font-size: clamp(2.8em, 6vw, 5.6em); text-transform: uppercase; }
+
+/* Navigation: pill tabs. */
+.career-shell .career-nav { border-bottom: 1px solid var(--fl-edge); gap: 6px; }
+.career-shell .career-nav :is(button, a), .career-nav button, .career-nav a {
+  background-color: transparent; color: var(--fl-muted); border: 1px solid transparent; border-radius: 999px;
+  font-family: var(--fl-display); font-size: 1.08em; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.career-shell .career-nav :is(button, a):hover { color: var(--fl-text); text-decoration: none; background-color: var(--fl-surface-2); }
+.career-shell .career-nav [aria-current="page"], .career-nav button[aria-current="page"] {
+  background-color: var(--fl-gold); color: var(--fl-gold-ink); border-color: var(--fl-gold);
+}
+
+/* Buttons. Primary is gold; others are glass. */
+button, .button-link, .career-nav a {
+  font-family: var(--fl-display); font-weight: 600; font-size: 1.05em; letter-spacing: 0.04em;
+}
+button, .button-link, .save-file-actions button, .skip {
+  background-color: var(--fl-surface-2); color: var(--fl-text); border: 1px solid rgba(214, 236, 226, 0.28);
+  border-radius: 8px; transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+button:hover:enabled, .button-link:hover { background-color: var(--fl-surface-3); border-color: var(--fl-gold); }
+button.primary, :is(.career-shell, .match-shell) button.primary, .tactical-badge.fit, .highlight-chip.active,
+.replay-viewer button[aria-pressed="true"], .scope-bar button[aria-pressed="true"], .career-panel button[aria-pressed="true"] {
+  background-color: var(--fl-gold);
+  background-image: linear-gradient(180deg, var(--fl-gold-hi), var(--fl-gold));
+  color: var(--fl-gold-ink); border-color: var(--fl-gold);
+  box-shadow: 0 4px 14px rgba(231, 187, 95, 0.25);
+}
+button.primary:hover:enabled, :is(.career-shell, .match-shell) button.primary:enabled:hover {
+  background-color: var(--fl-gold-hi); background-image: none; color: var(--fl-gold-ink); transform: translateY(-1px);
+}
+button:disabled { background-color: #1a2b2a; background-image: none; color: #8ea097; border-color: rgba(214, 236, 226, 0.12); box-shadow: none; }
+.career-shell .player-link { color: var(--fl-link); background: none; border: 0; font-family: var(--fl-body); font-weight: 600; text-decoration: none; }
+.career-shell .player-link:hover { text-decoration: underline; }
+:focus-visible, :is(.career-shell, .match-shell) :focus-visible { outline: 3px solid var(--fl-gold-hi); outline-offset: 3px; box-shadow: none; }
+
+/* Inputs. */
+select, input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea {
+  background-color: #0b1f21; color: var(--fl-text); border: 1px solid rgba(214, 236, 226, 0.3); border-radius: 8px;
+}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--fl-gold); }
+input[type="file"] { color: var(--fl-muted); }
+
+/* Tables: dark ledger with a sticky gold-ruled header. */
+table, .career-shell table { background-color: var(--fl-surface); color: var(--fl-text); border-radius: var(--fl-radius); overflow: hidden; }
+th, .career-shell th {
+  background-color: #0c2224; color: var(--fl-gold-hi); font-family: var(--fl-display); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--fl-gold);
+}
+td, .career-shell td, .career-shell th { border-bottom: 1px solid var(--fl-edge); }
+tbody tr:nth-child(even) td { background-color: rgba(255, 255, 255, 0.025); }
+tbody tr:hover td { background-color: rgba(231, 187, 95, 0.07); }
+.managed-fixture, .career-shell .managed-fixture { background-color: #133a2f; box-shadow: inset 4px 0 var(--fl-gold); }
+
+/* Chips and badges. */
+.tactical-badge, .award-provenance-tag, .commentary-milestone-badge, .audio-status-pill, .highlight-chip, .badge {
+  background-color: var(--fl-surface-3); color: var(--fl-text); border: 1px solid var(--fl-edge); border-radius: 999px;
+}
+.tactical-badge.active { background-color: #4a3812; color: var(--fl-gold-hi); }
+.tactical-context-reason, .legality-ok, .season-award-stat, .close-finish .passage-report { color: var(--fl-green); }
+.legality-violations, .season-award-unavailable { color: var(--fl-red); }
+.highlight-headline, .tactical-subdisclosure > summary { color: var(--fl-text); }
+.save-badge { background-color: var(--fl-surface-2); color: var(--fl-text); border: 1px solid var(--fl-edge); }
+.career-masthead .save-badge { color: var(--fl-text); }
+.save-badge[data-status="saving"] { background-color: #3a2c10; }
+.save-badge[data-status="read-only"], .save-badge[data-status="error"] { background-color: #3a1915; }
+.team-colours i { border-color: rgba(255, 255, 255, 0.35); }
+.analytics-sector-track { background-color: #21403c; }
+.live-field-svg { background-color: #0f2a22; }
+
+/* Scoreboard: broadcast score bug. */
+.scorestrip, .match-shell .scorestrip {
+  background-color: #0b2622; background-image: linear-gradient(100deg, #0e3a33 0%, #0b2622 60%, #10301f 100%);
+  color: var(--fl-text); border: 1px solid var(--fl-edge-strong); border-radius: var(--fl-radius);
+}
+.scorestrip p { color: var(--fl-muted); }
+.scorestrip .score { font-size: 3.1em; font-weight: 700; letter-spacing: -0.01em; }
+.scorestrip h2 { color: var(--fl-text); }
+
+/* Club cards on the start screen lift on hover. */
+.career-shell .team-card { border-bottom: 3px solid var(--fl-gold); }
+.career-shell .team-card:enabled:hover { background-color: var(--fl-surface-2); border-color: var(--fl-gold); transform: translateY(-2px); }
+.career-shell .team-card strong { font-size: 1.45em; text-transform: uppercase; }
+
+/* Print keeps black on white. */
+@media print {
+  html, body { background: #fff !important; color: #000 !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button, .career-shell .team-card { transition: none; transform: none !important; }
+}
+
+/* Component stylesheets and the Pavilion pass set their own light surfaces; these follow the night palette too. */
+.pitch-inspection, .tactical-disclosure, .career-match-banner, .captain-station, .captain-station .close-finish,
+.close-finish .passage-report, .match-shell .active, .live-field-card {
+  background-color: var(--fl-surface); background-image: none; color: var(--fl-text);
+  border-color: var(--fl-edge);
+}
+.career-match-banner { border-left: 4px solid var(--fl-gold); box-shadow: var(--fl-shadow); }
+.tactical-disclosure > summary, .tactical-subdisclosure > summary { color: var(--fl-text); }
+.captain-station { border: 1px solid var(--fl-edge-strong); border-radius: var(--fl-radius); box-shadow: var(--fl-shadow); }
+.captain-station > header { background-color: #0b2a27; background-image: linear-gradient(90deg, #0e3a33, #0b2a27); color: var(--fl-text); }
+.captain-station .eyebrow { color: var(--fl-gold-hi); }
+.captain-station > a, .match-shell a { color: var(--fl-link); }
+.close-finish .passage-report { border-left: 3px solid var(--fl-gold); background-color: var(--fl-surface-2); }
+.close-finish .action-row button { border-top: 3px solid var(--fl-green); }
+.close-finish .action-row button:hover:enabled { border-top-color: var(--fl-gold); }
+.field-read { border-left-color: var(--fl-edge); color: var(--fl-muted); }
+.delivery-strip span { background-color: var(--fl-surface-3); color: var(--fl-text); border: 1px solid var(--fl-edge); }
+.career-shell th, .match-shell table th { background-color: #0c2224; color: var(--fl-gold-hi); }
+.career-shell tbody tr:nth-child(even):not(.managed-fixture) { background-color: rgba(255, 255, 255, 0.025); }
+.career-shell tbody tr:focus-within { background-color: rgba(231, 187, 95, 0.12); }
+.match-shell button.primary:disabled { background-color: #1a2b2a; background-image: none; color: #8ea097; border-color: rgba(214, 236, 226, 0.12); }
+.fixture-lead[data-quay="true"]::before {
+  background: linear-gradient(95deg, #0f2526 19%, rgba(15, 37, 38, 0.92) 45%, rgba(15, 37, 38, 0.45) 72%, transparent),
+    url("./art/aster-quay.webp") center 58% / cover !important;
+}
+.analytics-pitch text { fill: var(--fl-text); }
+.career-match-banner a, .career-match-banner button { color: var(--fl-text); }
+.career-match-banner a { color: var(--fl-link); }
+/* These component stylesheets load after this one, so their overrides carry an extra element in the selector. */
+body .pitch-inspection, body .captain-station .field-read {
+  background-color: var(--fl-surface-2); background-image: none; color: var(--fl-text); border: 1px solid var(--fl-edge);
+}
+body .pitch-inspection h3 { color: var(--fl-gold-hi); }
+body .pitch-inspection :is(dt, dd, p, strong, span) { color: inherit; }
+body .captain-station .field-read { color: var(--fl-muted); }
+
+/* Phase 2: player identity. */
+.player-portrait { flex: none; border-radius: 50%; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4); background-color: var(--fl-surface-3); }
+.rating-badge {
+  display: inline-grid; place-items: center; min-width: 3.1em; padding: 0.15em 0.45em 0.2em; border-radius: 8px;
+  background-color: #2a2414; background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--fl-gold); color: var(--fl-gold-hi); line-height: 1; flex: none;
+}
+.rating-badge strong { font: 700 1.55em/1 var(--fl-display); font-variant-numeric: tabular-nums; color: inherit; }
+.rating-badge small { font: 600 0.62em/1.2 var(--fl-display); letter-spacing: 0.14em; color: inherit; opacity: 0.85; }
+.rating-badge[data-tier="ELITE"] { background-color: #3a2c08; border-color: #ffd877; color: #ffe39a; box-shadow: 0 0 14px rgba(255, 216, 119, 0.28); }
+.rating-badge[data-tier="STRONG"] { background-color: #1f3524; border-color: #79d79e; color: #a7f0c3; }
+.rating-badge[data-tier="SOLID"] { background-color: #1a2c36; border-color: #7fb6d9; color: #bfe2f7; }
+.rating-badge[data-tier="DEVELOPING"] { background-color: #262a2c; border-color: #8fa0a6; color: #d3dde0; }
+.role-chip {
+  display: inline-flex; align-items: center; gap: 0.35em; padding: 0.2em 0.6em 0.2em 0.45em; border-radius: 999px;
+  background-color: var(--fl-surface-3); border: 1px solid var(--fl-edge); color: var(--fl-text);
+  font: 600 0.92em/1.2 var(--fl-display); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+}
+.role-chip[data-role="BOWLER"] { border-color: rgba(240, 122, 108, 0.5); }
+.role-chip[data-role="KEEPER"] { border-color: rgba(231, 187, 95, 0.55); }
+.role-chip[data-role="ALLROUNDER"] { border-color: rgba(143, 211, 255, 0.5); }
+.career-shell td.player-cell { width: 330px; min-width: 280px; vertical-align: middle; }
+.career-shell td:has(> strong + small) { min-width: 8.5em; }
+.career-shell td select { max-width: 11em; }
+.player-cell-inner { display: flex; align-items: center; gap: 12px; }
+.career-shell td { vertical-align: middle; }
+.career-shell td strong { white-space: nowrap; }
+.career-shell td select { min-width: 9em; }
+.player-cell-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.player-cell-name .player-link { font-size: 1.05em; }
+.career-shell td small { display: block; color: var(--fl-muted); }
+
+/* Phase 3: the auction room. */
+.auction-room { padding: clamp(14px, 2vw, 26px); border-color: var(--fl-edge-strong); }
+.auction-room-head p:not(.eyebrow) { color: var(--fl-muted); max-width: 70ch; }
+.auction-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.1fr) minmax(0, 0.95fr); gap: 16px; margin: 14px 0; align-items: start; }
+.auction-col { background-color: #0c2224; border: 1px solid var(--fl-edge); border-radius: var(--fl-radius); padding: 12px; min-width: 0; }
+.auction-col > h3 { margin: 0 0 10px; padding: 6px 10px; text-align: center; border-radius: 6px; background-color: #123630; color: var(--fl-gold-hi); }
+.auction-block > h3 { background-color: var(--fl-gold); color: var(--fl-gold-ink); }
+.auction-teams table { min-width: 0; width: 100%; font-size: 0.95em; }
+.auction-teams th[scope="row"] { color: var(--fl-text); font-family: var(--fl-body); text-transform: none; letter-spacing: 0; font-weight: 600; white-space: nowrap; border-bottom-width: 1px; }
+.auction-teams tr[data-mine="true"] :is(th, td) { background-color: rgba(231, 187, 95, 0.16); }
+.auction-mine-tag { display: block; font: 600 0.72em/1.2 var(--fl-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fl-gold-hi); }
+.auction-wallet { font: 700 1.2em var(--fl-display); color: var(--fl-gold-hi); font-variant-numeric: tabular-nums; }
+.auction-lot-card {
+  text-align: center; padding: 14px 12px 16px; border-radius: 12px;
+  background-color: #10302b; background-image: radial-gradient(120% 80% at 50% 0%, rgba(231, 187, 95, 0.22), transparent 60%);
+  border: 1px solid var(--fl-edge-strong);
+}
+.auction-lot-top { display: grid; grid-template-columns: auto auto auto; align-items: center; justify-content: center; gap: 14px; }
+.auction-lot-top .rating-badge { font-size: 1.35em; }
+.auction-lot-stats { display: grid; gap: 6px; }
+.auction-lot-stats span { display: flex; flex-direction: column; align-items: center; font: 600 0.7em/1 var(--fl-display); letter-spacing: 0.12em; color: var(--fl-muted); }
+.auction-lot-stats strong { font: 700 1.9em/1 var(--fl-display); color: var(--fl-text); }
+.auction-lot-name { margin: 10px 0 6px; font: 700 2em/1.05 var(--fl-display); text-transform: uppercase; letter-spacing: 0.02em; }
+.auction-reserve { margin: 10px 0 0; color: var(--fl-muted); font-family: var(--fl-display); letter-spacing: 0.08em; text-transform: uppercase; }
+.auction-reserve strong { color: var(--fl-gold-hi); font-size: 1.4em; }
+.auction-last { margin: 10px 0 0; text-align: center; color: var(--fl-muted); font-size: 0.92em; }
+.auction-done { text-align: center; color: var(--fl-muted); padding: 30px 8px; }
+.auction-bid { margin-top: 12px; display: grid; gap: 8px; }
+.auction-bid-field { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--fl-display); letter-spacing: 0.06em; text-transform: uppercase; }
+.auction-bid-field input { width: 7em; font: 700 1.3em var(--fl-display); text-align: center; }
+.auction-bid .action-row button { flex: 1 1 8rem; }
+.auction-bid-button { font-size: 1.45em; letter-spacing: 0.12em; min-height: 52px; }
+.auction-purse { display: flex; align-items: center; gap: 14px; padding: 8px 10px; border-radius: 8px; background-color: #123630; margin: 8px 0; }
+.auction-purse span { display: flex; flex-direction: column; font: 600 0.72em/1.1 var(--fl-display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--fl-muted); }
+.auction-purse strong { font: 700 2.1em/1 var(--fl-display); color: var(--fl-gold-hi); }
+.auction-makeup { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 8px 0 12px; }
+.auction-makeup dt { color: var(--fl-muted); font-family: var(--fl-display); letter-spacing: 0.06em; text-transform: uppercase; }
+.auction-makeup dd { margin: 0; text-align: right; font: 700 1.1em var(--fl-display); }
+.auction-makeup dt:last-of-type, .auction-makeup dd:last-of-type { border-top: 1px solid var(--fl-edge); padding-top: 4px; color: var(--fl-gold-hi); }
+.auction-lots { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 0.9em; color: var(--fl-muted); }
+.auction-lots li { padding: 4px 6px; border-radius: 6px; background-color: rgba(255, 255, 255, 0.03); }
+@media (max-width: 1050px) { .auction-grid { grid-template-columns: 1fr; } }
+
+/* The start screen keeps the Aster Quay painting behind the title, under a night wash. */
+.career-shell.club-selection .career-masthead {
+  background-color: #0b2a27;
+  background-image: linear-gradient(90deg, rgba(6, 24, 22, 0.94) 4%, rgba(8, 30, 27, 0.55) 55%, rgba(8, 30, 27, 0.25)),
+    linear-gradient(0deg, rgba(6, 20, 20, 0.85), transparent 45%), url("./art/aster-quay.webp");
+  background-position: center 58%; background-size: cover;
+  min-height: 300px;
+}
+.club-selection .career-masthead .button-link { background-color: rgba(10, 34, 31, 0.86); color: var(--fl-text); border-color: rgba(231, 187, 95, 0.55); }
+
+/* Phase 5: every ground has a backdrop (its painting, or a procedural floodlit stadium). The image and its night wash
+   are set inline (see ground-art.ts); these rules only place it. Each surface keeps a solid background-color underneath
+   for the contrast audit. */
+.career-shell .fixture-lead[data-art="true"] { background-size: cover; background-position: center 58%; }
+.career-shell .fixture-lead[data-art="true"]::before { display: none; }
+.scorestrip[data-art="true"], .match-shell .scorestrip[data-art="true"] {
+  background-color: #0b2622; background-size: cover; background-position: center 36%;
+}
+@media (max-width: 650px) {
+  /* Text runs the full width on a phone, so the whole panel gets a heavier wash. */
+  .career-shell .fixture-lead[data-art="true"]::before { display: block; height: 100%; background: rgba(15, 37, 38, 0.85) !important; }
+}
+
+/* Match screen: the batters and bowler with their faces, like a broadcast lower third. */
+.active .active-player { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.active .active-player .player-portrait { flex: none; border-radius: 50%; box-shadow: 0 0 0 2px rgba(231, 187, 95, 0.35); }
+.active .active-player strong { font-family: var(--fl-display); font-size: 1.12em; letter-spacing: 0.02em; }
+
+/* Exhibition setup: a match-up banner over the chosen ground, and faces in the XI picker. */
+.setup-hero {
+  display: flex; align-items: center; justify-content: center; gap: clamp(16px, 5vw, 56px);
+  min-height: 190px; margin-bottom: 14px; border-radius: var(--fl-radius); border: 1px solid var(--fl-edge-strong);
+  background-color: #0b2622;
+  background-size: cover; background-position: center 34%; box-shadow: var(--fl-shadow);
+}
+.setup-hero svg { filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55)); }
+.setup-hero-v { font: 700 2.4em var(--fl-display); color: var(--fl-gold-hi); text-transform: uppercase; text-shadow: 0 2px 8px #000; }
+.player-choice { display: flex; align-items: center; gap: 8px; }
+.player-choice .player-portrait { flex: none; }
+
+/* League table: a narrow position column, the team with its crest, numbers in the display face. */
+.league-table th:first-child, .league-table td:first-child { width: 3.5em; text-align: center; font: 700 1.15em var(--fl-display); color: var(--fl-gold-hi); }
+.league-table td.league-team { width: 40%; font-weight: 600; white-space: nowrap; }
+.league-table td.league-team svg { vertical-align: middle; margin-right: 8px; }
+.league-table td:nth-child(n + 3) { font-variant-numeric: tabular-nums; }
+.league-table td:nth-child(8) { font: 700 1.15em var(--fl-display); color: var(--fl-text); }
+
+/* Scenario challenges: cards with the ground as an art header and a difficulty tag. */
+.career-stories .scenario-card { padding: 0 16px 16px; overflow: hidden; display: flex; flex-direction: column; }
+.scenario-card > .primary { margin-top: auto; align-self: flex-start; }
+.scenario-art {
+  margin: 0 -16px 12px; height: 120px; position: relative;
+  background-color: #0b2622;
+  background-size: cover; background-position: center 38%;
+}
+.scenario-difficulty {
+  position: absolute; top: 10px; right: 12px; padding: 3px 10px; border-radius: 999px;
+  font: 700 0.8em var(--fl-display); letter-spacing: 0.08em; text-transform: uppercase;
+  background-color: var(--fl-gold); color: var(--fl-gold-ink);
+}
+.scenario-card[data-difficulty="ELITE"] .scenario-difficulty { background-color: #c94a3a; color: #fff; }
+.scenario-card[data-difficulty="STANDARD"] .scenario-difficulty { background-color: #79d79e; color: #08240f; }
+[data-testid="scenarios-screen"] .career-stories { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+
+/* Tournament cards: the competing sides' crests, and a tidy start row pinned to the bottom. */
+[data-testid="tournaments-screen"] .career-stories > .career-panel { display: flex; flex-direction: column; }
+.tournament-crests { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.tournament-crests svg { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45)); }
+.tournament-start { margin-top: auto; align-items: flex-end; }
+.tournament-start label { display: grid; gap: 4px; }
+.tournament-start .primary { align-self: flex-end; }
+/* Screens with a masthead and an intro line: breathing room under the gold rule. */
+.career-shell > .career-masthead + p { margin-top: 14px; }
+
+/* The base stylesheet gives every table's first column 48%, which suits the batting scorecard and the Squad table's
+   player column but squashes tables that start with a round number (career results, contract history). Those get a
+   narrow first column; every other table keeps the base layout. */
+.career-shell .round-table th:first-child { width: 4em; }
+.career-shell .league-table th:first-child { width: 3.5em; }
+
+/* Broadcast "this ball" stage: the latest delivery called big, recent balls as a strip, and a short moment for
+   boundaries and wickets. Only transform and opacity animate, so a moment costs no layout or repaint of the page. */
+.broadcast-stage {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: grid; grid-template-columns: minmax(16rem, 1fr) minmax(0, 1.4fr); align-items: center; gap: 12px 24px;
+  margin: 10px 0; padding: 14px 20px; border-radius: var(--fl-radius);
+  background-color: #0a1f22; border: 1px solid var(--fl-edge-strong); box-shadow: var(--fl-shadow);
+}
+.stage-glow {
+  position: absolute; inset: 0; z-index: -1; opacity: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 18% 50%, var(--stage-glow, transparent), transparent 62%);
+}
+.broadcast-stage[data-moment="SIX"] { --stage-glow: rgba(231, 187, 95, 0.55); border-color: rgba(231, 187, 95, 0.7); }
+.broadcast-stage[data-moment="FOUR"] { --stage-glow: rgba(121, 215, 158, 0.45); border-color: rgba(121, 215, 158, 0.6); }
+.broadcast-stage[data-moment="WICKET"] { --stage-glow: rgba(214, 82, 64, 0.55); border-color: rgba(214, 82, 64, 0.75); }
+.stage-call { display: grid; gap: 2px; grid-column: 1; }
+.stage-balls { grid-column: 2; }
+.stage-over { font: 600 0.8em var(--fl-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fl-muted); }
+.stage-word {
+  font: 700 clamp(2.2em, 4.5vw, 3.4em)/1 var(--fl-display); text-transform: uppercase; letter-spacing: 0.02em;
+  color: var(--fl-text);
+}
+.stage-call[data-kind="SIX"] .stage-word { color: var(--fl-gold-hi); }
+.stage-call[data-kind="FOUR"] .stage-word { color: #9fe8bb; }
+.stage-call[data-kind="WICKET"] .stage-word { color: #ff9a8a; }
+.stage-call[data-kind="DOT"] .stage-word, .stage-call[data-kind="EXTRA"] .stage-word { color: var(--fl-muted); }
+.stage-line { color: var(--fl-muted); }
+.stage-balls { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.stage-balls li {
+  min-width: 2.1em; height: 2.1em; padding: 0 6px; display: grid; place-items: center; border-radius: 999px;
+  font: 700 1em var(--fl-display); background-color: var(--fl-surface-3); color: var(--fl-text); border: 1px solid var(--fl-edge);
+}
+.stage-balls li[data-kind="FOUR"] { background-color: #1d5a3a; border-color: #79d79e; }
+.stage-balls li[data-kind="SIX"] { background-color: var(--fl-gold); color: var(--fl-gold-ink); border-color: var(--fl-gold-hi); }
+.stage-balls li[data-kind="WICKET"] { background-color: #8c2f24; border-color: #ff9a8a; color: #fff; }
+.stage-balls li[data-kind="EXTRA"] { color: var(--fl-gold-hi); }
+.stage-balls li:last-child { box-shadow: 0 0 0 2px var(--fl-gold); }
+@media (prefers-reduced-motion: no-preference) {
+  .broadcast-stage[data-moment="SIX"] .stage-glow, .broadcast-stage[data-moment="FOUR"] .stage-glow, .broadcast-stage[data-moment="WICKET"] .stage-glow {
+    animation: fl-stage-glow 1.6s ease-out 1;
+  }
+  .stage-call[data-kind="SIX"], .stage-call[data-kind="FOUR"], .stage-call[data-kind="WICKET"] { animation: fl-stage-pop 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) 1; }
+}
+@keyframes fl-stage-glow { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0.25; } }
+@keyframes fl-stage-pop { 0% { transform: scale(0.86); opacity: 0.4; } 60% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
+@media (max-width: 700px) { .broadcast-stage { grid-template-columns: 1fr; } .stage-balls { grid-column: 1; justify-content: flex-start; } }
+@media print { .broadcast-stage { display: none; } }
+
+/* Title screen (owner order, step 2): the front door in the night-match menu style. */
+.title-screen { max-width: 1180px; margin: 0 auto; padding: 18px 16px 32px; }
+.title-hero {
+  position: relative; overflow: hidden; isolation: isolate; text-align: center;
+  padding: clamp(28px, 6vw, 70px) 20px clamp(26px, 5vw, 56px); border-radius: 18px;
+  background-color: #08171a;
+  background-image:
+    radial-gradient(circle at 12% 0%, rgba(255, 246, 216, 0.28), transparent 32%),
+    radial-gradient(circle at 88% 0%, rgba(255, 246, 216, 0.28), transparent 32%),
+    linear-gradient(180deg, rgba(6, 20, 22, 0.55), rgba(6, 20, 22, 0.92) 70%),
+    url("./art/aster-quay.webp");
+  background-size: cover; background-position: center 60%;
+  border: 1px solid rgba(231, 187, 95, 0.45); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.title-crests { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.title-crests svg { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6)); }
+.title-eyebrow { margin: 0; font: 700 0.85em var(--fl-display); letter-spacing: 0.32em; text-transform: uppercase; color: var(--fl-gold-hi); }
+.title-wordmark {
+  margin: 6px 0 4px; font: 700 clamp(2.8em, 9vw, 6em)/0.95 var(--fl-display); text-transform: uppercase; letter-spacing: 0.01em;
+  color: #fff; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+}
+.title-wordmark span { color: var(--fl-gold); }
+.title-tagline { margin: 0 auto 26px; max-width: 34rem; color: #d8e6df; font-size: 1.08em; }
+.title-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.title-actions button { display: grid; gap: 2px; min-width: 15rem; padding: 14px 26px; font-size: 1.35em; text-transform: uppercase; }
+.title-actions button small { font: 500 0.55em var(--fl-body); text-transform: none; letter-spacing: 0; opacity: 0.85; }
+.title-actions .title-guided { background-color: rgba(10, 34, 31, 0.9); border-color: rgba(231, 187, 95, 0.6); color: var(--fl-text); }
+.title-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr)); gap: 12px; margin-top: 18px; }
+.title-mode {
+  display: grid; gap: 4px; align-content: start; padding: 16px; border-radius: var(--fl-radius); text-decoration: none;
+  background-color: var(--fl-surface); border: 1px solid var(--fl-edge); border-top: 3px solid var(--fl-gold); color: var(--fl-text);
+}
+.title-mode svg { color: var(--fl-gold-hi); }
+.title-mode strong { font: 700 1.3em var(--fl-display); text-transform: uppercase; letter-spacing: 0.03em; }
+.title-mode span { color: var(--fl-muted); font-size: 0.92em; }
+.title-mode:hover, .title-mode:focus-visible { background-color: var(--fl-surface-2); border-color: var(--fl-gold); }
+.title-footer { text-align: center; color: var(--fl-muted); font-size: 0.9em; margin-top: 18px; }
+@media (prefers-reduced-motion: no-preference) {
+  .title-mode { transition: transform 0.15s ease, background-color 0.15s ease; }
+  .title-mode:hover { transform: translateY(-3px); }
+}
+
+/* Guided first match: a coach card above the decision tray. */
+.guided-coach {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px;
+  margin: 10px 0; padding: 14px 18px; border-radius: var(--fl-radius);
+  background-color: #23301b; border: 1px solid #8a6a24; border-left: 5px solid var(--fl-gold); color: var(--fl-text);
+}
+.guided-coach h2 { margin: 2px 0 4px; font: 700 1.4em var(--fl-display); text-transform: uppercase; color: var(--fl-gold-hi); }
+.guided-coach p { margin: 0; max-width: 48rem; }
+.guided-step { font: 700 0.75em var(--fl-display); letter-spacing: 0.18em; text-transform: uppercase; color: #ffe6b0; }
+.guided-actions { display: flex; gap: 10px; align-items: center; }
+.title-actions .title-play small { color: var(--fl-gold-ink); opacity: 0.8; }
+
+/* Full-figure cricketers (owner order, step 3): original, code-drawn art in club kits for the menus. */
+.title-figure { position: absolute; bottom: -6px; z-index: -1; filter: drop-shadow(0 0 18px rgba(231, 187, 95, 0.28)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)); }
+.title-figure-left { left: 3%; }
+.title-figure-right { right: 3%; }
+@media (max-width: 980px) { .title-figure { opacity: 0.35; } }
+@media (max-width: 640px) { .title-figure { display: none; } }
+.auction-lot-card { position: relative; isolation: isolate; overflow: hidden; }
+.auction-lot-figure { position: absolute; right: -70px; bottom: -14px; z-index: -1; opacity: 0.22; pointer-events: none; }
+
+/* Motion (owner order, step 4). Screens fade in (opacity only, so nothing shifts under the pointer); the lot on the
+   block and a changed score pop once; buttons give under the press. All of it is off under reduced motion. */
+.title-sound { display: flex; justify-content: center; margin-top: 14px; }
+.title-sound button[aria-pressed="true"] { border-color: var(--fl-gold); color: var(--fl-gold-hi); }
+/* E5: the first-run sound question, in the page flow so it never covers another control. */
+.title-sound-question { max-width: 560px; margin: 18px auto 0; padding: 14px 18px; border: 1px solid var(--fl-gold); border-radius: 12px; text-align: center; }
+.title-sound-question h2 { margin: 0 0 4px; font-size: 1.1rem; }
+.title-sound-question p { margin: 0 0 10px; }
+.title-sound-question-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (prefers-reduced-motion: no-preference) {
+  .title-screen, .career-shell, [data-testid="scenarios-screen"], [data-testid="tournaments-screen"], .broadcast-stage { animation: fl-fade-in 0.3s ease-out both; }
+  .auction-lot-card { animation: fl-lot-in 0.5s cubic-bezier(0.2, 1.3, 0.4, 1) both; }
+  .scorestrip .score { animation: fl-score-pulse 0.45s ease-out both; }
+  button:not(:disabled):active, .title-mode:active { transform: scale(0.97); }
+  button { transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease; }
+}
+@keyframes fl-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fl-lot-in { 0% { transform: translateY(14px) scale(0.96); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes fl-score-pulse { 0% { transform: scale(1.12); color: var(--fl-gold-hi); } 100% { transform: scale(1); } }
+.scorestrip .score { display: inline-block; transform-origin: left center; }
+
+/* Remaining screens (owner order, step 5). */
+input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color: var(--fl-gold); }
+.career-shell .fixtures-table th:first-child { width: auto; }
+.career-shell .contracts-table th:first-child { width: 24%; }
+.career-shell .contracts-table th:last-child { width: 15rem; }
+.contracts-table td:last-child input, .contracts-table td:last-child select { max-width: 100%; }
+.stats-grid ol:empty::after { content: "No matches played yet."; color: var(--fl-muted); font-size: 0.92em; }
+
+/* Player page: a hero card with face, rating, role and strengths, and bars behind every skill. */
+.player-hero {
+  display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "face main ovr" "face bars bars";
+  align-items: center; gap: 8px 18px; margin: 6px 0 14px; padding: 16px 20px; border-radius: var(--fl-radius);
+  background-color: var(--fl-surface); background-image: linear-gradient(100deg, rgba(231, 187, 95, 0.1), transparent 45%);
+  border: 1px solid var(--fl-edge-strong); border-top: 3px solid var(--fl-gold); box-shadow: var(--fl-shadow);
+}
+.player-hero > .player-portrait { grid-area: face; }
+.player-hero-main { grid-area: main; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.player-hero-name { font: 700 2em/1 var(--fl-display); text-transform: uppercase; letter-spacing: 0.02em; }
+.player-hero > .rating-badge { grid-area: ovr; }
+.player-hero-bars { grid-area: bars; display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 6px 18px; }
+.player-hero-bar { display: grid; grid-template-columns: 5.5em 1fr 2.2em; align-items: center; gap: 8px; color: var(--fl-muted); font-size: 0.92em; }
+.player-hero-bar b { font: 700 1.15em var(--fl-display); color: var(--fl-text); text-align: right; }
+.skill-bar {
+  display: inline-block; position: relative; height: 6px; border-radius: 3px; background-color: rgba(255, 255, 255, 0.08); overflow: hidden;
+}
+.skill-bar::before {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: calc(var(--v, 0) * 1%); border-radius: 3px;
+  background-image: linear-gradient(90deg, #4f9e72, var(--fl-gold));
+}
+.player-details dd .skill-bar { width: 6em; margin-right: 10px; vertical-align: middle; }
+@media (max-width: 640px) {
+  .player-hero { grid-template-columns: auto 1fr; grid-template-areas: "face main" "ovr ovr" "bars bars"; }
+}
+
+/* Project Pavilion B2: routine picks switch and notes in the decision panel. */
+.routine-picks { display: grid; gap: 0.25rem; margin: 0.25rem 0 0.5rem; color: var(--fl-muted); font-size: 0.92em; }
+.routine-picks label { display: inline-flex; gap: 0.4rem; align-items: center; }
+.routine-picks .routine-key { margin: 0; color: var(--fl-gold-hi); }
+.routine-picks .routine-note { margin: 0; }
+
+/* Project Pavilion B6: why "Next key moment" stopped. */
+.decision .key-moment { margin: 0.25rem 0 0.5rem; color: var(--fl-gold-hi); font-weight: 600; }
+
+/* Project Pavilion B9: the chase's win chance, under the situation strip. */
+.win-chance { margin: 0.25rem 0 0.5rem; color: var(--fl-muted); font-size: 0.95em; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; }
+.win-chance strong { color: var(--fl-text); }
+.win-chance small { color: var(--fl-faint); }
+
+/* Project Pavilion B9: opposition watch at the top of the tactics group. */
+.opposition-watch ul { margin: 0.25rem 0 0; padding-left: 1.1rem; color: var(--fl-muted); }
+.opposition-watch p { margin: 0.25rem 0; }
+
+/* Project Pavilion B3: the full-time result moment in the decision panel. */
+.result-moment { display: grid; gap: 0.75rem; }
+.result-moment .result-scores { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+.result-moment .result-scores li { font-family: var(--fl-display); font-size: 1.35rem; color: var(--fl-text); }
+.result-moment .result-scores span { color: var(--fl-muted); font-family: var(--fl-body); font-size: 0.9rem; }
+.result-moment .result-award { margin: 0; color: var(--fl-text); }
+.result-moment .result-award strong { color: var(--fl-gold-hi); }
+.result-moment .result-note { margin: 0; color: var(--fl-muted); }
+.result-moment .result-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+/* Project Pavilion B4: match settings gathered at the foot of the match. */
+.match-settings { border-top: 1px solid var(--fl-edge); margin-top: 1.5rem; padding-top: 1rem; display: grid; gap: 0.75rem; }
+.match-settings > h2 { margin: 0; font-family: var(--fl-display); letter-spacing: 0.04em; }
+
+/* Project Pavilion B3 and B5: technical detail behind a disclosure, quieter than the play. */
+.technical-details { color: var(--fl-muted); font-size: 0.92em; }
+.technical-details > summary { cursor: pointer; color: var(--fl-faint); }
+.technical-details[open] > summary { margin-bottom: 0.5rem; }

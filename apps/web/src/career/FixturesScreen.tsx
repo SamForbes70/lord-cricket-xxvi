@@ -1,3 +1,4 @@
+import { formatGameDate } from "./format.js";
 import { TeamCrest } from "../world/TeamCrest.js";
 import type { ReactNode } from "react";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
@@ -40,10 +41,10 @@ export function FixturesScreen(props: FixturesScreenProps) {
           aria-labelledby={`round-${round.roundNumber}`}
         >
           <h3 id={`round-${round.roundNumber}`}>
-            Round {round.roundNumber} · {round.matchDayDate}
+            Round {round.roundNumber} · {formatGameDate(round.matchDayDate)}
           </h3>
           <div className="table-wrap">
-            <table>
+            <table className="fixtures-table">
               <thead>
                 <tr>
                   <th>Home</th>

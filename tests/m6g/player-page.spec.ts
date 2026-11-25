@@ -51,6 +51,7 @@ test("a completed career match links statistics to the correct player profile", 
   await expect(page.getByText("1/14 managed-team fixtures complete.", { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 60_000 });
   const savedRevision = await page.locator(".save-badge small").innerText();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
   const playerButton = page.getByRole("button", { name: /^View / }).first();
   const label = (await playerButton.getAttribute("aria-label")) ?? (await playerButton.textContent()) ?? "";
@@ -73,7 +74,7 @@ test("pitch inspection keeps the primary match action in view at 150 percent", a
   await startCareer(page);
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await page.getByLabel("Text scale").selectOption("150");
-  await page.getByRole("button", { name: "Home", exact: true }).click();
+  await page.getByRole("button", { name: "Clubhouse", exact: true }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   const action = page.getByRole("button", { name: "Simulate match", exact: true });
   await expect(action).toBeVisible();
@@ -92,8 +93,8 @@ test("pitch inspection keeps the primary match action in view at 150 percent", a
   expect(ground).toBeDefined();
   const pitch = page.getByRole("region", { name: "Pitch and conditions" });
   await expect(pitch).toContainText(ground!.name);
-  await expect(pitch).toContainText(`${(ground!.pitchPrior.seamBp / 100).toFixed(2)} / 100`);
-  await expect(pitch).toContainText(`${(ground!.pitchPrior.turnBp / 100).toFixed(2)} / 100`);
+  await expect(pitch).toContainText(`${Math.round(ground!.pitchPrior.seamBp / 100)} / 100`);
+  await expect(pitch).toContainText(`${Math.round(ground!.pitchPrior.turnBp / 100)} / 100`);
 });
 
 test("player profiles fit a narrow viewport at 150 percent text scale", async ({ page }) => {

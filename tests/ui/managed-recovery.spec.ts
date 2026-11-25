@@ -244,9 +244,15 @@ test("an edited-world managed match keeps its edited world when recovered and ap
   await playToEnd(fresh);
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
+  // The career settles the match itself before it reads the returned result. A lifecycle career match stores a roster
+  // pack and no world copy, so settling must not reject it as "a different world copy" (seen on hosted Windows CI,
+  // run 45387716158, where a reload before the binding was marked left it pending with that error).
+  await expect(fresh.getByText("The saved match belongs to a different world copy.")).toHaveCount(0);
+  await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
   await fresh.reload();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(fresh.getByRole("heading", { name: /Quay Rovers/i }).first()).toBeVisible();
+  await expect(fresh.getByText("The saved match belongs to a different world copy.")).toHaveCount(0);
   await expect.poll(() => bindingStates(fresh), { timeout: 30_000 }).toEqual(["APPLIED"]);
 });
 

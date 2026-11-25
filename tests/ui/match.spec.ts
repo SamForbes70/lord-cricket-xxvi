@@ -81,7 +81,7 @@ test("cancellation waits for the current command to commit", async ({ page }) =>
   await expect(page.getByText("Stopping after this commit…")).toBeVisible();
   await settle(page);
   await expect(page.getByRole("button", { name: "Stop simulation" })).toHaveCount(0);
-  await expect(page.getByText(/^Committed events \d+–\d+\.$/)).toBeVisible();
+  await expect(page.getByText(/^Saved match events \d+ to \d+\.$/)).toBeVisible();
   await expect(page.locator("#decision")).toHaveAttribute("data-revision", String(before + 1));
   await page.reload();
   await settle(page);
@@ -134,15 +134,15 @@ test("a full keyboard-only human-command match, replay identity and terminal con
     if (++steps > 450) throw new Error("Unfinished match");
   }
   expect(disabledBowlerSeen).toBe(true);
-  await expect(
-    page.getByRole("button", { name: "Next delivery" }),
-  ).toBeDisabled();
-  await expect(
-    page.getByRole("button", { name: "Finish over" }),
-  ).toBeDisabled();
+  // Pavilion B3: at full time the advance buttons give way to the result moment.
+  await expect(page.getByTestId("result-moment")).toBeVisible();
+  await expect(page.locator("#decision").getByRole("button", { name: "Next delivery" })).toHaveCount(0);
+  await expect(page.locator("#decision").getByRole("button", { name: "Finish over" })).toHaveCount(0);
   const revision = await page
     .locator("#decision")
     .getAttribute("data-revision");
+  // Pavilion B3: the replay check is a technical disclosure under the result.
+  if ((await page.getByTestId("replay-check").getAttribute("open")) === null) await page.getByTestId("replay-check").locator("summary").click();
   await keyboardActivate(
     page,
     page.getByRole("button", { name: "Verify replay and scorecard" }),
@@ -155,6 +155,8 @@ test("a full keyboard-only human-command match, replay identity and terminal con
   await page.getByLabel("Commentary", { exact: true }).selectOption("off");
   await page.getByLabel("Layout", { exact: true }).selectOption("compact");
   await page.getByLabel("Text scale").selectOption("150");
+  // Pavilion B3: the replay check is a technical disclosure under the result.
+  if ((await page.getByTestId("replay-check").getAttribute("open")) === null) await page.getByTestId("replay-check").locator("summary").click();
   await page
     .getByRole("button", { name: "Verify replay and scorecard" })
     .click();
@@ -307,7 +309,7 @@ test("selection validity, tactics acceptance and explicit rejection of invalid n
   );
   await expect(page.getByLabel("Variation", { exact: true })).toBeDisabled();
   await expect(
-    page.getByText("Only stock is supported by this model."),
+    page.getByText("Only the stock ball is available for now."),
   ).toBeVisible();
   await page
     .locator(".tactic-grid>div")

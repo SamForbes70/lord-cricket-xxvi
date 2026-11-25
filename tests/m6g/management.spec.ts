@@ -9,9 +9,14 @@ test("M6G management career creates, persists, navigates, progresses and complet
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible();
 
-  for (const name of ["Career", "Squad", "Fixtures", "Statistics", "Settings", "Home"]) {
-    await page.getByRole("button", { name, exact: true }).click();
-    await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
+  // Each screen is reached through its place in the club; Season holds three screens.
+  for (const [place, section, heading] of [
+    ["Season", "Stories", "Career"], ["Squad", null, "Squad"], ["Season", "Fixtures", "Fixtures"],
+    ["Season", "Statistics", "Statistics"], ["Settings", null, "Settings"], ["Clubhouse", null, "Clubhouse"],
+  ] as const) {
+    await page.getByRole("button", { name: place, exact: true }).click();
+    if (section) await page.getByRole("button", { name: section, exact: true }).click();
+    await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
   }
 
   await page.getByRole("button", { name: "Squad", exact: true }).click();
@@ -25,7 +30,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await page.getByLabel("Text scale").selectOption("150");
   await expect(page.getByLabel("Text scale")).toHaveValue("150");
-  await page.getByRole("button", { name: "Home", exact: true }).click();
+  await page.getByRole("button", { name: "Clubhouse", exact: true }).click();
   await testInfo.attach("career-home-150", { body: await page.screenshot(), contentType: "image/png" });
 
   // A delayed hash keeps the real save path pending beyond the old five-second assertion deadline.
@@ -53,6 +58,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
     }
   }
   await expect(page.getByText("Season complete", { exact: true }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Season", exact: true }).click();
   await page.getByRole("button", { name: "Statistics", exact: true }).click();
   await expect(page.getByRole("heading", { name: "League table" })).toBeVisible();
   const completedTable = await page.getByRole("table").first().textContent();
@@ -76,6 +82,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
     await importedPage.getByLabel("Choose .lcxxvi archive").setInputFiles(archivePath!);
     // Import validates all 56 match archives first; over 5 s in Firefox on hosted Windows (as other specs allow).
     await expect(importedPage.getByText("Season complete", { exact: true }).first()).toBeVisible({ timeout: 30_000 });
+    await importedPage.getByRole("button", { name: "Season", exact: true }).click();
     await importedPage.getByRole("button", { name: "Statistics", exact: true }).click();
     await expect(importedPage.getByRole("table").first()).toHaveText(completedTable!);
     await importedPage.reload();

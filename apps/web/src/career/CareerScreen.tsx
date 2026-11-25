@@ -1,3 +1,5 @@
+import { formatGameDate } from "./format.js";
+import { AboutDetails } from "../AboutDetails.js";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { CareerStoryCard } from "@lcxxvi/contracts";
 import { CareerStoriesPanel } from "./CareerStoriesPanel.js";
@@ -38,13 +40,15 @@ export function CareerScreen(props: CareerScreenProps) {
                   ? `Season ${persistentWorld.currentSeasonNumber} (${persistentWorld.currentCalendarYear}) · ${state.phase}`
                   : state.phase}
               </p>
-              <p>Date {state.careerState.currentDate}</p>
+              <p>{formatGameDate(state.careerState.currentDate)}</p>
               <p>Round {currentRound} of 14</p>
               {persistentWorld && (
                 <small>
-                  World <code>{persistentWorld.worldIdentity.worldId}</code> ·{" "}
-                  {persistentWorld.completedSeasons.length} sealed{" "}
+                  {persistentWorld.completedSeasons.length} completed{" "}
                   {persistentWorld.completedSeasons.length === 1 ? "season" : "seasons"}
+                  <AboutDetails summary="About this world">
+                    World <code>{persistentWorld.worldIdentity.worldId}</code>
+                  </AboutDetails>
                 </small>
               )}
             </div>
@@ -83,8 +87,11 @@ export function CareerScreen(props: CareerScreenProps) {
                 {latestTransition.toSeasonNumber} ({latestTransition.calendarYear})
               </h3>
               <p>
-                Fictional lifecycle parameters (<code>{lifecycleState?.model.modelVersion}</code>) —
-                permanent off-season ageing, training progression, retirements, and youth intake.
+                Off-season changes: players age, training takes effect, some retire and young players
+                join.
+                <AboutDetails summary="About the player model">
+                  Fictional lifecycle parameters <code>{lifecycleState?.model.modelVersion}</code>.
+                </AboutDetails>
               </p>
               <p>
                 <strong>{latestTransition.agedPlayerCount}</strong> aged ·{" "}
@@ -160,7 +167,7 @@ export function CareerScreen(props: CareerScreenProps) {
                           <td>
                             Season {record.seasonNumber} · {record.calendarYear}
                             <small>
-                              {record.startDate} to {record.endDate}
+                              {formatGameDate(record.startDate)} to {formatGameDate(record.endDate)}
                             </small>
                           </td>
                           <td>
@@ -235,7 +242,7 @@ export function CareerScreen(props: CareerScreenProps) {
                     <code>{inspectedCompletedSeason.finalSeasonStateSha256.slice(0, 16)}…</code>
                   </p>
                   <div className="table-wrap">
-                    <table>
+                    <table className="round-table">
                       <thead>
                         <tr>
                           <th>Rnd</th>
@@ -255,7 +262,7 @@ export function CareerScreen(props: CareerScreenProps) {
                             return (
                               <tr key={completion.fixtureId}>
                                 <td>{completion.roundNumber}</td>
-                                <td>{completion.matchDayDate}</td>
+                                <td>{formatGameDate(completion.matchDayDate)}</td>
                                 <td>
                                   {service.teamName(completion.homeTeamId)} v{" "}
                                   {service.teamName(completion.awayTeamId)}
@@ -284,7 +291,7 @@ export function CareerScreen(props: CareerScreenProps) {
           )}
           <h3>Managed-team results (active season)</h3>
           <div className="table-wrap">
-            <table>
+            <table className="round-table">
               <thead>
                 <tr>
                   <th>Rnd</th>
@@ -305,7 +312,7 @@ export function CareerScreen(props: CareerScreenProps) {
                     return (
                       <tr key={fixture.fixtureId}>
                         <td>{fixture.roundNumber}</td>
-                        <td>{fixture.matchDayDate}</td>
+                        <td>{formatGameDate(fixture.matchDayDate)}</td>
                         <td>
                           {service.teamName(fixture.homeTeamId)} v{" "}
                           {service.teamName(fixture.awayTeamId)}

@@ -1,3 +1,4 @@
+import { AboutDetails } from "../AboutDetails.js";
 import { academyFocusOptions, directives, percentageBp } from "./format.js";
 import type {
   AcademyTrainingFocus,
@@ -6,6 +7,12 @@ import type {
 import {
   CareerApplicationService,
 } from "./service.js";
+import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.js";
+import { overallRating, playerStrengths } from "../world/player-visuals.js";
+import { useMemo } from "react";
+import { isBowlingCapable } from "@lcxxvi/data";
+import { playerForm, playerMilestones, squadPlayerTags } from "@lcxxvi/projections";
+import { TRAINING_PRESETS, matchingPreset, planTrainingPreset, type TrainingPresetPlayer } from "./training-presets.js";
 
 
 /** The career Squad screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
@@ -23,6 +30,33 @@ export function SquadScreen(props: SquadScreenProps) {
     lifecycleState,
     openPlayer,
   } = props;
+  // E6: what each player is known for (from skills), recent form (from this season's scorecards) and
+  // career milestones in reach (from recorded career totals). Derived here; nothing is saved.
+  const squadIds = (service.squadView()?.players ?? []).map((condition) => condition.playerId);
+  const identityTags = squadPlayerTags(
+    squadIds.flatMap((playerId) => {
+      const player = displayWorld.players.find((candidate) => candidate.playerId === playerId);
+      return player ? [{ playerId, role: player.role, bowlingCapable: isBowlingCapable(player), skills: player.skills.T20 }] : [];
+    }),
+  );
+  // Career totals are rebuilt from every completed match, so they are computed once per saved state.
+  const careerTotals = useMemo(() => {
+    const records = service.historicalStatistics({})?.players ?? [];
+    return new Map(records.map((record) => [record.playerId, { runs: record.runs, wickets: record.bowlingWickets, matches: record.matches }]));
+  }, [service, state]);
+  const trendMark = { UP: "\u25B2", LEVEL: "\u25B6", DOWN: "\u25BC" } as const;
+  const trendWord = { UP: "Form rising", LEVEL: "Form steady", DOWN: "Form falling" } as const;
+  const presetPlayers: TrainingPresetPlayer[] = (service.squadView()?.players ?? []).flatMap((condition) => {
+    const player = displayWorld.players.find((candidate) => candidate.playerId === condition.playerId);
+    if (!player) return [];
+    const strengths = playerStrengths(player, "T20");
+    return [{
+      playerId: condition.playerId, role: player.role, bowlingCapable: isBowlingCapable(player),
+      battingStrength: strengths.batting, bowlingStrength: strengths.bowling, fatigueBp: condition.fatigueBp, directive: condition.directive,
+    }];
+  });
+  const activePreset = matchingPreset(presetPlayers);
+  const trainingLocked = busy || inspectionOnly || service.isReadOnly() || state.phase === "COMPLETE";
   return (
         <section aria-labelledby="squad-heading">
           <h2 id="squad-heading">Squad</h2>
@@ -31,6 +65,36 @@ export function SquadScreen(props: SquadScreenProps) {
               ? "Daily training directives affect temporary readiness, daily fatigue recovery, and accumulated season exposure used for off-season fictional skill progression."
               : "Training changes affect temporary readiness and daily recovery only."}
           </p>
+          <div className="training-presets" role="group" aria-labelledby="training-presets-heading" data-testid="training-presets">
+            <h3 id="training-presets-heading">Squad training</h3>
+            <p>Set everyone at once, then change any player in the table below.</p>
+            <div className="training-preset-options">
+              {TRAINING_PRESETS.map((preset) => {
+                const plan = planTrainingPreset(preset.id, presetPlayers);
+                return (
+                  <div key={preset.id} data-active={activePreset === preset.id}>
+                    <button
+                      type="button"
+                      data-testid={`training-preset-${preset.id}`}
+                      aria-pressed={activePreset === preset.id}
+                      disabled={trainingLocked || plan.changes.length === 0}
+                      onClick={() =>
+                        void action(async () => {
+                          for (const change of plan.changes) await service.setTraining(change.playerId, change.directive);
+                        })
+                      }
+                    >
+                      {preset.label}
+                    </button>
+                    <small>{preset.description} {plan.summary}</small>
+                  </div>
+                );
+              })}
+            </div>
+            <p data-testid="training-preset-current">
+              {activePreset ? `Current plan: ${TRAINING_PRESETS.find((preset) => preset.id === activePreset)!.label}.` : "Current plan: your own mix."}
+            </p>
+          </div>
           <div className="table-wrap">
             <table>
               <thead>
@@ -38,6 +102,7 @@ export function SquadScreen(props: SquadScreenProps) {
                   <th>Player</th>
                   {lifecycleState && <th>Age</th>}
                   <th>Role</th>
+                  <th>Form</th>
                   {economyState && <th>Contract</th>}
                   <th>Availability</th>
                   <th>Fatigue</th>
@@ -61,27 +126,54 @@ export function SquadScreen(props: SquadScreenProps) {
                         ledger.lastSeasonDelta.bowlingDelta +
                         ledger.lastSeasonDelta.fieldingDelta
                       : 0;
+                  const kit =
+                    displayWorld.teams.find((team) => team.squadIds.includes(player.playerId))?.colours ??
+                    displayWorld.teams.find((team) => team.teamId === controlledTeam)?.colours ??
+                    [];
                   return (
                     <tr key={condition.playerId}>
-                      <td>
-                        <button
-                          type="button"
-                          className="player-link"
-                          id={`player-link-SQUAD-${player.playerId}`}
-                          aria-label={`View ${player.name}`}
-                          onClick={() => openPlayer(player.playerId, "SQUAD")}
-                        >
-                          {player.name}
-                        </button>
-                        <small>
-                          {player.playerId}
-                          {lastNetDelta !== 0
-                            ? ` · Off-season ${lastNetDelta > 0 ? `+${lastNetDelta}` : lastNetDelta}`
-                            : ""}
-                        </small>
+                      <td className="player-cell">
+                        <div className="player-cell-inner">
+                        <PlayerPortrait playerId={player.playerId} role={player.role} kit={kit} size={46} />
+                        <span className="player-cell-name">
+                          <button
+                            type="button"
+                            className="player-link"
+                            id={`player-link-SQUAD-${player.playerId}`}
+                            aria-label={`View ${player.name}`}
+                            onClick={() => openPlayer(player.playerId, "SQUAD")}
+                          >
+                            {player.name}
+                          </button>
+                          <small data-testid={`player-tags-${player.playerId}`}>
+                            {(identityTags[player.playerId] ?? []).map((tag) => (
+                              <span key={tag.id} className="identity-tag" title={`${tag.label}: ${tag.value}`}>{tag.label}</span>
+                            ))}
+                            {lastNetDelta !== 0
+                              ? ` Off-season ${lastNetDelta > 0 ? `+${lastNetDelta}` : lastNetDelta}`
+                              : ""}
+                          </small>
+                          {playerMilestones(careerTotals.get(player.playerId) ?? { runs: 0, wickets: 0, matches: 0 }).map((milestone) => (
+                            <small key={milestone.kind} className="identity-milestone" data-testid={`player-milestone-${player.playerId}`}>{milestone.text}</small>
+                          ))}
+                        </span>
+                        <RatingBadge rating={overallRating(player, "T20")} label="T20" />
+                        </div>
                       </td>
                       {lifecycleState && <td>{age ?? "–"}</td>}
-                      <td>{player.role}</td>
+                      <td><RoleChip role={player.role} /></td>
+                      <td data-testid={`player-form-${player.playerId}`}>
+                        {(() => {
+                          const form = playerForm(state.completedMatches, player.playerId);
+                          if (form.entries.length === 0) return <small>No innings or spell yet</small>;
+                          return (
+                            <>
+                              {form.trend && <span className="identity-trend" data-trend={form.trend} role="img" aria-label={trendWord[form.trend]}>{trendMark[form.trend]}</span>}{" "}
+                              <small>{form.text}</small>
+                            </>
+                          );
+                        })()}
+                      </td>
                       {economyState && (
                         <td>
                           {contract ? (
@@ -164,9 +256,12 @@ export function SquadScreen(props: SquadScreenProps) {
             >
               <h3 id="youth-academy-heading">Youth academy pathway</h3>
               <p>
-                Academy prospects use fictional ceiling tiers (
-                <code>{lifecycleState.model.modelVersion}</code>). Set training focus, queue
-                prospects for automatic off-season promotion, or promote directly before Round 1.
+                Set each prospect's training focus, queue them for promotion at the end of the season,
+                or promote them now, before Round 1.
+                <AboutDetails summary="About the player model">
+                  Academy prospects use fictional ceiling tiers (
+                  <code>{lifecycleState.model.modelVersion}</code>).
+                </AboutDetails>
               </p>
               {service.managedYouthAcademyProspects().length === 0 ? (
                 <p>No active academy prospects remain for {service.teamName(controlledTeam)} this season.</p>

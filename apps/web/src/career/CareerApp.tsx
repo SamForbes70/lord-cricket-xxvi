@@ -1,3 +1,5 @@
+import { formatGameDate } from "./format.js";
+import { AboutDetails } from "../AboutDetails.js";
 import { TeamCrest } from "../world/TeamCrest.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
@@ -139,6 +141,16 @@ function ErrorBanner({ rawError }: { rawError: string }) {
     </div>
   );
 }
+
+/** E8: the club's five places and the screens inside each. */
+const CLUB_PLACES: readonly { id: string; label: string; screens: readonly Screen[] }[] = [
+  { id: "CLUBHOUSE", label: "Clubhouse", screens: ["HOME"] },
+  { id: "SQUAD", label: "Squad", screens: ["SQUAD"] },
+  { id: "OFFICE", label: "Office", screens: ["CONTRACTS"] },
+  { id: "SEASON", label: "Season", screens: ["FIXTURES", "STATISTICS", "CAREER"] },
+  { id: "SETTINGS", label: "Settings", screens: ["SETTINGS"] },
+];
+const SECTION_LABEL: Partial<Record<Screen, string>> = { FIXTURES: "Fixtures", STATISTICS: "Statistics", CAREER: "Stories" };
 
 export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean } = {}) {
   const [, redraw] = useState(0);
@@ -656,7 +668,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                     <td>
                       {gen.completedFixtures}/56 · {gen.phase}
                     </td>
-                    <td>{gen.currentDate}</td>
+                    <td>{formatGameDate(gen.currentDate)}</td>
                     <td>{gen.createdAt}</td>
                     <td>
                       <code>{gen.stateSha256.slice(0, 12)}…</code>
@@ -701,7 +713,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       </div>
       <p>
         <strong>{service.resultText(activeReplay.completion)}</strong> ·{" "}
-        {activeReplay.completion.matchDayDate} · Source: {activeReplay.completion.source}
+        {formatGameDate(activeReplay.completion.matchDayDate)} · Source: {activeReplay.completion.source.toLowerCase().replaceAll("_", " ")}
       </p>
       {(() => {
         const matchSeasonNumber =
@@ -912,6 +924,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
             </a>
           )}
           {!inspectionOnly && (
+            <a className="button-link" href="#title">
+              Title screen
+            </a>
+          )}
+          {!inspectionOnly && (
             <a className="button-link" href="#rain">
               Rain-affected matches
             </a>
@@ -967,7 +984,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                     >
                       {save.title} · {save.completedFixtures}/56 · {save.phase}
                       <small>
-                        {modeLabel} · {save.currentDate} · revision {save.revision}
+                        {modeLabel} · {formatGameDate(save.currentDate)} · revision {save.revision}
                       </small>
                     </button>
                     <button
@@ -1053,8 +1070,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           </div>
         </section>
         <section className="career-disclosure" aria-label="Product status">
-          <strong>Playable alpha.</strong> Fictional eight-team dataset · SYNTHETIC_ALPHA model ·
-          multi-season T20 careers with youth development, domestic contracts and club wage budgets.
+          <strong>Playable alpha.</strong> Eight fictional clubs · multi-season T20 careers with youth
+          development, domestic contracts and club wage budgets.
         </section>
         <section className="career-panel import-panel">
           <h2>Import portable career</h2>
@@ -1108,10 +1125,10 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           <p data-testid="career-masthead-subtitle">
             {persistentWorld
               ? `Season ${persistentWorld.currentSeasonNumber} (${persistentWorld.currentCalendarYear}) · `
-              : "Single-season V0.1 · "}
+              : "Single season · "}
             {state.phase === "COMPLETE"
               ? "Season complete"
-              : `Round ${currentRound} · ${state.careerState.currentDate}`}
+              : `Round ${currentRound} · ${formatGameDate(state.careerState.currentDate)}`}
           </p>
         </div>
         <div className="save-badge" data-status={status.toLowerCase()}>
@@ -1122,17 +1139,27 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         </div>
       </header>
 
+      {/* E8: five places in the club. A place with more than one screen shows its screens in a second row. */}
       <nav className="career-nav" aria-label="Career navigation">
-        {([
-          "HOME",
-          "CAREER",
-          "SQUAD",
-          ...(persistentWorld ? (["CONTRACTS"] as Screen[]) : []),
-          "FIXTURES",
-          "STATISTICS",
-          "SETTINGS",
-        ] as Screen[]).map(
-          (item) => (
+        {CLUB_PLACES.filter((place) => place.id !== "OFFICE" || persistentWorld).map((place) => {
+          const current = place.screens.includes(screen);
+          return (
+            <button
+              key={place.id}
+              aria-current={current ? (place.screens.length === 1 ? "page" : "true") : undefined}
+              onClick={() => {
+                setActiveReplay(null);
+                if (!current) setScreen(place.screens[0]!);
+              }}
+            >
+              {place.label}
+            </button>
+          );
+        })}
+      </nav>
+      {CLUB_PLACES.filter((place) => place.screens.length > 1 && place.screens.includes(screen)).map((place) => (
+        <nav key={place.id} className="career-nav career-nav-sections" aria-label={`${place.label} sections`} data-testid="career-nav-sections">
+          {place.screens.map((item) => (
             <button
               key={item}
               aria-current={screen === item ? "page" : undefined}
@@ -1141,10 +1168,14 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 setScreen(item);
               }}
             >
-              {item[0] + item.slice(1).toLowerCase()}
+              {SECTION_LABEL[item] ?? item}
             </button>
-          ),
-        )}
+          ))}
+        </nav>
+      ))}
+      {/* E8: other game modes sit apart from the club's own screens, so the career reads as one place. */}
+      <nav className="career-nav career-nav-modes" aria-label="Other ways to play" data-testid="career-nav-modes">
+        <span className="career-nav-label" aria-hidden="true">Away from the club</span>
         <a
           href="#exhibition"
           onClick={() => {
@@ -1177,16 +1208,22 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           <p>
             {lifecycleState ? (
               <>
-                This save uses Stage 3 <code>LC_PERSISTENT_WORLD_V2_LIFECYCLE</code> (no domestic
-                contracts or free-agent market). You can create a Stage 4{" "}
-                <code>LC_PERSISTENT_WORLD_V3_ECONOMY</code> copy in a new slot while keeping this V2
-                save untouched.
+                This career was started before contracts and wages were added. You can make a copy with
+                contracts, wages and free agents in a new slot; this save stays as it is.
+                <AboutDetails summary="About this save">
+                  Save format <code>LC_PERSISTENT_WORLD_V2_LIFECYCLE</code> (Stage 3). The copy uses{" "}
+                  <code>LC_PERSISTENT_WORLD_V3_ECONOMY</code> (Stage 4).
+                </AboutDetails>
               </>
             ) : (
               <>
-                This save uses Stage 2 <code>LC_PERSISTENT_WORLD_V1</code>. You can create a Stage 3
-                lifecycle copy or a Stage 4 contracts &amp; economy copy in a new slot while keeping
-                this V1 save untouched.
+                This career was started before player ageing, youth players and contracts were added.
+                You can make a copy with player development, or one with contracts and wages too, in a
+                new slot; this save stays as it is.
+                <AboutDetails summary="About this save">
+                  Save format <code>LC_PERSISTENT_WORLD_V1</code> (Stage 2). The copies use Stage 3
+                  lifecycle or Stage 4 contracts and economy formats.
+                </AboutDetails>
               </>
             )}
           </p>
@@ -1798,6 +1835,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         </button>
       </section>
           <section className="career-disclosure compact" aria-label="Model disclosure">
+        Fictional players and clubs. Results come from the game's own model, not from real cricket.
+        <AboutDetails summary="About the model">
         {persistentWorld
           ? economyState && lifecycleState
             ? `Fictional data · SYNTHETIC_ALPHA · persistent world V3 (${persistentWorld.completedSeasons.length} completed seasons) · fictional lifecycle (${lifecycleState.model.modelVersion}) · fictional domestic contracts & budgets (${economyState.model.modelVersion}, symmetrical AI caps) · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
@@ -1805,6 +1844,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               ? `Fictional data · SYNTHETIC_ALPHA · persistent world V2 (${persistentWorld.completedSeasons.length} completed seasons) · fictional player lifecycle (${lifecycleState.model.modelVersion}) · contracts and finances deferred in V2 · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
               : `Fictional data · SYNTHETIC_ALPHA · Stage 2 V1 persistent world (${persistentWorld.completedSeasons.length} completed seasons) · permanent ageing and contracts deferred in V1 · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI.`
           : "Fictional data · SYNTHETIC_ALPHA · legacy V0.1 single-season career · DLS disabled · fixture autopilot is deterministic baseline completion, not tactical AI."}
+        </AboutDetails>
       </section>
     </main>
   );

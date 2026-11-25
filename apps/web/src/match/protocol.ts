@@ -1,3 +1,4 @@
+import type { DecisionRecommendation } from "./recommendation.js";
 import { z } from "zod";
 import type { MatchAnalytics } from "@lcxxvi/projections";
 import type {
@@ -236,7 +237,7 @@ export type Catalog = {
   }[];
   grounds: { id: string; name: string; seamBp?: number; turnBp?: number }[];
 };
-export type Candidate = { id: string; name: string; reason: string; batting?: { power:number; rotation:number; defence:number } };
+export type Candidate = { id: string; name: string; reason: string; batting?: { power:number; rotation:number; defence:number }; recommended?: true };
 export type View = {
   captainNotes?: Record<string, string>;
   fatigueBp?: Record<string,number>;
@@ -259,6 +260,8 @@ export type View = {
   innings: InningsLedger[];
   activeIndex: number;
   candidates: Candidate[];
+  /** The computer captain's choice on each other open decision (shown as "Recommended"; the player decides). */
+  recommendation?: DecisionRecommendation;
   bowlingPlan: BowlingPlan | null;
   battingPlans: Record<
     string,

@@ -1,3 +1,5 @@
+import { AboutDetails } from "../AboutDetails.js";
+import { TeamCrest } from "../world/TeamCrest.js";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { StatsScope } from "./CareerApp.js";
 import { metric } from "./format.js";
@@ -228,7 +230,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                       : "League table"}
                   </h3>
                   <div className="table-wrap">
-                    <table>
+                    <table className="league-table">
                       <thead>
                         <tr>
                           <th>Pos</th>
@@ -249,7 +251,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                             className={row.teamId === controlledTeam ? "managed-fixture" : ""}
                           >
                             <td>{row.rank}</td>
-                            <td>{service.teamName(row.teamId)}</td>
+                            <td className="league-team"><TeamCrest teamId={row.teamId} name={service.teamName(row.teamId)} colours={service.getWorld().teams.find((t) => t.teamId === row.teamId)?.colours ?? []} size={22} decorative />{service.teamName(row.teamId)}</td>
                             <td>{row.played}</td>
                             <td>{row.wins}</td>
                             <td>{row.losses}</td>
@@ -368,10 +370,12 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                 className="career-disclosure compact"
                 data-testid="historical-stats-provenance"
               >
-                {historicalProjection.separationNotice} (<code>{historicalProjection.projectionVersion}</code>{" "}
-                · {historicalProjection.filteredMatchesCount}/
+                {historicalProjection.separationNotice} ({historicalProjection.filteredMatchesCount}/
                 {historicalProjection.totalSourceMatches} career fixtures matched).{" "}
                 {historicalProjection.filterSupport.fielding.note}
+                <AboutDetails summary="About these statistics">
+                  Statistics projection <code>{historicalProjection.projectionVersion}</code>.
+                </AboutDetails>
               </p>
               <div className="stats-filter-grid" data-testid="historical-stats-filters">
                 <label>
