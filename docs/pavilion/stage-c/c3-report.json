@@ -1,0 +1,955 @@
+{
+ "version": "LC_STAGE_C_C2_REPORT_V1",
+ "researchOnly": true,
+ "gameplayIntegrationPermitted": false,
+ "attribution": {
+  "source": "Cricsheet, https://cricsheet.org/",
+  "sourceURL": "https://cricsheet.org/downloads/t20s_json.zip",
+  "licence": "Open Data Commons Attribution License (ODC-By) 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "archiveSha256": "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "retrievedAtUTC": "2026-11-25T12:57:47.048656+00:00",
+  "note": "Derived aggregates only (no ball-by-ball records). Contains information from Cricsheet, made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/."
+ },
+ "reference": "full-member men's T20 internationals, calibration split",
+ "perPointTargets": "c3-mapping.json (quarters of the game's regular players)",
+ "criterion1Raw": {
+  "synthetic-alpha-01": {
+   "batting.strikeRate": {
+    "game": 1.261177544366944,
+    "realTrueSkill": 1.3643368634024944,
+    "realP10P90": [
+     1.3728116307129712,
+     1.4396647586182048
+    ],
+    "realBracket": [
+     1.2018440435085829,
+     1.3927898364219515
+    ],
+    "verdict": "UNCLEAR"
+   },
+   "batting.average": {
+    "game": 2.2914821817118707,
+    "realTrueSkill": null,
+    "realP10P90": null,
+    "realBracket": [
+     1.5720171684708613,
+     2.4474533831191496
+    ],
+    "verdict": "UNCLEAR"
+   },
+   "batting.dismissalRate": {
+    "game": 0.5503763260444691,
+    "realTrueSkill": 0.5639822719447304,
+    "realP10P90": [
+     0.5667217937926442,
+     0.7198805187573394
+    ],
+    "realBracket": [
+     0.46411521711458215,
+     0.6541975173160396
+    ],
+    "verdict": "UNCLEAR"
+   },
+   "batting.dotPercent": {
+    "game": 0.8453676748623324,
+    "realTrueSkill": 0.7171366955020807,
+    "realP10P90": [
+     0.6860716113017352,
+     0.7114107259659083
+    ],
+    "realBracket": [
+     0.7031818259425061,
+     0.7915464470488787
+    ],
+    "verdict": "FAIL"
+   },
+   "batting.boundaryPercent": {
+    "game": 1.3197075863369254,
+    "realTrueSkill": 1.770808852631241,
+    "realP10P90": [
+     1.7802216314548942,
+     1.94783255139138
+    ],
+    "realBracket": [
+     1.4299675082685213,
+     1.7998368804807994
+    ],
+    "verdict": "FAIL"
+   },
+   "bowling.economy": {
+    "game": 0.9057996800577751,
+    "realTrueSkill": 0.7694876857034942,
+    "realP10P90": [
+     0.7275542046862773,
+     0.765933168140166
+    ],
+    "realBracket": [
+     0.7430577480600072,
+     0.8606710621493574
+    ],
+    "verdict": "FAIL"
+   },
+   "bowling.wicketRate": {
+    "game": 0.5507535787506047,
+    "realTrueSkill": 1.2435318354077736,
+    "realP10P90": [
+     1.0,
+     1.4042231762228392
+    ],
+    "realBracket": [
+     1.200684864269994,
+     1.9135459032486872
+    ],
+    "verdict": "FAIL (inverted)"
+   },
+   "bowling.dotPercent": {
+    "game": 0.9332084874241923,
+    "realTrueSkill": 1.4174489238390604,
+    "realP10P90": [
+     1.4324309117245444,
+     1.4920085284525886
+    ],
+    "realBracket": [
+     1.2744607323093793,
+     1.4459496357454436
+    ],
+    "verdict": "FAIL (inverted)"
+   },
+   "bowling.boundaryPercent": {
+    "game": 0.8134657255827699,
+    "realTrueSkill": 0.5915309120674773,
+    "realP10P90": [
+     0.5524246440516973,
+     0.6009556831887541
+    ],
+    "realBracket": [
+     0.5563959294582119,
+     0.6943099296720432
+    ],
+    "verdict": "FAIL"
+   }
+  },
+  "calibrated-t20-01": {
+   "batting.strikeRate": {
+    "game": 0.9840678608799025,
+    "realTrueSkill": 1.3643368634024944,
+    "realP10P90": [
+     1.3728116307129712,
+     1.4396647586182048
+    ],
+    "realBracket": [
+     1.2018440435085829,
+     1.3927898364219515
+    ],
+    "verdict": "FAIL (inverted)"
+   },
+   "batting.average": {
+    "game": 1.6671796987240581,
+    "realTrueSkill": null,
+    "realP10P90": null,
+    "realBracket": [
+     1.5720171684708613,
+     2.4474533831191496
+    ],
+    "verdict": "UNCLEAR"
+   },
+   "batting.dismissalRate": {
+    "game": 0.5902590234472257,
+    "realTrueSkill": 0.5639822719447304,
+    "realP10P90": [
+     0.5667217937926442,
+     0.7198805187573394
+    ],
+    "realBracket": [
+     0.46411521711458215,
+     0.6541975173160396
+    ],
+    "verdict": "PASS"
+   },
+   "batting.dotPercent": {
+    "game": 0.9434705653775978,
+    "realTrueSkill": 0.7171366955020807,
+    "realP10P90": [
+     0.6860716113017352,
+     0.7114107259659083
+    ],
+    "realBracket": [
+     0.7031818259425061,
+     0.7915464470488787
+    ],
+    "verdict": "FAIL"
+   },
+   "batting.boundaryPercent": {
+    "game": 0.9154205411573961,
+    "realTrueSkill": 1.770808852631241,
+    "realP10P90": [
+     1.7802216314548942,
+     1.94783255139138
+    ],
+    "realBracket": [
+     1.4299675082685213,
+     1.7998368804807994
+    ],
+    "verdict": "FAIL (inverted)"
+   },
+   "bowling.economy": {
+    "game": 0.6809617582519206,
+    "realTrueSkill": 0.7694876857034942,
+    "realP10P90": [
+     0.7275542046862773,
+     0.765933168140166
+    ],
+    "realBracket": [
+     0.7430577480600072,
+     0.8606710621493574
+    ],
+    "verdict": "FAIL"
+   },
+   "bowling.wicketRate": {
+    "game": 0.6178938710525329,
+    "realTrueSkill": 1.2435318354077736,
+    "realP10P90": [
+     1.0,
+     1.4042231762228392
+    ],
+    "realBracket": [
+     1.200684864269994,
+     1.9135459032486872
+    ],
+    "verdict": "FAIL (inverted)"
+   },
+   "bowling.dotPercent": {
+    "game": 1.062276606864567,
+    "realTrueSkill": 1.4174489238390604,
+    "realP10P90": [
+     1.4324309117245444,
+     1.4920085284525886
+    ],
+    "realBracket": [
+     1.2744607323093793,
+     1.4459496357454436
+    ],
+    "verdict": "FAIL"
+   },
+   "bowling.boundaryPercent": {
+    "game": 0.5219027526348781,
+    "realTrueSkill": 0.5915309120674773,
+    "realP10P90": [
+     0.5524246440516973,
+     0.6009556831887541
+    ],
+    "realBracket": [
+     0.5563959294582119,
+     0.6943099296720432
+    ],
+    "verdict": "FAIL"
+   }
+  }
+ },
+ "criterion1Adjusted": {
+  "synthetic-alpha-01": {
+   "runs.batter": {
+    "game": 1.4626998294359013,
+    "real": 1.3875710450643948,
+    "realRange": [
+     1.3875710450643948,
+     1.446767081657006
+    ],
+    "verdict": "FAIL"
+   },
+   "runs.bowler": {
+    "game": 0.8269498500909134,
+    "real": 0.7988898901215122,
+    "realRange": [
+     0.7658334708332125,
+     0.8021288556402764
+    ],
+    "verdict": "FAIL"
+   },
+   "boundary.batter": {
+    "game": 1.7243508023444087,
+    "real": 1.6839148938401292,
+    "realRange": [
+     1.6839148938401292,
+     1.8164639880994502
+    ],
+    "verdict": "PASS"
+   },
+   "boundary.bowler": {
+    "game": 0.7557846836614563,
+    "real": 0.6618282647972834,
+    "realRange": [
+     0.6138262214934976,
+     0.6805732593440215
+    ],
+    "verdict": "FAIL"
+   },
+   "nonDot.batter": {
+    "game": 1.3037579165838824,
+    "real": 1.2264952797030528,
+    "realRange": [
+     1.2264952797030528,
+     1.2659881486927393
+    ],
+    "verdict": "FAIL"
+   },
+   "nonDot.bowler": {
+    "game": 0.8865051088631319,
+    "real": 0.8637389873489119,
+    "realRange": [
+     0.8405450344937869,
+     0.8645642964875633
+    ],
+    "verdict": "FAIL"
+   },
+   "dismissal.batter": {
+    "game": 0.7911827858355482,
+    "real": 0.6854430116664868,
+    "realRange": [
+     0.6663081179762456,
+     1.0
+    ],
+    "verdict": "PASS"
+   },
+   "dismissal.bowler": {
+    "game": 1.0911037502142702,
+    "real": 1.2146118320424546,
+    "realRange": [
+     1.0,
+     1.3644198101545486
+    ],
+    "verdict": "PASS"
+   }
+  },
+  "calibrated-t20-01": {
+   "runs.batter": {
+    "game": 1.3507551472348194,
+    "real": 1.3875710450643948,
+    "realRange": [
+     1.3875710450643948,
+     1.446767081657006
+    ],
+    "verdict": "FAIL"
+   },
+   "runs.bowler": {
+    "game": 0.7888091054806006,
+    "real": 0.7988898901215122,
+    "realRange": [
+     0.7658334708332125,
+     0.8021288556402764
+    ],
+    "verdict": "PASS"
+   },
+   "boundary.batter": {
+    "game": 1.5529903918896801,
+    "real": 1.6839148938401292,
+    "realRange": [
+     1.6839148938401292,
+     1.8164639880994502
+    ],
+    "verdict": "FAIL"
+   },
+   "boundary.bowler": {
+    "game": 0.6930175913490824,
+    "real": 0.6618282647972834,
+    "realRange": [
+     0.6138262214934976,
+     0.6805732593440215
+    ],
+    "verdict": "FAIL"
+   },
+   "nonDot.batter": {
+    "game": 1.2204542093921533,
+    "real": 1.2264952797030528,
+    "realRange": [
+     1.2264952797030528,
+     1.2659881486927393
+    ],
+    "verdict": "FAIL"
+   },
+   "nonDot.bowler": {
+    "game": 0.8628051675089915,
+    "real": 0.8637389873489119,
+    "realRange": [
+     0.8405450344937869,
+     0.8645642964875633
+    ],
+    "verdict": "PASS"
+   },
+   "dismissal.batter": {
+    "game": 0.8204510444663968,
+    "real": 0.6854430116664868,
+    "realRange": [
+     0.6663081179762456,
+     1.0
+    ],
+    "verdict": "PASS"
+   },
+   "dismissal.bowler": {
+    "game": 1.1297534126331061,
+    "real": 1.2146118320424546,
+    "realRange": [
+     1.0,
+     1.3644198101545486
+    ],
+    "verdict": "PASS"
+   }
+  }
+ },
+ "perPoint": {
+  "synthetic-alpha-01": {
+   "batting.runs": {
+    "game": 0.012945739371758292,
+    "realRange": [
+     0.007784599077512894,
+     0.009233163551282564
+    ],
+    "verdict": "FAIL"
+   },
+   "batting.boundary": {
+    "game": 0.0190276570841822,
+    "realRange": [
+     0.012716329587871765,
+     0.015512980850518873
+    ],
+    "verdict": "FAIL"
+   },
+   "batting.nonDot": {
+    "game": 0.008337640124289216,
+    "realRange": [
+     0.0051631717595345804,
+     0.00614713208304455
+    ],
+    "verdict": "FAIL"
+   },
+   "batting.dismissal": {
+    "game": 0.004898426291778812,
+    "realRange": [
+     0.0,
+     0.01262817745267699
+    ],
+    "verdict": "PASS"
+   },
+   "bowling.runs": {
+    "game": 0.0015410171545483721,
+    "realRange": [
+     0.011947255347879424,
+     0.014579967799121768
+    ],
+    "verdict": "FAIL"
+   },
+   "bowling.boundary": {
+    "game": 0.0017213145037299426,
+    "realRange": [
+     0.021188290917629686,
+     0.026983826748770992
+    ],
+    "verdict": "FAIL"
+   },
+   "bowling.nonDot": {
+    "game": 0.0012588643228120362,
+    "realRange": [
+     0.008012617749353117,
+     0.009651452170469239
+    ],
+    "verdict": "FAIL"
+   },
+   "bowling.dismissal": {
+    "game": 0.001350949343247584,
+    "realRange": [
+     0.0,
+     0.02059686468324497
+    ],
+    "verdict": "PASS"
+   },
+   "variationTradeOff": {
+    "dismissalPerPoint": 0.0,
+    "runsPerPoint": 0.0,
+    "boundaryPerPoint": 0.0,
+    "verdict": "FAIL"
+   }
+  },
+  "calibrated-t20-01": {
+   "batting.runs": {
+    "game": 0.008992309442524205,
+    "realRange": [
+     0.007784599077512894,
+     0.009233163551282564
+    ],
+    "verdict": "PASS"
+   },
+   "batting.boundary": {
+    "game": 0.012790135770873595,
+    "realRange": [
+     0.012716329587871765,
+     0.015512980850518873
+    ],
+    "verdict": "PASS"
+   },
+   "batting.nonDot": {
+    "game": 0.005633624243523733,
+    "realRange": [
+     0.0051631717595345804,
+     0.00614713208304455
+    ],
+    "verdict": "PASS"
+   },
+   "batting.dismissal": {
+    "game": 0.004823764049013201,
+    "realRange": [
+     0.0,
+     0.01262817745267699
+    ],
+    "verdict": "PASS"
+   },
+   "bowling.runs": {
+    "game": 0.013583644097715475,
+    "realRange": [
+     0.011947255347879424,
+     0.014579967799121768
+    ],
+    "verdict": "PASS"
+   },
+   "bowling.boundary": {
+    "game": 0.021731166345301554,
+    "realRange": [
+     0.021188290917629686,
+     0.026983826748770992
+    ],
+    "verdict": "PASS"
+   },
+   "bowling.nonDot": {
+    "game": 0.008241484462415651,
+    "realRange": [
+     0.008012617749353117,
+     0.009651452170469239
+    ],
+    "verdict": "PASS"
+   },
+   "bowling.dismissal": {
+    "game": 0.006357671263888069,
+    "realRange": [
+     0.0,
+     0.02059686468324497
+    ],
+    "verdict": "PASS"
+   },
+   "variationTradeOff": {
+    "dismissalPerPoint": 0.00953046188698137,
+    "runsPerPoint": 0.005372982457719313,
+    "boundaryPerPoint": 0.009038520141574602,
+    "verdict": "PASS"
+   }
+  }
+ },
+ "specialisation": {
+  "synthetic-alpha-01": {
+   "averageRatio": {
+    "game": 1.8180025469981214,
+    "real": 2.246851266082045,
+    "relative": 0.8091334635461962,
+    "verdict": "FAIL"
+   },
+   "strikeRateRatio": {
+    "game": 1.1894615543468698,
+    "real": 1.1807079801856868,
+    "relative": 1.0074138350109283,
+    "verdict": "PASS"
+   },
+   "economyRatioPartTimeOverFrontline": {
+    "game": 1.1169927578023466,
+    "real": 1.0790782865023558,
+    "relative": 1.0351359783384058,
+    "verdict": "PASS"
+   }
+  },
+  "calibrated-t20-01": {
+   "averageRatio": {
+    "game": 1.4028006154592076,
+    "real": 2.246851266082045,
+    "relative": 0.6243406658177896,
+    "verdict": "FAIL"
+   },
+   "strikeRateRatio": {
+    "game": 0.9852597387901695,
+    "real": 1.1807079801856868,
+    "relative": 0.8344652152136892,
+    "verdict": "FAIL"
+   },
+   "economyRatioPartTimeOverFrontline": {
+    "game": 1.3872793638569683,
+    "real": 1.0790782865023558,
+    "relative": 1.2856151228411727,
+    "verdict": "FAIL"
+   }
+  }
+ },
+ "aggregates": {
+  "synthetic-alpha-01": {
+   "matches": 2000,
+   "runs": 111.66,
+   "wickets": 7.891,
+   "dotPercent": 58.723185291205255,
+   "boundaryPercent": 12.094887638748958,
+   "p10": 78.0,
+   "p50": 112.0,
+   "p90": 144.0,
+   "againstM7E": {
+    "runsWithin5pc": false,
+    "wicketsWithin0.5": false,
+    "dotsWithin2pp": false,
+    "boundariesWithin2pp": true
+   }
+  },
+  "calibrated-t20-01": {
+   "matches": 2000,
+   "runs": 106.065,
+   "wickets": 8.0125,
+   "dotPercent": 60.14247287217114,
+   "boundaryPercent": 11.348565898063015,
+   "p10": 71.9,
+   "p50": 107.0,
+   "p90": 139.0,
+   "againstM7E": {
+    "runsWithin5pc": false,
+    "wicketsWithin0.5": false,
+    "dotsWithin2pp": false,
+    "boundariesWithin2pp": false
+   }
+  },
+  "M7E holdout target": {
+   "runs": 150.55,
+   "wickets": 7.24,
+   "dotPercent": 39.32,
+   "boundaryPercent": 14.02
+  }
+ },
+ "tactical": {
+  "calibrated-t20-01": {
+   "aggression-all-out": {
+    "area": "Batting aggression",
+    "poor": "Aggression 4 every ball",
+    "matches": 200,
+    "goodWins": 112,
+    "poorWins": 84,
+    "tiesOrNoResult": 4,
+    "goodWinPercentOfDecided": 57.1,
+    "goodWinPercent95": [
+     50.1,
+     63.9
+    ],
+    "meanRunsGood": 96.5,
+    "meanRunsPoor": 91.7,
+    "meanRunDifference": 4.8,
+    "meanRunDifference95": [
+     0.6,
+     9
+    ]
+   },
+   "aggression-blocking": {
+    "area": "Batting aggression",
+    "poor": "Aggression 0 every ball",
+    "matches": 200,
+    "goodWins": 124,
+    "poorWins": 74,
+    "tiesOrNoResult": 2,
+    "goodWinPercentOfDecided": 62.6,
+    "goodWinPercent95": [
+     55.7,
+     69.1
+    ],
+    "meanRunsGood": 96.2,
+    "meanRunsPoor": 90,
+    "meanRunDifference": 6.2,
+    "meanRunDifference95": [
+     3,
+     9.4
+    ]
+   },
+   "batting-order-reversed": {
+    "area": "Selection (batting order)",
+    "poor": "The suggested eleven batting in reverse order (tail first)",
+    "matches": 200,
+    "goodWins": 131,
+    "poorWins": 63,
+    "tiesOrNoResult": 6,
+    "goodWinPercentOfDecided": 67.5,
+    "goodWinPercent95": [
+     60.7,
+     73.7
+    ],
+    "meanRunsGood": 97.7,
+    "meanRunsPoor": 93,
+    "meanRunDifference": 4.6,
+    "meanRunDifference95": [
+     0.7,
+     8.5
+    ]
+   },
+   "bowling-plan-full-max": {
+    "area": "Bowling plan",
+    "poor": "Full length at maximum effort all innings",
+    "matches": 200,
+    "goodWins": 94,
+    "poorWins": 99,
+    "tiesOrNoResult": 7,
+    "goodWinPercentOfDecided": 48.7,
+    "goodWinPercent95": [
+     41.7,
+     55.7
+    ],
+    "meanRunsGood": 99.4,
+    "meanRunsPoor": 99.1,
+    "meanRunDifference": 0.2,
+    "meanRunDifference95": [
+     -3.9,
+     4.3
+    ]
+   },
+   "bowling-worst-first": {
+    "area": "Bowling choice",
+    "poor": "Weakest available bowler first, every over (quota-safe)",
+    "matches": 200,
+    "goodWins": 105,
+    "poorWins": 90,
+    "tiesOrNoResult": 5,
+    "goodWinPercentOfDecided": 53.8,
+    "goodWinPercent95": [
+     46.8,
+     60.7
+    ],
+    "meanRunsGood": 103.9,
+    "meanRunsPoor": 100.2,
+    "meanRunDifference": 3.7,
+    "meanRunDifference95": [
+     -0.3,
+     7.7
+    ]
+   },
+   "field-attacking-throughout": {
+    "area": "Field setting",
+    "poor": "The two-slip powerplay field held for all 20 overs",
+    "matches": 200,
+    "goodWins": 109,
+    "poorWins": 87,
+    "tiesOrNoResult": 4,
+    "goodWinPercentOfDecided": 55.6,
+    "goodWinPercent95": [
+     48.6,
+     62.4
+    ],
+    "meanRunsGood": 102.9,
+    "meanRunsPoor": 99.8,
+    "meanRunDifference": 3.1,
+    "meanRunDifference95": [
+     -1.1,
+     7.2
+    ]
+   },
+   "selection-old-rule": {
+    "area": "Selection",
+    "poor": "The pre-stage-A rule: keeper, the first six bowling-capable players, then squad order (no specialist batters)",
+    "matches": 200,
+    "goodWins": 127,
+    "poorWins": 65,
+    "tiesOrNoResult": 8,
+    "goodWinPercentOfDecided": 66.1,
+    "goodWinPercent95": [
+     59.2,
+     72.5
+    ],
+    "meanRunsGood": 92.8,
+    "meanRunsPoor": 85.9,
+    "meanRunDifference": 6.9,
+    "meanRunDifference95": [
+     3.2,
+     10.6
+    ]
+   },
+   "selection-weakest": {
+    "area": "Selection",
+    "poor": "Weakest eleven: the weaker keeper, the five weakest bowlers and the five weakest other players, batting in skill order",
+    "matches": 200,
+    "goodWins": 134,
+    "poorWins": 64,
+    "tiesOrNoResult": 2,
+    "goodWinPercentOfDecided": 67.7,
+    "goodWinPercent95": [
+     60.9,
+     73.8
+    ],
+    "meanRunsGood": 109.8,
+    "meanRunsPoor": 100.8,
+    "meanRunDifference": 9.1,
+    "meanRunDifference95": [
+     5.2,
+     12.9
+    ]
+   }
+  },
+  "synthetic-alpha-01": {
+   "aggression-all-out": {
+    "area": "Batting aggression",
+    "poor": "Aggression 4 every ball",
+    "matches": 200,
+    "goodWins": 104,
+    "poorWins": 94,
+    "tiesOrNoResult": 2,
+    "goodWinPercentOfDecided": 52.5,
+    "goodWinPercent95": [
+     45.6,
+     59.4
+    ],
+    "meanRunsGood": 101.4,
+    "meanRunsPoor": 97.5,
+    "meanRunDifference": 3.9,
+    "meanRunDifference95": [
+     -0.5,
+     8.2
+    ]
+   },
+   "aggression-blocking": {
+    "area": "Batting aggression",
+    "poor": "Aggression 0 every ball",
+    "matches": 200,
+    "goodWins": 118,
+    "poorWins": 79,
+    "tiesOrNoResult": 3,
+    "goodWinPercentOfDecided": 59.9,
+    "goodWinPercent95": [
+     52.9,
+     66.5
+    ],
+    "meanRunsGood": 102.2,
+    "meanRunsPoor": 97.5,
+    "meanRunDifference": 4.8,
+    "meanRunDifference95": [
+     1.7,
+     7.8
+    ]
+   },
+   "batting-order-reversed": {
+    "area": "Selection (batting order)",
+    "poor": "The suggested eleven batting in reverse order (tail first)",
+    "matches": 200,
+    "goodWins": 139,
+    "poorWins": 54,
+    "tiesOrNoResult": 7,
+    "goodWinPercentOfDecided": 72,
+    "goodWinPercent95": [
+     65.3,
+     77.9
+    ],
+    "meanRunsGood": 101.8,
+    "meanRunsPoor": 94.2,
+    "meanRunDifference": 7.6,
+    "meanRunDifference95": [
+     4.1,
+     11.2
+    ]
+   },
+   "bowling-plan-full-max": {
+    "area": "Bowling plan",
+    "poor": "Full length at maximum effort all innings",
+    "matches": 200,
+    "goodWins": 102,
+    "poorWins": 96,
+    "tiesOrNoResult": 2,
+    "goodWinPercentOfDecided": 51.5,
+    "goodWinPercent95": [
+     44.6,
+     58.4
+    ],
+    "meanRunsGood": 105.2,
+    "meanRunsPoor": 104.7,
+    "meanRunDifference": 0.5,
+    "meanRunDifference95": [
+     -3.4,
+     4.3
+    ]
+   },
+   "bowling-worst-first": {
+    "area": "Bowling choice",
+    "poor": "Weakest available bowler first, every over (quota-safe)",
+    "matches": 200,
+    "goodWins": 96,
+    "poorWins": 101,
+    "tiesOrNoResult": 3,
+    "goodWinPercentOfDecided": 48.7,
+    "goodWinPercent95": [
+     41.8,
+     55.7
+    ],
+    "meanRunsGood": 104.5,
+    "meanRunsPoor": 104.6,
+    "meanRunDifference": -0.1,
+    "meanRunDifference95": [
+     -3.8,
+     3.6
+    ]
+   },
+   "field-attacking-throughout": {
+    "area": "Field setting",
+    "poor": "The two-slip powerplay field held for all 20 overs",
+    "matches": 200,
+    "goodWins": 108,
+    "poorWins": 87,
+    "tiesOrNoResult": 5,
+    "goodWinPercentOfDecided": 55.4,
+    "goodWinPercent95": [
+     48.4,
+     62.2
+    ],
+    "meanRunsGood": 108.6,
+    "meanRunsPoor": 105.5,
+    "meanRunDifference": 3,
+    "meanRunDifference95": [
+     -0.8,
+     6.9
+    ]
+   },
+   "selection-old-rule": {
+    "area": "Selection",
+    "poor": "The pre-stage-A rule: keeper, the first six bowling-capable players, then squad order (no specialist batters)",
+    "matches": 200,
+    "goodWins": 160,
+    "poorWins": 37,
+    "tiesOrNoResult": 3,
+    "goodWinPercentOfDecided": 81.2,
+    "goodWinPercent95": [
+     75.2,
+     86.1
+    ],
+    "meanRunsGood": 96.2,
+    "meanRunsPoor": 83.1,
+    "meanRunDifference": 13.1,
+    "meanRunDifference95": [
+     9.4,
+     16.9
+    ]
+   },
+   "selection-weakest": {
+    "area": "Selection",
+    "poor": "Weakest eleven: the weaker keeper, the five weakest bowlers and the five weakest other players, batting in skill order",
+    "matches": 200,
+    "goodWins": 113,
+    "poorWins": 84,
+    "tiesOrNoResult": 3,
+    "goodWinPercentOfDecided": 57.4,
+    "goodWinPercent95": [
+     50.4,
+     64.1
+    ],
+    "meanRunsGood": 106.6,
+    "meanRunsPoor": 103.2,
+    "meanRunDifference": 3.3,
+    "meanRunDifference95": [
+     -0.4,
+     7.1
+    ]
+   }
+  }
+ }
+}

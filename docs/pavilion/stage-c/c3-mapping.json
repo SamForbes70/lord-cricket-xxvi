@@ -1,0 +1,148 @@
+{
+ "version": "LC_STAGE_C_C3_MAPPING_V1",
+ "researchOnly": true,
+ "attribution": {
+  "source": "Cricsheet, https://cricsheet.org/",
+  "sourceURL": "https://cricsheet.org/downloads/t20s_json.zip",
+  "licence": "Open Data Commons Attribution License (ODC-By) 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "archiveSha256": "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "retrievedAtUTC": "2026-11-25T12:57:47.048656+00:00",
+  "note": "Derived aggregates only (no ball-by-ball records). Contains information from Cricsheet, made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/."
+ },
+ "gameQuarterMeans": {
+  "battingScore": [
+   133.8181818181818,
+   282.59090909090907
+  ],
+  "bowlingScore": [
+   157.08333333333334,
+   212.75
+  ]
+ },
+ "calibratedRunQuarterMeans": {
+  "battingScore": [
+   133.8181818181818,
+   282.59090909090907
+  ],
+  "bowlingScore": [
+   157.08333333333334,
+   212.75
+  ]
+ },
+ "quarterGapPerSkillPoint": {
+  "batter": 37.19318181818181,
+  "bowler": 18.555555555555554
+ },
+ "c2WorldSD": {
+  "batter": 7.653551664473125,
+  "bowler": 7.5230460849382705
+ },
+ "perPointTargets": {
+  "dismissal.batter": {
+   "trueRelativeSD": 0.17363038281052773,
+   "perPoint": 0.012066377809787358,
+   "perPoint_P10_P90": [
+    0.0,
+    0.01262817745267699
+   ],
+   "range": [
+    0.0,
+    0.01262817745267699
+   ],
+   "c2PerPoint": 0.022686249524714035
+  },
+  "dismissal.bowler": {
+   "trueRelativeSD": 0.10352593375489248,
+   "perPoint": 0.014266279493389768,
+   "perPoint_P10_P90": [
+    0.0,
+    0.02059686468324497
+   ],
+   "range": [
+    0.0,
+    0.02059686468324497
+   ],
+   "c2PerPoint": 0.013761172347748811
+  },
+  "boundary.batter": {
+   "trueRelativeSD": 0.18265170068800995,
+   "perPoint": 0.012716329587871765,
+   "perPoint_P10_P90": [
+    0.013117168798059527,
+    0.015512980850518873
+   ],
+   "range": [
+    0.012716329587871765,
+    0.015512980850518873
+   ],
+   "c2PerPoint": 0.02386495952406742
+  },
+  "boundary.bowler": {
+   "trueRelativeSD": 0.1647662410307306,
+   "perPoint": 0.02291278137489088,
+   "perPoint_P10_P90": [
+    0.021188290917629686,
+    0.026983826748770992
+   ],
+   "range": [
+    0.021188290917629686,
+    0.026983826748770992
+   ],
+   "c2PerPoint": 0.02190153285922381
+  },
+  "nonDot.batter": {
+   "trueRelativeSD": 0.07629674211059875,
+   "perPoint": 0.005231419046845663,
+   "perPoint_P10_P90": [
+    0.0051631717595345804,
+    0.00614713208304455
+   ],
+   "range": [
+    0.0051631717595345804,
+    0.00614713208304455
+   ],
+   "c2PerPoint": 0.009968802126829449
+  },
+  "nonDot.bowler": {
+   "trueRelativeSD": 0.05868023580392674,
+   "perPoint": 0.008054432407329275,
+   "perPoint_P10_P90": [
+    0.008012617749353117,
+    0.009651452170469239
+   ],
+   "range": [
+    0.008012617749353117,
+    0.009651452170469239
+   ],
+   "c2PerPoint": 0.00780006331762465
+  },
+  "runs.batter": {
+   "trueRelativeSD": 0.11310211118317222,
+   "perPoint": 0.007784599077512894,
+   "perPoint_P10_P90": [
+    0.007980906465420845,
+    0.009233163551282564
+   ],
+   "range": [
+    0.007784599077512894,
+    0.009233163551282564
+   ],
+   "c2PerPoint": 0.014777728842960419
+  },
+  "runs.bowler": {
+   "trueRelativeSD": 0.08720446443936218,
+   "perPoint": 0.011996724973353747,
+   "perPoint_P10_P90": [
+    0.011947255347879424,
+    0.014579967799121768
+   ],
+   "range": [
+    0.011947255347879424,
+    0.014579967799121768
+   ],
+   "c2PerPoint": 0.01159164299338168
+  }
+ }
+}

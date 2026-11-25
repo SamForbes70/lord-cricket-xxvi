@@ -105,14 +105,18 @@ def main():
     ap = argparse.ArgumentParser()
     for k in ("synthetic", "calibrated", "dose-synthetic", "dose-calibrated", "fit", "tactical", "out"):
         ap.add_argument(f"--{k}", type=Path, required=True)
+    ap.add_argument("--targets", type=Path, default=None,
+                    help="C3: per-point targets from c3-mapping.json (default: C2's world-SD targets in --fit)")
     ap.add_argument("--balls-synthetic", nargs="+", required=True)
     ap.add_argument("--balls-calibrated", nargs="+", required=True)
     a = ap.parse_args()
     S, C = json.loads(a.synthetic.read_text()), json.loads(a.calibrated.read_text())
     real = C["real"]
     fit = json.loads(a.fit.read_text())
+    mapping = json.loads(a.targets.read_text()) if a.targets else None
     res = {"version": "LC_STAGE_C_C2_REPORT_V1", "researchOnly": True, "gameplayIntegrationPermitted": False,
            "attribution": {**C["attribution"], "note": ATTRIBUTION_NOTE}, "reference": "full-member men's T20 internationals, calibration split",
+           "perPointTargets": "c3-mapping.json (quarters of the game's regular players)" if a.targets else "c2-fit.json (world rating SD)",
            "criterion1Raw": {}, "criterion1Adjusted": {}, "perPoint": {}, "specialisation": {}, "aggregates": {}, "tactical": {}}
     for model, G in (("synthetic-alpha-01", S["game"]), ("calibrated-t20-01", C["game"])):
         res["criterion1Raw"][model] = {f"{r}.{s}": raw_gate(G["byRating"][r][s], real, r, s) for r, s in RAW}
@@ -126,8 +130,11 @@ def main():
         for key, tkey, sign in (("batting.runs", "runs.batter", 1), ("batting.boundary", "boundary.batter", 1), ("batting.nonDot", "nonDot.batter", 1),
                                 ("batting.dismissal", "dismissal.batter", -1), ("bowling.runs", "runs.bowler", -1), ("bowling.boundary", "boundary.bowler", -1),
                                 ("bowling.nonDot", "nonDot.bowler", -1), ("bowling.dismissal", "dismissal.bowler", 1)):
-            t = fit["perPointTargets"][tkey]
-            lo = min(t["perPoint"], t["perPoint_P10_P90"][0]); hi = max(t["perPoint"], t["perPoint_P10_P90"][1])
+            if mapping is not None:
+                lo, hi = mapping["perPointTargets"][tkey]["range"]
+            else:
+                t = fit["perPointTargets"][tkey]
+                lo = min(t["perPoint"], t["perPoint_P10_P90"][0]); hi = max(t["perPoint"], t["perPoint_P10_P90"][1])
             g = sign * d[key]  # oriented so that a correct effect is positive
             rows[key] = {"game": g, "realRange": [lo, hi], "verdict": "PASS" if lo <= g <= hi else "FAIL"}
         rows["variationTradeOff"] = {"dismissalPerPoint": d["variation.dismissal"], "runsPerPoint": d["variation.runs"], "boundaryPerPoint": d["variation.boundary"],
