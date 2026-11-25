@@ -22,7 +22,9 @@ const steps = [
   // Hosted Windows runs of the UI suite (89 Chromium + 89 Firefox tests, one worker) took 53 to 73 minutes for the same
   // kind of code on different runner CPUs (EPYC 7763, 9V45, 9V74, Xeon 8370C/8573C), so 75 minutes left no headroom.
   // Raised to 100 minutes by owner direction (20 November 2026: "fix the CI time budget").
-  { name: "match-ui", timeoutMs: 6_000_000, args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
+  // Raised to 140 minutes by owner direction (24 November 2026): with the Pavilion specs a green run reached test 218 of
+  // 228 at the 100-minute limit on a slow runner (run 45408625785).
+  { name: "match-ui", timeoutMs: 8_400_000, args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
   { name: "career", args: ["exec", "--", "playwright", "test", "--config=playwright.m6g.portable.config.ts", "--reporter=list,json", `--output=${directory}/career`, "--trace=retain-on-failure"], report: "career.json" },
   { name: "research-browser-build", args: ["exec", "--", "vite", "build", "--config=vite.m7k.config.ts"] },
   { name: "research-browser", args: ["exec", "--", "playwright", "test", "--config=playwright.m7k.config.ts", "--reporter=list,json", `--output=${directory}/research`, "--trace=retain-on-failure"], report: "research-browser.json" },
