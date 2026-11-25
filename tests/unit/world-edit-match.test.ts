@@ -17,6 +17,14 @@ draft.grounds[0]!.name = "New Quay";
 draft.teams[0]!.colours = ["#1177cc", "#eeee11"];
 const copy = createNewGameWorldCopy(draft, world);
 
+// The edited player, p001, is one of team 1's two keepers. The suggested eleven picks the keeper who bats better in
+// each format, so field p001 as the keeper whenever the suggestion chose the other one.
+function withP001(selection: { teamId: string; playerIds: string[]; captainId: string; keeperId: string }) {
+  if (selection.playerIds.includes("p001")) return selection;
+  const swap = (id: string) => (id === selection.keeperId ? "p001" : id);
+  return { ...selection, playerIds: selection.playerIds.map(swap), captainId: swap(selection.captainId), keeperId: "p001" };
+}
+
 describe("edited exhibition presentation", () => {
   for (const [format, factory] of [
     ["T20", createMatchController], ["ODI", createODIMatchController], ["RED_BALL", createRed5MatchController],
@@ -27,7 +35,7 @@ describe("edited exhibition presentation", () => {
       const catalog = boot.catalog!;
       const response = controller.handle({
         version: UI_VERSION, requestId: "ui-2", expectedRevision: 0, type: "START", format,
-        selections: [catalog.teams[0]!.suggested, catalog.teams[1]!.suggested], groundId: catalog.grounds[0]!.id, worldCopy: copy,
+        selections: [withP001(catalog.teams[0]!.suggested), catalog.teams[1]!.suggested], groundId: catalog.grounds[0]!.id, worldCopy: copy,
       });
       expect(response.error).toBeNull();
       expect(response.view?.teams[0]?.name).toBe("Harbour XI");

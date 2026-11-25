@@ -314,7 +314,7 @@ export function TournamentsApp() {
     let roster: TournamentLaunch["roster"];
     try {
       const generated = generatedRosterFor(run);
-      if (generated) roster = { pack: generated.pack, selections: generatedSelections(fullWorld, generated.squads, fixture) };
+      if (generated) roster = { pack: generated.pack, selections: generatedSelections(fullWorld, generated.squads, fixture, competition.format) };
     } catch (error) {
       setProblem(error instanceof Error ? error.message : "This tournament's squads could not be rebuilt.");
       return;

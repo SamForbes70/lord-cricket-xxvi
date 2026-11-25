@@ -30,6 +30,7 @@ import {
   ODI_FIELD_REGISTRY,
   FROZEN_WORLD_PINS,
   isBowlingCapable,
+  suggestedEleven,
   MODEL_PACK_SHA256,
   DELIVERY_STAGE_PACK_SHA256,
 } from "@lcxxvi/data";
@@ -72,15 +73,7 @@ export function createODIMatchController(
       const players = t.squadIds.map(
         (id) => world.players.find((p) => p.playerId === id)!,
       );
-      const keeper = players.find((p) => p.role === "KEEPER")!;
-      const bowlers = players
-        .filter((p) => p.playerId !== keeper.playerId && isBowlingCapable(p))
-        .slice(0, 6);
-      const xi = [
-        keeper,
-        ...bowlers,
-        ...players.filter((p) => p !== keeper && !bowlers.includes(p)),
-      ].slice(0, 11);
+      const eleven = suggestedEleven(players, "ODI");
       return {
         id: t.teamId,
         name: t.name,
@@ -92,12 +85,7 @@ export function createODIMatchController(
           canBowl: isBowlingCapable(p),
           batHand: p.batHand,
         })),
-        suggested: {
-          teamId: t.teamId,
-          playerIds: xi.map((p) => p.playerId),
-          captainId: xi[0]!.playerId,
-          keeperId: keeper.playerId,
-        },
+        suggested: { teamId: t.teamId, ...eleven },
       };
     }),
     grounds: world.grounds.map((g) => ({ id: g.groundId, name: g.name, seamBp: g.pitchPrior.seamBp, turnBp: g.pitchPrior.turnBp })),

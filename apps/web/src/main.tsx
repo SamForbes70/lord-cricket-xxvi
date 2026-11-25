@@ -6,7 +6,7 @@ import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
-import { matchSituation } from "@lcxxvi/projections";
+import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -1344,6 +1344,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               {situation.facts.map((fact) => <span key={fact}>{fact}</span>)}
             </section>
           )}
+          {/* Pavilion B9: a T20 chase's win chance, from the game's own simulated matches. Kept out of the situation
+              strip, which states only what is on the board. */}
+          {view && i && view.format === "T20" && i.targetToWin != null && !view.resultText && (() => {
+            const chance = t20ChaseWinChance(Math.max(0, i.targetToWin - i.runs), i.wickets, i.legalBalls);
+            if (chance === null || chance === 0 || chance === 100) return null;
+            return (
+              <p className="win-chance" data-testid="win-chance">
+                <span>Win chance (game model estimate):</span>{" "}
+                <strong>{tn(i.battingTeamId)} about {chance}%</strong>{" · "}
+                <strong>{tn(i.bowlingTeamId)} about {100 - chance}%</strong>
+                <small> From this game&apos;s own simulated matches, not real cricket.</small>
+              </p>
+            );
+          })()}
           <BroadcastStage view={view} />
           {highlights && pacePanel}
           <section
@@ -1543,7 +1557,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     Computer makes routine batter and bowler picks; you choose at key moments
                   </label>
                   {routineDecision?.moment.key && routinePicks && <p className="routine-key" data-testid="routine-key">{routineDecision.moment.reason} Your choice.</p>}
-                  {routineNote && <p role="status" className="routine-note" data-testid="routine-note">{routineNote}</p>}
+                  {/* When play is ready to go on, the note takes the advance hint's line instead (below), so the decision
+                      still fits the first screen at 1366 by 768 (dugout-view.spec, hosted Windows run 45466265308). */}
+                  {routineNote && view.advanceReason && <p role="status" className="routine-note" data-testid="routine-note">{routineNote}</p>}
                 </div>
               )}
               {(view.phase === "AWAITING_BATTER" ||
@@ -1675,7 +1691,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 <button disabled={!!view.advanceReason} onClick={() => advanceTo("MATCH")}>Finish match</button>
                 <span id="advance-reason">
                   {view.advanceReason ||
-                    "Each option stops at your own decisions."}
+                    (routineNote ? <span role="status" className="routine-note" data-testid="routine-note">{routineNote}</span> : "Each option stops at your own decisions.")}
                 </span>
               </div>
               )}
@@ -1721,6 +1737,27 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             </details>
           )}
           <span id="dugout-tactics" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tactics: plans and field" />
+          {/* Pavilion B9: what the other side has done in this match and what it still has, from the ledger only. */}
+          {limitedOvers && captainedTeam && i && ledger && !view.resultText && (() => {
+            const playerSide = i.battingTeamId === captainedTeam ? "BATTING" as const : "BOWLING" as const;
+            const watch = oppositionWatch({
+              format: view.format === "ODI" ? "ODI" : "T20",
+              playerSide,
+              batting: ledger.batting,
+              bowling: ledger.bowling,
+              atCrease: [i.northBatterId ?? null, i.southBatterId ?? null],
+              battingElevenSize: view.teams.find((t) => t.id === i.battingTeamId)?.playerIds.length ?? 11,
+              names: view.names,
+            });
+            if (!watch.headline && watch.facts.length === 0) return null;
+            return (
+              <section className="panel opposition-watch" aria-labelledby="opposition-watch-heading" data-testid="opposition-watch">
+                <h2 id="opposition-watch-heading">Opposition: {watch.heading.toLowerCase()}</h2>
+                {watch.headline && <p data-testid="opposition-headline"><strong>{watch.headline}</strong></p>}
+                {watch.facts.length > 0 && <ul>{watch.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul>}
+              </section>
+            );
+          })()}
           {view.phase === "READY" && (
             <Tactics
               key={`${view.revision}`}

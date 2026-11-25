@@ -1,5 +1,5 @@
 import type { Competition, StagedRosterPack, TournamentFixture, TournamentResult, UserTour, WorldPack } from "@lcxxvi/contracts";
-import { RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK, isBowlingCapable } from "@lcxxvi/data";
+import { RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK, isBowlingCapable, suggestedEleven, type ElevenFormat } from "@lcxxvi/data";
 import {
   createRosterODISession,
   createRosterT20Session,
@@ -60,15 +60,11 @@ export function touringXI(world: WorldPack, hostTeamId: string, format: "T20" | 
   return { squadIds: [...batters, keeper, ...bowlers].map((p) => p.playerId), captainId: batters[0]!.playerId, keeperId: keeper.playerId };
 }
 
-/** The XI a squad fields: the keeper, six bowling-capable players, then the rest in squad order (the clubs' suggested XI rule). */
-export function squadXI(world: WorldPack, squadIds: readonly string[], captainId?: string): { playerIds: string[]; captainId: string; keeperId: string } {
+/** The XI a squad fields, in batting order: the clubs' suggested-eleven rule (Pavilion P04 stage A, `suggestedEleven`). */
+export function squadXI(world: WorldPack, squadIds: readonly string[], captainId?: string, format: ElevenFormat = "T20"): { playerIds: string[]; captainId: string; keeperId: string } {
   const players = squadIds.map((id) => world.players.find((p) => p.playerId === id)!);
-  const keeper = players.find((p) => p.role === "KEEPER");
-  if (!keeper) throw new Error("A squad needs a keeper.");
-  const bowlers = players.filter((p) => p.playerId !== keeper.playerId && isBowlingCapable(p)).slice(0, 6);
-  const xi = [keeper, ...bowlers, ...players.filter((p) => p !== keeper && !bowlers.includes(p))].slice(0, 11);
-  const ids = xi.map((p) => p.playerId);
-  return { playerIds: ids, captainId: captainId && ids.includes(captainId) ? captainId : ids[0]!, keeperId: keeper.playerId };
+  const eleven = suggestedEleven(players, format);
+  return { ...eleven, captainId: captainId && eleven.playerIds.includes(captainId) ? captainId : eleven.captainId };
 }
 
 /** A roster pack holding just these squads, built from the fictional world through the normal roster checks. */
@@ -129,11 +125,11 @@ export function tourCompetition(tour: UserTour): Competition {
 }
 
 /** The two XIs a fixture between generated squads fields, home first (the same rule whether simulated or played). */
-export function generatedSelections(world: WorldPack, squads: readonly GeneratedSquad[], fixture: Pick<TournamentFixture, "homeTeamId" | "awayTeamId">) {
+export function generatedSelections(world: WorldPack, squads: readonly GeneratedSquad[], fixture: Pick<TournamentFixture, "homeTeamId" | "awayTeamId">, format: "T20" | "ODI" = "T20") {
   const select = (teamId: string) => {
     const squad = squads.find((s) => s.teamId === teamId);
     if (!squad) throw new Error("TOURNAMENT_TEAM_UNKNOWN");
-    return { teamId, ...squadXI(world, squad.squadIds) };
+    return { teamId, ...squadXI(world, squad.squadIds, undefined, format) };
   };
   return [select(fixture.homeTeamId), select(fixture.awayTeamId)] as [ReturnType<typeof select>, ReturnType<typeof select>];
 }
@@ -169,7 +165,7 @@ export function playGeneratedFixture(input: {
     matchId: identity.matchId,
     seed: fixtureSeed(input.runSeed, fixture.fixtureId),
     format: competition.format,
-    selection: { groundId: fixture.groundId, teams: generatedSelections(input.world, input.squads, fixture) },
+    selection: { groundId: fixture.groundId, teams: generatedSelections(input.world, input.squads, fixture, competition.format) },
   };
   let session: T20Session | ODISession;
   if (competition.format === "T20") {

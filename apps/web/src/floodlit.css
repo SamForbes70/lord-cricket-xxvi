@@ -563,6 +563,15 @@ input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color:
 /* Project Pavilion B6: why "Next key moment" stopped. */
 .decision .key-moment { margin: 0.25rem 0 0.5rem; color: var(--fl-gold-hi); font-weight: 600; }
 
+/* Project Pavilion B9: the chase's win chance, under the situation strip. */
+.win-chance { margin: 0.25rem 0 0.5rem; color: var(--fl-muted); font-size: 0.95em; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; }
+.win-chance strong { color: var(--fl-text); }
+.win-chance small { color: var(--fl-faint); }
+
+/* Project Pavilion B9: opposition watch at the top of the tactics group. */
+.opposition-watch ul { margin: 0.25rem 0 0; padding-left: 1.1rem; color: var(--fl-muted); }
+.opposition-watch p { margin: 0.25rem 0; }
+
 /* Project Pavilion B3: the full-time result moment in the decision panel. */
 .result-moment { display: grid; gap: 0.75rem; }
 .result-moment .result-scores { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }

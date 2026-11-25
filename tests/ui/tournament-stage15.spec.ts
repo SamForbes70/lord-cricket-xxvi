@@ -155,7 +155,9 @@ test("Stage 15 a tour is arranged, simulated to a series result, and kept after 
   const run = page.getByTestId("tournament-run");
   await expect(run).toBeVisible({ timeout: 30_000 });
   await run.getByRole("button", { name: "Play all remaining" }).click();
-  await expect(page.getByTestId("tournament-champion")).toHaveText(/(Northlight Ridge|Invitation XI) win the Ridge Tour\. Series [23]-[01]\.|drawn/, { timeout: 120_000 });
+  // Tied matches count for neither side, so a three-match series can be won 1-0 (seen on hosted Windows CI, run 45487597241:
+  // tied, tied, then a win).
+  await expect(page.getByTestId("tournament-champion")).toHaveText(/(Northlight Ridge|Invitation XI) win the Ridge Tour\. Series [1-3]-[0-2]\.|drawn/, { timeout: 120_000 });
   await expect(page.getByTestId("tournament-fixtures")).toContainText("Invitation XI");
   await page.reload();
   const again = page.getByRole("list", { name: "Tournaments" }).locator("> li").last();
