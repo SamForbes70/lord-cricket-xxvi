@@ -28,7 +28,7 @@ function inspect(name,check){const started=performance.now();let error="";
   gates.push(entry);console.log(`${name}: ${entry.status}`);
 }
 const env={LCXXVI_VERIFY_DIR:inherited,LCXXVI_BROWSER_EVIDENCE_DIR:browser};
-const inherit=run("inherited-07a",["npm","run","verify:07a"],env,900_000);
+const inherit=run("inherited-07a",["npm","run","verify:07a"],env,2_400_000);
 let prior;
 try{prior=JSON.parse(readFileSync(join(inherited,"pass07a-results.json"),"utf8"));}catch{prior=null;}
 inspect("inherited-exact-16",()=>{

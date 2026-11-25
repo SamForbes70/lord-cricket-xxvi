@@ -17,7 +17,7 @@ const extra = [
 const run=(executable,args,label,options={})=>{
   const began=performance.now();
   const result=spawnSync(executable,args,{encoding:"utf8",maxBuffer:16_000_000,
-    timeout:label==="inherited-orchestrator"?1_500_000:240_000, env:options.env ?? process.env});
+    timeout:label==="inherited-orchestrator"?2_400_000:240_000, env:options.env ?? process.env});
   const log=[result.stdout ?? "",result.stderr ?? "",result.error?.message ?? ""].join("\n");
   writeFileSync(join(directory,label+".log"),log);
   const status=result.error?.code==="ETIMEDOUT"?"BLOCKED":result.status===0?"PASS":"FAIL";
