@@ -1,18 +1,32 @@
 {
+  "contract": "every feed parses with MatchCommentaryFeedSchema",
   "overs": 3570,
-  "withContext": 752,
-  "share": 0.211,
+  "oversWithContext": 752,
+  "overShare": 0.211,
+  "wickets": 1529,
+  "wicketsWithContext": 466,
+  "wicketShare": 0.305,
+  "inningsEnds": 200,
+  "inningsWithSummary": 200,
   "slots": {
     "collapse": 274,
     "boundaryDrought": 201,
+    "wicketsLeft": 240,
     "deathOvers": 155,
+    "inningsSummary": 200,
+    "newBatterTask": 154,
+    "standBroken": 72,
     "expensiveOver": 87,
     "askingRate": 35
   },
   "examples": {
     "collapse": "After 2 overs, Aster Harbour move to 13/4 (1 from Rilan Rookfield's over). 4 wickets for 13 runs in the last 2 overs.",
     "boundaryDrought": "End of over 7 (3 runs, 1 wkt): Aster Harbour 31/6. No boundary for 25 balls.",
+    "wicketsLeft": "Innings 1, 11.4: Zerin Wrenbrook bowls Isen Kelholt for 11 (19)! 3 wickets left.",
     "deathOvers": "Over 15 complete — 7 off it. Aster Harbour are 67/9. Into the death overs.",
+    "inningsSummary": "End of innings 1: Aster Harbour all out for 67 in 15.1 overs. Top score: Caro Harden 14 (18). Best bowling: Rilan Rookfield 3-2.",
+    "newBatterTask": "Innings 2, 13.6: Taken! Sela Sablestone induces the mistake and Borin Zornbrook is caught by Zerin Sablebrook for 19 (21). The new batter comes in with 5 needed from 36 balls.",
+    "standBroken": "Innings 1, 17.3: Ari Ashford to Nalo Zornfell — Nalo Zornfell caught by Talor Zornbrook for 32 (52)! That breaks a stand of 38 from 53 balls.",
     "expensiveOver": "End of over 3 (14 runs, 1 wkt): Silver Fen 21/1. The most expensive over of the innings.",
     "askingRate": "After 18 overs, Copper Vale move to 41/9 (1 from Ari Ashford's over) (33 needed from 12 balls). The asking rate is up to 16.5 an over."
   }

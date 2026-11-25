@@ -567,6 +567,8 @@ input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color:
 .win-chance { margin: 0.25rem 0 0.5rem; color: var(--fl-muted); font-size: 0.95em; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; }
 .win-chance strong { color: var(--fl-text); }
 .win-chance small { color: var(--fl-faint); }
+.win-chance summary { cursor: pointer; }
+.win-chance[open] summary { margin-right: 0.5rem; }
 
 /* Project Pavilion B9: opposition watch at the top of the tactics group. */
 .opposition-watch ul { margin: 0.25rem 0 0; padding-left: 1.1rem; color: var(--fl-muted); }

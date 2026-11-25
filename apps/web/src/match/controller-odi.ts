@@ -1,4 +1,5 @@
 import { proposeOpponentODICommand } from "./ai-opponent.js";
+import { marginText } from "./margin-text.js";
 import { recommendDecisions, withRecommendation } from "./recommendation.js";
 import { strandingReasons } from "./bowler-plan.js";
 import {
@@ -264,7 +265,7 @@ export function createODIMatchController(
       c.phase === "COMPLETE" && r
         ? r.kind === "TIE"
           ? "Match tied"
-          : `${tn(r.winnerTeamId)} won by ${r.marginRuns ?? r.marginWickets} ${r.marginType?.toLowerCase()}`
+          : `${tn(r.winnerTeamId)} won by ${marginText(r)}`
         : null;
     return {
       format: "ODI",

@@ -7,8 +7,9 @@ import {
   FormatSkillsSchema,
   LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION,
   LifecycleDiagnosticSeasonSnapshotSchema,
-  LifecycleSeasonStateCoreSchema,
-  LifecycleSeasonStateSchema,
+  AnyLifecycleSeasonStateCoreSchema,
+  AnyLifecycleSeasonStateSchema,
+  isLifecycleSeasonState,
   MAX_ACTIVE_TEAM_SQUAD_SIZE,
   MAX_CAREER_MATCH_EVENT_ARCHIVE_BYTES,
   MIN_ACTIVE_TEAM_SQUAD_SIZE,
@@ -295,18 +296,18 @@ export function validatePlayerLifecycleState(raw: unknown): PlayerLifecycleState
 }
 
 export function sealLifecycleSeasonState(coreInput: Omit<LifecycleSeasonState, "stateSha256">): LifecycleSeasonState {
-  const core = LifecycleSeasonStateCoreSchema.parse(coreInput);
+  const core = AnyLifecycleSeasonStateCoreSchema.parse(coreInput);
   const stateSha256 = sha256Hex(canonicalStateBytes(core));
-  return LifecycleSeasonStateSchema.parse({ ...core, stateSha256 });
+  return AnyLifecycleSeasonStateSchema.parse({ ...core, stateSha256 });
 }
 
 export function validateLifecycleSeasonState(
   raw: unknown,
   pack: StagedRosterPack,
 ): LifecycleSeasonState {
-  const state = LifecycleSeasonStateSchema.parse(raw);
+  const state = AnyLifecycleSeasonStateSchema.parse(raw);
   const { stateSha256, ...coreRaw } = state;
-  const core = LifecycleSeasonStateCoreSchema.parse(coreRaw);
+  const core = AnyLifecycleSeasonStateCoreSchema.parse(coreRaw);
   assertLifecycle(sha256Hex(canonicalStateBytes(core)) === stateSha256, "SEASON_HASH_MISMATCH");
   const validatedPack = validateStagedRosterPack(pack, ALLOWED_RULES, ALLOWED_VARIATIONS);
   const packSha = hasher.hash(validatedPack);
@@ -1916,7 +1917,7 @@ export async function runPlayerLifecycleDiagnosticHorizonAsync(
 }
 
 export function seasonStartDateOf(season: ActivePersistentSeasonState): string {
-  return season.seasonStateVersion === "LC_T20_SEASON_STATE_V1"
-    ? season.schedule.startDate
-    : season.schedule.request.startDate;
+  return isLifecycleSeasonState(season)
+    ? season.schedule.request.startDate
+    : season.schedule.startDate;
 }
