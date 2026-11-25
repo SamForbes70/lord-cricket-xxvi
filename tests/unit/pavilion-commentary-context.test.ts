@@ -61,3 +61,49 @@ describe("Pavilion P07: over context", () => {
     expect(overContext({ ...base, format: "RED_BALL", ballsSinceBoundary: 24 })).toBeNull();
   });
 });
+
+import { inningsSummary, wicketContext, type WicketContextInput } from "../../packages/projections/src/commentary-context.js";
+
+describe("Pavilion P07: wicket context", () => {
+  const w: WicketContextInput = { format: "T20", standRuns: 12, standBalls: 10, runs: 60, wickets: 3, legalBalls: 54, targetToWin: null };
+
+  it("names a broken stand of 30 or more first", () => {
+    expect(wicketContext({ ...w, standRuns: 43, standBalls: 31, targetToWin: 150 })).toEqual({ slot: "standBroken", text: "That breaks a stand of 43 from 31 balls." });
+  });
+
+  it("in a tight chase, gives the new batter's equation; early in an easy chase, says nothing", () => {
+    expect(wicketContext({ ...w, targetToWin: 106, runs: 60, legalBalls: 90 })!.text).toBe("The new batter comes in with 46 needed from 30 balls.");
+    // 70 needed from 42 balls is 10 an over: tight even before the last 36 balls.
+    expect(wicketContext({ ...w, targetToWin: 130, runs: 60, legalBalls: 78 })!.slot).toBe("newBatterTask");
+    // 47 needed from 92 balls early in the chase: nothing.
+    expect(wicketContext({ ...w, targetToWin: 107, runs: 60, legalBalls: 28 })).toBeNull();
+  });
+
+  it("late in an innings, counts the wickets left", () => {
+    expect(wicketContext({ ...w, wickets: 7 })!.text).toBe("3 wickets left.");
+    expect(wicketContext({ ...w, wickets: 9 })!.text).toBe("1 wicket left.");
+    expect(wicketContext({ ...w, wickets: 6 })).toBeNull();
+  });
+
+  it("says nothing once the innings or the chase is over, or in red-ball matches", () => {
+    expect(wicketContext({ ...w, wickets: 10 })).toBeNull();
+    expect(wicketContext({ ...w, legalBalls: 120 })).toBeNull();
+    expect(wicketContext({ ...w, targetToWin: 60 })).toBeNull();
+    expect(wicketContext({ ...w, format: "RED_BALL", standRuns: 80 })).toBeNull();
+  });
+});
+
+describe("Pavilion P07: innings summary", () => {
+  const names = { a: "Ava", b: "Bea", x: "Xan", y: "Yul" };
+  it("gives the top score and best bowling, breaking ties by balls and runs", () => {
+    const batters = new Map([["a", { runs: 34, ballsFaced: 28 }], ["b", { runs: 34, ballsFaced: 25 }]]);
+    const bowlers = new Map([["x", { wickets: 3, runsConceded: 18, legalBalls: 24 }], ["y", { wickets: 3, runsConceded: 12, legalBalls: 18 }]]);
+    expect(inningsSummary({ format: "T20", batters, bowlers, names })).toBe("Top score: Bea 34 (25). Best bowling: Yul 3-12.");
+  });
+
+  it("leaves out what did not happen, and stays silent in red-ball matches", () => {
+    expect(inningsSummary({ format: "ODI", batters: new Map([["a", { runs: 10, ballsFaced: 12 }]]), bowlers: new Map([["x", { wickets: 0, runsConceded: 30, legalBalls: 36 }]]), names })).toBe("Top score: Ava 10 (12).");
+    expect(inningsSummary({ format: "T20", batters: new Map(), bowlers: new Map(), names })).toBeNull();
+    expect(inningsSummary({ format: "RED_BALL", batters: new Map([["a", { runs: 10, ballsFaced: 12 }]]), bowlers: new Map(), names })).toBeNull();
+  });
+});
