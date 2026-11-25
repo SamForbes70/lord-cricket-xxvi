@@ -411,5 +411,103 @@
    "correlation": 0.10263499916389492
   }
  },
+ "perPointTargets": {
+  "dismissal.batter": {
+   "trueRelativeSD": 0.17363038281052773,
+   "trueRelativeSD_P10_P90": [
+    0.0,
+    0.1814310612418132
+   ],
+   "perPoint": 0.022686249524714035,
+   "perPoint_P10_P90": [
+    0.0,
+    0.02370547285699979
+   ]
+  },
+  "dismissal.bowler": {
+   "trueRelativeSD": 0.10352593375489248,
+   "trueRelativeSD_P10_P90": [
+    0.0,
+    0.1485332318780029
+   ],
+   "perPoint": 0.013761172347748811,
+   "perPoint_P10_P90": [
+    0.0,
+    0.019743762061404636
+   ]
+  },
+  "boundary.batter": {
+   "trueRelativeSD": 0.18265170068800995,
+   "trueRelativeSD_P10_P90": [
+    0.18819031136953043,
+    0.22086624948830186
+   ],
+   "perPoint": 0.02386495952406742,
+   "perPoint_P10_P90": [
+    0.024588624944297095,
+    0.02885800725871319
+   ]
+  },
+  "boundary.bowler": {
+   "trueRelativeSD": 0.1647662410307306,
+   "trueRelativeSD_P10_P90": [
+    0.15269183458737604,
+    0.1929412246664611
+   ],
+   "perPoint": 0.02190153285922381,
+   "perPoint_P10_P90": [
+    0.0202965438285799,
+    0.025646689185215094
+   ]
+  },
+  "nonDot.batter": {
+   "trueRelativeSD": 0.07629674211059875,
+   "trueRelativeSD_P10_P90": [
+    0.07530753267704407,
+    0.08954474680436372
+   ],
+   "perPoint": 0.009968802126829449,
+   "perPoint_P10_P90": [
+    0.00983955371028756,
+    0.011699763812926197
+   ]
+  },
+  "nonDot.bowler": {
+   "trueRelativeSD": 0.05868023580392674,
+   "trueRelativeSD_P10_P90": [
+    0.058376719220056675,
+    0.0702584125980416
+   ],
+   "perPoint": 0.00780006331762465,
+   "perPoint_P10_P90": [
+    0.007759718412058043,
+    0.00933909108156395
+   ]
+  },
+  "runs.batter": {
+   "trueRelativeSD": 0.11310211118317222,
+   "trueRelativeSD_P10_P90": [
+    0.11591330220752374,
+    0.13377199522329197
+   ],
+   "perPoint": 0.014777728842960419,
+   "perPoint_P10_P90": [
+    0.01514503426501705,
+    0.017478420619311378
+   ]
+  },
+  "runs.bowler": {
+   "trueRelativeSD": 0.08720446443936218,
+   "trueRelativeSD_P10_P90": [
+    0.08684780328081339,
+    0.10577503374418903
+   ],
+   "perPoint": 0.01159164299338168,
+   "perPoint_P10_P90": [
+    0.011544233851589652,
+    0.01406013369450959
+   ]
+  }
+ },
  "note": "Correlations use halves of the whole calibration split (full members), not the validation period. Half-sample effects with at least 50 balls in each half; correlation = cross-half covariance / product of true SDs."
 }

@@ -6,6 +6,14 @@ import { RandomAddressSchema } from "./determinism.js";
 export const PROBABILITY_VERSION = "LC_INTEGER_PROBABILITY_V1" as const;
 export const EXP_LUT_VERSION = "LC_EXP_LUT_V1" as const;
 export const PROBABILITY_MODEL_ID = "synthetic-alpha-01" as const;
+/**
+ * Stage C (owner decision, 25 November 2026, option A): the research-only calibrated T20 model id. The in-memory
+ * request and context schemas accept either id; every persisted schema keeps the synthetic-alpha-01 literal, and no
+ * game set-up, career, save, UI or default can select this id (only validateT20ResearchMatchSetup can).
+ */
+export const CALIBRATED_T20_MODEL_ID = "calibrated-t20-01" as const;
+export const PROBABILITY_MODEL_IDS = [PROBABILITY_MODEL_ID, CALIBRATED_T20_MODEL_ID] as const;
+export type ProbabilityModelId = (typeof PROBABILITY_MODEL_IDS)[number];
 export const PROBABILITY_SCALE = 10000 as const;
 export const PROBABILITY_MASS = 4294967296 as const;
 
@@ -28,7 +36,7 @@ export const ProbabilityCategorySchema = z.strictObject({
 });
 export const ProbabilityContextSchema = z.strictObject({
   probabilityVersion: z.literal(PROBABILITY_VERSION),
-  modelId: z.literal(PROBABILITY_MODEL_ID),
+  modelId: z.enum(PROBABILITY_MODEL_IDS),
   modelHash: HashSchema,
   lutVersion: z.literal(EXP_LUT_VERSION),
   lutHash: HashSchema,

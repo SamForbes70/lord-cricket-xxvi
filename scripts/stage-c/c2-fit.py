@@ -139,6 +139,23 @@ def main():
         r = float(np.mean(covs) / (sdx * sdy)) if sdx > 0 and sdy > 0 else None
         corr[label] = {"crossHalfCovariance": float(np.mean(covs)), "trueSDs": [sdx, sdy], "correlation": r}
     out["crossOutcomeCorrelations"] = corr
+    # per-rating-point targets for the game: fit-period true SDs with a match-bootstrap P10 to P90, divided by the
+    # world-pack rating SD (batting 7.65 over keepers, batters and all-rounders; bowling 7.52 over bowling-capable
+    # players; C1 c1-prototype-fit.json). Ratings are not rescaled (owner decision 2).
+    fit_keep = keep.copy(); fit_keep[keep] = dates <= FIT_END
+    tf = c1.Table(rc, fit_keep)
+    point = c1.crossed_effects(tf, np.ones(len(tf.m)))
+    boot = c1.crossed_bootstrap(tf, reps=100)
+    world_sd = {"batter": 7.653551664473125, "bowler": 7.5230460849382705}
+    targets = {}
+    for name in c1.TARGETS:
+        for who in ("batter", "bowler"):
+            sd = point[name][who]["trueRelativeSD"]
+            lo, hi = boot.get(f"{name}.{who}.trueRelativeSD", [None, None])[:2]
+            targets[f"{name}.{who}"] = {"trueRelativeSD": sd, "trueRelativeSD_P10_P90": [lo, hi],
+                                        "perPoint": sd / world_sd[who],
+                                        "perPoint_P10_P90": [lo / world_sd[who] if lo is not None else None, hi / world_sd[who] if hi is not None else None]}
+    out["perPointTargets"] = targets
     out["note"] = ("Correlations use halves of the whole calibration split (full members), not the validation period. "
                    "Half-sample effects with at least 50 balls in each half; correlation = cross-half covariance / product of true SDs.")
     a.out.parent.mkdir(parents=True, exist_ok=True)

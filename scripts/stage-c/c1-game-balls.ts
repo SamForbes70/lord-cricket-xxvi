@@ -15,7 +15,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { suggestedEleven } from "@lcxxvi/data";
 import {
-  createT20CorpusRequest, createT20Session, executeT20Command, validateT20MatchSetup, type T20Session,
+  createT20CorpusRequest, createT20Session, executeT20Command, validateT20ResearchMatchSetup, validateT20MatchSetup, type T20Session,
 } from "@lcxxvi/simulation";
 import type { WorldPack } from "@lcxxvi/contracts";
 import { tacticalT20Step } from "../../apps/batch/src/tactical-match.js";
@@ -34,9 +34,16 @@ const manifest = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-0
 const base = JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json", "utf8"));
 const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "utf8")) as { cases: { seed: string; caseId: string }[] };
 const byId = new Map(world.players.map((p) => [p.playerId, p]));
-const out = process.argv[2];
-const repeats = Number(process.argv[3] ?? 10);
-const first = Number(process.argv[4] ?? 0);
+/** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
+const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
+if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
+const ARGS = process.argv.filter((a) => !a.startsWith("--model="));
+const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
+  ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
+  : validateT20MatchSetup(request, bytes, manifest);
+const out = ARGS[2];
+const repeats = Number(ARGS[3] ?? 10);
+const first = Number(ARGS[4] ?? 0);
 if (!out || !Number.isInteger(repeats) || repeats < 1 || !Number.isInteger(first) || first < 0) throw new Error("usage: c1-game-balls.ts <output.json> [repeats]");
 
 const cols: Record<string, (string | number | boolean)[]> = Object.fromEntries(
@@ -53,7 +60,7 @@ for (let r = first; r < first + repeats; r += 1) {
       ...suggestedEleven(world.teams.find((t) => t.teamId === s.teamId)!.squadIds.map((id) => byId.get(id)!), "T20"),
     }));
     for (const s of request.selectedTeams as unknown as { playerIds: string[] }[]) s.playerIds.forEach((id) => selected.add(id));
-    let session: T20Session = createT20Session(validateT20MatchSetup(request, bytes, manifest));
+    let session: T20Session = createT20Session(setupFor(request));
     for (let n = 0; session.core.phase !== "COMPLETE"; n += 1) {
       if (n > 3000) throw new Error("NO_PROGRESS");
       session = executeT20Command(session, tacticalT20Step(session)).session;
@@ -85,7 +92,7 @@ const players = [...selected].sort().map((id) => {
   };
 });
 writeFileSync(out, JSON.stringify({
-  version: "LC_STAGE_C_C1_GAME_BALLS_V1", model: "synthetic-alpha-01", repeats, firstRepeat: first,
+  version: "LC_STAGE_C_C1_GAME_BALLS_V1", model: MODEL, repeats, firstRepeat: first,
   setUp: "frozen 100-seed corpus, suggested elevens, tactical captain both sides; repeat r>0 seeds suffixed -c1r<r>",
   players, columns: cols,
 }));

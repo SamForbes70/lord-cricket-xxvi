@@ -1,116 +1,257 @@
-# Stage C slice C2: calibrated skill component (status: fit done, engine integration stopped for an owner decision)
+# Stage C slice C2: the calibrated skill component (`calibrated-t20-01`), research only
 
-**Status: research only, and partly blocked.** The fit of the skill parameters on the owner's reference cohort is done. Running the match engine under a second model id needs changes the owner's constraints forbid without a decision (section 3), so no registry, pack or engine code has been written. Nothing in the game has changed. The holdout has not been read.
+**Status:** built and validated as research. It is not selectable in the game: no screen, set-up, career, save, UI or default can reach it. `synthetic-alpha-01` is unchanged (section 6). Nothing is marked passed; the owner accepts tolerances and measurements.
 
-Base: branch `pavilion/stage-c-research` after C1 (`038cee9`), 25 November 2026. Owner decisions: `C1_SKILL_DIFFERENTIATION.md`, "Owner decisions, 25 November 2026".
+- Branch `pavilion/stage-c-research`, 25 November 2026.
+- Model id `calibrated-t20-01`, pack SHA-256 `773d32f8373e99d3db98c0480ef2aa21968c549f95357cac260782bcae51bca9`.
 
-## 1. Fit on the reference cohort
+**Owner decisions applied (25 November 2026):**
+- **Engine:** option A. Only the in-memory request and context schemas widen; there is a registry keyed by model id; the research set-up is reached only through an explicit function argument.
+- **Reference:** full-member men's T20 internationals.
+- **Ratings:** not rescaled.
+- **Variation:** carries a wicket against economy trade-off; stamina is for fatigue only.
+- **Dismissal skill:** only through the measured links.
+
+## 1. Gate results
+
+**Game set-up for every gate:**
+- 2,000 matches per model (frozen corpus seeds × 20 repeats);
+- suggested elevens, and captain V3 on both sides;
+- both models run on the same code.
+
+**Real reference:** full-member men's T20 internationals.
+- Calibration split: 1,001 matches. The pack was fitted to the fit period, up to 2023-08-31.
+- Holdout, read once: 131 matches.
+
+### 1a. Per-rating-point effects
+
+These are causal: every player's skills are set to 30 and then 70, and the log change per point is reported. They are oriented so that a correct effect is positive.
+
+| Effect | synthetic-alpha-01 | calibrated-t20-01 | Real range (fit period) | Verdict, calibrated |
+| --- | ---: | ---: | --- | --- |
+| Batter runs per ball | 0.013 | 0.017 | 0.015 to 0.017 | PASS |
+| Batter boundary | 0.019 | 0.026 | 0.024 to 0.029 | PASS |
+| Batter non-dot | 0.008 | 0.011 | 0.010 to 0.012 | PASS |
+| Batter dismissal (fewer) | 0.005 | 0.003 | 0.000 to 0.024 | PASS (weak) |
+| Bowler runs (fewer) | 0.002 | 0.013 | 0.012 to 0.014 | PASS |
+| Bowler boundary (fewer) | 0.002 | 0.020 | 0.020 to 0.026 | PASS |
+| Bowler non-dot (fewer) | 0.001 | 0.008 | 0.008 to 0.009 | PASS |
+| Bowler dismissal (more) | 0.001 | 0.006 | 0.000 to 0.020 | PASS |
+| Variation alone: dismissal / runs / boundary | 0 / 0 / 0 | +0.009 / +0.005 / +0.009 | trade-off required | PASS (more wickets, more runs) |
+
+The real range runs from the lower to the higher of the point estimate and its match-bootstrap P10 to P90 interval, divided by the world-pack rating SD. Values in `c2-fit.json`.
+
+### 1b. Criterion 1, raw: top / bottom quarter by the game's own rating
+
+| Statistic | synthetic | calibrated | Real full members, true skill (P10 to P90); bracket | Verdict: synthetic, calibrated |
+| --- | ---: | ---: | --- | --- |
+| Strike rate | 1.26 | 1.34 | 1.36 (1.37 to 1.44); 1.20 to 1.39 | UNCLEAR, UNCLEAR |
+| Average | 2.29 | 2.29 | none; 1.57 to 2.45 | UNCLEAR, UNCLEAR |
+| Dismissal rate | 0.55 | 0.59 | 0.56 (0.57 to 0.72); 0.46 to 0.65 | UNCLEAR, **PASS** |
+| Batting dot % | 0.85 | 0.84 | 0.72 (0.69 to 0.71); 0.70 to 0.79 | FAIL, FAIL |
+| Batting boundary % | 1.32 | 1.44 | 1.77 (1.78 to 1.95); 1.43 to 1.80 | FAIL, UNCLEAR |
+| Economy | 0.91 | 0.80 | 0.77 (0.73 to 0.77); 0.74 to 0.86 | FAIL, UNCLEAR |
+| Wicket rate | 0.55 | 0.61 | 1.24 (1.00 to 1.40); 1.20 to 1.91 | FAIL, **FAIL (inverted)** |
+| Bowling dot % | 0.93 | 1.00 | 1.42 (1.43 to 1.49); 1.27 to 1.45 | FAIL, **FAIL (inverted)** |
+| Boundary % conceded | 0.81 | 0.67 | 0.59 (0.55 to 0.60); 0.56 to 0.69 | FAIL, UNCLEAR |
+
+The two inversions remain because of deployment, not the model. The captain bowls the lowest-rated quarter only in overs 16 to 20 (C1 section 2). The causal per-point effects in 1a have the right sign.
+
+### 1c. Criterion 1, adjusted for phase and opponent
+
+| Effect, top-rated / bottom-rated quarter | synthetic | calibrated | Real full members (range) | Verdict: synthetic, calibrated |
+| --- | ---: | ---: | --- | --- |
+| Batter runs | 1.46 | 1.76 | 1.39 (1.39 to 1.45) | FAIL, FAIL (too steep) |
+| Batter boundary | 1.72 | 2.26 | 1.68 (1.68 to 1.82) | PASS, FAIL (too steep) |
+| Batter non-dot | 1.30 | 1.47 | 1.23 (1.23 to 1.27) | FAIL, FAIL (too steep) |
+| Batter dismissal | 0.79 | 0.81 | 0.69 (0.67 to 1.00) | PASS, PASS |
+| Bowler runs | 0.83 | 0.72 | 0.80 (0.77 to 0.80) | FAIL, FAIL (too steep) |
+| Bowler boundary | 0.76 | 0.61 | 0.66 (0.61 to 0.68) | FAIL, FAIL (just) |
+| Bowler non-dot | 0.89 | 0.80 | 0.86 (0.84 to 0.87) | FAIL, FAIL (too steep) |
+| Bowler dismissal | 1.09 | 1.14 | 1.22 (1.00 to 1.36) | PASS, PASS |
+
+No ratio is inverted. The calibrated model is now **too steep** where the synthetic one was too flat or close.
+- The two gates disagree because of the rating-to-skill mapping. The per-point targets use the world-pack rating SD over keepers, batters and all-rounders (7.65). But the players who face 100 balls in the game span a far wider rating range (batting quarter means 134 against 283 on the four-skill score), so equal per-point effects produce a steeper quarter ratio than real.
+- [Inference] Matching both gates needs a mapping fitted to the quarters of players who actually bat and bowl, which gives smaller per-point coefficients. That is the next iteration (section 5).
+
+### 1d. Specialisation (game / real within 0.85 to 1.15)
+
+| Ratio | Real full members | synthetic | calibrated |
+| --- | ---: | --- | --- |
+| Average, positions 1 to 7 / 8 to 11 | 2.25 | 1.82 (0.81) FAIL | 1.80 (0.80) FAIL |
+| Strike rate, positions 1 to 7 / 8 to 11 | 1.18 | 1.19 (1.01) PASS | 1.24 (1.05) PASS |
+| Economy, part-time / frontline | 1.08 | 1.12 (1.04) PASS | 1.22 (1.13) PASS |
+
+### 1e. Tactical validation rerun
+
+Script: `scripts/pavilion-tactical-validation.ts`. The good side's share of decided matches over 200 matches per experiment, with a 95% Wilson interval, and the paired run difference per innings with a 95% interval.
+
+| Experiment (poor side) | synthetic-alpha-01 | calibrated-t20-01 |
+| --- | --- | --- |
+| Weakest eleven | 57.4% (50.4 to 64.1); +3.3 runs (-0.4 to 7.1) | **68.0% (61.2 to 74.1); +9.5 runs (5.5 to 13.5)** |
+| Weakest bowler first | 48.7% (41.8 to 55.7); -0.1 (-3.8 to 3.6) | **56.3% (49.4 to 63.1); +4.0 (0.0 to 8.0)** |
+| Full length, maximum effort | 51.5% (44.6 to 58.4); +0.5 (-3.4 to 4.3) | 50.3% (43.4 to 57.1); +0.4 (-3.8 to 4.6) |
+| Two-slip field all innings | 55.4% (48.4 to 62.2); +3.0 (-0.8 to 6.9) | 53.5% (46.6 to 60.3); +2.4 (-2.1 to 6.8) |
+| Aggression 4 every ball | 52.5% (45.6 to 59.4); +3.9 (-0.5 to 8.2) | 58.3% (51.3 to 64.9); +4.7 (0.4 to 9.1) |
+| Aggression 0 every ball | 59.9% (52.9 to 66.5); +4.8 (1.7 to 7.8) | 59.6% (52.6 to 66.2); +3.9 (0.7 to 7.1) |
+| Old selection rule | 81.2% (75.2 to 86.1); +13.1 (9.4 to 16.9) | 83.2% (77.4 to 87.8); +14.7 (11.0 to 18.4) |
+| Batting order reversed | 72.0% (65.3 to 77.9); +7.6 (4.1 to 11.2) | 72.4% (65.8 to 78.2); +7.9 (4.0 to 11.7) |
+
+**Reading the rerun:**
+- Selection by skill now matters clearly.
+- Bowler choice now matters a little; its interval just reaches 50%.
+- Bowling plan and field still make no measurable difference. They are not part of the skill component.
+- Aggression is about where it was. The aggression trade-off is a separate Stage C target.
+- The synthetic column is a fresh run on current `main` (captain V3), so it differs slightly from `TACTICAL_VALIDATION.md` (captain V2).
+
+### 1f. First innings against the M7E targets (not tuned to)
+
+| | Runs | Wickets | Dot % | Boundary % | P10 / P50 / P90 runs |
+| --- | ---: | ---: | ---: | ---: | --- |
+| M7E holdout target | 150.6 | 7.24 | 39.3 | 14.0 | 83 / 151 / 212 |
+| synthetic-alpha-01 | 111.7 | 7.89 | 58.7 | 12.1 (within 2 points) | 78 / 112 / 144 |
+| calibrated-t20-01 | 106.2 | 8.02 | 60.1 | 11.4 | 70 / 107 / 140 |
+| Holdout, all (read once) | 147.6 | 7.07 | 41.1 | 14.7 | 78 / 149 / 211 |
+| Holdout, full members (read once) | 169.0 | 6.68 | 34.7 | 18.6 | 114 / 169 / 223 |
+
+Both models fail the M7E aggregate targets, as expected: the skill component does not address the dot-heavy delivery model (C1, P04 cause C3).
+- The calibrated model scores 5.5 runs fewer.
+- [Inference] The cause is centring. The new terms are centred on world-pack means, but the bowlers the suggested eleven picks are rated above those means. That is a centring choice to revisit, not a tuned total.
+
+### 1g. Holdout, read once, after the pack was frozen
+
+Full members only: 131 matches, so the intervals are wide. Game values are as above. File: `c2-holdout.json`.
+
+**Raw:**
+- PASS: economy (0.80 against 0.81) and boundary % conceded (0.67 against 0.64).
+- UNCLEAR: strike rate, average, dismissal rate and batting dot %.
+- FAIL: batting boundary % (1.44 against 1.90).
+- Inverted: wicket rate and bowling dot %, by deployment.
+
+**Adjusted:**
+- PASS: bowler boundary, batter dismissal and bowler dismissal.
+- FAIL, too steep: batter runs (1.76 against 1.47), batter boundary (2.26 against 1.85), batter non-dot, bowler runs (0.72 against 0.85) and bowler non-dot.
+
+**Specialisation:**
+- Average: 0.75, FAIL.
+- Strike rate: 0.98, PASS.
+- Economy: 1.14, PASS.
+
+**Dismissal on the holdout:** real dismissal-rate spread is not measurable (true SD 0), consistent with C2's finding that dismissal skill does not predict later matches.
+
+## 2. What was built
+
+**Contracts** (`packages/contracts/src/probability.ts`, `generator.ts`):
+- `CALIBRATED_T20_MODEL_ID` and `PROBABILITY_MODEL_IDS`.
+- `ProbabilityContextSchema.modelId` and `GenerateDeliveryRequestSchema.modelId` accept an explicit enum of the two ids.
+- The generator request gains an optional `bowling.variationRating`. Decision 3 needs a variation rating in the engine, and the request had none. It is required for the calibrated model and refused for `synthetic-alpha-01`.
+- Every persisted schema is unchanged: the set-up, match versions, replay case (`T20ReplayCaseSchema` keeps its literal), the probability pack and the saves.
+
+**Pack** (`packages/data/src/calibrated-t20-pack.ts`):
+- Additive skill terms on top of the unchanged `synthetic-alpha-01` packs, with pinned SHA-256, `RESEARCH_ONLY` and `gameplayIntegrationPermitted: false`.
+- Each term is a coefficient on `(rating - centre) x 200` bp, with the centre at the world-pack mean of the skill.
+
+| Stage, category | Terms (bp) |
+| --- | --- |
+| Contact MISS | control +3,000 |
+| Contact AERIAL, EDGE | variation +8,000 (wicket chances and boundaries: the trade-off) |
+| Runs 0 | control +6,000, rotation -2,000 |
+| Runs 4 and 6 | timing +2,000, power +2,000, control -8,000, movement -8,000, variation +3,000 |
+| Bowled, lbw | synthetic-alpha-01's control and defence terms cancelled exactly (decision 2) |
+
+**Registry and engine:**
+- Registry: `packages/simulation/src/model-registry.ts`. It verifies the pack hash at load.
+- Probability service: accepts registered id and hash pairs and echoes them.
+- Generator: adds the pack's terms only when the model has a skill pack.
+- T20 engine: reads the model from `setup.versions.model` and `versions.modelHash`.
+- Research entry point: `validateT20ResearchMatchSetup(request, worldBytes, manifest, "calibrated-t20-01")` is the only way in. `modelStatus` stays `SYNTHETIC_ALPHA`, because that set-up type is a persisted literal.
+- A calibrated session cannot be rehydrated: rehydration goes through `validateT20MatchSetup`.
+
+**Fit:**
+- `scripts/stage-c/c2-fit.py` gives the targets.
+- The coefficients were matched to the per-point targets over three dose-response iterations (`scripts/stage-c/c2-dose.sh`), fit period only.
+- The holdout was not read until section 1g.
+
+**Tests:** `tests/unit/stage-c-calibrated-model.test.ts`, 9 tests covering the registry, the pack, the generator guards, the research set-up, and calibrated determinism and difference.
+
+## 3. Schema mirrors that changed
+
+Regenerated with `node --import tsx scripts/generate-schemas.ts`. All five are in-memory request or context schemas:
+
+| File | Change |
+| --- | --- |
+| `GenerateDeliveryRequestSchema.json` | `modelId` const becomes an enum of the two ids; optional `bowling.variationRating` (integer 0 to 100) |
+| `ProbabilityContextSchema.json` | `modelId` const becomes the enum |
+| `NormaliseCategoriesRequestSchema.json` | same (extends the context) |
+| `SampleCategoryRequestSchema.json` | same (extends the context) |
+| `ProbabilityRequestSchema.json` | same, in both union members |
+
+- `packages/persistence` references none of them (`grep`, re-confirmed).
+- `apps/web/src/determinism.worker.ts` forwards in-memory probability requests only. The game sends only `synthetic-alpha-01`.
+- All five files are among the hashes recorded in the historical Pass 07A inventory (`tests/fixtures/t20/pass07a-inventory.json`), so they now differ from it.
+- That inventory's check (`npm run t20:inventory`) already exits 1 on `main` `4e29882`. `package-lock.json` drifts, and the check expects 98 schema files where `main` has 409. It is not in CI.
+- The inventory file itself is unchanged.
+
+## 4. Data and reproduction
 
 **Data:**
-- Reference: men's T20 internationals between two of the 12 full members (list in `c2-fit.json`).
-- Fit period: on or before 2023-08-31 (835 matches).
-- Validation period: 2023-09-01 to 2025-08-24 (166 matches), used to choose the pooling strength only.
-- The M7G holdout is not read.
-
-**Method:**
-- Multiplicative batter and bowler effects over a phase baseline, fitted on the fit period.
-- True between-player SDs by moments.
-- Empirical-Bayes shrinkage with the noise term scaled by a pooling factor. The factor is chosen per outcome on the validation period.
-- Script: `scripts/stage-c/c2-fit.py`. Output: `c2-fit.json`.
-
-| Outcome (per ball faced) | True relative SD, batter (players) | True relative SD, bowler (players) | Pooling chosen | Validation loss change against phase-only (95%) | Predicts later matches? |
-| --- | ---: | ---: | --- | --- | --- |
-| Striker dismissal | 0.174 (342) | 0.104 (383) | 2 (stronger) | log loss -0.00015 (-0.00032 to +0.00003) | **No**: the interval includes zero |
-| Boundary | 0.183 | 0.165 | 1 | log loss -0.0032 (-0.0044 to -0.0021) | Yes |
-| Not a dot | 0.076 | 0.059 | 1 | log loss -0.0030 (-0.0043 to -0.0019) | Yes |
-| Batter runs | 0.113 | 0.087 | 0.5 | squared error -0.026 (-0.035 to -0.018) | Yes |
-
-The pooling factor was chosen on the validation period, so these intervals are optimistic. The untouched test is the holdout, once, at the end of C2.
-
-**Correlations between a player's true effects.** Each correlation uses outcome A on one half of the matches and outcome B on the other, so the shared noise of a ball cancels. These are point estimates; no interval was computed.
-
-| Pair | Correlation | Reading |
-| --- | ---: | --- |
-| Bowler wicket effect and bowler runs conceded | +0.18 | Wicket-taking bowlers concede slightly more runs |
-| Bowler wicket effect and boundaries conceded | +0.38 | ...and clearly more boundaries: the trade-off the owner asked variation to carry (decision 3) |
-| Batter boundary effect and dismissal effect | +0.21 | Boundary hitters are dismissed somewhat more |
-| Batter runs effect and dismissal effect | +0.10 | Weak |
-
-**What the parameters would mean on the game's scale.** The world's ratings are not rescaled (decision 2). The world-pack rating SDs from C1 are 7.65 for batting and 7.52 for bowling, so the implied log effect per rating point is:
-- batter runs: about 0.015;
-- batter boundary: about 0.024;
-- bowler runs: about 0.012;
-- bowler boundary: about 0.022.
-
-For comparison, the game's measured slopes (C1 section 5) are 0.013, 0.019, 0.0015 and 0.0017.
-
-[Inference] On the full-member reference, the batting coefficients need only modest increases. The bowling path needs a direct route into run value and boundaries, about 8 to 13 times today's effect.
-
-## 2. Gates: what is measured so far
-
-| Gate | State |
-| --- | --- |
-| Player effects predict later matches, interval excludes zero | Boundary, not a dot and runs: met on validation. Dismissal: **not met** (reported separately, as decided). |
-| Criterion 1 on the full-member reference, raw and adjusted, never inverted | NOT RUN: needs the engine under the new model |
-| Per-point effects within the real range | NOT RUN: needs the engine |
-| Specialisation within 15% | NOT RUN: needs the engine |
-| Tactical validation rerun (weakest eleven, worst bowler first, bowling plan, aggression) | NOT RUN: needs the engine |
-| First-innings runs, wickets, dots and boundaries against the M7E targets | NOT RUN: needs the engine |
-| `synthetic-alpha-01` unchanged | Holds trivially: no game file is changed on this branch |
-
-## 3. Why the engine integration stopped, and the options
-
-**What the constraint says.** The owner's constraint: if running the engine with the new id needs any change to a validated set-up or schema, stop and report the options. It does.
-
-**Where the engine pins the model:**
-- **Set-up validation** pins the model hash:
-  - `packages/simulation/src/world-setup.ts` lines 183 to 184 and 358 to 359 (the request and the world manifest must carry `MODEL_PACK_SHA256`);
-  - the same file, lines 265 and 440 (the validated set-up is written with it);
-  - `packages/simulation/src/t20-match.ts` line 87 (session creation refuses any other hash).
-- **Contract schemas** pin the model id as a literal:
-  - `GenerateDeliveryRequestSchema.modelId` (`packages/contracts/src/generator.ts` line 39);
-  - `ProbabilityContextSchema.modelId` (`packages/contracts/src/probability.ts` line 31);
-  - the pack schema's `manifest.modelId` (line 70);
-  - `T20ReplayCaseSchema.modelId` (`packages/contracts/src/t20-match.ts` line 46).
-- **The generator** also builds its request with the `synthetic-alpha-01` constants (`t20-match.ts` line 199).
-
-**Options:**
-
-| Option | What changes | Persisted formats | Effect on existing checks | Honesty of records |
-| --- | --- | --- | --- | --- |
-| A. Widen the two request schemas | The request schemas accept `synthetic-alpha-01` or `calibrated-t20-01`. A registry keyed by model id. Set-up validation accepts a registered hash only through a research-only function argument, never the request. | None: the request schemas are not persisted, and `T20ReplayCaseSchema` and the set-up schema are unchanged | Generated JSON schema mirrors change, so `schemas:check` needs regeneration. Every fixture, vector and replay stays byte for byte (to be proven). | Each session records its true model hash |
-| B. Additive version 2 contracts | New `GenerateDeliveryRequestV2`, probability context V2 and generator `LC_CONDITIONAL_DELIVERY_V2` for the new model only. The V1 schemas stay literal. | None | Adds schemas, so the pinned schema counts in `tests/unit/contracts.test.ts` and `scoring-fixtures.test.ts` change (an existing test edit) | As A |
-| C. Research generator hook | An optional in-memory generator argument to the T20 engine, used only by research scripts. No schema change. | None | Existing checks untouched | **Poor:** events would be produced by one model under a set-up that names another. Never persistable. |
-| D. Separate research match simulator | A headless simulator outside the engine (as M7G did) using the new pack and the existing captains through their public views | None | None | Honest, but the field, plan and rule fidelity of the real engine is lost, so the tactical-validation rerun would be weaker evidence |
-
-**Recommendation: A** [Inference]. It is the smallest change that keeps every record truthful. The persisted surfaces stay closed: `T20ReplayCaseSchema` keeps its literal and the set-up schema is unchanged. The new model can only be reached by a research function argument, never by a game set-up. Its cost is a regenerated schema mirror for two in-memory request contracts. B is the fallback if the owner prefers no existing schema to change at all.
-
-## 4. Next steps once an option is chosen
-
-1. The registry and a pinned `calibrated-t20-01` pack built from `c2-fit.json`:
-   - per-outcome batter and bowler terms;
-   - variation on the wicket and boundary trade-off;
-   - stamina left for fatigue;
-   - a bowler term on run value.
-
-   Unit tests for both.
-2. Proof that `synthetic-alpha-01` is unchanged: the full `npm test`, `schemas:check` (option B) or its reviewed regeneration (option A), `fixtures:engine`, `vectors:check`, `probability:check` and `generator:check`.
-3. Season soak and gates on the full-member reference, the tactical-validation rerun with intervals, and the aggregates against the M7E targets.
-4. The holdout once, for the final report.
-
-## 5. Reproduce
+- Cricsheet `t20s_json.zip`, archive SHA-256 `956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e`, licence SHA-256 `11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b`.
+- Raw files are outside the repository.
 
 ```bash
 python3 -I scripts/stage-c/c2-fit.py --real /home/user/lcx-data/c1-real-calibration-balls.json --out docs/pavilion/stage-c/c2-fit.json
+node --import tsx scripts/stage-c/c2-pin-pack.ts            # prints the pinned pack hash
+bash scripts/stage-c/c2-dose.sh /home/user/lcx-data/c2-dose-calibrated calibrated-t20-01
+bash scripts/stage-c/c2-dose.sh /home/user/lcx-data/c2-dose-synthetic synthetic-alpha-01
+for k in 0 1 2 3; do node --import tsx scripts/stage-c/c1-game-balls.ts /home/user/lcx-data/c2-game-balls-$k.json 5 $((k*5)) --model=calibrated-t20-01 & done; wait
+node --import tsx scripts/pavilion-tactical-validation.ts <out.json> <experiment> --model=calibrated-t20-01   # per experiment, both models
+python3 -I scripts/stage-c/c1-analyse.py --real /home/user/lcx-data/c1-real-calibration-balls.json --game /home/user/lcx-data/c2-game-balls-{0,1,2,3}.json --out docs/pavilion/stage-c/c2-skill-differentiation.json
+python3 -I scripts/stage-c/c2-report.py --synthetic docs/pavilion/stage-c/c1-skill-differentiation.json --calibrated docs/pavilion/stage-c/c2-skill-differentiation.json \
+  --dose-synthetic <synthetic per-point.json> --dose-calibrated <calibrated per-point.json> --fit docs/pavilion/stage-c/c2-fit.json \
+  --tactical <tactical dir> --balls-synthetic <c1 game balls> --balls-calibrated <c2 game balls> --out docs/pavilion/stage-c/c2-report.json
+# holdout, once:
+python3 -I scripts/stage-c/c1-real-extract.py ... --split holdout --balls /home/user/lcx-data/c2-holdout-balls.json
+python3 -I scripts/stage-c/c1-analyse.py --real /home/user/lcx-data/c2-holdout-balls.json --game <c2 game balls> --out /home/user/lcx-data/c2-holdout-analysis.json
+python3 -I scripts/stage-c/c2-holdout.py --analysis ... --holdout-balls ... --report docs/pavilion/stage-c/c2-report.json --out docs/pavilion/stage-c/c2-holdout.json
 ```
 
-The input comes from C1's `c1-real-extract.py` (C1 section 8). Archive SHA-256 `956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e`; licence SHA-256 `11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b`.
+**Outputs:** `c2-fit.json`, `c2-skill-differentiation.json`, `c2-report.json` and `c2-holdout.json`, each with ODC-By attribution and the SHA-256 values.
+- `c1-skill-differentiation.json` was regenerated with one addition, the full-member adjusted bootstrap. Every other value is unchanged (checked by comparison).
+- The new `--model=` flag (default `synthetic-alpha-01`) was added to `c1-game-balls.ts`, `c1-game-dose-response.ts` and `scripts/pavilion-tactical-validation.ts`. Their outputs without the flag are unchanged.
 
-**Attribution.** Contains information from Cricsheet (https://cricsheet.org/), made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/. Only derived aggregates are in this repository.
+**Attribution.** Contains information from Cricsheet (https://cricsheet.org/), made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/.
 
-## 6. Questions for the owner
+## 5. Findings and next steps
 
-1. Which option in section 3 (A recommended, B as the fallback, or C or D)?
-2. Dismissal skill does not predict later full-member matches even with stronger pooling. Should the new model:
-   - give batters and bowlers a small dismissal term at the fitted SD, accepting that it is not yet shown out of sample; or
-   - let dismissal differences come only through the correlations above (boundary hitters, wicket-taking bowlers)?
+1. **The skill component works where it was aimed.**
+   - Causal per-point effects are inside the real range for all eight effects.
+   - The variation trade-off is present.
+   - Skill-driven selection now decides matches (weakest eleven 68%, against 57% before).
+   - Bowler choice now registers.
+2. **It overshoots on the quarter-ratio test (1c).**
+   - Next step: fit the rating-to-skill mapping to the rated spread of the players who actually bat and bowl, rather than the world-pack SD, on the fit period. Then re-check 1a and 1c together.
+   - [Inference] That would roughly halve the batting coefficients.
+3. **Raw wicket-rate and bowling-dot inversions** come from the captain's deployment. The fix is in the captain's bowling plan, not the model.
+4. **Batting dot %, average by position, and all aggregates** are outside the skill component. They belong to the delivery-model work (P04 cause C3) and the aggression trade-off.
+
+## 6. Proof that synthetic-alpha-01 is unchanged
+
+The working tree was verified before the commit, on base `e144b76`, with `NODE_OPTIONS=--max-old-space-size=4096`. All exit 0:
+- `npx tsc -b`
+- `npm run lint`
+- `npm run schemas:check`
+- `npx vite build --config apps/web/vite.config.ts`
+- `npm run fixtures:audit`
+- `npm run fixtures:engine`
+- `npm run vectors:check`
+- `npm run probability:check`
+- `npm run generator:check`
+- `npm run red5:fixtures`
+- `npm run offscreen:fixtures`
+- `npm run projection:fixtures`
+- `npm run season:persistence:fixtures`
+- `npm test`: 123 test files, 1,031 tests passed
+
+**Files that must not change:** `git status` shows no change to any fixture, golden vector, replay, checksum file, world pack, `probability-pack.ts`, `delivery-pack.ts` or persistence code.
+
+**NOT RUN:** `npm run verify:07b` (it rewrites tracked evidence files and needs browsers) and the browser suites.

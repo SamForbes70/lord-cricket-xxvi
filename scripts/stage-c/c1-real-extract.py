@@ -62,6 +62,8 @@ def main():
     ap.add_argument("--manifest", type=Path, required=True)
     ap.add_argument("--splits", type=Path, required=True)
     ap.add_argument("--balls", type=Path, required=True)
+    ap.add_argument("--split", choices=("calibration", "holdout"), default="calibration",
+                    help="which split's deliveries to write (Stage C: the holdout is read once, for the C2 final report)")
     a = ap.parse_args()
     manifest = json.loads(a.manifest.read_text())
     archive_sha = sha256_file(a.archive)
@@ -97,8 +99,8 @@ def main():
         date = info["dates"][0]
         s = split_of(date)
         splits[s].append({"matchId": mid, "date": date})
-        if s != "calibration":
-            continue  # holdout and other matches are never read beyond their id and date
+        if s != a.split:
+            continue  # other splits are never read beyond their id and date
         full = all(t in FULL_MEMBERS for t in info.get("teams", []))
         reg = info.get("registry", {}).get("people", {})
         pid = lambda n: reg.get(n, "name:" + n)
@@ -154,11 +156,12 @@ def main():
         "dateRange": {k: [v[0]["date"], v[-1]["date"]] if v else None for k, v in splits.items()},
         "matchIds": {k: [m["matchId"] for m in v] for k, v in splits.items()},
     }
-    a.splits.parent.mkdir(parents=True, exist_ok=True)
-    a.splits.write_text(json.dumps(out, indent=1) + "\n")
-    a.balls.write_text(json.dumps({"attribution": attribution, "split": "calibration", "columns": cols}))
+    if a.split == "calibration":  # the split manifest is written once, by the calibration run
+        a.splits.parent.mkdir(parents=True, exist_ok=True)
+        a.splits.write_text(json.dumps(out, indent=1) + "\n")
+    a.balls.write_text(json.dumps({"attribution": attribution, "split": a.split, "columns": cols}))
     print(json.dumps({"counts": out["counts"], "dateRange": out["dateRange"], "excluded": excluded,
-                      "calibrationDeliveries": len(cols["match"])}))
+                      "split": a.split, "deliveries": len(cols["match"])}))
 
 
 if __name__ == "__main__":

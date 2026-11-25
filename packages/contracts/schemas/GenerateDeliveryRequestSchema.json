@@ -28,7 +28,10 @@
     },
     "modelId": {
       "type": "string",
-      "const": "synthetic-alpha-01"
+      "enum": [
+        "synthetic-alpha-01",
+        "calibrated-t20-01"
+      ]
     },
     "modelHash": {
       "type": "string",
@@ -307,6 +310,11 @@
         "variationId": {
           "type": "string",
           "const": "stock"
+        },
+        "variationRating": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
         }
       },
       "required": [

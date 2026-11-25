@@ -9,12 +9,13 @@
  * longer depend on skill, so differences between conditions are the model's own response to the rating.
  *
  *   node --import tsx scripts/stage-c/c1-game-dose-response.ts <output.json> [condition ...]
- * Conditions: bat30 bat50 bat70 bowl30 bowl70 (bat50 is also bowl50). Deterministic.
+ * Conditions: bat30 bat50 bat70 bowl30 bowl70 var30 var70 (bat50 is also bowl50). Add --model=calibrated-t20-01 for
+ * the Stage C research model. Deterministic.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { suggestedEleven } from "@lcxxvi/data";
 import {
-  createT20CorpusRequest, createT20Session, executeT20Command, validateT20MatchSetup, type T20Session,
+  createT20CorpusRequest, createT20Session, executeT20Command, validateT20ResearchMatchSetup, validateT20MatchSetup, type T20Session,
 } from "@lcxxvi/simulation";
 import type { WorldPack } from "@lcxxvi/contracts";
 import { tacticalT20Step } from "../../apps/batch/src/tactical-match.js";
@@ -26,20 +27,30 @@ const manifest = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-0
 const base = JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json", "utf8"));
 const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "utf8")) as { cases: unknown[] };
 const byId = new Map(world.players.map((p) => [p.playerId, p]));
+/** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
+const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
+if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
+const ARGS = process.argv.filter((a) => !a.startsWith("--model="));
+const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
+  ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
+  : validateT20MatchSetup(request, bytes, manifest);
 const BAT = ["timing", "power", "defence", "rotation", "vsPace", "vsSpin"] as const;
 const BOWL = ["control", "movement", "variation"] as const;
-const CONDITIONS: Record<string, { bat: number; bowl: number }> = {
+const CONDITIONS: Record<string, { bat: number; bowl: number; variation?: number }> = {
   bat30: { bat: 30, bowl: 50 }, bat50: { bat: 50, bowl: 50 }, bat70: { bat: 70, bowl: 50 },
   bowl30: { bat: 50, bowl: 30 }, bowl70: { bat: 50, bowl: 70 },
+  // Stage C: variation alone (control and movement held at 50), for the wicket-taking against economy trade-off.
+  var30: { bat: 50, bowl: 50, variation: 30 }, var70: { bat: 50, bowl: 50, variation: 70 },
 };
 
-function setSkills(node: unknown, level: { bat: number; bowl: number }): void {
+function setSkills(node: unknown, level: { bat: number; bowl: number; variation?: number }): void {
   if (!node || typeof node !== "object") return;
   const o = node as Record<string, unknown>;
   const skills = o.skills as Record<string, Record<string, number>> | undefined;
   if (skills && skills.T20 && typeof skills.T20.timing === "number") {
     for (const k of BAT) skills.T20[k] = level.bat;
     for (const k of BOWL) skills.T20[k] = level.bowl;
+    if (level.variation !== undefined) skills.T20.variation = level.variation;
   }
   for (const v of Object.values(o)) setSkills(v, level);
 }
@@ -55,7 +66,7 @@ function run(name: string) {
     }));
     // The engine accepts only a verified, frozen set-up, so the session is created from the real one and its set-up
     // reference is then replaced by an edited copy, in memory only, for this experiment.
-    const created = createT20Session(validateT20MatchSetup(request, bytes, manifest));
+    const created = createT20Session(setupFor(request));
     const setup = JSON.parse(JSON.stringify(created.setup));
     setSkills(setup, level);
     let session: T20Session = { ...created, setup };
@@ -84,11 +95,11 @@ function run(name: string) {
   return r;
 }
 
-const out = process.argv[2];
+const out = ARGS[2];
 if (!out) throw new Error("usage: c1-game-dose-response.ts <output.json> [condition ...]");
-const chosen = process.argv.slice(3).length ? process.argv.slice(3) : Object.keys(CONDITIONS);
+const chosen = ARGS.slice(3).length ? ARGS.slice(3) : Object.keys(CONDITIONS);
 writeFileSync(out, JSON.stringify({
-  version: "LC_STAGE_C_C1_DOSE_RESPONSE_V1", model: "synthetic-alpha-01",
+  version: "LC_STAGE_C_C1_DOSE_RESPONSE_V1", model: MODEL,
   setUp: "frozen 100-seed corpus, suggested elevens, tactical captain both sides, every player's batting or bowling skills set to one level in an in-memory set-up copy",
   results: chosen.map(run),
 }, null, 1) + "\n");

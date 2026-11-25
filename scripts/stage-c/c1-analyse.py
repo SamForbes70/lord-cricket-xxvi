@@ -511,7 +511,7 @@ def main():
         point["deliveries"] = int(len(t.m))
         point["perSeason"] = season_block(t, w, t.year)
         point["crossedEffects"] = crossed_effects(t, w)
-        if name == "all":
+        if name in ("all", "fullMembersOnly"):  # full members: the owner's skill reference (25 November 2026)
             point["crossedEffectsBootstrap"] = crossed_bootstrap(t, reps=max(50, a.boot // 4))
         point["bootstrap"] = bootstrap(t, {k: v for k, v in point.items() if k in ("batting", "bowling", "splitHalf", "specialisation")}, reps=a.boot if name == "all" else max(100, a.boot // 4))
         result["real"][name] = point
