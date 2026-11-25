@@ -5,7 +5,6 @@ import {
   type CareerMatchDigest,
   CompletedSeasonRecordCoreSchema,
   CompletedSeasonRecordSchema,
-  LIFECYCLE_SEASON_STATE_VERSION,
   MAX_PERSISTENT_WORLD_EVENT_ARCHIVES_TOTAL_BYTES,
   MAX_PERSISTENT_SEASONS,
   PERSISTENT_WORLD_PRESENTATION_SAVE_SCHEMA_VERSION,
@@ -32,6 +31,16 @@ import {
   type PersistentWorldStateV5,
   type PersistentWorldStateV5Core,
   type PersistentWorldStateV5Stored,
+  PERSISTENT_WORLD_STATE_V6_VERSION,
+  PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION,
+  PersistentWorldStateV6CoreSchema,
+  PersistentWorldStateV6Schema,
+  PersistentWorldStateV6StoredSchema,
+  type PersistentWorldStateV6,
+  type PersistentWorldStateV6Core,
+  type PersistentWorldStateV6Stored,
+  isLifecycleSeasonState,
   PersistentCareerProjectionCoreSchema,
   PersistentCareerProjectionSchema,
   PersistentWorldSaveSummarySchema,
@@ -102,7 +111,8 @@ export type AnyPersistentWorldState =
   | PersistentWorldStateV2
   | PersistentWorldStateV3
   | PersistentWorldStateV4
-  | PersistentWorldStateV5;
+  | PersistentWorldStateV5
+  | PersistentWorldStateV6;
 
 type PersistentWorldSchemaVersion =
   | typeof PERSISTENT_WORLD_SAVE_SCHEMA_VERSION
@@ -114,7 +124,9 @@ type PersistentWorldSchemaVersion =
   | typeof PERSISTENT_WORLD_SAVE_V4_SCHEMA_VERSION
   | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION
   | typeof PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION
-  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION;
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION
+  | typeof PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION;
 
 const ALLOWED_PERSISTENT_WORLD_SCHEMAS: readonly PersistentWorldSchemaVersion[] = [
   PERSISTENT_WORLD_SAVE_SCHEMA_VERSION,
@@ -127,6 +139,8 @@ const ALLOWED_PERSISTENT_WORLD_SCHEMAS: readonly PersistentWorldSchemaVersion[] 
   PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION,
   PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION,
   PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION,
+  PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION,
+  PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION,
 ];
 
 function isPresentationPersistentSchema(schemaVersion: string): boolean {
@@ -135,11 +149,18 @@ function isPresentationPersistentSchema(schemaVersion: string): boolean {
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V2_SCHEMA_VERSION ||
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V3_SCHEMA_VERSION ||
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V4_SCHEMA_VERSION ||
-    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION
   );
 }
 
-function persistentSchemaTier(schemaVersion: string): 1 | 2 | 3 | 4 | 5 {
+function persistentSchemaTier(schemaVersion: string): 1 | 2 | 3 | 4 | 5 | 6 {
+  if (
+    schemaVersion === PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION ||
+    schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION
+  ) {
+    return 6;
+  }
   if (
     schemaVersion === PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION ||
     schemaVersion === PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION
@@ -258,7 +279,7 @@ function assertPersistent(condition: unknown, code: string): asserts condition {
 }
 
 function seasonStartDateOf(state: ActivePersistentSeasonState): string {
-  return state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION
+  return isLifecycleSeasonState(state)
     ? state.schedule.request.startDate
     : state.schedule.startDate;
 }
@@ -596,14 +617,15 @@ const VERIFIED_LEDGER_ENTRY_OBJECTS = new WeakMap<object, string>();
 const VERIFIED_ROSTER_PACK_OBJECTS = new WeakMap<object, { packSha: string; worldJson: string }>();
 
 async function validateSharedLifecycleWorldInvariants(
-  state: PersistentWorldStateV2 | PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5,
+  state: PersistentWorldStateV2 | PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 | PersistentWorldStateV6,
 ): Promise<void> {
   const cachedLifecycleSha = VERIFIED_LIFECYCLE_OBJECTS.get(state.lifecycle as object);
   const lifecycle =
     cachedLifecycleSha === state.lifecycle.lifecycleSha256
       ? state.lifecycle
       : state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION ||
-          state.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION
+          state.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION ||
+          state.worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION
         ? PlayerLifecycleStateV2Schema.parse(state.lifecycle)
         : PlayerLifecycleStateSchema.parse(state.lifecycle);
   if (cachedLifecycleSha !== lifecycle.lifecycleSha256) {
@@ -633,7 +655,7 @@ async function validateSharedLifecycleWorldInvariants(
       currentSeason.controlledTeamId === state.controlledTeamId,
     "CURRENT_SEASON_CAREER_BINDING_MISMATCH",
   );
-  if (currentSeason.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+  if (isLifecycleSeasonState(currentSeason)) {
     assertPersistent(Boolean(lifecycle.activeRosterPack), "LIFECYCLE_ROSTER_PACK_REQUIRED");
     const packObj = lifecycle.activeRosterPack as object;
     let cachedPack = VERIFIED_ROSTER_PACK_OBJECTS.get(packObj);
@@ -820,7 +842,7 @@ function persistentStateV3Core(state: PersistentWorldStateV3): PersistentWorldSt
 }
 
 async function validatePersistentEconomyInvariants(
-  state: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5,
+  state: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 | PersistentWorldStateV6,
 ): Promise<void> {
   const cachedEconomySha = VERIFIED_ECONOMY_OBJECTS.get(state.economy as object);
   const economy =
@@ -962,7 +984,9 @@ const PersistentWorldStateV5WithoutSeasonsSchema = PersistentWorldStateV5Schema.
  * (docs/design/WORLD_STATE_V5_SEASON_REFS.md). Each record is bound by that hash, which
  * `validateCompletedSeasonRecord` checks in full.
  */
-function persistentWorldStateV5HashText(core: Omit<PersistentWorldStateV5, "stateSha256">): string {
+function persistentWorldStateV5HashText(
+  core: Omit<PersistentWorldStateV5, "stateSha256"> | Omit<PersistentWorldStateV6, "stateSha256">,
+): string {
   return canonicalJson({ ...core, completedSeasons: core.completedSeasons.map((record) => record.recordSha256) });
 }
 
@@ -1030,6 +1054,61 @@ export function persistentWorldStateV5StoredForm(state: PersistentWorldStateV5):
   };
 }
 
+const VERIFIED_STATE_V6_OBJECTS = new WeakSet<object>();
+const PersistentWorldStateV6CoreWithoutSeasonsSchema = PersistentWorldStateV6CoreSchema.omit({ completedSeasons: true });
+const PersistentWorldStateV6WithoutSeasonsSchema = PersistentWorldStateV6Schema.omit({ completedSeasons: true });
+
+/**
+ * World state V6 (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md): V5 with a season state V2 as its current season. Hashed,
+ * stored and checked exactly as V5 (finished seasons by reference); only the current season's version differs.
+ */
+export async function sealPersistentWorldStateV6(
+  raw: PersistentWorldStateV6Core,
+): Promise<PersistentWorldStateV6> {
+  const { completedSeasons: rawSeasons, ...rest } = raw;
+  const core: PersistentWorldStateV6Core = {
+    ...PersistentWorldStateV6CoreWithoutSeasonsSchema.parse(rest),
+    completedSeasons: await verifiedCompletedSeasons(rawSeasons),
+  };
+  const stateSha256 = await seasonSha256Text(persistentWorldStateV5HashText(core));
+  const state: PersistentWorldStateV6 = { ...core, stateSha256 };
+  await validatePersistentEconomyInvariants(state);
+  await validateSharedLifecycleWorldInvariants(state);
+  VERIFIED_STATE_V6_OBJECTS.add(state);
+  return state;
+}
+
+export async function validatePersistentWorldStateV6(raw: unknown): Promise<PersistentWorldStateV6> {
+  if (typeof raw === "object" && raw !== null && VERIFIED_STATE_V6_OBJECTS.has(raw)) {
+    return raw as PersistentWorldStateV6;
+  }
+  assertPersistent(typeof raw === "object" && raw !== null, "STATE_V6_INVALID");
+  const { completedSeasons: rawSeasons, ...rest } = raw as Record<string, unknown>;
+  const { stateSha256, ...withoutHash } = PersistentWorldStateV6WithoutSeasonsSchema.parse(rest);
+  const core: PersistentWorldStateV6Core = {
+    ...withoutHash,
+    completedSeasons: await verifiedCompletedSeasons(rawSeasons),
+  };
+  const expectedHash = await seasonSha256Text(persistentWorldStateV5HashText(core));
+  assertPersistent(stateSha256 === expectedHash, "STATE_V6_HASH_MISMATCH");
+  const state: PersistentWorldStateV6 = { ...core, stateSha256 };
+  await validatePersistentEconomyInvariants(state);
+  await validateSharedLifecycleWorldInvariants(state);
+  VERIFIED_STATE_V6_OBJECTS.add(state);
+  return state;
+}
+
+/** A V6 state as its checkpoint stores it: finished seasons as references, as for V5. */
+export function persistentWorldStateV6StoredForm(state: PersistentWorldStateV6): PersistentWorldStateV6Stored {
+  return {
+    ...state,
+    completedSeasons: state.completedSeasons.map((record) => ({
+      seasonId: record.seasonId,
+      recordSha256: record.recordSha256,
+    })),
+  };
+}
+
 /**
  * Reads a stored world checkpoint. A V5 checkpoint's finished seasons are rebuilt from the save's
  * COMPLETED_SEASON_RECORD_V1 rows: each row must match its stored hash and the reference's record hash, or the
@@ -1040,10 +1119,11 @@ async function decodePersistentWorldCheckpoint(
   seasonRecordRows: readonly ProjectionRecord[],
 ): Promise<AnyPersistentWorldState> {
   const raw = JSON.parse(payload) as { worldStateVersion?: unknown };
-  if (raw?.worldStateVersion !== PERSISTENT_WORLD_STATE_V5_VERSION) {
+  const isV6 = raw?.worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION;
+  if (raw?.worldStateVersion !== PERSISTENT_WORLD_STATE_V5_VERSION && !isV6) {
     return validateAnyPersistentWorldState(raw);
   }
-  const stored = PersistentWorldStateV5StoredSchema.parse(raw);
+  const stored = isV6 ? PersistentWorldStateV6StoredSchema.parse(raw) : PersistentWorldStateV5StoredSchema.parse(raw);
   const rowsBySeason = new Map(seasonRecordRows.map((row) => [row.key, row] as const));
   const completedSeasons: CompletedSeasonRecord[] = [];
   for (const reference of stored.completedSeasons) {
@@ -1054,7 +1134,9 @@ async function decodePersistentWorldCheckpoint(
     assertPersistent(seasonRecord.recordSha256 === reference.recordSha256, "COMPLETED_SEASON_ROW_MISMATCH");
     completedSeasons.push(seasonRecord);
   }
-  return validatePersistentWorldStateV5({ ...stored, completedSeasons });
+  return isV6
+    ? validatePersistentWorldStateV6({ ...stored, completedSeasons })
+    : validatePersistentWorldStateV5({ ...stored, completedSeasons });
 }
 
 export async function validateAnyPersistentWorldState(
@@ -1064,6 +1146,9 @@ export async function validateAnyPersistentWorldState(
     typeof raw === "object" && raw !== null
       ? (raw as { worldStateVersion?: unknown }).worldStateVersion
       : undefined;
+  if (version === PERSISTENT_WORLD_STATE_V6_VERSION) {
+    return validatePersistentWorldStateV6(raw);
+  }
   if (version === PERSISTENT_WORLD_STATE_V5_VERSION) {
     return validatePersistentWorldStateV5(raw);
   }
@@ -1244,7 +1329,7 @@ async function archiveRowText(row: ProjectionRecord): Promise<string> {
 
 /** COMPLETED_SEASON_RECORD_V1 rows, read only for a V5 save, whose checkpoints store finished seasons by reference. */
 function seasonRecordRowsFor(tx: IDBTransaction, saveId: string, schemaVersion: string): Promise<ProjectionRecord[]> {
-  return persistentSchemaTier(schemaVersion) === 5
+  return persistentSchemaTier(schemaVersion) >= 5
     ? projectionRowsForScope(tx.objectStore("projections"), saveId, COMPLETED_SEASON_RECORD_SCOPE)
     : Promise.resolve([]);
 }
@@ -1386,16 +1471,22 @@ export class IndexedDbPersistentWorldRepository {
     const isStateV4 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION;
     const isStateV3 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION;
     const isStateV5 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION;
-    /** Lifecycle V2 (two embedded roster packs): world states V4 and V5. */
-    const boundedPacks = isStateV4 || isStateV5;
-    const stateTier: 1 | 2 | 3 | 4 | 5 = isStateV5 ? 5 : isStateV4 ? 4 : isStateV3 ? 3 : isStateV2 ? 2 : 1;
+    const isStateV6 = state.worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION;
+    /** Lifecycle V2 (two embedded roster packs): world states V4, V5 and V6. */
+    const boundedPacks = isStateV4 || isStateV5 || isStateV6;
+    const stateTier: 1 | 2 | 3 | 4 | 5 | 6 =
+      isStateV6 ? 6 : isStateV5 ? 5 : isStateV4 ? 4 : isStateV3 ? 3 : isStateV2 ? 2 : 1;
     const command = input.command ? SeasonDurableCommandSchema.parse(input.command) : null;
     assertPersistent(
       input.updatedAt.length > 0 && !Number.isNaN(Date.parse(input.updatedAt)),
       "UPDATED_AT_INVALID",
     );
     // A V5 checkpoint stores finished seasons as references; their records are the rows written below.
-    const payload = isStateV5 ? canonicalJson(persistentWorldStateV5StoredForm(state)) : canonicalJson(state);
+    const payload = state.worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION
+      ? canonicalJson(persistentWorldStateV6StoredForm(state))
+      : state.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION
+        ? canonicalJson(persistentWorldStateV5StoredForm(state))
+        : canonicalJson(state);
     const snapshotHash = await seasonSha256Text(payload);
     const activeProjectionPayload = canonicalJson(state.currentSeason.projection);
     const activeProjectionHash = await seasonSha256Text(activeProjectionPayload);
@@ -1741,7 +1832,11 @@ export class IndexedDbPersistentWorldRepository {
       }
     }
 
-    const nextSchemaVersion: PersistentWorldSchemaVersion = isStateV5
+    const nextSchemaVersion: PersistentWorldSchemaVersion = isStateV6
+      ? copyHash
+        ? PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION
+        : PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION
+      : isStateV5
       ? copyHash
         ? PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION
         : PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION

@@ -48,7 +48,8 @@ export function seasonXIV2BowlingScore(candidate: SeasonXIV2Candidate): number {
 /**
  * `LC_SEASON_XI_BASELINE_V2`. Unavailable players are left out. Of the rest: the keeper with the best batting; the four
  * best bowling-capable players by bowling; the six best remaining by batting; then, while the side has fewer than six
- * bowling-capable players, the weakest batter who cannot bowl gives way to the best remaining bowler. The batting order
+ * bowling-capable players, the weakest batter who cannot bowl gives way to the remaining bowling-capable player who
+ * adds most in batting and bowling together (3 x batting + 4 x bowling, so all-rounders are preferred). The batting order
  * is batting value, best first, so specialist batters open. Ties: lower fatigue, then playerId by code point. The
  * keeper captains, as in `suggestedEleven`.
  */

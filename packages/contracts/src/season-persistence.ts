@@ -30,6 +30,28 @@ export const T20SeasonStateSchema = z.strictObject({
   stateSha256: HashSchema,
 });
 
+/**
+ * Season state V2 (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md): the same shape as V1. The version itself means its
+ * computer-run fixtures use career fixture policy V2 (`LC_SEASON_XI_BASELINE_V2` and `LC_FIXTURE_CAPTAIN_V2`).
+ * Only world state V6 accepts it; V1 seasons keep policy V1 for ever.
+ */
+export const T20_SEASON_STATE_V2_VERSION = "LC_T20_SEASON_STATE_V2" as const;
+export const T20SeasonStateV2CoreSchema = T20SeasonStateCoreSchema.extend({
+  seasonStateVersion: z.literal(T20_SEASON_STATE_V2_VERSION),
+});
+export const T20SeasonStateV2Schema = z.strictObject({
+  ...T20SeasonStateV2CoreSchema.shape,
+  stateSha256: HashSchema,
+});
+export const AnyT20SeasonStateCoreSchema = z.discriminatedUnion("seasonStateVersion", [
+  T20SeasonStateCoreSchema,
+  T20SeasonStateV2CoreSchema,
+]);
+export const AnyT20SeasonStateSchema = z.discriminatedUnion("seasonStateVersion", [
+  T20SeasonStateSchema,
+  T20SeasonStateV2Schema,
+]);
+
 export const SeasonSaveSummarySchema = z.strictObject({
   saveId: IDSchema,
   kind: z.enum(["AUTO", "MANUAL", "IMPORTED"]),
@@ -150,6 +172,11 @@ export const SeasonPortableManifestV3Schema = SeasonPortableManifestSchema.exten
 
 export type T20SeasonStateCore = z.infer<typeof T20SeasonStateCoreSchema>;
 export type T20SeasonState = z.infer<typeof T20SeasonStateSchema>;
+export type T20SeasonStateV2Core = z.infer<typeof T20SeasonStateV2CoreSchema>;
+export type T20SeasonStateV2 = z.infer<typeof T20SeasonStateV2Schema>;
+/** Either frozen-world season state version. */
+export type AnyT20SeasonStateCore = z.infer<typeof AnyT20SeasonStateCoreSchema>;
+export type AnyT20SeasonState = z.infer<typeof AnyT20SeasonStateSchema>;
 export type SeasonSaveSummary = z.infer<typeof SeasonSaveSummarySchema>;
 export type SeasonDurableCommand = z.infer<typeof SeasonDurableCommandSchema>;
 export type SeasonArchiveCore = z.infer<typeof SeasonArchiveCoreSchema>;

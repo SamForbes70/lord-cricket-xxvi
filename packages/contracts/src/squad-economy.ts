@@ -10,6 +10,7 @@ import {
 } from "./persistent-world.js";
 import {
   ActivePersistentSeasonStateSchema,
+  ActivePersistentSeasonStateV2Schema,
   LifecycleAbilityBandSummarySchema,
   PlayerLifecycleStateSchema,
   PlayerLifecycleStateV2Schema,
@@ -37,6 +38,15 @@ export const PERSISTENT_WORLD_STATE_V5_VERSION = "LC_PERSISTENT_WORLD_STATE_V5" 
 export const PERSISTENT_WORLD_SAVE_V5_SCHEMA_VERSION = "LC_PERSISTENT_WORLD_SAVE_V5" as const;
 export const PERSISTENT_WORLD_PRESENTATION_SAVE_V5_SCHEMA_VERSION =
   "LC_PERSISTENT_WORLD_SAVE_V5_PRESENTATION" as const;
+/**
+ * World state V6 (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md): V5's shape and storage, but its current season is a
+ * season state V2, whose computer-run fixtures use career fixture policy V2. New careers start on V6; a V5 career
+ * becomes V6 when it starts its next season. Its finished seasons are kept exactly as they were.
+ */
+export const PERSISTENT_WORLD_STATE_V6_VERSION = "LC_PERSISTENT_WORLD_STATE_V6" as const;
+export const PERSISTENT_WORLD_SAVE_V6_SCHEMA_VERSION = "LC_PERSISTENT_WORLD_SAVE_V6" as const;
+export const PERSISTENT_WORLD_PRESENTATION_SAVE_V6_SCHEMA_VERSION =
+  "LC_PERSISTENT_WORLD_SAVE_V6_PRESENTATION" as const;
 
 export const DEFAULT_ANNUAL_CLUB_WAGE_BUDGET_K = 2_500 as const;
 export const MIN_PLAYER_ANNUAL_WAGE_K = 35 as const;
@@ -283,6 +293,23 @@ export const PersistentWorldStateV5StoredSchema = z.strictObject({
   completedSeasons: z.array(CompletedSeasonReferenceSchema).max(MAX_PERSISTENT_SEASONS - 1),
 });
 
+/** World state V6: V5 with a policy V2 current season. Hashed and stored as V5 is. */
+export const PersistentWorldStateV6CoreSchema = PersistentWorldStateV5CoreSchema.extend({
+  worldStateVersion: z.literal(PERSISTENT_WORLD_STATE_V6_VERSION),
+  currentSeason: ActivePersistentSeasonStateV2Schema,
+});
+
+export const PersistentWorldStateV6Schema = z.strictObject({
+  ...PersistentWorldStateV6CoreSchema.shape,
+  stateSha256: HashSchema,
+});
+
+/** A V6 checkpoint payload: finished seasons as references, as in V5. */
+export const PersistentWorldStateV6StoredSchema = z.strictObject({
+  ...PersistentWorldStateV6Schema.shape,
+  completedSeasons: z.array(CompletedSeasonReferenceSchema).max(MAX_PERSISTENT_SEASONS - 1),
+});
+
 export const PersistentWorldPortableV3ManifestSchema = z.strictObject({
   archiveVersion: z.literal(PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION),
   saveSchema: z.enum([
@@ -384,6 +411,9 @@ export type PersistentWorldStateV5Core = z.infer<typeof PersistentWorldStateV5Co
 export type PersistentWorldStateV5 = z.infer<typeof PersistentWorldStateV5Schema>;
 export type CompletedSeasonReference = z.infer<typeof CompletedSeasonReferenceSchema>;
 export type PersistentWorldStateV5Stored = z.infer<typeof PersistentWorldStateV5StoredSchema>;
+export type PersistentWorldStateV6Core = z.infer<typeof PersistentWorldStateV6CoreSchema>;
+export type PersistentWorldStateV6 = z.infer<typeof PersistentWorldStateV6Schema>;
+export type PersistentWorldStateV6Stored = z.infer<typeof PersistentWorldStateV6StoredSchema>;
 export type PersistentWorldPortableV3Manifest = z.infer<
   typeof PersistentWorldPortableV3ManifestSchema
 >;

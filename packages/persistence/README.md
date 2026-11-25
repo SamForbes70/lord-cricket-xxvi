@@ -11,8 +11,8 @@ This package owns browser durability and portable archives. It does not decide c
 | [archive.ts](src/archive.ts) | `createPortableArchive`, `readPortableArchive` | Match archive encoding and validation |
 | [archive.ts](src/archive.ts) | `createSeasonPortableArchive`, `readSeasonPortableArchive` | Standard career portable archives |
 | [archive.ts](src/archive.ts) | `createRosterSeasonPortableArchive`, `readRosterSeasonPortableArchive` | Imported-roster career portable archives |
-| [persistent-world.ts](src/persistent-world.ts) | `IndexedDbPersistentWorldRepository`, `PersistentWorldDurableCommit` | Multi-season worlds (V1 to V5 state; V4 embeds two roster packs, [design](../../docs/design/WORLD_STATE_HISTORY_V4.md); V5 hashes and stores finished seasons by reference, [design](../../docs/design/WORLD_STATE_V5_SEASON_REFS.md)): one-transaction commits and rollover, archives, roster packs, match digests, single-fixture archive loads |
-| [archive.ts](src/archive.ts) | `createPersistentWorldPortableArchive*`, `readPersistentWorldPortableArchive*` | Multi-season portable archives, V1 to V3, compressed V4 (`LC_PERSISTENT_WORLD_PORTABLE_V4_GZIP`), V5 for world state V4 (`LC_PERSISTENT_WORLD_PORTABLE_V5_WORLD_V4`, every stored roster pack), and V6 for world state V5 (`LC_PERSISTENT_WORLD_PORTABLE_V6_WORLD_V5`) |
+| [persistent-world.ts](src/persistent-world.ts) | `IndexedDbPersistentWorldRepository`, `PersistentWorldDurableCommit` | Multi-season worlds (V1 to V6 state; V4 embeds two roster packs, [design](../../docs/design/WORLD_STATE_HISTORY_V4.md); V5 hashes and stores finished seasons by reference, [design](../../docs/design/WORLD_STATE_V5_SEASON_REFS.md); V6 is V5 with a career fixture policy V2 season, [design](../../docs/pavilion/CAREER_FIXTURE_POLICY_V2.md)): one-transaction commits and rollover, archives, roster packs, match digests, single-fixture archive loads |
+| [archive.ts](src/archive.ts) | `createPersistentWorldPortableArchive*`, `readPersistentWorldPortableArchive*` | Multi-season portable archives, V1 to V3, compressed V4 (`LC_PERSISTENT_WORLD_PORTABLE_V4_GZIP`), V5 for world state V4 (`LC_PERSISTENT_WORLD_PORTABLE_V5_WORLD_V4`, every stored roster pack), V6 for world state V5 (`LC_PERSISTENT_WORLD_PORTABLE_V6_WORLD_V5`), and V7 for world state V6 (`LC_PERSISTENT_WORLD_PORTABLE_V7_WORLD_V6`) |
 | [binding.ts](src/binding.ts) | `ManagedMatchBindings` | Durable career-fixture to match bindings |
 
 These are in-process TypeScript APIs, not HTTP endpoints. Consult the exported types for exact arguments and return shapes. A documentation example must not become an alternate implementation of validation.
@@ -46,7 +46,7 @@ Sharing stores does not make career completion and match persistence one atomic 
 
 See [MATCH_ARCHIVE_STORAGE_V2.md](../../docs/design/MATCH_ARCHIVE_STORAGE_V2.md) for why archives are compressed and digested. Readers accept both archive scopes; new commits write the compressed one.
 
-**No rollback.** An older build cannot read compressed archive rows, V4 to V6 exports, or world state V4 and V5 saves, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete. Moving a profile back below the build that introduced these is unsupported.
+**No rollback.** An older build cannot read compressed archive rows, V4 to V7 exports, or world state V4 to V6 saves, and builds from before Stage 2 list multi-season worlds as exhibition saves, which they can delete. Moving a profile back below the build that introduced these is unsupported.
 
 ## Commit and recovery invariants
 

@@ -1,5 +1,5 @@
 import {
-  RosterOffscreenFixtureOutcomeSchema, type RosterCareerDayState, type RosterOffscreenFixtureOutcome,
+  RosterOffscreenFixtureOutcomeSchema, RosterOffscreenFixtureOutcomeV3Schema, type RosterOffscreenFixtureOutcomeV3, type RosterCareerDayState, type RosterOffscreenFixtureOutcome,
   type RosterSeasonSchedule, type StagedRosterPack, type T20TeamSelection,
 } from "@lcxxvi/contracts";
 import { isBowlingCapable, T20_OFFSCREEN_FIXTURE_POLICY } from "@lcxxvi/data";
@@ -9,7 +9,7 @@ import { applyRosterMatchCondition, validateRosterCareerDayState } from "./roste
 import { validateRosterSeasonSchedule } from "./roster-season-schedule.js";
 import { createRosterT20Session, executeRosterT20Command, type RosterT20Session } from "./roster-t20-match.js";
 import { eventChainManifest, fixtureAutopilotStep, projectT20Scorecard, type T20Session } from "./t20-match.js";
-import { selectSeasonXIV2 } from "./fixture-policy-v2.js";
+import { fixtureAutopilotStepV2, selectSeasonXIV2 } from "./fixture-policy-v2.js";
 
 const hash = createStateHasher().hash;
 export function validateRosterOffscreenFixtureOutcome(raw: unknown): RosterOffscreenFixtureOutcome {
@@ -91,4 +91,45 @@ export function simulateRosterOffscreenFixture(pack: StagedRosterPack, scheduleI
     eventLogSha256: hash(session.events), commandLogSha256: hash(session.commands), scorecard, scorecardSha256: hash(scorecard),
     conditionDelta, conditionDeltaSha256: hash(conditionDelta), engineManifest: session.executionManifest };
   return { outcome: validateRosterOffscreenFixtureOutcome({ ...core, outcomeSha256: hash(core) }), session, careerState };
+}
+
+/** Checks a policy V2 roster off-screen outcome as `validateRosterOffscreenFixtureOutcome` checks a V1 one. */
+export function validateRosterOffscreenFixtureOutcomeV3(raw: unknown): RosterOffscreenFixtureOutcomeV3 {
+  const outcome = RosterOffscreenFixtureOutcomeV3Schema.parse(raw);
+  const { outcomeSha256, ...core } = outcome;
+  if (hash(core) !== outcomeSha256 || hash(outcome.scorecard) !== outcome.scorecardSha256 || hash(outcome.conditionDelta) !== outcome.conditionDeltaSha256 ||
+      outcome.engineManifest.engine !== "LC_T20_MATCH_ROSTER_V2" || outcome.scorecard.matchId !== outcome.matchId || outcome.conditionDelta.matchId !== outcome.matchId ||
+      outcome.conditionDelta.matchDayDate !== outcome.matchDayDate || outcome.eventChain.executionManifestHash !== hash(outcome.engineManifest)) throw new Error("ROSTER_OFFSCREEN_OUTCOME_MISMATCH");
+  return outcome;
+}
+
+/**
+ * One roster off-screen fixture under career fixture policy V2 (lifecycle season state V2 only):
+ * `selectRosterFixtureTeamsV2` and `fixtureAutopilotStepV2` on the same roster engine, seed and condition rules.
+ */
+export function simulateRosterOffscreenFixtureV2(pack: StagedRosterPack, scheduleInput: RosterSeasonSchedule, stateInput: RosterCareerDayState, fixtureId: string): { outcome: RosterOffscreenFixtureOutcomeV3; session: RosterT20Session; careerState: RosterCareerDayState } {
+  const schedule = validateRosterSeasonSchedule(scheduleInput, pack);
+  const before = validateRosterCareerDayState(stateInput, schedule, pack);
+  const fixture = schedule.fixtures.find(item => item.fixtureId === fixtureId);
+  if (!fixture) throw new Error("ROSTER_OFFSCREEN_UNKNOWN_FIXTURE");
+  const selectedTeams = selectRosterFixtureTeamsV2(pack, schedule, before, fixtureId);
+  let session = createRosterT20Session(pack, { gameId: schedule.request.gameId, matchId: fixture.matchId, seed: fixture.matchSeed, format: "T20", selection: { groundId: fixture.groundId, teams: selectedTeams } });
+  for (let steps = 0; session.core.phase !== "COMPLETE"; steps++) {
+    if (steps >= 1400) throw new Error("ROSTER_OFFSCREEN_COMMAND_LIMIT");
+    session = executeRosterT20Command(session, fixtureAutopilotStepV2(session as unknown as T20Session)).session;
+  }
+  const baseline = session as unknown as T20Session;
+  const scorecard = projectT20Scorecard(baseline);
+  const conditionDelta = conditionDeltaFromCompletedT20Session({ seasonId: schedule.request.seasonId, fixtureId, matchId: fixture.matchId, matchDayDate: fixture.matchDayDate, session: baseline });
+  const careerState = applyRosterMatchCondition(before, conditionDelta, schedule, pack);
+  const core = { executionVersion: "LC_T20_ROSTER_OFFSCREEN_FIXTURE_V3" as const, policyVersion: "LC_T20_ROSTER_OFFSCREEN_POLICY_V3" as const,
+    fixtureId, matchId: fixture.matchId, roundNumber: fixture.roundNumber, roundFixtureIndex: fixture.roundFixtureIndex,
+    matchDayDate: fixture.matchDayDate, homeTeamId: fixture.homeTeamId, awayTeamId: fixture.awayTeamId, groundId: fixture.groundId,
+    scheduleSha256: schedule.scheduleSha256, matchSeedHash: hash({ matchSeed: fixture.matchSeed }), careerRevisionBefore: before.revision,
+    careerRevisionAfter: careerState.revision, careerStateSha256Before: before.stateSha256, careerStateSha256After: careerState.stateSha256,
+    selectionPolicyId: "LC_SEASON_XI_BASELINE_V2" as const, captainPolicyId: "LC_FIXTURE_CAPTAIN_V2" as const,
+    conditionDeltaPolicyId: T20_OFFSCREEN_FIXTURE_POLICY.conditionDeltaPolicyId, selectedTeams, eventChain: eventChainManifest(baseline),
+    eventLogSha256: hash(session.events), commandLogSha256: hash(session.commands), scorecard, scorecardSha256: hash(scorecard),
+    conditionDelta, conditionDeltaSha256: hash(conditionDelta), engineManifest: session.executionManifest };
+  return { outcome: validateRosterOffscreenFixtureOutcomeV3({ ...core, outcomeSha256: hash(core) }), session, careerState };
 }

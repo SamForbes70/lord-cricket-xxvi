@@ -79,6 +79,16 @@ export const RosterOffscreenFixtureOutcomeSchema = OffscreenFixtureOutcomeSchema
 });
 export type RosterOffscreenFixtureOutcome = z.infer<typeof RosterOffscreenFixtureOutcomeSchema>;
 
+/** A roster off-screen fixture under career fixture policy V2 (lifecycle season state V2 only). */
+export const RosterOffscreenFixtureOutcomeV3Schema = OffscreenFixtureOutcomeSchema.extend({
+  executionVersion: z.literal("LC_T20_ROSTER_OFFSCREEN_FIXTURE_V3"),
+  policyVersion: z.literal("LC_T20_ROSTER_OFFSCREEN_POLICY_V3"),
+  selectionPolicyId: z.literal("LC_SEASON_XI_BASELINE_V2"),
+  captainPolicyId: z.literal("LC_FIXTURE_CAPTAIN_V2"),
+  engineManifest: RosterT20ExecutionManifestSchema,
+});
+export type RosterOffscreenFixtureOutcomeV3 = z.infer<typeof RosterOffscreenFixtureOutcomeV3Schema>;
+
 export const RosterSeasonMatchCompletionSchema = T20SeasonMatchCompletionSchema.extend({
   completionVersion: z.literal("LC_T20_ROSTER_SEASON_COMPLETION_V2"),
 });

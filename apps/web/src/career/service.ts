@@ -2,7 +2,12 @@ import worldManifest from "../../../../packages/data/worlds/fictional-eight-01.m
 import {
   canonicalJson,
   LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION,
-  LIFECYCLE_SEASON_STATE_VERSION,
+  isLifecycleSeasonState,
+  usesFixturePolicyV2,
+  T20_SEASON_STATE_V2_VERSION,
+  PERSISTENT_WORLD_STATE_V6_VERSION,
+  PERSISTENT_WORLD_PORTABLE_V7_ARCHIVE_VERSION,
+  type PersistentWorldStateV6,
   LifecycleSquadTrainingConditionViewSchema,
   type LifecycleSquadTrainingConditionView,
   PERSISTENT_WORLD_PORTABLE_ARCHIVE_VERSION,
@@ -28,7 +33,6 @@ import {
   type HistoricalFilterQuery,
   type HistoricalPlayerRecord,
   type HistoricalStatisticsProjection,
-  type LifecycleSeasonState,
   type MatchAwardRecord,
   type MatchConditionDelta,
   type NewGameWorldCopy,
@@ -109,13 +113,17 @@ import {
   sealLifecycleSeasonState,
   seasonStartDateOf,
   selectOffscreenFixtureTeams,
+  selectOffscreenFixtureTeamsV2,
   selectRosterFixtureTeams,
+  selectRosterFixtureTeamsV2,
   setAcademyProspectFocus as applySetAcademyProspectFocus,
   setAcademyProspectPromotionQueue,
   setRosterTrainingDirective,
   setTrainingDirective,
   simulateOffscreenFixture,
+  simulateOffscreenFixtureV2,
   simulateRosterOffscreenFixture,
+  simulateRosterOffscreenFixtureV2,
   submitContractOffer as applySubmitContractOffer,
   withdrawContractOffer as applyWithdrawContractOffer,
   type CareerArchivedReplaySummary,
@@ -138,6 +146,7 @@ import {
   createPersistentWorldPortableArchiveV4,
   createPersistentWorldPortableArchiveV5,
   createPersistentWorldPortableArchiveV6,
+  createPersistentWorldPortableArchiveV7,
   createSeasonPortableArchive,
   createT20SeasonArchive,
   describeSeasonPersistenceError,
@@ -151,11 +160,13 @@ import {
   readPersistentWorldPortableArchiveV4,
   readPersistentWorldPortableArchiveV5,
   readPersistentWorldPortableArchiveV6,
+  readPersistentWorldPortableArchiveV7,
   readSeasonPortableArchive,
   sealPersistentCareerProjection,
   sealPersistentWorldStateV2,
   sealPersistentWorldStateV3,
   sealT20SeasonState,
+  sealT20SeasonStateV2,
   SEASON_RECORD_TYPE,
   type AnyCareerMatchEventArchive,
   type AnyPersistentWorldState,
@@ -181,6 +192,8 @@ import {
   createInitialSeasonState,
   createLifecycleSeasonStateForWorld,
   deterministicSeasonCompletedAt,
+  expectSeasonPolicyV1,
+  lifecycleSeasonVersionFor,
   hasher,
   nowIso,
   rebuildPersistentWorldStateV2,
@@ -372,26 +385,29 @@ function toSlotSummaryFromPersistent(summary: PersistentWorldSaveSummary): Caree
   };
 }
 
+/** Any season state version without its hash and revision (the version is kept, so V1 stays V1 and V2 stays V2). */
+type ActiveSeasonCore = ActivePersistentSeasonState extends infer S
+  ? S extends ActivePersistentSeasonState ? Omit<S, "stateSha256" | "revision"> : never
+  : never;
+
 type AnyCareerMutationResult =
   | {
-      core:
-        | Omit<T20SeasonState, "stateSha256" | "revision">
-        | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
+      core: ActiveSeasonCore;
       matchEventArchives?: readonly AnyCareerMatchEventArchive[];
       nextLifecycle?: PlayerLifecycleState;
       nextEconomy?: SquadEconomyState;
     }
-  | Omit<T20SeasonState, "stateSha256" | "revision">
-  | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
+  | ActiveSeasonCore;
 
 /** Contracts-era worlds: V3, and V4 (the same rules with bounded embedded roster packs). */
 function isEconomyWorld(
   world: AnyPersistentWorldState | null | undefined,
-): world is PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 {
+): world is PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 | PersistentWorldStateV6 {
   return (
     world?.worldStateVersion === PERSISTENT_WORLD_STATE_V3_VERSION ||
     world?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION ||
-    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION
+    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION ||
+    world?.worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION
   );
 }
 
@@ -751,8 +767,9 @@ export class CareerApplicationService {
             ? await createInitialPersistentWorldCareerStateV2(createWorldArgs)
             : await createInitialPersistentWorldCareerStateV3({
                 ...createWorldArgs,
-                // New careers use world state V5 (docs/design/WORLD_STATE_V5_SEASON_REFS.md); V3 and V4 stay selectable.
-                worldStateVersion: options?.worldStateVersion ?? PERSISTENT_WORLD_STATE_V5_VERSION,
+                // New careers use world state V6 (V5 storage, fixture policy V2 seasons;
+                // docs/pavilion/CAREER_FIXTURE_POLICY_V2.md). V3 to V5 stay selectable.
+                worldStateVersion: options?.worldStateVersion ?? PERSISTENT_WORLD_STATE_V6_VERSION,
               });
       const saveId = options?.saveId ?? `pworld:${worldId}`;
       if (!(await this.persistentRepository.acquireLease(saveId, this.ownerId, Date.now()))) {
@@ -979,14 +996,12 @@ export class CareerApplicationService {
     return pack;
   }
 
-  private async sealActiveSeasonCore(
-    builtCore:
-      | Omit<T20SeasonState, "stateSha256" | "revision">
-      | Omit<LifecycleSeasonState, "stateSha256" | "revision">,
-    revision: number,
-  ): Promise<ActivePersistentSeasonState> {
-    if (builtCore.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+  private async sealActiveSeasonCore(builtCore: ActiveSeasonCore, revision: number): Promise<ActivePersistentSeasonState> {
+    if (isLifecycleSeasonState(builtCore)) {
       return sealLifecycleSeasonState({ ...builtCore, revision });
+    }
+    if (builtCore.seasonStateVersion === T20_SEASON_STATE_V2_VERSION) {
+      return sealT20SeasonStateV2({ ...builtCore, revision });
     }
     return sealT20SeasonState({ ...builtCore, revision });
   }
@@ -1028,9 +1043,7 @@ export class CareerApplicationService {
         const builtCore =
           "core" in builtRaw && "seasonStateVersion" in builtRaw.core
             ? builtRaw.core
-            : (builtRaw as
-                | Omit<T20SeasonState, "stateSha256" | "revision">
-                | Omit<LifecycleSeasonState, "stateSha256" | "revision">);
+            : (builtRaw as ActiveSeasonCore);
         const matchEventArchives =
           "core" in builtRaw && "matchEventArchives" in builtRaw
             ? builtRaw.matchEventArchives
@@ -1318,6 +1331,7 @@ export class CareerApplicationService {
         startDate: seasonStartDateOf(beforeSeason),
         priorSeasonFinalStateSha256: priorSeasonSha,
         carryForwardDirectives: beforeSeason.careerState.trainingAssignments,
+        seasonStateVersion: lifecycleSeasonVersionFor(beforeWorld.worldStateVersion),
       });
       const nextEconomy =
         isEconomyWorld(beforeWorld)
@@ -1429,7 +1443,7 @@ export class CareerApplicationService {
       const { nextState }:
         | { nextState: PersistentWorldState }
         | { nextState: PersistentWorldStateV2 }
-        | { nextState: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 } =
+        | { nextState: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 | PersistentWorldStateV6 } =
         isEconomyWorld(beforeWorld)
           ? await rolloverPersistentWorldCareerSeasonV3(beforeWorld, expectedRevision + 1)
           : beforeWorld.worldStateVersion === PERSISTENT_WORLD_STATE_V2_VERSION
@@ -1571,7 +1585,7 @@ export class CareerApplicationService {
 
   async copySingleSeasonToPersistentWorld(
     customTitle?: string,
-  ): Promise<PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5> {
+  ): Promise<PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 | PersistentWorldStateV6> {
     const { state: sourceState, saveId: sourceSaveId } = this.requireWritable();
     if (this.persistentState) {
       throw new Error("This career is already a persistent multi-season world.");
@@ -1598,7 +1612,8 @@ export class CareerApplicationService {
       newCareerId,
       baseSeed: `seed-${key}`,
       worldCopy: this.worldCopy,
-      worldStateVersion: PERSISTENT_WORLD_STATE_V5_VERSION,
+      // A new world from a finished single season starts on world state V6 (fixture policy V2).
+      worldStateVersion: PERSISTENT_WORLD_STATE_V6_VERSION,
     });
     const now = Date.now();
     if (!(await this.repository.acquireLease(sourceSaveId, this.ownerId, now))) {
@@ -1885,7 +1900,7 @@ export class CareerApplicationService {
     if (
       sourceWorld.currentSeason.completedMatches.length === 0 &&
       baseLifecycle.activeRosterPack &&
-      sourceWorld.currentSeason.seasonStateVersion !== LIFECYCLE_SEASON_STATE_VERSION
+      !isLifecycleSeasonState(sourceWorld.currentSeason)
     ) {
       upgradedSeason = await createLifecycleSeasonStateForWorld({
         worldIdentity,
@@ -1918,7 +1933,7 @@ export class CareerApplicationService {
       completedSeasons: sourceWorld.completedSeasons,
       lifecycle: expectLifecycleV1(baseLifecycle),
       economy,
-      currentSeason: upgradedSeason,
+      currentSeason: expectSeasonPolicyV1(upgradedSeason),
       careerProjection,
       lastRolloverReceipt: sourceWorld.lastRolloverReceipt,
       revision: 1,
@@ -1975,7 +1990,7 @@ export class CareerApplicationService {
     commandId: string,
     commandName: string,
     payload: unknown,
-    mutate: (worldState: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5) => Promise<{
+    mutate: (worldState: PersistentWorldStateV3 | PersistentWorldStateV4 | PersistentWorldStateV5 | PersistentWorldStateV6) => Promise<{
       economy: SquadEconomyState;
       lifecycle: PlayerLifecycleState;
       rosterChanged: boolean;
@@ -2027,6 +2042,7 @@ export class CareerApplicationService {
           startDate: seasonStartDateOf(beforeSeason),
           priorSeasonFinalStateSha256: priorSeasonSha,
           carryForwardDirectives: beforeSeason.careerState.trainingAssignments,
+          seasonStateVersion: lifecycleSeasonVersionFor(beforeWorld.worldStateVersion),
         });
       }
       const nextWorld = await rebuildPersistentWorldStateV3(
@@ -2289,7 +2305,7 @@ export class CareerApplicationService {
   async setTraining(playerId: string, directive: TrainingDirective): Promise<void> {
     await this.commitMutation("SET_TRAINING", { playerId, directive }, (state) => {
       if (state.phase !== "ACTIVE") throw new Error("Completed seasons are immutable.");
-      if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      if (isLifecycleSeasonState(state)) {
         const pack = this.requireActiveRosterPack();
         const changed = setRosterTrainingDirective(
           state.careerState,
@@ -2326,7 +2342,7 @@ export class CareerApplicationService {
       const nextLifecycle = lifecycle
         ? recordElapsedTrainingExposure(lifecycle, state.careerState.trainingAssignments, 1, state.controlledTeamId)
         : undefined;
-      if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+      if (isLifecycleSeasonState(state)) {
         const pack = this.requireActiveRosterPack();
         const careerState = advanceRosterCareerDay(
           state.careerState,
@@ -2356,14 +2372,15 @@ export class CareerApplicationService {
     state: ActivePersistentSeasonState,
     fixtureId: string,
   ): {
-    core:
-      | Omit<T20SeasonState, "stateSha256" | "revision">
-      | Omit<LifecycleSeasonState, "stateSha256" | "revision">;
+    core: ActiveSeasonCore;
     archive: AnyCareerMatchEventArchive;
   } {
-    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+    // Season states V2 run their computer fixtures under career fixture policy V2; V1 seasons keep V1, so a season
+    // already under way finishes exactly as it began (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md).
+    const policyV2 = usesFixturePolicyV2(state);
+    if (isLifecycleSeasonState(state)) {
       const pack = this.requireActiveRosterPack();
-      const simulated = simulateRosterOffscreenFixture(
+      const simulated = (policyV2 ? simulateRosterOffscreenFixtureV2 : simulateRosterOffscreenFixture)(
         pack,
         state.schedule,
         state.careerState,
@@ -2395,12 +2412,12 @@ export class CareerApplicationService {
           projection,
           completedMatches,
           phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
-        },
+        } as ActiveSeasonCore,
         archive,
       };
     }
 
-    const simulated = simulateOffscreenFixture({
+    const simulated = (policyV2 ? simulateOffscreenFixtureV2 : simulateOffscreenFixture)({
       schedule: state.schedule,
       careerState: state.careerState,
       fixtureId,
@@ -2428,7 +2445,7 @@ export class CareerApplicationService {
         projection,
         completedMatches,
         phase: completedMatches.length === 56 ? "COMPLETE" : "ACTIVE",
-      },
+      } as ActiveSeasonCore,
       archive,
     };
   }
@@ -2459,7 +2476,7 @@ export class CareerApplicationService {
       async (state, lifecycle) => {
         let daysAdvanced = 0;
         let working: ActivePersistentSeasonState = state;
-        if (working.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+        if (isLifecycleSeasonState(working)) {
           const pack = this.requireActiveRosterPack();
           let careerState = working.careerState;
           while (careerState.currentDate < target.matchDayDate) {
@@ -2503,12 +2520,7 @@ export class CareerApplicationService {
           archives.push(applied.archive);
           already.add(fixture.fixtureId);
         }
-        const activeCore:
-          | Omit<T20SeasonState, "stateSha256" | "revision">
-          | Omit<LifecycleSeasonState, "stateSha256" | "revision"> =
-          working.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION
-            ? { ...stateCore(working), phase: "ACTIVE" }
-            : { ...stateCore(working), phase: "ACTIVE" };
+        const activeCore: ActiveSeasonCore = { ...stateCore(working), phase: "ACTIVE" } as ActiveSeasonCore;
         const nextEconomy =
           isEconomyWorld(this.persistentState) &&
           this.persistentState.economy.negotiationWindow.windowPhase === "OPEN" &&
@@ -2548,16 +2560,18 @@ export class CareerApplicationService {
     );
   }
 
+  /** The match-day XIs, under the season's own fixture policy (V2 only for season states V2). */
   private matchDayTeams(state: CareerActiveSeasonState, fixtureId: string) {
-    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
-      return selectRosterFixtureTeams(
+    const policyV2 = usesFixturePolicyV2(state);
+    if (isLifecycleSeasonState(state)) {
+      return (policyV2 ? selectRosterFixtureTeamsV2 : selectRosterFixtureTeams)(
         this.requireActiveRosterPack(),
         state.schedule,
         state.careerState,
         fixtureId,
       );
     }
-    return selectOffscreenFixtureTeams({
+    return (policyV2 ? selectOffscreenFixtureTeamsV2 : selectOffscreenFixtureTeams)({
       schedule: state.schedule,
       careerState: state.careerState,
       fixtureId,
@@ -2664,7 +2678,7 @@ export class CareerApplicationService {
         id === call.incumbent.playerId ? pick.playerId : id,
       );
     }
-    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+    if (isLifecycleSeasonState(state)) {
       const pack = this.requireActiveRosterPack();
       return {
         launchVersion: "LC_CAREER_USER_MATCH_LAUNCH_V4_LIFECYCLE" as const,
@@ -2787,7 +2801,7 @@ export class CareerApplicationService {
           scorecard: result.scorecard,
           scorecardSha256: result.scorecardSha256,
         });
-        if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+        if (isLifecycleSeasonState(state)) {
           const pack = this.requireActiveRosterPack();
           const careerState = applyRosterMatchCondition(
             state.careerState,
@@ -2989,6 +3003,17 @@ export class CareerApplicationService {
         : [];
       // The awards ledger is derived and no longer exported (rebuilt on import), so it is not synced here.
       const awardsLedger = null;
+      if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION) {
+        // World state V6 exports as V7: the V6 layout, a V6 save schema.
+        return createPersistentWorldPortableArchiveV7(
+          loaded.state,
+          loaded.summary,
+          nowIso(),
+          loaded.worldCopy ?? null,
+          eventArchives.length > 0 ? eventArchives : null,
+          rosterPacks.length > 0 ? rosterPacks : null,
+        );
+      }
       if (loaded.state.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION) {
         // World state V5 exports as V6: the full state, finished seasons included, plus every stored pack.
         return createPersistentWorldPortableArchiveV6(
@@ -3082,13 +3107,16 @@ export class CareerApplicationService {
       version === PERSISTENT_WORLD_PORTABLE_V3_ARCHIVE_VERSION ||
       version === PERSISTENT_WORLD_PORTABLE_V4_ARCHIVE_VERSION ||
       version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION ||
-      version === PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION
+      version === PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION ||
+      version === PERSISTENT_WORLD_PORTABLE_V7_ARCHIVE_VERSION
     ) {
       if (!this.persistentRepository) {
         throw new Error("Persistent world storage is unavailable.");
       }
       const imported =
-        version === PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION
+        version === PERSISTENT_WORLD_PORTABLE_V7_ARCHIVE_VERSION
+          ? await readPersistentWorldPortableArchiveV7(bytes)
+          : version === PERSISTENT_WORLD_PORTABLE_V6_ARCHIVE_VERSION
           ? await readPersistentWorldPortableArchiveV6(bytes)
           : version === PERSISTENT_WORLD_PORTABLE_V5_ARCHIVE_VERSION
           ? await readPersistentWorldPortableArchiveV5(bytes)
@@ -3487,7 +3515,7 @@ export class CareerApplicationService {
     state = this.state,
   ): SquadTrainingConditionView | LifecycleSquadTrainingConditionView | null {
     if (!state?.controlledTeamId) return null;
-    if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+    if (isLifecycleSeasonState(state)) {
       return this.projectLifecycleSquadView(state.careerState, state.controlledTeamId);
     }
     return projectSquadTrainingCondition(
@@ -3502,7 +3530,7 @@ export class CareerApplicationService {
     const activeWorld = this.getWorld();
     const team = activeWorld.teams.find((candidate) => candidate.squadIds.includes(playerId));
     if (!team) return null;
-    if (this.state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
+    if (isLifecycleSeasonState(this.state)) {
       return (
         this.projectLifecycleSquadView(this.state.careerState, team.teamId).players.find(
           (player) => player.playerId === playerId,
@@ -3572,25 +3600,9 @@ export class CareerApplicationService {
 
     let selections: [T20TeamSelection, T20TeamSelection];
     try {
-      if (state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION) {
-        const pack = this.requireActiveRosterPack();
-        const picked = selectRosterFixtureTeams(
-          pack,
-          state.schedule,
-          state.careerState,
-          fixture.fixtureId,
-        );
-        selections = [picked[0], picked[1]];
-      } else {
-        const picked = selectOffscreenFixtureTeams({
-          schedule: state.schedule,
-          careerState: state.careerState,
-          fixtureId: fixture.fixtureId,
-          worldBytes,
-          worldManifest,
-        });
-        selections = [picked[0], picked[1]];
-      }
+      // The same season-policy choice as matchDayTeams: V2 only for season states V2.
+      const picked = this.matchDayTeams(state, fixture.fixtureId);
+      selections = [picked[0], picked[1]];
     } catch {
       selections = [
         fallbackSelection(fixture.homeTeamId),
@@ -3602,7 +3614,7 @@ export class CareerApplicationService {
     const buildSide = (teamId: string) => {
       const team = activeWorld.teams.find((candidate) => candidate.teamId === teamId)!;
       const condView =
-        state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION
+        isLifecycleSeasonState(state)
           ? this.projectLifecycleSquadView(state.careerState, teamId)
           : projectSquadTrainingCondition(
               state.careerState,
@@ -3960,7 +3972,8 @@ export class CareerApplicationService {
           ...careerWorld.players,
           ...(this.getEconomyState()?.freeAgents.map((fa) => fa.player) ?? []),
           ...(this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V4_VERSION ||
-          this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION
+          this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V5_VERSION ||
+          this.persistentState?.worldStateVersion === PERSISTENT_WORLD_STATE_V6_VERSION
             ? [...(await this.loadStoredRosterPacks()).values()].flatMap((pack) => pack.world.players)
             : []),
         ],

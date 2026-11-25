@@ -24,7 +24,7 @@ import {
   RosterSeasonScheduleSchema,
   StagedRosterPackSchema,
 } from "./roster-import.js";
-import { T20SeasonStateSchema } from "./season-persistence.js";
+import { T20SeasonStateSchema, T20SeasonStateV2Schema, T20_SEASON_STATE_V2_VERSION } from "./season-persistence.js";
 import { T20SeasonMatchCompletionSchema } from "./season-projections.js";
 import { T20EventChainManifestSchema, T20MatchEventSchema } from "./t20-match.js";
 
@@ -39,6 +39,11 @@ export const PLAYER_LIFECYCLE_STATE_VERSION = "LC_PLAYER_LIFECYCLE_STATE_V1" as 
 export const PLAYER_LIFECYCLE_STATE_V2_VERSION = "LC_PLAYER_LIFECYCLE_STATE_V2_BOUNDED_PACKS" as const;
 export const MAX_LIFECYCLE_V2_EMBEDDED_ROSTER_PACKS = 2 as const;
 export const LIFECYCLE_SEASON_STATE_VERSION = "LC_T20_LIFECYCLE_SEASON_STATE_V1" as const;
+/**
+ * Lifecycle season state V2 (docs/pavilion/CAREER_FIXTURE_POLICY_V2.md): the same shape as V1; the version means
+ * career fixture policy V2. Only world state V6 accepts it.
+ */
+export const LIFECYCLE_SEASON_STATE_V2_VERSION = "LC_T20_LIFECYCLE_SEASON_STATE_V2" as const;
 export const LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION =
   "LC_COMPLETED_CAREER_MATCH_EVENT_ARCHIVE_V2_LIFECYCLE" as const;
 export const PERSISTENT_WORLD_STATE_V2_VERSION = "LC_PERSISTENT_WORLD_STATE_V2" as const;
@@ -223,10 +228,51 @@ export const LifecycleSeasonStateSchema = z.strictObject({
   stateSha256: HashSchema,
 });
 
+/** The season states world states V2 to V5 accept: policy V1 only. Unchanged. */
 export const ActivePersistentSeasonStateSchema = z.discriminatedUnion("seasonStateVersion", [
   T20SeasonStateSchema,
   LifecycleSeasonStateSchema,
 ]);
+
+export const LifecycleSeasonStateV2CoreSchema = LifecycleSeasonStateCoreSchema.extend({
+  seasonStateVersion: z.literal(LIFECYCLE_SEASON_STATE_V2_VERSION),
+});
+export const LifecycleSeasonStateV2Schema = z.strictObject({
+  ...LifecycleSeasonStateV2CoreSchema.shape,
+  stateSha256: HashSchema,
+});
+export const AnyLifecycleSeasonStateCoreSchema = z.discriminatedUnion("seasonStateVersion", [
+  LifecycleSeasonStateCoreSchema,
+  LifecycleSeasonStateV2CoreSchema,
+]);
+export const AnyLifecycleSeasonStateSchema = z.discriminatedUnion("seasonStateVersion", [
+  LifecycleSeasonStateSchema,
+  LifecycleSeasonStateV2Schema,
+]);
+/** The season states world state V6 accepts: policy V2 only. */
+export const ActivePersistentSeasonStateV2Schema = z.discriminatedUnion("seasonStateVersion", [
+  T20SeasonStateV2Schema,
+  LifecycleSeasonStateV2Schema,
+]);
+/** Any season state of any world version, for code that handles them all. */
+export const AnyActivePersistentSeasonStateSchema = z.discriminatedUnion("seasonStateVersion", [
+  T20SeasonStateSchema,
+  LifecycleSeasonStateSchema,
+  T20SeasonStateV2Schema,
+  LifecycleSeasonStateV2Schema,
+]);
+
+/** Whether a season is a lifecycle (roster pack) season, of either version. */
+export function isLifecycleSeasonState<S extends { seasonStateVersion: string }>(
+  state: S,
+): state is Extract<S, { seasonStateVersion: typeof LIFECYCLE_SEASON_STATE_VERSION | typeof LIFECYCLE_SEASON_STATE_V2_VERSION }> {
+  return state.seasonStateVersion === LIFECYCLE_SEASON_STATE_VERSION || state.seasonStateVersion === LIFECYCLE_SEASON_STATE_V2_VERSION;
+}
+
+/** Whether a season's computer-run fixtures use career fixture policy V2: its version says so, nothing else. */
+export function usesFixturePolicyV2(state: { seasonStateVersion: string }): boolean {
+  return state.seasonStateVersion === LIFECYCLE_SEASON_STATE_V2_VERSION || state.seasonStateVersion === T20_SEASON_STATE_V2_VERSION;
+}
 
 export const CompletedLifecycleMatchEventArchiveCoreSchema = z.strictObject({
   archiveVersion: z.literal(LIFECYCLE_MATCH_EVENT_ARCHIVE_VERSION),
@@ -360,9 +406,15 @@ export type PlayerLifecycleStateV1 = z.infer<typeof PlayerLifecycleStateSchema>;
 export type PlayerLifecycleStateV2 = z.infer<typeof PlayerLifecycleStateV2Schema>;
 /** Either lifecycle version; the simulation handles both with the same rules apart from pack retention. */
 export type PlayerLifecycleState = PlayerLifecycleStateV1 | PlayerLifecycleStateV2;
-export type LifecycleSeasonStateCore = z.infer<typeof LifecycleSeasonStateCoreSchema>;
-export type LifecycleSeasonState = z.infer<typeof LifecycleSeasonStateSchema>;
-export type ActivePersistentSeasonState = z.infer<typeof ActivePersistentSeasonStateSchema>;
+/** Either lifecycle season state version (the version only selects the fixture policy). */
+export type LifecycleSeasonStateCore = z.infer<typeof AnyLifecycleSeasonStateCoreSchema>;
+export type LifecycleSeasonState = z.infer<typeof AnyLifecycleSeasonStateSchema>;
+export type LifecycleSeasonStateV1 = z.infer<typeof LifecycleSeasonStateSchema>;
+export type LifecycleSeasonStateV2 = z.infer<typeof LifecycleSeasonStateV2Schema>;
+/** Any season state of any version. World states V2 to V5 hold only `ActivePersistentSeasonStateV1`, V6 only V2. */
+export type ActivePersistentSeasonState = z.infer<typeof AnyActivePersistentSeasonStateSchema>;
+export type ActivePersistentSeasonStateV1 = z.infer<typeof ActivePersistentSeasonStateSchema>;
+export type ActivePersistentSeasonStateV2 = z.infer<typeof ActivePersistentSeasonStateV2Schema>;
 export type CompletedLifecycleMatchEventArchiveCore = z.infer<
   typeof CompletedLifecycleMatchEventArchiveCoreSchema
 >;

@@ -11,6 +11,9 @@ export type ElevenFormat = keyof Player["skills"];
  */
 export const SUGGESTED_ELEVEN_MIN_BOWLERS = 6;
 const ATTACK_CORE = 4;
+/** Batting (four skills) and bowling (three) on one per-skill scale when topping up the bowling: 3 x bat + 4 x bowl. */
+export const ELEVEN_ALL_ROUND_BATTING_WEIGHT = 3;
+export const ELEVEN_ALL_ROUND_BOWLING_WEIGHT = 4;
 
 const battingScore = (p: Player, format: ElevenFormat) => {
   const s = p.skills[format];
@@ -27,7 +30,11 @@ const byId = (a: Player, b: Player) => (a.playerId < b.playerId ? -1 : a.playerI
  *
  * The keeper with the best batting; the four best bowling-capable players by bowling; then the six best remaining
  * players by batting. If that leaves fewer than six bowling-capable players, the weakest batter who cannot bowl gives
- * way to the best remaining bowler. The batting order is batting skill, best first, so the autopilot (which sends in
+ * way to the remaining bowling-capable player who adds most in all (owner decision, 25 November 2026: prefer
+ * all-rounders when topping up the bowling). "Most in all" is batting and bowling on one scale: batting is a sum of
+ * four skills and bowling of three, so each is taken per skill, batting / 4 + bowling / 3, computed in whole numbers
+ * as 3 x batting + 4 x bowling. Only a player who cannot bowl ever gives way, so an all-rounder already chosen is kept
+ * ahead of a weaker specialist. The batting order is batting skill, best first, so the autopilot (which sends in
  * the next unused player in eleven order) bats the specialists at the top. Ties break on playerId, so the result never
  * depends on squad order or locale. Pure: it reads skills and roles only, never randomness.
  *
@@ -59,6 +66,8 @@ export function rankedEleven<P extends ElevenCandidate>(
 ): { playerIds: string[]; captainId: string; keeperId: string } {
   const bat = (a: P, b: P) => batting(b) - batting(a) || tieBreak(a, b);
   const bowl = (a: P, b: P) => bowling(b) - bowling(a) || tieBreak(a, b);
+  const allRound = (p: P) => ELEVEN_ALL_ROUND_BATTING_WEIGHT * batting(p) + ELEVEN_ALL_ROUND_BOWLING_WEIGHT * bowling(p);
+  const topUp = (a: P, b: P) => allRound(b) - allRound(a) || tieBreak(a, b);
   const keeper = squad.filter((p) => p.role === "KEEPER").sort(bat)[0];
   if (!keeper) throw new Error("A squad needs a keeper.");
   const rest = squad.filter((p) => p.playerId !== keeper.playerId);
@@ -68,7 +77,7 @@ export function rankedEleven<P extends ElevenCandidate>(
   const eleven = [keeper, ...attack, ...others];
   for (let bowlers = eleven.filter(isBowlingCapable).length; bowlers < SUGGESTED_ELEVEN_MIN_BOWLERS; bowlers += 1) {
     const inXI = new Set(eleven.map((p) => p.playerId));
-    const incoming = rest.filter((p) => !inXI.has(p.playerId) && isBowlingCapable(p)).sort(bowl)[0];
+    const incoming = rest.filter((p) => !inXI.has(p.playerId) && isBowlingCapable(p)).sort(topUp)[0];
     const outgoing = eleven.filter((p) => p !== keeper && !isBowlingCapable(p)).sort(bat).at(-1);
     if (!incoming || !outgoing) break;
     eleven[eleven.indexOf(outgoing)] = incoming;

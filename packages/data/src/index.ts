@@ -11,7 +11,7 @@ export * from "./probability-pack.js";
 export * from "./delivery-pack.js";
 export { FROZEN_WORLD_PINS } from "./world-pins.js";
 export { isBowlingCapable, validateDefaultWorld } from "./world.js";
-export { rankedEleven, suggestedEleven, SUGGESTED_ELEVEN_MIN_BOWLERS, type ElevenCandidate, type ElevenFormat } from "./eleven.js";
+export { ELEVEN_ALL_ROUND_BATTING_WEIGHT, ELEVEN_ALL_ROUND_BOWLING_WEIGHT, rankedEleven, suggestedEleven, SUGGESTED_ELEVEN_MIN_BOWLERS, type ElevenCandidate, type ElevenFormat } from "./eleven.js";
 export * from "./t20-conditions.js";
 
 export * from "./competition.js";

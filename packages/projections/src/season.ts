@@ -1,5 +1,7 @@
 import {
   OffscreenFixtureOutcomeSchema,
+  OffscreenFixtureOutcomeV2Schema,
+  RosterOffscreenFixtureOutcomeV3Schema,
   RosterOffscreenFixtureOutcomeSchema, RosterSeasonScheduleSchema, RosterSeasonMatchCompletionSchema, RosterSeasonProjectionSchema,
   type RosterSeasonProjection, type RosterSeasonMatchCompletion,
   SeasonScheduleSchema,
@@ -8,6 +10,7 @@ import {
   T20SeasonProjectionStateSchema,
   type AppliedSeasonMatch,
   type OffscreenFixtureOutcome,
+  type OffscreenFixtureOutcomeV2,
   type SeasonPlayerStats,
   type SeasonSchedule,
   type SeasonTeamTableRow,
@@ -250,7 +253,11 @@ export function completionFromOffscreenOutcome(
   outcomeRaw: unknown,
 ): T20SeasonMatchCompletion {
   const schedule = SeasonScheduleSchema.parse(scheduleRaw);
-  const outcome = OffscreenFixtureOutcomeSchema.parse(outcomeRaw) as OffscreenFixtureOutcome;
+  // A season state V2 records policy V2 outcomes; the completion they produce has the same form.
+  const outcome: OffscreenFixtureOutcome | OffscreenFixtureOutcomeV2 =
+    (outcomeRaw as { executionVersion?: unknown } | null)?.executionVersion === "LC_T20_OFFSCREEN_FIXTURE_V2"
+      ? OffscreenFixtureOutcomeV2Schema.parse(outcomeRaw)
+      : OffscreenFixtureOutcomeSchema.parse(outcomeRaw);
   const fixture = schedule.fixtures.find((entry) => entry.fixtureId === outcome.fixtureId);
   assertProjection(Boolean(fixture), `UNKNOWN_FIXTURE:${outcome.fixtureId}`);
   assertProjection(fixture!.matchId === outcome.matchId, "OUTCOME_MATCH_ID_MISMATCH");
@@ -407,7 +414,10 @@ export function validateT20SeasonProjection(input: {
 
 export function rosterCompletionFromOffscreen(scheduleRaw: unknown, outcomeRaw: unknown): RosterSeasonMatchCompletion {
   const schedule = RosterSeasonScheduleSchema.parse(scheduleRaw);
-  const outcome = RosterOffscreenFixtureOutcomeSchema.parse(outcomeRaw);
+  // A lifecycle season state V2 records policy V2 (V3) outcomes; the completion they produce has the same form.
+  const outcome = (outcomeRaw as { executionVersion?: unknown } | null)?.executionVersion === "LC_T20_ROSTER_OFFSCREEN_FIXTURE_V3"
+    ? RosterOffscreenFixtureOutcomeV3Schema.parse(outcomeRaw)
+    : RosterOffscreenFixtureOutcomeSchema.parse(outcomeRaw);
   const fixture = schedule.fixtures.find(entry => entry.fixtureId === outcome.fixtureId);
   assertProjection(fixture && fixture.matchId === outcome.matchId && outcome.scheduleSha256 === schedule.scheduleSha256, "ROSTER_OUTCOME_FIXTURE_MISMATCH");
   return RosterSeasonMatchCompletionSchema.parse({ completionVersion: "LC_T20_ROSTER_SEASON_COMPLETION_V2", seasonId: schedule.request.seasonId,
