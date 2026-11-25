@@ -297,9 +297,15 @@ test("a match survives closing the whole browser with a retained profile", async
     await first.close();
 
     const second = await launch();
-    const reopened = await second.newPage();
-    await reopened.goto("/#exhibition");
-    // The previous browser may still hold the lease for up to 12 s; the page retries instead of staying read-only.
+    const restoredTab = second.pages().find(candidate => candidate.url().startsWith(String(baseURL)));
+    const reopened = restoredTab ?? await second.newPage();
+    if (restoredTab) {
+      await reopened.waitForLoadState("domcontentloaded");
+      await reopened.evaluate(() => sessionStorage.clear());
+      await reopened.reload();
+    } else await reopened.goto("/#exhibition");
+    // A previous writer lease may remain briefly after the browser closes.
+
     await expectRestored(reopened, revision);
     await expect(reopened.getByText(BANNER)).toBeVisible();
     await expect(reopened.getByTestId("save-status")).not.toContainText("Read only", { timeout: 45_000 });
