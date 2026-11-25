@@ -10,6 +10,7 @@ import {
   type MatchCommentaryFeed,
   type MatchResult,
 } from "@lcxxvi/contracts";
+import { overContext, type OverRecord } from "./commentary-context.js";
 
 export const DEFAULT_REPETITION_COOLDOWN_WINDOW = 3 as const;
 
@@ -63,6 +64,9 @@ interface InningsRunningProjection {
   pendingFreeHit: boolean;
   partnershipRuns: number;
   partnershipBalls: number;
+  /** Pavilion P07: completed overs of this innings and the legal balls since the last four or six. */
+  overHistory: OverRecord[];
+  ballsSinceBoundary: number;
   batters: Map<string, BatterRunningFigures>;
   bowlers: Map<string, BowlerRunningFigures>;
 }
@@ -257,6 +261,8 @@ export function projectMatchCommentary(
       pendingFreeHit: false,
       partnershipRuns: 0,
       partnershipBalls: 0,
+      overHistory: [],
+      ballsSinceBoundary: 0,
       batters: new Map(),
       bowlers: new Map(),
     };
@@ -347,6 +353,8 @@ export function projectMatchCommentary(
         inn.legalBalls += 1;
         inn.overLegalBalls += 1;
       }
+      if (d.boundary === "FOUR" || d.boundary === "SIX") inn.ballsSinceBoundary = 0;
+      else if (d.legalBall) inn.ballsSinceBoundary += 1;
       inn.partnershipRuns += totalRuns;
       if (d.legalBall || d.legality === "NO_BALL") {
         inn.partnershipBalls += 1;
@@ -1040,6 +1048,7 @@ export function projectMatchCommentary(
       }
       const overRuns = inn.overTeamRuns;
       const overWkts = inn.overWickets;
+      inn.overHistory.push({ runs: overRuns, wickets: overWkts });
       inn.overTeamRuns = 0;
       inn.overWickets = 0;
       inn.overLegalBalls = 0;
@@ -1104,7 +1113,12 @@ export function projectMatchCommentary(
         recentTemplateIds,
         cooldownWindow,
       );
-      const standardText = picked.selected.render();
+      // Pavilion P07: one line of match context when the innings has a story to tell.
+      const context = overContext({
+        format: input.format, overs: inn.overHistory, runs: inn.runs, legalBalls: inn.legalBalls, targetToWin: inn.targetToWin,
+        bowlerName: bowler, bowlerFigures: figs, bowlerLegalBalls: bowlerFig.legalBalls, ballsSinceBoundary: inn.ballsSinceBoundary,
+      });
+      const standardText = context ? `${picked.selected.render()} ${context.text}` : picked.selected.render();
       entries.push({
         adapterVersion: COMMENTARY_ADAPTER_VERSION,
         sequence: ev.sequence,
@@ -1143,6 +1157,7 @@ export function projectMatchCommentary(
             sourceKind: "BOWLER_PROJECTION",
             sourceRef: `bowler.${p.bowlerId}`,
           },
+          ...(context ? [{ slot: context.slot, value: context.text, sourceKind: "INNINGS_PROJECTION" as const, sourceRef: "innings.overHistory" }] : []),
         ],
       });
       continue;
