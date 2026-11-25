@@ -83,7 +83,7 @@ import type { DelegationCategory } from "./match/ai-opponent.js";
 import { readRoutinePicks, routinePickMoment, writeRoutinePicks } from "./match/routine-picks.js";
 import { keyMomentBetween, type KeyMomentSnapshot } from "./match/key-moments.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
-import { isBowlingCapable, RULE_MANIFESTS, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
+import { isBowlingCapable, RULE_MANIFESTS, suggestedEleven, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
 type Body = Request extends infer R
   ? R extends Request
@@ -261,11 +261,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       const byId = new Map(world.players.map(player => [player.playerId, player]));
       return { teams: world.teams.map(team => {
         const players = team.squadIds.map(id => byId.get(id)!);
-        const keeper = players.find(player => player.role === "KEEPER")!;
-        const bowlers = players.filter(player => player !== keeper && isBowlingCapable(player)).slice(0, 5);
-        const xi = [keeper, ...bowlers, ...players.filter(player => player !== keeper && !bowlers.includes(player))].slice(0, 11);
+        // The shared suggested eleven (P04 stage A), not "keeper, first five bowlers, then squad order".
+        const suggested = suggestedEleven(players, "T20");
         return { id: team.teamId, name: team.name, players: players.map(player => ({ id: player.playerId, name: player.name, role: player.role, style: player.bowlingStyle, canBowl: isBowlingCapable(player) })),
-          suggested: { teamId: team.teamId, playerIds: xi.map(player => player.playerId), captainId: keeper.playerId, keeperId: keeper.playerId } };
+          suggested: { teamId: team.teamId, ...suggested } };
       }), grounds: world.grounds.map(ground => ({ id: ground.groundId, name: ground.name })) };
     }
     if (!catalog || !stagedWorld) return catalog;
