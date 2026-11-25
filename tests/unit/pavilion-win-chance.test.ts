@@ -23,9 +23,9 @@ describe("Pavilion B9: T20 chase win chance", () => {
   });
 
   it("is close to an even contest at the start of a chase of the model's average total", () => {
-    // The model's mean first innings is 83.2 runs, so a target of 84 needs 84.
-    expect(t20ChaseWinChance(84, 0, 0)).toBeGreaterThanOrEqual(40);
-    expect(t20ChaseWinChance(84, 0, 0)).toBeLessThanOrEqual(60);
+    // Table V3 (the suggested eleven): the model's mean first innings is 103.8 runs, so a target of 105.
+    expect(t20ChaseWinChance(105, 0, 0)).toBeGreaterThanOrEqual(40);
+    expect(t20ChaseWinChance(105, 0, 0)).toBeLessThanOrEqual(60);
   });
 
   it("ships with its recorded evaluation: better than the base rate on the corpus chases", () => {
