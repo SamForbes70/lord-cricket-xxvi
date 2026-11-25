@@ -1302,7 +1302,7 @@ export function projectMatchCommentary(
             sourceRef: "result.winnerTeamId",
           });
           if (r.marginType === "RUNS") {
-            short = `${winner} won by ${r.marginRuns} runs`;
+            short = `${winner} won by ${r.marginRuns} run${r.marginRuns === 1 ? "" : "s"}`;
             standardText = `Result: ${winner} win by ${r.marginRuns} run${r.marginRuns === 1 ? "" : "s"}.`;
             factSlots.push({
               slot: "marginRuns",
@@ -1311,7 +1311,7 @@ export function projectMatchCommentary(
               sourceRef: "result.marginRuns",
             });
           } else if (r.marginType === "WICKETS") {
-            short = `${winner} won by ${r.marginWickets} wkts`;
+            short = `${winner} won by ${r.marginWickets} wkt${r.marginWickets === 1 ? "" : "s"}`;
             standardText = `Result: ${winner} win by ${r.marginWickets} wicket${r.marginWickets === 1 ? "" : "s"}.`;
             factSlots.push({
               slot: "marginWickets",

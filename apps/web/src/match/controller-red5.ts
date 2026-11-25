@@ -1,4 +1,5 @@
 import { proposeOpponentRed5Command } from "./ai-opponent.js";
+import { marginText } from "./margin-text.js";
 import { recommendDecisions, withRecommendation } from "./recommendation.js";
 import {
   createMatchAnalyticsCache,
@@ -256,7 +257,7 @@ export function createRed5MatchController(
         ? r.kind === "DRAW" ? "Match drawn"
           : r.kind === "TIE" ? "Match tied"
           : r.marginType === "INNINGS" ? `${tn(r.winnerTeamId)} won by an innings and ${r.marginRuns} run${r.marginRuns === 1 ? "" : "s"}`
-          : `${tn(r.winnerTeamId)} won by ${r.marginRuns ?? r.marginWickets} ${r.marginType?.toLowerCase()}`
+          : `${tn(r.winnerTeamId)} won by ${marginText(r)}`
         : null;
     return {
       format: "RED_BALL",
