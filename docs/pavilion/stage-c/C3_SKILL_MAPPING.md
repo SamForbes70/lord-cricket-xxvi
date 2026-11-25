@@ -9,7 +9,71 @@
 - fit period up to 2023-08-31, selection period 2023-09-01 to 2025-08-24;
 - the holdout, read once in C2, was not used.
 
-**Pack:** `LC_CALIBRATED_T20_SKILL_V2`, SHA-256 `90ba2058f2d664258cc1d3f8b19109d2a99c0adf97f9757829240ebc00e6ffc5`.
+**Pack:** `LC_CALIBRATED_T20_SKILL_V2`, SHA-256 `90ba2058f2d664258cc1d3f8b19109d2a99c0adf97f9757829240ebc00e6ffc5`. Sections 1 to 5 record V2.
+
+## Revision V3: batting aimed at the upper end of the real range
+
+**Status:** per-point gates re-run, 9 of 9 PASS. The adjusted, raw, specialisation and tactical gates are **NOT RUN, pending captain V4 (#146)**.
+
+**Why a new version.** V2 is already consumed: it is published in PR #145, and `c3-report.json`, `c3-skill-differentiation.json` and the tactical runs below were produced with it. So the revision is a new version, `LC_CALIBRATED_T20_SKILL_V3`, SHA-256 `8e7768676be4fa31cbfb77d1aea7bd62c91267d3ab0e17e3862751a1a26b20f0`, under the same research-only model id `calibrated-t20-01`. V2's files stay as V2's record.
+
+**Owner decision.** Aim the batting per-point effect at the upper end of the measured real range. The same targets are used (`c3-mapping.json`: fit period, full-member reference, quarters of the game's regular players). Only the calibration split was used; the holdout was not.
+
+| Per-point effect (oriented) | Real range | V2 (position in range) | **V3 (position in range)** | V3 verdict |
+| --- | --- | ---: | ---: | --- |
+| Batter runs | 0.00778 to 0.00923 | 0.00899 (83%) | **0.00917 (96%)** | PASS |
+| Batter boundary | 0.01272 to 0.01551 | 0.01279 (3%) | **0.01380 (39%)** | PASS |
+| Batter non-dot | 0.00516 to 0.00615 | 0.00563 (48%) | **0.00536 (20%)** | PASS |
+| Batter dismissal (fewer) | 0 to 0.01263 | 0.00482 | **0.00454** | PASS |
+| Bowler runs (fewer) | 0.01195 to 0.01458 | 0.01358 | **0.01354** | PASS |
+| Bowler boundary (fewer) | 0.02119 to 0.02698 | 0.02173 | **0.02185** | PASS |
+| Bowler non-dot (fewer) | 0.00801 to 0.00965 | 0.00824 | **0.00816** | PASS |
+| Bowler dismissal (more) | 0 to 0.0206 | 0.00636 | **0.00629** | PASS |
+| Variation trade-off: wickets / runs | both positive | +0.0095 / +0.0054 | **+0.0093 / +0.0054** | PASS |
+
+**The three batting targets pull against each other.** Batter runs is now at the top of its range. That bound is what stops the boundary effect going higher.
+- In the real data, nearly all of a better batter's extra runs come from boundaries, not singles.
+- In this model, raising the boundary effect further raises runs per ball past 0.00923.
+- Trading singles for boundaries (iterations 5 and 6) pushed non-dot below its floor.
+- V3 therefore sits at 96% of the runs range, 39% of the boundary range and 20% of the non-dot range.
+
+**Terms changed from V2** (bp, on `(rating - world mean) x 200`):
+
+| Stage, category | V2 | V3 |
+| --- | --- | --- |
+| Runs 0 | control +6,000, rotation +2,600 | control +6,000, rotation **+3,000** |
+| Runs 4 and 6 | timing -1,300, power -1,300 (bowling terms as V2) | timing **-800**, power **-800** (bowling terms unchanged) |
+| Contact | as C2 | unchanged |
+
+**Search.** Five dose-response iterations, numbered 5 to 9 after V2's four:
+
+| Iteration | Change | Result |
+| ---: | --- | --- |
+| 5 | single -2,000, boundary +200 | overshoot: boundary 0.0193, non-dot 0.0038 |
+| 6 | single -1,200, boundary -300 | still over |
+| 7 | no single term, boundary -400, rotation 3,700 | non-dot 0.0049, below its floor |
+| 8 | boundary -700, rotation 3,000 | runs 0.00924, just over |
+| 9 | boundary -800 | V3 |
+
+**Commands** (on `ab70a31` plus this revision, pack hash `8e776867...`):
+
+```bash
+node --import tsx scripts/stage-c/c2-pin-pack.ts --write   # prints 8e7768676be4fa31cbfb77d1aea7bd62c91267d3ab0e17e3862751a1a26b20f0
+bash scripts/stage-c/c2-dose.sh /home/user/lcx-data/c3-dose-it9 calibrated-t20-01   # exit 0
+python3 -I scripts/stage-c/c3-per-point-gate.py --dose /home/user/lcx-data/c3-dose-it9/per-point.json \
+  --mapping docs/pavilion/stage-c/c3-mapping.json --pack-version LC_CALIBRATED_T20_SKILL_V3 \
+  --pack-sha256 8e7768676be4fa31cbfb77d1aea7bd62c91267d3ab0e17e3862751a1a26b20f0 --out docs/pavilion/stage-c/c3-v3-per-point.json   # exit 0
+```
+
+`c3-v2-per-point.json` records V2 on the same gate script, using V2's iteration-4 dose run, for comparison.
+
+**NOT RUN, pending captain V4 (#146):**
+- criterion 1 adjusted and raw;
+- specialisation;
+- the tactical validation rerun;
+- first-innings aggregates.
+
+Those gates depend on the captain's bowler deployment. They are re-run once #146 is merged.
 
 ## 1. Gate results
 
