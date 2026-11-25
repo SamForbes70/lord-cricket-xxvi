@@ -7,14 +7,14 @@ describe("Pavilion B7: likely T20 total", () => {
     expect(T20_EXPECTATION_TABLE.innings).toBe(100);
     expect(T20_EXPECTATION_TABLE.rows).toHaveLength(20);
     expect(T20_EXPECTATION_TABLE.rows[0]![0]!.n).toBe(100);
-    // The corpus mean first innings is 83.2 runs; rounded to the nearest 5.
-    expect(likelyT20Total(0, 0, 0)).toBe(85);
+    // Table V3 (the suggested eleven): the corpus mean first innings is 103.8 runs; rounded to the nearest 5.
+    expect(likelyT20Total(0, 0, 0)).toBe(105);
   });
 
   it("does not extrapolate a fast start the way a run-rate projection does", () => {
     // 16 for 1 after two overs reads 160 at the current rate; the model expects far fewer.
     expect(Math.round((16 * 120) / 12)).toBe(160);
-    expect(likelyT20Total(16, 1, 12)).toBe(90);
+    expect(likelyT20Total(16, 1, 12)).toBe(110);
   });
 
   it("rises with runs on the board, rounds to fives, and is the score itself when the innings is over", () => {
@@ -27,7 +27,7 @@ describe("Pavilion B7: likely T20 total", () => {
 
   it("is what the match situation shows for a T20, while a one-day innings keeps the run-rate wording", () => {
     const t20 = matchSituation({ format: "T20", runs: 16, wickets: 1, legalBalls: 12, targetToWin: null, lastWicket: null, partnershipKnown: false, matchComplete: false })!;
-    expect(t20.facts).toContain("Likely total about 90");
+    expect(t20.facts).toContain("Likely total about 110");
     const odi = matchSituation({ format: "ODI", runs: 100, wickets: 2, legalBalls: 120, targetToWin: null, lastWicket: null, partnershipKnown: false, matchComplete: false })!;
     expect(odi.facts).toContain("On course for 250 at this rate");
   });

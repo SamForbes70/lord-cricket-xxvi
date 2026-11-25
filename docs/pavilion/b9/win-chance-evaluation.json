@@ -1,125 +1,125 @@
 {
   "version": "LC_PAVILION_WIN_CHANCE_EVALUATION_V1",
-  "table": "LC_T20_EXPECTATION_TABLE_V2",
+  "table": "LC_T20_EXPECTATION_TABLE_V3",
   "corpusSha256": "14fd1f01736fdfeed5686c927ea4570ac08591fe36552edf2a66ba0243f20014",
   "chases": 100,
-  "chasesWon": 54,
-  "points": 1734,
+  "chasesWon": 56,
+  "points": 1724,
   "brier": {
-    "raw": 0.1532,
-    "baseRate": 0.2495,
+    "raw": 0.1172,
+    "baseRate": 0.2514,
     "coinFlip": 0.25
   },
   "crossValidation": [
     {
       "heldOutFold": 0,
       "fit": {
-        "a": -0.0555,
-        "b": 0.7452
+        "a": 0.3039,
+        "b": 1.2362
       },
-      "raw": 0.1448,
-      "recalibrated": 0.1482
+      "raw": 0.141,
+      "recalibrated": 0.1324
     },
     {
       "heldOutFold": 1,
       "fit": {
-        "a": 0.8422,
-        "b": 0.9885
+        "a": 0.8081,
+        "b": 0.9022
       },
-      "raw": 0.1617,
-      "recalibrated": 0.1826
+      "raw": 0.092,
+      "recalibrated": 0.0997
     }
   ],
   "recalibration": {
-    "a": 0.3512,
-    "b": 0.8235
+    "a": 0.5962,
+    "b": 1.0441
   },
   "calibrationRaw": [
     {
       "from": 0,
       "to": 0.1,
-      "points": 378,
-      "meanPredicted": 0.03,
-      "observedWinRate": 0.063
+      "points": 485,
+      "meanPredicted": 0.024,
+      "observedWinRate": 0.021
     },
     {
       "from": 0.1,
       "to": 0.3,
-      "points": 255,
-      "meanPredicted": 0.195,
-      "observedWinRate": 0.329
+      "points": 259,
+      "meanPredicted": 0.187,
+      "observedWinRate": 0.251
     },
     {
       "from": 0.3,
       "to": 0.5,
-      "points": 281,
-      "meanPredicted": 0.4,
-      "observedWinRate": 0.477
+      "points": 167,
+      "meanPredicted": 0.41,
+      "observedWinRate": 0.683
     },
     {
       "from": 0.5,
       "to": 0.7,
-      "points": 239,
-      "meanPredicted": 0.595,
-      "observedWinRate": 0.669
+      "points": 230,
+      "meanPredicted": 0.603,
+      "observedWinRate": 0.761
     },
     {
       "from": 0.7,
       "to": 0.9,
-      "points": 328,
-      "meanPredicted": 0.806,
-      "observedWinRate": 0.814
+      "points": 304,
+      "meanPredicted": 0.8,
+      "observedWinRate": 0.859
     },
     {
       "from": 0.9,
       "to": 1,
-      "points": 253,
-      "meanPredicted": 0.959,
-      "observedWinRate": 0.96
+      "points": 279,
+      "meanPredicted": 0.964,
+      "observedWinRate": 0.964
     }
   ],
   "calibrationRecalibrated": [
     {
       "from": 0,
       "to": 0.1,
-      "points": 261,
-      "meanPredicted": 0.03,
-      "observedWinRate": 0.019
+      "points": 415,
+      "meanPredicted": 0.021,
+      "observedWinRate": 0.012
     },
     {
       "from": 0.1,
       "to": 0.3,
-      "points": 242,
-      "meanPredicted": 0.197,
-      "observedWinRate": 0.215
+      "points": 220,
+      "meanPredicted": 0.19,
+      "observedWinRate": 0.132
     },
     {
       "from": 0.3,
       "to": 0.5,
-      "points": 253,
-      "meanPredicted": 0.405,
-      "observedWinRate": 0.423
+      "points": 149,
+      "meanPredicted": 0.389,
+      "observedWinRate": 0.463
     },
     {
       "from": 0.5,
       "to": 0.7,
-      "points": 331,
-      "meanPredicted": 0.591,
-      "observedWinRate": 0.556
+      "points": 188,
+      "meanPredicted": 0.611,
+      "observedWinRate": 0.697
     },
     {
       "from": 0.7,
       "to": 0.9,
-      "points": 402,
-      "meanPredicted": 0.807,
-      "observedWinRate": 0.818
+      "points": 356,
+      "meanPredicted": 0.811,
+      "observedWinRate": 0.803
     },
     {
       "from": 0.9,
       "to": 1,
-      "points": 245,
-      "meanPredicted": 0.955,
-      "observedWinRate": 0.959
+      "points": 396,
+      "meanPredicted": 0.964,
+      "observedWinRate": 0.944
     }
   ],
   "note": "In-model evidence on the 100-match synthetic corpus: predicted at the start of every over of every chase. Not real cricket."

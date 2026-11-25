@@ -5,13 +5,16 @@
  * the table never saw. At the start of every over of every chase it records the predicted chance and whether the
  * chasing side won, then reports the Brier score against two baselines and a calibration table. It also tests a
  * Platt recalibration with two-fold cross-validation (fit on half the matches, score on the other half); the game
- * ships the unrecalibrated estimate because that recalibration made the held-out score worse in both folds.
+ * ships the unrecalibrated estimate unless that recalibration improves the held-out score in both folds. With table V2
+ * it was worse in both; with V3 (the suggested eleven, Pavilion P04 stage A) it is better in one fold and worse in
+ * the other, so the unrecalibrated estimate stays.
  *
  *   node --import tsx scripts/pavilion-win-chance-evaluate.ts [output.json]
  *
  * In-model evidence only: it says nothing about real cricket.
  */
 import { readFileSync, writeFileSync } from "node:fs";
+import { suggestedEleven } from "@lcxxvi/data";
 import { validateT20MatchSetup, createT20CorpusRequest, runFixtureT20, projectT20Scorecard } from "@lcxxvi/simulation";
 import { t20ChaseWinChanceRaw, T20_EXPECTATION_TABLE } from "@lcxxvi/projections";
 
@@ -19,6 +22,13 @@ const bytes = readFileSync("packages/data/worlds/fictional-eight-01.json");
 const world = JSON.parse(bytes.toString("utf8"));
 const manifest = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.manifest.json", "utf8"));
 const base = JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json", "utf8"));
+
+/** Pavilion P04 stage A: both sides field the suggested eleven, as new matches in the game now do. */
+const playersById = new Map((world.players as { playerId: string }[]).map((p) => [p.playerId, p]));
+function withSuggestedElevens<T extends { selectedTeams: { teamId: string }[] }>(request: T): T {
+  const squad = (teamId: string) => (world.teams as { teamId: string; squadIds: string[] }[]).find((t) => t.teamId === teamId)!.squadIds.map((id) => playersById.get(id)!);
+  return { ...request, selectedTeams: request.selectedTeams.map((s) => ({ teamId: s.teamId, ...suggestedEleven(squad(s.teamId) as never, "T20") })) };
+}
 const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "utf8")) as { cases: unknown[] };
 
 type Delivery = { type: string; inningsIndex: number; legalBall: boolean; batRuns: number; dismissal: unknown; extras: Record<string, number> };
@@ -26,7 +36,7 @@ const points: { p: number; won: 0 | 1; over: number; fold: 0 | 1 }[] = [];
 let caseIndex = 0;
 let chases = 0, chasesWon = 0;
 for (const raw of corpus.cases) {
-  const setup = validateT20MatchSetup(createT20CorpusRequest(raw, base, world), bytes, manifest);
+  const setup = validateT20MatchSetup(withSuggestedElevens(createT20CorpusRequest(raw, base, world) as never), bytes, manifest);
   const game = runFixtureT20(setup);
   const card = projectT20Scorecard(game);
   const target = card.innings[0]!.runs + 1;

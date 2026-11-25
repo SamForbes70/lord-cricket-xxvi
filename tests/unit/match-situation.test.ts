@@ -7,14 +7,14 @@ const at = (overrides: Partial<MatchSituationInput>) => matchSituation({ ...base
 describe("match situation", () => {
   test("first innings: rate, the model's likely total and partnership from the board", () => {
     const s = at({ runs: 84, wickets: 2, legalBalls: 60, lastWicket: { runs: 50, legalBalls: 38 } })!;
-    expect(s).toMatchObject({ kind: "FIRST_INNINGS", currentRateX100: 840, projectedTotal: 125, partnership: { runs: 34, balls: 22 }, pressure: null, ballsLeft: 60, wicketsInHand: 8 });
+    expect(s).toMatchObject({ kind: "FIRST_INNINGS", currentRateX100: 840, projectedTotal: 135, partnership: { runs: 34, balls: 22 }, pressure: null, ballsLeft: 60, wicketsInHand: 8 });
     expect(s.headline).toBe("60 balls left, 8 wickets in hand.");
-    expect(s.facts).toEqual(["Run rate 8.40", "Likely total about 125", "Partnership 34 from 22 balls"]);
+    expect(s.facts).toEqual(["Run rate 8.40", "Likely total about 135", "Partnership 34 from 22 balls"]);
   });
 
   test("no projection or pressure reading before two overs are bowled, and no partnership when wickets are unaccounted for", () => {
     expect(at({ runs: 12, legalBalls: 11 })).toMatchObject({ projectedTotal: null, currentRateX100: 655 });
-    expect(at({ runs: 12, legalBalls: 12 })).toMatchObject({ projectedTotal: 90 });
+    expect(at({ runs: 12, legalBalls: 12 })).toMatchObject({ projectedTotal: 105 });
     expect(at({ runs: 40, wickets: 3, legalBalls: 30, partnershipKnown: false })!.partnership).toBeNull();
     expect(at({ runs: 5, legalBalls: 6, targetToWin: 150 })!.pressure).toBeNull();
     expect(at({})).toMatchObject({ currentRateX100: null, facts: [] });
