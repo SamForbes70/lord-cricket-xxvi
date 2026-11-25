@@ -105,6 +105,17 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
       legalBallsBowled: ledger.bowling[p.playerId]!.legalBalls,
       quotaRemaining: 24 - ledger.bowling[p.playerId]!.legalBalls,
     }));
+  // The previous over's bowler with public bowling skills, so captain V4's death-over plan counts them.
+  const previousBowler = () => {
+    const id = i.previousOverBowlerId;
+    if (!id) return null;
+    const s = bowlingTeam.xi.find(p => p.playerId === id)?.skills.T20;
+    return {
+      playerId: id,
+      quotaRemaining: 24 - (ledger.bowling[id]?.legalBalls ?? 0),
+      ...(s ? { control: s.control, movement: s.movement, variation: s.variation, stamina: s.stamina } : {}),
+    };
+  };
   const view = {
     inningsLegalBalls: i.legalBalls,
     inningsRuns: i.runs,
@@ -112,7 +123,7 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
     targetToWin: i.targetToWin,
     availableBatters: Math.max(0, 10 - i.wickets),
     bowlingCandidates: bowlers,
-    previousOverBowler: i.previousOverBowlerId ? { playerId: i.previousOverBowlerId, quotaRemaining: 24 - (ledger.bowling[i.previousOverBowlerId]?.legalBalls ?? 0) } : null,
+    previousOverBowler: previousBowler(),
     ...battersAtCrease(session, i),
   };
   const advice = { ...adviseT20Captain(view) };
@@ -143,18 +154,20 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
           b.fatigueBp / 250 -
           (a.control + a.movement - a.fatigueBp / 250),
       );
+    // Captain V4 already keeps its best bowlers' last overs for overs 16 to 20, so a captain who banks late overs
+    // also holds its top bowler back within the death (overs 16 to 18) for the last two overs. Before the death this
+    // rule would spend a reserved over early, so V4's choice stands there. Both modes otherwise take V4's choice:
+    // the match-aware captain no longer bowls its best bowler first, which left the weakest bowlers the death.
     const reserve =
       ranked.length > 1 &&
       bankLateOvers &&
-      i.legalBalls >= 72 &&
+      i.legalBalls >= 90 &&
       i.legalBalls < 108 &&
       ranked[0]!.quotaRemaining <= 12;
     const pick = reserve
       ? ranked[1]!
-      : matchAware
-        ? ranked[0]!
-        : (ranked.find((b) => b.playerId === advice.preferredBowlerId) ??
-          ranked[0]!);
+      : (ranked.find((b) => b.playerId === advice.preferredBowlerId) ??
+        ranked[0]!);
     return {
       ...base,
       actorId: `AI:${teamId}`,

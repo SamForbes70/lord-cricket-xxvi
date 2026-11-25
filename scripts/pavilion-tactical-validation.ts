@@ -2,7 +2,8 @@
  * Project Pavilion: does good management beat deliberately poor management? (owner direction of 25 November 2026,
  * "Tactical validation").
  *
- * Each experiment changes ONE decision area. The "good" side is the tactical captain (captain V2, as on main) with the
+ * Each experiment changes ONE decision area. The "good" side is the tactical captain (the code's adviseT20Captain,
+ * recorded in the output as `captain`; V2 when first measured, V4 from 25 November 2026) with the
  * suggested eleven. The "poor" side is identical except in that one area. Each of the 100 frozen corpus seeds is
  * played twice, the poor management on one side and then on the other, so team strength, toss and seed cancel out.
  *
@@ -14,7 +15,7 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { isBowlingCapable, suggestedEleven } from "@lcxxvi/data";
-import { adviseT20Captain, feasibleBowlerChoice, bowlersWithOversLeft } from "@lcxxvi/ai";
+import { adviseT20Captain, feasibleBowlerChoice, bowlersWithOversLeft, T20_TACTICAL_CAPTAIN_ID } from "@lcxxvi/ai";
 import {
   createT20CorpusRequest, createT20Session, executeT20Command, fixtureAutopilotStep, validateT20MatchSetup,
   type T20Session,
@@ -97,7 +98,7 @@ function command(session: T20Session, actorTeam: string, kind: T20Command["kind"
   return { expectedRevision: session.revision, commandId: `tv-${String(session.revision + 1).padStart(6, "0")}`, actorId: `AI:${actorTeam}`, kind, payload } as T20Command;
 }
 
-/** Good management is captain V2 for bowler, batting plan and bowling plan, and the engine's default field. */
+/** Good management is the tactical captain for bowler, batting plan and bowling plan, and the engine's default field. */
 function step(session: T20Session, managers: ReadonlyMap<string, Management>): T20Command {
   const phase = session.core.phase;
   const i = session.core.innings[session.core.activeInningsIndex]?.innings;
@@ -191,7 +192,8 @@ const results = chosen.map((name) => { const r = experiment(name); console.error
 const output = {
   version: "LC_PAVILION_TACTICAL_VALIDATION_V1",
   model: "synthetic-alpha-01",
-  design: "100 frozen corpus seeds, each played twice with the poor management on each side; good = tactical captain V2, suggested eleven, engine default field",
+  captain: T20_TACTICAL_CAPTAIN_ID,
+  design: "100 frozen corpus seeds, each played twice with the poor management on each side; good = the tactical captain named in `captain`, suggested eleven, engine default field",
   note: "Second-innings runs stop when the target is reached, so the run difference understates the gap in matches the chasing side wins.",
   results,
 };
