@@ -1,0 +1,415 @@
+{
+ "version": "LC_STAGE_C_C2_FIT_V1",
+ "researchOnly": true,
+ "gameplayIntegrationPermitted": false,
+ "attribution": {
+  "source": "Cricsheet, https://cricsheet.org/",
+  "sourceURL": "https://cricsheet.org/downloads/t20s_json.zip",
+  "licence": "Open Data Commons Attribution License (ODC-By) 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "archiveSha256": "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "retrievedAtUTC": "2026-11-25T12:57:47.048656+00:00",
+  "note": "Derived aggregates only (no ball-by-ball records). Contains information from Cricsheet, made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/."
+ },
+ "reference": {
+  "cohort": "men's T20 internationals between two full members",
+  "fullMembers": [
+   "Afghanistan",
+   "Australia",
+   "Bangladesh",
+   "England",
+   "India",
+   "Ireland",
+   "New Zealand",
+   "Pakistan",
+   "South Africa",
+   "Sri Lanka",
+   "West Indies",
+   "Zimbabwe"
+  ],
+  "note": "Cricsheet withholds Afghanistan men's matches"
+ },
+ "periods": {
+  "fit": "<= 2023-08-31",
+  "validation": "2023-09-01 to 2025-08-24",
+  "holdout": "not read"
+ },
+ "matches": {
+  "fit": 835,
+  "validation": 166
+ },
+ "outcomes": {
+  "dismissal": {
+   "metric": "logLoss",
+   "phaseBaselineFit": [
+    0.04398999311606978,
+    0.045297700377480835,
+    0.08366317039382545
+   ],
+   "phaseOnlyValidationLoss": 0.22085718119297046,
+   "batter": {
+    "players": 342,
+    "trueRelativeSD": 0.17363038281052773
+   },
+   "bowler": {
+    "players": 383,
+    "trueRelativeSD": 0.10352593375489248
+   },
+   "poolingTrials": [
+    {
+     "lambda": 0.5,
+     "lossChange": 4.7187671396963444e-05,
+     "lossChange95": [
+      -0.00027897764647124613,
+      0.0004290557681094575
+     ]
+    },
+    {
+     "lambda": 1.0,
+     "lossChange": -0.00010621876792381157,
+     "lossChange95": [
+      -0.0003609637752707977,
+      0.00016547888377782197
+     ]
+    },
+    {
+     "lambda": 2.0,
+     "lossChange": -0.00015128202782765756,
+     "lossChange95": [
+      -0.00031990483472275265,
+      2.6842044869191043e-05
+     ]
+    },
+    {
+     "lambda": 4.0,
+     "lossChange": -0.00013557321552858047,
+     "lossChange95": [
+      -0.000239321017515332,
+      -2.520509464756711e-05
+     ]
+    },
+    {
+     "lambda": 8.0,
+     "lossChange": -9.722151411123984e-05,
+     "lossChange95": [
+      -0.00015800306861733118,
+      -3.15678862626731e-05
+     ]
+    },
+    {
+     "lambda": 16.0,
+     "lossChange": -6.027351513384371e-05,
+     "lossChange95": [
+      -9.411275966879232e-05,
+      -2.319025822410205e-05
+     ]
+    },
+    {
+     "lambda": "full pooling",
+     "lossChange": -1.2425335944234309e-12,
+     "lossChange95": [
+      -1.867907162002791e-12,
+      -5.44487971502939e-13
+     ]
+    }
+   ],
+   "chosen": {
+    "lambda": 2.0,
+    "lossChange": -0.00015128202782765756,
+    "lossChange95": [
+     -0.00031990483472275265,
+     2.6842044869191043e-05
+    ]
+   },
+   "predictsLaterMatches": false
+  },
+  "boundary": {
+   "metric": "logLoss",
+   "phaseBaselineFit": [
+    0.18227304017864637,
+    0.1266413468886779,
+    0.1802889372649911
+   ],
+   "phaseOnlyValidationLoss": 0.47138807364852325,
+   "batter": {
+    "players": 342,
+    "trueRelativeSD": 0.18265170068800995
+   },
+   "bowler": {
+    "players": 383,
+    "trueRelativeSD": 0.1647662410307306
+   },
+   "poolingTrials": [
+    {
+     "lambda": 0.5,
+     "lossChange": -0.0030400515501233,
+     "lossChange95": [
+      -0.004523132050130594,
+      -0.00179171801442374
+     ]
+    },
+    {
+     "lambda": 1.0,
+     "lossChange": -0.003164017716432963,
+     "lossChange95": [
+      -0.0044076772692449966,
+      -0.002146036368027145
+     ]
+    },
+    {
+     "lambda": 2.0,
+     "lossChange": -0.0029665773612684533,
+     "lossChange95": [
+      -0.0040038787239412895,
+      -0.00215383919751472
+     ]
+    },
+    {
+     "lambda": 4.0,
+     "lossChange": -0.002508848747462363,
+     "lossChange95": [
+      -0.0033396574413551185,
+      -0.001893773383813641
+     ]
+    },
+    {
+     "lambda": 8.0,
+     "lossChange": -0.0019005780705608503,
+     "lossChange95": [
+      -0.0024648285339374507,
+      -0.0014603506917386328
+     ]
+    },
+    {
+     "lambda": 16.0,
+     "lossChange": -0.0012851302982246474,
+     "lossChange95": [
+      -0.0016534204759370967,
+      -0.00099549003184879
+     ]
+    },
+    {
+     "lambda": "full pooling",
+     "lossChange": -3.2529217274513874e-11,
+     "lossChange95": [
+      -4.1796797388593296e-11,
+      -2.572645160485157e-11
+     ]
+    }
+   ],
+   "chosen": {
+    "lambda": 1.0,
+    "lossChange": -0.003164017716432963,
+    "lossChange95": [
+     -0.0044076772692449966,
+     -0.002146036368027145
+    ]
+   },
+   "predictsLaterMatches": true
+  },
+  "nonDot": {
+   "metric": "logLoss",
+   "phaseBaselineFit": [
+    0.5109051528736211,
+    0.6579050971492092,
+    0.679225212744904
+   ],
+   "phaseOnlyValidationLoss": 0.663190460527876,
+   "batter": {
+    "players": 342,
+    "trueRelativeSD": 0.07629674211059875
+   },
+   "bowler": {
+    "players": 383,
+    "trueRelativeSD": 0.05868023580392674
+   },
+   "poolingTrials": [
+    {
+     "lambda": 0.5,
+     "lossChange": -0.0028917184207642986,
+     "lossChange95": [
+      -0.004328449533359449,
+      -0.0015445238428718274
+     ]
+    },
+    {
+     "lambda": 1.0,
+     "lossChange": -0.003009110490315184,
+     "lossChange95": [
+      -0.004257631379395511,
+      -0.0019154509825260503
+     ]
+    },
+    {
+     "lambda": 2.0,
+     "lossChange": -0.00278988673269514,
+     "lossChange95": [
+      -0.0037545840092791053,
+      -0.001920221354380362
+     ]
+    },
+    {
+     "lambda": 4.0,
+     "lossChange": -0.0023330506450830956,
+     "lossChange95": [
+      -0.0030064736494389514,
+      -0.0017061374160349284
+     ]
+    },
+    {
+     "lambda": 8.0,
+     "lossChange": -0.0017747356641442916,
+     "lossChange95": [
+      -0.0022758952828113607,
+      -0.0013467315392055763
+     ]
+    },
+    {
+     "lambda": 16.0,
+     "lossChange": -0.001237435300394149,
+     "lossChange95": [
+      -0.001575094654877941,
+      -0.0009295698323382388
+     ]
+    },
+    {
+     "lambda": "full pooling",
+     "lossChange": -3.807998203899103e-11,
+     "lossChange95": [
+      -4.9505187969761333e-11,
+      -2.7992250348062944e-11
+     ]
+    }
+   ],
+   "chosen": {
+    "lambda": 1.0,
+    "lossChange": -0.003009110490315184,
+    "lossChange95": [
+     -0.004257631379395511,
+     -0.0019154509825260503
+    ]
+   },
+   "predictsLaterMatches": true
+  },
+  "runs": {
+   "metric": "meanSquaredError",
+   "phaseBaselineFit": [
+    1.1980557094645645,
+    1.2083092100692434,
+    1.4685830199881258
+   ],
+   "phaseOnlyValidationLoss": 3.0246775933984376,
+   "batter": {
+    "players": 342,
+    "trueRelativeSD": 0.11310211118317222
+   },
+   "bowler": {
+    "players": 383,
+    "trueRelativeSD": 0.08720446443936218
+   },
+   "poolingTrials": [
+    {
+     "lambda": 0.5,
+     "lossChange": -0.025725162519076215,
+     "lossChange95": [
+      -0.03475249416547124,
+      -0.018262009942675583
+     ]
+    },
+    {
+     "lambda": 1.0,
+     "lossChange": -0.024980881038040356,
+     "lossChange95": [
+      -0.03263482943022285,
+      -0.018616374847708207
+     ]
+    },
+    {
+     "lambda": 2.0,
+     "lossChange": -0.022219762066852965,
+     "lossChange95": [
+      -0.028770457014067993,
+      -0.016771777237238418
+     ]
+    },
+    {
+     "lambda": 4.0,
+     "lossChange": -0.018072307544854973,
+     "lossChange95": [
+      -0.02315256428576639,
+      -0.013995409686720488
+     ]
+    },
+    {
+     "lambda": 8.0,
+     "lossChange": -0.013399169212296766,
+     "lossChange95": [
+      -0.016966243243825105,
+      -0.010564919617489532
+     ]
+    },
+    {
+     "lambda": 16.0,
+     "lossChange": -0.00902700427100125,
+     "lossChange95": [
+      -0.01131916212719528,
+      -0.007128656138109748
+     ]
+    },
+    {
+     "lambda": "full pooling",
+     "lossChange": -2.364611632437498e-10,
+     "lossChange95": [
+      -2.9331011535993176e-10,
+      -1.891364106761502e-10
+     ]
+    }
+   ],
+   "chosen": {
+    "lambda": 0.5,
+    "lossChange": -0.025725162519076215,
+    "lossChange95": [
+     -0.03475249416547124,
+     -0.018262009942675583
+    ]
+   },
+   "predictsLaterMatches": true
+  }
+ },
+ "crossOutcomeCorrelations": {
+  "bowlerWicketVsRuns": {
+   "crossHalfCovariance": 0.0011908149127976989,
+   "trueSDs": [
+    0.07623884835263992,
+    0.08795278656112254
+   ],
+   "correlation": 0.1775899291225596
+  },
+  "bowlerWicketVsBoundary": {
+   "crossHalfCovariance": 0.00465071052494689,
+   "trueSDs": [
+    0.07623884835263992,
+    0.1600926693161109
+   ],
+   "correlation": 0.38104084819041034
+  },
+  "batterBoundaryVsDismissal": {
+   "crossHalfCovariance": 0.006264460571397687,
+   "trueSDs": [
+    0.20047194433441698,
+    0.14682687199875605
+   ],
+   "correlation": 0.21282592563396827
+  },
+  "batterRunsVsDismissal": {
+   "crossHalfCovariance": 0.0019244929818508145,
+   "trueSDs": [
+    0.12770717613812738,
+    0.14682687199875605
+   ],
+   "correlation": 0.10263499916389492
+  }
+ },
+ "note": "Correlations use halves of the whole calibration split (full members), not the validation period. Half-sample effects with at least 50 balls in each half; correlation = cross-half covariance / product of true SDs."
+}

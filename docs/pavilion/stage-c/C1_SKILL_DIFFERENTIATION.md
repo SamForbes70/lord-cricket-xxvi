@@ -284,3 +284,12 @@ The JSON files carry the archive and licence SHA-256 and this notice.
 2. **What one rating point means.** The proposal maps rating percentiles to the real skill distribution. Should the world's ratings keep their present spread, with only the model's coefficients changing, or should the ratings be rescaled too?
 3. **Bowling variation and stamina.** They are rated and used by the captain but have no effect in the engine. Should `calibrated-t20-01` give them effects (variation in the death overs, stamina through fatigue), or should they leave the bowling score?
 4. **Dismissal skill.** It shows no out-of-sample gain at the ball level yet. Is it acceptable to fit it with stronger pooling, or to let it follow from boundary aggression, rather than to measure it independently?
+
+## Owner decisions, 25 November 2026
+
+The owner answered the four questions above: "go with your recommendations for C2".
+
+1. **Reference cohort:** full-member men's T20 internationals only, for the skill criteria. A match qualifies when both teams are among the 12 ICC full members: Afghanistan, Australia, Bangladesh, England, India, Ireland, New Zealand, Pakistan, South Africa, Sri Lanka, West Indies and Zimbabwe. This is the list in `scripts/stage-c/c1-real-extract.py` (`FULL_MEMBERS`). Cricsheet withholds Afghanistan men's matches, so in practice no Afghanistan match is in the data. Franchise leagues are not approved as a source.
+2. **Ratings:** the world's ratings are not rescaled. Only the new model's settings change.
+3. **Variation and stamina:** in the new model, variation gets a real engine effect, a trade-off between taking wickets and conceding runs. Stamina stays for fatigue only.
+4. **Dismissal skill:** it may be fitted with stronger pooling. Whether it predicts later matches is reported honestly.
