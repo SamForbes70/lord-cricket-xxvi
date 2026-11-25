@@ -13,6 +13,7 @@ import {
   type ProbabilityCategory,
   type ProbabilityContext,
   type ProbabilityMass,
+  type ProbabilityModelId,
   type ProbabilityPack,
 } from "@lcxxvi/contracts";
 import {
@@ -21,6 +22,7 @@ import {
   MODEL_PACK_SHA256,
 } from "@lcxxvi/data";
 import { canonicalStateBytes, createRandomService, sha256Hex } from "./determinism.js";
+import { registeredModel } from "./model-registry.js";
 
 const MASS = BigInt(PROBABILITY_MASS);
 const SCALE = 10000n;
@@ -93,7 +95,7 @@ function verifyPack(raw: unknown): ProbabilityPack {
 
 export type NormalisedProbabilities = {
   readonly probabilityVersion: typeof PROBABILITY_VERSION;
-  readonly modelId: typeof PROBABILITY_MODEL_ID;
+  readonly modelId: ProbabilityModelId;
   readonly modelHash: string;
   readonly lutVersion: typeof EXP_LUT_VERSION;
   readonly lutHash: string;
@@ -136,7 +138,8 @@ export function createProbabilityService(rawPack: unknown = SYNTHETIC_ALPHA_PACK
   function normalise(input: unknown): NormalisedProbabilities {
     canonicalJson(input);
     const context: ProbabilityContext = ProbabilityContextSchema.parse(input);
-    if (context.modelHash !== MODEL_PACK_SHA256 || context.lutHash !== EXP_LUT_SHA256) {
+    // Any registered model (synthetic-alpha-01, or the research calibrated-t20-01) shares the one pinned LUT.
+    if (!registeredModel(context.modelId, context.modelHash) || context.lutHash !== EXP_LUT_SHA256) {
       throw new Error("UNSUPPORTED_MODEL_OR_LUT_HASH");
     }
     const ids = context.categories.map((c) => c.id);
@@ -190,8 +193,8 @@ export function createProbabilityService(rawPack: unknown = SYNTHETIC_ALPHA_PACK
     if (cumulative !== PROBABILITY_MASS) throw new Error("MASS_NOT_NORMALISED");
     return Object.freeze({
       probabilityVersion: PROBABILITY_VERSION,
-      modelId: PROBABILITY_MODEL_ID,
-      modelHash: MODEL_PACK_SHA256,
+      modelId: context.modelId,
+      modelHash: context.modelHash,
       lutVersion: EXP_LUT_VERSION,
       lutHash: EXP_LUT_SHA256,
       totalMass: PROBABILITY_MASS,

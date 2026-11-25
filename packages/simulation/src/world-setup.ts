@@ -1,4 +1,5 @@
 import {
+  CALIBRATED_T20_MODEL_ID,
   canonicalJson,
   T20MatchSetupRequestSchema,
   ODIMatchSetupRequestSchema,
@@ -21,6 +22,7 @@ import {
   validateDefaultWorld,
 } from "@lcxxvi/data";
 import { canonicalStateBytes, sha256Hex } from "./determinism.js";
+import { MODEL_REGISTRY, type RegisteredModel } from "./model-registry.js";
 
 const VERIFIED_SETUP_INSTANCES = new WeakSet<object>();
 const VERIFIED_ODI_SETUP_INSTANCES = new WeakSet<object>();
@@ -142,6 +144,38 @@ export function validateT20MatchSetup(
   modelInput: unknown = SYNTHETIC_ALPHA_PACK,
   stageInput: unknown = DELIVERY_STAGE_PACK,
 ): FrozenT20Setup {
+  return buildT20MatchSetup(input, worldBytes, manifestInput, ruleInput, modelInput, stageInput, null);
+}
+
+/**
+ * Stage C RESEARCH ONLY (owner decision, 25 November 2026, option A). The same validation as
+ * validateT20MatchSetup, on the same synthetic-alpha-01 request, but the frozen set-up records the research model
+ * named by the explicit `researchModelId` argument in `versions.model` and `versions.modelHash`, so the engine
+ * generates with that model and every record names it truthfully. Used only by research scripts and tests: no game
+ * set-up, career, save, UI or default calls it, and a session built from it cannot be rehydrated from a save
+ * (rehydration goes through validateT20MatchSetup). `modelStatus` stays "SYNTHETIC_ALPHA" because the frozen set-up
+ * type is a persisted literal that this change must not widen.
+ */
+export function validateT20ResearchMatchSetup(
+  input: unknown,
+  worldBytes: Readonly<Uint8Array>,
+  manifestInput: unknown,
+  researchModelId: typeof CALIBRATED_T20_MODEL_ID,
+): FrozenT20Setup {
+  assert(researchModelId === CALIBRATED_T20_MODEL_ID, "unsupported research model ID");
+  return buildT20MatchSetup(input, worldBytes, manifestInput, T20_RULE, SYNTHETIC_ALPHA_PACK, DELIVERY_STAGE_PACK,
+    MODEL_REGISTRY[researchModelId]);
+}
+
+function buildT20MatchSetup(
+  input: unknown,
+  worldBytes: Readonly<Uint8Array>,
+  manifestInput: unknown,
+  ruleInput: unknown,
+  modelInput: unknown,
+  stageInput: unknown,
+  research: RegisteredModel | null,
+): FrozenT20Setup {
   const request = T20MatchSetupRequestSchema.parse(input);
   const { world, manifest } = verifyFrozenWorldBytes(worldBytes, manifestInput);
   assert(request.setup.format === "T20", "only T20 setup is supported");
@@ -261,8 +295,8 @@ export function validateT20MatchSetup(
     random: manifest.randomId,
     rules: request.setup.rulesId,
     rulesHash: ruleHash,
-    model: manifest.modelId,
-    modelHash: MODEL_PACK_SHA256,
+    model: research ? research.modelId : manifest.modelId,
+    modelHash: research ? research.modelHash : MODEL_PACK_SHA256,
     worldHash: manifest.worldCanonicalSha256,
   };
   const frozen: FrozenT20Setup = deepFreeze({

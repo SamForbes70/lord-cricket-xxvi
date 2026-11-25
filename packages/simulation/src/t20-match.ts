@@ -8,12 +8,13 @@ import {
   type T20MatchSetupRequest,type WorldPack,
 } from "@lcxxvi/contracts";
 import {FIELD_REGISTRY,T20_POWERPLAY_SLOTS,T20_LATER_SLOTS,T20_CONDITION_POLICY,
-  MODEL_PACK_SHA256,DELIVERY_STAGE_PACK_SHA256,EXP_LUT_SHA256,isBowlingCapable,FROZEN_WORLD_PINS} from "@lcxxvi/data";
+  DELIVERY_STAGE_PACK_SHA256,EXP_LUT_SHA256,isBowlingCapable,FROZEN_WORLD_PINS} from "@lcxxvi/data";
 import {validateInningsLedger,contextFromLedger,reduceInningsLedger,selectInningsBatter,selectInningsBowler,scoreDelivery} from "@lcxxvi/domain";
 import {type FrozenT20Setup,isVerifiedFrozenT20Setup,validateT20MatchSetup} from "./world-setup.js";
+import {registeredModel} from "./model-registry.js";
 import {createRandomService,createStateHasher,canonicalStateBytes,sha256Hex} from "./determinism.js";
 import {generateDelivery,expectedGeneratorPhase,generatorRuleHash} from "./generator.js";
-import {EXP_LUT_VERSION,PROBABILITY_MODEL_ID} from "@lcxxvi/contracts";
+import {EXP_LUT_VERSION} from "@lcxxvi/contracts";
 
 const hasher=createStateHasher();
 const random=createRandomService();
@@ -84,7 +85,8 @@ function beginInnings(s:T20Session,battingId:string,index:0|1):InningsLedger{
 }
 function makeManifest(setup:FrozenT20Setup){
   assert(isVerifiedFrozenT20Setup(setup)&&Object.isFrozen(setup)&&setup.setupVersion==="LC_T20_SETUP_V1" && setup.teams.length===2 && setup.fixtureOnly,"INVALID_FROZEN_SETUP");
-  assert(setup.versions.worldHash===FROZEN_WORLD_PINS.worldCanonicalSha256&&setup.versions.modelHash===MODEL_PACK_SHA256&&
+  // synthetic-alpha-01, or a registered research model recorded by validateT20ResearchMatchSetup (Stage C option A).
+  assert(setup.versions.worldHash===FROZEN_WORLD_PINS.worldCanonicalSha256&&registeredModel(setup.versions.model,setup.versions.modelHash)!==null&&
     setup.stagePackHash===DELIVERY_STAGE_PACK_SHA256 &&setup.versions.rulesHash===generatorRuleHash("LC_T20_01")&&
     setup.versions.random===RANDOM_VERSION&&setup.versions.rules==="LC_T20_01","UNSUPPORTED_PINNED_SETUP");
   return T20MatchExecutionManifestSchema.parse({engine:T20_MATCH_VERSION,eventChain:T20_EVENT_CHAIN_VERSION,
@@ -190,18 +192,20 @@ function emit(s:T20Session,commandId:string,type:string,payload:Payload):void{
   s.events.push(entry);s.lastEventHash=eventHash;
 }
 function generate(s:T20Session){
+  const model=registeredModel(s.setup.versions.model,s.setup.versions.modelHash);assert(model!==null,"UNSUPPORTED_PINNED_SETUP");
   const l=ledger(s),context=contextFromLedger(l),bat=player(s,context.strikerId),bowl=player(s,context.bowlerId),
     keeper=player(s,context.keeperId),skills=bat.skills.T20,bowSkills=bowl.skills.T20;
   validateT20Field(s.core.fieldSlots,l.outfieldIds,bat.batHand,l.innings.legalBalls);
   const req={kind:"GENERATE_DELIVERY" as const,generatorVersion:"LC_CONDITIONAL_DELIVERY_V1" as const,
     stagePackId:"synthetic-alpha-01-delivery-v1" as const,stagePackHash:DELIVERY_STAGE_PACK_SHA256,
-    randomVersion:RANDOM_VERSION,probabilityVersion:PROBABILITY_VERSION,modelId:PROBABILITY_MODEL_ID,
-    modelHash:MODEL_PACK_SHA256,lutVersion:EXP_LUT_VERSION,lutHash:EXP_LUT_SHA256,rulesHash:s.setup.versions.rulesHash,
+    randomVersion:RANDOM_VERSION,probabilityVersion:PROBABILITY_VERSION,modelId:model.modelId,
+    modelHash:model.modelHash,lutVersion:EXP_LUT_VERSION,lutHash:EXP_LUT_SHA256,rulesHash:s.setup.versions.rulesHash,
     matchId:s.setup.matchId,seed:s.setup.seed,attemptOrdinal:s.core.globalAttemptOrdinal,format:"T20" as const,
     phase:expectedGeneratorPhase("T20",l.innings.legalBalls),context,
     bowling:{bowlingStyle:bowl.bowlingStyle!,controlRating:bowSkills.control,movementRating:bowSkills.movement,
       fatigueBp:s.core.fatigueBp[bowl.playerId]!,line:s.core.bowlingPlan!.line,
-      intendedLength:s.core.bowlingPlan!.length,effort:s.core.bowlingPlan!.effort,variationId:"stock" as const},
+      intendedLength:s.core.bowlingPlan!.length,effort:s.core.bowlingPlan!.effort,variationId:"stock" as const,
+      ...(model.skillPack?{variationRating:bowSkills.variation}:{})},
     batting:{defenceRating:skills.defence,timingRating:skills.timing,powerRating:skills.power,
       rotationRating:skills.rotation,vsPaceRating:skills.vsPace,vsSpinRating:skills.vsSpin,
       aggression:s.core.battingPlans[bat.playerId]?.aggression??2,intent:s.core.battingPlans[bat.playerId]?.intent??"NORMAL",

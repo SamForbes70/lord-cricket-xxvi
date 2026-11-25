@@ -1,0 +1,63 @@
+/**
+ * Stage C research model `calibrated-t20-01`: the skill component, as ADDITIVE terms on top of the unchanged
+ * synthetic-alpha-01 probability pack (baselines, LUT, existing coefficients) and the unchanged delivery stage pack.
+ *
+ * RESEARCH ONLY. `gameplayIntegrationPermitted` is false. No game set-up, career, save, UI or default selects this
+ * model; only `validateT20ResearchMatchSetup` (packages/simulation) can, for research scripts and tests.
+ *
+ * Each term adds coefficientBp x featureBp / 10000 bp of logit to one category, where a skill feature is
+ * (rating - centre) x 200 bp and the centre is the world-pack mean of that skill (rounded), so the component
+ * redistributes outcomes between players rather than moving the average (no total is tuned).
+ * Owner decisions of 25 November 2026: dismissal skill only through measured links (no separate dismissal term:
+ * synthetic-alpha-01's bowled and lbw skill terms are cancelled here), and variation carries the wicket-taking
+ * against economy trade-off. Fitted to docs/pavilion/stage-c/c2-fit.json (full-member men's T20 internationals,
+ * matches up to 2023-08-31) by matching the game's per-rating-point effects, see docs/pavilion/stage-c/C2_CALIBRATED_SKILL.md.
+ * Derived from Cricsheet data (https://cricsheet.org/), ODC-By 1.0 (https://cricsheet.org/licensing/).
+ */
+function deepFreeze<T extends object>(value: T): T {
+  for (const child of Object.values(value)) if (child && typeof child === "object") deepFreeze(child);
+  return Object.freeze(value);
+}
+
+export type CalibratedSkill = "TIMING" | "POWER" | "DEFENCE" | "ROTATION" | "CONTROL" | "MOVEMENT" | "VARIATION";
+export type CalibratedTerms = Readonly<Record<string, Readonly<Partial<Record<CalibratedSkill, number>>>>>;
+
+export const CALIBRATED_T20_PACK = deepFreeze({
+  manifest: {
+    modelId: "calibrated-t20-01",
+    packVersion: "LC_CALIBRATED_T20_SKILL_V1",
+    status: "RESEARCH_ONLY",
+    gameplayIntegrationPermitted: false,
+    base: {
+      probabilityPackSha256: "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
+      stagePackSha256: "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
+    },
+    source: {
+      dataset: "Cricsheet t20s_json.zip",
+      licence: "ODC-By-1.0",
+      archiveSha256: "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+      licenceNoticeSha256: "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+      reference: "men's T20 internationals between two full members",
+      fitPeriod: "<= 2023-08-31",
+    },
+  },
+  /** World-pack means of each skill (batting: keepers, batters, all-rounders; bowling: bowling-capable players). */
+  centres: { TIMING: 60, POWER: 64, DEFENCE: 59, ROTATION: 60, CONTROL: 60, MOVEMENT: 62, VARIATION: 60 },
+  /** Contact class (MISS, PAD, GROUND, AERIAL, EDGE, HIT_WICKET). */
+  contact: {
+    MISS: { CONTROL: 3000 },
+    AERIAL: { VARIATION: 8000 },
+    EDGE: { VARIATION: 8000 },
+  } as CalibratedTerms,
+  /** Run value after bat contact (categories 0, 1, 2, 3, 4, 6). */
+  runs: {
+    "0": { CONTROL: 6000, ROTATION: -2000 },
+    "4": { TIMING: 2000, POWER: 2000, CONTROL: -8000, MOVEMENT: -8000, VARIATION: 3000 },
+    "6": { TIMING: 2000, POWER: 2000, CONTROL: -8000, MOVEMENT: -8000, VARIATION: 3000 },
+  } as CalibratedTerms,
+  /** Cancels synthetic-alpha-01's bowled and lbw skill terms (controlBp, defenceBp in DELIVERY_STAGE_PACK). */
+  cancelMissDismissalSkill: true,
+});
+
+/** SHA-256 of LC canonical JSON of CALIBRATED_T20_PACK; verified by the simulation model registry at load. */
+export const CALIBRATED_T20_PACK_SHA256 = "773d32f8373e99d3db98c0480ef2aa21968c549f95357cac260782bcae51bca9";
