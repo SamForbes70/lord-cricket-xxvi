@@ -6,7 +6,7 @@ import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
-import { matchSituation, t20ChaseWinChance } from "@lcxxvi/projections";
+import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -1737,6 +1737,27 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             </details>
           )}
           <span id="dugout-tactics" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Tactics: plans and field" />
+          {/* Pavilion B9: what the other side has done in this match and what it still has, from the ledger only. */}
+          {limitedOvers && captainedTeam && i && ledger && !view.resultText && (() => {
+            const playerSide = i.battingTeamId === captainedTeam ? "BATTING" as const : "BOWLING" as const;
+            const watch = oppositionWatch({
+              format: view.format === "ODI" ? "ODI" : "T20",
+              playerSide,
+              batting: ledger.batting,
+              bowling: ledger.bowling,
+              atCrease: [i.northBatterId ?? null, i.southBatterId ?? null],
+              battingElevenSize: view.teams.find((t) => t.id === i.battingTeamId)?.playerIds.length ?? 11,
+              names: view.names,
+            });
+            if (!watch.headline && watch.facts.length === 0) return null;
+            return (
+              <section className="panel opposition-watch" aria-labelledby="opposition-watch-heading" data-testid="opposition-watch">
+                <h2 id="opposition-watch-heading">Opposition: {watch.heading.toLowerCase()}</h2>
+                {watch.headline && <p data-testid="opposition-headline"><strong>{watch.headline}</strong></p>}
+                {watch.facts.length > 0 && <ul>{watch.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul>}
+              </section>
+            );
+          })()}
           {view.phase === "READY" && (
             <Tactics
               key={`${view.revision}`}

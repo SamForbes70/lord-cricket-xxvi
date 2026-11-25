@@ -29,5 +29,6 @@ export * from "./season-objective.js";
 export * from "./player-identity.js";
 export * from "./fixture-preview.js";
 export * from "./match-situation.js";
+export * from "./opposition-watch.js";
 export * from "./t20-expectation-table.js";
 export * from "./pitch-verdict.js";
