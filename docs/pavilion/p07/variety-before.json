@@ -1,0 +1,55 @@
+{
+  "contract": "every feed parses with MatchCommentaryFeedSchema",
+  "lines": 31848,
+  "repeatRate": 0.547,
+  "top": [
+    {
+      "family": "DELIVERY_DOT",
+      "lines": 12978,
+      "templates": 4,
+      "repeatRate": 0.449
+    },
+    {
+      "family": "DELIVERY_SINGLE",
+      "lines": 4032,
+      "templates": 4,
+      "repeatRate": 0.528
+    },
+    {
+      "family": "BOWLER_SELECTED",
+      "lines": 3663,
+      "templates": 2,
+      "repeatRate": 0.836
+    },
+    {
+      "family": "OVER_SUMMARY",
+      "lines": 3274,
+      "templates": 3,
+      "repeatRate": 0.665
+    },
+    {
+      "family": "BATTER_SELECTED",
+      "lines": 1864,
+      "templates": 2,
+      "repeatRate": 0.815
+    },
+    {
+      "family": "WICKET_CAUGHT",
+      "lines": 1317,
+      "templates": 3,
+      "repeatRate": 0.611
+    },
+    {
+      "family": "DELIVERY_MULTI_RUN",
+      "lines": 1287,
+      "templates": 3,
+      "repeatRate": 0.607
+    },
+    {
+      "family": "DELIVERY_FOUR",
+      "lines": 1057,
+      "templates": 4,
+      "repeatRate": 0.461
+    }
+  ]
+}
