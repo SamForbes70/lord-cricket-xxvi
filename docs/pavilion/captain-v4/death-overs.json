@@ -1,0 +1,283 @@
+{
+  "version": "LC_PAVILION_CAPTAIN_DEATH_OVERS_MEASURE_V1",
+  "model": "synthetic-alpha-01",
+  "corpus": "100-seed Pass 07B T20 corpus, suggested elevens, both sides on the captain",
+  "codeCaptainIdenticalToV3Copy": false,
+  "captain": {
+    "captain": "adviseT20Captain at this revision",
+    "policyIdsReported": [
+      "LC_T20_TACTICAL_CAPTAIN_V4"
+    ],
+    "bowlersWhoBowled": 48,
+    "quarters": [
+      {
+        "quarter": "lowest",
+        "bowlers": 12,
+        "ratingRange": [
+          129,
+          169
+        ],
+        "overs": 518.2,
+        "powerplay": 0,
+        "middle": 100,
+        "death": 0
+      },
+      {
+        "quarter": "second",
+        "bowlers": 12,
+        "ratingRange": [
+          169,
+          192
+        ],
+        "overs": 1002.8,
+        "powerplay": 27.2,
+        "middle": 60.2,
+        "death": 12.6
+      },
+      {
+        "quarter": "third",
+        "bowlers": 12,
+        "ratingRange": [
+          192,
+          203
+        ],
+        "overs": 1088.3,
+        "powerplay": 34.5,
+        "middle": 45.9,
+        "death": 19.5
+      },
+      {
+        "quarter": "highest",
+        "bowlers": 12,
+        "ratingRange": [
+          204,
+          229
+        ],
+        "overs": 1091.8,
+        "powerplay": 50.5,
+        "middle": 11.5,
+        "death": 38
+      }
+    ],
+    "byRankInEleven": [
+      {
+        "rankInEleven": 1,
+        "overs": 723.2,
+        "powerplay": 55.3,
+        "middle": 0,
+        "death": 44.7
+      },
+      {
+        "rankInEleven": 2,
+        "overs": 731.7,
+        "powerplay": 44.4,
+        "middle": 26.9,
+        "death": 28.7
+      },
+      {
+        "rankInEleven": 3,
+        "overs": 720.8,
+        "powerplay": 34.7,
+        "middle": 41.6,
+        "death": 23.7
+      },
+      {
+        "rankInEleven": 4,
+        "overs": 769.5,
+        "powerplay": 29.2,
+        "middle": 64.3,
+        "death": 6.6
+      },
+      {
+        "rankInEleven": 5,
+        "overs": 449.3,
+        "powerplay": 0,
+        "middle": 100,
+        "death": 0
+      },
+      {
+        "rankInEleven": 6,
+        "overs": 306.7,
+        "powerplay": 0,
+        "middle": 100,
+        "death": 0
+      }
+    ],
+    "deathOversByRank": [
+      {
+        "rank": 1,
+        "deathOversPerInnings": 1.62
+      },
+      {
+        "rank": 2,
+        "deathOversPerInnings": 1.05
+      },
+      {
+        "rank": 3,
+        "deathOversPerInnings": 0.85
+      },
+      {
+        "rank": 4,
+        "deathOversPerInnings": 0.25
+      },
+      {
+        "rank": 5,
+        "deathOversPerInnings": 0
+      },
+      {
+        "rank": 6,
+        "deathOversPerInnings": 0
+      }
+    ],
+    "economy": {
+      "powerplay": 6.14,
+      "middle": 5.18,
+      "death": 6.21
+    },
+    "meanFirstInningsRuns": 113.2
+  },
+  "v3": {
+    "captain": "captain V3 bowler choice (copy in this script)",
+    "policyIdsReported": [
+      "LC_T20_TACTICAL_CAPTAIN_V4"
+    ],
+    "bowlersWhoBowled": 48,
+    "quarters": [
+      {
+        "quarter": "lowest",
+        "bowlers": 12,
+        "ratingRange": [
+          129,
+          169
+        ],
+        "overs": 419.5,
+        "powerplay": 0,
+        "middle": 0,
+        "death": 100
+      },
+      {
+        "quarter": "second",
+        "bowlers": 12,
+        "ratingRange": [
+          169,
+          192
+        ],
+        "overs": 974.8,
+        "powerplay": 15.4,
+        "middle": 64.6,
+        "death": 20
+      },
+      {
+        "quarter": "third",
+        "bowlers": 12,
+        "ratingRange": [
+          192,
+          203
+        ],
+        "overs": 1136.7,
+        "powerplay": 26.4,
+        "middle": 62.3,
+        "death": 11.3
+      },
+      {
+        "quarter": "highest",
+        "bowlers": 12,
+        "ratingRange": [
+          204,
+          229
+        ],
+        "overs": 1193.3,
+        "powerplay": 62.8,
+        "middle": 35.4,
+        "death": 1.7
+      }
+    ],
+    "byRankInEleven": [
+      {
+        "rankInEleven": 1,
+        "overs": 796,
+        "powerplay": 75.4,
+        "middle": 24.6,
+        "death": 0
+      },
+      {
+        "rankInEleven": 2,
+        "overs": 784.5,
+        "powerplay": 47.8,
+        "middle": 46.8,
+        "death": 5.4
+      },
+      {
+        "rankInEleven": 3,
+        "overs": 785.2,
+        "powerplay": 19.7,
+        "middle": 77.6,
+        "death": 2.7
+      },
+      {
+        "rankInEleven": 4,
+        "overs": 763.3,
+        "powerplay": 9.2,
+        "middle": 71.1,
+        "death": 19.7
+      },
+      {
+        "rankInEleven": 5,
+        "overs": 340.5,
+        "powerplay": 0,
+        "middle": 13.2,
+        "death": 86.8
+      },
+      {
+        "rankInEleven": 6,
+        "overs": 254.8,
+        "powerplay": 0,
+        "middle": 0,
+        "death": 100
+      }
+    ],
+    "deathOversByRank": [
+      {
+        "rank": 1,
+        "deathOversPerInnings": 0
+      },
+      {
+        "rank": 2,
+        "deathOversPerInnings": 0.21
+      },
+      {
+        "rank": 3,
+        "deathOversPerInnings": 0.11
+      },
+      {
+        "rank": 4,
+        "deathOversPerInnings": 0.75
+      },
+      {
+        "rank": 5,
+        "deathOversPerInnings": 1.48
+      },
+      {
+        "rank": 6,
+        "deathOversPerInnings": 1.27
+      }
+    ],
+    "economy": {
+      "powerplay": 6.13,
+      "middle": 5.13,
+      "death": 6.31
+    },
+    "meanFirstInningsRuns": 113.4
+  },
+  "headToHead": {
+    "matches": 200,
+    "codeCaptainWins": 99,
+    "v3Wins": 96,
+    "tiesOrNoResult": 5,
+    "codeCaptainWinPercentOfDecided": 50.8,
+    "interval95": [
+      43.8,
+      57.7
+    ]
+  }
+}

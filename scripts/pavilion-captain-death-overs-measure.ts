@@ -143,6 +143,7 @@ function deployment(inner: Advisor, label: string) {
   const deathOversByRank = byRank.map((r) => ({ rank: r.rankInEleven!, deathOversPerInnings: +((r.overs! * r.death!) / 100 / sessions.reduce((a, s) => a + s.core.innings.filter(Boolean).length, 0)).toFixed(2) }));
   return {
     captain: label,
+    // The policy id adviseT20Captain reported. The V3 copy takes its batting choices from it, so it reports the same id.
     policyIdsReported: [...policyIds],
     bowlersWhoBowled: bowlers.length,
     quarters,
