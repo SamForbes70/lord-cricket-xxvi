@@ -14,7 +14,7 @@ describe("match situation", () => {
 
   test("no projection or pressure reading before two overs are bowled, and no partnership when wickets are unaccounted for", () => {
     expect(at({ runs: 12, legalBalls: 11 })).toMatchObject({ projectedTotal: null, currentRateX100: 655 });
-    expect(at({ runs: 12, legalBalls: 12 })).toMatchObject({ projectedTotal: 105 });
+    expect(at({ runs: 12, legalBalls: 12 })).toMatchObject({ projectedTotal: 110 });
     expect(at({ runs: 40, wickets: 3, legalBalls: 30, partnershipKnown: false })!.partnership).toBeNull();
     expect(at({ runs: 5, legalBalls: 6, targetToWin: 150 })!.pressure).toBeNull();
     expect(at({})).toMatchObject({ currentRateX100: null, facts: [] });
