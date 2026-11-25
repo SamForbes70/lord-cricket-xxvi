@@ -7,6 +7,7 @@ import {
   adviseT20Captain,
   evaluateRed5DeclarationRollouts,
   evaluateRed5FollowOnRollouts,
+  type BatterSkills,
 } from "@lcxxvi/ai";
 import {
   fixtureAutopilotStep,
@@ -36,6 +37,20 @@ function slotsSignature(slots: readonly { slotId: string; playerId: string }[]):
     .sort((a, b) => a.playerId.localeCompare(b.playerId))
     .map(s => `${s.playerId}:${s.slotId}`)
     .join("|");
+}
+
+/** Public batting skills of the striker and the batter at the other end, for the captain's batting policy. */
+function battersAtCrease(
+  session: Readonly<T20Session>,
+  i: { battingTeamId: string; strikerEnd: string; northBatterId: string | null; southBatterId: string | null },
+): { striker: BatterSkills | null; partner: BatterSkills | null } {
+  const xi = session.setup.teams.find(t => t.teamId === i.battingTeamId)?.xi ?? [];
+  const skills = (id: string | null): BatterSkills | null => {
+    const s = id ? xi.find(p => p.playerId === id)?.skills.T20 : undefined;
+    return s ? { timing: s.timing, power: s.power, defence: s.defence, rotation: s.rotation } : null;
+  };
+  const north = skills(i.northBatterId), south = skills(i.southBatterId);
+  return i.strikerEnd === "NORTH" ? { striker: north, partner: south } : { striker: south, partner: north };
 }
 
 export function proposeOpponentT20Command(
@@ -98,6 +113,7 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
     availableBatters: Math.max(0, 10 - i.wickets),
     bowlingCandidates: bowlers,
     previousOverBowler: i.previousOverBowlerId ? { playerId: i.previousOverBowlerId, quotaRemaining: 24 - (ledger.bowling[i.previousOverBowlerId]?.legalBalls ?? 0) } : null,
+    ...battersAtCrease(session, i),
   };
   const advice = { ...adviseT20Captain(view) };
   // Stable captain temperament uses identity; decisions use only public match observations.
@@ -168,8 +184,9 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
   if (phase !== "READY") return null;
   if (batting) {
     const striker = i.strikerEnd === "NORTH" ? i.northBatterId : i.southBatterId;
-    if (striker && (session.core.battingPlans[striker]?.aggression ?? 2) !== advice.aggression) {
-      return { ...base, actorId: `AI:${teamId}`, kind: "SET_BATTING_PLAN", payload: { playerId: striker, aggression: advice.aggression, intent: "NORMAL" } };
+    const plan = striker ? session.core.battingPlans[striker] : undefined;
+    if (striker && ((plan?.aggression ?? 2) !== advice.aggression || (plan?.intent ?? "NORMAL") !== advice.battingIntent)) {
+      return { ...base, actorId: `AI:${teamId}`, kind: "SET_BATTING_PLAN", payload: { playerId: striker, aggression: advice.aggression, intent: advice.battingIntent } };
     }
   }
   if (bowling && session.core.bowlingPlan) {
