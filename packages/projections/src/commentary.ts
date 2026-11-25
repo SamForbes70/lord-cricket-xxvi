@@ -10,7 +10,7 @@ import {
   type MatchCommentaryFeed,
   type MatchResult,
 } from "@lcxxvi/contracts";
-import { overContext, type OverRecord } from "./commentary-context.js";
+import { inningsSummary, overContext, wicketContext, type OverRecord } from "./commentary-context.js";
 
 export const DEFAULT_REPETITION_COOLDOWN_WINDOW = 3 as const;
 
@@ -695,6 +695,14 @@ export function projectMatchCommentary(
               render: () =>
                 `Wicket for ${bowler}: ${outName} departs, ${catcher}, for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
             },
+            // Pavilion P07: more variety, matched to how the ball travelled where the delivery records it.
+            { id: "W_CT_4", render: () => `Gone! ${outName} ${catcher} off ${bowler} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).` },
+            ...(d.trajectory === "EDGE"
+              ? [{ id: "W_CT_ED", render: () => `${outName} edges ${bowler} and is ${catcher} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).` }]
+              : []),
+            ...(d.trajectory === "AERIAL"
+              ? [{ id: "W_CT_AR", render: () => `${outName} goes in the air off ${bowler} and is ${catcher} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).` }]
+              : []),
           ];
         } else if (d.dismissal.kind === "STUMPED") {
           family = "WICKET_STUMPED";
@@ -899,6 +907,16 @@ export function projectMatchCommentary(
             render: () =>
               `${striker} plays ${bowler} back safely — dot ball${stopNote}.`,
           },
+          // Pavilion P07: more variety, each line drawn from what the delivery records (length, trajectory).
+          { id: "DLV_DOT_5", render: () => `Another dot: ${bowler} keeps ${striker} quiet${stopNote}.` },
+          { id: "DLV_DOT_6", render: () => `No run. ${bowler} to ${striker}${stopNote}.` },
+          ...(d.executedLength === "YORKER" ? [{ id: "DLV_DOT_YK", render: () => `${bowler} nails the yorker and ${striker} cannot score${stopNote}.` }] : []),
+          ...(d.executedLength === "SHORT" ? [{ id: "DLV_DOT_SH", render: () => `Short from ${bowler}, and nothing doing for ${striker}${stopNote}.` }] : []),
+          ...(d.executedLength === "FULL" ? [{ id: "DLV_DOT_FL", render: () => `Full from ${bowler}; ${striker} cannot find a gap${stopNote}.` }] : []),
+          ...(d.executedLength === "GOOD" ? [{ id: "DLV_DOT_GD", render: () => `Good length from ${bowler}, and ${striker} is kept honest${stopNote}.` }] : []),
+          ...(d.executedLength === "FULL_TOSS" ? [{ id: "DLV_DOT_FT", render: () => `A full toss from ${bowler}, but ${striker} cannot cash in${stopNote}.` }] : []),
+          ...(d.trajectory === "EDGE" && d.fieldOutcome !== "DROP" ? [{ id: "DLV_DOT_ED", render: () => `${striker} edges ${bowler} but it falls safe: no run${stopNote}.` }] : []),
+          ...(d.trajectory === "AERIAL" && d.fieldOutcome !== "DROP" ? [{ id: "DLV_DOT_AR", render: () => `${striker} goes in the air off ${bowler}, but there is no run${stopNote}.` }] : []),
         ];
       } else if (d.batRuns === 0 && (d.extras.byes > 0 || d.extras.legByes > 0)) {
         family = "DELIVERY_BYES_LEGBYES";
@@ -947,6 +965,10 @@ export function projectMatchCommentary(
             render: () =>
               `${striker} taps ${bowler}${where} and crosses cleanly for 1.`,
           },
+          { id: "DLV_ONE_5", render: () => `${striker} takes one${where} off ${bowler}.` },
+          { id: "DLV_ONE_6", render: () => `${bowler} to ${striker}, pushed${where} for one.` },
+          { id: "DLV_ONE_7", render: () => `One more for ${striker}${where} off ${bowler}.` },
+          { id: "DLV_ONE_8", render: () => `${striker} keeps the scoreboard moving with a single${where}.` },
         ];
       } else {
         family = "DELIVERY_MULTI_RUN";
@@ -994,8 +1016,14 @@ export function projectMatchCommentary(
       const milestoneSuffix =
         milestoneNotes.length > 0 ? ` ${milestoneNotes.join(" ")}` : "";
 
+      // Pavilion P07: at a wicket, one line on the stand it broke, the new batter's task or the wickets left.
+      const wicketLine = d.dismissal
+        ? wicketContext({ format: input.format, standRuns: standBeforeWicket.runs, standBalls: standBeforeWicket.balls,
+            runs: inn.runs, wickets: inn.wickets, legalBalls: inn.legalBalls, targetToWin: inn.targetToWin })
+        : null;
+      if (wicketLine) factSlots.push({ slot: wicketLine.slot, value: wicketLine.text, sourceKind: "PARTNERSHIP_PROJECTION", sourceRef: "innings.partnership" });
       // Keep `Innings X, ...` prefix strictly on DELIVERY_RECORDED for match-ui invariant compatibility
-      const standardText = `Innings ${d.inningsIndex + 1}, ${coord}: ${picked.selected.render()}${dropNotice}${milestoneSuffix}`;
+      const standardText = `Innings ${d.inningsIndex + 1}, ${coord}: ${picked.selected.render()}${dropNotice}${milestoneSuffix}${wicketLine ? ` ${wicketLine.text}` : ""}`;
 
       const techParts: string[] = [];
       if (wasFreeHit) techParts.push("free-hit delivery");
@@ -1101,6 +1129,21 @@ export function projectMatchCommentary(
               id: "OV_SUM_3",
               render: () =>
                 `After ${overNum} over${overNum === 1 ? "" : "s"}, ${teamName} move to ${inn.runs}/${inn.wickets} (${overRuns} from ${bowler}'s over)${chaseTail}.`,
+            },
+            {
+              id: "OV_SUM_4",
+              render: () =>
+                `${overRuns} from the over${overWkts > 0 ? ` and ${overWkts} down` : ""}. ${teamName} ${inn.runs}/${inn.wickets} after ${overNum}${chaseTail}.`,
+            },
+            {
+              id: "OV_SUM_5",
+              render: () =>
+                `${bowler}'s over costs ${overRuns}${overWkts > 0 ? ` but brings ${overWkts} wicket${overWkts === 1 ? "" : "s"}` : ""}; ${teamName} are ${inn.runs}/${inn.wickets}${chaseTail}.`,
+            },
+            {
+              id: "OV_SUM_6",
+              render: () =>
+                `That is over ${overNum}: ${overRuns} run${overRuns === 1 ? "" : "s"} off it, ${teamName} on ${inn.runs}/${inn.wickets}${chaseTail}.`,
             },
           ];
 
@@ -1241,9 +1284,12 @@ export function projectMatchCommentary(
       const teamName = tName(inn.battingTeamId);
       const oversStr = formatOvers(inn.legalBalls);
       const allOut = inn.wickets >= 10;
-      const standardText = allOut
+      // Pavilion P07: the innings in one more line, its top score and best bowling.
+      const summary = inningsSummary({ format: input.format, batters: inn.batters, bowlers: inn.bowlers, names: input.playerNames });
+      const closeText = allOut
         ? `End of innings ${p.inningsIndex + 1}: ${teamName} all out for ${inn.runs} in ${oversStr} overs.`
         : `End of innings ${p.inningsIndex + 1}: ${teamName} close on ${inn.runs}/${inn.wickets} (${oversStr} overs).`;
+      const standardText = summary ? `${closeText} ${summary}` : closeText;
       entries.push({
         adapterVersion: COMMENTARY_ADAPTER_VERSION,
         sequence: ev.sequence,
@@ -1276,6 +1322,7 @@ export function projectMatchCommentary(
             sourceKind: "INNINGS_PROJECTION",
             sourceRef: "innings.legalBalls",
           },
+          ...(summary ? [{ slot: "inningsSummary", value: summary.slice(0, 160), sourceKind: "INNINGS_PROJECTION" as const, sourceRef: "innings.batters+bowlers" }] : []),
         ],
       });
       continue;
@@ -1422,6 +1469,8 @@ export function projectMatchCommentary(
         [
           { id: "BAT_SEL_1", render: () => `${batter} comes in to bat.` },
           { id: "BAT_SEL_2", render: () => `${batter} walks to the crease.` },
+          { id: "BAT_SEL_3", render: () => `In comes ${batter}, with the score ${inn.runs}/${inn.wickets}.` },
+          { id: "BAT_SEL_4", render: () => `${batter} makes the walk out at ${inn.runs}/${inn.wickets}.` },
         ],
         presentationKey,
         ev.sequence,
@@ -1459,13 +1508,25 @@ export function projectMatchCommentary(
       const playerId = (ev.payload as { playerId: string }).playerId;
       const bowler = pName(playerId);
       const inn = ensureInnings(activeInningsIndex);
-      const figs = bowlerFiguresText(getBowler(inn, playerId));
+      const bowlerSoFar = getBowler(inn, playerId);
+      const figs = bowlerFiguresText(bowlerSoFar);
+      // Pavilion P07: a returning bowler is introduced with the figures so far; a new one as new to the attack.
+      const returning = bowlerSoFar.legalBalls > 0;
       const picked = pickTemplateWithCooldown(
         "BOWLER_SELECTED",
-        [
-          { id: "BWL_SEL_1", render: () => `${bowler} will bowl.` },
-          { id: "BWL_SEL_2", render: () => `${bowler} comes into the attack.` },
-        ],
+        returning
+          ? [
+              { id: "BWL_SEL_1", render: () => `${bowler} will bowl.` },
+              { id: "BWL_SEL_R1", render: () => `${bowler} returns (${figs}).` },
+              { id: "BWL_SEL_R2", render: () => `Back comes ${bowler}, ${figs} so far.` },
+              { id: "BWL_SEL_R3", render: () => `${bowler} has the ball again (${figs}).` },
+            ]
+          : [
+              { id: "BWL_SEL_1", render: () => `${bowler} will bowl.` },
+              { id: "BWL_SEL_2", render: () => `${bowler} comes into the attack.` },
+              { id: "BWL_SEL_N1", render: () => `${bowler} into the attack for the first time.` },
+              { id: "BWL_SEL_N2", render: () => `First over of the innings for ${bowler}.` },
+            ],
         presentationKey,
         ev.sequence,
         evHash,
