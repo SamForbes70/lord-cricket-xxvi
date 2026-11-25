@@ -29,7 +29,7 @@ const tour = UserTourSchema.parse({ tourId: "user-tour-play", title: "Vale Tour"
 /** Plays a fixture the way the match screen does: a roster session from the launch, then a save round trip. */
 function playAsUser(format: "T20" | "ODI", roster: ReturnType<typeof generatedRunRoster>, fixture: Parameters<typeof generatedSelections>[2] & { fixtureId: string; matchNumber: number; groundId: string }, runId: string, runSeed: string) {
   const identity = tournamentMatchIdentity(runId, fixture.matchNumber);
-  const request = { ...identity, seed: fixtureSeed(runSeed, fixture.fixtureId), format, selection: { groundId: fixture.groundId, teams: generatedSelections(world, roster.squads, fixture) } };
+  const request = { ...identity, seed: fixtureSeed(runSeed, fixture.fixtureId), format, selection: { groundId: fixture.groundId, teams: generatedSelections(world, roster.squads, fixture, format) } };
   // Through JSON, as the launch crosses sessionStorage and the worker message.
   const pack = JSON.parse(JSON.stringify(roster.pack));
   let saved: unknown;

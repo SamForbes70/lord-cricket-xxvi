@@ -86,6 +86,20 @@ export function playToScenarioCheckpoint(start: AnySession, checkpoint: Pick<Sce
 }
 
 /**
+ * The eleven a curated scenario side fields. The scenario pack pins each challenge's checkpoint (score, batters at the
+ * crease, overs left), and those were produced with the suggested eleven of the time: the keeper, the first six
+ * bowling-capable players, then squad order. Pavilion P04 stage A changed the suggested eleven for new matches, so the
+ * pack keeps its own rule here and its curated situations do not move. A new pack version may adopt the new eleven.
+ */
+export function scenarioPackEleven(team: { id: string; players: readonly { id: string; role: string; canBowl: boolean }[] }): Selection {
+  const keeper = team.players.find((p) => p.role === "KEEPER");
+  if (!keeper) throw new Error("SCENARIO_TEAM_HAS_NO_KEEPER");
+  const bowlers = team.players.filter((p) => p.id !== keeper.id && p.canBowl).slice(0, 6);
+  const xi = [keeper, ...bowlers, ...team.players.filter((p) => p !== keeper && !bowlers.includes(p))].slice(0, 11);
+  return { teamId: team.id, playerIds: xi.map((p) => p.id), captainId: keeper.id, keeperId: keeper.id };
+}
+
+/**
  * Starts `challenge` on a controller that has no session and was created with `() => challenge.seed`.
  * Returns the controller's response at the checkpoint; the controller then holds the checkpoint session.
  */
@@ -96,7 +110,7 @@ export function startScenarioOnController(controller: ScenarioController, challe
   const pick = (teamId: string): Selection => {
     const team = catalog.teams.find((candidate) => candidate.id === teamId);
     if (!team) throw new Error("SCENARIO_TEAM_UNKNOWN");
-    return team.suggested;
+    return scenarioPackEleven(team);
   };
   const selections: [Selection, Selection] = [pick(challenge.teamIds[0]), pick(challenge.teamIds[1])];
   const started = controller.handle({
