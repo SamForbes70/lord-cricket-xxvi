@@ -313,3 +313,16 @@ Each has a recommended answer.
 
 - Revision read: `main` at `4558fdb` (worktree on branch `pavilion/c2-scouting-proposal`).
 - Commands run: source reads and searches only (`git grep`, `grep`, `sed`). **NOT RUN:** `npx tsc -b`, `npm run verify:09:core`, any test. No code changed, so no test result is claimed.
+
+## Owner decisions, 26 November 2026
+
+The owner said "go with your recommendations" to the session's recommendations on this proposal. Recorded here:
+
+1. **Option A is approved in principle.** It is built after the season-end work (Directive 02 C6) and the championship and milestone presentations (D4), which move the one-season milestone more directly. No scouting code is written until then.
+2. **The "ceiling tier" display is relabelled now** as an intake grade, display only (#161). Whether a real growth trait exists is decided under C3.
+3. **Question 4, AI using true ratings:** accepted for the first slice as an explicit, recorded exception to the AGENTS.md rule that AI uses only authorised public observations. The exception covers AI clubs' recruitment and AI captains in this first slice only, and is to be revisited in option B.
+4. **The remaining questions (1 to 3 and 5 to 12) take the recommended answers above.** These include:
+   - ranges always contain the truth, tested at 100%;
+   - automatic upgrade at the next rollover, with a one-time choice that defaults to exact ratings;
+   - career only;
+   - `LC_SCOUTING_POLICY_V1` numbers tuned only through a new policy version after a playtest.
