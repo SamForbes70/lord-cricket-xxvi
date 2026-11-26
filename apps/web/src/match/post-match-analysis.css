@@ -1,0 +1,41 @@
+/* LC_POST_MATCH_ANALYSIS_V1 panel. Uses the Floodlit tokens where present. */
+.post-match-analysis {
+  border: 1px solid var(--fl-edge, #b4c4b5);
+  border-radius: var(--fl-radius, 8px);
+  background: var(--fl-surface, #f5f8ee);
+  color: var(--fl-text, #18362d);
+  margin: 1em 0;
+  padding: 1em;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.post-match-analysis h3 { margin-top: 0; }
+.post-match-analysis h4 { margin: 1.2em 0 0.4em; }
+.post-match-analysis h5 { margin: 0.8em 0 0.3em; }
+.pma-intro, .pma-sub-intro { color: var(--fl-muted, #3f5a50); margin: 0.3em 0 0.6em; }
+.pma-sub { display: block; font-size: 0.85em; color: var(--fl-muted, #3f5a50); font-weight: 400; }
+.pma-table-wrap { max-width: 100%; overflow-x: auto; }
+.pma-phases { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.post-match-analysis .pma-phases th, .post-match-analysis .pma-phases td { text-align: left; padding: 0.35em 0.5em; border-bottom: 1px solid var(--fl-edge, #d0dbd1); vertical-align: top; }
+.post-match-analysis .pma-phases thead th { overflow-wrap: normal; word-break: normal; letter-spacing: 0.02em; }
+.pma-turning, .pma-decisions { margin: 0.3em 0; padding-left: 1.4em; }
+.pma-turning li { margin: 0.3em 0; }
+.pma-decisions { list-style: none; padding-left: 0; }
+.pma-decision { border-left: 3px solid var(--fl-edge-strong, #9bb3a3); padding: 0.2em 0 0.2em 0.7em; margin: 0.6em 0; }
+.pma-decision p { margin: 0.15em 0; }
+.pma-decision-head { display: flex; flex-wrap: wrap; gap: 0.3em 0.8em; font-weight: 600; }
+.pma-kind { color: var(--fl-gold, #6b4e10); }
+.pma-label { font-weight: 600; }
+.pma-measured { font-size: 0.85em; color: var(--fl-faint, #4b6559); }
+.pma-decision[data-measured="NONE_DETECTED"] { border-left-style: dashed; }
+.pma-picks { margin: 0.6em 0; }
+.pma-picks summary, .pma-footnote summary { cursor: pointer; }
+.pma-footnote ul { margin: 0.4em 0; padding-left: 1.2em; }
+@media (max-width: 480px) {
+  .post-match-analysis { padding: 0.75em; }
+  .pma-phases { font-size: 0.85em; }
+  .pma-phases thead th { font-size: 0.8em; }
+  .post-match-analysis .pma-phases th, .post-match-analysis .pma-phases td { padding: 0.3em 0.5em 0.3em 0.25em; }
+}

@@ -84,6 +84,7 @@ import { RED_BALL_PROFILE_DESCRIPTIONS } from "@lcxxvi/ai";
 import type { DelegationCategory } from "./match/ai-opponent.js";
 import { readRoutinePicks, routinePickMoment, writeRoutinePicks } from "./match/routine-picks.js";
 import { keyMomentBetween, type KeyMomentSnapshot } from "./match/key-moments.js";
+import { PostMatchAnalysisPanel } from "./match/PostMatchAnalysisPanel.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, suggestedEleven, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
@@ -1884,6 +1885,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
                   </details>
                 </div>
+              )}
+              {view.postMatchAnalysis && (
+                <PostMatchAnalysisPanel analysis={view.postMatchAnalysis} teamName={tn}
+                  focusTeamIds={aiTeamId && captainedTeam ? [captainedTeam] : view.teams.map((t) => t.id)} />
               )}
               {/* Pavilion B3: the engineering check sits behind a closed disclosure, apart from the result. */}
               <details className="technical-details" data-testid="replay-check">
