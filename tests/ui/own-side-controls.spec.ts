@@ -8,22 +8,26 @@ import { expect, test, type Page } from "@playwright/test";
  */
 const MANAGED = "Aster Harbour";
 
-async function untilReady(page: Page) {
+/** Answers the person's decisions until the first ball to bowl in the given innings, finishing earlier innings. */
+async function untilReady(page: Page, innings: number) {
   const decision = page.locator("#decision");
-  for (let n = 0; n < 60; n += 1) {
-    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
+  const where = page.getByTestId("scorestrip").locator("p").first();
+  for (let n = 0; n < 400; n += 1) {
+    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
     const phase = await decision.getAttribute("data-phase");
-    if (phase === "READY") return;
+    const inRequired = ((await where.textContent()) ?? "").includes(`Innings ${innings}`);
     const candidate = decision.locator("button[data-candidate]:enabled");
-    if (phase === "TOSS") await decision.getByRole("button", { name: "Call heads" }).click({ timeout: 2_000 }).catch(() => undefined);
+    if (phase === "READY" && inRequired) return;
+    if (phase === "READY") await decision.getByRole("button", { name: "Finish innings", exact: true }).click({ timeout: 2_000 }).catch(() => undefined);
+    else if (phase === "TOSS") await decision.getByRole("button", { name: "Call heads" }).click({ timeout: 2_000 }).catch(() => undefined);
     else if (phase === "AWAITING_INNINGS") await decision.getByRole("button", { name: "Bat first" }).click({ timeout: 2_000 }).catch(() => undefined);
     else if ((await candidate.count()) > 0) await candidate.first().click({ timeout: 2_000 }).catch(() => undefined);
     else await page.waitForTimeout(200);
   }
-  throw new Error("The match did not reach a ball to bowl");
+  throw new Error(`The match did not reach a ball to bowl in innings ${innings}`);
 }
 
-/** Checks the controls for the side batting now, given whether the person runs it. Returns true if the managed side bats. */
+/** Checks the plan controls for the side batting now and the side bowling, given which side the person manages. */
 async function checkControls(page: Page, battingName: string, managedName: string) {
   const tactics = page.locator("section.tactics");
   await expect(tactics).toBeVisible();
@@ -65,18 +69,13 @@ async function checkControls(page: Page, battingName: string, managedName: strin
 
 /** Plays both innings to their first ball and checks the controls in each, so both sides bat once. */
 async function checkBothInnings(page: Page, managedName: string) {
-  const decision = page.locator("#decision");
   const batting = page.getByTestId("scorestrip").locator("h2");
   const seen = new Set<string>();
-  for (let innings = 0; innings < 2; innings += 1) {
-    await untilReady(page);
+  for (const innings of [1, 2]) {
+    await untilReady(page, innings);
     const name = (await batting.textContent())!.trim();
     await checkControls(page, name, managedName);
     seen.add(name === managedName ? "managed" : "opposition");
-    if (innings === 0) {
-      await decision.getByRole("button", { name: "Finish innings", exact: true }).click();
-      await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
-    }
   }
   expect([...seen].sort()).toEqual(["managed", "opposition"]);
 }
@@ -111,7 +110,7 @@ test("an exhibition with a computer opponent follows the same rule; with no comp
 
   // Manual control of both teams: every plan control is the person's, whichever side bats.
   await page.locator("#ai-opponent-select").selectOption("");
-  await untilReady(page);
+  await untilReady(page, 2);
   const tactics = page.locator("section.tactics");
   for (const control of await tactics.locator("select[aria-label^='Aggression for']").all()) await expect(control).toBeEnabled();
   await expect(tactics.getByLabel("Effort", { exact: true })).toBeEnabled();
