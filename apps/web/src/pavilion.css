@@ -236,9 +236,9 @@
 .season-review-milestones, .season-review-ahead {margin:.2em 0;padding-inline-start:1.2em;display:grid;gap:.35em;}
 @media (max-width: 650px) {
   .season-review-list > div {grid-template-columns:1fr;}
-  .season-review-squad {font-size:.85em;}
-  .season-review-squad :is(td,th) {padding:.45em .3em;}
-  .season-review-squad th[scope="row"] {white-space:normal;}
+  .career-shell .season-finale .season-review-squad {font-size:.82em;}
+  .career-shell .season-finale .season-review-squad :is(td,th) {padding:.45em .35em;letter-spacing:0;}
+  .career-shell .season-finale .season-review-squad th[scope="row"] {white-space:normal;overflow-wrap:anywhere;}
 }
 /* E8: the screens inside a place (Season: fixtures, statistics, stories) sit in a second row. */
 .career-shell .career-nav-sections {border-bottom:0;padding:2px 0 4px 12px;font-size:.92em;}
