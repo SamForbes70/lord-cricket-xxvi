@@ -696,3 +696,51 @@ describe("Stage 9 historical statistics and leaderboards", () => {
     expect(retiredOnly.players[0]!.contributingMatches.map((m) => m.fixtureId)).toEqual(["fx-1", "fx-2"]);
   });
 });
+
+describe("LC_PLAYER_IDENTITY_V2 career summary for match introductions", () => {
+  it("hands over each named player's league record before the match, matching the historical statistics, and saves nothing", async () => {
+    const seasonRepo = new InMemorySeasonRepo();
+    const persistentRepo = new InMemoryPersistentWorldRepo(seasonRepo);
+    const service = new CareerApplicationService("tab-pid2", seasonRepo, undefined, persistentRepo);
+    await service.boot();
+    await service.createCareer(careerWorld.teams[0]!.teamId, null, {
+      seed: "pid2-intro-seed",
+      worldId: "world-pid2",
+      careerId: "career-pid2",
+    });
+    for (let round = 1; round <= 3; round += 1) {
+      await service.simulateToNextUserFixture();
+      await service.simulateManagedFixture();
+    }
+    const launch = await service.prepareUserMatch();
+    const before = canonicalJson(service.getPersistentState());
+    const summary = service.careerIntroSummary(launch)!;
+    expect(canonicalJson(service.getPersistentState())).toBe(before);
+    expect(summary.version).toBe("LC_PLAYER_IDENTITY_V2");
+    expect(summary.matchGameId).toBe(launch.matchGameId);
+    const named = launch.selections.flatMap((side) => side.playerIds);
+    expect(Object.keys(summary.players).sort()).toEqual([...named].sort());
+    let withRuns = 0;
+    for (const playerId of named) {
+      const intro = summary.players[playerId]!;
+      const record = service.historicalPlayerRecord(playerId);
+      if (!record) {
+        expect(intro.matches).toBe(0);
+        continue;
+      }
+      expect(intro.runs).toBe(record.runs);
+      expect(intro.wickets).toBe(record.bowlingWickets);
+      expect(intro.battingInnings).toBe(record.battingInnings);
+      // Only matches already played, never the fixture about to start.
+      expect(record.contributingMatches.some((m) => m.fixtureId === launch.fixtureId)).toBe(false);
+      const batted = record.contributingMatches
+        .filter((m) => m.battedInnings !== null)
+        .sort((a, b) => a.seasonNumber - b.seasonNumber || a.roundNumber - b.roundNumber)
+        .slice(-3)
+        .map((m) => `${m.runsScored}${m.notOut ? "*" : ""}`);
+      expect(intro.recentBatting).toEqual(batted);
+      if (intro.runs > 0) withRuns += 1;
+    }
+    expect(withRuns).toBeGreaterThan(0);
+  }, 240_000);
+});

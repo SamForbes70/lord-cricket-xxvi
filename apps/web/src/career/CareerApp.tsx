@@ -47,6 +47,8 @@ import { CareerScreen } from "./CareerScreen.js";
 import { HomeScreen, selectionNoteKey } from "./HomeScreen.js";
 import { FixturesScreen } from "./FixturesScreen.js";
 
+import { handOverCareerIntro } from "../match/career-intro-handoff.js";
+
 const OWNER_KEY = "lcxxvi-career-writer-owner";
 const LAUNCH_KEY = "lcxxvi-career-match-launch";
 const RESULT_KEY = "lcxxvi-career-match-result";
@@ -459,6 +461,13 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         } catch {
           /* XI remains in the binding */
         }
+      }
+      // LC_PLAYER_IDENTITY_V2: the players' league records before this match, held in memory for the match view's
+      // introductions. Presentation only; a failure here leaves the V1 style-only introductions.
+      try {
+        handOverCareerIntro(service.careerIntroSummary(launch));
+      } catch {
+        handOverCareerIntro(null);
       }
       sessionStorage.setItem(LAUNCH_KEY, JSON.stringify(launch));
       window.location.hash = "#exhibition";

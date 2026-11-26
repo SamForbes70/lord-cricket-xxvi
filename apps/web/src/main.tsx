@@ -8,6 +8,7 @@ import {
 } from "@lcxxvi/projections";
 import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import { MatchStyleChip } from "./match/MatchStyleChip.js";
+import { careerIntroFor } from "./match/career-intro-handoff.js";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -737,6 +738,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   }, [editingWorld, restoreWorldFocus, view]);
 
+  // LC_PLAYER_IDENTITY_V2: league records before this match, handed over in memory by the career on launch.
+  const careerIntro = careerIntroFor(careerLaunch.current?.matchGameId);
   const captainedTeam = scenario?.playerTeamId ?? careerLaunch.current?.managedTeamId ?? view?.teams.find(t => t.id !== aiTeamId)?.id;
   const rivalTeam = view?.teams.find(t => t.id !== captainedTeam)?.id;
   const limitedOvers = view?.format === "T20" || view?.format === "ODI";
@@ -1384,7 +1387,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         {ledger!.batting[id]!.runs} (
                         {ledger!.batting[id]!.ballsFaced})
                         {!view.resultText && view.playingStyles?.[id] && (
-                          <MatchStyleChip playerId={id} name={view.names[id] ?? id} style={view.playingStyles[id].batting} kind="BATTER" isNew={ledger!.batting[id]!.ballsFaced === 0} />
+                          <MatchStyleChip playerId={id} name={view.names[id] ?? id} style={view.playingStyles[id].batting} kind="BATTER" isNew={ledger!.batting[id]!.ballsFaced === 0} record={careerIntro?.players[id] ?? null} />
                         )}
                       </>
                     ) : (
@@ -1407,7 +1410,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   const bowlerId = i?.bowlerId;
                   const bowlerStyle = bowlerId ? view.playingStyles?.[bowlerId]?.bowling : undefined;
                   if (!bowlerId || !bowlerStyle || view.resultText) return null;
-                  return <MatchStyleChip playerId={bowlerId} name={view.names[bowlerId] ?? bowlerId} style={bowlerStyle} kind="BOWLER" isNew={(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0} />;
+                  return <MatchStyleChip playerId={bowlerId} name={view.names[bowlerId] ?? bowlerId} style={bowlerStyle} kind="BOWLER" isNew={(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0} record={careerIntro?.players[bowlerId] ?? null} />;
                 })()}
               </p>
               {i?.bowlerId && (
