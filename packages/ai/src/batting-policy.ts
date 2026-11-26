@@ -100,3 +100,35 @@ export function adviseT20Batting(view: Readonly<T20BattingView>): T20BattingAdvi
 
   return { policyId: T20_BATTING_POLICY_ID, aggression: clamp(aggression), intent, reason: reasons.join("; ") };
 }
+
+/** LC_T20_BATTING_POLICY_V2 (captain V5, 26 November 2026). */
+export const T20_BATTING_POLICY_V2_ID = "LC_T20_BATTING_POLICY_V2" as const;
+export type T20BattingAdviceV2 = Readonly<{
+  policyId: typeof T20_BATTING_POLICY_V2_ID;
+  aggression: 0 | 1 | 2 | 3 | 4;
+  intent: BattingIntent;
+  reason: string;
+}>;
+
+/**
+ * V1 everywhere except in the first innings's death overs (overs 16 to 20, setting a total), where V1 held the striker
+ * to aggression 2 in two cases that a side setting a total does not hold back in (docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md):
+ *
+ * - three or fewer wickets left with more than 18 balls to go: V1 protected the innings so it lasts the overs. In the
+ *   death so few balls are left that a wicket costs little; V2 attacks at 3 (V1 was 2) and still not at 4.
+ * - a tail-ender on strike with a recognised batter at the other end: V2 attacks at 3 (V1 was 2) and still looks for
+ *   the single (ROTATE) while more than 12 balls are left, as V1 did.
+ *
+ * Everything else, including every chase rule and the powerplay and middle overs, is V1's. Cricket judgement, not
+ * fitted to any total. Pure and deterministic.
+ */
+export function adviseT20BattingV2(view: Readonly<T20BattingView>): T20BattingAdviceV2 {
+  const v1 = adviseT20Batting(view);
+  const setting = view.targetToWin === null;
+  const death = view.inningsLegalBalls >= 90;
+  if (!setting || !death || v1.aggression >= 3) return { ...v1, policyId: T20_BATTING_POLICY_V2_ID };
+  const reason = v1.reason.split("; ");
+  const held = reason.includes("few wickets left") || reason.includes("tail-ender on strike");
+  if (!held) return { ...v1, policyId: T20_BATTING_POLICY_V2_ID };
+  return { ...v1, policyId: T20_BATTING_POLICY_V2_ID, aggression: 3, reason: `${v1.reason}; death overs: attack at 3` };
+}

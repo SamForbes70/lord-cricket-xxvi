@@ -13,7 +13,7 @@ describe("M7 public-only tactical captain V1", () => {
     const result = adviseT20Captain(basis);
     expect(result).toEqual(adviseT20Captain(structuredClone(basis)));
     expect(result.preferredBowlerId).toBe("p100");
-    expect(result.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
+    expect(result.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V5");
   });
   test("reacts to chase pressure and wicket preservation without changing engine outcomes", () => {
     const chase = adviseT20Captain({ ...basis, inningsRuns: 45, targetToWin: 200 });
@@ -117,7 +117,7 @@ describe("M7 tactical captain engine integration", () => {
     expect(projectT20MatchAnalytics(one.events, projectT20Scorecard(one)).finalRuns).toEqual(projectT20Scorecard(one).innings.map(i=>i.runs));
     const view = publicT20CaptainView(one);
     expect(view).not.toBeNull();
-    expect(Object.keys(view!)).toEqual(["inningsLegalBalls","inningsRuns","wicketsLost","targetToWin","availableBatters","bowlingCandidates","previousOverBowler","striker","partner"]);
+    expect(Object.keys(view!)).toEqual(["inningsLegalBalls","inningsRuns","wicketsLost","targetToWin","availableBatters","bowlingCandidates","previousOverBowler","striker","partner","bowlerStyle"]);
     expect(JSON.stringify(view)).not.toContain(setup.seed);
   }, 120000);
 });

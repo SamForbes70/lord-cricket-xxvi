@@ -3,7 +3,7 @@
  * "Tactical validation").
  *
  * Each experiment changes ONE decision area. The "good" side is the tactical captain (the code's adviseT20Captain,
- * recorded in the output as `captain`; V2 when first measured, V4 from 25 November 2026) with the
+ * recorded in the output as `captain`; V2 when first measured, V4 from 25 November 2026, V5 from 26 November 2026) with the
  * suggested eleven. The "poor" side is identical except in that one area. Each of the 100 frozen corpus seeds is
  * played twice, the poor management on one side and then on the other, so team strength, toss and seed cancel out.
  *
@@ -11,11 +11,11 @@
  * innings by each side, and the mean difference with a 95% interval (paired by match, normal approximation).
  * Deterministic: the same command gives the same output. Read-only: no game file is changed.
  *
- *   node --import tsx scripts/pavilion-tactical-validation.ts [output.json] [experiment ...]
+ *   node --import tsx scripts/pavilion-tactical-validation.ts [output.json] [experiment ...] [--model=...] [--captain=V4|V5] [--advance=OVER|DELIVERY]
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { isBowlingCapable, suggestedEleven } from "@lcxxvi/data";
-import { adviseT20Captain, feasibleBowlerChoice, bowlersWithOversLeft, T20_TACTICAL_CAPTAIN_ID } from "@lcxxvi/ai";
+import { adviseT20Captain, adviseT20CaptainV4, feasibleBowlerChoice, bowlersWithOversLeft, T20_TACTICAL_CAPTAIN_ID, T20_TACTICAL_CAPTAIN_V4_ID } from "@lcxxvi/ai";
 import {
   createT20CorpusRequest, createT20Session, executeT20Command, validateT20ResearchMatchSetup, fixtureAutopilotStep, validateT20MatchSetup,
   type T20Session,
@@ -34,7 +34,15 @@ const byId = new Map(world.players.map((p) => [p.playerId, p]));
 /** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
 const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
 if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
-const ARGS = process.argv.filter((a) => !a.startsWith("--model="));
+/** Captain V5 (26 November 2026): `--captain=V4` runs adviseT20CaptainV4 as the good side instead of the current captain;
+ * `--advance=OVER` bowls a whole over per ADVANCE (the script up to V4) instead of one ball (the default from V5, as
+ * the live game asks the computer opponent before each ball; V5's death plan is ball by ball). */
+const CAPTAIN = process.argv.find((a) => a.startsWith("--captain="))?.slice(10) ?? "V5";
+if (CAPTAIN !== "V4" && CAPTAIN !== "V5") throw new Error(`unknown captain ${CAPTAIN}`);
+const ADVANCE = process.argv.find((a) => a.startsWith("--advance="))?.slice(10) ?? "DELIVERY";
+if (ADVANCE !== "OVER" && ADVANCE !== "DELIVERY") throw new Error(`unknown advance ${ADVANCE}`);
+const captainAdvice = CAPTAIN === "V4" ? adviseT20CaptainV4 : adviseT20Captain;
+const ARGS = process.argv.filter((a) => !a.startsWith("--"));
 const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
   ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
   : validateT20MatchSetup(request, bytes, manifest);
@@ -115,7 +123,7 @@ function step(session: T20Session, managers: ReadonlyMap<string, Management>): T
   const i = session.core.innings[session.core.activeInningsIndex]?.innings;
   const view = i ? publicT20CaptainView(session) : null;
   if (!i || !view || (phase !== "AWAITING_BOWLER" && phase !== "READY")) return fixtureAutopilotStep(session);
-  const advice = adviseT20Captain(view);
+  const advice = captainAdvice(view);
   const batting = managers.get(i.battingTeamId)!, bowling = managers.get(i.bowlingTeamId)!;
   if (phase === "AWAITING_BOWLER") {
     let bowlerId = advice.preferredBowlerId;
@@ -133,14 +141,20 @@ function step(session: T20Session, managers: ReadonlyMap<string, Management>): T
   const plan = { length: bowling.bowlingPlan?.length ?? advice.bowlingLength, effort: bowling.bowlingPlan?.effort ?? advice.bowlingEffort };
   const current = session.core.bowlingPlan;
   if (current && (current.length !== plan.length || current.effort !== plan.effort))
-    return command(session, i.bowlingTeamId, "SET_BOWLING_PLAN", { ...current, ...plan });
+    // Drop the event's `type` the engine's copy carries after a change within the over (captain V5 makes such changes).
+    return command(session, i.bowlingTeamId, "SET_BOWLING_PLAN", { ...withoutEventType(current), ...plan });
   if (bowling.field) {
     const slots = session.core.fieldSlots;
     const want = [...slots].map((s) => s.playerId).sort().map((playerId, n) => ({ slotId: bowling.field![n]!, playerId }));
     const same = (a: typeof want) => [...a].sort((x, y) => x.playerId.localeCompare(y.playerId)).map((s) => `${s.playerId}:${s.slotId}`).join("|");
     if (same(slots) !== same(want)) return command(session, i.bowlingTeamId, "SET_FIELD", { teamId: i.bowlingTeamId, fieldSlots: want });
   }
+  if (ADVANCE === "DELIVERY") return { expectedRevision: session.revision, commandId: `tv-${String(session.revision + 1).padStart(6, "0")}`, actorId: "SYSTEM", kind: "ADVANCE", payload: { scope: "DELIVERY" } } as T20Command;
   return fixtureAutopilotStep(session);
+}
+
+function withoutEventType<T extends object>(plan: T): T {
+  return Object.fromEntries(Object.entries(plan).filter(([key]) => key !== "type")) as T;
 }
 
 function inningsRuns(session: T20Session, index: number) {
@@ -203,7 +217,8 @@ const results = chosen.map((name) => { const r = experiment(name); console.error
 const output = {
   version: "LC_PAVILION_TACTICAL_VALIDATION_V1",
   model: MODEL,
-  captain: T20_TACTICAL_CAPTAIN_ID,
+  captain: CAPTAIN === "V4" ? T20_TACTICAL_CAPTAIN_V4_ID : T20_TACTICAL_CAPTAIN_ID,
+  advance: ADVANCE,
   design: "100 frozen corpus seeds, each played twice with the poor management on each side; good = the tactical captain named in `captain`, suggested eleven, engine default field",
   note: "Second-innings runs stop when the target is reached, so the run difference understates the gap in matches the chasing side wins.",
   results,

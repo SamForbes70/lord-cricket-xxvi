@@ -1,0 +1,330 @@
+{
+  "version": "LC_PAVILION_TACTICAL_VALIDATION_V1",
+  "model": "synthetic-alpha-01",
+  "captain": "LC_T20_TACTICAL_CAPTAIN_V5",
+  "advance": "DELIVERY",
+  "design": "100 frozen corpus seeds, each played twice with the poor management on each side; good = the tactical captain named in `captain`, suggested eleven, engine default field",
+  "note": "Second-innings runs stop when the target is reached, so the run difference understates the gap in matches the chasing side wins.",
+  "results": [
+    {
+      "experiment": "selection-weakest",
+      "area": "Selection",
+      "poor": "Weakest eleven: the weaker keeper, the five weakest bowlers and the five weakest other players, batting in skill order",
+      "matches": 200,
+      "goodWins": 109,
+      "poorWins": 86,
+      "tiesOrNoResult": 5,
+      "goodWinPercentOfDecided": 55.9,
+      "goodWinPercent95": [
+        48.9,
+        62.7
+      ],
+      "meanRunsGood": 108.5,
+      "meanRunsPoor": 104.8,
+      "meanRunDifference": 3.6,
+      "meanRunDifference95": [
+        -0.2,
+        7.5
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 8.7,
+        "SET_BATTING_PLAN": 11.6,
+        "SET_BOWLER": 18.9,
+        "SET_BOWLING_PLAN": 29.5
+      }
+    },
+    {
+      "experiment": "selection-old-rule",
+      "area": "Selection",
+      "poor": "The pre-stage-A rule: keeper, the first six bowling-capable players, then squad order (no specialist batters)",
+      "matches": 200,
+      "goodWins": 160,
+      "poorWins": 34,
+      "tiesOrNoResult": 6,
+      "goodWinPercentOfDecided": 82.5,
+      "goodWinPercent95": [
+        76.5,
+        87.2
+      ],
+      "meanRunsGood": 98.2,
+      "meanRunsPoor": 85,
+      "meanRunDifference": 13.2,
+      "meanRunDifference95": [
+        9.6,
+        16.9
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 9.9,
+        "SET_BATTING_PLAN": 11.3,
+        "SET_BOWLER": 17.8,
+        "SET_BOWLING_PLAN": 25.2
+      }
+    },
+    {
+      "experiment": "batting-order-reversed",
+      "area": "Selection (batting order)",
+      "poor": "The suggested eleven batting in reverse order (tail first)",
+      "matches": 200,
+      "goodWins": 141,
+      "poorWins": 54,
+      "tiesOrNoResult": 5,
+      "goodWinPercentOfDecided": 72.3,
+      "goodWinPercent95": [
+        65.6,
+        78.1
+      ],
+      "meanRunsGood": 102.7,
+      "meanRunsPoor": 94.7,
+      "meanRunDifference": 8,
+      "meanRunDifference95": [
+        4.4,
+        11.7
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 9.7,
+        "SET_BATTING_PLAN": 11.7,
+        "SET_BOWLER": 18.4,
+        "SET_BOWLING_PLAN": 26.8
+      }
+    },
+    {
+      "experiment": "aggression-all-out",
+      "area": "Batting aggression",
+      "poor": "Aggression 4 every ball",
+      "matches": 200,
+      "goodWins": 107,
+      "poorWins": 92,
+      "tiesOrNoResult": 1,
+      "goodWinPercentOfDecided": 53.8,
+      "goodWinPercent95": [
+        46.8,
+        60.6
+      ],
+      "meanRunsGood": 102.5,
+      "meanRunsPoor": 98.1,
+      "meanRunDifference": 4.4,
+      "meanRunDifference95": [
+        0.1,
+        8.7
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 10.1,
+        "SET_BATTING_PLAN": 10,
+        "SET_BOWLER": 18.2,
+        "SET_BOWLING_PLAN": 27.2
+      }
+    },
+    {
+      "experiment": "aggression-blocking",
+      "area": "Batting aggression",
+      "poor": "Aggression 0 every ball",
+      "matches": 200,
+      "goodWins": 130,
+      "poorWins": 66,
+      "tiesOrNoResult": 4,
+      "goodWinPercentOfDecided": 66.3,
+      "goodWinPercent95": [
+        59.5,
+        72.6
+      ],
+      "meanRunsGood": 103,
+      "meanRunsPoor": 96.9,
+      "meanRunDifference": 6.1,
+      "meanRunDifference95": [
+        3.1,
+        9.1
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 5.1,
+        "SET_BATTING_PLAN": 5.1,
+        "SET_BOWLER": 18.5,
+        "SET_BOWLING_PLAN": 27.3
+      }
+    },
+    {
+      "experiment": "bowling-worst-first",
+      "area": "Bowling choice",
+      "poor": "Weakest available bowler first, every over (quota-safe)",
+      "matches": 200,
+      "goodWins": 96,
+      "poorWins": 101,
+      "tiesOrNoResult": 3,
+      "goodWinPercentOfDecided": 48.7,
+      "goodWinPercent95": [
+        41.8,
+        55.7
+      ],
+      "meanRunsGood": 105.8,
+      "meanRunsPoor": 106.3,
+      "meanRunDifference": -0.5,
+      "meanRunDifference95": [
+        -4.2,
+        3.2
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 8.5,
+        "SET_BATTING_PLAN": 11.3,
+        "SET_BOWLER": 18.7,
+        "SET_BOWLING_PLAN": 28.4
+      }
+    },
+    {
+      "experiment": "bowling-plan-full-max",
+      "area": "Bowling plan",
+      "poor": "Full length at maximum effort all innings",
+      "matches": 200,
+      "goodWins": 96,
+      "poorWins": 100,
+      "tiesOrNoResult": 4,
+      "goodWinPercentOfDecided": 49,
+      "goodWinPercent95": [
+        42.1,
+        55.9
+      ],
+      "meanRunsGood": 105.9,
+      "meanRunsPoor": 106.5,
+      "meanRunDifference": -0.6,
+      "meanRunDifference95": [
+        -4.2,
+        3.1
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 8.6,
+        "SET_BATTING_PLAN": 11.3,
+        "SET_BOWLER": 18.7,
+        "SET_BOWLING_PLAN": 18.7
+      }
+    },
+    {
+      "experiment": "bowling-length-good",
+      "area": "Bowling plan (length)",
+      "poor": "Good length all innings (no yorkers at the death), the captain's effort",
+      "matches": 200,
+      "goodWins": 101,
+      "poorWins": 96,
+      "tiesOrNoResult": 3,
+      "goodWinPercentOfDecided": 51.3,
+      "goodWinPercent95": [
+        44.3,
+        58.2
+      ],
+      "meanRunsGood": 105.9,
+      "meanRunsPoor": 105.8,
+      "meanRunDifference": 0.1,
+      "meanRunDifference95": [
+        -3.7,
+        3.9
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 8.7,
+        "SET_BATTING_PLAN": 11.2,
+        "SET_BOWLER": 18.7,
+        "SET_BOWLING_PLAN": 17.2
+      }
+    },
+    {
+      "experiment": "bowling-effort-maximum",
+      "area": "Bowling plan (effort)",
+      "poor": "Maximum effort all innings, the captain's length",
+      "matches": 200,
+      "goodWins": 97,
+      "poorWins": 100,
+      "tiesOrNoResult": 3,
+      "goodWinPercentOfDecided": 49.2,
+      "goodWinPercent95": [
+        42.3,
+        56.2
+      ],
+      "meanRunsGood": 106.2,
+      "meanRunsPoor": 106,
+      "meanRunDifference": 0.2,
+      "meanRunDifference95": [
+        -3.5,
+        3.9
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 8.6,
+        "SET_BATTING_PLAN": 11,
+        "SET_BOWLER": 18.7,
+        "SET_BOWLING_PLAN": 37.3
+      }
+    },
+    {
+      "experiment": "bowling-effort-conserve",
+      "area": "Bowling plan (effort)",
+      "poor": "Conserve effort all innings, the captain's length",
+      "matches": 200,
+      "goodWins": 94,
+      "poorWins": 104,
+      "tiesOrNoResult": 2,
+      "goodWinPercentOfDecided": 47.5,
+      "goodWinPercent95": [
+        40.6,
+        54.4
+      ],
+      "meanRunsGood": 105.3,
+      "meanRunsPoor": 106.3,
+      "meanRunDifference": -1,
+      "meanRunDifference95": [
+        -4.6,
+        2.6
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 8.5,
+        "SET_BATTING_PLAN": 11.1,
+        "SET_BOWLER": 18.7,
+        "SET_BOWLING_PLAN": 37.3
+      }
+    },
+    {
+      "experiment": "field-attacking-throughout",
+      "area": "Field setting",
+      "poor": "The two-slip powerplay field held for all 20 overs",
+      "matches": 200,
+      "goodWins": 106,
+      "poorWins": 91,
+      "tiesOrNoResult": 3,
+      "goodWinPercentOfDecided": 53.8,
+      "goodWinPercent95": [
+        46.8,
+        60.6
+      ],
+      "meanRunsGood": 110.3,
+      "meanRunsPoor": 106.7,
+      "meanRunDifference": 3.6,
+      "meanRunDifference95": [
+        -0.3,
+        7.6
+      ],
+      "poorSideCommandsPerMatch": {
+        "CALL_TOSS": 0.5,
+        "CHOOSE_INNINGS": 0.5,
+        "SET_BATTER": 8.7,
+        "SET_BATTING_PLAN": 11.4,
+        "SET_BOWLER": 18.9,
+        "SET_BOWLING_PLAN": 29.5,
+        "SET_FIELD": 12.9
+      }
+    }
+  ]
+}

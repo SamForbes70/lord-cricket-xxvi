@@ -1,0 +1,724 @@
+{
+  "version": "LC_PAVILION_CAPTAIN_V5_MEASURE_V1",
+  "model": "synthetic-alpha-01",
+  "advance": "DELIVERY",
+  "bowlingPlan": "V5",
+  "battingPolicy": "V5",
+  "repeats": 10,
+  "firstRepeat": 0,
+  "matches": 1000,
+  "design": "frozen 100-seed corpus, suggested elevens, the same captain on both sides; repeat r>0 seeds suffixed -c1r<r>; phases are overs 1-6, 7-15, 16-20",
+  "definitions": "runs an over include extras; dot = legal ball with no run of any kind and no wicket; wicket, four and six % are per legal ball; intervals are 95% match bootstrap",
+  "firstInnings": {
+    "innings": 1000,
+    "runs": {
+      "value": 112.823,
+      "ci95": [
+        111.303,
+        114.47
+      ]
+    },
+    "wickets": {
+      "value": 8.13,
+      "ci95": [
+        8.008,
+        8.24
+      ]
+    },
+    "dotPercentIncludingWicketBalls": {
+      "value": 58.271,
+      "ci95": [
+        57.947,
+        58.573
+      ]
+    },
+    "powerplay": {
+      "legalBalls": 36000,
+      "runsPerOver": {
+        "value": 6.227,
+        "ci95": [
+          6.122,
+          6.338
+        ]
+      },
+      "wicketPercent": {
+        "value": 5.95,
+        "ci95": [
+          5.711,
+          6.158
+        ]
+      },
+      "dotPercentExcludingWicketBalls": {
+        "value": 51.992,
+        "ci95": [
+          51.511,
+          52.453
+        ]
+      },
+      "fourPercent": {
+        "value": 8.472,
+        "ci95": [
+          8.192,
+          8.736
+        ]
+      },
+      "sixPercent": {
+        "value": 5.311,
+        "ci95": [
+          5.078,
+          5.547
+        ]
+      }
+    },
+    "middle": {
+      "legalBalls": 53572,
+      "runsPerOver": {
+        "value": 5.289,
+        "ci95": [
+          5.208,
+          5.366
+        ]
+      },
+      "wicketPercent": {
+        "value": 5.848,
+        "ci95": [
+          5.647,
+          6.041
+        ]
+      },
+      "dotPercentExcludingWicketBalls": {
+        "value": 51.208,
+        "ci95": [
+          50.774,
+          51.65
+        ]
+      },
+      "fourPercent": {
+        "value": 6.546,
+        "ci95": [
+          6.338,
+          6.764
+        ]
+      },
+      "sixPercent": {
+        "value": 3.261,
+        "ci95": [
+          3.089,
+          3.423
+        ]
+      }
+    },
+    "death": {
+      "legalBalls": 25200,
+      "runsPerOver": {
+        "value": 6.724,
+        "ci95": [
+          6.577,
+          6.867
+        ]
+      },
+      "wicketPercent": {
+        "value": 11.329,
+        "ci95": [
+          10.96,
+          11.712
+        ]
+      },
+      "dotPercentExcludingWicketBalls": {
+        "value": 50.063,
+        "ci95": [
+          49.432,
+          50.689
+        ]
+      },
+      "fourPercent": {
+        "value": 8.016,
+        "ci95": [
+          7.658,
+          8.374
+        ]
+      },
+      "sixPercent": {
+        "value": 8.008,
+        "ci95": [
+          7.677,
+          8.325
+        ]
+      }
+    }
+  },
+  "deathFirstInnings": {
+    "legalBalls": 25200,
+    "runsPerOver": 6.724,
+    "wicketPercent": 11.329,
+    "byPlan": {
+      "FULL/CONSERVE": {
+        "shareOfLegalBalls": 16.69,
+        "runsPerOver": 6.62,
+        "wicketPercent": 11.29,
+        "dotPercent": 50.1,
+        "shareOfDeathRuns": 16.44,
+        "shareOfDeathWickets": 16.64
+      },
+      "FULL/MAXIMUM": {
+        "shareOfLegalBalls": 7.31,
+        "runsPerOver": 6.54,
+        "wicketPercent": 12.7,
+        "dotPercent": 48.9,
+        "shareOfDeathRuns": 7.11,
+        "shareOfDeathWickets": 8.2
+      },
+      "FULL/NORMAL": {
+        "shareOfLegalBalls": 7.59,
+        "runsPerOver": 6.11,
+        "wicketPercent": 11.4,
+        "dotPercent": 54.2,
+        "shareOfDeathRuns": 6.89,
+        "shareOfDeathWickets": 7.64
+      },
+      "GOOD/CONSERVE": {
+        "shareOfLegalBalls": 16.63,
+        "runsPerOver": 6.93,
+        "wicketPercent": 11.21,
+        "dotPercent": 49.3,
+        "shareOfDeathRuns": 17.15,
+        "shareOfDeathWickets": 16.46
+      },
+      "GOOD/MAXIMUM": {
+        "shareOfLegalBalls": 12.23,
+        "runsPerOver": 7,
+        "wicketPercent": 10.9,
+        "dotPercent": 49.2,
+        "shareOfDeathRuns": 12.73,
+        "shareOfDeathWickets": 11.77
+      },
+      "GOOD/NORMAL": {
+        "shareOfLegalBalls": 7.88,
+        "runsPerOver": 7.45,
+        "wicketPercent": 11.78,
+        "dotPercent": 46.6,
+        "shareOfDeathRuns": 8.74,
+        "shareOfDeathWickets": 8.2
+      },
+      "SHORT/MAXIMUM": {
+        "shareOfLegalBalls": 9.02,
+        "runsPerOver": 7.37,
+        "wicketPercent": 11.83,
+        "dotPercent": 48,
+        "shareOfDeathRuns": 9.88,
+        "shareOfDeathWickets": 9.42
+      },
+      "YORKER/MAXIMUM": {
+        "shareOfLegalBalls": 13.39,
+        "runsPerOver": 6.14,
+        "wicketPercent": 10.76,
+        "dotPercent": 52.5,
+        "shareOfDeathRuns": 12.22,
+        "shareOfDeathWickets": 12.71
+      },
+      "YORKER/NORMAL": {
+        "shareOfLegalBalls": 9.25,
+        "runsPerOver": 6.42,
+        "wicketPercent": 10.98,
+        "dotPercent": 51.5,
+        "shareOfDeathRuns": 8.83,
+        "shareOfDeathWickets": 8.97
+      }
+    },
+    "byPlannedLength": {
+      "FULL": {
+        "shareOfLegalBalls": 31.59,
+        "runsPerOver": 6.48,
+        "wicketPercent": 11.64,
+        "dotPercent": 50.8,
+        "shareOfDeathRuns": 30.44,
+        "shareOfDeathWickets": 32.47
+      },
+      "GOOD": {
+        "shareOfLegalBalls": 36.75,
+        "runsPerOver": 7.07,
+        "wicketPercent": 11.23,
+        "dotPercent": 48.7,
+        "shareOfDeathRuns": 38.62,
+        "shareOfDeathWickets": 36.43
+      },
+      "SHORT": {
+        "shareOfLegalBalls": 9.02,
+        "runsPerOver": 7.37,
+        "wicketPercent": 11.83,
+        "dotPercent": 48,
+        "shareOfDeathRuns": 9.88,
+        "shareOfDeathWickets": 9.42
+      },
+      "YORKER": {
+        "shareOfLegalBalls": 22.64,
+        "runsPerOver": 6.25,
+        "wicketPercent": 10.85,
+        "dotPercent": 52.1,
+        "shareOfDeathRuns": 21.06,
+        "shareOfDeathWickets": 21.68
+      }
+    },
+    "byEffort": {
+      "CONSERVE": {
+        "shareOfLegalBalls": 33.33,
+        "runsPerOver": 6.78,
+        "wicketPercent": 11.25,
+        "dotPercent": 49.7,
+        "shareOfDeathRuns": 33.59,
+        "shareOfDeathWickets": 33.1
+      },
+      "MAXIMUM": {
+        "shareOfLegalBalls": 41.95,
+        "runsPerOver": 6.72,
+        "wicketPercent": 11.37,
+        "dotPercent": 49.9,
+        "shareOfDeathRuns": 41.95,
+        "shareOfDeathWickets": 42.1
+      },
+      "NORMAL": {
+        "shareOfLegalBalls": 24.72,
+        "runsPerOver": 6.65,
+        "wicketPercent": 11.36,
+        "dotPercent": 50.8,
+        "shareOfDeathRuns": 24.46,
+        "shareOfDeathWickets": 24.8
+      }
+    },
+    "byExecutedLength": {
+      "FULL": {
+        "shareOfLegalBalls": 34.6,
+        "runsPerOver": 6.63,
+        "wicketPercent": 11.51,
+        "dotPercent": 50.1,
+        "shareOfDeathRuns": 34.12,
+        "shareOfDeathWickets": 35.17
+      },
+      "FULL_TOSS": {
+        "shareOfLegalBalls": 2.27,
+        "runsPerOver": 8.24,
+        "wicketPercent": 12.24,
+        "dotPercent": 43.4,
+        "shareOfDeathRuns": 2.78,
+        "shareOfDeathWickets": 2.45
+      },
+      "GOOD": {
+        "shareOfLegalBalls": 32.65,
+        "runsPerOver": 6.96,
+        "wicketPercent": 11.27,
+        "dotPercent": 49.2,
+        "shareOfDeathRuns": 33.8,
+        "shareOfDeathWickets": 32.47
+      },
+      "SHORT": {
+        "shareOfLegalBalls": 10.59,
+        "runsPerOver": 7.38,
+        "wicketPercent": 12.11,
+        "dotPercent": 47.3,
+        "shareOfDeathRuns": 11.61,
+        "shareOfDeathWickets": 11.31
+      },
+      "YORKER": {
+        "shareOfLegalBalls": 19.89,
+        "runsPerOver": 5.98,
+        "wicketPercent": 10.59,
+        "dotPercent": 53.7,
+        "shareOfDeathRuns": 17.69,
+        "shareOfDeathWickets": 18.6
+      }
+    },
+    "byAggression": {
+      "3": {
+        "shareOfLegalBalls": 29.13,
+        "runsPerOver": 5.61,
+        "wicketPercent": 10.24,
+        "dotPercent": 53.4,
+        "shareOfDeathRuns": 24.31,
+        "shareOfDeathWickets": 26.34
+      },
+      "4": {
+        "shareOfLegalBalls": 70.87,
+        "runsPerOver": 7.18,
+        "wicketPercent": 11.78,
+        "dotPercent": 48.7,
+        "shareOfDeathRuns": 75.69,
+        "shareOfDeathWickets": 73.66
+      }
+    },
+    "byBowlerStyle": {
+      "pace": {
+        "shareOfLegalBalls": 54.34,
+        "runsPerOver": 6.78,
+        "wicketPercent": 11.04,
+        "dotPercent": 50.2,
+        "shareOfDeathRuns": 54.79,
+        "shareOfDeathWickets": 52.96
+      },
+      "spin": {
+        "shareOfLegalBalls": 45.66,
+        "runsPerOver": 6.66,
+        "wicketPercent": 11.67,
+        "dotPercent": 49.9,
+        "shareOfDeathRuns": 45.21,
+        "shareOfDeathWickets": 47.04
+      }
+    },
+    "lowAggressionReasons": {
+      "aggression 3 or 4": {
+        "shareOfLegalBalls": 100,
+        "runsPerOver": 6.72,
+        "wicketPercent": 11.33,
+        "dotPercent": 50.1,
+        "shareOfDeathRuns": 100,
+        "shareOfDeathWickets": 100
+      }
+    }
+  },
+  "deathSecondInnings": {
+    "legalBalls": 19880,
+    "runsPerOver": 6.043,
+    "wicketPercent": 9.095,
+    "byPlan": {
+      "FULL/CONSERVE": {
+        "shareOfLegalBalls": 16.82,
+        "runsPerOver": 5.93,
+        "wicketPercent": 8.85,
+        "dotPercent": 52.9,
+        "shareOfDeathRuns": 16.49,
+        "shareOfDeathWickets": 16.37
+      },
+      "FULL/MAXIMUM": {
+        "shareOfLegalBalls": 6.71,
+        "runsPerOver": 6.01,
+        "wicketPercent": 10.95,
+        "dotPercent": 50.1,
+        "shareOfDeathRuns": 6.67,
+        "shareOfDeathWickets": 8.08
+      },
+      "FULL/NORMAL": {
+        "shareOfLegalBalls": 7.28,
+        "runsPerOver": 6.09,
+        "wicketPercent": 9.67,
+        "dotPercent": 52.2,
+        "shareOfDeathRuns": 7.34,
+        "shareOfDeathWickets": 7.74
+      },
+      "GOOD/CONSERVE": {
+        "shareOfLegalBalls": 16.52,
+        "runsPerOver": 6.3,
+        "wicketPercent": 8.1,
+        "dotPercent": 51.4,
+        "shareOfDeathRuns": 17.23,
+        "shareOfDeathWickets": 14.71
+      },
+      "GOOD/MAXIMUM": {
+        "shareOfLegalBalls": 13.44,
+        "runsPerOver": 6.24,
+        "wicketPercent": 9.13,
+        "dotPercent": 49.7,
+        "shareOfDeathRuns": 13.88,
+        "shareOfDeathWickets": 13.5
+      },
+      "GOOD/NORMAL": {
+        "shareOfLegalBalls": 7.92,
+        "runsPerOver": 6.18,
+        "wicketPercent": 10.16,
+        "dotPercent": 49.8,
+        "shareOfDeathRuns": 8.1,
+        "shareOfDeathWickets": 8.85
+      },
+      "SHORT/MAXIMUM": {
+        "shareOfLegalBalls": 9.27,
+        "runsPerOver": 5.9,
+        "wicketPercent": 9.77,
+        "dotPercent": 52.8,
+        "shareOfDeathRuns": 9.04,
+        "shareOfDeathWickets": 9.96
+      },
+      "YORKER/MAXIMUM": {
+        "shareOfLegalBalls": 12.35,
+        "runsPerOver": 5.81,
+        "wicketPercent": 8.88,
+        "dotPercent": 53.6,
+        "shareOfDeathRuns": 11.87,
+        "shareOfDeathWickets": 12.06
+      },
+      "YORKER/NORMAL": {
+        "shareOfLegalBalls": 9.69,
+        "runsPerOver": 5.85,
+        "wicketPercent": 8.2,
+        "dotPercent": 51.8,
+        "shareOfDeathRuns": 9.37,
+        "shareOfDeathWickets": 8.74
+      }
+    },
+    "byPlannedLength": {
+      "FULL": {
+        "shareOfLegalBalls": 30.8,
+        "runsPerOver": 5.98,
+        "wicketPercent": 9.5,
+        "dotPercent": 52.1,
+        "shareOfDeathRuns": 30.49,
+        "shareOfDeathWickets": 32.19
+      },
+      "GOOD": {
+        "shareOfLegalBalls": 37.89,
+        "runsPerOver": 6.26,
+        "wicketPercent": 8.9,
+        "dotPercent": 50.5,
+        "shareOfDeathRuns": 39.22,
+        "shareOfDeathWickets": 37.06
+      },
+      "SHORT": {
+        "shareOfLegalBalls": 9.27,
+        "runsPerOver": 5.9,
+        "wicketPercent": 9.77,
+        "dotPercent": 52.8,
+        "shareOfDeathRuns": 9.04,
+        "shareOfDeathWickets": 9.96
+      },
+      "YORKER": {
+        "shareOfLegalBalls": 22.04,
+        "runsPerOver": 5.83,
+        "wicketPercent": 8.58,
+        "dotPercent": 52.8,
+        "shareOfDeathRuns": 21.24,
+        "shareOfDeathWickets": 20.8
+      }
+    },
+    "byEffort": {
+      "CONSERVE": {
+        "shareOfLegalBalls": 33.34,
+        "runsPerOver": 6.11,
+        "wicketPercent": 8.48,
+        "dotPercent": 52.2,
+        "shareOfDeathRuns": 33.72,
+        "shareOfDeathWickets": 31.08
+      },
+      "MAXIMUM": {
+        "shareOfLegalBalls": 41.77,
+        "runsPerOver": 6,
+        "wicketPercent": 9.49,
+        "dotPercent": 51.6,
+        "shareOfDeathRuns": 41.47,
+        "shareOfDeathWickets": 43.58
+      },
+      "NORMAL": {
+        "shareOfLegalBalls": 24.89,
+        "runsPerOver": 6.02,
+        "wicketPercent": 9.25,
+        "dotPercent": 51.3,
+        "shareOfDeathRuns": 24.81,
+        "shareOfDeathWickets": 25.33
+      }
+    },
+    "byExecutedLength": {
+      "FULL": {
+        "shareOfLegalBalls": 33.56,
+        "runsPerOver": 6.03,
+        "wicketPercent": 9.25,
+        "dotPercent": 51.5,
+        "shareOfDeathRuns": 33.47,
+        "shareOfDeathWickets": 34.13
+      },
+      "FULL_TOSS": {
+        "shareOfLegalBalls": 2.11,
+        "runsPerOver": 7.13,
+        "wicketPercent": 10.48,
+        "dotPercent": 43.6,
+        "shareOfDeathRuns": 2.49,
+        "shareOfDeathWickets": 2.43
+      },
+      "GOOD": {
+        "shareOfLegalBalls": 33.92,
+        "runsPerOver": 6.15,
+        "wicketPercent": 8.71,
+        "dotPercent": 51.4,
+        "shareOfDeathRuns": 34.5,
+        "shareOfDeathWickets": 32.47
+      },
+      "SHORT": {
+        "shareOfLegalBalls": 10.84,
+        "runsPerOver": 6.1,
+        "wicketPercent": 10.35,
+        "dotPercent": 50.8,
+        "shareOfDeathRuns": 10.94,
+        "shareOfDeathWickets": 12.33
+      },
+      "YORKER": {
+        "shareOfLegalBalls": 19.57,
+        "runsPerOver": 5.75,
+        "wicketPercent": 8.66,
+        "dotPercent": 53.8,
+        "shareOfDeathRuns": 18.6,
+        "shareOfDeathWickets": 18.64
+      }
+    },
+    "byAggression": {
+      "1": {
+        "shareOfLegalBalls": 30.27,
+        "runsPerOver": 5.18,
+        "wicketPercent": 5.85,
+        "dotPercent": 54.6,
+        "shareOfDeathRuns": 25.95,
+        "shareOfDeathWickets": 19.47
+      },
+      "2": {
+        "shareOfLegalBalls": 22.26,
+        "runsPerOver": 5.51,
+        "wicketPercent": 8.27,
+        "dotPercent": 52.2,
+        "shareOfDeathRuns": 20.29,
+        "shareOfDeathWickets": 20.24
+      },
+      "3": {
+        "shareOfLegalBalls": 3.37,
+        "runsPerOver": 6.5,
+        "wicketPercent": 8.37,
+        "dotPercent": 52.6,
+        "shareOfDeathRuns": 3.62,
+        "shareOfDeathWickets": 3.1
+      },
+      "4": {
+        "shareOfLegalBalls": 44.1,
+        "runsPerOver": 6.87,
+        "wicketPercent": 11.79,
+        "dotPercent": 49.4,
+        "shareOfDeathRuns": 50.14,
+        "shareOfDeathWickets": 57.19
+      }
+    },
+    "byBowlerStyle": {
+      "pace": {
+        "shareOfLegalBalls": 55.85,
+        "runsPerOver": 5.93,
+        "wicketPercent": 8.5,
+        "dotPercent": 52.3,
+        "shareOfDeathRuns": 54.79,
+        "shareOfDeathWickets": 52.21
+      },
+      "spin": {
+        "shareOfLegalBalls": 44.15,
+        "runsPerOver": 6.19,
+        "wicketPercent": 9.84,
+        "dotPercent": 51,
+        "shareOfDeathRuns": 45.21,
+        "shareOfDeathWickets": 47.79
+      }
+    },
+    "lowAggressionReasons": {
+      "aggression 3 or 4": {
+        "shareOfLegalBalls": 47.47,
+        "runsPerOver": 6.84,
+        "wicketPercent": 11.55,
+        "dotPercent": 49.7,
+        "shareOfDeathRuns": 53.77,
+        "shareOfDeathWickets": 60.29
+      },
+      "chase, required rate 8 or more; few wickets left": {
+        "shareOfLegalBalls": 2.55,
+        "runsPerOver": 4.96,
+        "wicketPercent": 8.88,
+        "dotPercent": 57.6,
+        "shareOfDeathRuns": 2.09,
+        "shareOfDeathWickets": 2.49
+      },
+      "chase, required rate 8 or more; few wickets left; tail-ender on strike": {
+        "shareOfLegalBalls": 0.51,
+        "runsPerOver": 4.35,
+        "wicketPercent": 5.88,
+        "dotPercent": 56.9,
+        "shareOfDeathRuns": 0.37,
+        "shareOfDeathWickets": 0.33
+      },
+      "chase, required rate 8 or more; tail-ender on strike": {
+        "shareOfLegalBalls": 4.59,
+        "runsPerOver": 4.49,
+        "wicketPercent": 6.91,
+        "dotPercent": 55.2,
+        "shareOfDeathRuns": 3.41,
+        "shareOfDeathWickets": 3.48
+      },
+      "chase, required rate below 8": {
+        "shareOfLegalBalls": 38.52,
+        "runsPerOver": 5.55,
+        "wicketPercent": 6.78,
+        "dotPercent": 52.7,
+        "shareOfDeathRuns": 35.39,
+        "shareOfDeathWickets": 28.71
+      },
+      "chase, required rate below 8; few wickets left": {
+        "shareOfLegalBalls": 4,
+        "runsPerOver": 4.54,
+        "wicketPercent": 6.66,
+        "dotPercent": 57.3,
+        "shareOfDeathRuns": 3.01,
+        "shareOfDeathWickets": 2.93
+      },
+      "chase, required rate below 8; few wickets left; tail-ender on strike": {
+        "shareOfLegalBalls": 0.82,
+        "runsPerOver": 5.3,
+        "wicketPercent": 5.49,
+        "dotPercent": 53.7,
+        "shareOfDeathRuns": 0.72,
+        "shareOfDeathWickets": 0.5
+      },
+      "chase, required rate below 8; tail-ender on strike": {
+        "shareOfLegalBalls": 1.53,
+        "runsPerOver": 4.91,
+        "wicketPercent": 7.57,
+        "dotPercent": 53.3,
+        "shareOfDeathRuns": 1.24,
+        "shareOfDeathWickets": 1.27
+      }
+    }
+  },
+  "aggressionSharePercentByPhase": {
+    "firstInnings": {
+      "powerplay": {
+        "0": 0,
+        "1": 0,
+        "2": 31.29,
+        "3": 68.71,
+        "4": 0
+      },
+      "middle": {
+        "0": 0,
+        "1": 0,
+        "2": 85.15,
+        "3": 14.85,
+        "4": 0
+      },
+      "death": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 29.13,
+        "4": 70.87
+      }
+    },
+    "secondInnings": {
+      "powerplay": {
+        "0": 0,
+        "1": 56.59,
+        "2": 37.22,
+        "3": 5.78,
+        "4": 0.41
+      },
+      "middle": {
+        "0": 0,
+        "1": 48.23,
+        "2": 32.91,
+        "3": 13,
+        "4": 5.86
+      },
+      "death": {
+        "0": 0,
+        "1": 30.27,
+        "2": 22.26,
+        "3": 3.37,
+        "4": 44.1
+      }
+    }
+  }
+}

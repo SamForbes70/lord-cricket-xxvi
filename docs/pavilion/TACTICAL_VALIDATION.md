@@ -6,6 +6,8 @@ Owner direction of 25 November 2026, "Tactical validation". The question is whet
 
 Rerun with captains V3 and V4 (25 November 2026): [CAPTAIN_V4_DEATH_OVERS.md](CAPTAIN_V4_DEATH_OVERS.md).
 
+Rerun with captain V5 (26 November 2026), both models: [CAPTAIN_V5_DEATH_OVERS.md](CAPTAIN_V5_DEATH_OVERS.md).
+
 ## Method
 
 `node --import tsx scripts/pavilion-tactical-validation.ts docs/pavilion/tactical-validation.json`
