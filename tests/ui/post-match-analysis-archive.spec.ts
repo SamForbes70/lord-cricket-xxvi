@@ -5,10 +5,10 @@ const MANAGED = "Aster Harbour";
 
 /**
  * Plays to full time and sets one of the managed side's own batters to Attack while that side bats. Returns the
- * batter's name, or null if no chance came. The shared V1 helper changes the first aggression control it finds, which
- * can be an opponent batter's when the opponent bats first; the computer captain then sets its own batter's plan back
- * at the same ball, so the record holds no net change to Attack. Changing a managed batter whose plan is not already
- * Attack makes the change in the record certain.
+ * batter's name, or null if no chance came. Before own-side controls the shared V1 helper could change an opponent
+ * batter's aggression when the opponent batted first, and the computer captain then set it back at the same ball, so
+ * the record held no net change to Attack. The opponent's controls are now disabled (docs/pavilion/OWN_SIDE_CONTROLS.md);
+ * changing a managed batter whose plan is not already Attack still makes the change in the record certain.
  */
 async function playSettingManagedBatterToAttack(page: Page): Promise<string | null> {
   const decision = page.locator("#decision");

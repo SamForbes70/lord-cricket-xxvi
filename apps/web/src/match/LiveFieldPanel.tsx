@@ -11,6 +11,7 @@ import {
   selectHighlightReelForMode,
 } from "@lcxxvi/projections";
 import type { Action } from "./protocol.js";
+import { OPPOSITION_CAPTAIN_NOTE } from "./side-control.js";
 
 export type CommittedSequenceWindow = {
   readonly token: number;
@@ -57,6 +58,7 @@ export function LiveFieldPanel({
   committedFieldSlots,
   outfieldIds,
   bowlingTeamId,
+  fieldSetByOpposition = false,
   legalBalls,
   names,
   busy,
@@ -72,6 +74,8 @@ export function LiveFieldPanel({
   committedFieldSlots: readonly FieldSlot[];
   outfieldIds: readonly string[];
   bowlingTeamId: string | null;
+  /** True when the computer captain runs the fielding side: the person cannot edit that side's field. */
+  fieldSetByOpposition?: boolean;
   legalBalls: number;
   names: Readonly<Record<string, string>>;
   busy: boolean;
@@ -175,6 +179,7 @@ export function LiveFieldPanel({
   const canEditField =
     presentation.phase === "READY" &&
     Boolean(bowlingTeamId) &&
+    !fieldSetByOpposition &&
     draftSlots.length === 9;
 
   const isDirty = useMemo(() => {
@@ -831,6 +836,11 @@ export function LiveFieldPanel({
             )}
           </div>
 
+          {presentation.phase === "READY" && fieldSetByOpposition && (
+            <p className="control-owner-note" role="note" data-testid="field-owner-note">
+              {OPPOSITION_CAPTAIN_NOTE}: the fielding side's captain places this field.
+            </p>
+          )}
           {/* Keyboard alternatives to pointer dragging */}
           {canEditField && (
             <div

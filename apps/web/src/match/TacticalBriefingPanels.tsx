@@ -4,6 +4,7 @@ import type {
   TacticalPresetOption,
 } from "@lcxxvi/contracts";
 import type { Action } from "./protocol.js";
+import { OPPOSITION_CAPTAIN_NOTE } from "./side-control.js";
 
 const TENDENCY_LABEL: Record<PreMatchBriefing["ground"]["pitchTendency"], string> = {
   SEAM_FRIENDLY: "Seam-leaning",
@@ -134,6 +135,7 @@ export function InMatchTacticalAssistantPanel({
   strikerId,
   activeBowlerId,
   bowlingTeamId,
+  ownSide = { batting: true, bowling: true },
   onApplyAction,
 }: {
   assistant: InMatchTacticalAssistantView;
@@ -142,6 +144,8 @@ export function InMatchTacticalAssistantPanel({
   strikerId: string | null;
   activeBowlerId: string | null;
   bowlingTeamId: string | null;
+  /** Which sides' plans the person may set; the computer captain sets the other side's (own-side controls). */
+  ownSide?: { batting: boolean; bowling: boolean };
   onApplyAction: (action: Action) => void;
 }) {
   const battingPresets = assistant.presets.filter(
@@ -154,8 +158,10 @@ export function InMatchTacticalAssistantPanel({
     (p) => p.commandKind === "SET_FIELD",
   );
 
+  const presetAllowed = (preset: TacticalPresetOption) =>
+    preset.commandKind === "SET_BATTING_PLAN" ? ownSide.batting : ownSide.bowling;
   function triggerPreset(preset: TacticalPresetOption) {
-    if (busy || phase !== "READY") return;
+    if (busy || phase !== "READY" || !presetAllowed(preset)) return;
     if (preset.commandKind === "SET_BATTING_PLAN" && preset.battingPatch && strikerId) {
       onApplyAction({
         kind: "SET_BATTING_PLAN",
@@ -268,12 +274,15 @@ export function InMatchTacticalAssistantPanel({
                         </p>
                         <button
                           type="button"
-                          disabled={busy || preset.activeNow}
+                          disabled={busy || preset.activeNow || !presetAllowed(preset)}
                           data-testid={`apply-preset-${preset.presetId}`}
                           onClick={() => triggerPreset(preset)}
                         >
                           {preset.activeNow ? `Active: ${preset.label}` : `Apply: ${preset.label}`}
                         </button>
+                        {!presetAllowed(preset) && (
+                          <small className="control-owner-note">{OPPOSITION_CAPTAIN_NOTE}.</small>
+                        )}
                       </div>
                     ))}
                   </div>
