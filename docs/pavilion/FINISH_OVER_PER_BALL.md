@@ -30,6 +30,8 @@ Outcomes are unchanged when no plan changes. Each ball's random draws are keyed 
 | --- | --- | --- |
 | Type check | `NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b` | PASS (exit 0) |
 | New spec | `LCXXVI_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npx playwright test --config playwright.ui.config.ts tests/ui/finish-over-per-ball.spec.ts --project=chromium --reporter=line --trace off` | PASS, 1 test (19.2 s) |
+| Every other spec in `tests/ui` that presses "Finish over" (20 files) | same command with those files, at `bb9c42b` | PASS, 59 passed (44.5 min) |
+| Inventory | `node scripts/check-pass07b-inventory.mjs` | PASS (exit 0) |
 | New spec against the old page (main `5fc98e3`'s `main.tsx`) | same command | FAIL as expected: an `ADVANCE` with scope `OVER` was sent |
 
 The spec records the page's messages to the match worker. It checks that every advance is a single delivery and that an `AI_STEP` was sent between consecutive balls and after the last one.
