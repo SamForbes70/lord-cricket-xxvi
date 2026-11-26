@@ -472,7 +472,9 @@ test("A selection from Home takes the field and returns to the next matchday not
   await page.getByRole("button", {name:"Return result to career"}).click();
   const notebook = page.locator(".score-notebook");
   await expect(notebook).toContainText("ROUND 2", {timeout:60_000});
-  await expect(notebook.getByText(player, {exact:true})).toBeVisible();
+  // Scope to the selection line: the same player can also be named player of the match.
+  const selection = notebook.getByRole("paragraph").filter({hasText: "Your selection:"}).getByText(player, {exact:true});
+  await expect(selection).toBeVisible();
   await page.reload();
-  await expect(notebook.getByText(player, {exact:true})).toBeVisible({timeout:60_000});
+  await expect(selection).toBeVisible({timeout:60_000});
 });

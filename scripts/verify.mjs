@@ -50,8 +50,9 @@ for (const [name, args] of gates) {
   const result = spawnSync(executable, arguments_, {
     encoding: "utf8",
     maxBuffer: 10_000_000,
-    // The full season/persistence suite outgrew the original 90-second budget.
-    timeout: name === "smoke" ? 660_000 : name === "unit" ? 900_000 : 90_000,
+    // The full season/persistence suite outgrew the original 90-second budget. Unit: 25 minutes (25 November 2026);
+    // the suite took 600 to 756 s on hosted runners and two runs hit the old 900 s limit with no failing test.
+    timeout: name === "smoke" ? 660_000 : name === "unit" ? 1_500_000 : 90_000,
   });
   const log =
     (result.stdout ?? "") +
