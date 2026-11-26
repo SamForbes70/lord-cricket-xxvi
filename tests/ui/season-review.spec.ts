@@ -113,7 +113,7 @@ test("a completed season ends with the season review, built from the recorded se
   await expect(ahead).toContainText("Closing the season starts Season 2");
   await expectFits(page);
   await shot(page, "1366-5-ahead");
-  await expect(finale).not.toContainText(/[–—]/);
+  await expect(finale).not.toContainText(/[\u2013\u2014]/);
 
   // Phone width: walk back through every step.
   await page.setViewportSize({ width: 390, height: 844 });

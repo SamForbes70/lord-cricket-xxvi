@@ -257,7 +257,7 @@ describe("season review V1", () => {
     ];
     for (const s of sentences) {
       expectNumbersAreFacts(s.text, s.facts);
-      expect(s.text).not.toMatch(/[–—]/);
+      expect(s.text).not.toMatch(/[\u2013\u2014]/);
       expect(s.text).not.toMatch(/\b(because|caused|thanks to|due to|should|will)\b/i);
     }
   });
