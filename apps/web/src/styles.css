@@ -332,6 +332,13 @@ label {
   margin-top: 3px;
   font-size: 0.75em;
 }
+/* Own-side controls: why a plan control for the computer captain's side is not available. */
+.control-owner-note {
+  display: block;
+  margin: 3px 0 6px;
+  font-size: 0.85em;
+  font-style: italic;
+}
 .tactics {
   margin-bottom: 20px;
 }

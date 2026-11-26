@@ -2,6 +2,7 @@ import { CloseFinish, boundaryCount, requiredRate, isCloseFinish, passageReport,
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AWARDS_PROVENANCE_NOTICE, type MatchAwardCandidate } from "@lcxxvi/contracts";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
+import { OPPOSITION_CAPTAIN_NOTE, mayIssuePlanCommand, ownSideControls } from "./match/side-control.js";
 import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
@@ -922,6 +923,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   }
   function act(action: Action, continuingPassage = false) {
     if (!view || inflight.current || fatal) return;
+    // Own-side controls: never send a plan or field command for the side the computer captain runs. Input layer only;
+    // the worker still accepts such commands already in a saved match, so old saves and replays reproduce unchanged.
+    if (!mayIssuePlanCommand(action, view.innings[view.activeIndex]?.innings, aiTeamId)) return;
     if (action.kind === "ADVANCE") routineArmed.current = true;
     if (action.kind === "ADVANCE" && !advanceBatch.current) setKeyMoment("");
     if (!advanceBatch.current) resumeAfterAi.current = null;
@@ -1804,6 +1808,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               key={`${view.revision}`}
               view={view}
               disabled={busy || fatal}
+              aiTeamId={aiTeamId}
               act={act}
             />
           )}
@@ -1813,6 +1818,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               committedFieldSlots={view.fieldSlots}
               outfieldIds={ledger?.outfieldIds ?? []}
               bowlingTeamId={i?.bowlingTeamId ?? null}
+              fieldSetByOpposition={!ownSideControls(i, aiTeamId).bowling}
               legalBalls={i?.legalBalls ?? 0}
               names={view.names}
               busy={busy || fatal || Boolean(persistence?.readOnly)}
@@ -1833,6 +1839,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               strikerId={striker ?? null}
               activeBowlerId={i?.bowlerId ?? null}
               bowlingTeamId={i?.bowlingTeamId ?? null}
+              ownSide={ownSideControls(i, aiTeamId)}
               onApplyAction={act}
             />
           )}
@@ -2556,15 +2563,22 @@ function RecommendedTag({ id }: { id: string }) {
 function Tactics({
   view,
   disabled,
+  aiTeamId,
   act,
 }: {
   view: View;
   disabled: boolean;
+  /** The side the computer captain runs, or null when the person runs both sides. */
+  aiTeamId: string | null;
   act: (a: Action) => void;
 }) {
   const i = view.innings[view.activeIndex]!.innings;
   const [bowling, setBowling] = useState(view.bowlingPlan!);
   const [field, setField] = useState(view.fieldSlots);
+  // Own-side controls: the person sets plans only for the side they manage; the computer captain sets the other's.
+  const own = ownSideControls(i, aiTeamId);
+  const battingNote = own.batting ? undefined : "tactics-batting-owner";
+  const bowlingNote = own.bowling ? undefined : "tactics-bowling-owner";
   return (
     <section className="tactics panel">
       <h2>Tactics</h2>
@@ -2573,6 +2587,11 @@ function Tactics({
         <div className="tactic-grid">
           <div>
             <h3>Batting aggression</h3>
+            {battingNote && (
+              <small id={battingNote} className="control-owner-note" data-testid="batting-owner-note">
+                {OPPOSITION_CAPTAIN_NOTE}: {view.teams.find((t) => t.id === i.battingTeamId)?.name ?? "the opposition"} chooses its batters' aggression.
+              </small>
+            )}
             {[i.northBatterId, i.southBatterId]
               .filter((id): id is string => !!id)
               .map((id) => (
@@ -2580,6 +2599,8 @@ function Tactics({
                   {view.names[id]}
                   <select
                     aria-label={`Aggression for ${view.names[id]}`}
+                    aria-describedby={battingNote}
+                    disabled={!own.batting}
                     value={view.battingPlans[id]?.aggression ?? 2}
                     onChange={(e) =>
                       act({
@@ -2605,7 +2626,7 @@ function Tactics({
                       </option>
                     ))}
                   </select>
-                  {view.recommendation?.aggression?.playerId === id && (
+                  {own.batting && view.recommendation?.aggression?.playerId === id && (
                     <small className="recommended-tag" data-testid="recommended-aggression" title="The computer captain's choice. You decide.">
                       Recommended: {["Defend", "Cautious", "Balanced", "Positive", "Attack"][view.recommendation.aggression.level] ?? view.recommendation.aggression.level}
                     </small>
@@ -2615,6 +2636,11 @@ function Tactics({
           </div>
           <div>
             <h3>Bowling plan</h3>
+            {bowlingNote && (
+              <small id={bowlingNote} className="control-owner-note" data-testid="bowling-owner-note">
+                {OPPOSITION_CAPTAIN_NOTE}: {view.teams.find((t) => t.id === i.bowlingTeamId)?.name ?? "the opposition"} sets its bowling plan and field.
+              </small>
+            )}
             <label>
               Variation
               <select aria-label="Variation" value="stock" disabled>
@@ -2626,6 +2652,8 @@ function Tactics({
               Effort
               <select
                 aria-label="Effort"
+                aria-describedby={bowlingNote}
+                disabled={!own.bowling}
                 value={bowling.effort}
                 onChange={(e) =>
                   setBowling({
@@ -2643,6 +2671,8 @@ function Tactics({
               Line
               <select
                 aria-label="Line"
+                aria-describedby={bowlingNote}
+                disabled={!own.bowling}
                 value={bowling.line}
                 onChange={(e) =>
                   setBowling({
@@ -2660,6 +2690,8 @@ function Tactics({
               Length
               <select
                 aria-label="Length"
+                aria-describedby={bowlingNote}
+                disabled={!own.bowling}
                 value={bowling.length}
                 onChange={(e) =>
                   setBowling({
@@ -2673,12 +2705,14 @@ function Tactics({
                 ))}
               </select>
             </label>
-            {view.recommendation?.bowling && (
+            {own.bowling && view.recommendation?.bowling && (
               <small className="recommended-tag" data-testid="recommended-bowling" title="The computer captain's choice. You decide.">
                 Recommended: {view.recommendation.bowling.length.toLowerCase()} length, {view.recommendation.bowling.effort.toLowerCase()} effort
               </small>
             )}
             <button
+              disabled={!own.bowling}
+              aria-describedby={bowlingNote}
               onClick={() =>
                 act({ kind: "SET_BOWLING_PLAN", payload: bowling })
               }
@@ -2697,6 +2731,8 @@ function Tactics({
                 {view.names[slot.playerId]}
                 <select
                   aria-label={`Field for ${view.names[slot.playerId]}`}
+                  aria-describedby={bowlingNote}
+                  disabled={!own.bowling}
                   value={slot.slotId}
                   onChange={(e) =>
                     setField(
@@ -2715,6 +2751,8 @@ function Tactics({
               </label>
             ))}
             <button
+              disabled={!own.bowling}
+              aria-describedby={bowlingNote}
               onClick={() =>
                 act({
                   kind: "SET_FIELD",
