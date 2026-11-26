@@ -104,7 +104,7 @@ npx playwright test --config playwright.m4.config.ts     # real-IndexedDB persis
 node scripts/owner-acceptance.mjs --skip-install         # what hosted Windows runs, about an hour
 ```
 
-Last local results (Linux, Node 22, Chromium) on #86's head `7a2840b`, 18 November 2026: `npx vitest run --maxWorkers=2` exit 0, 884 tests; Chromium `tests/ui/tournament-stage15.spec.ts` 6/6, `match.spec.ts` and `scenario-mode-stage12.spec.ts` 9/9. Firefox is not installed in the agent's container; hosted Windows CI runs it. Re-run them; do not rely on these numbers. Hosted CI runs a Linux job (about 25 minutes) and a Windows job (Chromium and Firefox, about 60 to 80 minutes) on every pull request. In a 16 GB container a full `npx tsc -b` was killed once (exit 137, container restarted); with `NODE_OPTIONS=--max-old-space-size=4096` it has completed every time since.
+Last local results (Linux, Node 22, Chromium) on #86's head `7a2840b`, 18 November 2026: `npx vitest run --maxWorkers=2` exit 0, 884 tests; Chromium `tests/ui/tournament-stage15.spec.ts` 6/6, `match.spec.ts` and `scenario-mode-stage12.spec.ts` 9/9. Firefox is not installed in the agent's container; hosted Windows CI runs it. Re-run them; do not rely on these numbers. Hosted CI runs a Linux job (about 25 minutes) and Windows acceptance on every pull request: three parallel legs (core, Chromium, Firefox), about 45 to 70 minutes, checked together by the `windows-browser-acceptance` job ([split record](verification-pass07a/WINDOWS_CI_SPLIT_2026-11-26.md)). In a 16 GB container a full `npx tsc -b` was killed once (exit 137, container restarted); with `NODE_OPTIONS=--max-old-space-size=4096` it has completed every time since.
 
 ## Read in this order
 

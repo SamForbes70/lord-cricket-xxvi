@@ -1,5 +1,6 @@
 /** Collects local acceptance evidence without uploading files or opening an existing browser profile. */
 import { spawnSync } from "node:child_process";
+import { parseAcceptanceArguments, scopeSteps } from "./acceptance-scope.mjs";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -7,8 +8,8 @@ import { arch, availableParallelism, cpus, hostname, platform, release, totalmem
 import { playwrightEvidence, vitestEvidence, npmInvocation } from "./acceptance-evidence.mjs";
 import { summariseNetLogDirectory } from "./chromium-netlog-summary.mjs";
 
-const flags = new Set(process.argv.slice(2));
-if ([...flags].some(flag => !["--plan", "--skip-install", "--owner-pc"].includes(flag)) || flags.size !== process.argv.slice(2).length) throw new Error("UNKNOWN_OR_DUPLICATE_ACCEPTANCE_ARGUMENT");
+// --scope=core|chromium|firefox runs one leg of the hosted Windows split (scripts/acceptance-scope.mjs); the default is all.
+const { flags, scope } = parseAcceptanceArguments(process.argv.slice(2));
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const directory = `test-results/owner-acceptance-${stamp}-${process.pid}`;
 const steps = [
@@ -81,7 +82,7 @@ async function finishNetworkDiagnostics({ name, env, netLogDirectory, before, be
   writeFileSync(join(directory, `${name}-network-diagnostics.json`), JSON.stringify(out, null, 2) + "\n");
 }
 if (flags.has("--plan")) {
-  console.log(JSON.stringify({ version: "LC_OWNER_ACCEPTANCE_PLAN_V1", declaredOwnerPc: flags.has("--owner-pc"), steps, externalUploads: false, existingBrowserProfilesOpened: false }, null, 2));
+  console.log(JSON.stringify({ version: scope === "all" ? "LC_OWNER_ACCEPTANCE_PLAN_V1" : "LC_OWNER_ACCEPTANCE_PLAN_V2", ...scope === "all" ? {} : { scope }, declaredOwnerPc: flags.has("--owner-pc"), steps: scopeSteps(steps, scope), externalUploads: false, existingBrowserProfilesOpened: false }, null, 2));
 } else {
   mkdirSync("test-results", { recursive: true });
   mkdirSync(directory, { recursive: false });
@@ -89,7 +90,7 @@ if (flags.has("--plan")) {
   const revision = git(["rev-parse", "HEAD"]), changes = git(["status", "--porcelain"]);
   const npmVersionInvocation = npmInvocation(["--version"]);
   const npmVersion = spawnSync(npmVersionInvocation.executable, npmVersionInvocation.args, { encoding: "utf8", timeout: 10000 });
-  const report = { version: "LC_OWNER_ACCEPTANCE_EVIDENCE_V1", startedAtUtc: new Date().toISOString(), directory,
+  const report = { version: scope === "all" ? "LC_OWNER_ACCEPTANCE_EVIDENCE_V1" : "LC_OWNER_ACCEPTANCE_EVIDENCE_V2", ...scope === "all" ? {} : { scope }, startedAtUtc: new Date().toISOString(), directory,
     declaredOwnerPc: flags.has("--owner-pc"), hostedCi: process.env.GITHUB_ACTIONS === "true",
     host: { platform: platform(), release: release(), arch: arch(), logicalCpus: cpus().length, availableParallelism: availableParallelism(), cpuModel: cpus()[0]?.model ?? null, totalMemoryBytes: totalmem(), fingerprint: createHash("sha256").update(hostname()).digest("hex") },
     source: { commit: revision.status === 0 ? revision.stdout.trim() : null, dirty: changes.status === 0 ? changes.stdout.trim() !== "" : null,
@@ -99,7 +100,7 @@ if (flags.has("--plan")) {
     node: process.version, npm: npmVersion.status === 0 ? npmVersion.stdout.trim() : null, commands: [], status: "RUNNING", ownerPcGate: "NOT_ESTABLISHED", referenceHardwarePerformance: "NOT_ACCEPTED_INCOMPLETE_BUDGET_COVERAGE", humanChecklist: "EXISTING_OWNER_REPORT_RETAINED_NO_NEW_OBSERVATIONS_INFERRED" };
   const save = () => writeFileSync(join(directory, "acceptance.json"), JSON.stringify(report, null, 2) + "\n");
   save();
-  for (const step of steps) {
+  for (const step of scopeSteps(steps, scope)) {
     const started = Date.now(), invocation = step.node ? { executable: process.execPath, args: step.args } : npmInvocation(step.args);
     console.log(`${step.name}: running`);
     const diagnostics = step.networkDiagnostics ? startNetworkDiagnostics(step.name) : null;

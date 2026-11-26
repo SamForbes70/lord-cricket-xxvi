@@ -56,12 +56,27 @@ jobs:
             test-results/acceptance-observations/
           if-no-files-found: warn
           retention-days: 7
-  windows-browser-acceptance:
+  # Hosted Windows acceptance, split into three parallel legs (docs/verification-pass07a/WINDOWS_CI_SPLIT_2026-11-26.md):
+  # core runs the non-browser checks, the Chromium persistence suite and the EXE build and smoke test once; each browser
+  # leg runs every browser suite for its own browser. The job named windows-browser-acceptance below keeps the check
+  # name and fails unless every leg passed and together they are the whole run of scripts/owner-acceptance.mjs.
+  windows-acceptance:
+    name: windows-acceptance (${{ matrix.scope }})
     runs-on: windows-latest
-    # About 25 to 40 minutes of steps around the 140-minute UI suite budget in scripts/owner-acceptance.mjs.
+    # Each leg runs part of the old single job: the 140-minute UI suite budget in scripts/owner-acceptance.mjs is kept
+    # per browser leg, so the job limit is kept too.
     timeout-minutes: 200
     permissions:
       contents: read
+    strategy:
+      # Every leg runs to the end, so one leg's failure does not hide another's result.
+      fail-fast: false
+      matrix:
+        scope: [core, chromium, firefox]
+    outputs:
+      leg-core: ${{ steps.evidence.outputs.leg-core }}
+      leg-chromium: ${{ steps.evidence.outputs.leg-chromium }}
+      leg-firefox: ${{ steps.evidence.outputs.leg-firefox }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -77,16 +92,18 @@ jobs:
       # The launcher scripts parse, and open the browser they find, under both Windows PowerShell 5.1 (used by the
       # .bat launchers) and PowerShell 7.
       - name: Check the Windows launcher scripts (Windows PowerShell 5.1)
+        if: matrix.scope == 'core'
         shell: powershell
         run: powershell -NoProfile -ExecutionPolicy Bypass -File tools/windows/test-launcher-scripts.ps1
       - name: Check the Windows launcher scripts (PowerShell 7)
+        if: matrix.scope == 'core'
         shell: pwsh
         run: pwsh -NoProfile -File tools/windows/test-launcher-scripts.ps1
       - run: npm ci
-      - name: Collect hosted Windows build and browser evidence
-        run: node scripts/owner-acceptance.mjs --skip-install
+      - name: Collect hosted Windows build and browser evidence (${{ matrix.scope }})
+        run: node scripts/owner-acceptance.mjs --skip-install --scope=${{ matrix.scope }}
       - name: Build and smoke-test the Windows EXE launcher
-        if: always()
+        if: always() && matrix.scope == 'core'
         timeout-minutes: 10
         shell: pwsh
         run: |
@@ -123,23 +140,45 @@ jobs:
           node scripts/package-game.mjs windows-package
           if ($LASTEXITCODE -ne 0) { throw 'Packaging the Windows game zip failed' }
       - uses: actions/upload-artifact@v4
+        if: matrix.scope == 'core'
         continue-on-error: true
         with:
           name: windows-game
           path: windows-package/lord-cricket-xxvi-windows-*.zip
           if-no-files-found: warn
           retention-days: 30
-      - name: Retain structured verification evidence
+      - name: Retain structured verification evidence (${{ matrix.scope }})
+        id: evidence
         if: always()
-        run: node scripts/ci-evidence.mjs --kind=windows
+        run: node scripts/ci-evidence.mjs --kind=windows --scope=${{ matrix.scope }}
         env:
           LCXXVI_UPSTREAM_STATUS: ${{ job.status }}
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
         with:
-          name: windows-browser-acceptance
+          name: windows-browser-acceptance-${{ matrix.scope }}
           path: |
             test-results/owner-acceptance-*/
           if-no-files-found: warn
           retention-days: 7
+  # Keeps the check name windows-browser-acceptance (docs/BRANCH_PROTECTION.md asks for it as a required check). It
+  # fails unless all three legs passed, ran exactly their planned steps from this commit, together covered every step
+  # of the full plan, wrote both browsers' observations and passed the same number of tests in each browser.
+  windows-browser-acceptance:
+    needs: windows-acceptance
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check that every Windows leg passed and together they are the whole acceptance run
+        run: node scripts/ci-evidence.mjs --combine
+        env:
+          LCXXVI_LEGS_RESULT: ${{ needs.windows-acceptance.result }}
+          LCXXVI_LEG_OUTPUTS: ${{ toJSON(needs.windows-acceptance.outputs) }}
