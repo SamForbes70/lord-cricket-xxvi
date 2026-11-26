@@ -62,3 +62,25 @@ Playwright browsers are not cached: downloading both browsers took 14 to 18 s in
 ## Combining with pull request #157
 
 Pull request #157 (`ci/windows-connection-failed`) adds network diagnostics to the `match-ui` step and the UI preview server. This change does not touch `playwright.ui.config.ts`, and in `scripts/owner-acceptance.mjs` it changes only lines that #157 leaves alone, so the two merge without conflict. The scope module spreads each step, so #157's `networkDiagnostics` flag stays on `match-ui` in both browser legs, and each leg's diagnostics land in that leg's artefact.
+
+## First hosted run (run 45826620776, head `8322c8e`)
+
+| Job | Result | Time |
+| --- | --- | --- |
+| `windows-acceptance (core)` | success | 13.4 min (`unit` included) |
+| `windows-acceptance (firefox)` | success | 47.2 min (`match-ui` 126 passed in 40.9 min, `career` 3.4, `research-browser` 0.4, `performance-observations` 1.4) |
+| `windows-acceptance (chromium)` | failure | 28.4 min (`match-ui` 125 passed, 1 failed, 27.4 min; the later steps did not run because the collector stops at the first failure) |
+| `windows-browser-acceptance` | failure, as designed | 5 s; it received all three leg records through the job outputs and named the failed Chromium leg, its unrun steps and missing counts |
+
+Windows wall time for the run: 47 minutes, against 87 to 130 before.
+
+The Chromium failure was `tests\ui\offline-assets.spec.ts:3` (test 63): after `page.goto("/#exhibition")` the page showed "The match worker stopped." because the request for `/assets/match.worker-BzDEGMt7.js` failed with `net::ERR_ABORTED` before it was sent (no connect, send or wait time in the trace's `0-trace.network`). In the same page load, `/`, the stylesheet, `main-BXzVXuU6.js` and the fonts were served with HTTP 200. The worker's `onerror` then set the fatal state, so the start button never appeared.
+
+Checked against the split, and not caused by it:
+
+- The served build is the same. `match-ui` serves `apps/web/dist`, written by `build` in both layouts; none of the steps the Chromium leg leaves out (`schemas-check`, `typecheck`, `lint`, `fixtures-engine`, `frozen-world`, `unit`, `persistence-m4`) writes there, and the research and performance builds write to `tests/m7k/dist` and `tests/acceptance/dist` and run after `match-ui` in both layouts.
+- The test order is the same: Chromium is the first project with one worker, so test 63 had the same 62 tests before it, against one `vite preview` server on port 4180 started for the step.
+- The environment is the same: the collector passes the same `LCXXVI_*` and `PLAYWRIGHT_JSON_OUTPUT_NAME` variables; the only new argument is `--project=chromium`. No earlier step uses port 4180 and each test has a fresh browser context, so no service worker carries over.
+- No earlier hosted run of the single job failed this test: none of the 169 failed Windows jobs since the middle of November lists `offline-assets.spec.ts` among its failures.
+
+The signature (Chromium only, on hosted Windows, one request failing before it is sent while the server serves the requests around it) matches the intermittent fault recorded in `WINDOWS_CONNECTION_FAILED_2026-11-26.md` on pull request #157 (about three in 380 runs on the single job). That pull request's Chromium NetLog would name the operating-system error. With one occurrence the link is likely but not proven. No retry, skip or test change was made.
