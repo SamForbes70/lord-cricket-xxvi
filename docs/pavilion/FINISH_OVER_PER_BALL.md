@@ -10,7 +10,8 @@ Owner direction, 26 November 2026: "Finish over" should let the computer decide 
 
 `apps/web/src/main.tsx` only. The engine, contracts, saved data and the worker are unchanged.
 
-- "Finish over" now starts an over run. The page sends `ADVANCE { scope: "DELIVERY" }`, one ball at a time, until the over number or the innings changes.
+- **Only when the computer can act.** If a computer captain plays a side in the match, or any choice is delegated, "Finish over" starts an over run. Otherwise there is nobody to ask between balls, and it still sends the single `ADVANCE { scope: "OVER" }`, which plays the same balls. Windows Firefox CI on `0dfa095` showed why this matters. With per-ball runs in every match, a manual five-day exhibition played over by over took longer than the 10-minute limit of `tests/ui/analytics-formats.spec.ts` (RED_BALL, 10.4 min, run 45890451039).
+- In an over run the page sends `ADVANCE { scope: "DELIVERY" }`, one ball at a time, until the over number or the innings changes.
 - The next ball is sent only after the computer's step for the drawn view has been sent and answered. This uses the same `dueAiStep()` check and effect that a passage uses. Any delegated choices are made between balls in the same way.
 - **When the run stops:** at a wicket, like the old command, if the player must choose the new batter. If the computer must choose, the run waits for its pick and carries on. The run also stops on an error, a read-only save, a finished match, an `advanceReason`, a new or loaded match, a passage starting or a held panel click. It has a limit of 40 commands.
 - While the run lasts, the decision panel reports itself busy ("Applying…" and `aria-busy="true"`) and its controls are disabled. The offline-update coordinator treats the run as match activity.
@@ -23,6 +24,7 @@ Outcomes are unchanged when no plan changes. Each ball's random draws are keyed 
 - **"Next decision", "Finish innings" and "Finish match"** still advance an over per command inside their batch. In those batches the computer acts only when it is the side to decide. Changing them to ball by ball would multiply the number of saved commands by about six for a whole match, so I left them out of this change. They are listed as remaining work.
 - "Next key moment" already sends single deliveries. Its batch does not stop for the computer's plan steps either. This is also listed as remaining work.
 - The rain screen (`apps/web/src/rain/RainApp.tsx`) has its own "Finish over" and has no computer captain.
+- [Inference] A five-day match against a computer captain, played over by over, now sends about six times as many commands per over as before. That match is slower to play through with this button. "Finish innings" and "Finish match" are unaffected.
 
 ## Verification
 
@@ -31,6 +33,7 @@ Outcomes are unchanged when no plan changes. Each ball's random draws are keyed 
 | Type check | `NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b` and `npm run typecheck` (includes tests) | PASS (exit 0) |
 | New spec | `LCXXVI_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npx playwright test --config playwright.ui.config.ts tests/ui/finish-over-per-ball.spec.ts --project=chromium --reporter=line --trace off` | PASS, 1 test (19.2 s) |
 | Every other spec in `tests/ui` that presses "Finish over" (20 files) | same command with those files, at `99c9533` (same code as this head; later commits are docs only) | PASS, 59 passed (44.5 min) |
+| After the change to keep one command per over with no computer side (`d5ddc1f`) | same command, `tests/ui/analytics-formats.spec.ts tests/ui/finish-over-per-ball.spec.ts --project=firefox` (local Linux) | PASS, 4 passed (5.7 min); RED_BALL 3.5 min against 10.4 min and a timeout on Windows Firefox CI at `0dfa095` |
 | Inventory | `node scripts/check-pass07b-inventory.mjs` | PASS (exit 0) |
 | New spec against the old page (main `5fc98e3`'s `main.tsx`) | same command | FAIL as expected: an `ADVANCE` with scope `OVER` was sent |
 
