@@ -64,7 +64,7 @@ The one interpretive element is the measured note on each decision. It repeats `
 - **Captain V4 and the stage C model are not reflected.** The measured notes come from the captain V2 run. The captain V4 rerun (`CAPTAIN_V4_DEATH_OVERS.md`) and any later model need the notes reviewed.
 - **The suggested-eleven comparison uses ratings alone.** In a career, an injured or unavailable player can make the eleven differ from the suggestion for reasons the comparison does not know. A career eleven from an imported roster may have no comparison ("No suggested eleven to compare with").
 - **Super overs** are not included; the analysis covers the 20-over match. ODI, red-ball and rain-affected matches have no analysis yet.
-- **Shown at full time only.** The career home screen's match report (`match-report.ts`) is a separate, earlier feature built from the scorecard alone. It is not changed and does not show this analysis, because the career keeps only the scorecard in its completion record and the event archive is not read there.
+- **Shown at full time only.** The career home screen's match report (`match-report.ts`) is a separate, earlier feature built from the scorecard alone. It does not show this analysis, because the career keeps only the scorecard in its completion record. Since the second slice, a completed career fixture's analysis can be reopened from the fixture list or the match report, rebuilt from the stored event archive without the commands: see [POST_MATCH_ANALYSIS_ARCHIVE_V1.md](POST_MATCH_ANALYSIS_ARCHIVE_V1.md) for what that view shows and omits.
 - **Thresholds are untested with players.** 12 runs, 40 runs and three wickets were chosen to keep the list short; they are not tuned.
 
 ## Playtest questions

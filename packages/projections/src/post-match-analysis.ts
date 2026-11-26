@@ -171,29 +171,26 @@ function oversText(legalBalls: number): string { return `${Math.floor(legalBalls
 function overRange(from: number, to: number): string { return from === to ? `over ${from}` : `overs ${from} to ${to}`; }
 function words(id: string): string { return id.toLowerCase().replaceAll(/[-_]/g, " "); }
 
-export function projectPostMatchAnalysis(input: PostMatchAnalysisInput): PostMatchAnalysis {
-  const { scorecard, names, teamNames } = input;
-  const name = (id: string) => names[id] ?? id;
-  const team = (id: string) => teamNames[id] ?? id;
-  const commandById = new Map(input.commands.map((command) => [command.commandId, command]));
+/** One pass over the event chain: every delivery by innings, checked against the scorecard. Shared by V1 and the archive variant. */
+function walkRecord(
+  events: readonly T20MatchEvent[],
+  scorecard: T20Scorecard,
+  onEvent?: (event: T20MatchEvent, at: Position) => void,
+) {
   const inningsCount = scorecard.innings.length;
   const balls: Ball[][] = Array.from({ length: inningsCount }, () => []);
   const legal = Array<number>(inningsCount).fill(0), runs = Array<number>(inningsCount).fill(0), wickets = Array<number>(inningsCount).fill(0);
-  const positions = new Map<string, Position>();
   const battingOrder: { playerId: string; inningsIndex: number; commandId: string }[] = [];
   let active: number | null = null;
   let toss: { winnerId: string; call: string; coin: string } | null = null;
   let lastSequence = 0;
 
-  for (const event of input.events) {
+  for (const event of events) {
     if (event.sequence !== lastSequence + 1) throw new Error("LC_POST_MATCH_ANALYSIS_SEQUENCE_ORDER");
     lastSequence = event.sequence;
-    const command = commandById.get(event.commandId);
-    if (command && DECISION_KINDS[command.kind] && !positions.has(command.commandId)) {
-      positions.set(command.commandId, active === null
-        ? { inningsIndex: null, legalBalls: 0, runs: 0, wickets: 0 }
-        : { inningsIndex: active, legalBalls: legal[active]!, runs: runs[active]!, wickets: wickets[active]! });
-    }
+    onEvent?.(event, active === null
+      ? { inningsIndex: null, legalBalls: 0, runs: 0, wickets: 0 }
+      : { inningsIndex: active, legalBalls: legal[active]!, runs: runs[active]!, wickets: wickets[active]! });
     const payload = event.payload as Record<string, unknown>;
     if (event.type === "TOSS_RESOLVED") toss = { winnerId: String(payload.winnerId), call: String(payload.call), coin: String(payload.coin) };
     else if (event.type === "INNINGS_STARTED") active = Number(payload.inningsIndex);
@@ -213,7 +210,11 @@ export function projectPostMatchAnalysis(input: PostMatchAnalysisInput): PostMat
     // The event chain must agree with the scorecard; a mismatch means the inputs are not one match record.
     if (innings.legalBalls !== legal[i] || innings.runs !== runs[i] || innings.wickets !== wickets[i]) throw new Error("LC_POST_MATCH_ANALYSIS_SCORECARD_MISMATCH");
   });
+  return { balls, battingOrder, toss };
+}
 
+/** Phase by phase and turning points: the same fixed rules for the live and the archived analysis. */
+function phasesAndTurningPoints(balls: readonly Ball[][], scorecard: T20Scorecard, team: (id: string) => string) {
   // Phase summary.
   const phases: PostMatchPhaseInnings[] = scorecard.innings.map((innings, i) => ({
     inningsIndex: i, battingTeamId: innings.battingTeamId, runs: innings.runs, wickets: innings.wickets, legalBalls: innings.legalBalls,
@@ -329,6 +330,21 @@ export function projectPostMatchAnalysis(input: PostMatchAnalysisInput): PostMat
     .slice(0, POST_MATCH_ANALYSIS_RULES.maxTurningPoints)
     .sort((x, y) => x.inningsIndex - y.inningsIndex || x.fromOver - y.fromOver || x.priority - y.priority)
     .map((candidate): PostMatchTurningPoint => ({ kind: candidate.kind, inningsIndex: candidate.inningsIndex, teamId: candidate.teamId, fromOver: candidate.fromOver, toOver: candidate.toOver, runs: candidate.runs, wickets: candidate.wickets, text: candidate.text }));
+
+  return { phases, turningPoints };
+}
+
+export function projectPostMatchAnalysis(input: PostMatchAnalysisInput): PostMatchAnalysis {
+  const { scorecard, names, teamNames } = input;
+  const name = (id: string) => names[id] ?? id;
+  const team = (id: string) => teamNames[id] ?? id;
+  const commandById = new Map(input.commands.map((command) => [command.commandId, command]));
+  const positions = new Map<string, Position>();
+  const { balls, battingOrder, toss } = walkRecord(input.events, scorecard, (event, at) => {
+    const command = commandById.get(event.commandId);
+    if (command && DECISION_KINDS[command.kind] && !positions.has(command.commandId)) positions.set(command.commandId, at);
+  });
+  const { phases, turningPoints } = phasesAndTurningPoints(balls, scorecard, team);
 
   // Decisions.
   const commandCounts: Record<string, { user: number; ai: number }> = Object.fromEntries(input.teams.map((t) => [t.teamId, { user: 0, ai: 0 }]));
@@ -487,4 +503,200 @@ export function projectPostMatchAnalysis(input: PostMatchAnalysisInput): PostMat
     .sort((a, b) => order(a.d) - order(b.d) || (a.d.atLegalBall ?? 0) - (b.d.atLegalBall ?? 0) || a.index - b.index)
     .map(({ d }) => d);
   return { version: POST_MATCH_ANALYSIS_VERSION, matchId: scorecard.matchId, phases, turningPoints, decisions: stable, commandCounts };
+}
+
+/**
+ * LC_POST_MATCH_ANALYSIS_ARCHIVE_V1: the post-match analysis of a completed career fixture, reopened from the
+ * stored career event archive. The archive keeps the committed events but not the commands, so the record shows
+ * what changed and when, but not who asked for it. Phase by phase and turning points use the V1 rules unchanged
+ * (`rulesVersion`). Plan and field changes are listed from their events without saying who made them; there is no
+ * "your decisions" section and no comparison with a suggested eleven. Pure, derived on read, nothing saved.
+ */
+export const ARCHIVED_POST_MATCH_ANALYSIS_VERSION = "LC_POST_MATCH_ANALYSIS_ARCHIVE_V1" as const;
+
+export type ArchivedMatchChangeKind = "BATTING_PLAN" | "BOWLING_PLAN" | "FIELD";
+export interface ArchivedMatchChange {
+  kind: ArchivedMatchChangeKind;
+  /** The side whose setting changed: the batting side for a batting plan, the fielding side otherwise. */
+  teamId: string;
+  inningsIndex: number;
+  atLegalBall: number;
+  /** "Over 4.2, 31 for 1". */
+  when: string;
+  summary: string;
+  followUp: PostMatchFollowUp;
+  followed: string;
+  measured: PostMatchMeasuredEffect;
+}
+
+export interface ArchivedPostMatchAnalysis {
+  version: typeof ARCHIVED_POST_MATCH_ANALYSIS_VERSION;
+  /** Phases and turning points follow these rules. */
+  rulesVersion: typeof POST_MATCH_ANALYSIS_VERSION;
+  matchId: string;
+  phases: PostMatchPhaseInnings[];
+  turningPoints: PostMatchTurningPoint[];
+  /** The coin and who batted first, as recorded. */
+  toss: string | null;
+  changes: ArchivedMatchChange[];
+  /** Listed changes by side. */
+  changeCounts: Record<string, number>;
+}
+
+export interface ArchivedPostMatchAnalysisInput {
+  events: readonly T20MatchEvent[];
+  /** The scorecard stored with the fixture's completion; the events must add up to it. */
+  scorecard: T20Scorecard;
+  /** Both sides' elevens and keepers, in the match setup's order. */
+  teams: readonly { teamId: string; playerIds: readonly string[]; keeperId: string }[];
+  names: Readonly<Record<string, string>>;
+  teamNames: Readonly<Record<string, string>>;
+  /**
+   * The field the engine sets when a bowler comes on: the powerplay positions before `powerplayLegalBalls` legal
+   * balls of the innings, the later positions after. The engine puts the outfielders (the eleven without the keeper
+   * and the bowler) into those positions in sorted order. A new bowler also resets the bowling plan to the default.
+   */
+  defaultField: { powerplay: readonly string[]; later: readonly string[]; powerplayLegalBalls: number };
+}
+
+/** One recorded setting change: `key` names the setting (a batter's plan, the bowler's plan, the field). */
+type RecordedChange = {
+  kind: ArchivedMatchChangeKind; teamId: string; position: Position & { inningsIndex: number };
+  key: string; before: unknown; after: unknown; describe: (before: unknown, after: unknown) => string | null;
+};
+
+export function projectArchivedPostMatchAnalysis(input: ArchivedPostMatchAnalysisInput): ArchivedPostMatchAnalysis {
+  const { scorecard, names, teamNames, defaultField } = input;
+  const name = (id: string) => names[id] ?? id;
+  const team = (id: string) => teamNames[id] ?? id;
+  const teamIds = input.teams.map((t) => t.teamId);
+  if (scorecard.innings.length !== 2 || teamIds.length !== 2 || teamIds[0] === teamIds[1]) throw new Error("LC_POST_MATCH_ANALYSIS_ARCHIVE_TEAMS");
+  for (const innings of scorecard.innings) {
+    if (!teamIds.includes(innings.battingTeamId) || !teamIds.includes(innings.bowlingTeamId)) throw new Error("LC_POST_MATCH_ANALYSIS_ARCHIVE_TEAMS");
+  }
+
+  // The settings in force, rebuilt from the events the way the engine applies them.
+  const battingPlans = new Map<string, { aggression: number; intent: string }>();
+  let bowlingPlan: { line: string; length: string; variationId: string; effort: string } | null = null;
+  let field: { slotId: string; playerId: string }[] = [];
+  const recorded: RecordedChange[] = [];
+  let battingFirst: string | null = null;
+  const { balls, toss } = walkRecord(input.events, scorecard, (event, at) => {
+    const payload = event.payload as Record<string, unknown>;
+    if (event.type === "INNINGS_STARTED") {
+      if (Number(payload.inningsIndex) === 0) battingFirst = String(payload.battingTeamId);
+      bowlingPlan = null; field = []; return;
+    }
+    if (event.type === "BOWLER_SELECTED") {
+      bowlingPlan = { ...DEFAULT_BOWLING };
+      const fielding = at.inningsIndex === null ? undefined : input.teams.find((t) => t.teamId === scorecard.innings[at.inningsIndex!]?.bowlingTeamId);
+      if (!fielding) throw new Error("LC_POST_MATCH_ANALYSIS_ARCHIVE_FIELD");
+      const bowlerId = String(payload.playerId);
+      const outfield = fielding.playerIds.filter((id) => id !== fielding.keeperId && id !== bowlerId).sort();
+      const slots = at.legalBalls < defaultField.powerplayLegalBalls ? defaultField.powerplay : defaultField.later;
+      if (outfield.length !== slots.length) throw new Error("LC_POST_MATCH_ANALYSIS_ARCHIVE_FIELD");
+      field = slots.map((slotId, n) => ({ slotId, playerId: outfield[n]! }));
+      return;
+    }
+    if (at.inningsIndex === null) return;
+    const innings = scorecard.innings[at.inningsIndex];
+    if (!innings) return;
+    const position = { ...at, inningsIndex: at.inningsIndex };
+    if (event.type === "BATTING_PLAN_CHANGED") {
+      const playerId = String(payload.playerId), after = { aggression: Number(payload.aggression), intent: String(payload.intent) };
+      const before = battingPlans.get(playerId) ?? DEFAULT_BATTING;
+      battingPlans.set(playerId, after);
+      recorded.push({ kind: "BATTING_PLAN", teamId: innings.battingTeamId, position, key: playerId, before, after, describe: (b, a) => {
+        const x = b as typeof after, y = a as typeof after, changes: string[] = [];
+        if (x.aggression !== y.aggression) changes.push(`aggression ${AGGRESSION[x.aggression]} to ${AGGRESSION[y.aggression]}`);
+        if (x.intent !== y.intent) changes.push(`intent ${words(x.intent)} to ${words(y.intent)}`);
+        return changes.length ? `${name(playerId)}: ${changes.join(", ")}` : null;
+      } });
+    } else if (event.type === "BOWLING_PLAN_CHANGED") {
+      const bowlerId = String(payload.bowlerId);
+      const after = { line: String(payload.line), length: String(payload.length), variationId: String(payload.variationId), effort: String(payload.effort) };
+      const before: typeof after = bowlingPlan ?? { ...DEFAULT_BOWLING };
+      bowlingPlan = after;
+      recorded.push({ kind: "BOWLING_PLAN", teamId: innings.bowlingTeamId, position, key: bowlerId, before, after, describe: (b, a) => {
+        const x = b as typeof after, y = a as typeof after;
+        const changes = (["line", "length", "variationId", "effort"] as const)
+          .filter((key) => x[key] !== y[key])
+          .map((key) => `${key === "variationId" ? "variation" : key} ${words(x[key])} to ${words(y[key])}`);
+        return changes.length ? `${name(bowlerId)}: ${changes.join(", ")}` : null;
+      } });
+    } else if (event.type === "FIELD_CHANGED") {
+      const after = (payload.fieldSlots as { slotId: string; playerId: string }[]).map((slot) => ({ slotId: String(slot.slotId), playerId: String(slot.playerId) }));
+      const before = field;
+      field = after;
+      recorded.push({ kind: "FIELD", teamId: innings.bowlingTeamId, position, key: "field", before, after, describe: (b, a) => {
+        const x = b as typeof after, y = a as typeof after;
+        const beforeSlots = x.map((slot) => slot.slotId), afterSlots = y.map((slot) => slot.slotId);
+        const added = afterSlots.filter((slot) => !beforeSlots.includes(slot)), removed = beforeSlots.filter((slot) => !afterSlots.includes(slot));
+        const moved = y.some((slot) => x.find((old) => old.slotId === slot.slotId)?.playerId !== slot.playerId);
+        return added.length > 0
+          ? `fielders moved to ${listText(added.map(words))}, away from ${listText(removed.map(words))}`
+          : moved ? "the same positions, with fielders swapped between them" : null;
+      } });
+    }
+  });
+  const { phases, turningPoints } = phasesAndTurningPoints(balls, scorecard, team);
+
+  // Several changes of one kind for one side at the same ball (for example one per batter) are one line; a change
+  // that left the setting as it was is not listed.
+  const groups: RecordedChange[][] = [];
+  for (const change of recorded) {
+    const last = groups.at(-1)?.[0];
+    if (last && last.kind === change.kind && last.teamId === change.teamId && last.position.inningsIndex === change.position.inningsIndex &&
+      last.position.legalBalls === change.position.legalBalls) groups.at(-1)!.push(change);
+    else groups.push([change]);
+  }
+  // Within a line, each setting is described from its value before the first change to its value after the last, so
+  // a setting changed and changed back at the same ball is not listed.
+  const listed = groups.map((group) => {
+    const net = new Map<string, { before: unknown; after: unknown; describe: RecordedChange["describe"] }>();
+    for (const change of group) {
+      const seen = net.get(change.key);
+      if (seen) seen.after = change.after;
+      else net.set(change.key, { before: change.before, after: change.after, describe: change.describe });
+    }
+    const parts = [...net.values()].map((entry) => entry.describe(entry.before, entry.after)).filter((part): part is string => part !== null);
+    return { first: group[0]!, parts };
+  }).filter((group) => group.parts.length > 0);
+  const label = { BATTING_PLAN: "Batting plan changed", BOWLING_PLAN: "Bowling plan changed", FIELD: "Field changed" } as const;
+  const changes: ArchivedMatchChange[] = listed.map(({ first, parts }) => {
+    const p = first.position, i = p.inningsIndex, end = p.legalBalls + POST_MATCH_ANALYSIS_RULES.followLegalBalls;
+    const span = balls[i]!.filter((ball) => ball.legalBefore >= p.legalBalls && ball.legalBefore < end);
+    const legalBalls = span.filter((ball) => ball.legal).length;
+    const overlapped = listed.some((other) => other.first !== first && other.first.teamId === first.teamId && other.first.position.inningsIndex === i &&
+      other.first.position.legalBalls > p.legalBalls && other.first.position.legalBalls < end);
+    const followUp: PostMatchFollowUp = {
+      legalBalls, runs: span.reduce((sum, ball) => sum + ball.runs, 0), wickets: span.filter((ball) => ball.wicket).length,
+      inningsEnded: legalBalls < POST_MATCH_ANALYSIS_RULES.followLegalBalls, overlapped,
+      rateBefore: p.legalBalls > 0 ? rate(p.runs, p.legalBalls) : null,
+    };
+    let followed: string;
+    if (followUp.legalBalls === 0) followed = "No more balls were bowled in the innings.";
+    else {
+      const spanText = followUp.inningsEnded ? `The next ${plural(followUp.legalBalls, "ball")} (the innings then ended)` : "The next 2 overs";
+      const before = followUp.rateBefore === null ? "" : ` Before it: ${rateText(followUp.rateBefore)} an over.`;
+      const overlap = followUp.overlapped ? " Another plan or field change for this side came within those balls." : "";
+      followed = `${spanText}: ${plural(followUp.runs, "run")}, ${plural(followUp.wickets, "wicket")}.${before}${overlap}`;
+    }
+    return {
+      kind: first.kind, teamId: first.teamId, inningsIndex: i, atLegalBall: p.legalBalls,
+      when: p.legalBalls === 0 ? `Start of innings ${i + 1}, 0 for 0` : `Over ${oversText(p.legalBalls)}, ${p.runs} for ${p.wickets}`,
+      summary: `${label[first.kind]}: ${parts.join("; ")}.`, followUp, followed, measured: POST_MATCH_DECISION_EFFECT[first.kind],
+    };
+  });
+  const changeCounts: Record<string, number> = Object.fromEntries(teamIds.map((id) => [id, 0]));
+  for (const change of changes) changeCounts[change.teamId] = (changeCounts[change.teamId] ?? 0) + 1;
+
+  const first = battingFirst as string | null;
+  const tossText = toss
+    ? `The coin landed ${toss.coin.toLowerCase()}: ${team(toss.winnerId)} won the toss.${first ? ` ${team(first)} batted first.` : ""}`
+    : null;
+  return {
+    version: ARCHIVED_POST_MATCH_ANALYSIS_VERSION, rulesVersion: POST_MATCH_ANALYSIS_VERSION, matchId: scorecard.matchId,
+    phases, turningPoints, toss: tossText, changes, changeCounts,
+  };
 }

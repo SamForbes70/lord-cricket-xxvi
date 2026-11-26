@@ -37,6 +37,8 @@ import {
   saveStoredAudioPreferences,
 } from "../match/audio-manager.js";
 import { WorldEditor } from "../world/WorldEditor.js";
+import { ArchivedPostMatchAnalysisPanel } from "./ArchivedPostMatchAnalysisPanel.js";
+import { archivedPostMatchAnalysis } from "./archived-post-match-analysis.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
 import { offlineUpdateCoordinator } from "../offline-update.js";
 import "./career.css";
@@ -236,10 +238,13 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     fixtureId: string;
     completion: T20SeasonMatchCompletion;
     outcome: CareerReplayOutcome;
+    /** Opened with "Post-match analysis": focus the analysis rather than the replay heading. */
+    focus?: "ANALYSIS";
   } | null>(null);
   const [replayInningsTab, setReplayInningsTab] = useState(0);
   const [replayTriggerId, setReplayTriggerId] = useState<string | null>(null);
   const replayPanelRef = useRef<HTMLElement>(null);
+  const analysisPanelRef = useRef<HTMLElement>(null);
   const [scale, setScale] = useState(() => {
     const saved = localStorage.getItem("lcxxvi-career-scale");
     return saved && ["90", "100", "115", "125", "150"].includes(saved) ? saved : "100";
@@ -290,7 +295,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     if (checkpointView) checkpointPanelRef.current?.focus();
   }, [checkpointView]);
   useEffect(() => {
-    if (activeReplay) replayPanelRef.current?.focus();
+    if (!activeReplay) return;
+    if (activeReplay.focus === "ANALYSIS" && analysisPanelRef.current) {
+      analysisPanelRef.current.focus();
+      analysisPanelRef.current.scrollIntoView?.({ block: "start" });
+    } else replayPanelRef.current?.focus();
   }, [activeReplay]);
   useEffect(() => {
     if (
@@ -542,7 +551,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     });
   }
 
-  async function openReplay(fixtureId: string, triggerId: string) {
+  async function openReplay(fixtureId: string, triggerId: string, focus?: "ANALYSIS") {
     const completion = service.findCompletionByFixtureId(fixtureId);
     if (!completion) return;
     setBusy(true);
@@ -551,13 +560,27 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       const outcome = await service.replayFixtureArchive(fixtureId);
       setReplayTriggerId(triggerId);
       setReplayInningsTab(0);
-      setActiveReplay({ fixtureId, completion, outcome });
+      setActiveReplay({ fixtureId, completion, outcome, ...(focus ? { focus } : {}) });
     } catch (error) {
       setUiError(error instanceof Error ? error.message : "Replay loading failed.");
     } finally {
       setBusy(false);
     }
   }
+
+  /** From the Home match report: the fixture list holds the archive viewer, so go there and open the analysis. */
+  async function openAnalysisFromReport(fixtureId: string) {
+    setScreen("FIXTURES");
+    await openReplay(fixtureId, `analysis-fixtures-${fixtureId}`, "ANALYSIS");
+  }
+
+  // LC_POST_MATCH_ANALYSIS_ARCHIVE_V1: worked out on read from the verified archive replay; nothing is stored.
+  const archivedAnalysis = useMemo(
+    () => activeReplay
+      ? archivedPostMatchAnalysis(activeReplay.outcome, activeReplay.completion, (id) => service.playerName(id), (id) => service.teamName(id))
+      : null,
+    [activeReplay],
+  );
 
   function closeReplay() {
     const triggerId = replayTriggerId;
@@ -815,6 +838,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           </div>
         ))}
       </div>
+      {archivedAnalysis && (
+        <ArchivedPostMatchAnalysisPanel result={archivedAnalysis} teamName={(id) => service.teamName(id)} panelRef={analysisPanelRef} />
+      )}
       {activeReplay.outcome.status === "UNAVAILABLE" && (
         <p role="status" className="career-warning">
           Ball-by-ball replay unavailable: this fixture was completed before event archives were
@@ -1348,6 +1374,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           controlledTeam={controlledTeam}
           tableRow={tableRow}
           completedManaged={completedManaged}
+          openAnalysis={openAnalysisFromReport}
         />
       )}
 

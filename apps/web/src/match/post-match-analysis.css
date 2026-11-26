@@ -18,6 +18,9 @@
 .pma-sub { display: block; font-size: 0.85em; color: var(--fl-muted, #3f5a50); font-weight: 400; }
 .pma-table-wrap { max-width: 100%; overflow-x: auto; }
 .pma-phases { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+/* In the career replay viewer the career table rules (a 760 px minimum and unwrapped headers) would push the phases off screen. */
+.post-match-analysis .pma-phases { min-width: 0; }
+.post-match-analysis .pma-phases th { white-space: normal; }
 .post-match-analysis .pma-phases th, .post-match-analysis .pma-phases td { text-align: left; padding: 0.35em 0.5em; border-bottom: 1px solid var(--fl-edge, #d0dbd1); vertical-align: top; }
 .post-match-analysis .pma-phases thead th { overflow-wrap: normal; word-break: normal; letter-spacing: 0.02em; }
 .pma-turning, .pma-decisions { margin: 0.3em 0; padding-left: 1.4em; }
