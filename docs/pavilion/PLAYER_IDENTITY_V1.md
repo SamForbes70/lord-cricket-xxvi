@@ -13,7 +13,7 @@ It builds on what was already there: the portraits and overall rating (`apps/web
   - one line naming the T20 ratings behind each style, such as "Finisher (power 74, strike rotation 66)";
   - **Story so far**: one paragraph from the recorded career, such as "21 league matches across 2 seasons, now with Aster Quay. 468 runs, best of 77 not out, 3 fifties. Latest scores, oldest first: 9, 0, 41*, 12, 30. Player of the Match 2 times. 32 runs from 500 career runs.";
   - two personality traits under the heading "Personality · flavour, not a rating".
-- **Match screen** (T20). Under each batter and the bowler in the active-players panel: "New at the crease: *name*, *style (ratings)*." before a batter faces a ball, and "Into the attack: *name*, *style (ratings)*." before a bowler bowls in the innings. After that, the line shows the style alone.
+- **Match screen** (T20). Each batter and the bowler in the active-players panel has a small chip in their own row. Before a batter faces a ball it reads "Walks out: *style*", and before a bowler bowls in the innings "On to bowl: *style*"; after that it shows the style alone. The full introduction, such as "New at the crease: Vero Jorcroft, Accumulator (strike rotation 77).", is the chip's title and its screen-reader text. The chip sits inside the row because the first screen at 1366 by 768 had no room for extra lines (the dugout-view and match specs measure it).
 
 ## How identity is derived
 
@@ -46,7 +46,7 @@ On the default world (`fictional-eight-01`), the 160 players get 28 different pr
 ## Limitations
 
 - Styles describe ratings. [Inference] Under `synthetic-alpha-01` not every rating has a measurable effect on results: `TACTICAL_VALIDATION.md` found that bowler skill and bowling tactics barely move outcomes. A "Miserly off-spinner" is a player with high control, which the model may not reward. The labels will mean more once stage C calibration lands.
-- The match introduction states only the style. The match screen does not hold career records, so it cannot say "312 career runs" without a new data path from the career.
+- The match introduction states only the style, and the version with ratings is in a tooltip, not on screen. The match screen does not hold career records, so it cannot say "312 career runs" without a new data path from the career.
 - The story uses league T20 records only. Exhibition, tournament, tour and auction matches are not counted, and the page's format selector does not change the style (always T20 ratings).
 - Thresholds are design choices, not calibration. They were set so that styles spread across the default world; imported or edited worlds may give flatter spreads.
 - Traits are flavour and do not grow or change through a career.
