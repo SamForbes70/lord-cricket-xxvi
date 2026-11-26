@@ -98,6 +98,9 @@ test("the reopened analysis fits a 390 px screen", async ({ page }) => {
   expect(box!.x).toBeGreaterThanOrEqual(0);
   expect(box!.x + box!.width).toBeLessThanOrEqual(390);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  // Every phase column is on screen without scrolling the table (the career table rules must not widen it).
+  const death = await panel.getByRole("columnheader", { name: /Death/ }).boundingBox();
+  expect(death!.x + death!.width).toBeLessThanOrEqual(box!.x + box!.width);
   if (SHOTS) await panel.screenshot({ path: `${SHOTS}/pma2-fixture-390.png` });
 });
 
