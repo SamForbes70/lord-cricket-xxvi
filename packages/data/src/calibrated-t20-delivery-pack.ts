@@ -106,16 +106,16 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
   /** V2: coefficients (bp) on the pitch feature seamBp + turnBp - 2 x centreBp of the current pitch. */
   pitch: {
     centreBp: 5600,
-    contact: { MISS: 9000, PAD: 9000, GROUND: 0, AERIAL: 0, EDGE: 9000, HIT_WICKET: 0 },
-    runs: { "0": 6000, "1": 0, "2": 0, "3": 0, "4": -7500, "6": -7500 },
+    contact: { MISS: 4500, PAD: 4500, GROUND: 0, AERIAL: 0, EDGE: 4500, HIT_WICKET: 0 },
+    runs: { "0": 3000, "1": 0, "2": 0, "3": 0, "4": -3750, "6": -3750 },
   },
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_DELIVERY_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "d8632151fae9a8c8782a7ae3ad7ce670715a45b1917a16c99214b59ed087d4e7";
+export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "2ea31526811177f0a973e4b4612b457d1ba374f8c64b1af34b94585659b388ad";
 /**
  * The calibrated model's hash, recorded in a research set-up's `versions.modelHash`: SHA-256 of LC canonical JSON of
  * { deliveryPackSha256, skillPackSha256, tacticsPackSha256 } (C5: the tactics pack is the third component). It changes
  * whenever any component changes.
  */
-export const CALIBRATED_T20_MODEL_HASH = "f6e9ca219b3c61d5164c2e5bf0ea7e4b97397d4582e39c7e09e0f5ccd0300d15";
+export const CALIBRATED_T20_MODEL_HASH = "64e09b4b00d2b3b9565a7e18b86e219933487713cbbd2a2b62e24885e6592802";
