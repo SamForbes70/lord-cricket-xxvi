@@ -11,6 +11,8 @@ import {
   projectMatchCommentary,
   bowlingStyleOf,
   playingStyle,
+  projectPostMatchAnalysis,
+  type PostMatchAnalysis,
 } from "@lcxxvi/projections";
 import {
   type T20Session,
@@ -151,6 +153,36 @@ export function createMatchController(
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
   let cachedFieldPresentation: LiveFieldPresentation | null = null;
   let cachedMatchAward: MatchAwardRecord | null = null;
+  let cachedAnalysis: { session: T20Session; world: typeof displayWorld; value: PostMatchAnalysis | null } | null = null;
+  /** LC_POST_MATCH_ANALYSIS_V1: read-only, from the completed session's own record. Never fails the view. */
+  function postMatchAnalysis(s: T20Session, scorecard: ReturnType<typeof projectT20Scorecard>, names: Record<string, string>): PostMatchAnalysis | null {
+    if (cachedAnalysis?.session === s && cachedAnalysis.world === displayWorld) return cachedAnalysis.value;
+    let value: PostMatchAnalysis | null = null;
+    try {
+      const suggestedXi: Record<string, string[]> = {};
+      for (const t of s.setup.teams) {
+        const squad = displayWorld.teams.find((team) => team.teamId === t.teamId)?.squadIds ?? [];
+        const players = squad.map((id) => displayWorld.players.find((p) => p.playerId === id));
+        // Compare only when the whole squad and the whole eleven are known; otherwise say there is nothing to compare.
+        if (players.length > 0 && players.every((p) => p !== undefined) && t.playerIds.every((id) => squad.includes(id))) {
+          try { suggestedXi[t.teamId] = suggestedEleven(players as NonNullable<(typeof players)[number]>[], "T20").playerIds; } catch { /* no keeper: nothing to compare */ }
+        }
+      }
+      value = projectPostMatchAnalysis({
+        events: s.events,
+        commands: s.commands,
+        scorecard,
+        teams: s.setup.teams.map((t) => ({ teamId: t.teamId, playerIds: [...t.playerIds] })),
+        suggestedXi,
+        names,
+        teamNames: Object.fromEntries(s.setup.teams.map((t) => [t.teamId, displayWorld.teams.find((team) => team.teamId === t.teamId)?.name ?? t.teamId])),
+      });
+    } catch {
+      value = null;
+    }
+    cachedAnalysis = { session: s, world: displayWorld, value };
+    return value;
+  }
   let cachedCommentary: CommentaryEntry[] = [];
   let cachedAudioCues: AudioCue[] = [];
   function view(): View | null {
@@ -373,6 +405,7 @@ export function createMatchController(
                 teamNames: Object.fromEntries(displayWorld.teams.map((t) => [t.teamId, t.name])),
               }))
           : null,
+      postMatchAnalysis: c.phase === "COMPLETE" && scorecard ? postMatchAnalysis(s, scorecard, names) : null,
       resultText,
       eventCount: s.events.length,
       lastEventHash: s.lastEventHash,
