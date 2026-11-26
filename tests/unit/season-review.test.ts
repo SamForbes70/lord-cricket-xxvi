@@ -196,6 +196,10 @@ describe("season review V1", () => {
     // t1p10 played before and had a wicket: nothing new.
     expect(line("t1p10").milestones).toEqual([]);
     expect(PLAYER_IDENTITY_V3_RULES.runsMarks).toContain(100);
+    // In the league's first season every fifty and wicket is a first, so firsts are not told; marks still are.
+    const first = projectSeasonReview(input());
+    expect(first.squad.find((p) => p.playerId === "t1p1")!.milestones.map((m) => m.text)).toEqual(["Passed 100 league runs (107 in all)."]);
+    expect(first.squad.find((p) => p.playerId === "t1p9")!.milestones).toEqual([]);
   });
 
   test("development at the rollover that opened this season, and the bridge to the next one", () => {

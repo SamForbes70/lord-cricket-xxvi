@@ -598,7 +598,7 @@ export function projectSeasonReview(input: SeasonReviewInput): SeasonReview {
   const economyAward = (id: SeasonReviewAwardId, label: string, pool: Map<string, Aggregate>, minBalls: number): SeasonReviewAward => {
     const qualified = [...pool.values()].filter((p) => p.legalBalls >= minBalls);
     qualified.sort((a, b) => a.runsConceded * b.legalBalls - b.runsConceded * a.legalBalls || b.legalBalls - a.legalBalls || compare(a.playerId, b.playerId));
-    const rule = `Fewest runs an over, with at least ${minBalls / 6} overs bowled. Ties: more overs, then the player list order.`;
+    const rule = `Fewest runs an over, with at least ${minBalls / 6} overs bowled. Ties: more overs bowled.`;
     const top = qualified[0];
     if (!top) return { id, label, rule, playerId: null, teamId: null, value: `No bowler reached ${minBalls / 6} overs.`, facts: [{ key: "minOvers", value: minBalls / 6 }] };
     return {
@@ -657,9 +657,10 @@ export function projectSeasonReview(input: SeasonReviewInput): SeasonReview {
       const wicketsAfter = prior.wickets + thisSeason.wickets;
       const wicketMark = marksUpTo(wicketsAfter, v3.wicketsMarks, v3.wicketsEvery).filter((m) => m > prior.wickets).at(-1);
       if (wicketMark !== undefined) milestones.push({ text: `Passed ${wicketMark} league wickets (${wicketsAfter} in all).`, facts: [{ key: "mark", value: wicketMark }, { key: "total", value: wicketsAfter }] });
-      if (prior.hundreds === 0 && thisSeason.hundreds > 0) milestones.push({ text: `First league hundred (best ${thisSeason.highScore!.runs}${thisSeason.highScore!.notOut ? "*" : ""}).`, facts: [{ key: "best", value: thisSeason.highScore!.runs }] });
-      else if (prior.fifties + prior.hundreds === 0 && thisSeason.fifties > 0) milestones.push({ text: `First league fifty (best ${thisSeason.highScore!.runs}${thisSeason.highScore!.notOut ? "*" : ""}).`, facts: [{ key: "best", value: thisSeason.highScore!.runs }] });
-      if (prior.wickets === 0 && thisSeason.wickets > 0) milestones.push({ text: "First league wicket.", facts: [] });
+      // Firsts are told only once the league has an earlier season: in its first season every one is a first.
+      if (hasPrior && prior.hundreds === 0 && thisSeason.hundreds > 0) milestones.push({ text: `First league hundred (best ${thisSeason.highScore!.runs}${thisSeason.highScore!.notOut ? "*" : ""}).`, facts: [{ key: "best", value: thisSeason.highScore!.runs }] });
+      else if (hasPrior && prior.fifties + prior.hundreds === 0 && thisSeason.fifties > 0) milestones.push({ text: `First league fifty (best ${thisSeason.highScore!.runs}${thisSeason.highScore!.notOut ? "*" : ""}).`, facts: [{ key: "best", value: thisSeason.highScore!.runs }] });
+      if (hasPrior && prior.wickets === 0 && thisSeason.wickets > 0) milestones.push({ text: "First league wicket.", facts: [] });
       const { highScore, ...rest } = line;
       squad.push({ ...rest, highScore: highScore ? { runs: highScore.runs, notOut: highScore.notOut } : null, milestones });
     }
