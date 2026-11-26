@@ -64,7 +64,7 @@ test("a completed season ends with the season review, built from the recorded se
 
   // 1. Champions: the title race and your club's season, from the applied results.
   await expect(heading(page)).toHaveText(/ are champions$/);
-  const champion = (await heading(page).innerText()).replace(/ are champions$/, "");
+  const champion = ((await heading(page).textContent()) ?? "").replace(/ are champions$/, "");
   await expect(page.getByTestId("season-review-title-race")).toHaveText(new RegExp(`^${champion} won the title with \\d+ points from 14 matches \\(\\d+ won\\), `));
   await expect(page.getByTestId("season-review-club")).toHaveText(/^Aster Harbour finished \d+(st|nd|rd|th) with \d+ won, \d+ lost/);
   await expectFits(page);
@@ -134,7 +134,7 @@ test("a completed season ends with the season review, built from the recorded se
   await expect(page.getByTestId("career-masthead-subtitle")).toContainText("Season 2 (2028)", { timeout: 60_000 });
   await playSeason(page);
   await expect(finale).toBeVisible({ timeout: 30_000 });
-  while (!(await heading(page).innerText()).startsWith("Your cricketers")) await next(page).click();
+  while (!((await heading(page).textContent()) ?? "").startsWith("Your cricketers")) await next(page).click();
   await expect(page.getByTestId("season-review-development")).toContainText("Skill changes recorded when Season 1 closed");
   await expect(page.getByTestId("season-review-milestones")).toBeVisible();
   await shot(page, "1366-6-season2-cricketers");
