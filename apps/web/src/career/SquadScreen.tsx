@@ -14,6 +14,12 @@ import { isBowlingCapable } from "@lcxxvi/data";
 import { playerForm, playerMilestones, playingStyle, squadPlayerTags } from "@lcxxvi/projections";
 import { TRAINING_PRESETS, matchingPreset, planTrainingPreset, type TrainingPresetPlayer } from "./training-presets.js";
 
+/** Display labels for the stored youth intake tier. The tier only sets a starting-skill bonus (+0, +2 or +5); see generateYouthProspect. */
+const INTAKE_GRADE_LABEL: Record<"ACADEMY_GRADUATE" | "FIRST_TEAM_PROSPECT" | "HIGH_CEILING_PROSPECT", string> = {
+  ACADEMY_GRADUATE: "Standard intake (+0)",
+  FIRST_TEAM_PROSPECT: "Good intake (+2)",
+  HIGH_CEILING_PROSPECT: "Top intake (+5)",
+};
 
 /** The career Squad screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
 export function SquadScreen(props: SquadScreenProps) {
@@ -264,8 +270,9 @@ export function SquadScreen(props: SquadScreenProps) {
                 Set each prospect's training focus, queue them for promotion at the end of the season,
                 or promote them now, before Round 1.
                 <AboutDetails summary="About the player model">
-                  Academy prospects use fictional ceiling tiers (
-                  <code>{lifecycleState.model.modelVersion}</code>).
+                  Each prospect has an intake grade, set when they join the academy (
+                  <code>{lifecycleState.model.modelVersion}</code>). The grade adds 0, 2 or 5 to their
+                  starting skills only. It does not change how they develop afterwards.
                 </AboutDetails>
               </p>
               {service.managedYouthAcademyProspects().length === 0 ? (
@@ -278,7 +285,7 @@ export function SquadScreen(props: SquadScreenProps) {
                         <th>Prospect</th>
                         <th>Age</th>
                         <th>Role</th>
-                        <th>Ceiling tier</th>
+                        <th>Intake grade</th>
                         <th>Key T20 skills</th>
                         <th>Academy focus</th>
                         <th>Off-season queue</th>
@@ -309,7 +316,7 @@ export function SquadScreen(props: SquadScreenProps) {
                             </td>
                             <td>{prospectAge}</td>
                             <td>{prospect.player.role.replaceAll("_", " ")}</td>
-                            <td>{prospect.fictionalCeilingTier.replaceAll("_", " ")}</td>
+                            <td>{INTAKE_GRADE_LABEL[prospect.fictionalCeilingTier]}</td>
                             <td>
                               Tim {t20.timing} · Pow {t20.power} · Ctl {t20.control} · Cat{" "}
                               {t20.catching}
