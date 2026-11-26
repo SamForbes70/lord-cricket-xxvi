@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-/** E9: when the last fixture is complete, Home presents the finale step by step, and the rollover is unchanged. */
+/** E9: when the last fixture is complete, Home presents the finale step by step (extended by LC_SEASON_REVIEW_V1), and the rollover is unchanged. */
 test("a completed season is presented as a finale and then rolls over as before", async ({ page }) => {
   test.setTimeout(600_000);
   await page.goto("/");
@@ -30,10 +30,17 @@ test("a completed season is presented as a finale and then rolls over as before"
   await expect(page.getByTestId("season-finale-heading")).toHaveText(/^Objective (exceeded|met|missed)$/);
   await expect(page.getByTestId("season-finale-verdict")).toContainText(/^Finished \d(st|nd|rd|th)\. The objective was: /);
 
+  // LC_SEASON_REVIEW_V1 adds the season in results before the awards, and your cricketers and the next season after.
+  await page.getByTestId("season-finale-continue").click();
+  await expect(page.getByTestId("season-finale-heading")).toHaveText("The season in results");
   await page.getByTestId("season-finale-continue").click();
   await expect(page.getByTestId("season-finale-heading")).toHaveText("Season awards");
   await expect(page.getByTestId("season-finale-awards")).toBeVisible({ timeout: 60_000 });
   await expect(finale).not.toContainText(/\bp\d{3}\b/);
+  await page.getByTestId("season-finale-continue").click();
+  await expect(page.getByTestId("season-finale-heading")).toHaveText("Your cricketers' seasons");
+  await page.getByTestId("season-finale-continue").click();
+  await expect(page.getByTestId("season-finale-heading")).toHaveText("Looking ahead to Season 2");
   await page.getByTestId("season-finale-continue").click();
   await expect(finale).toHaveCount(0);
 
