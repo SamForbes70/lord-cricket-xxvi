@@ -3,11 +3,11 @@ import { readFileSync } from "node:fs";
 import { createT20Session, executeT20Command, fixtureAutopilotStep, validateT20MatchSetup } from "@lcxxvi/simulation";
 import { proposeOpponentT20Command } from "../../apps/web/src/match/ai-opponent.js";
 import {
-  adviseT20Captain,
+  adviseT20CaptainV4 as adviseT20Captain,
   t20BowlerSkill,
   canCompleteBowling,
   deathOverReserve,
-  T20_TACTICAL_CAPTAIN_ID,
+  T20_TACTICAL_CAPTAIN_V4_ID,
   type T20TacticalPublicView,
   type TacticalBowlerCandidate,
 } from "@lcxxvi/ai";
@@ -50,8 +50,10 @@ function playOut(start: readonly Bowler[], oversRemaining: number, previous: str
 }
 
 describe("Captain V4: the best bowlers keep overs for the death", () => {
-  test("is a new captain version with V3's batting policy", () => {
-    expect(T20_TACTICAL_CAPTAIN_ID).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
+  // Captain V5 replaced V4 as the current captain (26 November 2026); V4 is kept as adviseT20CaptainV4, tested here.
+  // V5 keeps V4's bowler choice (tests/unit/pavilion-captain-v5.test.ts checks that they agree).
+  test("is a captain version with V3's batting policy", () => {
+    expect(T20_TACTICAL_CAPTAIN_V4_ID).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
     const bowlers = ["a", "b"].map((id) => ({ id, level: 60, oversLeft: 4 }));
     expect(adviseT20Captain(view(bowlers, 20, null)).policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
   });
@@ -151,7 +153,7 @@ describe("Captain V4: the best bowlers keep overs for the death", () => {
   });
 });
 
-describe("Captain V4 in the computer opponent", () => {
+describe("The computer opponent keeps V4's death-over bowlers (bowler choice is unchanged in V5)", () => {
   const worldBytes = readFileSync("packages/data/worlds/fictional-eight-01.json");
   const manifest = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.manifest.json", "utf8"));
   const template = JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json", "utf8"));

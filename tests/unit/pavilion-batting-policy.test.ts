@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { adviseT20Batting, adviseT20Captain, battingSkill, TAIL_BELOW, T20_BATTING_POLICY_ID } from "@lcxxvi/ai";
+import { adviseT20Batting, adviseT20BattingV2, adviseT20Captain, adviseT20CaptainV4, battingSkill, TAIL_BELOW, T20_BATTING_POLICY_ID } from "@lcxxvi/ai";
 
 const specialist = { timing: 70, power: 65, defence: 60, rotation: 65 };
 const tailender = { timing: 35, power: 40, defence: 30, rotation: 30 };
@@ -65,11 +65,17 @@ describe("Pavilion P04 stage B: LC_T20_BATTING_POLICY_V1", () => {
     expect(() => adviseT20Batting({ ...view, inningsLegalBalls: 121 })).toThrow(/INVALID/);
   });
 
-  test("captain V4, like V3, takes its batting choices from the policy", () => {
+  test("captain V4, like V3, takes its batting choices from the policy; captain V5 from policy V2", () => {
     const captainView = { inningsLegalBalls: 96, inningsRuns: 90, wicketsLost: 7, targetToWin: null, availableBatters: 3, bowlingCandidates: [], striker: tailender, partner: specialist };
-    const captain = adviseT20Captain(captainView);
+    const v4 = adviseT20CaptainV4(captainView);
     const batting = adviseT20Batting(captainView);
-    expect(captain.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
-    expect([captain.aggression, captain.battingIntent]).toEqual([batting.aggression, batting.intent]);
+    expect(v4.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
+    expect([v4.aggression, v4.battingIntent]).toEqual([batting.aggression, batting.intent]);
+    const v5 = adviseT20Captain(captainView);
+    const v2 = adviseT20BattingV2(captainView);
+    expect(v5.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V5");
+    expect([v5.aggression, v5.battingIntent]).toEqual([v2.aggression, v2.intent]);
+    // Here (over 17, three wickets left, a tail-ender on strike) V1 holds at 2 and V2 attacks at 3.
+    expect([batting.aggression, v2.aggression]).toEqual([2, 3]);
   });
 });

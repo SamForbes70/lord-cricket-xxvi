@@ -2,8 +2,9 @@
  * Project Pavilion: who bowls the death overs? Measures the T20 tactical captain's bowler deployment.
  *
  * Frozen 100-seed Pass 07B T20 corpus, suggested elevens, both sides on the tactical captain. Two captains are run:
- *   - "captain": the captain in the code at this revision (adviseT20Captain through the same steps as
- *     apps/batch tacticalT20Step; the script checks its event hashes equal tacticalT20Step's);
+ *   - "captain": captain V4 (adviseT20CaptainV4 since captain V5, 26 November 2026; before that adviseT20Captain)
+ *     through the same steps as apps/batch tacticalT20Step with V4's settings (a whole over per ADVANCE); the script
+ *     checks its event hashes equal tacticalT20Step's);
  *   - "v3": captain V3's bowler choice and effort (V2's score, kept here unchanged so the comparison stays
  *     reproducible), every other choice from adviseT20Captain, whose batting policy V3 and V4 share.
  * On the revision where the code's captain is V3 the two runs must be identical, which checks the copy.
@@ -19,7 +20,7 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { suggestedEleven } from "@lcxxvi/data";
-import { adviseT20Captain, bowlersWithOversLeft, feasibleBowlerChoice, type T20TacticalAdvice, type T20TacticalPublicView } from "@lcxxvi/ai";
+import { adviseT20CaptainV4 as adviseT20Captain, bowlersWithOversLeft, feasibleBowlerChoice, type T20TacticalAdvice, type T20TacticalPublicView } from "@lcxxvi/ai";
 import { createT20CorpusRequest, createT20Session, executeT20Command, fixtureAutopilotStep, validateT20MatchSetup, type T20Session } from "@lcxxvi/simulation";
 import type { T20Command, WorldPack } from "@lcxxvi/contracts";
 import { publicT20CaptainView, tacticalT20Step } from "../apps/batch/src/tactical-match.js";
@@ -93,7 +94,7 @@ function play(raw: unknown, advisorFor: (teamId: string, teams: string[]) => Adv
   let session: T20Session = createT20Session(setup);
   for (let n = 0; session.core.phase !== "COMPLETE"; n += 1) {
     if (n > 3000) throw new Error("NO_PROGRESS");
-    session = executeT20Command(session, useBatchStep ? tacticalT20Step(session) : step(session, (t) => advisorFor(t, teams))).session;
+    session = executeT20Command(session, useBatchStep ? tacticalT20Step(session, { advise: adviseT20Captain, advance: "OVER" }) : step(session, (t) => advisorFor(t, teams))).session;
   }
   return { session, teams };
 }
@@ -177,7 +178,7 @@ function headToHead() {
 for (const raw of corpus.cases.slice(0, 5)) {
   if (play(raw, () => adviseT20Captain).session.lastEventHash !== play(raw, () => adviseT20Captain, true).session.lastEventHash) throw new Error("STEP_COPY_DIFFERS");
 }
-const captain = deployment(adviseT20Captain, "adviseT20Captain at this revision");
+const captain = deployment(adviseT20Captain, "captain V4 (adviseT20CaptainV4)");
 const v3 = deployment(adviseV3, "captain V3 bowler choice (copy in this script)");
 const identical = captain.eventHashes.every((h, n) => h === v3.eventHashes[n]);
 const strip = (d: typeof captain) => Object.fromEntries(Object.entries(d).filter(([k]) => k !== "eventHashes"));

@@ -5,6 +5,7 @@ import {
   adviseODICaptain,
   adviseRed5Captain,
   adviseT20Captain,
+  t20BowlerStyleOf,
   evaluateRed5DeclarationRollouts,
   evaluateRed5FollowOnRollouts,
   type BatterSkills,
@@ -125,6 +126,8 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
     bowlingCandidates: bowlers,
     previousOverBowler: previousBowler(),
     ...battersAtCrease(session, i),
+    // Captain V5: pace or spin for the bowler of the current over (its death-overs plan).
+    bowlerStyle: t20BowlerStyleOf(bowlingTeam.xi.find(p => p.playerId === i.bowlerId)?.bowlingStyle),
   };
   const advice = { ...adviseT20Captain(view) };
   // Stable captain temperament uses identity; decisions use only public match observations.

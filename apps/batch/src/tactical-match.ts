@@ -20,12 +20,14 @@ import {
   adviseODICaptain,
   adviseRed5Captain,
   adviseT20Captain,
+  t20BowlerStyleOf,
   type ODITacticalPublicView,
   type Red5BowlerCandidate,
   type Red5TacticalPublicView,
   type BatterSkills,
   type PreviousOverBowler,
   type TacticalBowlerCandidate,
+  type T20TacticalAdvice,
   type T20TacticalPublicView,
 } from "@lcxxvi/ai";
 
@@ -65,6 +67,8 @@ export function publicT20CaptainView(session: Readonly<T20Session>): T20Tactical
     bowlingCandidates: candidates,
     previousOverBowler: previousT20Bowler(bowling.xi, i.previousOverBowlerId, ledger.bowling),
     ...battersAtCrease(session),
+    // Captain V5: pace or spin for the bowler of the current over (its death-overs plan).
+    bowlerStyle: t20BowlerStyleOf(bowling.xi.find(p => p.playerId === i.bowlerId)?.bowlingStyle),
   };
 }
 
@@ -96,12 +100,24 @@ export function battersAtCrease(session: Readonly<T20Session>): { striker: Batte
   return i.strikerEnd === "NORTH" ? { striker: north, partner: south } : { striker: south, partner: north };
 }
 
-/** The T20 tactical captain (adviseT20Captain, now V4) chooses only legal engine commands; accepted LC_T20_MATCH_V1 owns delivery sampling. */
-export function tacticalT20Step(session: Readonly<T20Session>): T20Command {
+/** How the batch step runs the tactical captain. */
+export type T20TacticalStepOptions = Readonly<{
+  /** The captain; the current one (adviseT20Captain, V5) by default. adviseT20CaptainV4 replays V4's choices. */
+  advise?: (view: T20TacticalPublicView) => T20TacticalAdvice;
+  /** What one ADVANCE bowls when the captain has nothing to change. DELIVERY (the default from captain V5) asks the
+   * captain before every ball, as the live game's passages ask the computer opponent. OVER bowls the rest of the over,
+   * as the step did up to V4: the captain was then asked once an over, so the batter at the other end kept an older
+   * plan (or the default) when they took strike, and V5's ball-by-ball death plan could not be bowled. */
+  advance?: "OVER" | "DELIVERY";
+}>;
+
+/** The T20 tactical captain (adviseT20Captain, now V5) chooses only legal engine commands; accepted LC_T20_MATCH_V1 owns delivery sampling. */
+export function tacticalT20Step(session: Readonly<T20Session>, options: T20TacticalStepOptions = {}): T20Command {
+  const advise = options.advise ?? adviseT20Captain;
   const fallback = fixtureAutopilotStep(session as T20Session);
   const view = publicT20CaptainView(session);
   if (!view) return fallback;
-  const advice = adviseT20Captain(view);
+  const advice = advise(view);
   const base = { expectedRevision: session.revision, commandId: `tactical-${String(session.revision + 1).padStart(6, "0")}` };
   const ledger = session.core.innings[session.core.activeInningsIndex]!;
   const i = ledger.innings;
@@ -116,17 +132,21 @@ export function tacticalT20Step(session: Readonly<T20Session>): T20Command {
   }
   const current = session.core.bowlingPlan;
   if (current && (current.length !== advice.bowlingLength || current.effort !== advice.bowlingEffort)) {
-    return { ...base, actorId: `AI:${i.bowlingTeamId}`, kind: "SET_BOWLING_PLAN", payload: { ...current, length: advice.bowlingLength, effort: advice.bowlingEffort } };
+    // After a change within the over the engine's copy of the plan also carries the event's `type`, which the command
+    // schema refuses. Captain V5 changes the plan within the over, so drop that key; any other payload is unchanged.
+    const bowlingPlan = Object.fromEntries(Object.entries(current).filter(([key]) => key !== "type")) as typeof current;
+    return { ...base, actorId: `AI:${i.bowlingTeamId}`, kind: "SET_BOWLING_PLAN", payload: { ...bowlingPlan, length: advice.bowlingLength, effort: advice.bowlingEffort } };
   }
-  return fallback;
+  if ((options.advance ?? "DELIVERY") === "OVER") return fallback;
+  return { ...base, actorId: "SYSTEM", kind: "ADVANCE", payload: { scope: "DELIVERY" } };
 }
 
 /** Fully autonomous tactical run, separate from frozen Pass12D fixture policy and its accepted regression corpus. */
-export function runTacticalT20(setup: FrozenT20Setup, maxCommands = 900): T20Session {
+export function runTacticalT20(setup: FrozenT20Setup, maxCommands = 1500, options: T20TacticalStepOptions = {}): T20Session {
   let session = createT20Session(setup);
   while (session.core.phase !== "COMPLETE") {
     if (session.revision >= maxCommands) throw new Error("LC_T20_AI_COMMAND_LIMIT");
-    session = executeT20Command(session, tacticalT20Step(session)).session;
+    session = executeT20Command(session, tacticalT20Step(session, options)).session;
   }
   return session;
 }

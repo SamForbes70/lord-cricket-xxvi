@@ -1,4 +1,4 @@
-/** LC_T20_TACTICAL_CAPTAIN_V4. Pure deterministic, public-observation-only choices.
+/** LC_T20_TACTICAL_CAPTAIN_V5. Pure deterministic, public-observation-only choices.
  * V2 (Pavilion P04, 25 November 2026): never picks a bowler after whom the rest of the innings cannot be bowled
  * (bowling-plan.ts); otherwise the same choices as V1.
  * V3 (Pavilion P04 stage B): batting aggression and intent come from LC_T20_BATTING_POLICY_V1 (batting-policy.ts),
@@ -8,6 +8,11 @@
  * Before the death, each of the best bowlers keeps up to two overs back (deathOverReserve) until the five death
  * overs are covered, and the captain picks from the overs left over; in the death it picks its best bowler. The
  * batting policy, lengths, effort rule and field intent are V3's. Never strands the innings (bowling-plan.ts).
+ * V5 (Pavilion, 26 November 2026): a varied death-overs bowling plan instead of a yorker at full effort on almost
+ * every ball (t20DeathBowlingPlanV5), and LC_T20_BATTING_POLICY_V2 at the death (batting-policy.ts). Bowler choice,
+ * the powerplay and middle-overs plans and field intent are V4's (docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md).
+ * V4 stays available as adviseT20CaptainV4 for measurement and comparison. A captain's choices are recorded as
+ * match commands, so a match played under an older version replays from its commands, not from this code.
  * The caller owns legality; candidates here are already filtered by the cricket engine.
  * No match seed, random counter, hidden player attributes or opponent future actions occur in this DTO.
  */
@@ -34,6 +39,15 @@ export interface T20TacticalPublicView {
   /** The batter about to face and the one at the other end (public batting skills), when known. */
   readonly striker?: BatterSkills | null;
   readonly partner?: BatterSkills | null;
+  /** V5: whether the bowler of the current over bowls pace or spin (public: the bowling style), when known. The
+   * death-overs plan of a spinner has no bouncer or yorker. Unknown is treated as pace. */
+  readonly bowlerStyle?: T20BowlerStyle | null;
+}
+export type T20BowlerStyle = "PACE" | "SPIN";
+/** Pace for FAST and MEDIUM, spin for any other style (the generator's rule), null for no style. */
+export function t20BowlerStyleOf(bowlingStyle: string | null | undefined): T20BowlerStyle | null {
+  if (!bowlingStyle) return null;
+  return bowlingStyle === "FAST" || bowlingStyle === "MEDIUM" ? "PACE" : "SPIN";
 }
 export type PreviousOverBowler = Readonly<{
   playerId: string;
@@ -43,20 +57,26 @@ export type PreviousOverBowler = Readonly<{
   variation?: number;
   stamina?: number;
 }>;
-export const T20_TACTICAL_CAPTAIN_ID = "LC_T20_TACTICAL_CAPTAIN_V4" as const;
+/** The current tactical captain. */
+export const T20_TACTICAL_CAPTAIN_ID = "LC_T20_TACTICAL_CAPTAIN_V5" as const;
+/** The previous version, kept for measurement and comparison (adviseT20CaptainV4). */
+export const T20_TACTICAL_CAPTAIN_V4_ID = "LC_T20_TACTICAL_CAPTAIN_V4" as const;
+export type T20TacticalCaptainId = typeof T20_TACTICAL_CAPTAIN_ID | typeof T20_TACTICAL_CAPTAIN_V4_ID;
+export type T20BowlingLength = "GOOD" | "FULL" | "YORKER" | "SHORT";
+export type T20BowlingEffort = "CONSERVE" | "NORMAL" | "MAXIMUM";
 export type T20TacticalAdvice = Readonly<{
-  policyId: typeof T20_TACTICAL_CAPTAIN_ID;
+  policyId: T20TacticalCaptainId;
   aggression: 0 | 1 | 2 | 3 | 4;
   battingIntent: BattingIntent;
   preferredBowlerId: string | null;
-  bowlingEffort: "CONSERVE" | "NORMAL" | "MAXIMUM";
-  bowlingLength: "GOOD" | "FULL" | "YORKER";
+  bowlingEffort: T20BowlingEffort;
+  bowlingLength: T20BowlingLength;
   fieldIntent: "ATTACK" | "BALANCED" | "DEFEND";
   reason: string;
 }>;
 
 import { feasibleBowlerChoice, type BowlerOvers } from "./bowling-plan.js";
-import { adviseT20Batting, type BatterSkills, type BattingIntent } from "./batting-policy.js";
+import { adviseT20Batting, adviseT20BattingV2, battingSkill, TAIL_BELOW, type BatterSkills, type BattingIntent } from "./batting-policy.js";
 
 /** Every bowling-capable player with overs left, the previous over's bowler included, in whole overs. */
 export function bowlersWithOversLeft(
@@ -100,8 +120,9 @@ export function deathOverReserve(
 function assertFiniteNonnegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) throw new Error(`LC_T20_AI_INVALID_${name}`);
 }
-/** Rule-based expected-utility proxy on allowed observable values. Not empirically fitted. */
-export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
+type T20Phase = "EARLY" | "MIDDLE" | "DEATH";
+/** Bowler choice, phase and the checks V4 and V5 share. */
+function captainCore(view: Readonly<T20TacticalPublicView>) {
   for (const [name, value] of Object.entries({
     inningsLegalBalls: view.inningsLegalBalls,
     inningsRuns: view.inningsRuns,
@@ -111,11 +132,7 @@ export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20Tact
   if (view.inningsLegalBalls > 120 || view.wicketsLost > 10) throw new Error("LC_T20_AI_INVALID_INNINGS");
   const remaining = Math.max(1, 120 - view.inningsLegalBalls);
   const requiredRate = view.targetToWin === null ? null : Math.max(0, view.targetToWin - view.inningsRuns) * 6 / remaining;
-  const phase = view.inningsLegalBalls < 36 ? "EARLY" : view.inningsLegalBalls < 90 ? "MIDDLE" : "DEATH";
-  const batting = adviseT20Batting({
-    inningsLegalBalls: view.inningsLegalBalls, inningsRuns: view.inningsRuns, wicketsLost: view.wicketsLost,
-    targetToWin: view.targetToWin, striker: view.striker ?? null, partner: view.partner ?? null,
-  });
+  const phase: T20Phase = view.inningsLegalBalls < 36 ? "EARLY" : view.inningsLegalBalls < 90 ? "MIDDLE" : "DEATH";
   const valid = view.bowlingCandidates.filter(p => {
     for (const [name, value] of Object.entries(p)) {
       if (name !== "playerId") assertFiniteNonnegative(value as number, name);
@@ -147,16 +164,100 @@ export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20Tact
     order = [...free, ...reserved].map(p => p.playerId);
   }
   const chosenId = feasibleBowlerChoice(order, oversRemaining, overs, view.previousOverBowler?.playerId ?? null);
-  const chosen = valid.find(p => p.playerId === chosenId);
-  const bowlingEffort = chosen && chosen.fatigueBp >= 7000 ? "CONSERVE" : phase === "DEATH" && chosen && chosen.fatigueBp < 4000 ? "MAXIMUM" : "NORMAL";
+  const chosen = valid.find(p => p.playerId === chosenId) ?? null;
+  const reason = `Public score context: ${phase.toLowerCase()} phase, ${view.wicketsLost} wickets, ${remaining} balls remaining${requiredRate === null ? "" : `, required rate ${requiredRate.toFixed(2)}`}`;
+  return { phase, chosen, reason };
+}
+
+function battingView(view: Readonly<T20TacticalPublicView>) {
   return {
-    policyId: T20_TACTICAL_CAPTAIN_ID,
+    inningsLegalBalls: view.inningsLegalBalls, inningsRuns: view.inningsRuns, wicketsLost: view.wicketsLost,
+    targetToWin: view.targetToWin, striker: view.striker ?? null, partner: view.partner ?? null,
+  };
+}
+
+/** V4's effort rule: conserve when tired, flat out at the death while fresh. */
+function effortV4(phase: T20Phase, chosen: TacticalBowlerCandidate | null): T20BowlingEffort {
+  return chosen && chosen.fatigueBp >= 7000 ? "CONSERVE" : phase === "DEATH" && chosen && chosen.fatigueBp < 4000 ? "MAXIMUM" : "NORMAL";
+}
+
+/** V4's length by phase: good length early, full in the middle, a yorker at the death. */
+function lengthV4(phase: T20Phase): T20BowlingLength {
+  return phase === "DEATH" ? "YORKER" : phase === "MIDDLE" ? "FULL" : "GOOD";
+}
+
+function fieldIntent(view: Readonly<T20TacticalPublicView>, phase: T20Phase): "ATTACK" | "BALANCED" | "DEFEND" {
+  return view.wicketsLost >= 7 ? "ATTACK" : phase === "DEATH" ? "DEFEND" : "BALANCED";
+}
+
+function advice(policyId: T20TacticalCaptainId, batting: Readonly<{ aggression: 0 | 1 | 2 | 3 | 4; intent: BattingIntent }>, chosen: TacticalBowlerCandidate | null, plan: T20DeathBowlingPlan, field: "ATTACK" | "BALANCED" | "DEFEND", reason: string): T20TacticalAdvice {
+  return {
+    policyId,
     aggression: batting.aggression,
     battingIntent: batting.intent,
     preferredBowlerId: chosen?.playerId ?? null,
-    bowlingEffort,
-    bowlingLength: phase === "DEATH" ? "YORKER" : phase === "MIDDLE" ? "FULL" : "GOOD",
-    fieldIntent: view.wicketsLost >= 7 ? "ATTACK" : phase === "DEATH" ? "DEFEND" : "BALANCED",
-    reason: `Public score context: ${phase.toLowerCase()} phase, ${view.wicketsLost} wickets, ${remaining} balls remaining${requiredRate === null ? "" : `, required rate ${requiredRate.toFixed(2)}`}`,
+    bowlingEffort: plan.effort,
+    bowlingLength: plan.length,
+    fieldIntent: field,
+    reason,
   };
+}
+
+/** LC_T20_TACTICAL_CAPTAIN_V4, unchanged: kept for measurement and comparison. Rule-based, not empirically fitted. */
+export function adviseT20CaptainV4(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
+  const { phase, chosen, reason } = captainCore(view);
+  const batting = adviseT20Batting(battingView(view));
+  return advice(T20_TACTICAL_CAPTAIN_V4_ID, batting, chosen, { length: lengthV4(phase), effort: effortV4(phase, chosen) }, fieldIntent(view, phase), reason);
+}
+
+export type T20DeathBowlingPlan = Readonly<{ length: T20BowlingLength; effort: T20BowlingEffort }>;
+
+/**
+ * V5's death-overs plan for one ball (overs 16 to 20). Cricket judgement, not fitted to any total
+ * (docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md). The ball's place in the over sets the plan, so each over mixes:
+ *
+ *   ball of the over      1          2              3          4            5              6
+ *   pace                  yorker     slower ball    yorker     bouncer      slower ball    hard length
+ *                         (normal)   (good length)  (maximum)  (maximum)    (full)         (maximum)
+ *   pace, tail on strike  as pace, but the sixth ball is a yorker at maximum effort
+ *   spin                  good       full, slower   good,      full         good, slower   full, quicker
+ *                         length     (flighted)     quicker    length       length
+ *
+ * Pace: two yorkers (three to a tail-ender), two slower balls, one bouncer (the T20 playing condition allows one
+ * short ball an over) and one hard length. Spin: no bouncer and no yorker; pace changes on good and full lengths.
+ * A tired bowler (fatigue 7,000 bp or more) conserves effort on every ball, as in V4. Pure and deterministic.
+ */
+export function t20DeathBowlingPlanV5(input: Readonly<{ ballOfOver: number; style: T20BowlerStyle; strikerIsTail: boolean; fatigueBp: number }>): T20DeathBowlingPlan {
+  if (!Number.isInteger(input.ballOfOver) || input.ballOfOver < 0 || input.ballOfOver > 5) throw new Error("LC_T20_AI_INVALID_BALL_OF_OVER");
+  const pace: readonly T20DeathBowlingPlan[] = [
+    { length: "YORKER", effort: "NORMAL" },
+    { length: "GOOD", effort: "CONSERVE" },
+    { length: "YORKER", effort: "MAXIMUM" },
+    { length: "SHORT", effort: "MAXIMUM" },
+    { length: "FULL", effort: "CONSERVE" },
+    input.strikerIsTail ? { length: "YORKER", effort: "MAXIMUM" } : { length: "GOOD", effort: "MAXIMUM" },
+  ];
+  const spin: readonly T20DeathBowlingPlan[] = [
+    { length: "GOOD", effort: "NORMAL" },
+    { length: "FULL", effort: "CONSERVE" },
+    { length: "GOOD", effort: "MAXIMUM" },
+    { length: "FULL", effort: "NORMAL" },
+    { length: "GOOD", effort: "CONSERVE" },
+    { length: "FULL", effort: "MAXIMUM" },
+  ];
+  const plan = (input.style === "SPIN" ? spin : pace)[input.ballOfOver]!;
+  return input.fatigueBp >= 7000 ? { length: plan.length, effort: "CONSERVE" } : plan;
+}
+
+/** LC_T20_TACTICAL_CAPTAIN_V5, the current captain. Rule-based expected-utility proxy on allowed observable values. */
+export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
+  const { phase, chosen, reason } = captainCore(view);
+  const batting = adviseT20BattingV2(battingView(view));
+  // The plan is for the ball about to be bowled, by the bowler of the current over: in the death that bowler is the
+  // chosen one (V4's choice of the best available bowler), or the one already bowling the over.
+  const strikerIsTail = view.striker !== null && view.striker !== undefined && battingSkill(view.striker) < TAIL_BELOW;
+  const plan = phase === "DEATH"
+    ? t20DeathBowlingPlanV5({ ballOfOver: view.inningsLegalBalls % 6, style: view.bowlerStyle ?? "PACE", strikerIsTail, fatigueBp: chosen?.fatigueBp ?? 0 })
+    : { length: lengthV4(phase), effort: effortV4(phase, chosen) };
+  return advice(T20_TACTICAL_CAPTAIN_ID, batting, chosen, plan, fieldIntent(view, phase), reason);
 }
