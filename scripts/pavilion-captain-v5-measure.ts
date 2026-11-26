@@ -16,7 +16,8 @@
  * Corpus mode: both sides use one captain made of two parts, so the causes can be separated (with --advance, 2 x 2 x 2):
  *   --bowling: V4 (yorker at maximum effort on almost every death ball) or V5 (t20DeathBowlingPlanV5);
  *   --batting: V4 (LC_T20_BATTING_POLICY_V1) or V5 (LC_T20_BATTING_POLICY_V2).
- * Bowler choice, the powerplay and middle-overs plans and the field are the same in V4 and V5. V4 + V4 is
+ * The powerplay and middle-overs plans and the field are the same in V4 and V5; from the second V5 pass (pace
+ * preference at the death) bowler choice can differ, and goes with --bowling. V4 + V4 is
  * adviseT20CaptainV4; V5 + V5 is adviseT20Captain. Reports first-innings runs and wickets, phase rates, the death
  * plan mix, aggression by phase and each one's share of death runs and wickets, with 95% match-bootstrap intervals.
  *
@@ -36,7 +37,7 @@ import {
 import { publicT20CaptainView } from "../apps/batch/src/tactical-match.js";
 
 type Delivery = {
-  type: string; inningsIndex: number; strikerId: string; legalBall: boolean; batRuns: number;
+  type: string; inningsIndex: number; strikerId: string; bowlerId: string; legalBall: boolean; batRuns: number;
   extras: { wides: number; noBalls: number; byes: number; legByes: number; penalties: number };
   executedLength: string | null; dismissal: { kind: string } | null;
 };
@@ -64,12 +65,13 @@ const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
   : validateT20MatchSetup(request, bytes, manifest);
 
 type Captain = (view: T20TacticalPublicView) => T20TacticalAdvice;
-/** A captain made of V4's or V5's death bowling plan and V4's or V5's batting policy. */
+/** A captain made of V4's or V5's bowling (bowler choice and death plan) and V4's or V5's batting policy. */
 function composed(bowling: string, batting: string): Captain {
   return (view) => {
     const v4 = adviseT20CaptainV4(view), v5 = adviseT20Captain(view);
     const bowl = bowling === "V5" ? v5 : v4, bat = batting === "V5" ? v5 : v4;
-    if (v4.preferredBowlerId !== v5.preferredBowlerId || v4.fieldIntent !== v5.fieldIntent) throw new Error("V4_V5_BOWLER_OR_FIELD_DIFFER");
+    // V5's death-overs pace preference (26 November 2026, second pass) can choose a different bowler; field intent is shared.
+    if (v4.fieldIntent !== v5.fieldIntent) throw new Error("V4_V5_FIELD_DIFFER");
     return { ...bowl, aggression: bat.aggression, battingIntent: bat.battingIntent };
   };
 }
@@ -109,8 +111,9 @@ function requestFor(raw: { seed: string; caseId: string }, r: number) {
 
 type Ball = {
   match: number; inn: number; over: number; legal: boolean; total: number; bat: number; out: boolean;
-  aggression: number; intent: string; length: string; effort: string; executed: string; why: string;
+  aggression: number; intent: string; length: string; effort: string; executed: string; why: string; style: string;
 };
+const styleOf = (playerId: string) => { const st = byId.get(playerId)?.bowlingStyle; return !st ? "none" : st === "FAST" || st === "MEDIUM" ? "pace" : "spin"; };
 /** Why the batting policy held a death ball at aggression 2 or lower: its own reason text, without the numbers. */
 function whyLow(view: T20TacticalPublicView, aggression: number, battingPolicy: string): string {
   if (aggression > 2) return "";
@@ -146,6 +149,7 @@ function play(request: unknown, captainOf: (teamId: string) => Captain, match: n
         aggression: plan?.aggression ?? 2, intent: plan?.intent ?? "NORMAL",
         length: bowlingPlan?.length ?? "", effort: bowlingPlan?.effort ?? "", executed: e.executedLength ?? "",
         why: over >= 15 && view && advice ? whyLow(view, plan?.aggression ?? 2, battingPolicy) : "",
+        style: styleOf(e.bowlerId),
       });
       if (e.legalBall) legal[e.inningsIndex] = (legal[e.inningsIndex] ?? 0) + 1;
     }
@@ -222,6 +226,7 @@ function summarise(balls: Ball[], matches: number) {
       legalBalls: legal, runsPerOver: +((6 * runs) / legal).toFixed(3), wicketPercent: +((100 * wkts) / legal).toFixed(3),
       byPlan: cell((b) => `${b.length}/${b.effort}`), byPlannedLength: cell((b) => b.length), byEffort: cell((b) => b.effort),
       byExecutedLength: cell((b) => b.executed || "none"), byAggression: cell((b) => String(b.aggression)),
+      byBowlerStyle: cell((b) => b.style),
       lowAggressionReasons: cell((b) => b.why || "aggression 3 or 4"),
     };
   };

@@ -9,6 +9,10 @@ import {
   adviseT20CaptainV4,
   T20_BATTING_POLICY_V2_ID,
   t20BowlerStyleOf,
+  t20BowlerSkill,
+  t20DeathSuitabilityV5,
+  canCompleteBowling,
+  T20_DEATH_PACE_PREFERENCE_PERCENT,
   t20DeathBowlingPlanV5,
   T20_TACTICAL_CAPTAIN_ID,
   T20_TACTICAL_CAPTAIN_V4_ID,
@@ -51,7 +55,8 @@ describe("Captain V5: a varied death-overs bowling plan", () => {
     expect(adviseT20CaptainV4(v).policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
   });
 
-  test("keeps V4's bowler choice and field everywhere, and V4's plan before the death", () => {
+  // These views carry no bowler styles, so V5's pace preference does not apply and the choice is V4's.
+  test("without bowler styles keeps V4's bowler choice; keeps V4's field everywhere and V4's plan before the death", () => {
     let death = 0;
     for (const v of views()) {
       const [v4, v5] = [adviseT20CaptainV4(v), adviseT20Captain(v)];
@@ -110,6 +115,71 @@ describe("Captain V5: a varied death-overs bowling plan", () => {
     expect(t20BowlerStyleOf("LEG_SPIN")).toBe("SPIN");
     expect(t20BowlerStyleOf(null)).toBeNull();
   });
+});
+
+describe("Captain V5: pace preferred for the death overs", () => {
+  type B = { id: string; level: number; oversLeft: number; style: "PACE" | "SPIN" };
+  const sk = (level: number) => ({ control: level, movement: level, variation: level, stamina: level });
+  const styledView = (bowlers: readonly B[], oversRemaining: number, previous: string | null): T20TacticalPublicView => ({
+    inningsLegalBalls: 120 - 6 * oversRemaining, inningsRuns: 0, wicketsLost: 0, targetToWin: null, availableBatters: 10,
+    bowlingCandidates: bowlers.filter((b) => b.id !== previous && b.oversLeft > 0)
+      .map((b) => ({ playerId: b.id, ...sk(b.level), fatigueBp: 0, legalBallsBowled: 24 - 6 * b.oversLeft, quotaRemaining: 6 * b.oversLeft, style: b.style })),
+    previousOverBowler: (() => { const b = bowlers.find((x) => x.id === previous); return b ? { playerId: b.id, quotaRemaining: 6 * b.oversLeft, ...sk(b.level), style: b.style } : null; })(),
+  });
+  const playOut = (start: readonly B[], overs: number, advise = adviseT20Captain): string[] => {
+    const bowlers = start.map((b) => ({ ...b }));
+    const order: string[] = [];
+    let prev: string | null = null;
+    for (let left = overs; left > 0; left -= 1) {
+      const choice: string | null = advise(styledView(bowlers, left, prev)).preferredBowlerId;
+      const chosen: B | undefined = bowlers.find((b) => b.id === choice);
+      if (!chosen || chosen.id === prev || chosen.oversLeft < 1) throw new Error(`ILLEGAL ${choice}`);
+      chosen.oversLeft -= 1; order.push(chosen.id); prev = chosen.id;
+    }
+    return order;
+  };
+
+  test("a pace bowler's death standing is 10% above their skill; spin and unknown are unchanged", () => {
+    expect(T20_DEATH_PACE_PREFERENCE_PERCENT).toBe(10);
+    expect(t20DeathSuitabilityV5({ ...sk(60), style: "PACE" })).toBeCloseTo(t20BowlerSkill(sk(60)) * 1.1);
+    expect(t20DeathSuitabilityV5({ ...sk(60), style: "SPIN" })).toBe(t20BowlerSkill(sk(60)));
+    expect(t20DeathSuitabilityV5(sk(60))).toBe(t20BowlerSkill(sk(60)));
+  });
+
+  test("in the death a capable pace bowler bowls ahead of a slightly better spinner, not ahead of a clearly better one", () => {
+    const close = [{ id: "s", level: 72, oversLeft: 2, style: "SPIN" }, { id: "p", level: 68, oversLeft: 2, style: "PACE" }] as const;
+    expect(adviseT20Captain(styledView(close, 4, null)).preferredBowlerId).toBe("p");
+    expect(adviseT20CaptainV4(styledView(close, 4, null)).preferredBowlerId).toBe("s");
+    const clear = [{ id: "s", level: 80, oversLeft: 2, style: "SPIN" }, { id: "p", level: 68, oversLeft: 2, style: "PACE" }] as const;
+    expect(adviseT20Captain(styledView(clear, 4, null)).preferredBowlerId).toBe("s");
+  });
+
+  test("full innings: pace keeps the death overs when skills are close, and every bowlable state is still bowled out", () => {
+    const six: B[] = [
+      { id: "s1", level: 75, oversLeft: 4, style: "SPIN" }, { id: "s2", level: 73, oversLeft: 4, style: "SPIN" }, { id: "s3", level: 71, oversLeft: 4, style: "SPIN" },
+      { id: "p1", level: 70, oversLeft: 4, style: "PACE" }, { id: "p2", level: 68, oversLeft: 4, style: "PACE" }, { id: "s4", level: 50, oversLeft: 4, style: "SPIN" },
+    ];
+    const v5 = playOut(six, 20).slice(15), v4 = playOut(six, 20, adviseT20CaptainV4).slice(15);
+    // Death standing: p1 70 x 1.1 = 77 ranks first, then s1 (75), then p2 (68 x 1.1 = 74.8): two, two and one reserved
+    // overs, so pace bowls three of the last five. V4 (skill alone) reserves them for s1, s2 and s3: no pace.
+    expect(v5.filter((id) => id.startsWith("p")).length).toBe(3);
+    expect(v4.filter((id) => id.startsWith("p")).length).toBe(0);
+    // Never strands: five bowlers, mixed styles, every quota combination, 1 to 10 overs left.
+    const levels = [80, 72, 64, 56, 48];
+    let checked = 0;
+    for (let code = 0; code < 5 ** 5; code += 1) {
+      const bowlers: B[] = levels.map((level, n) => ({ id: `b${n}`, level, oversLeft: Math.floor(code / 5 ** n) % 5, style: n % 2 ? "PACE" : "SPIN" }));
+      for (let overs = 1; overs <= 10; overs += 1) {
+        const left = bowlers.map((b) => ({ playerId: b.id, oversLeft: b.oversLeft }));
+        if (!canCompleteBowling(overs, left, null)) continue;
+        const choice = adviseT20Captain(styledView(bowlers, overs, null)).preferredBowlerId;
+        const after = left.map((b) => (b.playerId === choice ? { ...b, oversLeft: b.oversLeft - 1 } : b));
+        expect(canCompleteBowling(overs - 1, after, choice)).toBe(true);
+        checked += 1;
+      }
+    }
+    expect(checked).toBeGreaterThan(5000);
+  }, 60_000);
 });
 
 describe("Batting policy V2: the first innings's death overs", () => {

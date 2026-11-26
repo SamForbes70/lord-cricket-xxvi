@@ -9,8 +9,10 @@
  * overs are covered, and the captain picks from the overs left over; in the death it picks its best bowler. The
  * batting policy, lengths, effort rule and field intent are V3's. Never strands the innings (bowling-plan.ts).
  * V5 (Pavilion, 26 November 2026): a varied death-overs bowling plan instead of a yorker at full effort on almost
- * every ball (t20DeathBowlingPlanV5), and LC_T20_BATTING_POLICY_V2 at the death (batting-policy.ts). Bowler choice,
- * the powerplay and middle-overs plans and field intent are V4's (docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md).
+ * every ball (t20DeathBowlingPlanV5), LC_T20_BATTING_POLICY_V2 at the death (batting-policy.ts), and a pace
+ * preference for the death overs (t20DeathSuitabilityV5, in both the death-over reservation and the choice within the
+ * death). The rest of bowler choice, the powerplay and middle-overs plans and field intent are V4's
+ * (docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md).
  * V4 stays available as adviseT20CaptainV4 for measurement and comparison. A captain's choices are recorded as
  * match commands, so a match played under an older version replays from its commands, not from this code.
  * The caller owns legality; candidates here are already filtered by the cricket engine.
@@ -25,6 +27,8 @@ export interface TacticalBowlerCandidate {
   readonly fatigueBp: number;
   readonly legalBallsBowled: number;
   readonly quotaRemaining: number;
+  /** V5: pace or spin (public: the bowling style), when known. V5 prefers pace for the death overs. */
+  readonly style?: T20BowlerStyle | null;
 }
 export interface T20TacticalPublicView {
   readonly inningsLegalBalls: number;
@@ -56,6 +60,7 @@ export type PreviousOverBowler = Readonly<{
   movement?: number;
   variation?: number;
   stamina?: number;
+  style?: T20BowlerStyle | null;
 }>;
 /** The current tactical captain. */
 export const T20_TACTICAL_CAPTAIN_ID = "LC_T20_TACTICAL_CAPTAIN_V5" as const;
@@ -121,8 +126,26 @@ function assertFiniteNonnegative(value: number, name: string) {
   if (!Number.isFinite(value) || value < 0) throw new Error(`LC_T20_AI_INVALID_${name}`);
 }
 type T20Phase = "EARLY" | "MIDDLE" | "DEATH";
-/** Bowler choice, phase and the checks V4 and V5 share. */
-function captainCore(view: Readonly<T20TacticalPublicView>) {
+/** Bowler choice, phase and the checks V4 and V5 share; they differ only in how bowlers rank for the death. */
+/** How a captain ranks bowlers for the death overs: V4 by skill alone, V5 by t20DeathSuitabilityV5. */
+type DeathRank = (p: { readonly control: number; readonly movement: number; readonly variation: number; readonly stamina: number; readonly style?: T20BowlerStyle | null }) => number;
+
+/** V5's pace preference for the death: a pace bowler's skill counts 10% more there. */
+export const T20_DEATH_PACE_PREFERENCE_PERCENT = 10;
+
+/**
+ * V5's standing for the death overs (overs 16 to 20): t20BowlerSkill, raised by T20_DEATH_PACE_PREFERENCE_PERCENT for
+ * a pace bowler. Cricket judgement, written before measuring (docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md): real T20
+ * death overs are mostly bowled by pace, because yorkers, bouncers and pace changes are a quick bowler's tools. A
+ * capable pace bowler is preferred to a spinner of similar skill, but a spinner more than 10% more skilled still
+ * bowls, and so a weak pace bowler does not displace a clearly better spinner. Unknown style earns no preference.
+ */
+export function t20DeathSuitabilityV5(p: Parameters<DeathRank>[0]): number {
+  const skill = t20BowlerSkill(p);
+  return p.style === "PACE" ? skill * (100 + T20_DEATH_PACE_PREFERENCE_PERCENT) / 100 : skill;
+}
+
+function captainCore(view: Readonly<T20TacticalPublicView>, deathRank: DeathRank) {
   for (const [name, value] of Object.entries({
     inningsLegalBalls: view.inningsLegalBalls,
     inningsRuns: view.inningsRuns,
@@ -135,32 +158,33 @@ function captainCore(view: Readonly<T20TacticalPublicView>) {
   const phase: T20Phase = view.inningsLegalBalls < 36 ? "EARLY" : view.inningsLegalBalls < 90 ? "MIDDLE" : "DEATH";
   const valid = view.bowlingCandidates.filter(p => {
     for (const [name, value] of Object.entries(p)) {
-      if (name !== "playerId") assertFiniteNonnegative(value as number, name);
+      if (name !== "playerId" && name !== "style") assertFiniteNonnegative(value as number, name);
     }
     return p.quotaRemaining > 0 && p.fatigueBp <= 10000;
   });
   for (const [name, value] of Object.entries(view.previousOverBowler ?? {})) {
-    if (name !== "playerId" && value !== undefined) assertFiniteNonnegative(value as number, name);
+    if (name !== "playerId" && name !== "style" && value !== undefined) assertFiniteNonnegative(value as number, name);
   }
   const oversRemaining = Math.ceil(remaining / 6);
   const overs = bowlersWithOversLeft(view, 6);
   const score = (p: TacticalBowlerCandidate) => t20BowlerSkill(p) - p.fatigueBp / 90;
+  const deathScore = (p: TacticalBowlerCandidate) => deathRank(p) - p.fatigueBp / 90;
   const byId = (a: { playerId: string }, b: { playerId: string }) => a.playerId.localeCompare(b.playerId);
   let order: string[];
   if (phase === "DEATH") {
     // The death: the best bowler who can bowl now.
-    order = [...valid].sort((a, b) => score(b) - score(a) || byId(a, b)).map(p => p.playerId);
+    order = [...valid].sort((a, b) => deathScore(b) - deathScore(a) || byId(a, b)).map(p => p.playerId);
   } else {
     // Before the death: keep the best bowlers' last overs back and bowl the overs left over, best first. Only when no
     // one has an over to spare, dip into the reserve of the least skilled reserved bowler.
     const prev = view.previousOverBowler;
     const prevSkill = prev && [prev.control, prev.movement, prev.variation, prev.stamina].every(v => typeof v === "number")
-      ? t20BowlerSkill(prev as Required<PreviousOverBowler>) : Number.NEGATIVE_INFINITY;
-    const skillOf = new Map<string, number>([...valid.map(p => [p.playerId, t20BowlerSkill(p)] as const), ...(prev ? [[prev.playerId, prevSkill] as const] : [])]);
+      ? deathRank(prev as Required<PreviousOverBowler>) : Number.NEGATIVE_INFINITY;
+    const skillOf = new Map<string, number>([...valid.map(p => [p.playerId, deathRank(p)] as const), ...(prev ? [[prev.playerId, prevSkill] as const] : [])]);
     const reserve = deathOverReserve(overs.map(b => ({ ...b, skill: skillOf.get(b.playerId) ?? Number.NEGATIVE_INFINITY })), T20_DEATH_OVERS);
     const spare = (p: TacticalBowlerCandidate) => Math.floor(p.quotaRemaining / 6) - (reserve.get(p.playerId) ?? 0) > 0;
     const free = valid.filter(spare).sort((a, b) => score(b) - score(a) || byId(a, b));
-    const reserved = valid.filter(p => !spare(p)).sort((a, b) => t20BowlerSkill(a) - t20BowlerSkill(b) || byId(a, b));
+    const reserved = valid.filter(p => !spare(p)).sort((a, b) => deathRank(a) - deathRank(b) || byId(a, b));
     order = [...free, ...reserved].map(p => p.playerId);
   }
   const chosenId = feasibleBowlerChoice(order, oversRemaining, overs, view.previousOverBowler?.playerId ?? null);
@@ -205,7 +229,7 @@ function advice(policyId: T20TacticalCaptainId, batting: Readonly<{ aggression: 
 
 /** LC_T20_TACTICAL_CAPTAIN_V4, unchanged: kept for measurement and comparison. Rule-based, not empirically fitted. */
 export function adviseT20CaptainV4(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
-  const { phase, chosen, reason } = captainCore(view);
+  const { phase, chosen, reason } = captainCore(view, t20BowlerSkill);
   const batting = adviseT20Batting(battingView(view));
   return advice(T20_TACTICAL_CAPTAIN_V4_ID, batting, chosen, { length: lengthV4(phase), effort: effortV4(phase, chosen) }, fieldIntent(view, phase), reason);
 }
@@ -251,7 +275,7 @@ export function t20DeathBowlingPlanV5(input: Readonly<{ ballOfOver: number; styl
 
 /** LC_T20_TACTICAL_CAPTAIN_V5, the current captain. Rule-based expected-utility proxy on allowed observable values. */
 export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
-  const { phase, chosen, reason } = captainCore(view);
+  const { phase, chosen, reason } = captainCore(view, t20DeathSuitabilityV5);
   const batting = adviseT20BattingV2(battingView(view));
   // The plan is for the ball about to be bowled, by the bowler of the current over: in the death that bowler is the
   // chosen one (V4's choice of the best available bowler), or the one already bowling the over.

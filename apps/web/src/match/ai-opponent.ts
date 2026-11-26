@@ -105,16 +105,18 @@ function proposeT20Command(session: Readonly<T20Session>, teamId: string, matchA
       fatigueBp: session.core.fatigueBp[p.playerId] ?? 0,
       legalBallsBowled: ledger.bowling[p.playerId]!.legalBalls,
       quotaRemaining: 24 - ledger.bowling[p.playerId]!.legalBalls,
+      style: t20BowlerStyleOf(p.bowlingStyle),
     }));
   // The previous over's bowler with public bowling skills, so captain V4's death-over plan counts them.
   const previousBowler = () => {
     const id = i.previousOverBowlerId;
     if (!id) return null;
-    const s = bowlingTeam.xi.find(p => p.playerId === id)?.skills.T20;
+    const player = bowlingTeam.xi.find(p => p.playerId === id);
+    const s = player?.skills.T20;
     return {
       playerId: id,
       quotaRemaining: 24 - (ledger.bowling[id]?.legalBalls ?? 0),
-      ...(s ? { control: s.control, movement: s.movement, variation: s.variation, stamina: s.stamina } : {}),
+      ...(s ? { control: s.control, movement: s.movement, variation: s.variation, stamina: s.stamina, style: t20BowlerStyleOf(player!.bowlingStyle) } : {}),
     };
   };
   const view = {

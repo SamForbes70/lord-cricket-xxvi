@@ -51,7 +51,7 @@ function playOut(start: readonly Bowler[], oversRemaining: number, previous: str
 
 describe("Captain V4: the best bowlers keep overs for the death", () => {
   // Captain V5 replaced V4 as the current captain (26 November 2026); V4 is kept as adviseT20CaptainV4, tested here.
-  // V5 keeps V4's bowler choice (tests/unit/pavilion-captain-v5.test.ts checks that they agree).
+  // V5 keeps V4's bowler choice except for a pace preference in the death (tests/unit/pavilion-captain-v5.test.ts).
   test("is a captain version with V3's batting policy", () => {
     expect(T20_TACTICAL_CAPTAIN_V4_ID).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
     const bowlers = ["a", "b"].map((id) => ({ id, level: 60, oversLeft: 4 }));
@@ -153,7 +153,7 @@ describe("Captain V4: the best bowlers keep overs for the death", () => {
   });
 });
 
-describe("The computer opponent keeps V4's death-over bowlers (bowler choice is unchanged in V5)", () => {
+describe("The computer opponent keeps its best bowlers for the death (V4's reservation, kept in V5)", () => {
   const worldBytes = readFileSync("packages/data/worlds/fictional-eight-01.json");
   const manifest = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.manifest.json", "utf8"));
   const template = JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json", "utf8"));

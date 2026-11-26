@@ -57,6 +57,7 @@ export function publicT20CaptainView(session: Readonly<T20Session>): T20Tactical
       fatigueBp: session.core.fatigueBp[p.playerId] ?? 0,
       legalBallsBowled: ledger.bowling[p.playerId]!.legalBalls,
       quotaRemaining: 24 - ledger.bowling[p.playerId]!.legalBalls,
+      style: t20BowlerStyleOf(p.bowlingStyle),
     }));
   return {
     inningsLegalBalls: i.legalBalls,
@@ -74,16 +75,17 @@ export function publicT20CaptainView(session: Readonly<T20Session>): T20Tactical
 
 /** The previous over's bowler with the balls left in their quota and their public T20 bowling skills (captain V4). */
 export function previousT20Bowler(
-  xi: readonly { playerId: string; skills: { T20: { control: number; movement: number; variation: number; stamina: number } } }[],
+  xi: readonly { playerId: string; bowlingStyle?: string | null; skills: { T20: { control: number; movement: number; variation: number; stamina: number } } }[],
   previousOverBowlerId: string | null,
   bowling: Readonly<Record<string, { legalBalls: number } | undefined>>,
 ): PreviousOverBowler | null {
   if (!previousOverBowlerId) return null;
-  const s = xi.find(p => p.playerId === previousOverBowlerId)?.skills.T20;
+  const player = xi.find(p => p.playerId === previousOverBowlerId);
+  const s = player?.skills.T20;
   return {
     playerId: previousOverBowlerId,
     quotaRemaining: 24 - (bowling[previousOverBowlerId]?.legalBalls ?? 0),
-    ...(s ? { control: s.control, movement: s.movement, variation: s.variation, stamina: s.stamina } : {}),
+    ...(s ? { control: s.control, movement: s.movement, variation: s.variation, stamina: s.stamina, style: t20BowlerStyleOf(player.bowlingStyle) } : {}),
   };
 }
 
