@@ -36,6 +36,7 @@ export function HomeScreen(props: HomeScreenProps) {
     controlledTeam,
     tableRow,
     completedManaged,
+    openAnalysis,
   } = props;
   const call = pendingMatch ? null : service.selectionCall();
   const previous = state.completedMatches
@@ -160,6 +161,11 @@ export function HomeScreen(props: HomeScreenProps) {
       playerName={(playerId) => service.playerName(playerId)}
     >
       {selectionNote}
+      {openAnalysis && previous && (
+        <button type="button" data-testid="match-report-analysis" disabled={busy} onClick={() => void openAnalysis(previous.fixtureId)}>
+          Post-match analysis
+        </button>
+      )}
     </MatchReportPanel>
   ) : null;
   return (
@@ -523,4 +529,6 @@ export type HomeScreenProps = {
   controlledTeam: string | null;
   tableRow: ActiveState["projection"]["table"][number] | null;
   completedManaged: ActiveState["completedMatches"];
+  /** Opens the post-match analysis of a completed fixture from its stored record (LC_POST_MATCH_ANALYSIS_ARCHIVE_V1). */
+  openAnalysis?: (fixtureId: string) => Promise<void>;
 };

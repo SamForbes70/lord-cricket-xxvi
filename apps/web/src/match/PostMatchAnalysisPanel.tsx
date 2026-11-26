@@ -18,7 +18,7 @@ function overs(legalBalls: number): string {
   return legalBalls % 6 === 0 ? `${legalBalls / 6}` : `${Math.floor(legalBalls / 6)}.${legalBalls % 6}`;
 }
 
-function DecisionItem({ decision }: { decision: PostMatchDecision }) {
+export function DecisionItem({ decision }: { decision: Pick<PostMatchDecision, "kind" | "when" | "summary" | "followed" | "measured"> }) {
   return (
     <li className="pma-decision" data-kind={decision.kind} data-measured={decision.measured}>
       <p className="pma-decision-head">
@@ -34,6 +34,85 @@ function DecisionItem({ decision }: { decision: PostMatchDecision }) {
       )}
       <p className="pma-measured">{POST_MATCH_MEASURED_NOTES[decision.measured]}</p>
     </li>
+  );
+}
+
+/** Phase by phase: the same table in the live and the archived analysis. */
+export function PhaseTable({ phases, teamName, headingLevel = 4, idPrefix = "pma" }: {
+  phases: PostMatchAnalysis["phases"];
+  teamName: (teamId: string) => string;
+  headingLevel?: 4 | 5;
+  idPrefix?: string;
+}) {
+  const Heading = headingLevel === 4 ? "h4" : "h5";
+  return (
+    <section aria-labelledby={`${idPrefix}-phases-heading`} data-testid="pma-phases">
+      <Heading id={`${idPrefix}-phases-heading`}>Phase by phase</Heading>
+      <div className="pma-table-wrap">
+        <table className="pma-phases">
+          <caption className="sr-only">Runs and wickets by phase for each innings</caption>
+          <thead>
+            <tr>
+              <th scope="col">Batting side</th>
+              {POST_MATCH_ANALYSIS_RULES.phases.map((p) => (
+                <th scope="col" key={p.phase}>
+                  {PHASE_LABEL[p.phase]} <span className="pma-sub">overs {p.fromOver} to {p.toOver}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {phases.map((innings) => (
+              <tr key={innings.inningsIndex} data-testid={`pma-phase-row-${innings.inningsIndex}`}>
+                <th scope="row">
+                  {teamName(innings.battingTeamId)}
+                  <span className="pma-sub">{innings.runs}/{innings.wickets} ({overs(innings.legalBalls)} overs)</span>
+                </th>
+                {innings.lines.map((line) => (
+                  <td key={line.phase}>
+                    {line.reached ? (
+                      <>
+                        <strong>{line.runs}/{line.wickets}</strong>
+                        <span className="pma-sub">{overs(line.legalBalls)} overs</span>
+                      </>
+                    ) : (
+                      <span className="pma-sub">Not reached</span>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+/** Turning points under the fixed V1 rule. */
+export function TurningPoints({ points, headingLevel = 4, idPrefix = "pma" }: {
+  points: PostMatchAnalysis["turningPoints"];
+  headingLevel?: 4 | 5;
+  idPrefix?: string;
+}) {
+  const Heading = headingLevel === 4 ? "h4" : "h5";
+  return (
+    <section aria-labelledby={`${idPrefix}-turning-heading`} data-testid="pma-turning-points">
+      <Heading id={`${idPrefix}-turning-heading`}>Turning points</Heading>
+      <p className="pma-sub-intro">
+        The passages furthest from each innings&apos; own scoring rate, any run of three overs with three or more wickets,
+        the biggest stand, and the death overs when the two sides differed widely. The same fixed rule applies to every match.
+      </p>
+      {points.length === 0 ? (
+        <p>No passage met the rule in this match: scoring and wickets stayed close to each innings&apos; own rate.</p>
+      ) : (
+        <ol className="pma-turning">
+          {points.map((point) => (
+            <li key={`${point.kind}-${point.inningsIndex}-${point.fromOver}`} data-kind={point.kind}>{point.text}</li>
+          ))}
+        </ol>
+      )}
+    </section>
   );
 }
 
@@ -61,63 +140,8 @@ export function PostMatchAnalysisPanel({ analysis, focusTeamIds, teamName }: {
         the other.
       </p>
 
-      <section aria-labelledby="pma-phases-heading" data-testid="pma-phases">
-        <h4 id="pma-phases-heading">Phase by phase</h4>
-        <div className="pma-table-wrap">
-          <table className="pma-phases">
-            <caption className="sr-only">Runs and wickets by phase for each innings</caption>
-            <thead>
-              <tr>
-                <th scope="col">Batting side</th>
-                {POST_MATCH_ANALYSIS_RULES.phases.map((p) => (
-                  <th scope="col" key={p.phase}>
-                    {PHASE_LABEL[p.phase]} <span className="pma-sub">overs {p.fromOver} to {p.toOver}</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {analysis.phases.map((innings) => (
-                <tr key={innings.inningsIndex} data-testid={`pma-phase-row-${innings.inningsIndex}`}>
-                  <th scope="row">
-                    {teamName(innings.battingTeamId)}
-                    <span className="pma-sub">{innings.runs}/{innings.wickets} ({overs(innings.legalBalls)} overs)</span>
-                  </th>
-                  {innings.lines.map((line) => (
-                    <td key={line.phase}>
-                      {line.reached ? (
-                        <>
-                          <strong>{line.runs}/{line.wickets}</strong>
-                          <span className="pma-sub">{overs(line.legalBalls)} overs</span>
-                        </>
-                      ) : (
-                        <span className="pma-sub">Not reached</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section aria-labelledby="pma-turning-heading" data-testid="pma-turning-points">
-        <h4 id="pma-turning-heading">Turning points</h4>
-        <p className="pma-sub-intro">
-          The passages furthest from each innings&apos; own scoring rate, any run of three overs with three or more wickets,
-          the biggest stand, and the death overs when the two sides differed widely. The same fixed rule applies to every match.
-        </p>
-        {analysis.turningPoints.length === 0 ? (
-          <p>No passage met the rule in this match: scoring and wickets stayed close to each innings&apos; own rate.</p>
-        ) : (
-          <ol className="pma-turning">
-            {analysis.turningPoints.map((point) => (
-              <li key={`${point.kind}-${point.inningsIndex}-${point.fromOver}`} data-kind={point.kind}>{point.text}</li>
-            ))}
-          </ol>
-        )}
-      </section>
+      <PhaseTable phases={analysis.phases} teamName={teamName} />
+      <TurningPoints points={analysis.turningPoints} />
 
       <section aria-labelledby="pma-decisions-heading" data-testid="pma-decisions">
         <h4 id="pma-decisions-heading">Your decisions and what followed</h4>
