@@ -28,7 +28,7 @@ Outcomes are unchanged when no plan changes. Each ball's random draws are keyed 
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Type check | `NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b` | PASS (exit 0) |
+| Type check | `NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b` and `npm run typecheck` (includes tests) | PASS (exit 0) |
 | New spec | `LCXXVI_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npx playwright test --config playwright.ui.config.ts tests/ui/finish-over-per-ball.spec.ts --project=chromium --reporter=line --trace off` | PASS, 1 test (19.2 s) |
 | Every other spec in `tests/ui` that presses "Finish over" (20 files) | same command with those files, at `99c9533` (same code as this head; later commits are docs only) | PASS, 59 passed (44.5 min) |
 | Inventory | `node scripts/check-pass07b-inventory.mjs` | PASS (exit 0) |

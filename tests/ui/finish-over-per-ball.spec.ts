@@ -14,7 +14,7 @@ test("Finish over asks the computer captain before every ball of the over", asyn
     Worker.prototype.postMessage = function (this: Worker, message: unknown, ...rest: unknown[]) {
       const m = message as { type?: string; command?: { kind?: string; payload?: { scope?: string } } } | null;
       if (m && typeof m.type === "string")
-        log.push({ type: m.type, kind: m.command?.kind, scope: m.command?.payload?.scope });
+        log.push({ type: m.type, ...(m.command?.kind ? { kind: m.command.kind } : {}), ...(m.command?.payload?.scope ? { scope: m.command.payload.scope } : {}) });
       return (original as (...args: unknown[]) => void).call(this, message, ...rest);
     } as typeof Worker.prototype.postMessage;
   });
