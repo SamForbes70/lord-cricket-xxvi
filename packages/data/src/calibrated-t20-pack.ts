@@ -18,6 +18,10 @@
  * V3 (owner decision, C3 next iteration): batting aimed at the upper end of the measured real per-point ranges, with
  * less negative timing and power terms on a boundary and a stronger rotation term on a dot. V2 (hash 90ba2058...) produced
  * the C3 gate files c3-report.json and c3-skill-differentiation.json and stays their record.
+ * V4 (C4): the delivery-outcome component (calibrated-t20-delivery-pack.ts) lowers the dot level from about 60% to
+ * about 34%, which flattens the per-point non-dot effects of the same terms. V4 steepens the dot terms (control on a
+ * dot and on a miss, rotation on a dot) and eases timing and power on a boundary, refitted to the same C3 per-point
+ * targets (c3-mapping.json, calibration split only). V3 (hash 8e776867...) stays the record of the C3 gate files.
  * Derived from Cricsheet data (https://cricsheet.org/), ODC-By 1.0 (https://cricsheet.org/licensing/).
  */
 function deepFreeze<T extends object>(value: T): T {
@@ -31,7 +35,7 @@ export type CalibratedTerms = Readonly<Record<string, Readonly<Partial<Record<Ca
 export const CALIBRATED_T20_PACK = deepFreeze({
   manifest: {
     modelId: "calibrated-t20-01",
-    packVersion: "LC_CALIBRATED_T20_SKILL_V3",
+    packVersion: "LC_CALIBRATED_T20_SKILL_V4",
     /** C3: per-point targets from the rating-quarter gap of the game's regular batters and bowlers (c3-mapping.json). */
     ratingMapping: "quarters of players with at least 100 balls faced or bowled, suggested elevens, captain V3",
     status: "RESEARCH_ONLY",
@@ -53,19 +57,19 @@ export const CALIBRATED_T20_PACK = deepFreeze({
   centres: { TIMING: 60, POWER: 64, DEFENCE: 59, ROTATION: 60, CONTROL: 60, MOVEMENT: 62, VARIATION: 60 },
   /** Contact class (MISS, PAD, GROUND, AERIAL, EDGE, HIT_WICKET). */
   contact: {
-    MISS: { CONTROL: 3000 },
+    MISS: { CONTROL: 16000 },
     AERIAL: { VARIATION: 8000 },
     EDGE: { VARIATION: 8000 },
   } as CalibratedTerms,
   /** Run value after bat contact (categories 0, 1, 2, 3, 4, 6). */
   runs: {
-    "0": { CONTROL: 6000, ROTATION: 3000 },
-    "4": { TIMING: -800, POWER: -800, CONTROL: -9000, MOVEMENT: -9000, VARIATION: 3000 },
-    "6": { TIMING: -800, POWER: -800, CONTROL: -9000, MOVEMENT: -9000, VARIATION: 3000 },
+    "0": { CONTROL: 13000, ROTATION: -2500 },
+    "4": { TIMING: -1800, POWER: -1800, CONTROL: -7000, MOVEMENT: -7000, VARIATION: 3000 },
+    "6": { TIMING: -1800, POWER: -1800, CONTROL: -7000, MOVEMENT: -7000, VARIATION: 3000 },
   } as CalibratedTerms,
   /** Cancels synthetic-alpha-01's bowled and lbw skill terms (controlBp, defenceBp in DELIVERY_STAGE_PACK). */
   cancelMissDismissalSkill: true,
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_PACK_SHA256 = "8e7768676be4fa31cbfb77d1aea7bd62c91267d3ab0e17e3862751a1a26b20f0";
+export const CALIBRATED_T20_PACK_SHA256 = "4fa5d84597d105afdae72dc4d0681a7b883055824bfe449a342a82d3ef4fe43e";
