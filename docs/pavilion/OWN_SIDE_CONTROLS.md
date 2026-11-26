@@ -39,3 +39,18 @@ The match settings' "Tactical captain" selector still lets the player switch the
 
 - `tests/unit/own-side-controls.test.ts`: the rule, and rehydration of a saved match with an opposition plan command.
 - `tests/ui/own-side-controls.spec.ts`: in a career match and in an exhibition with a computer opponent, each side's controls in both innings; with manual control of both teams, every control is enabled.
+
+## Opposition lock in career and scenario matches
+
+Owner decision, 26 November 2026: in a career match (the player's league fixture) and in a scenario challenge, the other side is always the computer captain.
+
+- `apps/web/src/main.tsx`: the "Tactical captain" select is disabled in those matches, and `changeAiOpponent` ignores any change. The note beside it reads "In a career match the opposition is always the computer captain." or "In a scenario the opposition is always the computer captain."
+- Exhibitions and quick matches are unchanged. The player can still choose either side, or neither.
+- **Not covered: tournament fixtures.** The page sets the computer opponent when a fixture launches, but after a reload it no longer knows the match is a tournament fixture. A lock there needs the worker to report that binding, as it already does for career fixtures (`careerFixture`). This is remaining work.
+- **Test changes:** `tests/ui/roster-career.spec.ts` and `tests/ui/player-identity-v3.spec.ts` used to switch the opposition to manual. They now check the lock and play against the computer captain. `tests/ui/scenario-mode-stage12.spec.ts` checks the lock in a scenario.
+- The engine, the worker and saved data are unchanged.
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Type check | `NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b`; `npm run typecheck` | PASS (exit 0) |
+| Affected specs | `LCXXVI_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npx playwright test --config playwright.ui.config.ts tests/ui/roster-career.spec.ts tests/ui/player-identity-v3.spec.ts tests/ui/scenario-mode-stage12.spec.ts --project=chromium --reporter=line --trace off` at `127bf30` | PASS, 9 passed (2.3 min) |
