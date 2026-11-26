@@ -5,6 +5,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { arch, availableParallelism, cpus, hostname, platform, release, totalmem } from "node:os";
 import { playwrightEvidence, vitestEvidence, npmInvocation } from "./acceptance-evidence.mjs";
+import { summariseNetLogDirectory } from "./chromium-netlog-summary.mjs";
 
 const flags = new Set(process.argv.slice(2));
 if ([...flags].some(flag => !["--plan", "--skip-install", "--owner-pc"].includes(flag)) || flags.size !== process.argv.slice(2).length) throw new Error("UNKNOWN_OR_DUPLICATE_ACCEPTANCE_ARGUMENT");
@@ -24,13 +25,61 @@ const steps = [
   // Raised to 100 minutes by owner direction (20 November 2026: "fix the CI time budget").
   // Raised to 140 minutes by owner direction (24 November 2026): with the Pavilion specs a green run reached test 218 of
   // 228 at the 100-minute limit on a slow runner (run 45408625785).
-  { name: "match-ui", timeoutMs: 8_400_000, args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
+  // networkDiagnostics: see docs/verification-pass07a/WINDOWS_CONNECTION_FAILED_2026-11-26.md. Diagnostics only.
+  { name: "match-ui", timeoutMs: 8_400_000, networkDiagnostics: true, args: ["exec", "--", "playwright", "test", "--config=playwright.ui.config.ts", "--reporter=list,json", `--output=${directory}/ui`, "--trace=retain-on-failure"], report: "match-ui.json" },
   { name: "career", args: ["exec", "--", "playwright", "test", "--config=playwright.m6g.portable.config.ts", "--reporter=list,json", `--output=${directory}/career`, "--trace=retain-on-failure"], report: "career.json" },
   { name: "research-browser-build", args: ["exec", "--", "vite", "build", "--config=vite.m7k.config.ts"] },
   { name: "research-browser", args: ["exec", "--", "playwright", "test", "--config=playwright.m7k.config.ts", "--reporter=list,json", `--output=${directory}/research`, "--trace=retain-on-failure"], report: "research-browser.json" },
   { name: "performance-build", args: ["exec", "--", "vite", "build", "--config=vite.acceptance.config.ts"] },
   { name: "performance-observations", args: ["exec", "--", "playwright", "test", "--config=playwright.acceptance.config.ts", "--reporter=list,json", `--output=${directory}/performance`, "--trace=retain-on-failure"], report: "performance-observations.json" },
 ];
+/**
+ * Diagnostics for the intermittent hosted Windows net::ERR_CONNECTION_FAILED on the browser suite's preview server
+ * (docs/verification-pass07a/WINDOWS_CONNECTION_FAILED_2026-11-26.md). They record, beside the step's log: the preview
+ * server's own log (exit code, output, liveness probes), the operating system's TCP counters before and after, and on
+ * Windows a summary of Chromium's NetLog with the operating-system error behind any failed connection. They never change
+ * a step's status, and a failure to collect them is recorded rather than thrown.
+ */
+function tcpSnapshot() {
+  if (platform() !== "win32") return null;
+  const run = (executable, args) => {
+    const result = spawnSync(executable, args, { encoding: "utf8", timeout: 60000, maxBuffer: 16000000, windowsHide: true });
+    return { command: [executable, ...args].join(" "), exitCode: result.status, error: result.error?.message ?? null, stdout: result.stdout ?? "" };
+  };
+  const statistics = run("netstat", ["-s", "-p", "tcp"]);
+  const connections = run("netstat", ["-a", "-n", "-p", "tcp"]);
+  const states = {};
+  for (const line of connections.stdout.split(/\r?\n/)) {
+    const parts = line.trim().split(/\s+/);
+    if (parts[0] === "TCP" && parts.length >= 4) states[parts[3]] = (states[parts[3]] ?? 0) + 1;
+  }
+  const port4180 = connections.stdout.split(/\r?\n/).filter(line => /:4180\s/.test(line)).length;
+  return { atUtc: new Date().toISOString(), tcpStatistics: statistics, connectionStates: states, connectionsOnPort4180: port4180,
+    dynamicPortRange: run("netsh", ["int", "ipv4", "show", "dynamicport", "tcp"]) };
+}
+function startNetworkDiagnostics(name) {
+  const netLogDirectory = join(process.cwd(), directory, `${name}-netlog`);
+  const env = { LCXXVI_PREVIEW_SERVER_LOG: join(process.cwd(), directory, `${name}-preview-server.jsonl`) };
+  if (platform() === "win32") { mkdirSync(netLogDirectory, { recursive: true }); env.LCXXVI_CHROMIUM_NETLOG_DIR = netLogDirectory; }
+  let before = null, beforeError = null;
+  try { before = tcpSnapshot(); } catch (error) { beforeError = error.message; }
+  return { name, env, netLogDirectory, before, beforeError };
+}
+async function finishNetworkDiagnostics({ name, env, netLogDirectory, before, beforeError }) {
+  const out = { version: "LC_NETWORK_DIAGNOSTICS_V1", step: name, purpose: "Diagnostic only; see docs/verification-pass07a/WINDOWS_CONNECTION_FAILED_2026-11-26.md",
+    previewServerLog: env.LCXXVI_PREVIEW_SERVER_LOG, tcpBefore: before, tcpBeforeError: beforeError, tcpAfter: null, tcpAfterError: null,
+    chromiumNetLogSummary: null, chromiumNetLogError: null };
+  try { out.tcpAfter = tcpSnapshot(); } catch (error) { out.tcpAfterError = error.message; }
+  if (env.LCXXVI_CHROMIUM_NETLOG_DIR) {
+    const summaryPath = join(directory, `${name}-chromium-netlog-summary.json`);
+    try {
+      const summary = await summariseNetLogDirectory(netLogDirectory, summaryPath);
+      out.chromiumNetLogSummary = summaryPath;
+      console.log(`${name}: Chromium NetLog ${summary.files.length} file(s), ${summary.totalFailures} failed network event(s)`);
+    } catch (error) { out.chromiumNetLogError = error.message; }
+  }
+  writeFileSync(join(directory, `${name}-network-diagnostics.json`), JSON.stringify(out, null, 2) + "\n");
+}
 if (flags.has("--plan")) {
   console.log(JSON.stringify({ version: "LC_OWNER_ACCEPTANCE_PLAN_V1", declaredOwnerPc: flags.has("--owner-pc"), steps, externalUploads: false, existingBrowserProfilesOpened: false }, null, 2));
 } else {
@@ -53,9 +102,11 @@ if (flags.has("--plan")) {
   for (const step of steps) {
     const started = Date.now(), invocation = step.node ? { executable: process.execPath, args: step.args } : npmInvocation(step.args);
     console.log(`${step.name}: running`);
+    const diagnostics = step.networkDiagnostics ? startNetworkDiagnostics(step.name) : null;
     const result = spawnSync(invocation.executable, invocation.args, { encoding: "utf8", timeout: step.timeoutMs ?? 900000, maxBuffer: 64000000,
       env: { ...process.env, PLAYWRIGHT_JSON_OUTPUT_NAME: join(process.cwd(), directory, step.report ?? "unused.json"),
-        LCXXVI_UI_EVIDENCE_DIR: join(process.cwd(), directory, "ui-images"), LCXXVI_ACCEPTANCE_DIR: join(process.cwd(), directory) } });
+        LCXXVI_UI_EVIDENCE_DIR: join(process.cwd(), directory, "ui-images"), LCXXVI_ACCEPTANCE_DIR: join(process.cwd(), directory), ...diagnostics?.env } });
+    if (diagnostics) await finishNetworkDiagnostics(diagnostics);
     const log = `${result.stdout ?? ""}${result.stderr ?? ""}${result.error ? `\n${result.error.message}` : ""}`;
     const logPath = join(directory, `${step.name}.log`); writeFileSync(logPath, log);
     let evidence = null, evidenceError = null;
