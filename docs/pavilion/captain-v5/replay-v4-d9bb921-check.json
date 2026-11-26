@@ -1,0 +1,131 @@
+{
+  "failures": 0,
+  "rows": [
+    {
+      "id": "batch-v5-replay-1",
+      "revision": 154,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "0e82ba8677b700b530b4f49674df1aa90a7d1e4a8b9fb788f40122e6d08ca7ec"
+    },
+    {
+      "id": "opponent-default-v5-replay-1",
+      "revision": 154,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "206cbcfe8965d5f2fa8c7ce47a9d7a17517fe42304956a3ddce089f3b7954752"
+    },
+    {
+      "id": "opponent-club-style-v5-replay-1",
+      "revision": 158,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "6929d171a1f2c9b1a515b8d8ac33376d91deb8dc6acca28e8ac25c11c7a4ec31"
+    },
+    {
+      "id": "opponent-match-aware-v5-replay-1",
+      "revision": 158,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "6929d171a1f2c9b1a515b8d8ac33376d91deb8dc6acca28e8ac25c11c7a4ec31"
+    },
+    {
+      "id": "batch-v5-replay-2",
+      "revision": 171,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "551c9b0814edbe422bae4760895ce070b1b1e750c8356bbb9eb8e997861dbd54"
+    },
+    {
+      "id": "opponent-default-v5-replay-2",
+      "revision": 171,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "f7116a6f197a1a549afa4e811eadcbfb71cc97062e0f10d7a3eb8d3653d5eee1"
+    },
+    {
+      "id": "opponent-club-style-v5-replay-2",
+      "revision": 182,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "4644f5218f746f89a7b5162dc538e9f659c5f9ca7fa5131430598c43cc0c8ead"
+    },
+    {
+      "id": "opponent-match-aware-v5-replay-2",
+      "revision": 182,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "4644f5218f746f89a7b5162dc538e9f659c5f9ca7fa5131430598c43cc0c8ead"
+    },
+    {
+      "id": "batch-v5-replay-3",
+      "revision": 153,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "434acb8985546aa259895b1181e23bc52e19fe5279e2a8efe0113240bbe9ae71"
+    },
+    {
+      "id": "opponent-default-v5-replay-3",
+      "revision": 153,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "20fe628d120006cb309d249ea7f6977a9fd8c43da69bd2d1d70b42edd21254e5"
+    },
+    {
+      "id": "opponent-club-style-v5-replay-3",
+      "revision": 162,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "6b67f1f62e74278ab93625a647f5c53a4357537401f6ea9a26fe0262f929ac1c"
+    },
+    {
+      "id": "opponent-match-aware-v5-replay-3",
+      "revision": 162,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "6b67f1f62e74278ab93625a647f5c53a4357537401f6ea9a26fe0262f929ac1c"
+    },
+    {
+      "id": "in-progress-innings1-ball60",
+      "revision": 42,
+      "complete": false,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": null,
+      "storedLastEventHash": "8fa935f8b72c78bbad0ab21ed590dd195ae0cba5bf32ff7cab8b0bffbaf22631"
+    },
+    {
+      "id": "in-progress-innings2-ball96",
+      "revision": 147,
+      "complete": false,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": null,
+      "storedLastEventHash": "3d834911a7b0e54a15dfb1b33807f700b47574c0f544e07246228b7d16a2a1ad"
+    }
+  ]
+}

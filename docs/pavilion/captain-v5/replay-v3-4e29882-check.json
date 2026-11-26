@@ -1,0 +1,77 @@
+{
+  "failures": 0,
+  "rows": [
+    {
+      "id": "batch-v5-replay-1",
+      "revision": 156,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "0d9e495d6cfc45b8e648a1cb1e1724b42f958f18c72ace5da989b820ca049850"
+    },
+    {
+      "id": "opponent-default-v5-replay-1",
+      "revision": 156,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "d7cf40cf97c00d6c5382d009bcad2cd459cb452540015932b827e249b55f76ee"
+    },
+    {
+      "id": "batch-v5-replay-2",
+      "revision": 175,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "45724e16e712f8ab806db2c01855916a3409917975ca0cedce4e67147282bf42"
+    },
+    {
+      "id": "opponent-default-v5-replay-2",
+      "revision": 175,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "d3b859785148d8d9b0ec2e3aeb7215b576c2b7f3456d53988294d69bf8f62da2"
+    },
+    {
+      "id": "batch-v5-replay-3",
+      "revision": 156,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "bf79a017bf56d8c17f574bda2e31e198aa9084b979219a765bfc8117cff8f220"
+    },
+    {
+      "id": "opponent-default-v5-replay-3",
+      "revision": 156,
+      "complete": true,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": true,
+      "storedLastEventHash": "4b6c31073b2c68bc0731b95984ab1aeb685510e4d3a45603859ea73be935e3f9"
+    },
+    {
+      "id": "in-progress-innings1-ball60",
+      "revision": 42,
+      "complete": false,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": null,
+      "storedLastEventHash": "e1d0be9709e5ba62183926536501e19b6d3de7b4f84dd8862a77cb4a55ebe50a"
+    },
+    {
+      "id": "in-progress-innings2-ball96",
+      "revision": 152,
+      "complete": false,
+      "replayIdentical": true,
+      "error": null,
+      "liveUnderCurrentCaptainDiffers": null,
+      "storedLastEventHash": "66300f583623ee36425717a5e762c88541ffbeb0902f93518a62d6eff05662e6"
+    }
+  ]
+}
