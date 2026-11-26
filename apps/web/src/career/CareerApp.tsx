@@ -47,7 +47,7 @@ import { CareerScreen } from "./CareerScreen.js";
 import { HomeScreen, selectionNoteKey } from "./HomeScreen.js";
 import { FixturesScreen } from "./FixturesScreen.js";
 
-import { handOverCareerIntro } from "../match/career-intro-handoff.js";
+import { handOverCareerIntro, takeInspectPlayer } from "../match/career-intro-handoff.js";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
 const LAUNCH_KEY = "lcxxvi-career-match-launch";
@@ -362,6 +362,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         if (alive) {
           setSavedCareers(await service.listCareers());
           setBusy(false);
+          // LC_PLAYER_IDENTITY_V3: a match chip asked for this player's page. Inspection only, so nothing can change.
+          const requested = inspectionOnly ? takeInspectPlayer() : null;
+          if (requested && service.findPlayerIncludingRetired(requested.playerId)) {
+            openPlayer(requested.playerId, requested.origin);
+          }
         }
         for (
           let attempt = 0;

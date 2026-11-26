@@ -47,7 +47,7 @@ The introduction stays inside the V1 chip, so the active-players panel does not 
 
 - **Reload.** The summary is held in memory. After a page reload during a managed match the chips fall back to the V1 style-only form; returning to the career and pressing "Play match" resumes the same match and hands the summary over again. Persisting it was ruled out to keep every save format unchanged.
 - League T20 records only, as in V1: exhibition, tournament, tour and auction matches are not counted, and roster careers have no historical statistics, so they keep the V1 chip.
-- The record is as it stood before this match. The chip does not update with runs scored in the match, and a batter who bowled earlier in the same match is introduced with his pre-match record.
+- The record is as it stood before this match. The chip does not update with runs scored in the match, and a batter who bowled earlier in the same match is introduced with his pre-match record. [Player identity V3](PLAYER_IDENTITY_V3.md) adds a live line when a milestone is close or reached.
 - The selection advice appears only when the existing selection room does (round 2 onwards, when a like-for-like reserve exists). It compares the two options only; it does not suggest other changes to the XI.
 - [Inference] Style balance has no measured effect under `synthetic-alpha-01`: `TACTICAL_VALIDATION.md` found selection matters through ratings, and bowling skills barely move outcomes. The advice therefore says it is not a prediction, and the labels will mean more once stage C calibration lands.
 - Thresholds (three latest matches, a 5-point rating gap, three reasons) are design choices, not calibration.
