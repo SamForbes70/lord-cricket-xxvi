@@ -59,7 +59,7 @@ describe("acceptance scopes", () => {
     expect(ACCEPTANCE_SCOPES).toEqual(["all", ...SPLIT_SCOPES]);
   });
   it("matches the hosted workflow's legs and keeps the windows-browser-acceptance check name", () => {
-    const workflow = readFileSync(".github/workflows/verify.yml", "utf8");
+    const workflow = readFileSync(".github/workflows/verify.yml", "utf8").replace(/\r\n/g, "\n"); // Windows checkouts use CRLF
     expect(workflow).toContain(`scope: [${SPLIT_SCOPES.join(", ")}]`);
     expect(workflow).toContain("run: node scripts/owner-acceptance.mjs --skip-install --scope=${{ matrix.scope }}");
     expect(workflow).toContain("run: node scripts/ci-evidence.mjs --kind=windows --scope=${{ matrix.scope }}");
