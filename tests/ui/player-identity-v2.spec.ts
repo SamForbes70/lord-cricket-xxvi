@@ -103,9 +103,16 @@ test("selection advice, then factual introductions in the managed match", async 
   await shot(page, "pid2-match-intro-390", page.getByTestId("active"));
   await page.setViewportSize({ width: 1366, height: 768 });
 
-  // After the first ball the chip shows the style alone, as in V1.
-  await decision.getByRole("button", { name: "Next delivery" }).click();
-  await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
+  // After the first legal ball the chip shows the style alone, as in V1. A wide or no-ball is not a ball faced or a
+  // legal ball bowled, so every chip is still an introduction after it: bowl on until a legal ball has been recorded
+  // (the over count moves), then check.
+  const oversOf = () => page.getByTestId("active").evaluate((n) => (n.textContent ?? "").match(/(\d+\.\d) overs/)?.[1] ?? null);
+  const startOvers = await oversOf();
+  for (let n = 0; n < 6 && (await oversOf()) === startOvers; n += 1) {
+    await decision.getByRole("button", { name: "Next delivery" }).click();
+    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
+  }
+  expect(await oversOf()).not.toBe(startOvers);
   const after = await read();
-  expect(after.some((c) => !c.isNew && !/:/.test(c.text))).toBe(true);
+  expect(after.some((c) => !c.isNew && !/:/.test(c.text)), JSON.stringify(after)).toBe(true);
 });

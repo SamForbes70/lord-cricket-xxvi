@@ -776,9 +776,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     else if (held.kind === "select") act(held.action);
     else replayScenario();
   }, [view, busy]);
-  useEffect(() => {
-    if (!view || busy || inflight.current || heldPanelClick.current || fatal || error || persistence?.readOnly) return;
-    if (view.phase === "COMPLETE") return;
+  // The computer captain's (and any delegated) step that the effect below is about to send for the current view, or
+  // null. Until it has been sent and answered, the decision panel is not settled: the computer may be the side to
+  // decide (it may have won the toss), so the panel reports itself busy and its controls stay disabled. Without this,
+  // the panel showed "Up to date" with enabled buttons for one render between the view arriving and the step being
+  // sent, and a click in that gap could act for the computer's side or land on a button about to disappear.
+  function dueAiStep(): { teamId: string; delegated: boolean; key: string; stamp: string } | null {
+    if (!view || fatal || error || persistence?.readOnly || view.phase === "COMPLETE") return null;
     const candidates = [
       ...(aiTeamId && view.teams.some(team => team.id === aiTeamId) ? [{ teamId: aiTeamId, delegated: false }] : []),
       ...view.teams.filter(team => team.id !== aiTeamId && delegationForTeam(delegation, team.id).length > 0).map(team => ({ teamId: team.id, delegated: true })),
@@ -786,11 +790,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     for (const candidate of candidates) {
       const key = `${candidate.delegated ? "delegated" : "opponent"}:${candidate.teamId}`;
       const stamp = `${view.revision}:${delegation.changes.length}:${matchAware}:${highlights}`;
-      if (lastAiChecked.current[key] === stamp) continue;
-      lastAiChecked.current[key] = stamp;
-      send({ type: "AI_STEP", ...candidate, clubStyle: highlights && !candidate.delegated, matchAware: matchAware && !candidate.delegated });
-      return;
+      if (lastAiChecked.current[key] !== stamp) return { ...candidate, key, stamp };
     }
+    return null;
+  }
+  const aiStepPending = dueAiStep() !== null;
+  useEffect(() => {
+    if (!view || busy || inflight.current || heldPanelClick.current) return;
+    const due = dueAiStep();
+    if (!due) return;
+    lastAiChecked.current[due.key] = due.stamp;
+    send({ type: "AI_STEP", teamId: due.teamId, delegated: due.delegated, clubStyle: highlights && !due.delegated, matchAware: matchAware && !due.delegated });
   }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly, matchAware, highlights]);
   // Pavilion B2: the computer makes the player's routine batter and bowler picks (the "Recommended" choice, sent as
   // the same command a click sends) and leaves key moments to the player. Never in scenarios or red-ball matches.
@@ -1454,7 +1464,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           <section
             className="decision"
             id="decision"
-            aria-busy={busy}
+            aria-busy={busy || aiStepPending}
             data-phase={view.phase}
             data-revision={view.revision}
           >
@@ -1466,13 +1476,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 </h2>
               </div>
               <span role="status" className="working">
-                {batchState === "stopping" ? "Stopping after this commit…" : busy ? "Applying…" : "Up to date"}
+                {batchState === "stopping" ? "Stopping after this commit…" : busy || aiStepPending ? "Applying…" : "Up to date"}
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
             {keyMoment && !batchState.startsWith("run") && <p role="status" className="key-moment" data-testid="key-moment">Key moment: {keyMoment}</p>}
             {batchProgress && !(view.phase === "COMPLETE" && view.resultText) && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
-            <fieldset disabled={busy || fatal || persistence?.readOnly}>
+            <fieldset disabled={busy || aiStepPending || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
                 <div className="actions">
