@@ -4,6 +4,8 @@ Owner direction of 25 November 2026, "Tactical validation". The question is whet
 
 **Status:** measured on `main` at `c5d91c6`, which uses the `synthetic-alpha-01` model and captain V2. This changes no game behaviour.
 
+Rerun with captains V3 and V4 (25 November 2026): [CAPTAIN_V4_DEATH_OVERS.md](CAPTAIN_V4_DEATH_OVERS.md).
+
 ## Method
 
 `node --import tsx scripts/pavilion-tactical-validation.ts docs/pavilion/tactical-validation.json`

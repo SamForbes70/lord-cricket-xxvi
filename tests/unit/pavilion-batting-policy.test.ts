@@ -65,11 +65,11 @@ describe("Pavilion P04 stage B: LC_T20_BATTING_POLICY_V1", () => {
     expect(() => adviseT20Batting({ ...view, inningsLegalBalls: 121 })).toThrow(/INVALID/);
   });
 
-  test("captain V3 takes its batting choices from the policy", () => {
+  test("captain V4, like V3, takes its batting choices from the policy", () => {
     const captainView = { inningsLegalBalls: 96, inningsRuns: 90, wicketsLost: 7, targetToWin: null, availableBatters: 3, bowlingCandidates: [], striker: tailender, partner: specialist };
     const captain = adviseT20Captain(captainView);
     const batting = adviseT20Batting(captainView);
-    expect(captain.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V3");
+    expect(captain.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
     expect([captain.aggression, captain.battingIntent]).toEqual([batting.aggression, batting.intent]);
   });
 });
