@@ -1,5 +1,48 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { expectFactualWording, playToTheEnd } from "./post-match-helpers.js";
+import { expectFactualWording } from "./post-match-helpers.js";
+
+const MANAGED = "Aster Harbour";
+
+/**
+ * Plays to full time and sets one of the managed side's own batters to Attack while that side bats. Returns the
+ * batter's name, or null if no chance came. The shared V1 helper changes the first aggression control it finds, which
+ * can be an opponent batter's when the opponent bats first; the computer captain then sets its own batter's plan back
+ * at the same ball, so the record holds no net change to Attack. Changing a managed batter whose plan is not already
+ * Attack makes the change in the record certain.
+ */
+async function playSettingManagedBatterToAttack(page: Page): Promise<string | null> {
+  const decision = page.locator("#decision");
+  const batting = page.getByTestId("scorestrip").locator("h2");
+  let changed: string | null = null;
+  for (let n = 0; n < 500; n += 1) {
+    await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
+    const phase = await decision.getAttribute("data-phase");
+    if (phase === "COMPLETE") return changed;
+    const candidate = decision.locator("button[data-candidate]:enabled");
+    if (phase === "TOSS") await decision.getByRole("button", { name: "Call heads" }).click({ timeout: 2_000 }).catch(() => undefined);
+    else if (phase === "AWAITING_INNINGS") await decision.getByRole("button", { name: "Bat first" }).click({ timeout: 2_000 }).catch(() => undefined);
+    else if ((await candidate.count()) > 0) await candidate.first().click({ timeout: 2_000 }).catch(() => undefined);
+    else if (phase === "READY") {
+      if (!changed && (await batting.textContent())?.trim() === MANAGED) {
+        const controls = page.locator("select[aria-label^='Aggression for']:enabled");
+        for (const control of await controls.all()) {
+          if ((await control.inputValue()) === "4") continue;
+          const label = (await control.getAttribute("aria-label"))!.replace(/^Aggression for /, "");
+          await control.selectOption("4", { timeout: 2_000 });
+          await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
+          await expect(page.getByRole("combobox", { name: `Aggression for ${label}`, exact: true })).toHaveValue("4");
+          changed = label;
+          break;
+        }
+        if (changed) continue;
+      }
+      const finish = decision.getByRole("button", { name: "Finish innings", exact: true });
+      if (await finish.isEnabled().catch(() => false)) await finish.click({ timeout: 2_000 }).catch(() => undefined);
+      else await page.waitForTimeout(200);
+    } else await page.waitForTimeout(200);
+  }
+  throw new Error("The match did not finish");
+}
 
 /**
  * LC_POST_MATCH_ANALYSIS_ARCHIVE_V1: the post-match analysis reopened for a completed career fixture from the fixture
@@ -153,7 +196,8 @@ test("a played career match lists its plan changes from the record, without sayi
   }
   await page.getByRole("button", { name: "Play match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
-  expect(await playToTheEnd(page)).toBe(true);
+  const batter = await playSettingManagedBatterToAttack(page);
+  expect(batter).not.toBeNull();
   await page.getByRole("button", { name: "Return result to career" }).click();
   await expect(page.getByText("1/14 managed-team fixtures complete.", { exact: true })).toBeVisible({ timeout: 60_000 });
   await expect(page.locator(".save-badge strong")).toHaveText("Saved", { timeout: 30_000 });
@@ -166,8 +210,10 @@ test("a played career match lists its plan changes from the record, without sayi
   const sides = changes.locator("details");
   expect(await sides.count()).toBeGreaterThan(0);
   for (const side of await sides.all()) await side.locator("summary").click();
-  const plan = changes.locator(".pma-decision[data-kind='BATTING_PLAN']").filter({ hasText: "Attack" }).first();
-  await expect(plan).toContainText(/Batting plan changed: .+aggression \w+ to Attack/);
+  // The managed side's change is in the record, listed under that side and not credited to anyone.
+  const managedSide = changes.locator("details").filter({ has: page.locator("summary", { hasText: `Changes for ${MANAGED}` }) });
+  const plan = managedSide.locator(".pma-decision[data-kind='BATTING_PLAN']").filter({ hasText: `${batter}: aggression` }).filter({ hasText: "to Attack" }).first();
+  await expect(plan).toContainText(new RegExp(`Batting plan changed: (.+; )?${batter!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}: aggression \\w+ to Attack`));
   await expect(plan.locator(".pma-followed")).toContainText(/What followed: The next (2 overs|\d+ balls?)/);
   await expect(plan.locator(".pma-measured")).toHaveText(/small effect at most/);
   // Nothing is credited to the player or the computer captain.
