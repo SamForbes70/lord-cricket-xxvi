@@ -39,7 +39,8 @@ test("squad style tags, the player page identity and the selection room", async 
   await expect(page.getByRole("heading", { name: `Player: ${name}` })).toBeVisible();
 
   // The same save shows the same identity when the page is opened again.
-  const before = await identity.innerText();
+  const before = (await identity.textContent()) ?? "";
+  expect(before.length).toBeGreaterThan(0);
   await page.getByRole("button", { name: "Back to squad" }).click();
   await table.locator("button.player-link").first().click();
   await expect(identity).toHaveText(before);
@@ -66,22 +67,33 @@ test("the match screen introduces a new batter and a new bowler by style", async
   await page.getByRole("button", { name: /QUICK MATCH/i }).click();
   const decision = page.locator("#decision");
   await expect(decision.getByRole("button").first()).toBeVisible({ timeout: 30_000 });
-  const intros = page.locator("[data-testid^='match-intro-']");
-  const seen = new Set<string>();
-  const both = () => [...seen].some((t) => t.startsWith("New at the crease: ")) && [...seen].some((t) => t.startsWith("Into the attack: "));
-  for (let n = 0; n < 40 && !both(); n += 1) {
-    for (const text of await intros.allTextContents()) seen.add(text.trim());
-    if (both()) break;
-    const finish = decision.getByRole("button", { name: "Finish innings" });
-    const target = (await finish.isEnabled().catch(() => false)) ? finish : decision.locator("button:not([disabled])").first();
+  const chips = page.locator("[data-testid^='match-intro-']");
+  type Chip = { text: string; title: string; isNew: boolean };
+  const seen: Chip[] = [];
+  const read = async () =>
+    chips.evaluateAll((nodes) => nodes.map((node) => ({
+      text: node.querySelector("i")?.textContent ?? "",
+      title: node.getAttribute("title") ?? "",
+      isNew: node.getAttribute("data-new") === "true",
+    })));
+  const both = () => seen.some((c) => c.isNew && c.text.startsWith("Walks out: ")) && seen.some((c) => c.isNew && c.text.startsWith("On to bowl: "));
+  for (let n = 0; n < 40; n += 1) {
+    seen.push(...(await read()));
+    if (both() && seen.some((c) => !c.isNew)) break;
+    const next = decision.getByRole("button", { name: "Next delivery" });
+    const target = (await next.isEnabled().catch(() => false)) ? next : decision.locator("button:not([disabled])").first();
     await target.click();
     await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 30_000 });
   }
-  expect(both(), [...seen].join(" | ")).toBe(true);
-  // Every line is a style, or an introduction with the style and, where earned, the ratings behind it. None states a
-  // record or a result, which the match screen does not hold.
-  for (const text of seen) {
-    expect(text.length).toBeGreaterThan(0);
-    expect(text).not.toMatch(/\b(runs|wickets|average|won|lost)\b/i);
+  expect(both(), JSON.stringify(seen.slice(0, 6))).toBe(true);
+  for (const chip of seen) {
+    // The title is the full introduction: the style and, where earned, the ratings behind it.
+    expect(chip.title).toMatch(/^(New at the crease|Into the attack): .+, .+\.$/);
+    if (chip.isNew) expect(chip.text).toMatch(/^(Walks out|On to bowl): \S/);
+    else expect(chip.text).not.toMatch(/:/);
+    // Never a record or a result, which the match screen does not hold.
+    expect(`${chip.text} ${chip.title}`).not.toMatch(/\b(runs|wickets|average|won|lost)\b/i);
   }
+  // Once a batter has faced, the chip shows the style alone.
+  expect(seen.some((c) => !c.isNew)).toBe(true);
 });
