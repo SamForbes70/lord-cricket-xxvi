@@ -2,7 +2,8 @@ import {
   CALIBRATED_T20_MODEL_ID, PROBABILITY_MODEL_ID, type ProbabilityModelId,
 } from "@lcxxvi/contracts";
 import {
-  CALIBRATED_T20_PACK, CALIBRATED_T20_PACK_SHA256, MODEL_PACK_SHA256,
+  CALIBRATED_T20_DELIVERY_PACK, CALIBRATED_T20_DELIVERY_PACK_SHA256, CALIBRATED_T20_MODEL_HASH,
+  CALIBRATED_T20_PACK, CALIBRATED_T20_PACK_SHA256, DELIVERY_STAGE_PACK_SHA256, MODEL_PACK_SHA256,
 } from "@lcxxvi/data";
 import { canonicalStateBytes, sha256Hex } from "./determinism.js";
 
@@ -11,22 +12,34 @@ import { canonicalStateBytes, sha256Hex } from "./determinism.js";
  * synthetic-alpha-01 is the only gameplay model and is unchanged. calibrated-t20-01 is research only: it adds the
  * CALIBRATED_T20_PACK skill terms to synthetic-alpha-01's packs and is reachable only through
  * validateT20ResearchMatchSetup. Each entry pins the SHA-256 that a set-up records as `versions.modelHash`.
+ * C4: calibrated-t20-01 also carries the delivery-outcome component CALIBRATED_T20_DELIVERY_PACK, and its model hash
+ * covers both components (CALIBRATED_T20_MODEL_HASH).
  */
 export type RegisteredModel = Readonly<{
   modelId: ProbabilityModelId;
   modelHash: string;
   gameplay: boolean;
   skillPack: typeof CALIBRATED_T20_PACK | null;
+  deliveryPack: typeof CALIBRATED_T20_DELIVERY_PACK | null;
 }>;
 
 if (sha256Hex(canonicalStateBytes(CALIBRATED_T20_PACK)) !== CALIBRATED_T20_PACK_SHA256)
   throw new Error("UNSUPPORTED_MODEL_HASH: calibrated-t20-01 pack bytes do not match the pinned hash");
 if (CALIBRATED_T20_PACK.manifest.base.probabilityPackSha256 !== MODEL_PACK_SHA256)
   throw new Error("UNSUPPORTED_MODEL_HASH: calibrated-t20-01 base pack is not the pinned synthetic-alpha-01 pack");
+if (sha256Hex(canonicalStateBytes(CALIBRATED_T20_DELIVERY_PACK)) !== CALIBRATED_T20_DELIVERY_PACK_SHA256)
+  throw new Error("UNSUPPORTED_MODEL_HASH: calibrated-t20-01 delivery pack bytes do not match the pinned hash");
+if (CALIBRATED_T20_DELIVERY_PACK.manifest.base.probabilityPackSha256 !== MODEL_PACK_SHA256 ||
+    CALIBRATED_T20_DELIVERY_PACK.manifest.base.stagePackSha256 !== DELIVERY_STAGE_PACK_SHA256 ||
+    CALIBRATED_T20_DELIVERY_PACK.manifest.base.skillPackSha256 !== CALIBRATED_T20_PACK_SHA256)
+  throw new Error("UNSUPPORTED_MODEL_HASH: calibrated-t20-01 delivery pack is not built on the pinned packs");
+if (sha256Hex(canonicalStateBytes({ deliveryPackSha256: CALIBRATED_T20_DELIVERY_PACK_SHA256, skillPackSha256: CALIBRATED_T20_PACK_SHA256 })) !== CALIBRATED_T20_MODEL_HASH)
+  throw new Error("UNSUPPORTED_MODEL_HASH: calibrated-t20-01 model hash does not cover its pinned components");
 
 export const MODEL_REGISTRY: Readonly<Record<ProbabilityModelId, RegisteredModel>> = Object.freeze({
-  [PROBABILITY_MODEL_ID]: Object.freeze({ modelId: PROBABILITY_MODEL_ID, modelHash: MODEL_PACK_SHA256, gameplay: true, skillPack: null }),
-  [CALIBRATED_T20_MODEL_ID]: Object.freeze({ modelId: CALIBRATED_T20_MODEL_ID, modelHash: CALIBRATED_T20_PACK_SHA256, gameplay: false, skillPack: CALIBRATED_T20_PACK }),
+  [PROBABILITY_MODEL_ID]: Object.freeze({ modelId: PROBABILITY_MODEL_ID, modelHash: MODEL_PACK_SHA256, gameplay: true, skillPack: null, deliveryPack: null }),
+  [CALIBRATED_T20_MODEL_ID]: Object.freeze({ modelId: CALIBRATED_T20_MODEL_ID, modelHash: CALIBRATED_T20_MODEL_HASH, gameplay: false,
+    skillPack: CALIBRATED_T20_PACK, deliveryPack: CALIBRATED_T20_DELIVERY_PACK }),
 });
 
 /** The registered model for an id and hash pair, or null when the pair is not registered. */
