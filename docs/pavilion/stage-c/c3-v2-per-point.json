@@ -1,0 +1,105 @@
+{
+ "version": "LC_STAGE_C_C3_PER_POINT_GATE_V1",
+ "researchOnly": true,
+ "model": "calibrated-t20-01",
+ "packVersion": "LC_CALIBRATED_T20_SKILL_V2",
+ "packSha256": "90ba2058f2d664258cc1d3f8b19109d2a99c0adf97f9757829240ebc00e6ffc5",
+ "attribution": {
+  "source": "Cricsheet, https://cricsheet.org/",
+  "sourceURL": "https://cricsheet.org/downloads/t20s_json.zip",
+  "licence": "Open Data Commons Attribution License (ODC-By) 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "archiveSha256": "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "retrievedAtUTC": "2026-11-25T12:57:47.048656+00:00",
+  "note": "Derived aggregates only (no ball-by-ball records). Contains information from Cricsheet, made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/."
+ },
+ "targets": "c3-mapping.json (fit period, full-member reference, quarters of the game's regular players)",
+ "gates": {
+  "batting.runs": {
+   "game": 0.008992309442524205,
+   "range": [
+    0.007784599077512894,
+    0.009233163551282564
+   ],
+   "positionInRange": 0.8337291069056993,
+   "verdict": "PASS"
+  },
+  "batting.boundary": {
+   "game": 0.012790135770873595,
+   "range": [
+    0.012716329587871765,
+    0.015512980850518873
+   ],
+   "positionInRange": 0.02639091401477433,
+   "verdict": "PASS"
+  },
+  "batting.nonDot": {
+   "game": 0.005633624243523733,
+   "range": [
+    0.0051631717595345804,
+    0.00614713208304455
+   ],
+   "positionInRange": 0.478121396512169,
+   "verdict": "PASS"
+  },
+  "batting.dismissal": {
+   "game": 0.004823764049013201,
+   "range": [
+    0.0,
+    0.01262817745267699
+   ],
+   "positionInRange": 0.38198418315626637,
+   "verdict": "PASS"
+  },
+  "bowling.runs": {
+   "game": 0.013583644097715475,
+   "range": [
+    0.011947255347879424,
+    0.014579967799121768
+   ],
+   "positionInRange": 0.621559999484129,
+   "verdict": "PASS"
+  },
+  "bowling.boundary": {
+   "game": 0.021731166345301554,
+   "range": [
+    0.021188290917629686,
+    0.026983826748770992
+   ],
+   "positionInRange": 0.0936713090021498,
+   "verdict": "PASS"
+  },
+  "bowling.nonDot": {
+   "game": 0.008241484462415651,
+   "range": [
+    0.008012617749353117,
+    0.009651452170469239
+   ],
+   "positionInRange": 0.13965212721530773,
+   "verdict": "PASS"
+  },
+  "bowling.dismissal": {
+   "game": 0.006357671263888069,
+   "range": [
+    0.0,
+    0.02059686468324497
+   ],
+   "positionInRange": 0.30867179843444204,
+   "verdict": "PASS"
+  },
+  "variationTradeOff": {
+   "dismissalPerPoint": 0.00953046188698137,
+   "runsPerPoint": 0.005372982457719313,
+   "verdict": "PASS"
+  }
+ },
+ "firstInningsRunsByCondition": {
+  "bat30": 94.38,
+  "bat70": 138.19,
+  "bowl30": 152.1,
+  "bowl70": 86.26,
+  "var30": 106.16,
+  "var70": 124.97
+ }
+}
