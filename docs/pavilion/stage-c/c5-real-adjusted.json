@@ -1,0 +1,206 @@
+{
+ "version": "LC_STAGE_C_C5_REAL_ADJUSTED_V1",
+ "researchOnly": true,
+ "attribution": {
+  "source": "Cricsheet, https://cricsheet.org/",
+  "sourceURL": "https://cricsheet.org/downloads/t20s_json.zip",
+  "licence": "Open Data Commons Attribution License (ODC-By) 1.0",
+  "licenceURL": "https://cricsheet.org/licensing/",
+  "archiveSha256": "956f29df9d2b95dd6fe12de5bc70d4522f23693e5e7e2ac4c1a004e1b541ad8e",
+  "licenceNoticeSha256": "11a6d83734845ad09d809667aa219857a5b985b28c258a2eebf5677668a6bd3b",
+  "retrievedAtUTC": "2026-11-25T12:57:47.048656+00:00",
+  "note": "Derived aggregates only (no ball-by-ball records). Contains information from Cricsheet, made available under the Open Data Commons Attribution License (ODC-By) 1.0, https://cricsheet.org/licensing/."
+ },
+ "reference": "full-member men's T20 internationals",
+ "bootstrapReplicates": 100,
+ "fit": {
+  "matches": 835,
+  "criterion1Adjusted": {
+   "calibrated-t20-01": {
+    "runs.batter": {
+     "real": 1.3358048697508484,
+     "realP10P90": [
+      1.34559396472728,
+      1.4097477706620962
+     ],
+     "realRange": [
+      1.3358048697508484,
+      1.4097477706620962
+     ]
+    },
+    "runs.bowler": {
+     "real": 0.8004302393188463,
+     "realP10P90": [
+      0.7629678438670676,
+      0.8011653434417653
+     ],
+     "realRange": [
+      0.7629678438670676,
+      0.8011653434417653
+     ]
+    },
+    "boundary.batter": {
+     "real": 1.6047384092726378,
+     "realP10P90": [
+      1.6288432898079737,
+      1.7806476104640891
+     ],
+     "realRange": [
+      1.6047384092726378,
+      1.7806476104640891
+     ]
+    },
+    "boundary.bowler": {
+     "real": 0.653665590549071,
+     "realP10P90": [
+      0.6061066273031681,
+      0.6749210921518775
+     ],
+     "realRange": [
+      0.6061066273031681,
+      0.6749210921518775
+     ]
+    },
+    "nonDot.batter": {
+     "real": 1.2147923049794271,
+     "realP10P90": [
+      1.2117127487332104,
+      1.2568786714749933
+     ],
+     "realRange": [
+      1.2117127487332104,
+      1.2568786714749933
+     ]
+    },
+    "nonDot.bowler": {
+     "real": 0.8611776482654193,
+     "realP10P90": [
+      0.8360322838297454,
+      0.8618461267786297
+     ],
+     "realRange": [
+      0.8360322838297454,
+      0.8618461267786297
+     ]
+    },
+    "dismissal.batter": {
+     "real": 0.6384020742161964,
+     "realP10P90": [
+      0.6252032128383659,
+      1.0
+     ],
+     "realRange": [
+      0.6252032128383659,
+      1.0
+     ]
+    },
+    "dismissal.bowler": {
+     "real": 1.3030644265617897,
+     "realP10P90": [
+      1.0,
+      1.4654884940772652
+     ],
+     "realRange": [
+      1.0,
+      1.4654884940772652
+     ]
+    }
+   }
+  }
+ },
+ "selection": {
+  "matches": 166,
+  "criterion1Adjusted": {
+   "calibrated-t20-01": {
+    "runs.batter": {
+     "real": 1.428524521708944,
+     "realP10P90": [
+      1.3920820484469325,
+      1.5368260859501885
+     ],
+     "realRange": [
+      1.3920820484469325,
+      1.5368260859501885
+     ]
+    },
+    "runs.bowler": {
+     "real": 0.7538592428525241,
+     "realP10P90": [
+      0.7073653344412093,
+      0.7930968363266353
+     ],
+     "realRange": [
+      0.7073653344412093,
+      0.7930968363266353
+     ]
+    },
+    "boundary.batter": {
+     "real": 1.752506539089621,
+     "realP10P90": [
+      1.6795331128515716,
+      1.977578179494779
+     ],
+     "realRange": [
+      1.6795331128515716,
+      1.977578179494779
+     ]
+    },
+    "boundary.bowler": {
+     "real": 0.6660451286019957,
+     "realP10P90": [
+      0.5846458170666619,
+      0.721948913607982
+     ],
+     "realRange": [
+      0.5846458170666619,
+      0.721948913607982
+     ]
+    },
+    "nonDot.batter": {
+     "real": 1.2193426818377118,
+     "realP10P90": [
+      1.1806948283700744,
+      1.2533354697202548
+     ],
+     "realRange": [
+      1.1806948283700744,
+      1.2533354697202548
+     ]
+    },
+    "nonDot.bowler": {
+     "real": 0.8374976688607544,
+     "realP10P90": [
+      0.8015146066114993,
+      0.8510738348490942
+     ],
+     "realRange": [
+      0.8015146066114993,
+      0.8510738348490942
+     ]
+    },
+    "dismissal.batter": {
+     "real": 1.0,
+     "realP10P90": [
+      0.7885941167789414,
+      1.0
+     ],
+     "realRange": [
+      0.7885941167789414,
+      1.0
+     ]
+    },
+    "dismissal.bowler": {
+     "real": 1.4805517941620834,
+     "realP10P90": [
+      1.0,
+      1.901637928913588
+     ],
+     "realRange": [
+      1.0,
+      1.901637928913588
+     ]
+    }
+   }
+  }
+ }
+}

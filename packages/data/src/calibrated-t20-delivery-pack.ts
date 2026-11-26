@@ -55,7 +55,7 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
     base: {
       probabilityPackSha256: "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
       stagePackSha256: "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
-      skillPackSha256: "4fa5d84597d105afdae72dc4d0681a7b883055824bfe449a342a82d3ef4fe43e",
+      skillPackSha256: "24472ba59aa03cda32815ffa8fe0f5bdc139dfc4439b7a9d508c313a1ff485c4",
     },
     source: {
       dataset: "Cricsheet t20s_json.zip",
@@ -70,9 +70,9 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
   contact: {
     /** Additive intercepts (bp of logit) by phase. */
     intercept: {
-      T20_EARLY: { MISS: -2500, PAD: -2500, GROUND: 0, AERIAL: -4500, EDGE: -2000, HIT_WICKET: 0 },
+      T20_EARLY: { MISS: -3500, PAD: -3500, GROUND: 0, AERIAL: -4500, EDGE: -2000, HIT_WICKET: 0 },
       T20_MIDDLE: { MISS: -5000, PAD: -5000, GROUND: 0, AERIAL: 0, EDGE: -3300, HIT_WICKET: 0 },
-      T20_LATE: { MISS: -19000, PAD: -19000, GROUND: 0, AERIAL: -4500, EDGE: -4500, HIT_WICKET: 0 },
+      T20_LATE: { MISS: -21000, PAD: -21000, GROUND: 0, AERIAL: 0, EDGE: -6000, HIT_WICKET: 0 },
     },
     /** Additive coefficient (bp) on the aggression feature (aggression - 2) x 10,000. */
     aggression: { MISS: -1000, PAD: 0, GROUND: 0, AERIAL: 0, EDGE: -1000, HIT_WICKET: -1000 },
@@ -89,11 +89,11 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
     DEEP: { "0": -8000, "1": 3000, "2": 5000, "3": 0, "4": -30000, "6": -20000 },
   },
   /** Coefficient (bp) on (aggression - 2) x 10,000 for each run category after a GROUND or AERIAL shot. */
-  runsAggressionBp: { "0": -2500, "1": 0, "2": 0, "3": 0, "4": 2500, "6": 2000 },
+  runsAggressionBp: { "0": -3500, "1": 0, "2": 0, "3": 0, "4": 3500, "6": 2000 },
   catchOpportunityBp: { AERIAL: 2000, EDGE: 3000 },
   dismissalInterceptBp: { BOWLED: -28000, LBW: -28000, RUN_OUT: -57000 },
   /** V2: coefficient (bp) on max(0, aggression - 2) x the field's spread (bp) for each run category after a GROUND or AERIAL shot. */
-  runsAggressionDeepBp: { "0": -5000, "1": 2000, "2": 2000, "3": 0, "4": 0, "6": 0 },
+  runsAggressionDeepBp: { "0": -7000, "1": 2500, "2": 2000, "3": 0, "4": 0, "6": 0 },
   /** V2: added to catchOpportunityBp for each aggression level above 2 (subtracted below), clamped to 0 to 10,000. */
   catchOpportunityAggressionBp: { AERIAL: 300, EDGE: 0 },
   /** V2: coefficient (bp) on the aggression feature (aggression - 2) x 10,000 in the run-out category. */
@@ -109,10 +109,10 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_DELIVERY_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "8c33d804bb5e234455a5820d4e5f6726c3653402fe1528d511b447a807395f71";
+export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "eb4971cc78efd50c1971d1caa251476a7374cc0a0d065ea62a8890dc9ce52e55";
 /**
  * The calibrated model's hash, recorded in a research set-up's `versions.modelHash`: SHA-256 of LC canonical JSON of
  * { deliveryPackSha256, skillPackSha256, tacticsPackSha256 } (C5: the tactics pack is the third component). It changes
  * whenever any component changes.
  */
-export const CALIBRATED_T20_MODEL_HASH = "cc1fecb8444253ae53439fe159798f7bb4e9a751fc358469e1d8f7dabc87d4ce";
+export const CALIBRATED_T20_MODEL_HASH = "edd087854deee16a918c475ceee0174d84e258b0c43d7bd5f43df62bc1bb3b34";

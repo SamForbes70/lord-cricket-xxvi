@@ -59,8 +59,8 @@ export const CALIBRATED_T20_TACTICS_PACK = deepFreeze({
     },
     /** Additive run-value intercepts (bp) after a GROUND or AERIAL shot, by executed length. */
     runs: {
-      YORKER: { "0": 500, "1": 0, "2": 0, "3": 0, "4": -2000, "6": -2000 },
-      FULL: { "0": -500, "1": 0, "2": 0, "3": 0, "4": 800, "6": 0 },
+      YORKER: { "0": 500, "1": 0, "2": 0, "3": 0, "4": -1000, "6": -2000 },
+      FULL: { "0": -500, "1": 0, "2": 0, "3": 0, "4": 300, "6": 0 },
       GOOD: { "0": 1500, "1": 0, "2": 0, "3": 0, "4": -1000, "6": -500 },
       SHORT: { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "6": 1500 },
       FULL_TOSS: { "0": 0, "1": 0, "2": 0, "3": 0, "4": 2000, "6": 2000 },
@@ -86,4 +86,4 @@ export const CALIBRATED_T20_TACTICS_PACK = deepFreeze({
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_TACTICS_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_TACTICS_PACK_SHA256 = "0cad9b7b5bddf95d7264db7c1db5f86146363173bbcf1f421a448305c20f7055";
+export const CALIBRATED_T20_TACTICS_PACK_SHA256 = "006d7af87aa76d8c64bec76217c510df68447951ab60f9bf8e217e707d63f0e1";
