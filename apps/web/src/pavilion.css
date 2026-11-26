@@ -229,6 +229,9 @@
 .season-review-list dt {font-size:.8em;letter-spacing:.06em;text-transform:uppercase;opacity:.8;padding-top:.15em;}
 .season-review-list dd {margin:0;}
 .season-review-rule {display:block;font-size:.8em;opacity:.8;margin-top:.15em;}
+/* The base table rules fix the layout and give the first column 48%; this table sizes its columns to their figures. */
+.career-shell .season-finale .season-review-squad {table-layout:auto;}
+.career-shell .season-finale .season-review-squad th:first-child {width:auto;}
 .season-review-squad th[scope="row"] {text-align:start;font-weight:600;white-space:nowrap;}
 .season-review-squad :is(td,th[scope="col"]) {text-align:end;font-variant-numeric:tabular-nums;}
 .season-review-squad th[scope="col"]:first-child {text-align:start;}
