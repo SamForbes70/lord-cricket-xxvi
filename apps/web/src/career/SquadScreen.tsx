@@ -11,7 +11,7 @@ import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.j
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { useMemo } from "react";
 import { isBowlingCapable } from "@lcxxvi/data";
-import { playerForm, playerMilestones, squadPlayerTags } from "@lcxxvi/projections";
+import { playerForm, playerMilestones, playingStyle, squadPlayerTags } from "@lcxxvi/projections";
 import { TRAINING_PRESETS, matchingPreset, planTrainingPreset, type TrainingPresetPlayer } from "./training-presets.js";
 
 
@@ -145,6 +145,11 @@ export function SquadScreen(props: SquadScreenProps) {
                           >
                             {player.name}
                           </button>
+                          {(() => {
+                            // LC_PLAYER_IDENTITY_V1: the playing style read from this player's T20 ratings.
+                            const style = playingStyle({ playerId: player.playerId, role: player.role, bowlingStyle: player.bowlingStyle, skills: player.skills.T20 }).primary;
+                            return <span className="style-tag" data-testid={`player-style-${player.playerId}`} title="Playing style, from T20 ratings">{style.label}</span>;
+                          })()}
                           <small data-testid={`player-tags-${player.playerId}`}>
                             {(identityTags[player.playerId] ?? []).map((tag) => (
                               <span key={tag.id} className="identity-tag" title={`${tag.label}: ${tag.value}`}>{tag.label}</span>

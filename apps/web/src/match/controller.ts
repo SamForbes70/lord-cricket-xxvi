@@ -9,6 +9,8 @@ import {
   projectMatchAudioCues,
   computeMatchAward,
   projectMatchCommentary,
+  bowlingStyleOf,
+  playingStyle,
 } from "@lcxxvi/projections";
 import {
   type T20Session,
@@ -240,6 +242,17 @@ export function createMatchController(
     const hands = Object.fromEntries(
       s.setup.teams.flatMap((team) => team.xi.map((player) => [player.playerId, player.batHand])),
     );
+    // LC_PLAYER_IDENTITY_V1: each player's style from the ratings this match uses. Presentation only.
+    const playingStyles = Object.fromEntries(
+      s.setup.teams.flatMap((team) =>
+        team.xi.map((player) => {
+          const style = playingStyle({ playerId: player.playerId, role: team.keeperId === player.playerId ? "KEEPER" : player.role, bowlingStyle: player.bowlingStyle, skills: player.skills.T20! });
+          const batting = style.primary.discipline !== "BATTING" && style.secondary?.discipline === "BATTING" ? style.secondary : style.primary;
+          const bowling = player.bowlingStyle ? bowlingStyleOf(player.bowlingStyle, player.skills.T20!) : style.primary;
+          return [player.playerId, { batting, bowling }];
+        }),
+      ),
+    );
     const groundDisplayName =
       displayWorld.grounds.find((ground) => ground.groundId === s.setup.ground.groundId)?.name ??
       s.setup.ground.name;
@@ -322,6 +335,7 @@ export function createMatchController(
       })),
       names,
       hands,
+      playingStyles,
       ground: displayWorld.grounds.find(ground => ground.groundId === s.setup.ground.groundId)?.name ?? s.setup.ground.name,
       innings: structuredClone(c.innings),
       activeIndex: c.activeInningsIndex,

@@ -6,7 +6,7 @@ import {
   projectPreMatchBriefing,
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
-import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
+import { matchIntroduction, matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -1372,7 +1372,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               <span>Batters</span>
               {i ? (
                 [i.northBatterId, i.southBatterId].map((id, n) => (
-                  <p key={n} className={id ? "active-player" : undefined}>
+                  <React.Fragment key={n}>
+                  <p className={id ? "active-player" : undefined}>
                     {id ? (
                       <>
                         <PlayerPortrait playerId={id} role={activeRole(view, id)} kit={activeKit(view, id)} size={44} />
@@ -1387,6 +1388,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       view.resultText ? "Innings closed" : "Awaiting selection"
                     )}
                   </p>
+                  {id && !view.resultText && view.playingStyles?.[id] && (
+                    <small className="match-intro" data-testid={`match-intro-${id}`}>
+                      {ledger!.batting[id]!.ballsFaced === 0
+                        ? matchIntroduction(view.names[id] ?? id, view.playingStyles[id].batting, "BATTER")
+                        : view.playingStyles[id].batting.label}
+                    </small>
+                  )}
+                  </React.Fragment>
                 ))
               ) : (
                 <p>Awaiting innings choice</p>
@@ -1400,6 +1409,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   {i?.bowlerId ? view.names[i.bowlerId] : view.resultText ? "Innings closed" : "Awaiting selection"}
                 </strong>
               </p>
+              {(() => {
+                const bowlerId = i?.bowlerId;
+                const bowlerStyle = bowlerId ? view.playingStyles?.[bowlerId]?.bowling : undefined;
+                if (!bowlerId || !bowlerStyle || view.resultText) return null;
+                return (
+                  <small className="match-intro" data-testid={`match-intro-${bowlerId}`}>
+                    {(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0
+                      ? matchIntroduction(view.names[bowlerId] ?? bowlerId, bowlerStyle, "BOWLER")
+                      : bowlerStyle.label}
+                  </small>
+                );
+              })()}
               {i?.bowlerId && (
                 <p>
                   {overs(ledger!.bowling[i.bowlerId]!.legalBalls)} overs ·{" "}

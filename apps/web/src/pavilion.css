@@ -174,6 +174,16 @@
 .identity-milestone {display:block;font-style:italic;}
 .identity-trend[data-trend="UP"] {color:#9fd6a3;}
 .identity-trend[data-trend="DOWN"] {color:#f0b0a0;}
+/* LC_PLAYER_IDENTITY_V1: playing style tags, the player page's identity panel and the match introductions. */
+.style-tag {display:inline-block;margin:0 .4em .2em 0;padding:.1em .6em;border-radius:999px;background:var(--fl-gold, #e7bb5f);color:var(--fl-gold-ink, #1b1305);font-weight:600;font-size:.86em;letter-spacing:.02em;}
+.style-tag-secondary {background:transparent;color:inherit;border:1px solid currentColor;font-weight:500;}
+.player-identity {margin-bottom:14px;}
+.player-identity h3 {margin-top:0;}
+.player-identity-style {margin:.2em 0 .3em;font-size:1.1em;}
+.player-identity-story {margin:.6em 0;max-width:70ch;}
+.player-identity-traits ul {margin:.3em 0 0;padding-left:1.2em;}
+.player-identity-traits .eyebrow {margin:.6em 0 0;font-size:.78em;}
+.match-intro {display:block;margin-top:.2em;font-size:.86em;color:var(--fl-muted, #b6c8bf);}
 /* E7 fixture preview: the opponent, the history and what the match means. */
 .fixture-preview {margin:.6em 0 .9em;}
 .fixture-meaning {font:600 1.1em var(--display);margin:.2em 0 .5em;}

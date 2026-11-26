@@ -3,7 +3,7 @@ import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { useState } from "react";
-import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, rankClubStrength, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
+import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, playingStyle, rankClubStrength, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { percentageBp, formatGameDate } from "./format.js";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
@@ -299,6 +299,10 @@ export function HomeScreen(props: HomeScreenProps) {
                       return (
                         <div key={player.playerId}>
                           <strong>{player.name}</strong>
+                          {" "}
+                          <span className="style-tag" data-testid={`selection-style-${player.playerId}`} title="Playing style, from T20 ratings">
+                            {playingStyle({ playerId: player.playerId, role: player.role, bowlingStyle: player.bowlingStyle, skills: player.skills.T20 }).primary.label}
+                          </span>
                           <p>
                             {index === 0
                               ? figures
