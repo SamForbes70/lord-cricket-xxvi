@@ -52,7 +52,7 @@ export function FixturesScreen(props: FixturesScreenProps) {
                   <th>Ground</th>
                   <th>Status</th>
                   <th>Result</th>
-                  <th>Replay</th>
+                  <th>Replay and analysis</th>
                 </tr>
               </thead>
               <tbody>
@@ -99,6 +99,21 @@ export function FixturesScreen(props: FixturesScreenProps) {
                             >
                               View replay
                             </button>
+                          ) : null}
+                          {completion ? (
+                            <button
+                              id={`analysis-fixtures-${fixture.fixtureId}`}
+                              type="button"
+                              className="replay-btn"
+                              data-testid="fixture-post-match-analysis"
+                              disabled={busy}
+                              aria-label={`Post-match analysis for ${service.teamName(fixture.homeTeamId)} v ${service.teamName(fixture.awayTeamId)}`}
+                              onClick={() =>
+                                void openReplay(fixture.fixtureId, `analysis-fixtures-${fixture.fixtureId}`, "ANALYSIS")
+                              }
+                            >
+                              Post-match analysis
+                            </button>
                           ) : (
                             "–"
                           )}
@@ -127,6 +142,6 @@ export type FixturesScreenProps = {
   showTacticalBriefings: boolean;
   controlledTeam: string | null;
   completionByFixture: Map<string, ActiveState["completedMatches"][number]>;
-  openReplay: (fixtureId: string, triggerId: string) => Promise<void>;
+  openReplay: (fixtureId: string, triggerId: string, focus?: "ANALYSIS") => Promise<void>;
   replayViewerSection: ReactNode;
 };

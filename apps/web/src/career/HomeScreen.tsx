@@ -3,7 +3,7 @@ import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { useState } from "react";
-import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, playingStyle, rankClubStrength, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
+import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, playerForm, playingStyle, rankClubStrength, selectionAdvice, SELECTION_ADVICE_NOTE, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { percentageBp, formatGameDate } from "./format.js";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
@@ -36,6 +36,7 @@ export function HomeScreen(props: HomeScreenProps) {
     controlledTeam,
     tableRow,
     completedManaged,
+    openAnalysis,
   } = props;
   const call = pendingMatch ? null : service.selectionCall();
   const previous = state.completedMatches
@@ -160,6 +161,11 @@ export function HomeScreen(props: HomeScreenProps) {
       playerName={(playerId) => service.playerName(playerId)}
     >
       {selectionNote}
+      {openAnalysis && previous && (
+        <button type="button" data-testid="match-report-analysis" disabled={busy} onClick={() => void openAnalysis(previous.fixtureId)}>
+          Post-match analysis
+        </button>
+      )}
     </MatchReportPanel>
   ) : null;
   return (
@@ -314,6 +320,28 @@ export function HomeScreen(props: HomeScreenProps) {
                             Age {service.playerAge(player.birthDate)}
                             {deal && ` · ${deal.annualWageK}k per season`}
                           </small>
+                          {(() => {
+                            // LC_PLAYER_IDENTITY_V2: reasons from styles, ratings and recorded form. Inferences are labelled.
+                            const other = index === 0 ? call.reserve : call.incumbent;
+                            const asAdvice = (p: typeof player) => ({ playerId: p.playerId, name: p.name, role: p.playerId === call.keeperId ? "KEEPER" : p.role, bowlingStyle: p.bowlingStyle, skills: p.skills.T20 });
+                            const form = playerForm(state.completedMatches, player.playerId);
+                            const reasons = selectionAdvice({
+                              option: asAdvice(player),
+                              other: asAdvice(other),
+                              restOfXi: call.xi.filter((p) => p.playerId !== call.incumbent.playerId && p.playerId !== call.reserve.playerId).map(asAdvice),
+                              form: form.entries.length > 0 ? form : null,
+                            });
+                            if (reasons.length === 0) return null;
+                            return (
+                              <ul className="selection-advice" data-testid={`selection-advice-${player.playerId}`}>
+                                {reasons.map((reason) => (
+                                  <li key={reason.id} data-kind={reason.kind}>
+                                    <b>{reason.kind === "SUGGESTION" ? "Suggestion" : reason.kind === "RATING" ? "Rating" : "Record"}</b> {reason.text}
+                                  </li>
+                                ))}
+                              </ul>
+                            );
+                          })()}
                           <button
                             disabled={
                               busy || inspectionOnly || service.isReadOnly()
@@ -332,6 +360,7 @@ export function HomeScreen(props: HomeScreenProps) {
                       );
                     })}
                   </div>
+                  <small className="selection-advice-note" data-testid="selection-advice-note">{SELECTION_ADVICE_NOTE}</small>
                   {budget && (
                     <small>
                       Club wages committed · {budget.committedWagesK}k of{" "}
@@ -500,4 +529,6 @@ export type HomeScreenProps = {
   controlledTeam: string | null;
   tableRow: ActiveState["projection"]["table"][number] | null;
   completedManaged: ActiveState["completedMatches"];
+  /** Opens the post-match analysis of a completed fixture from its stored record (LC_POST_MATCH_ANALYSIS_ARCHIVE_V1). */
+  openAnalysis?: (fixtureId: string) => Promise<void>;
 };
