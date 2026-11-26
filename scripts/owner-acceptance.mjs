@@ -1,11 +1,11 @@
 /** Collects local acceptance evidence without uploading files or opening an existing browser profile. */
 import { spawnSync } from "node:child_process";
+import { parseAcceptanceArguments, scopeSteps } from "./acceptance-scope.mjs";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { arch, availableParallelism, cpus, hostname, platform, release, totalmem } from "node:os";
 import { playwrightEvidence, vitestEvidence, npmInvocation } from "./acceptance-evidence.mjs";
-import { parseAcceptanceArguments, scopeSteps } from "./acceptance-scope.mjs";
 
 // --scope=core|chromium|firefox runs one leg of the hosted Windows split (scripts/acceptance-scope.mjs); the default is all.
 const { flags, scope } = parseAcceptanceArguments(process.argv.slice(2));
