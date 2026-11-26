@@ -134,7 +134,9 @@ import {
 import {
   applyRosterSeasonCompletion,
   applyT20SeasonMatchCompletion,
+  careerIntroSummary,
   completionFromOffscreenOutcome,
+  type CareerIntroSummary,
   projectPreMatchBriefing,
   rebuildPersistentCareerProjectionCore,
   rosterCompletionFromOffscreen,
@@ -2640,6 +2642,9 @@ export class CareerApplicationService {
           fixtureId: fixture.fixtureId,
           incumbent,
           reserve,
+          /** The match-day XI as picked (incumbent included) and its keeper, for the LC_PLAYER_IDENTITY_V2 advice. */
+          xi: world.players.filter((p) => side.playerIds.includes(p.playerId)),
+          keeperId: side.keeperId,
           batted: batting[incumbent.playerId]!,
           bowled: bowling[incumbent.playerId],
           reserveMatches:
@@ -3876,6 +3881,20 @@ export class CareerApplicationService {
         .map((y) => ({ playerId: y.player.playerId, teamId: y.teamId, promotedInSeasonNumber: y.promotedInSeasonNumber! })),
       retirements: lifecycle?.retiredPlayers ?? [],
     });
+  }
+
+  /**
+   * LC_PLAYER_IDENTITY_V2: the read-only league records of every player in a managed launch, as they stand before the
+   * match, for the match introductions. Derived from the historical statistics on demand; never saved.
+   */
+  careerIntroSummary(launch: { matchGameId: string; selections: readonly { playerIds: readonly string[] }[] }): CareerIntroSummary | null {
+    const projection = this.historicalStatistics();
+    if (!projection) return null;
+    return careerIntroSummary(
+      launch.matchGameId,
+      launch.selections.flatMap((side) => side.playerIds),
+      projection.players,
+    );
   }
 
   historicalPlayerRecord(
