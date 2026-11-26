@@ -33,7 +33,8 @@ A reload, replacement tab, new context and browser process restart are distinct 
 [The workflow](../.github/workflows/verify.yml) runs on pull requests and pushes to main:
 
 - `pass07a`: Ubuntu 24.04, Node 22, synthetic diagnostic tests, research review provenance, core verification, research archive browser acceptance, production performance observations and layout regressions.
-- `windows-browser-acceptance`: Windows, Node 22 and `scripts/owner-acceptance.mjs --skip-install`, with a 45-minute job timeout.
+- `windows-acceptance (core)`, `(chromium)` and `(firefox)`: Windows, Node 22 and `scripts/owner-acceptance.mjs --skip-install --scope=<leg>` in parallel, with a 200-minute job timeout each; the core leg also builds and smoke-tests the EXE.
+- `windows-browser-acceptance`: fails unless all three Windows legs passed and together ran the whole acceptance plan with matching Chromium and Firefox test counts ([split record](verification-pass07a/WINDOWS_CI_SPLIT_2026-11-26.md)).
 
 Both jobs collect structured evidence even on failure. Uploaded artifacts have seven-day retention. Retain durable release evidence in the approved repository/report process before expiry; a temporary artifact URL is not a permanent acceptance record.
 

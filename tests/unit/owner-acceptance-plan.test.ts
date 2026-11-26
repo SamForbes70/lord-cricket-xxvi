@@ -20,6 +20,14 @@ describe("owner acceptance command plan", () => {
       expect(report.status).toBe("FAIL"); expect(report.commands).toHaveLength(1);
       expect(report.commands[0]).toMatchObject({ name: "installation", status: "FAIL", exitCode: 42 });
       expect(report.ownerPcGate).toBe("NOT_ESTABLISHED");
+      expect(report.version).toBe("LC_OWNER_ACCEPTANCE_EVIDENCE_V1"); expect(report).not.toHaveProperty("scope");
+      // A hosted Windows leg records which leg it is, and fails the same way.
+      rmSync(join(directory, "test-results"), { recursive: true, force: true });
+      const leg = spawnSync(process.execPath, [resolve("scripts/owner-acceptance.mjs"), "--scope=firefox"], { cwd: directory, env: { ...process.env, PATH: `${bin}${delimiter}${process.env.PATH}` }, encoding: "utf8" });
+      expect(leg.status).toBe(1);
+      const legReport = JSON.parse(readFileSync(join(directory, "test-results", readdirSync(join(directory, "test-results"))[0]!, "acceptance.json"), "utf8"));
+      expect(legReport).toMatchObject({ version: "LC_OWNER_ACCEPTANCE_EVIDENCE_V2", scope: "firefox", status: "FAIL", ownerPcGate: "NOT_ESTABLISHED" });
+      expect(legReport.commands).toHaveLength(1);
     } finally { rmSync(directory, { recursive: true, force: true }); }
   });
   it("includes both-browser career, match, research and observation gates without opening a profile", () => {
