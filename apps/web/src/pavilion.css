@@ -194,6 +194,12 @@
 .active .active-player .match-style {flex:1 1 8em;min-width:0;font-size:.78em;line-height:1.15;color:var(--fl-muted, #b6c8bf);}
 .active .active-player .match-style i {font-style:normal;}
 .active .active-player .match-style[data-new="true"] i {color:var(--fl-gold-hi, #f6d58d);}
+/* LC_PLAYER_IDENTITY_V3: a live league milestone (close or reached) once the player has faced or bowled, and the chip as
+   a button to the player page (career inspection; the match is kept). Same size as the V2 chip: no extra line. */
+.active .active-player .match-style[data-live] i {color:var(--fl-gold-hi, #f6d58d);}
+.active .active-player .match-style-open {display:inline;max-width:100%;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;border-radius:0;box-shadow:none;transform:none;text-align:left;cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;overflow-wrap:anywhere;}
+.active .active-player .match-style-open:disabled {cursor:default;text-decoration:none;}
+.active .active-player .match-style-open:focus-visible {outline:2px solid var(--fl-gold-hi, #f6d58d);outline-offset:1px;}
 /* E7 fixture preview: the opponent, the history and what the match means. */
 .fixture-preview {margin:.6em 0 .9em;}
 .fixture-meaning {font:600 1.1em var(--display);margin:.2em 0 .5em;}

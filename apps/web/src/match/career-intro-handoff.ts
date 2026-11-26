@@ -16,3 +16,22 @@ export function handOverCareerIntro(summary: CareerIntroSummary | null): void {
 export function careerIntroFor(matchGameId: string | null | undefined): CareerIntroSummary | null {
   return matchGameId && current && current.matchGameId === matchGameId ? current : null;
 }
+
+/**
+ * LC_PLAYER_IDENTITY_V3: a player page requested from a match chip. The match screen stays mounted (hidden) while the
+ * career opens in inspection only, as the existing "Inspect career" button does, so the match is kept exactly as it
+ * is. The request is held in memory and taken once; after a reload the career simply opens at its home screen.
+ */
+export interface InspectPlayerRequest { playerId: string; origin: "SQUAD" | "STATISTICS" }
+let inspectRequest: InspectPlayerRequest | null = null;
+
+export function requestInspectPlayer(request: InspectPlayerRequest | null): void {
+  inspectRequest = request ? { ...request } : null;
+}
+
+/** The pending request, cleared as it is read. */
+export function takeInspectPlayer(): InspectPlayerRequest | null {
+  const request = inspectRequest;
+  inspectRequest = null;
+  return request;
+}

@@ -8,7 +8,7 @@ import {
 } from "@lcxxvi/projections";
 import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import { MatchStyleChip } from "./match/MatchStyleChip.js";
-import { careerIntroFor } from "./match/career-intro-handoff.js";
+import { careerIntroFor, requestInspectPlayer } from "./match/career-intro-handoff.js";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -741,6 +741,20 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
 
   // LC_PLAYER_IDENTITY_V2: league records before this match, handed over in memory by the career on launch.
   const careerIntro = careerIntroFor(careerLaunch.current?.matchGameId);
+  // LC_PLAYER_IDENTITY_V3: a chip opens the player's page through the same career inspection as "Inspect career",
+  // which keeps this match mounted and unchanged. Standard careers only (a roster career has no player page link).
+  const chipOpener = (id: string): (() => void) | undefined => {
+    const launch = careerLaunch.current;
+    if (!launch || !onInspectCareer || launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" || !view || view.resultText) return undefined;
+    const managed = view.teams.find((team) => team.id === launch.managedTeamId);
+    return () => {
+      if (busy || fatal || batchState !== "idle") return;
+      requestInspectPlayer({ playerId: id, origin: managed?.playerIds.includes(id) ? "SQUAD" : "STATISTICS" });
+      onInspectCareer(false);
+    };
+  };
+  // Only the two innings of the match carry the league record forward (no super-over innings in a career match).
+  const liveRecord = (id: string) => (view && view.activeIndex <= 1 ? careerIntro?.players[id] ?? null : null);
   const captainedTeam = scenario?.playerTeamId ?? careerLaunch.current?.managedTeamId ?? view?.teams.find(t => t.id !== aiTeamId)?.id;
   const rivalTeam = view?.teams.find(t => t.id !== captainedTeam)?.id;
   const limitedOvers = view?.format === "T20" || view?.format === "ODI";
@@ -1388,7 +1402,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         {ledger!.batting[id]!.runs} (
                         {ledger!.batting[id]!.ballsFaced})
                         {!view.resultText && view.playingStyles?.[id] && (
-                          <MatchStyleChip playerId={id} name={view.names[id] ?? id} style={view.playingStyles[id].batting} kind="BATTER" isNew={ledger!.batting[id]!.ballsFaced === 0} record={careerIntro?.players[id] ?? null} />
+                          <MatchStyleChip playerId={id} name={view.names[id] ?? id} style={view.playingStyles[id].batting} kind="BATTER" isNew={ledger!.batting[id]!.ballsFaced === 0} record={liveRecord(id)} line={{ runs: ledger!.batting[id]!.runs }} onOpen={chipOpener(id)} openDisabled={busy || fatal || batchState !== "idle"} />
                         )}
                       </>
                     ) : (
@@ -1411,7 +1425,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   const bowlerId = i?.bowlerId;
                   const bowlerStyle = bowlerId ? view.playingStyles?.[bowlerId]?.bowling : undefined;
                   if (!bowlerId || !bowlerStyle || view.resultText) return null;
-                  return <MatchStyleChip playerId={bowlerId} name={view.names[bowlerId] ?? bowlerId} style={bowlerStyle} kind="BOWLER" isNew={(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0} record={careerIntro?.players[bowlerId] ?? null} />;
+                  return <MatchStyleChip playerId={bowlerId} name={view.names[bowlerId] ?? bowlerId} style={bowlerStyle} kind="BOWLER" isNew={(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0} record={liveRecord(bowlerId)} line={{ wickets: ledger!.bowling[bowlerId]?.wickets ?? 0 }} onOpen={chipOpener(bowlerId)} openDisabled={busy || fatal || batchState !== "idle"} />;
                 })()}
               </p>
               {i?.bowlerId && (

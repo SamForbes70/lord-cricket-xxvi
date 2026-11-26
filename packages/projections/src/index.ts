@@ -29,6 +29,7 @@ export * from "./season-objective.js";
 export * from "./player-identity.js";
 export * from "./player-identity-v1.js";
 export * from "./player-identity-v2.js";
+export * from "./player-identity-v3.js";
 export * from "./fixture-preview.js";
 export * from "./match-situation.js";
 export * from "./opposition-watch.js";
