@@ -35,6 +35,9 @@
  *    DELIVERY_STAGE_PACK.stumping's 3 / 1000 of the keeping sigmoid.
  *  - pitch: the ground's pitch. A coefficient on (seam + turn - 2 x centre) of the current pitch for contact and run
  *    categories, so a bowler-friendly surface gives more false shots and fewer boundaries in both innings.
+ * V2 also corrects rare dismissal kinds against the calibration split (Studio Production Directive 02, A3): a
+ * hit-wicket contact intercept in every phase, higher bowled and lbw intercepts, and a lower aerial catch chance so
+ * the total stays level. Cricsheet's "caught and bowled" has no separate branch here (a catch is never the bowler's).
  * V1 (hash baf16852...) produced the C4 files c4-after.json and c4-per-point.json and stays their record.
  * Derived from Cricsheet data (https://cricsheet.org/), ODC-By 1.0 (https://cricsheet.org/licensing/).
  */
@@ -55,7 +58,7 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
     base: {
       probabilityPackSha256: "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
       stagePackSha256: "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
-      skillPackSha256: "24472ba59aa03cda32815ffa8fe0f5bdc139dfc4439b7a9d508c313a1ff485c4",
+      skillPackSha256: "07949faa30bab7713ae2aa6d3e00e6b443c4812fc3bbfb5e3e4e26d4fb680bfa",
     },
     source: {
       dataset: "Cricsheet t20s_json.zip",
@@ -70,9 +73,9 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
   contact: {
     /** Additive intercepts (bp of logit) by phase. */
     intercept: {
-      T20_EARLY: { MISS: -3500, PAD: -3500, GROUND: 0, AERIAL: -4500, EDGE: -2000, HIT_WICKET: 0 },
-      T20_MIDDLE: { MISS: -5000, PAD: -5000, GROUND: 0, AERIAL: 0, EDGE: -3300, HIT_WICKET: 0 },
-      T20_LATE: { MISS: -21000, PAD: -21000, GROUND: 0, AERIAL: 0, EDGE: -6000, HIT_WICKET: 0 },
+      T20_EARLY: { MISS: -5000, PAD: -5000, GROUND: 0, AERIAL: -4500, EDGE: -2000, HIT_WICKET: -16000 },
+      T20_MIDDLE: { MISS: -5000, PAD: -5000, GROUND: 0, AERIAL: 0, EDGE: -3300, HIT_WICKET: -16000 },
+      T20_LATE: { MISS: -21000, PAD: -21000, GROUND: 0, AERIAL: 0, EDGE: -6000, HIT_WICKET: -16000 },
     },
     /** Additive coefficient (bp) on the aggression feature (aggression - 2) x 10,000. */
     aggression: { MISS: -1000, PAD: 0, GROUND: 0, AERIAL: 0, EDGE: -1000, HIT_WICKET: -1000 },
@@ -90,8 +93,8 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
   },
   /** Coefficient (bp) on (aggression - 2) x 10,000 for each run category after a GROUND or AERIAL shot. */
   runsAggressionBp: { "0": -3500, "1": 0, "2": 0, "3": 0, "4": 3500, "6": 2000 },
-  catchOpportunityBp: { AERIAL: 2000, EDGE: 3000 },
-  dismissalInterceptBp: { BOWLED: -28000, LBW: -28000, RUN_OUT: -57000 },
+  catchOpportunityBp: { AERIAL: 1800, EDGE: 3000 },
+  dismissalInterceptBp: { BOWLED: -26000, LBW: -21000, RUN_OUT: -57000 },
   /** V2: coefficient (bp) on max(0, aggression - 2) x the field's spread (bp) for each run category after a GROUND or AERIAL shot. */
   runsAggressionDeepBp: { "0": -7000, "1": 2500, "2": 2000, "3": 0, "4": 0, "6": 0 },
   /** V2: added to catchOpportunityBp for each aggression level above 2 (subtracted below), clamped to 0 to 10,000. */
@@ -109,10 +112,10 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_DELIVERY_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "eb4971cc78efd50c1971d1caa251476a7374cc0a0d065ea62a8890dc9ce52e55";
+export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "d8632151fae9a8c8782a7ae3ad7ce670715a45b1917a16c99214b59ed087d4e7";
 /**
  * The calibrated model's hash, recorded in a research set-up's `versions.modelHash`: SHA-256 of LC canonical JSON of
  * { deliveryPackSha256, skillPackSha256, tacticsPackSha256 } (C5: the tactics pack is the third component). It changes
  * whenever any component changes.
  */
-export const CALIBRATED_T20_MODEL_HASH = "edd087854deee16a918c475ceee0174d84e258b0c43d7bd5f43df62bc1bb3b34";
+export const CALIBRATED_T20_MODEL_HASH = "f6e9ca219b3c61d5164c2e5bf0ea7e4b97397d4582e39c7e09e0f5ccd0300d15";

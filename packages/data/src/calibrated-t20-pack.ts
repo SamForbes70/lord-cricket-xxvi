@@ -69,13 +69,13 @@ export const CALIBRATED_T20_PACK = deepFreeze({
   } as CalibratedTerms,
   /** Run value after bat contact (categories 0, 1, 2, 3, 4, 6). */
   runs: {
-    "0": { CONTROL: 24000, ROTATION: -12000 },
-    "4": { TIMING: 1700, POWER: 1700, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
-    "6": { TIMING: 1700, POWER: 1700, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
+    "0": { CONTROL: 24000, ROTATION: -13000 },
+    "4": { TIMING: 1200, POWER: 1200, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
+    "6": { TIMING: 1200, POWER: 1200, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
   } as CalibratedTerms,
   /** Cancels synthetic-alpha-01's bowled and lbw skill terms (controlBp, defenceBp in DELIVERY_STAGE_PACK). */
   cancelMissDismissalSkill: true,
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_PACK_SHA256 = "24472ba59aa03cda32815ffa8fe0f5bdc139dfc4439b7a9d508c313a1ff485c4";
+export const CALIBRATED_T20_PACK_SHA256 = "07949faa30bab7713ae2aa6d3e00e6b443c4812fc3bbfb5e3e4e26d4fb680bfa";
