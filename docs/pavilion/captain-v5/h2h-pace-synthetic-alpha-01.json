@@ -1,0 +1,20 @@
+{
+  "version": "LC_PAVILION_CAPTAIN_V5_H2H_V1",
+  "model": "synthetic-alpha-01",
+  "advance": "DELIVERY",
+  "matches": 200,
+  "v5Wins": 98,
+  "v4Wins": 100,
+  "tiesOrNoResult": 2,
+  "v5PercentOfDecided": 49.5,
+  "v5PercentOfDecided95": [
+    42.6,
+    56.4
+  ],
+  "meanRunDifferenceV5MinusV4": -0.1,
+  "meanRunDifference95": [
+    -3.7,
+    3.5
+  ],
+  "design": "100 frozen corpus seeds (repeat 0), each twice: V5 on one side and V4 on the other, then swapped"
+}

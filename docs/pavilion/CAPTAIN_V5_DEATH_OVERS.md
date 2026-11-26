@@ -1,6 +1,6 @@
 # Captain V5: a realistic death-overs bowling plan
 
-Owner-approved captain-policy change, 26 November 2026: fix the research model's too-tight death overs in the captain, as a new versioned policy `LC_T20_TACTICAL_CAPTAIN_V5`, not with a death-overs run term. Branch `pavilion/captain-v5`, based on `main` at `d9bb921`. No change to `synthetic-alpha-01`, the research packs, the engines, the generator, contracts or any persisted format (section 7). The research model `calibrated-t20-01` stays unselectable. No gate is claimed as accepted. The holdout (2025-08-30 onward) was not read.
+Owner-approved captain-policy change, 26 November 2026: fix the research model's too-tight death overs in the captain, as a new versioned policy `LC_T20_TACTICAL_CAPTAIN_V5`, not with a death-overs run term. Branch `pavilion/captain-v5`, based on `main` at `d9bb921`, with `main` merged in at `bee69d4`. Second pass, the same day: the owner approved V5 for the live game and asked for pace to be preferred in the death overs (section 4f); V5 has not shipped and no captain id is persisted, so the rule joins V5 under the same id. No change to `synthetic-alpha-01`, the research packs, the engines, the generator, contracts or any persisted format (section 7). The research model `calibrated-t20-01` stays unselectable. No gate is claimed as accepted. The holdout (2025-08-30 onward) was not read.
 
 **Why.** Stage C slice C5 ([C5_TACTICS_AND_REFIT.md](stage-c/C5_TACTICS_AND_REFIT.md), section 6) found the research model's death overs too tight: 8.47 runs an over against 9.75 real, 26.3% dots against 18.8%. It named two likely captain causes: about 74% executed yorkers at the death, and about a quarter of death balls batted at aggression 2.
 
@@ -14,7 +14,7 @@ Owner-approved captain-policy change, 26 November 2026: fix the research model's
 - `--batting`: `LC_T20_BATTING_POLICY_V1` (V4) or `LC_T20_BATTING_POLICY_V2` (V5);
 - `--advance`: `OVER` (one ADVANCE command bowls the rest of the over, as the batch step did up to V4 and as every C5 measurement did) or `DELIVERY` (one ball, so the captain is asked before every ball, as the live game asks the computer opponent).
 
-Bowler choice, field intent and the powerplay and middle-overs plans are identical in V4 and V5; the script checks that on every call and stops if they differ.
+Field intent and the powerplay and middle-overs plans are identical in V4 and V5, and the script checks that on every call. Bowler choice was identical in the first pass; from the second pass (section 3c) it can differ in the death, and goes with `--bowling`.
 
 **Definitions** (as `scripts/stage-c/c4-analyse.py`). Phases are overs 1 to 6, 7 to 15 and 16 to 20. Runs an over include extras. A dot is a legal ball with no run of any kind and no wicket ("dot %, wicket balls excluded"); the innings dot % counts wicket balls as dots, as C5's aggregate does. Wicket, four and six % are per legal ball. Brackets are 95% match-bootstrap intervals (1,000 resamples, fixed seed). Head to head and tactical validation use 95% Wilson intervals for win shares and a normal interval for the paired run difference, as `scripts/pavilion-tactical-validation.ts` does.
 
@@ -72,7 +72,7 @@ The plan set the engine accepts is length (YORKER, FULL, GOOD, SHORT), effort (C
 - A tired bowler (fatigue 7,000 bp or more) conserves on every ball, as in V4.
 - Pace or spin comes from the current bowler's public bowling style (`bowlerStyle` in the public view, from `t20BowlerStyleOf`: FAST and MEDIUM are pace, as in the generator). Unknown is treated as pace.
 - [Inference] The mix is cricket judgement about how a modern side bowls at the death: yorkers are a minority of balls, mixed with slower balls, hard lengths and the odd bouncer, with the yorker kept for tail-enders. Cricsheet records neither length nor pace, so no real data in the repository can check it. It was written once, before any V5 measurement, and was not changed after seeing results.
-- Unchanged from V4: the powerplay (good length) and middle-overs (full) plans and V4's effort rule there, bowler choice (including the best bowlers' death-over reservation; the evidence gives no reason to change it), and field intent.
+- Unchanged from V4: the powerplay (good length) and middle-overs (full) plans and V4's effort rule there, the best bowlers' death-over reservation (with the pace preference of section 3c in how bowlers rank for it), and field intent.
 
 ### 3b. Batting policy V2 (`adviseT20BattingV2`, `packages/ai/src/batting-policy.ts`)
 
@@ -83,7 +83,22 @@ V1 everywhere except in the first innings's death overs, where V1 held the strik
 
 V2 attacks at 3 in those cases, not 4. [Inference] With so few balls left a wicket costs little, but a side seven down still does not slog every ball. The tail-ender still looks for the single (ROTATE). Chases are unchanged, because a low required rate justifies low aggression. Written once, not tuned.
 
-### 3c. The batch step asks before every ball
+### 3c. Pace preferred for the death overs (second pass, `t20DeathSuitabilityV5`)
+
+The first pass found two-thirds of death balls bowled by spinners (section 4c). [Inference] Real T20 death overs are mostly bowled by pace, because yorkers, bouncers and changes of pace are a quick bowler's tools. The rule, written before measuring it:
+
+- A bowler's standing for the death is `t20BowlerSkill` (2 control + 2 movement + variation + stamina / 2), raised by 10% for a pace bowler (`T20_DEATH_PACE_PREFERENCE_PERCENT`). Spin, and a bowler whose style is unknown, keep their skill.
+- So a capable pace bowler goes ahead of a spinner of similar skill. A spinner more than 10% more skilled still bowls, which is the capability threshold: a weak pace bowler never displaces a clearly better spinner.
+- The standing is used wherever V4 ranks bowlers for the death:
+  - which bowlers keep overs back for overs 16 to 20 (`deathOverReserve`, unchanged in itself);
+  - whose reserve is spent first when no one has an over to spare;
+  - the choice within the death.
+- Bowler choice before the death (the best free bowler first) and the never-strand check are unchanged.
+- Each bowler candidate, and the previous over's bowler, now carries an optional public `style` (pace or spin), from `t20BowlerStyleOf`. V4 ignores it.
+- 10% is a judgement, about six rating points on every bowling skill. It was not tuned to any result.
+- The fictional world is unchanged.
+
+### 3d. The batch step asks before every ball
 
 `tacticalT20Step` now takes options `{ advise, advance }`. From V5 the default is the current captain and `advance: "DELIVERY"`: when the captain has nothing to change it bowls one ball, so V5's ball-by-ball plan is bowled and every striker bats on the current advice, as in the live game. `{ advise: adviseT20CaptainV4, advance: "OVER" }` reproduces V4's harness exactly: on all 100 corpus seeds, under both models, its event hashes equal `main`'s `tacticalT20Step` (checked by playing both and comparing the 100 final event hashes).
 
@@ -91,7 +106,7 @@ V2 attacks at 3 in those cases, not 4. [Inference] With so few balls left a wick
 
 ## 4. Results, before (V4) and after (V5), first innings, 1,000 matches each
 
-"Before" is V4 as measured to date (over at a time); the ball-by-ball V4 row shows how much of the change is the harness alone.
+"Before" is V4 as measured to date (over at a time); the ball-by-ball V4 row shows how much of the change is the harness alone. The "V5" columns of sections 4a to 4e are the first pass, before the pace preference; section 4f gives V5 as it now stands.
 
 ### 4a. `calibrated-t20-01` (research)
 
@@ -183,14 +198,84 @@ The V4 column equals C5's published "after" column exactly.
 
 The V4 column equals the V4 rerun in [CAPTAIN_V4_DEATH_OVERS.md](CAPTAIN_V4_DEATH_OVERS.md) for the eight experiments it had.
 
+### 4f. Second pass: pace preferred for the death (1,000 matches each)
+
+"Before" is V5 as in sections 4a to 4e (it reproduces those files exactly, now with each ball's bowler style recorded). "After" is V5 with the pace preference (`9e15751`). First innings, 95% intervals.
+
+| | Real fit / selection | `calibrated-t20-01` before | `calibrated-t20-01` after | `synthetic-alpha-01` before | `synthetic-alpha-01` after |
+| --- | --- | --- | --- | --- | --- |
+| **Spin share of death balls** | | **67.6%** | **46.7%** | **67.5%** | **45.7%** |
+| Spin share, second innings | | 69.2% | 44.3% | 68.5% | 44.2% |
+| Runs | 158.9 / 166.0 | 163.4 (161.0 to 165.7) | 162.2 (159.9 to 164.6) | 113.0 (111.5 to 114.7) | 112.8 (111.3 to 114.5) |
+| Wickets | 6.40 / 6.87 | 7.17 (7.03 to 7.29) | 7.17 (7.03 to 7.30) | 8.13 (8.00 to 8.24) | 8.13 (8.01 to 8.24) |
+| Dot % (wicket balls included) | 35.3 / 37.2 | 34.6 | 34.9 | 58.2 | 58.3 |
+| Runs an over: powerplay | 7.68 / 8.30 | 7.93 (7.79 to 8.08) | 7.75 (7.61 to 7.91) | 6.23 (6.13 to 6.34) | 6.23 (6.12 to 6.34) |
+| Runs an over: middle | 7.66 / 8.27 | 7.85 (7.73 to 7.97) | 7.79 (7.67 to 7.91) | 5.29 (5.20 to 5.37) | 5.29 (5.21 to 5.37) |
+| Runs an over: death | 9.75 / 9.84 | 9.60 (9.43 to 9.77) | **9.71 (9.55 to 9.88)** | 6.77 (6.63 to 6.92) | 6.72 (6.58 to 6.87) |
+| Wicket %: powerplay | 4.24 / 4.77 | 5.22 (5.00 to 5.41) | 5.25 (5.04 to 5.44) | 5.95 (5.71 to 6.15) | 5.95 (5.71 to 6.16) |
+| Wicket %: middle | 4.49 / 5.09 | 4.51 (4.34 to 4.68) | 4.55 (4.37 to 4.71) | 5.85 (5.65 to 6.04) | 5.85 (5.65 to 6.04) |
+| Wicket %: death | 8.87 / 9.14 | 10.03 (9.67 to 10.38) | 9.94 (9.60 to 10.28) | 11.34 (10.98 to 11.72) | 11.33 (10.96 to 11.71) |
+| Death dot % | 18.8 / 23.6 | 18.7 (18.1 to 19.3) | 18.0 (17.5 to 18.6) | 49.8 (49.2 to 50.5) | 50.1 (49.4 to 50.7) |
+| Death four % | 11.1 / 11.3 | 9.2 (8.8 to 9.5) | 9.2 (8.8 to 9.6) | 8.1 (7.7 to 8.5) | 8.0 (7.7 to 8.4) |
+| Death six % | 7.4 / 8.5 | 8.9 (8.5 to 9.3) | 9.0 (8.6 to 9.4) | 8.1 (7.7 to 8.4) | 8.0 (7.7 to 8.3) |
+| Planned yorkers / bouncers, % of death balls | | 12.9 / 5.4 | 21.1 / 8.9 | 13.8 / 5.4 | 22.6 / 9.0 |
+| Executed yorkers, % of death balls | | 13.4 | 18.2 | 14.3 | 19.9 |
+
+- **Why the earlier overs move.** The powerplay and middle overs change a little in the research model (7.93 to 7.75 an over in the powerplay) because different bowlers now keep overs back for the death, so others bowl earlier.
+- **Pace against spin, after** (research model, first-innings death): pace 9.98 runs an over and 9.89% wickets; spin 9.40 and 9.99%.
+- **Where the spinners still bowl.** [Inference] They bowl the rest because many sides have only two or three pace bowlers, some well below their best spinner. Spinners also bowl the death overs a reserved pace bowler cannot take, because he bowled the previous over or has no overs left.
+
+**Head to head, V5 with the pace preference against V4** (100 seeds, each twice, ball by ball):
+
+| Model | V5 wins | V4 wins | Ties or no result | V5 share of decided | Run difference (V5 minus V4) |
+| --- | ---: | ---: | ---: | --- | --- |
+| `calibrated-t20-01` | 100 | 93 | 7 | 51.8% (44.8 to 58.8) | +1.4 (-3.3 to 6.1) |
+| `synthetic-alpha-01` | 98 | 100 | 2 | 49.5% (42.6 to 56.4) | -0.1 (-3.7 to 3.5) |
+
+**Tactical validation, V5 first pass against V5 with the pace preference** (both ball by ball, 200 matches each):
+
+**`calibrated-t20-01`:**
+
+| Experiment (poor side) | V5, first pass | V5 with the pace preference |
+| --- | --- | --- |
+| Weakest eleven | 166 of 196: 84.7% (79.0 to 89.1); +21.4 (15.7 to 27.1) | 169 of 196: 86.2% (80.7 to 90.4); +22.0 (16.4 to 27.6) |
+| Old selection rule | 166 of 192: 86.5% (80.9 to 90.6); +20.1 (15.1 to 25.0) | 168 of 195: 86.2% (80.6 to 90.3); +20.6 (15.5 to 25.7) |
+| Batting order reversed | 158 of 194: 81.4% (75.4 to 86.3); +17.6 (12.6 to 22.6) | 155 of 192: 80.7% (74.6 to 85.7); +17.9 (13.1 to 22.8) |
+| Aggression 4 every ball | 92 of 197: 46.7% (39.9 to 53.7); -1.2 (-6.6 to 4.1) | 91 of 196: 46.4% (39.6 to 53.4); -1.4 (-7.0 to 4.2) |
+| Aggression 0 every ball | 183 of 199: 92.0% (87.3 to 95.0); +34.3 (28.2 to 40.4) | 182 of 197: 92.4% (87.8 to 95.3); +34.8 (28.5 to 41.0) |
+| Weakest bowler first | 128 of 189: 67.7% (60.8 to 74.0); +12.4 (7.2 to 17.6) | 131 of 196: 66.8% (60.0 to 73.0); +13.6 (8.4 to 18.8) |
+| Full length, maximum effort | 102 of 187: 54.5% (47.4 to 61.5); +0.7 (-4.2 to 5.6) | 105 of 193: 54.4% (47.4 to 61.3); +0.7 (-4.3 to 5.8) |
+| Good length throughout | 101 of 191: 52.9% (45.8 to 59.8); +0.0 (-4.6 to 4.6) | 98 of 190: 51.6% (44.5 to 58.6); -0.7 (-5.5 to 4.1) |
+| Maximum effort throughout | 94 of 184: 51.1% (43.9 to 58.2); +0.5 (-4.5 to 5.5) | 104 of 191: 54.5% (47.4 to 61.4); +0.7 (-4.6 to 6.0) |
+| Conserve effort throughout | 93 of 191: 48.7% (41.7 to 55.7); -0.5 (-5.1 to 4.1) | 91 of 189: 48.1% (41.1 to 55.2); +0.4 (-4.6 to 5.4) |
+| Two-slip field all innings | 119 of 189: 63.0% (55.9 to 69.5); +8.0 (2.6 to 13.5) | 122 of 194: 62.9% (55.9 to 69.4); +9.5 (4.0 to 15.0) |
+
+**`synthetic-alpha-01`:**
+
+| Experiment (poor side) | V5, first pass | V5 with the pace preference |
+| --- | --- | --- |
+| Weakest eleven | 109 of 195: 55.9% (48.9 to 62.7); +3.6 (-0.2 to 7.5) | 110 of 194: 56.7% (49.7 to 63.5); +3.4 (-0.5 to 7.2) |
+| Old selection rule | 160 of 194: 82.5% (76.5 to 87.2); +13.2 (9.6 to 16.9) | 158 of 196: 80.6% (74.5 to 85.5); +13.6 (9.7 to 17.5) |
+| Batting order reversed | 141 of 195: 72.3% (65.6 to 78.1); +8.0 (4.4 to 11.7) | 141 of 193: 73.1% (66.4 to 78.8); +8.1 (4.3 to 11.9) |
+| Aggression 4 every ball | 107 of 199: 53.8% (46.8 to 60.6); +4.4 (0.1 to 8.7) | 105 of 198: 53.0% (46.1 to 59.9); +4.6 (0.4 to 8.7) |
+| Aggression 0 every ball | 130 of 196: 66.3% (59.5 to 72.6); +6.1 (3.1 to 9.1) | 130 of 196: 66.3% (59.5 to 72.6); +6.2 (3.2 to 9.1) |
+| Weakest bowler first | 96 of 197: 48.7% (41.8 to 55.7); -0.5 (-4.2 to 3.2) | 95 of 195: 48.7% (41.8 to 55.7); +0.0 (-3.6 to 3.7) |
+| Full length, maximum effort | 96 of 196: 49.0% (42.1 to 55.9); -0.6 (-4.2 to 3.1) | 99 of 197: 50.3% (43.3 to 57.2); +0.3 (-3.3 to 3.9) |
+| Good length throughout | 101 of 197: 51.3% (44.3 to 58.2); +0.1 (-3.7 to 3.9) | 101 of 196: 51.5% (44.6 to 58.4); -0.2 (-3.8 to 3.4) |
+| Maximum effort throughout | 97 of 197: 49.2% (42.3 to 56.2); +0.2 (-3.5 to 3.9) | 100 of 198: 50.5% (43.6 to 57.4); +0.7 (-3.0 to 4.3) |
+| Conserve effort throughout | 94 of 198: 47.5% (40.6 to 54.4); -1.0 (-4.6 to 2.6) | 97 of 196: 49.5% (42.6 to 56.4); -0.2 (-3.8 to 3.4) |
+| Two-slip field all innings | 106 of 197: 53.8% (46.8 to 60.6); +3.6 (-0.3 to 7.6) | 110 of 197: 55.8% (48.9 to 62.6); +3.6 (-0.2 to 7.4) |
+
+Every experiment's result after the change lies within its interval before it, in both models.
+
 ## 5. What this shows
 
-1. **The research model's death overs are now close to real on runs and dots.** 9.60 runs an over (9.43 to 9.77) against 9.75 (fit) and 9.84 (selection); dots 18.7% against 18.8% and 23.6%. Before: 8.49 and 26.2%.
+1. **The research model's death overs are now close to real on runs and dots.** With the pace preference: 9.71 runs an over (9.55 to 9.88) against 9.75 (fit) and 9.84 (selection); dots 18.0% against 18.8% and 23.6%. First pass: 9.60 and 18.7%. V4 as measured: 8.49 and 26.2%. Pace now bowls most death balls: 53% in the first innings (first pass 32%), and yorkers are 21% of planned death balls (first pass 13%), with the world unchanged.
 2. **The causes were three, of similar size** (section 2b): the bowling plan, the batting holds and the over-at-a-time harness. Every C5 measurement was taken with that harness, so its death figures understate what the same captain does ball by ball, as the live game plays.
-3. **Death wickets now run high.** 10.03% a ball against 8.87% (fit) and 9.14% (selection); first-innings wickets 7.17 against 6.40 and 6.87. Fours are still low (9.2% against 11.1%) and sixes a little high (8.9% against 7.4%). [Inference] More attacking at the death in this model buys runs with wickets at the rate C5 measured for the aggression response, and the spin-heavy death (section 4c) gives fewer boundaries along the ground.
-4. **First-innings runs** rose to 163.4, between the fit (158.9) and selection (166.0) periods.
-5. **The live game changes little.** Death runs an over 6.31 to 6.77 and death wickets 10.3% to 11.3%; first-innings runs 111.6 to 113.0. The live model has no tactics component, so the plan matters only through its small length terms.
-6. **No change in strength or in what management decides.** V5 against V4 is level in both models. The tactical validation results stay within each other's intervals in every experiment; bowling plans still have no measurable effect on results. [Inference] The plan was made realistic, not stronger, as intended.
+3. **Death wickets now run high.** 9.94% a ball with the pace preference (first pass 10.03%) against 8.87% (fit) and 9.14% (selection); first-innings wickets 7.17 against 6.40 and 6.87. Fours are still low (9.2% against 11.1%) and sixes a little high (8.9% against 7.4%). [Inference] More attacking at the death in this model buys runs with wickets at the rate C5 measured for the aggression response, and the spin-heavy death (section 4c) gives fewer boundaries along the ground.
+4. **First-innings runs** are 162.2 with the pace preference (first pass 163.4), between the fit (158.9) and selection (166.0) periods.
+5. **The live game changes little.** Death runs an over 6.31 to 6.72 and death wickets 10.3% to 11.3%; first-innings runs 111.6 to 112.8. The live model has no tactics component, so the plan matters only through its small length terms.
+6. **No change in strength or in what management decides.** V5 against V4 is level in both models, before and after the pace preference. The tactical validation results stay within each other's intervals in every experiment; bowling plans still have no measurable effect on results. [Inference] The plan was made realistic, not stronger, as intended.
 
 ## 6. Compatibility
 
@@ -201,7 +286,7 @@ The V4 column equals the V4 rerun in [CAPTAIN_V4_DEATH_OVERS.md](CAPTAIN_V4_DEAT
 - At V3 (`4e29882`) and V4 (`d9bb921`), the script played three seeds with the batch captain and with each computer-opponent mode, and saved two matches part-way through: over 11 of the first innings and over 17 of the second. Each was saved as the game stores it (the session object, as JSON).
   - V4: 14 sessions, SHA-256 `82838d43...`.
   - V3: 8 sessions, SHA-256 `cc17e508...`. Its club-style and match-aware opponents fail at that revision with the `type`-key defect V4 fixed, so they could not be saved.
-- On this branch every saved session rehydrated with identical events and hash chain: **22 of 22**.
+- On this branch every saved session rehydrated with identical events and hash chain: **22 of 22**, at `3e2df81` and again at `9e15751` (with the pace preference).
 - Each saved in-progress match finished under V5, and its recorded commands were unchanged.
 - The same set-ups played live under V5 differ from the saved matches in **18 of 18** finished matches, so the identical replays are not because V5 makes the same choices.
 - Outputs: `docs/pavilion/captain-v5/replay-v3-4e29882-check.json` and `replay-v4-d9bb921-check.json`. The saved sessions (2.8 and 5.3 MB) stay outside the repository, in `/home/user/lcx-data/cap5/`.
@@ -214,13 +299,15 @@ The V4 column equals the V4 rerun in [CAPTAIN_V4_DEATH_OVERS.md](CAPTAIN_V4_DEAT
 ## 7. Proof that the models and formats are unchanged
 
 - No file under `packages/data`, `packages/simulation`, `packages/contracts`, `packages/persistence` or `packages/projections` changed (`git diff --stat origin/main` lists none).
-- The public captain view gains one optional in-memory field, `bowlerStyle`. It is a DTO, not a persisted format; the allow-list test in `tests/unit/m7-ai-analytics.test.ts` was updated to name it.
+- The public captain view gains one optional in-memory field, `bowlerStyle`, and each bowler candidate an optional `style`. It is a DTO, not a persisted format; the allow-list test in `tests/unit/m7-ai-analytics.test.ts` was updated to name `bowlerStyle`.
+- The second pass merged `main` at `bee69d4` and was checked again: `git diff --stat origin/main` on those packages lists nothing.
 
 ## 8. Limitations
 
 - Bowling plans still have no measurable effect on results in either model (section 4e), so the plan is realism, not yet a decision that wins matches.
 - The plan mix and the batting change are cricket judgement. Cricsheet has no ball length or pace, so no real yardstick exists for the mix.
-- [Inference] The death is spin-heavy because of the fictional world (50 spin bowlers to 22 pace) and V4's skill ranking. With pace-led deaths, yorkers would be about a third of death balls.
+- Even with the pace preference, spinners bowl 47% of first-innings death balls. The fictional world has 50 spin bowlers and 22 pace (section 4f).
+- The computer opponent's club-style temperament holds its top bowler back within overs 16 to 18. It ranks by control + movement, not by V5's death standing, so for those sides the pace preference applies only where that rule does not.
 - The plan is set by the ball's place in the over. It does not read the batter's strengths, the score or the field, beyond the tail-ender rule. A wide or no-ball repeats that ball's plan.
 - The fatigue rule reads the fatigue of the bowler the captain would choose next, as V4's did, not the current bowler's. In T20 fatigue rarely reaches 7,000 bp, so it seldom applies.
 - In the live game a person who presses "Finish over" bowls the rest of the over on the plans in force, so the varied plan and fresh batting plans apply only ball by ball.
@@ -234,6 +321,11 @@ The V4 column equals the V4 rerun in [CAPTAIN_V4_DEATH_OVERS.md](CAPTAIN_V4_DEAT
 node --import tsx scripts/pavilion-captain-v5-measure.ts measure-$m-OVER-V4-V4.json --model=$m --advance=OVER --bowling=V4 --batting=V4 --repeats=10
 node --import tsx scripts/pavilion-captain-v5-measure.ts measure-$m-DELIVERY-<P>-<B>.json --model=$m --bowling=<P> --batting=<B> --repeats=10   # P, B in V4, V5
 node --import tsx scripts/pavilion-captain-v5-measure.ts h2h-$m.json --h2h --model=$m
+# second pass: before at bee69d4 (this script copied in), after on this branch at 9e15751
+node --import tsx scripts/pavilion-captain-v5-measure.ts measure-$m-DELIVERY-V5-V5.json --model=$m --repeats=10   # at bee69d4
+node --import tsx scripts/pavilion-captain-v5-measure.ts measure-$m-V5-pace.json --model=$m --repeats=10
+node --import tsx scripts/pavilion-captain-v5-measure.ts h2h-pace-$m.json --h2h --model=$m
+node --import tsx scripts/pavilion-tactical-validation.ts tactical-validation-v5-pace-<model>.json [--model=calibrated-t20-01]
 # tactical validation: V4 on main (d9bb921); V5 and V4 ball by ball on this branch
 node --import tsx scripts/pavilion-tactical-validation.ts tactical-validation-v5-<model>.json [--model=calibrated-t20-01]
 node --import tsx scripts/pavilion-tactical-validation.ts tactical-validation-v4-delivery-<model>.json --captain=V4 [--model=calibrated-t20-01]

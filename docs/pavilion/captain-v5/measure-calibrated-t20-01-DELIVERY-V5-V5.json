@@ -345,6 +345,24 @@
         "shareOfDeathWickets": 84.88
       }
     },
+    "byBowlerStyle": {
+      "pace": {
+        "shareOfLegalBalls": 32.43,
+        "runsPerOver": 10,
+        "wicketPercent": 9.45,
+        "dotPercent": 16.4,
+        "shareOfDeathRuns": 33.78,
+        "shareOfDeathWickets": 30.55
+      },
+      "spin": {
+        "shareOfLegalBalls": 67.57,
+        "runsPerOver": 9.41,
+        "wicketPercent": 10.31,
+        "dotPercent": 19.8,
+        "shareOfDeathRuns": 66.22,
+        "shareOfDeathWickets": 69.45
+      }
+    },
     "lowAggressionReasons": {
       "aggression 3 or 4": {
         "shareOfLegalBalls": 100,
@@ -568,6 +586,24 @@
         "dotPercent": 19.6,
         "shareOfDeathRuns": 53.11,
         "shareOfDeathWickets": 64.93
+      }
+    },
+    "byBowlerStyle": {
+      "pace": {
+        "shareOfLegalBalls": 30.76,
+        "runsPerOver": 6.9,
+        "wicketPercent": 6.34,
+        "dotPercent": 33.3,
+        "shareOfDeathRuns": 30.19,
+        "shareOfDeathWickets": 27.5
+      },
+      "spin": {
+        "shareOfLegalBalls": 69.24,
+        "runsPerOver": 7.09,
+        "wicketPercent": 7.43,
+        "dotPercent": 34.1,
+        "shareOfDeathRuns": 69.81,
+        "shareOfDeathWickets": 72.5
       }
     },
     "lowAggressionReasons": {
