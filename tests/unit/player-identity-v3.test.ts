@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test, vi } from "vitest";
 import {
-  PLAYER_IDENTITY_RULES,
   PLAYER_IDENTITY_V3_RULES,
   PLAYER_IDENTITY_V3_VERSION,
   liveMilestone,
@@ -54,8 +53,8 @@ describe("live milestone", () => {
     const wicketsEdge = 25 - PLAYER_IDENTITY_V3_RULES.liveWicketsWithin;
     expect(liveMilestone(record({ wickets: wicketsEdge - 1 }), "BOWLER", { wickets: 0 })).toBeNull();
     expect(liveMilestone(record({ wickets: wicketsEdge }), "BOWLER", { wickets: 0 })!.visible).toBe("2 more for 25 league wickets");
-    // A new player with few runs is far from any milestone.
-    expect(liveMilestone(record({ runs: 41 }), "BATTER", { runs: 30 })).toBeNull();
+    // Far from the next mark, with an earlier fifty: nothing.
+    expect(liveMilestone(record({ runs: 141 }), "BATTER", { runs: 30 })).toBeNull();
   });
 
   test("a milestone passed in this innings stays as reached; one passed before the match does not", () => {
@@ -87,24 +86,99 @@ describe("live milestone", () => {
   test("every number shown is a listed fact, and the chip text stays short", () => {
     for (let before = 0; before <= 2_100; before += 7) {
       for (const inMatch of [0, 1, 4, 9, 23, 61]) {
-        for (const kind of ["BATTER", "BOWLER"] as const) {
+        for (const [kind, fifties] of [["BATTER", 0], ["BATTER", 2], ["BOWLER", 0]] as const) {
           const scaled = kind === "BATTER" ? before : Math.floor(before / 20);
           const line = kind === "BATTER" ? { runs: inMatch } : { wickets: Math.min(inMatch, 10) };
-          const live = liveMilestone(record({ runs: scaled, wickets: scaled }), kind, line);
+          const live = liveMilestone(record({ runs: scaled, wickets: scaled, fifties, battingInnings: scaled > 0 ? 7 : 0, bowlingInnings: scaled > 0 ? 4 : 0 }), kind, line);
           if (!live) continue;
           const allowed = supported(live.facts);
           for (const n of numbers(`${live.visible} ${live.sentence}`)) expect(allowed.has(n), `${n} in ${live.sentence}`).toBe(true);
           expect(live.visible.length).toBeLessThanOrEqual(32);
-          expect(live.visible).toMatch(/^(One more|\d+ more) for \d+ league (runs|wickets)$|^Reached \d+ league (runs|wickets)$/);
+          expect(live.visible).toMatch(/^(One more|\d+ more) for (\d+ league (runs|wickets)|first league fifty)$|^Reached \d+ league (runs|wickets)$|^First league (fifty|wicket)$/);
         }
       }
     }
   });
 
-  test("milestones use the E6 steps", () => {
-    expect(PLAYER_IDENTITY_RULES.runsStep).toBe(500);
-    expect(PLAYER_IDENTITY_RULES.wicketsStep).toBe(25);
+  test("runs marks: 100, 250, 500, then every 500", () => {
     expect(PLAYER_IDENTITY_V3_VERSION).toBe("LC_PLAYER_IDENTITY_V3");
+    expect(PLAYER_IDENTITY_V3_RULES.runsMarks).toEqual([100, 250, 500]);
+    const close = (runs: number, inMatch: number) => liveMilestone(record({ runs }), "BATTER", { runs: inMatch })?.visible ?? null;
+    expect(close(80, 12)).toBe("8 more for 100 league runs");
+    expect(close(0, 99)).toBe("One more for 100 league runs");
+    expect(close(200, 41)).toBe("9 more for 250 league runs");
+    expect(close(230, 10)).toBe("10 more for 250 league runs");
+    expect(close(230, 9)).toBeNull();
+    expect(close(480, 12)).toBe("8 more for 500 league runs");
+    expect(close(990, 3)).toBe("7 more for 1000 league runs");
+    expect(close(1480, 15)).toBe("5 more for 1500 league runs");
+    expect(close(2000, 489)).toBeNull();
+    const reached = (runs: number, inMatch: number) => liveMilestone(record({ runs }), "BATTER", { runs: inMatch })?.visible ?? null;
+    expect(reached(95, 5)).toBe("Reached 100 league runs");
+    expect(reached(240, 30)).toBe("Reached 250 league runs");
+    expect(reached(1490, 12)).toBe("Reached 1500 league runs");
+    // Two marks in one innings: the higher one is stated.
+    expect(reached(90, 170)).toBe("Reached 250 league runs");
+    // Passed before the match: never "reached" again.
+    expect(reached(100, 20)).toBeNull();
+    expect(reached(250, 5)).toBeNull();
+  });
+
+  test("wickets marks: 10, 25, 50, then every 25", () => {
+    expect(PLAYER_IDENTITY_V3_RULES.wicketsMarks).toEqual([10, 25, 50]);
+    const bowl = (wickets: number, inMatch: number) => liveMilestone(record({ wickets }), "BOWLER", { wickets: inMatch })?.visible ?? null;
+    expect(bowl(8, 0)).toBe("2 more for 10 league wickets");
+    expect(bowl(7, 2)).toBe("One more for 10 league wickets");
+    expect(bowl(7, 0)).toBeNull();
+    expect(bowl(9, 1)).toBe("Reached 10 league wickets");
+    expect(bowl(23, 0)).toBe("2 more for 25 league wickets");
+    expect(bowl(24, 1)).toBe("Reached 25 league wickets");
+    expect(bowl(48, 1)).toBe("One more for 50 league wickets");
+    expect(bowl(49, 2)).toBe("Reached 50 league wickets");
+    expect(bowl(73, 0)).toBe("2 more for 75 league wickets");
+    expect(bowl(99, 1)).toBe("Reached 100 league wickets");
+    expect(bowl(10, 2)).toBeNull();
+  });
+
+  test("first league fifty: close from 40, reached at 50 in this innings, only with no fifty or hundred before", () => {
+    const fresh = { runs: 120, fifties: 0, hundreds: 0, battingInnings: 9 };
+    const close = liveMilestone(record(fresh), "BATTER", { runs: 46 });
+    expect(close).toMatchObject({ mark: "FIRST_FIFTY", state: "CLOSE", target: 50, needed: 4 });
+    expect(close!.visible).toBe("4 more for first league fifty");
+    expect(close!.sentence).toBe("46 in this innings. No fifty in 9 league innings before this match. 4 runs short of a first league fifty.");
+    expect(liveMilestone(record(fresh), "BATTER", { runs: 49 })!.visible).toBe("One more for first league fifty");
+    expect(liveMilestone(record(fresh), "BATTER", { runs: 39 })).toBeNull();
+    const reached = liveMilestone(record(fresh), "BATTER", { runs: 53 });
+    expect(reached).toMatchObject({ mark: "FIRST_FIFTY", state: "REACHED" });
+    expect(reached!.visible).toBe("First league fifty");
+    expect(reached!.sentence).toBe("First league fifty: 53 in this innings. No fifty in 9 league innings before this match.");
+    // A debutant.
+    expect(liveMilestone(record({ ...fresh, runs: 0, battingInnings: 0 }), "BATTER", { runs: 44 })!.sentence)
+      .toBe("44 in this innings. No league innings before this match. 6 runs short of a first league fifty.");
+    // Not with an earlier fifty or hundred.
+    expect(liveMilestone(record({ ...fresh, fifties: 1 }), "BATTER", { runs: 55 })).toBeNull();
+    expect(liveMilestone(record({ ...fresh, hundreds: 1 }), "BATTER", { runs: 45 })).toBeNull();
+  });
+
+  test("a league total takes precedence: reached over first fifty, and close total over close first fifty", () => {
+    const fresh = { fifties: 0, hundreds: 0, battingInnings: 5 };
+    expect(liveMilestone(record({ ...fresh, runs: 60 }), "BATTER", { runs: 52 })!.visible).toBe("Reached 100 league runs");
+    expect(liveMilestone(record({ ...fresh, runs: 47 }), "BATTER", { runs: 45 })!.visible).toBe("8 more for 100 league runs");
+    // First fifty reached ranks above a close total.
+    expect(liveMilestone(record({ ...fresh, runs: 190 }), "BATTER", { runs: 51 })!.visible).toBe("First league fifty");
+  });
+
+  test("first league wicket: shown once taken in this innings, never as close", () => {
+    const first = liveMilestone(record({ wickets: 0, bowlingInnings: 3 }), "BOWLER", { wickets: 1 });
+    expect(first).toMatchObject({ mark: "FIRST_WICKET", state: "REACHED", target: 1 });
+    expect(first!.visible).toBe("First league wicket");
+    expect(first!.sentence).toBe("First league wicket: 1 in this innings. No league wicket in 3 matches bowled before this one.");
+    expect(liveMilestone(record({ wickets: 0, bowlingInnings: 0 }), "BOWLER", { wickets: 2 })!.sentence)
+      .toBe("First league wicket: 2 in this innings. No league bowling before this match.");
+    expect(liveMilestone(record({ wickets: 0 }), "BOWLER", { wickets: 0 })).toBeNull();
+    expect(liveMilestone(record({ wickets: 1 }), "BOWLER", { wickets: 1 })).toBeNull();
+    // Ten in one innings from none is the 10 mark, not the first wicket.
+    expect(liveMilestone(record({ wickets: 0 }), "BOWLER", { wickets: 10 })!.visible).toBe("Reached 10 league wickets");
   });
 });
 
@@ -151,7 +225,7 @@ describe("match introduction V3", () => {
   test("the module imports nothing from the simulation, its random stream or the probability tables", () => {
     const text = readFileSync(resolve(root, "packages/projections/src/player-identity-v3.ts"), "utf8");
     const imports = [...text.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
-    expect(imports).toEqual(["./player-identity.js", "./player-identity-v1.js", "./player-identity-v2.js"]);
+    expect(imports).toEqual(["./player-identity-v1.js", "./player-identity-v2.js"]);
   });
 });
 

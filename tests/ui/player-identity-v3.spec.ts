@@ -77,7 +77,7 @@ test("the chip opens the player page while the managed match is kept, and stays 
   expect(all.length, JSON.stringify(all)).toBeGreaterThanOrEqual(3);
   for (const chip of all) {
     expect(chip.button).toBe(true);
-    if (chip.live) expect(chip.text).toMatch(/^(One more|\d+ more) for \d+ league (runs|wickets)$|^Reached \d+ league (runs|wickets)$/);
+    if (chip.live) expect(chip.text).toMatch(/^(One more|\d+ more) for (\d+ league (runs|wickets)|first league fifty)$|^Reached \d+ league (runs|wickets)$|^First league (fifty|wicket)$/);
     else if (!chip.isNew) expect(chip.text).not.toMatch(/:|league/);
   }
 
