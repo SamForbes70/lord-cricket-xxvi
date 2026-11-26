@@ -47,7 +47,7 @@ export function MatchStyleChip({ playerId, name, style, kind, isNew, record = nu
         <button
           type="button"
           className="match-style-open"
-          data-testid={`match-intro-open-${playerId}`}
+          data-testid={`chip-player-link-${playerId}`}
           disabled={openDisabled}
           onClick={onOpen}
         >

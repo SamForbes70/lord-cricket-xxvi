@@ -52,7 +52,7 @@ test("the chip opens the player page while the managed match is kept, and stays 
   await expect(decision).toHaveAttribute("aria-busy", "false");
 
   // Toss, innings choice, openers and bowler, then one delivery so the chips leave their introduction.
-  const chips = page.locator("[data-testid^='match-intro-']:not([data-testid^='match-intro-open-'])");
+  const chips = page.locator("[data-testid^='match-intro-']");
   for (let n = 0; n < 12 && (await chips.count()) < 3; n += 1) {
     const phase = await decision.getAttribute("data-phase");
     const target = phase === "TOSS" ? decision.getByRole("button", { name: "Call heads" })
@@ -75,6 +75,9 @@ test("the chip opens the player page while the managed match is kept, and stays 
   })));
   const all = await read();
   expect(all.length, JSON.stringify(all)).toBeGreaterThanOrEqual(3);
+  // The link carries its own test id, outside the chip prefix the V1 and V2 specs count (a shared prefix once made
+  // the V2 spec stop collecting before the bowler was chosen).
+  expect(await page.locator("[data-testid^='match-intro-'] [data-testid^='match-intro-']").count()).toBe(0);
   for (const chip of all) {
     expect(chip.button).toBe(true);
     if (chip.live) expect(chip.text).toMatch(/^(One more|\d+ more) for (\d+ league (runs|wickets)|first league fifty)$|^Reached \d+ league (runs|wickets)$|^First league (fifty|wicket)$/);
@@ -110,8 +113,8 @@ test("the chip opens the player page while the managed match is kept, and stays 
   const revision = await decision.getAttribute("data-revision");
   const phase = await decision.getAttribute("data-phase");
   const before = await careerCheckpoint(page);
-  const bowlerChip = page.locator(".active .active-player").last().locator("[data-testid^='match-intro-open-']");
-  const bowlerId = (await bowlerChip.getAttribute("data-testid"))!.replace("match-intro-open-", "");
+  const bowlerChip = page.locator(".active .active-player").last().locator("[data-testid^='chip-player-link-']");
+  const bowlerId = (await bowlerChip.getAttribute("data-testid"))!.replace("chip-player-link-", "");
   const bowlerName = (await page.locator(".active .active-player").last().locator("strong").innerText()).trim();
   await expect(bowlerChip).toHaveAccessibleName(new RegExp(`Opens ${bowlerName}'s player page; the match is kept\\.`));
   await bowlerChip.click();
