@@ -1,0 +1,105 @@
+{
+  "version": "LC_PAVILION_ODI_DEATH_OVERS_MEASURE_V1",
+  "model": "synthetic-alpha-01",
+  "captain": "LC_ODI_TACTICAL_CAPTAIN_V2 (apps/batch tacticalODIStep), both sides",
+  "matches": 100,
+  "quarters": [
+    {
+      "quarter": "lowest",
+      "bowlers": 12,
+      "ratingRange": [
+        137,
+        171
+      ],
+      "overs": 503.5,
+      "overs1to10": 0,
+      "overs11to40": 96.5,
+      "overs41to50": 3.5
+    },
+    {
+      "quarter": "second",
+      "bowlers": 12,
+      "ratingRange": [
+        176,
+        193
+      ],
+      "overs": 1771.7,
+      "overs1to10": 0,
+      "overs11to40": 96.8,
+      "overs41to50": 3.2
+    },
+    {
+      "quarter": "third",
+      "bowlers": 12,
+      "ratingRange": [
+        193,
+        202
+      ],
+      "overs": 2269.8,
+      "overs1to10": 40.9,
+      "overs11to40": 54.7,
+      "overs41to50": 4.4
+    },
+    {
+      "quarter": "highest",
+      "bowlers": 12,
+      "ratingRange": [
+        202,
+        221
+      ],
+      "overs": 2347.3,
+      "overs1to10": 45.5,
+      "overs11to40": 51.3,
+      "overs41to50": 3.2
+    }
+  ],
+  "byRankInEleven": [
+    {
+      "rankInEleven": 1,
+      "overs": 1637,
+      "overs1to10": 53.4,
+      "overs11to40": 43.7,
+      "overs41to50": 2.9
+    },
+    {
+      "rankInEleven": 2,
+      "overs": 1533.2,
+      "overs1to10": 54.1,
+      "overs11to40": 41.4,
+      "overs41to50": 4.5
+    },
+    {
+      "rankInEleven": 3,
+      "overs": 1456.5,
+      "overs1to10": 20.2,
+      "overs11to40": 75.8,
+      "overs41to50": 4.1
+    },
+    {
+      "rankInEleven": 4,
+      "overs": 1307,
+      "overs1to10": 0,
+      "overs11to40": 96.5,
+      "overs41to50": 3.5
+    },
+    {
+      "rankInEleven": 5,
+      "overs": 788.3,
+      "overs1to10": 0,
+      "overs11to40": 97.1,
+      "overs41to50": 2.9
+    },
+    {
+      "rankInEleven": 6,
+      "overs": 170.3,
+      "overs1to10": 0,
+      "overs11to40": 97.3,
+      "overs41to50": 2.7
+    }
+  ],
+  "economy": {
+    "overs1to10": 4.57,
+    "overs11to40": 4.11,
+    "overs41to50": 4.68
+  }
+}

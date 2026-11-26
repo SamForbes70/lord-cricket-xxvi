@@ -1,8 +1,13 @@
-/** LC_T20_TACTICAL_CAPTAIN_V3. Pure deterministic, public-observation-only choices.
+/** LC_T20_TACTICAL_CAPTAIN_V4. Pure deterministic, public-observation-only choices.
  * V2 (Pavilion P04, 25 November 2026): never picks a bowler after whom the rest of the innings cannot be bowled
  * (bowling-plan.ts); otherwise the same choices as V1.
  * V3 (Pavilion P04 stage B): batting aggression and intent come from LC_T20_BATTING_POLICY_V1 (batting-policy.ts),
  * which also reads the skill of the two batters at the crease; bowling and field choices are V2's.
+ * V4 (Pavilion, 25 November 2026): plans the bowling so the best bowlers keep overs for the death. V2's choice spent
+ * the best bowlers first and left the weakest to bowl overs 16 to 20 (docs/pavilion/CAPTAIN_V4_DEATH_OVERS.md).
+ * Before the death, each of the best bowlers keeps up to two overs back (deathOverReserve) until the five death
+ * overs are covered, and the captain picks from the overs left over; in the death it picks its best bowler. The
+ * batting policy, lengths, effort rule and field intent are V3's. Never strands the innings (bowling-plan.ts).
  * The caller owns legality; candidates here are already filtered by the cricket engine.
  * No match seed, random counter, hidden player attributes or opponent future actions occur in this DTO.
  */
@@ -23,14 +28,24 @@ export interface T20TacticalPublicView {
   readonly targetToWin: number | null;
   readonly availableBatters: number;
   readonly bowlingCandidates: readonly TacticalBowlerCandidate[];
-  /** The bowler of the previous over (not a candidate for this one) and the balls left in their quota. */
-  readonly previousOverBowler?: { readonly playerId: string; readonly quotaRemaining: number } | null;
+  /** The bowler of the previous over (not a candidate for this one), the balls left in their quota and, from V4, their
+   * public bowling skills, so the death-over plan can count them. Without skills they keep no overs for the death. */
+  readonly previousOverBowler?: PreviousOverBowler | null;
   /** The batter about to face and the one at the other end (public batting skills), when known. */
   readonly striker?: BatterSkills | null;
   readonly partner?: BatterSkills | null;
 }
+export type PreviousOverBowler = Readonly<{
+  playerId: string;
+  quotaRemaining: number;
+  control?: number;
+  movement?: number;
+  variation?: number;
+  stamina?: number;
+}>;
+export const T20_TACTICAL_CAPTAIN_ID = "LC_T20_TACTICAL_CAPTAIN_V4" as const;
 export type T20TacticalAdvice = Readonly<{
-  policyId: "LC_T20_TACTICAL_CAPTAIN_V3";
+  policyId: typeof T20_TACTICAL_CAPTAIN_ID;
   aggression: 0 | 1 | 2 | 3 | 4;
   battingIntent: BattingIntent;
   preferredBowlerId: string | null;
@@ -50,6 +65,36 @@ export function bowlersWithOversLeft(
 ): BowlerOvers[] {
   const all = [...view.bowlingCandidates, ...(view.previousOverBowler ? [view.previousOverBowler] : [])];
   return all.map(p => ({ playerId: p.playerId, oversLeft: Math.floor(p.quotaRemaining / ballsPerOver) }));
+}
+
+/** Overs 16 to 20. */
+export const T20_DEATH_OVERS = 5;
+/** The most overs one bowler keeps back for the death. */
+export const T20_DEATH_RESERVE_PER_BOWLER = 2;
+
+/** A bowler's standing for the death-over plan: skills only, so the plan does not move with fatigue from over to over. */
+export function t20BowlerSkill(p: { readonly control: number; readonly movement: number; readonly variation: number; readonly stamina: number }): number {
+  return 2 * p.control + 2 * p.movement + p.variation + p.stamina / 2;
+}
+
+/**
+ * The overs each bowler keeps back for the death: best bowler first (ties by playerId), up to
+ * T20_DEATH_RESERVE_PER_BOWLER each and no more than they have left, until `deathOvers` are covered. With six
+ * bowlers on four overs each that is two overs for the best two and one for the third. Pure and deterministic.
+ */
+export function deathOverReserve(
+  bowlers: readonly { readonly playerId: string; readonly oversLeft: number; readonly skill: number }[],
+  deathOvers: number,
+): Map<string, number> {
+  const reserve = new Map<string, number>();
+  let toCover = Math.max(0, deathOvers);
+  const ranked = [...bowlers].sort((a, b) => b.skill - a.skill || (a.playerId < b.playerId ? -1 : a.playerId > b.playerId ? 1 : 0));
+  for (const b of ranked) {
+    const kept = Math.min(T20_DEATH_RESERVE_PER_BOWLER, Math.max(0, b.oversLeft), toCover);
+    reserve.set(b.playerId, kept);
+    toCover -= kept;
+  }
+  return reserve;
 }
 
 function assertFiniteNonnegative(value: number, name: string) {
@@ -77,18 +122,35 @@ export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20Tact
     }
     return p.quotaRemaining > 0 && p.fatigueBp <= 10000;
   });
-  // Preserve death overs for good bowlers when there is sufficient remaining capacity.
-  const scores = valid.map(p => ({
-    id: p.playerId,
-    score: 2*p.control + 2*p.movement + p.variation + p.stamina/2 - p.fatigueBp/90
-      - (phase !== "DEATH" && p.quotaRemaining <= 6 ? 30 : 0),
-  }));
-  scores.sort((a,b) => b.score - a.score || a.id.localeCompare(b.id));
-  const chosenId = feasibleBowlerChoice(scores.map(s => s.id), Math.ceil(remaining / 6), bowlersWithOversLeft(view, 6), view.previousOverBowler?.playerId ?? null);
+  for (const [name, value] of Object.entries(view.previousOverBowler ?? {})) {
+    if (name !== "playerId" && value !== undefined) assertFiniteNonnegative(value as number, name);
+  }
+  const oversRemaining = Math.ceil(remaining / 6);
+  const overs = bowlersWithOversLeft(view, 6);
+  const score = (p: TacticalBowlerCandidate) => t20BowlerSkill(p) - p.fatigueBp / 90;
+  const byId = (a: { playerId: string }, b: { playerId: string }) => a.playerId.localeCompare(b.playerId);
+  let order: string[];
+  if (phase === "DEATH") {
+    // The death: the best bowler who can bowl now.
+    order = [...valid].sort((a, b) => score(b) - score(a) || byId(a, b)).map(p => p.playerId);
+  } else {
+    // Before the death: keep the best bowlers' last overs back and bowl the overs left over, best first. Only when no
+    // one has an over to spare, dip into the reserve of the least skilled reserved bowler.
+    const prev = view.previousOverBowler;
+    const prevSkill = prev && [prev.control, prev.movement, prev.variation, prev.stamina].every(v => typeof v === "number")
+      ? t20BowlerSkill(prev as Required<PreviousOverBowler>) : Number.NEGATIVE_INFINITY;
+    const skillOf = new Map<string, number>([...valid.map(p => [p.playerId, t20BowlerSkill(p)] as const), ...(prev ? [[prev.playerId, prevSkill] as const] : [])]);
+    const reserve = deathOverReserve(overs.map(b => ({ ...b, skill: skillOf.get(b.playerId) ?? Number.NEGATIVE_INFINITY })), T20_DEATH_OVERS);
+    const spare = (p: TacticalBowlerCandidate) => Math.floor(p.quotaRemaining / 6) - (reserve.get(p.playerId) ?? 0) > 0;
+    const free = valid.filter(spare).sort((a, b) => score(b) - score(a) || byId(a, b));
+    const reserved = valid.filter(p => !spare(p)).sort((a, b) => t20BowlerSkill(a) - t20BowlerSkill(b) || byId(a, b));
+    order = [...free, ...reserved].map(p => p.playerId);
+  }
+  const chosenId = feasibleBowlerChoice(order, oversRemaining, overs, view.previousOverBowler?.playerId ?? null);
   const chosen = valid.find(p => p.playerId === chosenId);
   const bowlingEffort = chosen && chosen.fatigueBp >= 7000 ? "CONSERVE" : phase === "DEATH" && chosen && chosen.fatigueBp < 4000 ? "MAXIMUM" : "NORMAL";
   return {
-    policyId: "LC_T20_TACTICAL_CAPTAIN_V3",
+    policyId: T20_TACTICAL_CAPTAIN_ID,
     aggression: batting.aggression,
     battingIntent: batting.intent,
     preferredBowlerId: chosen?.playerId ?? null,

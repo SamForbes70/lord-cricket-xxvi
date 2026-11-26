@@ -81,3 +81,24 @@ describe("M7B optional opponent through authoritative T20 engine", () => {
     expect(run()).toBe(run());
   }, 120000);
 });
+
+describe("M7B opponent: a second bowling-plan change in one over", () => {
+  test("club-style and match-aware opponents send only the plan's own fields and finish the match", () => {
+    // Found 25 November 2026: the engine's plan after a change carries the event's `type`, and copying it into the
+    // next SET_BOWLING_PLAN was refused by the command schema, so these modes failed mid-match.
+    for (const [matchAware, clubStyle] of [[false, true], [true, true]] as const) {
+      let session = fixture();
+      let changes = 0;
+      while (session.core.phase !== "COMPLETE") {
+        if (session.revision >= 900) throw new Error("M7B_MATCH_STALLED");
+        const proposed = session.setup.teams.map((t) => proposeOpponentT20Command(session, t.teamId, undefined, matchAware, clubStyle)).find((c) => c !== null);
+        if (proposed?.kind === "SET_BOWLING_PLAN") {
+          expect(Object.keys(proposed.payload).sort()).toEqual(["bowlerId", "effort", "length", "line", "variationId"]);
+          changes += 1;
+        }
+        session = executeT20Command(session, proposed ?? fixtureAutopilotStep(session)).session;
+      }
+      expect(changes).toBeGreaterThan(0);
+    }
+  }, 120000);
+});

@@ -24,6 +24,7 @@ import {
   type Red5BowlerCandidate,
   type Red5TacticalPublicView,
   type BatterSkills,
+  type PreviousOverBowler,
   type TacticalBowlerCandidate,
   type T20TacticalPublicView,
 } from "@lcxxvi/ai";
@@ -62,8 +63,23 @@ export function publicT20CaptainView(session: Readonly<T20Session>): T20Tactical
     targetToWin: i.targetToWin,
     availableBatters: Math.max(0, 10 - i.wickets),
     bowlingCandidates: candidates,
-    previousOverBowler: i.previousOverBowlerId ? { playerId: i.previousOverBowlerId, quotaRemaining: 24 - (ledger.bowling[i.previousOverBowlerId]?.legalBalls ?? 0) } : null,
+    previousOverBowler: previousT20Bowler(bowling.xi, i.previousOverBowlerId, ledger.bowling),
     ...battersAtCrease(session),
+  };
+}
+
+/** The previous over's bowler with the balls left in their quota and their public T20 bowling skills (captain V4). */
+export function previousT20Bowler(
+  xi: readonly { playerId: string; skills: { T20: { control: number; movement: number; variation: number; stamina: number } } }[],
+  previousOverBowlerId: string | null,
+  bowling: Readonly<Record<string, { legalBalls: number } | undefined>>,
+): PreviousOverBowler | null {
+  if (!previousOverBowlerId) return null;
+  const s = xi.find(p => p.playerId === previousOverBowlerId)?.skills.T20;
+  return {
+    playerId: previousOverBowlerId,
+    quotaRemaining: 24 - (bowling[previousOverBowlerId]?.legalBalls ?? 0),
+    ...(s ? { control: s.control, movement: s.movement, variation: s.variation, stamina: s.stamina } : {}),
   };
 }
 
@@ -80,7 +96,7 @@ export function battersAtCrease(session: Readonly<T20Session>): { striker: Batte
   return i.strikerEnd === "NORTH" ? { striker: north, partner: south } : { striker: south, partner: north };
 }
 
-/** Additive V1 captain chooses only legal engine commands; accepted LC_T20_MATCH_V1 owns delivery sampling. */
+/** The T20 tactical captain (adviseT20Captain, now V4) chooses only legal engine commands; accepted LC_T20_MATCH_V1 owns delivery sampling. */
 export function tacticalT20Step(session: Readonly<T20Session>): T20Command {
   const fallback = fixtureAutopilotStep(session as T20Session);
   const view = publicT20CaptainView(session);
