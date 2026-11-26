@@ -161,7 +161,24 @@ function deliveryContactTerms(req: GenerateDeliveryRequest, id: string): Array<{
   return [
     {coefficientBp: phase[id as CalibratedContactId], featureBp: 10000},
     {coefficientBp: pack.contact.aggression[id as CalibratedContactId], featureBp: (req.batting.aggression - 2) * 10000},
+    // V2: the ground's pitch (both bowling types), on seam + turn about the pack's centre.
+    {coefficientBp: pack.pitch.contact[id as CalibratedContactId], featureBp: calibratedPitchBp(req)},
   ];
+}
+/**
+ * C5 (delivery V2), calibrated-t20-01 only: attacking into a spread field. The field's spread is 2,000 bp for each
+ * boundary rider (DEEP slot), 10,000 with five out; the feature is that spread times the attacking levels above
+ * aggression 2 (a defensive or normal stroke gets nothing from it).
+ */
+export function calibratedSpreadAttackBp(req: GenerateDeliveryRequest): number {
+  const spreadBp = Math.min(10000, 2000 * req.field.slots.filter((slot) => slot.depth === "DEEP").length);
+  return Math.max(0, req.batting.aggression - 2) * spreadBp;
+}
+/** C5 (delivery V2), calibrated-t20-01 only: the pitch feature, seam + turn of the current pitch about twice the centre. */
+export function calibratedPitchBp(req: GenerateDeliveryRequest): number {
+  const pack = deliveryPackOf(req);
+  if (!pack) return 0;
+  return clamp(req.conditions.seamBp + req.conditions.turnBp - 2 * pack.pitch.centreBp, -10000, 10000);
 }
 function skillRating(req: GenerateDeliveryRequest, skill: CalibratedSkill): number {
   switch (skill) {
@@ -287,6 +304,11 @@ function runningCategories(req: GenerateDeliveryRequest, contact: "GROUND"|"AERI
     }
     const aggression = pack && contact !== "EDGE" ? pack.runsAggressionBp[id as CalibratedRunId] : 0;
     if (aggression !== 0) terms.push({coefficientBp:aggression,featureBp:(req.batting.aggression-2)*10000});
+    if (pack && cover) {
+      // V2: attacking into a spread field (aggression x deep coverage) and the pitch.
+      if (contact !== "EDGE") terms.push({coefficientBp:pack.runsAggressionDeepBp[id as CalibratedRunId],featureBp:calibratedSpreadAttackBp(req)});
+      terms.push({coefficientBp:pack.pitch.runs[id as CalibratedRunId],featureBp:calibratedPitchBp(req)});
+    }
     terms.push(...skillTerms(req,"runs",id));
     const runs = Number(id);
     // An attempted physical run cannot overrun a winning target; boundaries may fully score.
@@ -301,6 +323,8 @@ function runOutCategories(req: GenerateDeliveryRequest, fielder: ChosenFielder, 
     {coefficientBp:DELIVERY_STAGE_PACK.running.throwingBp,featureBp:rating(fielder.throwingRating)},
     {coefficientBp:DELIVERY_STAGE_PACK.running.coverageBp,featureBp:fielder.coverageBp},
     {coefficientBp:DELIVERY_STAGE_PACK.running.rotateBp,featureBp:req.batting.intent === "ROTATE"?10000:0},
+    // V2 (calibrated-t20-01 only): hard running at higher aggression.
+    ...(deliveryPackOf(req) ? [{coefficientBp:deliveryPackOf(req)!.runOutAggressionBp,featureBp:(req.batting.aggression-2)*10000}] : []),
   ],allowed),cat("SAFE",1)];
 }
 /** Internal SHA-address trace is never included in public prediction/projection DTOs. */
@@ -368,7 +392,10 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
     fielder=coveringFielder(req,base.shotSector,contact);
     if (contact === "AERIAL" || contact === "EDGE") {
       if (!forbidden && fielder.coverageBp>0) {
-        const opportunityBp=deliveryPackOf(req)?.catchOpportunityBp[contact] ?? DELIVERY_STAGE_PACK.catchOpportunityBp[contact];
+        const dpack=deliveryPackOf(req);
+        // V2 (calibrated-t20-01 only): a slog is more often skied, a defensive stroke less often.
+        const opportunityBp=dpack ? clamp(dpack.catchOpportunityBp[contact]+dpack.catchOpportunityAggressionBp[contact]*(req.batting.aggression-2),0,10000)
+          : DELIVERY_STAGE_PACK.catchOpportunityBp[contact];
         const chanceWeight=rounded(opportunityBp,fielder.coverageBp);
         const chance=sample("FIELD_CHANCE",[cat("CHANCE",chanceWeight),cat("NO_CHANCE",10000-chanceWeight)]);
         if (chance === "CHANCE") {
@@ -434,7 +461,9 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
       modelHash:req.modelHash,lutVersion:EXP_LUT_VERSION,lutHash:EXP_LUT_SHA256,
       categories:[cat("SUCCESS",1,0,[{coefficientBp:10000,featureBp:rating(req.field.keeper.keepingRating)}]),cat("FAILURE",1)]});
     const successMass=BigInt(sigmoid.categories[0]!.mass);
-    const fraction=successMass*BigInt(DELIVERY_STAGE_PACK.stumping.numerator)/BigInt(DELIVERY_STAGE_PACK.stumping.denominator);
+    // V2 (calibrated-t20-01 only): the pack's stumping fraction replaces 3 / 1000.
+    const stumping=deliveryPackOf(req)?.stumping ?? DELIVERY_STAGE_PACK.stumping;
+    const fraction=successMass*BigInt(stumping.numerator)/BigInt(stumping.denominator);
     const successWeight=Number(roundDivTiesAway(fraction*1000000000n,4294967296n));
     const stump=sample("STUMPING",[cat("STUMPED",successWeight),cat("NONE",1000000000-successWeight)]);
     if (stump==="STUMPED") {

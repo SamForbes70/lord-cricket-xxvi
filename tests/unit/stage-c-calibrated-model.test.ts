@@ -3,6 +3,7 @@
  * calibrated-t20-01 skill pack. synthetic-alpha-01 must be unaffected; the research model is reachable only through
  * validateT20ResearchMatchSetup.
  * C4: the calibrated model also carries the delivery-outcome pack, and its model hash covers both components.
+ * C5: delivery pack V2 (attacking into a spread field, skied slogs, hard running, stumpings, the pitch).
  */
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
@@ -16,7 +17,7 @@ import {
   CALIBRATED_T20_PACK, CALIBRATED_T20_PACK_SHA256, DELIVERY_STAGE_PACK_SHA256, MODEL_PACK_SHA256, suggestedEleven,
 } from "@lcxxvi/data";
 import {
-  MODEL_REGISTRY, calibratedFieldCover, canonicalStateBytes, conditionedContactCategories, coveringFielder, createProbabilityService, createT20CorpusRequest,
+  MODEL_REGISTRY, calibratedFieldCover, calibratedPitchBp, calibratedSpreadAttackBp, canonicalStateBytes, conditionedContactCategories, coveringFielder, createProbabilityService, createT20CorpusRequest,
   createT20Session, executeT20Command, fixtureAutopilotStep, generateDelivery, registeredModel, sha256Hex,
   validateT20MatchSetup, validateT20ResearchMatchSetup, type T20Session,
 } from "@lcxxvi/simulation";
@@ -96,9 +97,9 @@ describe("calibrated-t20-01 skill pack", () => {
   it("leaves the synthetic generator's categories untouched and adds terms only for the calibrated model", () => {
     const s = conditionedContactCategories(synthetic, "GOOD", false);
     const c = conditionedContactCategories(calibrated, "GOOD", false);
-    // Skill terms from the skill pack, plus the delivery pack's two contact terms (phase intercept, aggression).
+    // Skill terms from the skill pack, plus the delivery pack's three contact terms (phase intercept, aggression, pitch).
     expect(c.map((row) => row.terms.length - s.find((x) => x.id === row.id)!.terms.length)).toEqual(
-      c.map((row) => Object.keys((CALIBRATED_T20_PACK.contact as Record<string, object>)[row.id] ?? {}).length + 2));
+      c.map((row) => Object.keys((CALIBRATED_T20_PACK.contact as Record<string, object>)[row.id] ?? {}).length + 3));
   });
   it("requires the variation rating for the calibrated model and refuses it for synthetic-alpha-01", () => {
     expect(generateDelivery(calibrated).kind).toBe("GENERATED_DELIVERY");
@@ -109,13 +110,13 @@ describe("calibrated-t20-01 skill pack", () => {
   });
 });
 
-describe("calibrated-t20-01 delivery-outcome pack (C4)", () => {
+describe("calibrated-t20-01 delivery-outcome pack (C4, V2 in C5)", () => {
   it("is pinned, research only, built on the pinned packs, and covered by the model hash", () => {
     expect(sha256Hex(canonicalStateBytes(CALIBRATED_T20_DELIVERY_PACK))).toBe(CALIBRATED_T20_DELIVERY_PACK_SHA256);
     expect(sha256Hex(canonicalStateBytes({ deliveryPackSha256: CALIBRATED_T20_DELIVERY_PACK_SHA256, skillPackSha256: CALIBRATED_T20_PACK_SHA256 })))
       .toBe(CALIBRATED_T20_MODEL_HASH);
     expect(CALIBRATED_T20_DELIVERY_PACK.manifest).toMatchObject({
-      modelId: CALIBRATED_T20_MODEL_ID, packVersion: "LC_CALIBRATED_T20_DELIVERY_V1", status: "RESEARCH_ONLY", gameplayIntegrationPermitted: false,
+      modelId: CALIBRATED_T20_MODEL_ID, packVersion: "LC_CALIBRATED_T20_DELIVERY_V2", status: "RESEARCH_ONLY", gameplayIntegrationPermitted: false,
     });
     expect(CALIBRATED_T20_DELIVERY_PACK.manifest.base).toEqual({
       probabilityPackSha256: MODEL_PACK_SHA256, stagePackSha256: DELIVERY_STAGE_PACK_SHA256, skillPackSha256: CALIBRATED_T20_PACK_SHA256,
@@ -125,9 +126,8 @@ describe("calibrated-t20-01 delivery-outcome pack (C4)", () => {
   it("uses only integer basis-point parameters and keeps every base weight positive somewhere", () => {
     const values: unknown[] = [];
     const walk = (v: unknown) => { if (v && typeof v === "object") Object.values(v).forEach(walk); else values.push(v); };
-    const { contact, runs, runsCoverageBp, runsAggressionBp, catchOpportunityBp, dismissalInterceptBp } = CALIBRATED_T20_DELIVERY_PACK;
-    walk({ contact, runs, runsCoverageBp, runsAggressionBp, catchOpportunityBp, dismissalInterceptBp });
-    expect(values.length).toBeGreaterThan(40);
+    walk(Object.fromEntries(Object.entries(CALIBRATED_T20_DELIVERY_PACK).filter(([key]) => key !== "manifest")));
+    expect(values.length).toBeGreaterThan(60);
     for (const v of values) expect(Number.isInteger(v)).toBe(true);
     for (const row of Object.values(CALIBRATED_T20_DELIVERY_PACK.runs)) expect(row.reduce((a, b) => a + b, 0)).toBeGreaterThan(0);
   });
@@ -148,6 +148,36 @@ describe("calibrated-t20-01 delivery-outcome pack (C4)", () => {
     const cover = calibratedFieldCover(calibrated, sector, "GROUND", chosen);
     expect(Math.max(cover.ringBp, cover.deepBp)).toBeGreaterThanOrEqual(chosen.coverageBp);
     expect(calibratedFieldCover(calibrated, sector, "EDGE", chosen)).toEqual({ ringBp: chosen.coverageBp, deepBp: 0 });
+  });
+});
+
+describe("calibrated-t20-01 delivery V2 mechanisms (C5)", () => {
+  const withField = (req: GenerateDeliveryRequest, deep: number, aggression: number): GenerateDeliveryRequest => ({
+    ...req, batting: { ...req.batting, aggression },
+    field: { ...req.field, slots: req.field.slots.map((slot, n) => ({ ...slot, depth: n < deep ? "DEEP" as const : "MIDDLE" as const })) },
+  });
+  it("gives the spread-field attack feature only to attacking strokes, scaled by the boundary riders", () => {
+    expect(calibratedSpreadAttackBp(withField(calibrated, 4, 2))).toBe(0);
+    expect(calibratedSpreadAttackBp(withField(calibrated, 4, 0))).toBe(0);
+    expect(calibratedSpreadAttackBp(withField(calibrated, 4, 3))).toBe(8000);
+    expect(calibratedSpreadAttackBp(withField(calibrated, 5, 4))).toBe(20000);
+    expect(calibratedSpreadAttackBp(withField(calibrated, 2, 4))).toBe(8000);
+    const { runsAggressionDeepBp } = CALIBRATED_T20_DELIVERY_PACK;
+    expect(runsAggressionDeepBp["0"]).toBeLessThan(0);
+    expect(runsAggressionDeepBp["1"]).toBeGreaterThan(0);
+  });
+  it("reads the pitch only for the calibrated model, about the pack's centre", () => {
+    const centre = CALIBRATED_T20_DELIVERY_PACK.pitch.centreBp;
+    expect(calibratedPitchBp({ ...synthetic, conditions: { seamBp: 9000, turnBp: 9000 } })).toBe(0);
+    expect(calibratedPitchBp({ ...calibrated, conditions: { seamBp: centre, turnBp: centre } })).toBe(0);
+    expect(calibratedPitchBp({ ...calibrated, conditions: { seamBp: centre + 500, turnBp: centre + 700 } })).toBe(1200);
+    expect(CALIBRATED_T20_DELIVERY_PACK.pitch.contact.MISS).toBeGreaterThan(0);
+    expect(CALIBRATED_T20_DELIVERY_PACK.pitch.runs["4"]).toBeLessThan(0);
+  });
+  it("raises the stumping fraction and prices hard running, for the calibrated model only", () => {
+    const { stumping, runOutAggressionBp } = CALIBRATED_T20_DELIVERY_PACK;
+    expect(stumping.numerator / stumping.denominator).toBeGreaterThan(3 / 1000);
+    expect(runOutAggressionBp).toBeGreaterThan(0);
   });
 });
 
