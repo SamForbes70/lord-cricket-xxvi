@@ -218,6 +218,31 @@
 .season-finale-awards {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:.6em 1.4em;}
 .season-finale-awards dt {font-size:.8em;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}
 .season-finale-awards dd {margin:.15em 0 0;}
+/* LC_SEASON_REVIEW_V1: the season review inside the finale. Hierarchy from headings and rules, not decoration. */
+.season-finale h3:focus {outline:none;}
+.season-finale h3:focus-visible {outline:3px solid #1373ad;outline-offset:3px;}
+.season-finale table {min-width:0;}
+.season-finale h4 {font:600 1.05em var(--display);margin:1em 0 .35em;padding-bottom:.2em;border-bottom:1px solid var(--rule);}
+.season-finale .season-review-note {font-size:.88em;opacity:.85;margin:.2em 0 .5em;}
+.season-review-list {display:grid;gap:.55em;margin:0;}
+.season-review-list > div {display:grid;grid-template-columns:minmax(9rem,13rem) 1fr;gap:.2em 1em;}
+.season-review-list dt {font-size:.8em;letter-spacing:.06em;text-transform:uppercase;opacity:.8;padding-top:.15em;}
+.season-review-list dd {margin:0;}
+.season-review-rule {display:block;font-size:.8em;opacity:.8;margin-top:.15em;}
+/* The base table rules fix the layout and give the first column 48%; this table sizes its columns to their figures. */
+.career-shell .season-finale .season-review-squad {table-layout:auto;}
+.career-shell .season-finale .season-review-squad th:first-child {width:auto;}
+.season-review-squad th[scope="row"] {text-align:start;font-weight:600;white-space:nowrap;}
+.season-review-squad :is(td,th[scope="col"]) {text-align:end;font-variant-numeric:tabular-nums;}
+.season-review-squad th[scope="col"]:first-child {text-align:start;}
+.season-review-squad abbr {text-decoration:none;}
+.season-review-milestones, .season-review-ahead {margin:.2em 0;padding-inline-start:1.2em;display:grid;gap:.35em;}
+@media (max-width: 650px) {
+  .season-review-list > div {grid-template-columns:1fr;}
+  .career-shell .season-finale .season-review-squad {font-size:.82em;}
+  .career-shell .season-finale .season-review-squad :is(td,th) {padding:.45em .35em;letter-spacing:0;}
+  .career-shell .season-finale .season-review-squad th[scope="row"] {white-space:normal;overflow-wrap:anywhere;}
+}
 /* E8: the screens inside a place (Season: fixtures, statistics, stories) sit in a second row. */
 .career-shell .career-nav-sections {border-bottom:0;padding:2px 0 4px 12px;font-size:.92em;}
 .career-shell .career-nav [aria-current="true"] {background:var(--pine);color:white;}
