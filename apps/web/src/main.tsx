@@ -212,6 +212,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const passage = useRef<Passage | null>(null);
   const [finishReport, setFinishReport] = useState("");
   const [playingPassage, setPlayingPassage] = useState(false);
+  // "Finish over" plays one delivery per command so that the computer captain (and any delegated choice) can act
+  // between balls, as it does during a passage. One ADVANCE { scope: "OVER" } bowled the rest of the over on the
+  // plans in force, so a batter who took strike mid-over kept an older plan (docs/pavilion/FINISH_OVER_PER_BALL.md).
+  const overRun = useRef<{ saveId: string | null; inningsIndex: number; over: number; steps: number } | null>(null);
+  const [finishingOver, setFinishingOver] = useState(false);
+  function endOverRun() {
+    overRun.current = null;
+    setFinishingOver(false);
+  }
   // While the computer side takes its automatic step, the captain's panel stays usable: a click there is held and
   // applied once the step returns, against the view it produces (run 44839086294 lost a plan click that landed on
   // buttons disabled for that step). Only the latest click is kept.
@@ -285,9 +294,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
   useEffect(() => {
-    offlineUpdateCoordinator.setBusySource("match", busy || batchState !== "idle");
+    offlineUpdateCoordinator.setBusySource("match", busy || batchState !== "idle" || finishingOver);
     return () => offlineUpdateCoordinator.setBusySource("match", false);
-  }, [busy, batchState]);
+  }, [busy, batchState, finishingOver]);
   const [verification, setVerification] = useState<Verification | null>(null);
   const rebuildRequest = useRef<string | null>(null);
   const [analyticsRebuild, setAnalyticsRebuild] = useState<{ state: "IDLE" | "RUNNING" | "STOPPING" | "COMPLETE" | "CANCELLED"; applied: number; total: number }>({ state: "IDLE", applied: 0, total: 0 });
@@ -404,7 +413,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       audioBootSyncRef.current = false;
       audioManagerRef.current?.unlockFromUserGesture();
     }
-    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); heldPanelClick.current = null; }
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); endOverRun(); setPaceOverride(null); heldPanelClick.current = null; }
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -867,6 +876,42 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       endPassage(passageReport(active, view));
     }
   }, [view, captainedTeam, rivalTeam, busy, error, fatal, persistence, aiTeamId]);
+  // "Finish over": the next delivery is sent only once the computer's step for the drawn view has been sent and
+  // answered (the effect above runs first and marks the request in flight), so its plans apply to every ball.
+  useEffect(() => {
+    const run = overRun.current;
+    if (!run || !view || busy || inflight.current || repliesDrawn.current !== repliesReceived.current) return;
+    if (passage.current || heldPanelClick.current) { endOverRun(); return; }
+    if (dueAiStep()) return;
+    const innings = view.innings[view.activeIndex]?.innings;
+    const sameOver = Boolean(innings) && view.activeIndex === run.inningsIndex && Math.floor(innings!.legalBalls / 6) === run.over;
+    if (error || fatal || persistence?.readOnly || persistence?.saveId !== run.saveId || view.phase === "COMPLETE" || !sameOver ||
+        view.advanceReason || run.steps >= 40) {
+      endOverRun();
+      return;
+    }
+    if (view.phase === "READY") {
+      run.steps += 1;
+      act({ kind: "ADVANCE", payload: { scope: "DELIVERY" } });
+      return;
+    }
+    // A new batter mid-over: carry on after the computer's own pick, stop for the player's (as the engine's over did).
+    if (!aiTeamId || view.decisionTeamId !== aiTeamId) endOverRun();
+  }, [view, busy, aiTeamId, delegation, error, fatal, persistence, matchAware, highlights]);
+  function finishOver() {
+    if (!view || inflight.current || fatal || view.advanceReason || view.phase !== "READY") return;
+    const innings = view.innings[view.activeIndex]?.innings;
+    if (!innings) return;
+    // With no computer side and nothing delegated there is no one to ask between balls, and one command plays the
+    // same balls (draws are keyed by attempt ordinal), so keep the single-command over: it is about six times fewer
+    // saved commands, which a five-day match played over by over needs (Windows Firefox CI run 45890451039).
+    const computerActs = Boolean(aiTeamId && view.teams.some(team => team.id === aiTeamId)) ||
+      view.teams.some(team => delegationForTeam(delegation, team.id).length > 0);
+    if (!computerActs) { act({ kind: "ADVANCE", payload: { scope: "OVER" } }); return; }
+    overRun.current = { saveId: persistence?.saveId ?? null, inningsIndex: view.activeIndex, over: Math.floor(innings.legalBalls / 6), steps: 1 };
+    setFinishingOver(true);
+    act({ kind: "ADVANCE", payload: { scope: "DELIVERY" } });
+  }
   // Stage 14: the tactical captain makes its side's super-over choices.
   const lastSuperOverAi = useRef("");
   useEffect(() => {
@@ -1468,7 +1513,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           <section
             className="decision"
             id="decision"
-            aria-busy={busy || aiStepPending}
+            aria-busy={busy || aiStepPending || finishingOver}
             data-phase={view.phase}
             data-revision={view.revision}
           >
@@ -1480,13 +1525,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 </h2>
               </div>
               <span role="status" className="working">
-                {batchState === "stopping" ? "Stopping after this commit…" : busy || aiStepPending ? "Applying…" : "Up to date"}
+                {batchState === "stopping" ? "Stopping after this commit…" : busy || aiStepPending || finishingOver ? "Applying…" : "Up to date"}
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
             {keyMoment && !batchState.startsWith("run") && <p role="status" className="key-moment" data-testid="key-moment">Key moment: {keyMoment}</p>}
             {batchProgress && !(view.phase === "COMPLETE" && view.resultText) && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
-            <fieldset disabled={busy || aiStepPending || fatal || persistence?.readOnly}>
+            <fieldset disabled={busy || aiStepPending || finishingOver || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
                 <div className="actions">
@@ -1725,9 +1770,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   className={limitedOvers ? undefined : "primary"}
                   disabled={!!view.advanceReason}
                   aria-describedby="advance-reason"
-                  onClick={() =>
-                    act({ kind: "ADVANCE", payload: { scope: "OVER" } })
-                  }
+                  onClick={finishOver}
                 >
                   Finish over
                 </button>
