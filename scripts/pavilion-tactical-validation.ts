@@ -51,8 +51,8 @@ interface Management {
   aggression?: 0 | 1 | 2 | 3 | 4;
   /** Choose bowlers worst first (still never leaving the innings unbowlable). */
   worstBowlerFirst?: boolean;
-  /** Bowling plan held all innings instead of the captain's by phase. */
-  bowlingPlan?: { length: "GOOD" | "FULL" | "YORKER"; effort: "CONSERVE" | "NORMAL" | "MAXIMUM" };
+  /** Bowling plan held all innings instead of the captain's by phase. A part left out stays the captain's (C5). */
+  bowlingPlan?: { length?: "GOOD" | "FULL" | "YORKER"; effort?: "CONSERVE" | "NORMAL" | "MAXIMUM" };
   /** Field held all innings instead of the engine's default by phase. */
   field?: readonly string[];
 }
@@ -94,6 +94,10 @@ const EXPERIMENTS: Record<string, { area: string; poor: string; management: Mana
   "aggression-blocking": { area: "Batting aggression", poor: "Aggression 0 every ball", management: { aggression: 0 } },
   "bowling-worst-first": { area: "Bowling choice", poor: "Weakest available bowler first, every over (quota-safe)", management: { worstBowlerFirst: true } },
   "bowling-plan-full-max": { area: "Bowling plan", poor: "Full length at maximum effort all innings", management: { bowlingPlan: { length: "FULL", effort: "MAXIMUM" } } },
+  // Stage C C5: one bowling-plan lever at a time (the other part stays the captain's).
+  "bowling-length-good": { area: "Bowling plan (length)", poor: "Good length all innings (no yorkers at the death), the captain's effort", management: { bowlingPlan: { length: "GOOD" } } },
+  "bowling-effort-maximum": { area: "Bowling plan (effort)", poor: "Maximum effort all innings, the captain's length", management: { bowlingPlan: { effort: "MAXIMUM" } } },
+  "bowling-effort-conserve": { area: "Bowling plan (effort)", poor: "Conserve effort all innings, the captain's length", management: { bowlingPlan: { effort: "CONSERVE" } } },
   "field-attacking-throughout": {
     area: "Field setting",
     poor: "The two-slip powerplay field held for all 20 overs",
@@ -126,7 +130,7 @@ function step(session: T20Session, managers: ReadonlyMap<string, Management>): T
   const aggression = batting.aggression ?? advice.aggression;
   if (striker && (session.core.battingPlans[striker]?.aggression ?? 2) !== aggression)
     return command(session, i.battingTeamId, "SET_BATTING_PLAN", { playerId: striker, aggression, intent: "NORMAL" });
-  const plan = bowling.bowlingPlan ?? { length: advice.bowlingLength, effort: advice.bowlingEffort };
+  const plan = { length: bowling.bowlingPlan?.length ?? advice.bowlingLength, effort: bowling.bowlingPlan?.effort ?? advice.bowlingEffort };
   const current = session.core.bowlingPlan;
   if (current && (current.length !== plan.length || current.effort !== plan.effort))
     return command(session, i.bowlingTeamId, "SET_BOWLING_PLAN", { ...current, ...plan });

@@ -72,10 +72,10 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
     intercept: {
       T20_EARLY: { MISS: -2500, PAD: -2500, GROUND: 0, AERIAL: -4500, EDGE: -2000, HIT_WICKET: 0 },
       T20_MIDDLE: { MISS: -5000, PAD: -5000, GROUND: 0, AERIAL: 0, EDGE: -3300, HIT_WICKET: 0 },
-      T20_LATE: { MISS: -15000, PAD: -15000, GROUND: 0, AERIAL: -4500, EDGE: -4500, HIT_WICKET: 0 },
+      T20_LATE: { MISS: -19000, PAD: -19000, GROUND: 0, AERIAL: -4500, EDGE: -4500, HIT_WICKET: 0 },
     },
     /** Additive coefficient (bp) on the aggression feature (aggression - 2) x 10,000. */
-    aggression: { MISS: -1500, PAD: 0, GROUND: 0, AERIAL: 0, EDGE: -1500, HIT_WICKET: -1000 },
+    aggression: { MISS: -1000, PAD: 0, GROUND: 0, AERIAL: 0, EDGE: -1000, HIT_WICKET: -1000 },
   },
   /** Base weights for run categories 0, 1, 2, 3, 4, 6 after bat contact. */
   runs: {
@@ -95,7 +95,7 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
   /** V2: coefficient (bp) on max(0, aggression - 2) x the field's spread (bp) for each run category after a GROUND or AERIAL shot. */
   runsAggressionDeepBp: { "0": -5000, "1": 2000, "2": 2000, "3": 0, "4": 0, "6": 0 },
   /** V2: added to catchOpportunityBp for each aggression level above 2 (subtracted below), clamped to 0 to 10,000. */
-  catchOpportunityAggressionBp: { AERIAL: 0, EDGE: 0 },
+  catchOpportunityAggressionBp: { AERIAL: 300, EDGE: 0 },
   /** V2: coefficient (bp) on the aggression feature (aggression - 2) x 10,000 in the run-out category. */
   runOutAggressionBp: 8000,
   /** V2: stumping chance as a fraction of the keeping sigmoid (synthetic-alpha-01: 3 / 1000). */
@@ -109,9 +109,10 @@ export const CALIBRATED_T20_DELIVERY_PACK = deepFreeze({
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_DELIVERY_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "47855dd6c7b5d8252ecafb9561adcc067f5e22579634f2b3d09432f4a786d12c";
+export const CALIBRATED_T20_DELIVERY_PACK_SHA256 = "8c33d804bb5e234455a5820d4e5f6726c3653402fe1528d511b447a807395f71";
 /**
  * The calibrated model's hash, recorded in a research set-up's `versions.modelHash`: SHA-256 of LC canonical JSON of
- * { deliveryPackSha256, skillPackSha256 }. It changes whenever either component changes.
+ * { deliveryPackSha256, skillPackSha256, tacticsPackSha256 } (C5: the tactics pack is the third component). It changes
+ * whenever any component changes.
  */
-export const CALIBRATED_T20_MODEL_HASH = "c53161b2fd30cc1c844c9f8022493ace0fd601f8a339eaf3b29e369b529de8e7";
+export const CALIBRATED_T20_MODEL_HASH = "cc1fecb8444253ae53439fe159798f7bb4e9a751fc358469e1d8f7dabc87d4ce";

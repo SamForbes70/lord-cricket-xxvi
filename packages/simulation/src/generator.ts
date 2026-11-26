@@ -27,7 +27,7 @@ import {
   legalityCategories, roundDivTiesAway,
 } from "./probability.js";
 import { registeredModel, type RegisteredModel } from "./model-registry.js";
-import type { CalibratedContactId, CalibratedRunId, CalibratedSkill, CalibratedTerms } from "@lcxxvi/data";
+import type { CalibratedContactId, CalibratedLengthId, CalibratedRunId, CalibratedSkill, CalibratedTerms } from "@lcxxvi/data";
 
 /** Addresses are frozen protocol. Each distinct variable owns one unique (stage, drawIndex). */
 export const DELIVERY_DRAW_REGISTRY = Object.freeze({
@@ -140,6 +140,8 @@ export function executedLengthCategories(req: GenerateDeliveryRequest): Probabil
   const scaleTerm = [
     { coefficientBp: DELIVERY_STAGE_PACK.length.intendedControlBp, featureBp: rating(req.bowling.controlRating) },
     { coefficientBp: DELIVERY_STAGE_PACK.length.intendedFatigueBp, featureBp: req.bowling.fatigueBp },
+    // C5 tactics (calibrated-t20-01 only): bowling flat out costs accuracy, conserving gains a little.
+    ...(tacticsPackOf(req) ? [{ coefficientBp: tacticsPackOf(req)!.effort.intendedLengthBp, featureBp: effortBp(req) }] : []),
   ];
   // Freeze category order independently of the selected intent or insertion order.
   return [...LENGTHS, "FULL_TOSS"].filter((id) => (weighted.get(id) ?? 0) > 0)
@@ -152,6 +154,25 @@ function skillPackOf(req: Pick<GenerateDeliveryRequest, "modelId" | "modelHash">
 /** The calibrated-t20-01 delivery-outcome pack (C4) of a request's model, or null for synthetic-alpha-01. */
 function deliveryPackOf(req: Pick<GenerateDeliveryRequest, "modelId" | "modelHash">): RegisteredModel["deliveryPack"] {
   return registeredModel(req.modelId, req.modelHash)?.deliveryPack ?? null;
+}
+/** The calibrated-t20-01 tactics pack (C5) of a request's model, or null for synthetic-alpha-01. */
+function tacticsPackOf(req: Pick<GenerateDeliveryRequest, "modelId" | "modelHash">): RegisteredModel["tacticsPack"] {
+  return registeredModel(req.modelId, req.modelHash)?.tacticsPack ?? null;
+}
+/** C5 tactics: the effort feature, +10,000 for MAXIMUM, 0 for NORMAL, -10,000 for CONSERVE. */
+function effortBp(req: GenerateDeliveryRequest): number {
+  return req.bowling.effort === "MAXIMUM" ? 10000 : req.bowling.effort === "CONSERVE" ? -10000 : 0;
+}
+/** C5 tactics (calibrated-t20-01 only): contact terms for the executed length (with its aggression term) and effort. */
+function tacticsContactTerms(req: GenerateDeliveryRequest, executed: string, id: string): Array<{coefficientBp:number;featureBp:number}> {
+  const pack = tacticsPackOf(req);
+  if (!pack || !(executed in pack.length.contact)) return [];
+  const length = executed as CalibratedLengthId, contact = id as CalibratedContactId;
+  return [
+    {coefficientBp: pack.length.contact[length][contact], featureBp: 10000},
+    {coefficientBp: pack.length.contactAggression[length][contact], featureBp: (req.batting.aggression - 2) * 10000},
+    {coefficientBp: pack.effort.contact[contact], featureBp: effortBp(req)},
+  ];
 }
 /** C4 additive contact terms (phase intercept, aggression) for one contact class; none for synthetic-alpha-01. */
 function deliveryContactTerms(req: GenerateDeliveryRequest, id: string): Array<{coefficientBp:number;featureBp:number}> {
@@ -219,7 +240,7 @@ export function conditionedContactCategories(req: GenerateDeliveryRequest, execu
     if (row.id === "MISS" || row.id === "EDGE") extra.push({coefficientBp:-2000,featureBp:matchup});
     if (row.id === "GROUND") extra.push({coefficientBp:2000,featureBp:matchup});
     return {...row, allowed: !(noBallOrFreeHit && row.id === "HIT_WICKET"),
-      terms:[...row.terms,...extra,...skillTerms(req,"contact",row.id),...deliveryContactTerms(req,row.id)]};
+      terms:[...row.terms,...extra,...skillTerms(req,"contact",row.id),...deliveryContactTerms(req,row.id),...tacticsContactTerms(req,executed,row.id)]};
   });
 }
 /** Eight sectors are a V0.1 derived geometry: 0..2 off, 3..4 straight, 5..7 leg. */
@@ -254,7 +275,7 @@ export function coveringFielder(req: GenerateDeliveryRequest, sector: number, co
  */
 type FieldCover = { ringBp: number; deepBp: number };
 export function calibratedFieldCover(req: GenerateDeliveryRequest, sector: number, contact: "GROUND"|"AERIAL"|"EDGE", chosen: ChosenFielder): FieldCover {
-  if (contact === "EDGE") return { ringBp: chosen.coverageBp, deepBp: 0 };
+  if (contact === "EDGE") return { ringBp: calibratedEdgeCoverBp(req, chosen), deepBp: 0 };
   let ringBp = 0, deepBp = 0;
   for (const slot of req.field.slots) {
     const step = (slot.sector - sector + 8) % 8;
@@ -265,7 +286,17 @@ export function calibratedFieldCover(req: GenerateDeliveryRequest, sector: numbe
   }
   return { ringBp, deepBp };
 }
-function missDismissalCategories(req: GenerateDeliveryRequest, contact: "MISS"|"PAD", forbidden: boolean): ProbabilityCategory[] {
+/**
+ * C5 tactics, calibrated-t20-01 only: an edge's cover by the keeper and slip cordon, keeperEdgeBp plus slipEdgeBp per
+ * slip (at most 10,000). Without the tactics pack (synthetic-alpha-01, or C4) it is the chosen fielder's coverage.
+ */
+export function calibratedEdgeCoverBp(req: GenerateDeliveryRequest, chosen: ChosenFielder): number {
+  const pack = tacticsPackOf(req);
+  if (!pack) return chosen.coverageBp;
+  const slips = req.field.slots.filter((slot) => slot.role === "SLIP").length;
+  return Math.min(10000, pack.field.keeperEdgeBp + pack.field.slipEdgeBp * slips);
+}
+function missDismissalCategories(req: GenerateDeliveryRequest, contact: "MISS"|"PAD", forbidden: boolean, executed: string): ProbabilityCategory[] {
   const isMiss = contact === "MISS";
   const base = isMiss ? DELIVERY_STAGE_PACK.bowled : DELIVERY_STAGE_PACK.lbw;
   const interceptBp = deliveryPackOf(req)?.dismissalInterceptBp[isMiss ? "BOWLED" : "LBW"] ?? base.interceptBp;
@@ -281,9 +312,12 @@ function missDismissalCategories(req: GenerateDeliveryRequest, contact: "MISS"|"
     {coefficientBp:base.defenceBp, featureBp:rating(req.batting.defenceRating)},
     ...(isMiss && req.bowling.line === "STUMPS" ? [{coefficientBp:DELIVERY_STAGE_PACK.bowled.stumpsBp,featureBp:10000}] : []),
     ...cancel,
+    // C5 tactics (calibrated-t20-01 only): a yorker or full ball hits the stumps or pads more often, a short one less.
+    ...(tacticsPackOf(req) && executed in tacticsPackOf(req)!.length.dismissal
+      ? [{coefficientBp:tacticsPackOf(req)!.length.dismissal[executed as CalibratedLengthId][isMiss ? "BOWLED" : "LBW"],featureBp:10000}] : []),
   ],allowed),cat("NONE",1)];
 }
-function runningCategories(req: GenerateDeliveryRequest, contact: "GROUND"|"AERIAL"|"EDGE", coverageBp:number, cover:FieldCover|null): ProbabilityCategory[] {
+function runningCategories(req: GenerateDeliveryRequest, contact: "GROUND"|"AERIAL"|"EDGE", coverageBp:number, cover:FieldCover|null, executed:string): ProbabilityCategory[] {
   const pack = deliveryPackOf(req);
   const weights = pack ? pack.runs[contact] : DELIVERY_STAGE_PACK.runs[contact];
   const timing = rating(req.batting.timingRating), power = rating(req.batting.powerRating), rotation = rating(req.batting.rotationRating);
@@ -308,6 +342,12 @@ function runningCategories(req: GenerateDeliveryRequest, contact: "GROUND"|"AERI
       // V2: attacking into a spread field (aggression x deep coverage) and the pitch.
       if (contact !== "EDGE") terms.push({coefficientBp:pack.runsAggressionDeepBp[id as CalibratedRunId],featureBp:calibratedSpreadAttackBp(req)});
       terms.push({coefficientBp:pack.pitch.runs[id as CalibratedRunId],featureBp:calibratedPitchBp(req)});
+    }
+    const tactics = tacticsPackOf(req);
+    if (tactics && contact !== "EDGE") {
+      // C5 tactics: the executed length and the bowler's effort on the run value of a ground or aerial shot.
+      if (executed in tactics.length.runs) terms.push({coefficientBp:tactics.length.runs[executed as CalibratedLengthId][id as CalibratedRunId],featureBp:10000});
+      terms.push({coefficientBp:tactics.effort.runs[id as CalibratedRunId],featureBp:effortBp(req)});
     }
     terms.push(...skillTerms(req,"runs",id));
     const runs = Number(id);
@@ -376,7 +416,7 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
     return finish(base);
   }
   if (contact === "MISS" || contact === "PAD") {
-    const chance = sample("IMMEDIATE_DISMISSAL",missDismissalCategories(req,contact,forbidden));
+    const chance = sample("IMMEDIATE_DISMISSAL",missDismissalCategories(req,contact,forbidden,length!));
     if (chance !== "NONE") {
       base.dismissal={kind:chance as "BOWLED"|"LBW",playerId:c.strikerId,fielderId:null,wicketEnd:c.strikerEnd};
       base.endsAfter[c.strikerEnd === "NORTH"?"north":"south"]=null;
@@ -396,7 +436,8 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
         // V2 (calibrated-t20-01 only): a slog is more often skied, a defensive stroke less often.
         const opportunityBp=dpack ? clamp(dpack.catchOpportunityBp[contact]+dpack.catchOpportunityAggressionBp[contact]*(req.batting.aggression-2),0,10000)
           : DELIVERY_STAGE_PACK.catchOpportunityBp[contact];
-        const chanceWeight=rounded(opportunityBp,fielder.coverageBp);
+        // C5 tactics (calibrated-t20-01 only): an edge's catch chance follows the keeper and slip cordon's cover.
+        const chanceWeight=rounded(opportunityBp,contact === "EDGE" ? calibratedEdgeCoverBp(req,fielder) : fielder.coverageBp);
         const chance=sample("FIELD_CHANCE",[cat("CHANCE",chanceWeight),cat("NO_CHANCE",10000-chanceWeight)]);
         if (chance === "CHANCE") {
           const conv=sample("FIELD_CONVERSION",[cat("CATCH",1,DELIVERY_STAGE_PACK.catchConversion.interceptBp,[
@@ -421,7 +462,7 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
     : missed ? [cat("0",DELIVERY_STAGE_PACK.runs.NONE[0]),cat("1",DELIVERY_STAGE_PACK.runs.NONE[1],0,[],contact === "MISS" || req.batting.attemptedStroke),
       cat("4",DELIVERY_STAGE_PACK.runs.NONE[4],0,[],contact === "MISS" || req.batting.attemptedStroke)]
     : runningCategories(req,contact as "GROUND"|"AERIAL"|"EDGE",fielder.coverageBp,
-      deliveryPackOf(req) ? calibratedFieldCover(req,base.shotSector!,contact as "GROUND"|"AERIAL"|"EDGE",fielder) : null);
+      deliveryPackOf(req) ? calibratedFieldCover(req,base.shotSector!,contact as "GROUND"|"AERIAL"|"EDGE",fielder) : null,length!);
   // A chase stops on the winning completed run. Mask categories whose ordinary
   // physical running would exceed the remaining target BEFORE sampling.
   // Boundaries may legitimately award the full four/six above the target.
