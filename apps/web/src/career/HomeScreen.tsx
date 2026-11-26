@@ -3,7 +3,7 @@ import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { useState } from "react";
-import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, playerForm, playingStyle, rankClubStrength, selectionAdvice, SELECTION_ADVICE_NOTE, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus } from "@lcxxvi/projections";
+import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, playerForm, playingStyle, projectSeasonReview, rankClubStrength, selectionAdvice, SELECTION_ADVICE_NOTE, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus, type SeasonReview } from "@lcxxvi/projections";
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { percentageBp, formatGameDate } from "./format.js";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
@@ -135,6 +135,42 @@ export function HomeScreen(props: HomeScreenProps) {
   const [finaleReplay, setFinaleReplay] = useState<string | null>(null);
   const [, setAwardsTick] = useState(0);
   const finaleOpen = state.phase === "COMPLETE" && (finaleReplay === finaleKey || (!finaleClosed.includes(finaleKey) && !readFinaleSeen(finaleKey)));
+  // LC_SEASON_REVIEW_V1: worked out from the recorded season only while the finale is open; never saved.
+  let seasonReview: SeasonReview | null = null;
+  if (finaleOpen) {
+    try {
+      const seasonNumber = persistentWorld?.currentSeasonNumber ?? 1;
+      const lifecycle = service.getLifecycleState();
+      const rollover = lifecycle?.transitions.find((transition) => transition.toSeasonNumber === seasonNumber) ?? null;
+      const economy = service.getEconomyState();
+      seasonReview = projectSeasonReview({
+        seasonNumber,
+        completedMatches: state.completedMatches,
+        appliedMatches: state.projection.appliedMatches,
+        teamIds: state.projection.table.map((row) => row.teamId),
+        priorSeasons: (persistentWorld?.completedSeasons ?? []).map((season) => ({ seasonNumber: season.seasonNumber, completedMatches: season.completedMatches })),
+        focusTeamId: controlledTeam ?? null,
+        teamName: (teamId) => service.teamName(teamId),
+        playerName: (playerId) => service.playerName(playerId),
+        lastRollover: rollover,
+        ahead: persistentWorld
+          ? {
+              contracts: economy?.contracts ?? [],
+              academy: (lifecycle?.youthAcademy ?? []).map((prospect) => ({
+                playerId: prospect.prospectId,
+                teamId: prospect.teamId,
+                generatedInSeasonNumber: prospect.generatedInSeasonNumber,
+                promotedInSeasonNumber: prospect.promotedInSeasonNumber,
+                queuedForPromotion: prospect.queuedForPromotion,
+              })),
+            }
+          : null,
+      });
+    } catch {
+      // The review is presentation only: if it cannot be built, the finale shows the table, verdict and awards as before.
+      seasonReview = null;
+    }
+  }
   const reportKey = previous ? matchReportSeenKey(service.getSaveId() ?? "", state.seasonId, previous.fixtureId) : "";
   // Dismissals made in this session are remembered here as well, so the report closes even when storage is unavailable.
   const [closedReports, setClosedReports] = useState<readonly string[]>([]);
@@ -181,6 +217,7 @@ export function HomeScreen(props: HomeScreenProps) {
             objectiveStatus={objectiveStatus}
             awards={service.getSeasonAwards(persistentWorld?.currentSeasonNumber ?? 1)}
             requestAwards={() => void service.syncAwardsLedger().then(() => setAwardsTick((tick) => tick + 1)).catch(() => undefined)}
+            review={seasonReview}
             teamName={(teamId) => service.teamName(teamId)}
             playerName={(playerId) => service.playerName(playerId)}
             onDone={() => { writeFinaleSeen(finaleKey); setFinaleClosed((keys) => [...keys, finaleKey]); setFinaleReplay(null); }}

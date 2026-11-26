@@ -36,3 +36,4 @@ export * from "./opposition-watch.js";
 export * from "./t20-expectation-table.js";
 export * from "./pitch-verdict.js";
 export * from "./post-match-analysis.js";
+export * from "./season-review.js";
