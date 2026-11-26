@@ -901,6 +901,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     if (!view || inflight.current || fatal || view.advanceReason || view.phase !== "READY") return;
     const innings = view.innings[view.activeIndex]?.innings;
     if (!innings) return;
+    // With no computer side and nothing delegated there is no one to ask between balls, and one command plays the
+    // same balls (draws are keyed by attempt ordinal), so keep the single-command over: it is about six times fewer
+    // saved commands, which a five-day match played over by over needs (Windows Firefox CI run 45890451039).
+    const computerActs = Boolean(aiTeamId && view.teams.some(team => team.id === aiTeamId)) ||
+      view.teams.some(team => delegationForTeam(delegation, team.id).length > 0);
+    if (!computerActs) { act({ kind: "ADVANCE", payload: { scope: "OVER" } }); return; }
     overRun.current = { saveId: persistence?.saveId ?? null, inningsIndex: view.activeIndex, over: Math.floor(innings.legalBalls / 6), steps: 1 };
     setFinishingOver(true);
     act({ kind: "ADVANCE", payload: { scope: "DELIVERY" } });
