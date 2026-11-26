@@ -8,6 +8,7 @@ import {
 } from "@lcxxvi/projections";
 import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import { MatchStyleChip } from "./match/MatchStyleChip.js";
+import { careerIntroFor, requestInspectPlayer } from "./match/career-intro-handoff.js";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -83,6 +84,7 @@ import { RED_BALL_PROFILE_DESCRIPTIONS } from "@lcxxvi/ai";
 import type { DelegationCategory } from "./match/ai-opponent.js";
 import { readRoutinePicks, routinePickMoment, writeRoutinePicks } from "./match/routine-picks.js";
 import { keyMomentBetween, type KeyMomentSnapshot } from "./match/key-moments.js";
+import { PostMatchAnalysisPanel } from "./match/PostMatchAnalysisPanel.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, suggestedEleven, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 
@@ -737,6 +739,22 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   }, [editingWorld, restoreWorldFocus, view]);
 
+  // LC_PLAYER_IDENTITY_V2: league records before this match, handed over in memory by the career on launch.
+  const careerIntro = careerIntroFor(careerLaunch.current?.matchGameId);
+  // LC_PLAYER_IDENTITY_V3: a chip opens the player's page through the same career inspection as "Inspect career",
+  // which keeps this match mounted and unchanged. Standard careers only (a roster career has no player page link).
+  const chipOpener = (id: string): (() => void) | undefined => {
+    const launch = careerLaunch.current;
+    if (!launch || !onInspectCareer || launch.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER" || !view || view.resultText) return undefined;
+    const managed = view.teams.find((team) => team.id === launch.managedTeamId);
+    return () => {
+      if (busy || fatal || batchState !== "idle") return;
+      requestInspectPlayer({ playerId: id, origin: managed?.playerIds.includes(id) ? "SQUAD" : "STATISTICS" });
+      onInspectCareer(false);
+    };
+  };
+  // Only the two innings of the match carry the league record forward (no super-over innings in a career match).
+  const liveRecord = (id: string) => (view && view.activeIndex <= 1 ? careerIntro?.players[id] ?? null : null);
   const captainedTeam = scenario?.playerTeamId ?? careerLaunch.current?.managedTeamId ?? view?.teams.find(t => t.id !== aiTeamId)?.id;
   const rivalTeam = view?.teams.find(t => t.id !== captainedTeam)?.id;
   const limitedOvers = view?.format === "T20" || view?.format === "ODI";
@@ -758,9 +776,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     else if (held.kind === "select") act(held.action);
     else replayScenario();
   }, [view, busy]);
-  useEffect(() => {
-    if (!view || busy || inflight.current || heldPanelClick.current || fatal || error || persistence?.readOnly) return;
-    if (view.phase === "COMPLETE") return;
+  // The computer captain's (and any delegated) step that the effect below is about to send for the current view, or
+  // null. Until it has been sent and answered, the decision panel is not settled: the computer may be the side to
+  // decide (it may have won the toss), so the panel reports itself busy and its controls stay disabled. Without this,
+  // the panel showed "Up to date" with enabled buttons for one render between the view arriving and the step being
+  // sent, and a click in that gap could act for the computer's side or land on a button about to disappear.
+  function dueAiStep(): { teamId: string; delegated: boolean; key: string; stamp: string } | null {
+    if (!view || fatal || error || persistence?.readOnly || view.phase === "COMPLETE") return null;
     const candidates = [
       ...(aiTeamId && view.teams.some(team => team.id === aiTeamId) ? [{ teamId: aiTeamId, delegated: false }] : []),
       ...view.teams.filter(team => team.id !== aiTeamId && delegationForTeam(delegation, team.id).length > 0).map(team => ({ teamId: team.id, delegated: true })),
@@ -768,11 +790,17 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     for (const candidate of candidates) {
       const key = `${candidate.delegated ? "delegated" : "opponent"}:${candidate.teamId}`;
       const stamp = `${view.revision}:${delegation.changes.length}:${matchAware}:${highlights}`;
-      if (lastAiChecked.current[key] === stamp) continue;
-      lastAiChecked.current[key] = stamp;
-      send({ type: "AI_STEP", ...candidate, clubStyle: highlights && !candidate.delegated, matchAware: matchAware && !candidate.delegated });
-      return;
+      if (lastAiChecked.current[key] !== stamp) return { ...candidate, key, stamp };
     }
+    return null;
+  }
+  const aiStepPending = dueAiStep() !== null;
+  useEffect(() => {
+    if (!view || busy || inflight.current || heldPanelClick.current) return;
+    const due = dueAiStep();
+    if (!due) return;
+    lastAiChecked.current[due.key] = due.stamp;
+    send({ type: "AI_STEP", teamId: due.teamId, delegated: due.delegated, clubStyle: highlights && !due.delegated, matchAware: matchAware && !due.delegated });
   }, [view, aiTeamId, delegation, busy, fatal, error, persistence?.readOnly, matchAware, highlights]);
   // Pavilion B2: the computer makes the player's routine batter and bowler picks (the "Recommended" choice, sent as
   // the same command a click sends) and leaves key moments to the player. Never in scenarios or red-ball matches.
@@ -1384,7 +1412,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         {ledger!.batting[id]!.runs} (
                         {ledger!.batting[id]!.ballsFaced})
                         {!view.resultText && view.playingStyles?.[id] && (
-                          <MatchStyleChip playerId={id} name={view.names[id] ?? id} style={view.playingStyles[id].batting} kind="BATTER" isNew={ledger!.batting[id]!.ballsFaced === 0} />
+                          <MatchStyleChip playerId={id} name={view.names[id] ?? id} style={view.playingStyles[id].batting} kind="BATTER" isNew={ledger!.batting[id]!.ballsFaced === 0} record={liveRecord(id)} line={{ runs: ledger!.batting[id]!.runs }} onOpen={chipOpener(id)} openDisabled={busy || fatal || batchState !== "idle"} />
                         )}
                       </>
                     ) : (
@@ -1407,7 +1435,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   const bowlerId = i?.bowlerId;
                   const bowlerStyle = bowlerId ? view.playingStyles?.[bowlerId]?.bowling : undefined;
                   if (!bowlerId || !bowlerStyle || view.resultText) return null;
-                  return <MatchStyleChip playerId={bowlerId} name={view.names[bowlerId] ?? bowlerId} style={bowlerStyle} kind="BOWLER" isNew={(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0} />;
+                  return <MatchStyleChip playerId={bowlerId} name={view.names[bowlerId] ?? bowlerId} style={bowlerStyle} kind="BOWLER" isNew={(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0} record={liveRecord(bowlerId)} line={{ wickets: ledger!.bowling[bowlerId]?.wickets ?? 0 }} onOpen={chipOpener(bowlerId)} openDisabled={busy || fatal || batchState !== "idle"} />;
                 })()}
               </p>
               {i?.bowlerId && (
@@ -1436,7 +1464,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           <section
             className="decision"
             id="decision"
-            aria-busy={busy}
+            aria-busy={busy || aiStepPending}
             data-phase={view.phase}
             data-revision={view.revision}
           >
@@ -1448,13 +1476,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 </h2>
               </div>
               <span role="status" className="working">
-                {batchState === "stopping" ? "Stopping after this commit…" : busy ? "Applying…" : "Up to date"}
+                {batchState === "stopping" ? "Stopping after this commit…" : busy || aiStepPending ? "Applying…" : "Up to date"}
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
             {keyMoment && !batchState.startsWith("run") && <p role="status" className="key-moment" data-testid="key-moment">Key moment: {keyMoment}</p>}
             {batchProgress && !(view.phase === "COMPLETE" && view.resultText) && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
-            <fieldset disabled={busy || fatal || persistence?.readOnly}>
+            <fieldset disabled={busy || aiStepPending || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
                 <div className="actions">
@@ -1881,6 +1909,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
                   </details>
                 </div>
+              )}
+              {view.postMatchAnalysis && (
+                <PostMatchAnalysisPanel analysis={view.postMatchAnalysis} teamName={tn}
+                  focusTeamIds={aiTeamId && captainedTeam ? [captainedTeam] : view.teams.map((t) => t.id)} />
               )}
               {/* Pavilion B3: the engineering check sits behind a closed disclosure, apart from the result. */}
               <details className="technical-details" data-testid="replay-check">

@@ -1,0 +1,191 @@
+{
+ "version": "LC_STAGE_C_C5_REAL_YARDSTICKS_V1",
+ "researchOnly": true,
+ "attribution": "Contains information from Cricsheet (https://cricsheet.org/), ODC-By 1.0 (https://cricsheet.org/licensing/). Derived aggregates only. Calibration split only; the holdout is not read.",
+ "fit": {
+  "powerplay": {
+   "legalBalls": 29936,
+   "wicketPerLegalBall": 0.04235702832709781,
+   "kindsShare": {
+    "bowled": 0.20189274447949526,
+    "caught": 0.6253943217665615,
+    "caught and bowled": 0.027602523659305992,
+    "hit wicket": 0.0007886435331230284,
+    "lbw": 0.08832807570977919,
+    "run out": 0.04258675078864353,
+    "stumped": 0.013406940063091483
+   },
+   "kindsPerLegalBall": {
+    "bowled": 0.0085515766969535,
+    "caught": 0.026489845002672367,
+    "caught and bowled": 0.0011691608765366113,
+    "hit wicket": 3.340459647247461e-05,
+    "lbw": 0.0037413148049171567,
+    "run out": 0.0018038482095136291,
+    "stumped": 0.0005678781400320684
+   }
+  },
+  "middle": {
+   "legalBalls": 44114,
+   "wicketPerLegalBall": 0.04506505871152015,
+   "kindsShare": {
+    "bowled": 0.1579476861167002,
+    "caught": 0.5975855130784709,
+    "caught and bowled": 0.04426559356136821,
+    "hit wicket": 0.001006036217303823,
+    "lbw": 0.08350100603621731,
+    "run out": 0.06941649899396378,
+    "stumped": 0.04627766599597585
+   },
+   "kindsPerLegalBall": {
+    "bowled": 0.007117921748197851,
+    "caught": 0.02693022623203518,
+    "caught and bowled": 0.001994831572743347,
+    "hit wicket": 4.533708119871243e-05,
+    "lbw": 0.0037629777394931315,
+    "run out": 0.0031282586027111575,
+    "stumped": 0.0020855057351407717
+   }
+  },
+  "death": {
+   "legalBalls": 23446,
+   "wicketPerLegalBall": 0.08922630725923399,
+   "kindsShare": {
+    "bowled": 0.19455066921606118,
+    "caught": 0.6075525812619503,
+    "caught and bowled": 0.020076481835564052,
+    "hit wicket": 0.0033460803059273425,
+    "lbw": 0.038718929254302106,
+    "run out": 0.11998087954110899,
+    "stumped": 0.01577437858508604
+   },
+   "kindsPerLegalBall": {
+    "bowled": 0.01735903778896187,
+    "caught": 0.0542096732918195,
+    "caught and bowled": 0.0017913503369444681,
+    "hit wicket": 0.0002985583894907447,
+    "lbw": 0.003454747078392903,
+    "run out": 0.010705450823168131,
+    "stumped": 0.0014074895504563678
+   }
+  },
+  "totalsAll": {
+   "innings": 835,
+   "mean": 158.93293413173652,
+   "sd": 35.97948130134565,
+   "p10": 118.0,
+   "p50": 160.0,
+   "p90": 201.60000000000002
+  },
+  "totalsFullInnings": {
+   "innings": 785,
+   "mean": 161.9248407643312,
+   "sd": 32.91416956524598,
+   "p10": 121.0,
+   "p50": 163.0,
+   "p90": 202.60000000000002
+  },
+  "shortenedInnings": 50,
+  "dismissalKinds": {
+   "bowled": 0.18268511593118922,
+   "caught": 0.6080777860882572,
+   "caught and bowled": 0.030852655198204935,
+   "hit wicket": 0.0018698578908002991,
+   "lbw": 0.06712789827973074,
+   "run out": 0.08283470456245326,
+   "stumped": 0.026551982049364247
+  }
+ },
+ "selection": {
+  "powerplay": {
+   "legalBalls": 5930,
+   "wicketPerLegalBall": 0.047892074198988194,
+   "kindsShare": {
+    "bowled": 0.15492957746478872,
+    "caught": 0.7147887323943662,
+    "caught and bowled": 0.02112676056338028,
+    "hit wicket": 0.0035211267605633804,
+    "lbw": 0.07746478873239436,
+    "run out": 0.02112676056338028,
+    "stumped": 0.007042253521126761
+   },
+   "kindsPerLegalBall": {
+    "bowled": 0.007419898819561552,
+    "caught": 0.034232715008431704,
+    "caught and bowled": 0.001011804384485666,
+    "hit wicket": 0.00016863406408094435,
+    "lbw": 0.003709949409780776,
+    "run out": 0.001011804384485666,
+    "stumped": 0.0003372681281618887
+   }
+  },
+  "middle": {
+   "legalBalls": 8638,
+   "wicketPerLegalBall": 0.05116925214169947,
+   "kindsShare": {
+    "bowled": 0.16289592760180996,
+    "caught": 0.6764705882352942,
+    "caught and bowled": 0.024886877828054297,
+    "lbw": 0.06787330316742081,
+    "run out": 0.033936651583710405,
+    "stumped": 0.033936651583710405
+   },
+   "kindsPerLegalBall": {
+    "bowled": 0.008335262792313036,
+    "caught": 0.03461449409585552,
+    "caught and bowled": 0.0012734429266033805,
+    "lbw": 0.003473026163463765,
+    "run out": 0.0017365130817318824,
+    "stumped": 0.0017365130817318824
+   }
+  },
+  "death": {
+   "legalBalls": 4541,
+   "wicketPerLegalBall": 0.09138956177053513,
+   "kindsShare": {
+    "bowled": 0.1614457831325301,
+    "caught": 0.6457831325301204,
+    "caught and bowled": 0.021686746987951807,
+    "hit wicket": 0.0024096385542168677,
+    "lbw": 0.033734939759036145,
+    "run out": 0.11566265060240964,
+    "stumped": 0.01927710843373494
+   },
+   "kindsPerLegalBall": {
+    "bowled": 0.01475445937018278,
+    "caught": 0.05901783748073112,
+    "caught and bowled": 0.001981942303457388,
+    "hit wicket": 0.00022021581149526536,
+    "lbw": 0.0030830213609337152,
+    "run out": 0.010570358951772737,
+    "stumped": 0.0017617264919621229
+   }
+  },
+  "totalsAll": {
+   "innings": 166,
+   "mean": 166.0120481927711,
+   "sd": 45.511768435015924,
+   "p10": 110.0,
+   "p50": 172.0,
+   "p90": 218.5
+  },
+  "totalsFullInnings": {
+   "innings": 155,
+   "mean": 171.21935483870968,
+   "sd": 40.48043795123666,
+   "p10": 121.6,
+   "p50": 174.0,
+   "p90": 219.6
+  },
+  "shortenedInnings": 11,
+  "dismissalKinds": {
+   "bowled": 0.16038562664329536,
+   "caught": 0.6748466257668712,
+   "caught and bowled": 0.022787028921998246,
+   "hit wicket": 0.0017528483786152498,
+   "lbw": 0.057843996494303246,
+   "run out": 0.060473269062226116,
+   "stumped": 0.021910604732690624
+  }
+ }
+}

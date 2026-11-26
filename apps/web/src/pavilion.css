@@ -148,6 +148,12 @@
 .selection-options p {margin:.35em 0;color:#f1eddf;}
 .selection-options small,.selection-call > small {color:#e6d7af;}
 .selection-options button {margin-top:auto;transform:translateY(.35em);}
+/* LC_PLAYER_IDENTITY_V2: selection advice. Suggestions are inferences from styles; ratings and records are facts. */
+.selection-advice {list-style:none;margin:.45em 0 .2em;padding:0;font-size:.86em;line-height:1.3;color:#f1eddf;}
+.selection-advice li {margin:.15em 0;}
+.selection-advice b {display:inline-block;margin-right:.35em;padding:0 .4em;border-radius:3px;font-size:.82em;font-weight:600;letter-spacing:.03em;text-transform:uppercase;border:1px solid #6c887b;color:#e6d7af;}
+.selection-advice li[data-kind="SUGGESTION"] b {border-style:dashed;color:#e6c886;}
+.selection-call > .selection-advice-note {display:block;margin:.1em 0 .4em;font-style:italic;}
 .close-finish button small {display:block;margin-top:.35em;font-weight:400;line-height:1.4;}
 .field-read .scout-note {margin:.5em 0;line-height:1.4;}
 .captain-station header label {white-space:nowrap;overflow-wrap:normal;}
@@ -188,6 +194,12 @@
 .active .active-player .match-style {flex:1 1 8em;min-width:0;font-size:.78em;line-height:1.15;color:var(--fl-muted, #b6c8bf);}
 .active .active-player .match-style i {font-style:normal;}
 .active .active-player .match-style[data-new="true"] i {color:var(--fl-gold-hi, #f6d58d);}
+/* LC_PLAYER_IDENTITY_V3: a live league milestone (close or reached) once the player has faced or bowled, and the chip as
+   a button to the player page (career inspection; the match is kept). Same size as the V2 chip: no extra line. */
+.active .active-player .match-style[data-live] i {color:var(--fl-gold-hi, #f6d58d);}
+.active .active-player .match-style-open {display:inline;max-width:100%;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;border-radius:0;box-shadow:none;transform:none;text-align:left;cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;overflow-wrap:anywhere;}
+.active .active-player .match-style-open:disabled {cursor:default;text-decoration:none;}
+.active .active-player .match-style-open:focus-visible {outline:2px solid var(--fl-gold-hi, #f6d58d);outline-offset:1px;}
 /* E7 fixture preview: the opponent, the history and what the match means. */
 .fixture-preview {margin:.6em 0 .9em;}
 .fixture-meaning {font:600 1.1em var(--display);margin:.2em 0 .5em;}
@@ -206,6 +218,31 @@
 .season-finale-awards {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:.6em 1.4em;}
 .season-finale-awards dt {font-size:.8em;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}
 .season-finale-awards dd {margin:.15em 0 0;}
+/* LC_SEASON_REVIEW_V1: the season review inside the finale. Hierarchy from headings and rules, not decoration. */
+.season-finale h3:focus {outline:none;}
+.season-finale h3:focus-visible {outline:3px solid #1373ad;outline-offset:3px;}
+.season-finale table {min-width:0;}
+.season-finale h4 {font:600 1.05em var(--display);margin:1em 0 .35em;padding-bottom:.2em;border-bottom:1px solid var(--rule);}
+.season-finale .season-review-note {font-size:.88em;opacity:.85;margin:.2em 0 .5em;}
+.season-review-list {display:grid;gap:.55em;margin:0;}
+.season-review-list > div {display:grid;grid-template-columns:minmax(9rem,13rem) 1fr;gap:.2em 1em;}
+.season-review-list dt {font-size:.8em;letter-spacing:.06em;text-transform:uppercase;opacity:.8;padding-top:.15em;}
+.season-review-list dd {margin:0;}
+.season-review-rule {display:block;font-size:.8em;opacity:.8;margin-top:.15em;}
+/* The base table rules fix the layout and give the first column 48%; this table sizes its columns to their figures. */
+.career-shell .season-finale .season-review-squad {table-layout:auto;}
+.career-shell .season-finale .season-review-squad th:first-child {width:auto;}
+.season-review-squad th[scope="row"] {text-align:start;font-weight:600;white-space:nowrap;}
+.season-review-squad :is(td,th[scope="col"]) {text-align:end;font-variant-numeric:tabular-nums;}
+.season-review-squad th[scope="col"]:first-child {text-align:start;}
+.season-review-squad abbr {text-decoration:none;}
+.season-review-milestones, .season-review-ahead {margin:.2em 0;padding-inline-start:1.2em;display:grid;gap:.35em;}
+@media (max-width: 650px) {
+  .season-review-list > div {grid-template-columns:1fr;}
+  .career-shell .season-finale .season-review-squad {font-size:.82em;}
+  .career-shell .season-finale .season-review-squad :is(td,th) {padding:.45em .35em;letter-spacing:0;}
+  .career-shell .season-finale .season-review-squad th[scope="row"] {white-space:normal;overflow-wrap:anywhere;}
+}
 /* E8: the screens inside a place (Season: fixtures, statistics, stories) sit in a second row. */
 .career-shell .career-nav-sections {border-bottom:0;padding:2px 0 4px 12px;font-size:.92em;}
 .career-shell .career-nav [aria-current="true"] {background:var(--pine);color:white;}

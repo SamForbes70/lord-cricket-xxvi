@@ -46,7 +46,7 @@ On the default world (`fictional-eight-01`), the 160 players get 28 different pr
 ## Limitations
 
 - Styles describe ratings. [Inference] Under `synthetic-alpha-01` not every rating has a measurable effect on results: `TACTICAL_VALIDATION.md` found that bowler skill and bowling tactics barely move outcomes. A "Miserly off-spinner" is a player with high control, which the model may not reward. The labels will mean more once stage C calibration lands.
-- The match introduction states only the style, and the version with ratings is in a tooltip, not on screen. The match screen does not hold career records, so it cannot say "312 career runs" without a new data path from the career.
+- The match introduction states only the style, and the version with ratings is in a tooltip, not on screen. The match screen does not hold career records, so it cannot say "312 career runs" without a new data path from the career. [Player identity V2](PLAYER_IDENTITY_V2.md) adds that path for managed career matches.
 - The story uses league T20 records only. Exhibition, tournament, tour and auction matches are not counted, and the page's format selector does not change the style (always T20 ratings).
 - Thresholds are design choices, not calibration. They were set so that styles spread across the default world; imported or edited worlds may give flatter spreads.
 - Traits are flavour and do not grow or change through a career.

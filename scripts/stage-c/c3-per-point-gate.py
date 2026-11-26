@@ -5,6 +5,11 @@ RESEARCH ONLY. Reads derived files only: per-point.json from scripts/stage-c/c2-
 c3-mapping.json (fit-period targets, calibration split; the holdout is never read). Effects are oriented so that a
 correct effect is positive. PASS when the effect lies inside the target range.
 
+C5 (--sign-range): the per-point effects become a sign and range check, not the fitting target (skill pack V5 is
+fitted to the adjusted quarter ratios). PASS when the effect has the correct sign and is at most twice the upper end
+of the C3 range (C2's world-SD mapping overshot that range by up to about 1.9 times); `insideC3Range` is still
+reported. The default (no flag) is the C3 rule, unchanged.
+
   python3 -I scripts/stage-c/c3-per-point-gate.py --dose <per-point.json> --mapping docs/pavilion/stage-c/c3-mapping.json \
       --pack-version LC_CALIBRATED_T20_SKILL_V3 --pack-sha256 <hash> --out docs/pavilion/stage-c/c3-v3-per-point.json
 """
@@ -24,6 +29,7 @@ def main():
     ap.add_argument("--pack-version", required=True)
     ap.add_argument("--pack-sha256", required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--sign-range", action="store_true", help="C5: correct sign and at most twice the C3 upper bound")
     a = ap.parse_args()
     d = json.loads(a.dose.read_text())
     m = json.loads(a.mapping.read_text())
@@ -31,11 +37,14 @@ def main():
     for key, tkey, sign in ROWS:
         lo, hi = m["perPointTargets"][tkey]["range"]
         g = sign * d[key]
+        inside = lo <= g <= hi
+        ok = (0 < g <= 2 * hi) if a.sign_range else inside
         gates[key] = {"game": g, "range": [lo, hi], "positionInRange": (g - lo) / (hi - lo) if hi > lo else None,
-                      "verdict": "PASS" if lo <= g <= hi else "FAIL"}
+                      "insideC3Range": inside, "verdict": "PASS" if ok else "FAIL"}
     gates["variationTradeOff"] = {"dismissalPerPoint": d["variation.dismissal"], "runsPerPoint": d["variation.runs"],
                                   "verdict": "PASS" if d["variation.dismissal"] > 0 and d["variation.runs"] > 0 else "FAIL"}
     out = {"version": "LC_STAGE_C_C3_PER_POINT_GATE_V1", "researchOnly": True, "model": "calibrated-t20-01",
+           "rule": "C5 sign and range: correct sign, at most twice the C3 upper bound" if a.sign_range else "C3: inside the range",
            "packVersion": a.pack_version, "packSha256": a.pack_sha256, "attribution": m["attribution"],
            "targets": "c3-mapping.json (fit period, full-member reference, quarters of the game's regular players)",
            "gates": gates, "firstInningsRunsByCondition": d.get("firstInningsRuns")}
