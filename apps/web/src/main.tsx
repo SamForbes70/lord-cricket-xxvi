@@ -7,6 +7,7 @@ import {
   selectCommentaryTextForMode,
 } from "@lcxxvi/projections";
 import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
+import { MatchStyleChip } from "./match/MatchStyleChip.js";
 import {
   InMatchTacticalAssistantPanel,
   PreMatchBriefingPanel,
@@ -1382,6 +1383,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         </strong>{" "}
                         {ledger!.batting[id]!.runs} (
                         {ledger!.batting[id]!.ballsFaced})
+                        {!view.resultText && view.playingStyles?.[id] && (
+                          <MatchStyleChip playerId={id} name={view.names[id] ?? id} style={view.playingStyles[id].batting} kind="BATTER" isNew={ledger!.batting[id]!.ballsFaced === 0} />
+                        )}
                       </>
                     ) : (
                       view.resultText ? "Innings closed" : "Awaiting selection"
@@ -1399,6 +1403,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 <strong>
                   {i?.bowlerId ? view.names[i.bowlerId] : view.resultText ? "Innings closed" : "Awaiting selection"}
                 </strong>
+                {(() => {
+                  const bowlerId = i?.bowlerId;
+                  const bowlerStyle = bowlerId ? view.playingStyles?.[bowlerId]?.bowling : undefined;
+                  if (!bowlerId || !bowlerStyle || view.resultText) return null;
+                  return <MatchStyleChip playerId={bowlerId} name={view.names[bowlerId] ?? bowlerId} style={bowlerStyle} kind="BOWLER" isNew={(ledger!.bowling[bowlerId]?.legalBalls ?? 0) === 0} />;
+                })()}
               </p>
               {i?.bowlerId && (
                 <p>

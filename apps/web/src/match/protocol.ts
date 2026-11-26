@@ -256,6 +256,8 @@ export type View = {
   }[];
   names: Record<string, string>;
   hands: Record<string, "L" | "R">;
+  /** LC_PLAYER_IDENTITY_V1, T20 only: each player's style as a batter and as a bowler, from the match's ratings. Derived for display. */
+  playingStyles?: Record<string, { batting: import("@lcxxvi/projections").PlayingStyle; bowling: import("@lcxxvi/projections").PlayingStyle }>;
   ground: string;
   innings: InningsLedger[];
   activeIndex: number;

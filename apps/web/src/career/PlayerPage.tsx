@@ -4,6 +4,7 @@ import { CareerStoriesPanel } from "./CareerStoriesPanel.js";
 import { PlayerPortrait, RatingBadge, RoleChip } from "../world/PlayerPortrait.js";
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { careerWorld } from "./world-state.js";
+import { derivePlayerIdentity, styleWithBasis, type PlayerIdentity, type StoryRecord } from "@lcxxvi/projections";
 import {
   AWARDS_PROVENANCE_NOTICE,
   type HistoricalPlayerRecord,
@@ -125,6 +126,22 @@ export function PlayerPage({
         {skillLedgerEntry ? ` · Debut Season ${skillLedgerEntry.debutSeasonNumber}` : ""}
       </p>
       <PlayerHero player={player} format={format} />
+      <PlayerIdentityPanel
+        identity={derivePlayerIdentity(
+          { playerId: player.playerId, role: player.role, bowlingStyle: player.bowlingStyle, skills: player.skills.T20 },
+          storyRecord({
+            player,
+            age,
+            retiredRecord,
+            lastTeamName,
+            activeContract,
+            contractTeamName,
+            careerStats,
+            historicalRecord,
+            awardsSummary,
+          }),
+        )}
+      />
       {retiredRecord && (
         <div
           className="career-panel retired-banner"
@@ -554,6 +571,123 @@ export function PlayerPage({
   );
 }
 export type PlayerFormat = Format;
+
+/** The recorded figures the identity's story may use, from the same props the panels below show. */
+function storyRecord({
+  player,
+  age,
+  retiredRecord,
+  lastTeamName,
+  activeContract,
+  contractTeamName,
+  careerStats,
+  historicalRecord,
+  awardsSummary,
+}: {
+  player: WorldPack["players"][number];
+  age: number | null;
+  retiredRecord: RetiredPlayerRecord | null;
+  lastTeamName: string | null;
+  activeContract: PlayerContract | null;
+  contractTeamName: string | null;
+  careerStats: PersistentCareerPlayerStats | null;
+  historicalRecord: HistoricalPlayerRecord | null;
+  awardsSummary: PlayerAwardsSummary | null;
+}): StoryRecord {
+  const h = historicalRecord;
+  const c = careerStats;
+  const club = retiredRecord
+    ? lastTeamName ? { name: lastTeamName, relation: "LAST" as const } : null
+    : activeContract && contractTeamName ? { name: contractTeamName, relation: "CURRENT" as const } : null;
+  const seasonAwardsWon = (awardsSummary?.seasonAwards ?? []).reduce(
+    (sum, season) => sum + season.awards.filter((a) => a.status === "AWARDED" && a.winnerPlayerId === player.playerId).length,
+    0,
+  );
+  const base = {
+    name: player.name,
+    club,
+    age,
+    retired: retiredRecord !== null,
+    playerOfTheMatchCount: awardsSummary?.playerOfTheMatchCount ?? 0,
+    seasonAwardsWon,
+  };
+  if (h) {
+    return {
+      ...base,
+      matches: h.matches,
+      seasonsPlayed: h.seasonsPlayed,
+      runs: h.runs,
+      battingInnings: h.battingInnings,
+      highScore: h.battingInnings > 0 ? { runs: h.highScoreRuns, notOut: h.highScoreNotOut } : null,
+      fifties: h.fifties,
+      hundreds: h.hundreds,
+      wickets: h.bowlingWickets,
+      bestBowling: h.bestBowlingRuns !== null ? { wickets: h.bestBowlingWickets, runs: h.bestBowlingRuns } : null,
+      recentMatches: h.contributingMatches.map((m) => ({
+        seasonNumber: m.seasonNumber,
+        roundNumber: m.roundNumber,
+        batted: m.battedInnings !== null,
+        runs: m.runsScored ?? 0,
+        notOut: m.notOut ?? false,
+        bowled: (m.bowledLegalBalls ?? 0) > 0,
+        wickets: m.bowlingWickets ?? 0,
+        runsConceded: m.bowlingRunsConceded ?? 0,
+      })),
+    };
+  }
+  return {
+    ...base,
+    matches: c?.matches ?? 0,
+    seasonsPlayed: c?.seasonsPlayed ?? 0,
+    runs: c?.runs ?? 0,
+    battingInnings: c?.battingInnings ?? 0,
+    highScore: c && c.battingInnings > 0 ? { runs: c.highScoreRuns, notOut: c.highScoreNotOut } : null,
+    fifties: c?.fifties ?? 0,
+    hundreds: c?.hundreds ?? 0,
+    wickets: c?.bowlingWickets ?? 0,
+    bestBowling: null,
+    recentMatches: [],
+  };
+}
+
+/**
+ * LC_PLAYER_IDENTITY_V1 on the player page: the playing style read from the T20 ratings (with the ratings that earn
+ * it), two personality traits marked as flavour, and the story so far from recorded figures only.
+ */
+function PlayerIdentityPanel({ identity }: { identity: PlayerIdentity }) {
+  return (
+    <section className="career-panel player-identity" aria-labelledby="player-identity-heading" data-testid="player-identity">
+      <h3 id="player-identity-heading">Who they are</h3>
+      <p className="player-identity-style">
+        <span className="style-tag" data-testid="player-identity-style">{identity.primary.label}</span>
+        {identity.secondary && (
+          <span className="style-tag style-tag-secondary" data-testid="player-identity-secondary">{identity.secondary.label}</span>
+        )}
+      </p>
+      <p data-testid="player-identity-basis">
+        <small>
+          Playing style, from T20 ratings: {styleWithBasis(identity.primary)}
+          {identity.secondary ? `; also ${styleWithBasis(identity.secondary)}` : ""}.
+        </small>
+      </p>
+      {identity.story && (
+        <p className="player-identity-story" data-testid="player-identity-story">
+          <strong>Story so far.</strong> {identity.story.text}
+        </p>
+      )}
+      <div className="player-identity-traits" data-testid="player-identity-traits">
+        <p className="eyebrow">Personality · flavour, not a rating</p>
+        <ul>
+          {identity.traits.map((trait) => (
+            <li key={trait.id}>
+              <strong>{trait.label}.</strong> {trait.flavour}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
 
 /**
  * The player page's hero card (owner order of 20 November 2026, step 5): face, overall rating, role and the four
