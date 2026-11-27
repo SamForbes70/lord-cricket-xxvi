@@ -13,7 +13,7 @@ describe("M7 public-only tactical captain V1", () => {
     const result = adviseT20Captain(basis);
     expect(result).toEqual(adviseT20Captain(structuredClone(basis)));
     expect(result.preferredBowlerId).toBe("p100");
-    expect(result.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V5");
+    expect(result.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V6");
   });
   test("reacts to chase pressure and wicket preservation without changing engine outcomes", () => {
     const chase = adviseT20Captain({ ...basis, inningsRuns: 45, targetToWin: 200 });

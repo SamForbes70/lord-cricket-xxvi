@@ -5,7 +5,7 @@ import { createT20Session, executeT20Command, fixtureAutopilotStep, rehydrateT20
 import {
   adviseT20Batting,
   adviseT20BattingV2,
-  adviseT20Captain,
+  adviseT20CaptainV5 as adviseT20Captain,
   adviseT20CaptainV4,
   T20_BATTING_POLICY_V2_ID,
   t20BowlerStyleOf,
@@ -14,13 +14,15 @@ import {
   canCompleteBowling,
   T20_DEATH_PACE_PREFERENCE_PERCENT,
   t20DeathBowlingPlanV5,
-  T20_TACTICAL_CAPTAIN_ID,
+  T20_TACTICAL_CAPTAIN_V5_ID as T20_TACTICAL_CAPTAIN_ID,
   T20_TACTICAL_CAPTAIN_V4_ID,
   type T20TacticalPublicView,
 } from "@lcxxvi/ai";
 import { runTacticalT20, tacticalT20Step } from "../../apps/batch/src/tactical-match.js";
 import { proposeOpponentT20Command } from "../../apps/web/src/match/ai-opponent.js";
 
+// Captain V6 replaced V5 as the current captain (27 November 2026); V5 is kept as adviseT20CaptainV5, tested here.
+// The replay tests below play the current captain (runTacticalT20's default), now V6.
 const specialist = { timing: 70, power: 70, defence: 70, rotation: 70 };
 const tailender = { timing: 30, power: 35, defence: 30, rotation: 30 };
 const bowler = (playerId: string, level: number, oversLeft = 4, fatigueBp = 0) => ({
