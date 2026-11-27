@@ -178,6 +178,8 @@ describe("CP04 batching rule", () => {
     expect(end.fieldPresentation!.recentHighlights).toHaveLength(24); // the highlights window drops old balls
     expect(tallyBetween(momentBaseline(start), end).fours).toBe(8);
     expect(tallyText({ wickets: 0, fours: 1, sixes: 0, runs: 5, legalBalls: 1 })).toBeNull();
+    expect(tallyText({ wickets: 0, fours: 2, sixes: 0, runs: 10, legalBalls: 6 })).toBe("In that over: 10 runs, 2 fours.");
+    expect(tallyText({ wickets: 1, fours: 0, sixes: 0, runs: 9, legalBalls: 8 })).toBe("In those 1.2 overs: 9 runs, 1 wicket.");
   });
   it("shows nothing after a load, a new match or a rewind", () => {
     const a = makeView([{ boundary: "SIX" }], { revision: 9 });

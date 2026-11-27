@@ -283,15 +283,15 @@ export function tallyBetween(baseline: MomentBaseline, view: View): MomentTally 
   return tally;
 }
 
-/** "In those 4 overs: 31 runs, 2 wickets, 3 fours, 1 six." Null when the passage was a single ball or nothing. */
+/** "In that over: 10 runs, 2 fours." or "In those 4 overs: 31 runs, 2 wickets, 3 fours, 1 six." Null for one ball or none. */
 export function tallyText(tally: MomentTally): string | null {
   if (tally.legalBalls < 2) return null;
   const parts = [`${tally.runs} ${tally.runs === 1 ? "run" : "runs"}`];
   if (tally.wickets) parts.push(`${tally.wickets} ${tally.wickets === 1 ? "wicket" : "wickets"}`);
   if (tally.fours) parts.push(`${tally.fours} ${tally.fours === 1 ? "four" : "fours"}`);
   if (tally.sixes) parts.push(`${tally.sixes} ${tally.sixes === 1 ? "six" : "sixes"}`);
-  const span = tally.legalBalls >= 6 ? `${overs(tally.legalBalls)} overs` : `${tally.legalBalls} balls`;
-  return `In those ${span}: ${parts.join(", ")}.`;
+  const span = tally.legalBalls === 6 ? "over" : tally.legalBalls > 6 ? `${overs(tally.legalBalls)} overs` : `${tally.legalBalls} balls`;
+  return `${span === "over" ? "In that over" : `In those ${span}`}: ${parts.join(", ")}.`;
 }
 
 /**
