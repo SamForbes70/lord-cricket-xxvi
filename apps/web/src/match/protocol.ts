@@ -405,6 +405,19 @@ export type ScenarioStatus = {
   outcome: "COMPLETED" | "FAILED" | null;
   resultText: string | null;
 };
+/**
+ * The stored tournament run and fixture the active match belongs to, found by the worker from stored data (the run, its
+ * competition and its auction), so it survives a reload. Page-worker protocol only; never persisted.
+ */
+export type TournamentBinding = {
+  runId: string;
+  competitionId: string;
+  fixtureId: string;
+  /** The fixture's teams, home first. */
+  teamIds: [string, string];
+  /** The team the player bid for in the run's stored auction, when it is one of the fixture's teams; otherwise null. */
+  auctionPlayerTeamId: string | null;
+};
 export type Response = {
   version: typeof UI_VERSION;
   requestId: string;
@@ -424,6 +437,8 @@ export type Response = {
   superOver?: SuperOverView | null;
   /** Set when the active match is a scenario challenge. */
   scenario?: ScenarioStatus | null;
+  /** Set when the active match is a fixture of a stored tournament run. */
+  tournament?: TournamentBinding | null;
   /** Status of the durable binding for the active match, when one exists. */
   managedStatus?: ManagedStatus | null;
   /** On BOOT and restores: the highest committed ui-N id, so the page can start its ids above it. */

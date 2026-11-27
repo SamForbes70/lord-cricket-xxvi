@@ -51,7 +51,7 @@ export type TournamentLaunch = {
 
 /** The player's team in a run: a per-browser preference, not part of the stored run. */
 const teamKey = (runId: string) => `lcxxvi-tournament-team:${runId}`;
-function readPlayerTeam(runId: string): string | null {
+export function readPlayerTeam(runId: string): string | null {
   try {
     return localStorage.getItem(teamKey(runId));
   } catch {

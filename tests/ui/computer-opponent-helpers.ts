@@ -25,3 +25,10 @@ export async function expectCareerOpponentLocked(page: Page): Promise<void> {
   await expect(page.getByLabel("Tactical captain")).toBeDisabled();
   await expect(page.getByTestId("ai-opponent-note")).toHaveText("In a career match the opposition is always the computer captain.");
 }
+
+/** The opposition setting is locked to the computer captain in the player's tournament fixture. */
+export async function expectTournamentOpponentLocked(page: Page, computerTeamId: string): Promise<void> {
+  await expect(page.locator("#ai-opponent-select")).toHaveValue(computerTeamId, { timeout: 60_000 });
+  await expect(page.getByLabel("Tactical captain")).toBeDisabled();
+  await expect(page.getByTestId("ai-opponent-note")).toHaveText("In a tournament match the opposition is always the computer captain.");
+}

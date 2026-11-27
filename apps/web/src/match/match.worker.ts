@@ -37,13 +37,16 @@ import {
   type Request,
   type Response,
   type ScenarioStatus,
+  type TournamentBinding,
 } from "./protocol.js";
-import { scenarioById } from "@lcxxvi/data";
+import { competitionById, scenarioById } from "@lcxxvi/data";
 import { emptyScenarioLedger, evaluateScenarioResult, recordScenarioFinish, recordScenarioStart, scenarioAttemptFor } from "@lcxxvi/projections";
 import type { ScenarioRecordLedger } from "@lcxxvi/contracts";
 import { scenarioResultOf, startScenarioOnController } from "./scenario-runtime.js";
 import { applySuperOverAction, loadSuperOverState, superOverEligible, superOverView, type SuperOverStore } from "./super-over-runtime.js";
 import { fixtureSeed, tournamentMatchIdentity } from "../tournament/runner.js";
+import { findTournamentBinding } from "../tournament/tournament-binding.js";
+import { tourCompetition } from "../tournament/generated-roster.js";
 import { verifySuperOverRecord } from "@lcxxvi/simulation";
 import type { SuperOverView } from "./protocol.js";
 
@@ -268,6 +271,54 @@ const superOverStore: SuperOverStore = {
   load: (gameId) => repository.loadSuperOverRecord(gameId),
   save: (record, expected) => repository.saveSuperOverRecord(record, expected),
 };
+/** The last tournament lookup, for one match lineage: the stored run and fixture never change under an open match. */
+let tournamentLookup: { key: string; binding: TournamentBinding | null } | null = null;
+/**
+ * The stored tournament run and fixture the active match belongs to, or null. Found from stored data only (the run,
+ * its competition, a user tournament or tour, and the run's auction), so the page learns it again after a reload.
+ * Only the tournament's own save lineage counts, as for a career binding; a manual copy or import is an exhibition.
+ */
+async function tournamentStatus(): Promise<TournamentBinding | null> {
+  const session = controller.peek() as Readonly<AnySession> | null;
+  if (!session) return null;
+  const setup = session.setup as unknown as {
+    format: string; gameId: unknown; matchId: unknown; seed: unknown; teams: readonly { teamId: string }[]; ground: { groundId: string };
+  };
+  const gameId = String(setup.gameId);
+  if (!bindableSave(gameId)) return null;
+  const key = `${activeSaveId}|${gameId}|${String(setup.seed)}`;
+  if (tournamentLookup?.key === key) return tournamentLookup.binding;
+  try {
+    const { runs } = await repository.listTournamentRuns();
+    let binding: TournamentBinding | null = null;
+    if (runs.length > 0) {
+      const { competitions } = await repository.listUserCompetitions();
+      const { tours } = await repository.listUserTours();
+      const { auctions } = await repository.listTournamentAuctions();
+      binding = findTournamentBinding(
+        {
+          format: setup.format,
+          gameId,
+          matchId: String(setup.matchId),
+          seed: String(setup.seed),
+          teamIds: setup.teams.map((team) => team.teamId),
+          groundId: setup.ground.groundId,
+        },
+        runs,
+        (competitionId) => {
+          const tour = tours.find((t) => t.tourId === competitionId);
+          return competitionById(competitionId) ?? competitions.find((c) => c.competitionId === competitionId) ?? (tour ? tourCompetition(tour) : null);
+        },
+        (runId) => auctions.find((a) => a.runId === runId)?.playerTeamId ?? null,
+      );
+    }
+    tournamentLookup = { key, binding };
+    return binding;
+  } catch {
+    // Unreadable records: report nothing this time and look again on the next response.
+    return null;
+  }
+}
 /** Stage 14: the super-over view for a completed tied T20 or one-day exhibition, or null. */
 async function superOverStatus(phase: string | null): Promise<SuperOverView | null> {
   if (phase !== "COMPLETE") return null;
@@ -288,9 +339,11 @@ async function decorate(
   const current = persistence.saves.find((save) => save.saveId === persistence.saveId) ?? null;
   const scenario = await scenarioStatusFor(current?.matchGameId ?? null, base.view?.phase ?? null);
   const superOver = await superOverStatus(base.view?.phase ?? null);
+  const tournament = await tournamentStatus();
   return {
     ...base,
     scenario,
+    tournament,
     superOver,
     persistence,
     archive,
@@ -575,6 +628,7 @@ async function commitCandidate(
       archive: null,
       delegation,
       scenario: await scenarioStatusFor(String(session.setup.gameId), response.view?.phase ?? null),
+      tournament: await tournamentStatus(),
       superOver: await superOverStatus(response.view?.phase ?? null),
       ...(session.receipts[request.requestId] ? { acknowledgement: session.receipts[request.requestId] } : {}),
     };
