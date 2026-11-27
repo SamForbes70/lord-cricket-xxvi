@@ -40,4 +40,4 @@ Before a generated image is committed, the owner confirms that the image service
 
 | Ground | Service and model | Date | Terms checked by | File |
 | --- | --- | --- | --- | --- |
-| Aster Quay | Existing painting from #90 | | | `art/aster-quay.webp` |
+| Aster Quay | Existing painting from #90 (service and model not recorded) | added 18 November 2026 (`e2a3a92`) | Owner, 27 November 2026: confirmed it can be shipped in a distributed game | `art/aster-quay.webp` |

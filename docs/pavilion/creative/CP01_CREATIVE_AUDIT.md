@@ -243,7 +243,7 @@ Observation [Inference]: Finish over completes an over in about a quarter of a s
 | Motion | 7 `@keyframes`; reduced motion handled in `styles.css`, `floodlit.css` (four blocks), `pavilion.css`, `main.tsx` (scroll) and `LiveFieldPanel.tsx`; measured fully off under the preference |
 | Focus | `floodlit.css` gold `:focus-visible` (3 px); legacy `styles.css` orange `#a65015` focus rules still apply to `h2:focus` |
 | Art | one raster painting, `apps/web/src/art/aster-quay.webp` (247 KB); the other seven grounds and the scenario cards use the procedural SVG stadium in `world/ground-art.ts`; crests (`world/crest.ts`, `TeamCrest.tsx`) and portraits and figures (`PlayerPortrait.tsx`, `CricketerFigure.tsx`, `cricketer-paint.ts`) are procedural SVG |
-| Art provenance | `docs/design/GROUND_ART_PROMPTS.md` records the Aster Quay painting only as "Existing painting from #90" with the service, model, date and terms-checked columns blank |
+| Art provenance | `docs/design/GROUND_ART_PROMPTS.md` records the Aster Quay painting only as "Existing painting from #90" with the service, model, date and terms-checked columns blank. Update, 27 November 2026: the owner confirmed it can be shipped in a distributed game (CD-032 resolved). |
 | Audio | `packages/projections/src/audio-cues.ts`: 10 cue kinds (bat and ball dot and single, four, six, wicket, milestone, over bell, innings change, match complete, UI click), synthesised in the browser from waveforms and noise (`ORIGINAL_AUDIO_PROVENANCE_MANIFEST`: "synthesized offline in-repo ... No third-party commercial sound recordings"); optional browser speech narration; no music; muted by default |
 | Commentary | `packages/projections/src/commentary.ts` (1,882 lines) and `commentary-context.ts`; text only |
 
