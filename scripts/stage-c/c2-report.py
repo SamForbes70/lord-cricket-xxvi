@@ -109,7 +109,10 @@ def main():
                     help="C3: per-point targets from c3-mapping.json (default: C2's world-SD targets in --fit)")
     ap.add_argument("--balls-synthetic", nargs="+", required=True)
     ap.add_argument("--balls-calibrated", nargs="+", required=True)
+    ap.add_argument("--calibrated-label", default="calibrated-t20-01",
+                    help="C6: the model id that labels the calibrated column (calibrated-t20-02 for its files); default unchanged")
     a = ap.parse_args()
+    CAL = a.calibrated_label
     S, C = json.loads(a.synthetic.read_text()), json.loads(a.calibrated.read_text())
     real = C["real"]
     fit = json.loads(a.fit.read_text())
@@ -118,13 +121,13 @@ def main():
            "attribution": {**C["attribution"], "note": ATTRIBUTION_NOTE}, "reference": "full-member men's T20 internationals, calibration split",
            "perPointTargets": "c3-mapping.json (quarters of the game's regular players)" if a.targets else "c2-fit.json (world rating SD)",
            "criterion1Raw": {}, "criterion1Adjusted": {}, "perPoint": {}, "specialisation": {}, "aggregates": {}, "tactical": {}}
-    for model, G in (("synthetic-alpha-01", S["game"]), ("calibrated-t20-01", C["game"])):
+    for model, G in (("synthetic-alpha-01", S["game"]), (CAL, C["game"])):
         res["criterion1Raw"][model] = {f"{r}.{s}": raw_gate(G["byRating"][r][s], real, r, s) for r, s in RAW}
         res["criterion1Adjusted"][model] = {f"{n}.{w}": adjusted_gate(G, real, n, w) for n in ("runs", "boundary", "nonDot", "dismissal") for w in ("batter", "bowler")}
         sp, rs = G["specialisation"], real["fullMembersOnly"]["specialisation"]
         res["specialisation"][model] = {k: {"game": sp[k], "real": rs[k], "relative": sp[k] / rs[k], "verdict": "PASS" if 0.85 <= sp[k] / rs[k] <= 1.15 else "FAIL"}
                                         for k in ("averageRatio", "strikeRateRatio", "economyRatioPartTimeOverFrontline")}
-    for model, path in (("synthetic-alpha-01", a.dose_synthetic), ("calibrated-t20-01", a.dose_calibrated)):
+    for model, path in (("synthetic-alpha-01", a.dose_synthetic), (CAL, a.dose_calibrated)):
         d = json.loads(path.read_text())
         rows = {}
         for key, tkey, sign in (("batting.runs", "runs.batter", 1), ("batting.boundary", "boundary.batter", 1), ("batting.nonDot", "nonDot.batter", 1),
@@ -140,7 +143,7 @@ def main():
         rows["variationTradeOff"] = {"dismissalPerPoint": d["variation.dismissal"], "runsPerPoint": d["variation.runs"], "boundaryPerPoint": d["variation.boundary"],
                                      "verdict": "PASS" if d["variation.dismissal"] > 0 and d["variation.runs"] > 0 else "FAIL"}
         res["perPoint"][model] = rows
-    for model, paths in (("synthetic-alpha-01", a.balls_synthetic), ("calibrated-t20-01", a.balls_calibrated)):
+    for model, paths in (("synthetic-alpha-01", a.balls_synthetic), (CAL, a.balls_calibrated)):
         agg = first_innings(paths)
         res["aggregates"][model] = {**agg, "againstM7E": aggregate_gate(agg)}
     res["aggregates"]["M7E holdout target"] = M7E
