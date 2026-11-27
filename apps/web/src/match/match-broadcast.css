@@ -225,3 +225,108 @@
   .advance-skip { padding-left: 0; border-left: 0; }
   .match-shell .advance-primary { flex: 1 1 100%; grid-template-columns: 1fr 1fr; }
 }
+
+/*
+ * CP04 match moments. The moment sits over the "This ball" panel only: never over the score bug or the decision
+ * controls, and it blocks nothing. Full: a lower third with a portrait or crest, the word, a sentence and figures.
+ * Brief: one slim line along the foot of the panel, so the ball call stays readable. Motion only when the player
+ * has not asked for reduced motion (system setting or the match's Highlight motion: Reduced motion).
+ */
+.stage-slot { position: relative; }
+.match-moment {
+  --moment-colour: var(--accent);
+  position: absolute; inset: 0; z-index: 3; /* the slot box is the stage border box: its margins collapse through */
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-1) var(--space-4);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4); overflow: hidden;
+  border: 1px solid var(--moment-colour); border-left: 6px solid var(--moment-colour); border-radius: var(--radius-md);
+  background-color: var(--surface-1);
+  background-image: linear-gradient(100deg, color-mix(in srgb, var(--moment-colour) 26%, var(--surface-1)) 0%, var(--surface-1) 58%, var(--surface-sunken) 100%);
+  box-shadow: var(--shadow-2); color: var(--text-default);
+}
+.stage-slot[data-stage="false"] .match-moment { position: relative; inset: auto; margin: var(--space-2) 0; }
+.match-moment[data-kind="WICKET"], .match-moment[data-kind="HAT_TRICK"], .match-moment[data-kind="FIVE_WICKETS"] { --moment-colour: var(--colour-wicket); }
+.match-moment[data-kind="SIX"] { --moment-colour: var(--colour-six); }
+.match-moment[data-kind="FOUR"] { --moment-colour: var(--colour-boundary); }
+.match-moment[data-kind="MAIDEN"] { --moment-colour: var(--colour-positive); }
+.moment-art { display: flex; align-items: center; justify-content: center; }
+.moment-art .player-portrait { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 0 0 2px var(--moment-colour); }
+.moment-text { display: grid; gap: 2px; min-width: 0; }
+.moment-word {
+  font: 700 var(--type-2xl)/1 var(--font-display); letter-spacing: 0.02em; text-transform: uppercase; color: var(--moment-colour);
+}
+.moment-line { font: 600 var(--type-md)/var(--leading-tight) var(--font-body); color: var(--text-strong); overflow-wrap: anywhere; }
+.moment-detail { font-size: var(--type-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.match-shell .moment-dismiss {
+  align-self: start; min-width: 32px; min-height: 32px; padding: 0; border-radius: var(--radius-pill);
+  background: transparent; background-image: none; border: 1px solid var(--border-strong); color: var(--text-default);
+  font-size: var(--type-lg); line-height: 1; box-shadow: none;
+}
+.match-shell .moment-dismiss:hover { background-color: var(--surface-3); border-color: var(--moment-colour); }
+.moment-timer {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--moment-colour); opacity: 0.7; transform-origin: left center;
+  transform: scaleX(0);
+}
+/* Brief: a slim band at the foot of the panel. */
+.match-moment[data-mode="brief"] {
+  inset: auto 0 0 0; grid-template-columns: minmax(0, 1fr) auto; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  border-width: 1px 1px 1px 4px; box-shadow: none;
+}
+.match-moment[data-mode="brief"] .moment-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); }
+.match-moment[data-mode="brief"] .moment-word { font-size: var(--type-md); }
+.match-moment[data-mode="brief"] .moment-line { font-size: var(--type-sm); font-weight: 500; }
+.match-moment[data-mode="brief"] .moment-dismiss { min-width: 28px; min-height: 28px; font-size: var(--type-md); align-self: center; }
+@media (max-width: 700px) {
+  .match-moment { gap: var(--space-1) var(--space-2); padding-left: var(--space-3); }
+  .moment-art .player-portrait { width: 44px; height: 44px; }
+  .moment-word { font-size: var(--type-xl); }
+  .moment-line { font-size: var(--type-sm); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .match-shell:not([data-motion="REDUCED"]) .match-moment { animation: moment-in 280ms var(--ease-out) both; }
+  .match-shell:not([data-motion="REDUCED"]) .match-moment .moment-word { animation: moment-word 420ms var(--ease-emphasis) both; }
+  .match-shell:not([data-motion="REDUCED"]) .moment-timer { transform: scaleX(1); animation: moment-timer var(--moment-ms, 3200ms) linear both; }
+  .match-shell:not([data-motion="REDUCED"]) .match-moment[data-held="true"] .moment-timer { animation-play-state: paused; }
+}
+@keyframes moment-in { from { clip-path: inset(0 100% 0 0); opacity: 0.4; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
+@keyframes moment-word { from { transform: translateX(-12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes moment-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+/* While a batched advance runs, the stage does not replay its flash for every over it passes. */
+.broadcast-stage[data-quiet="true"] .stage-glow, .broadcast-stage[data-quiet="true"] .stage-call { animation: none !important; }
+@media print { .match-moment { display: none; } }
+
+/* "This ball" card: plain words first, tracking detail behind a disclosure. */
+.match-shell .highlight-plain { margin: 0 0 var(--space-1); }
+.match-shell .highlight-tracking { font-size: var(--type-sm); color: var(--text-muted); margin-bottom: var(--space-1); }
+.match-shell .highlight-tracking summary { cursor: pointer; }
+.match-shell .highlight-tracking p { margin: var(--space-1) 0 0; }
+
+/* Scorecard: how each batter was out, under the name. */
+.match-shell .how-out { display: block; font-size: var(--type-xs); color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: normal; }
+
+/* CP11 result card at full time. */
+.result-card { gap: var(--space-3); }
+.result-card .result-outcome {
+  margin: 0; font: 600 var(--type-xs)/1.2 var(--font-display); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--accent-strong);
+}
+.result-card[data-outcome="LOST"] .result-outcome { color: var(--text-muted); }
+.result-card .result-scores li { display: inline-flex; align-items: center; gap: var(--space-2); }
+.result-card .result-scores li[data-winner="true"] strong { color: var(--accent-strong); }
+.result-card .result-scores .result-score-runs { font-family: var(--font-display); font-size: var(--type-xl); color: var(--text-strong); }
+.result-card .result-margin { margin: 0; color: var(--text-default); font-size: var(--type-sm); }
+.result-card .result-award {
+  display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-accent); border-radius: var(--radius-md); background: var(--surface-2);
+}
+.result-card .result-award p { margin: 0; }
+.result-card .result-award .player-portrait { flex: none; border-radius: 50%; box-shadow: 0 0 0 2px var(--accent); }
+.result-card .result-label {
+  display: block; font: 600 var(--type-xs)/1.2 var(--font-display); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-muted);
+}
+.result-card .result-rule { display: block; color: var(--text-faint); font-size: var(--type-xs); }
+.result-card .result-tops { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--space-2) var(--space-4); margin: 0; }
+.result-card .result-tops dt { font: 600 var(--type-xs)/1.2 var(--font-display); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-muted); }
+.result-card .result-tops dd { margin: 2px 0 0; display: grid; gap: 2px; font-size: var(--type-sm); color: var(--text-default); font-variant-numeric: tabular-nums; }
+.result-card .result-turns ul { margin: 2px 0 0; padding-left: 1.1rem; font-size: var(--type-sm); }
+.result-card .result-next { margin: 0; font-size: var(--type-sm); color: var(--text-muted); }
+/* At full time there is no next pick to make, so the routine-picks switch gives way to the result card. */
+.match-shell .decision[data-phase="COMPLETE"] .routine-picks { display: none; }
