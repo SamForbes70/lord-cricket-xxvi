@@ -1,0 +1,251 @@
+{
+  "base": "http://127.0.0.1:4187",
+  "startedAt": "2026-11-27T09:31:09.308Z",
+  "shots": [
+    "01-clubhouse-pre-season_1280x720.png",
+    "01-clubhouse-pre-season_1366x768.png",
+    "01-clubhouse-pre-season_1920x1080.png",
+    "01-clubhouse-pre-season_2560x1440.png",
+    "01-clubhouse-pre-season_390x844.png",
+    "01-clubhouse-pre-season_1366x768_full.png",
+    "02-clubhouse-after-match-report_1280x720.png",
+    "02-clubhouse-after-match-report_1366x768.png",
+    "02-clubhouse-after-match-report_1920x1080.png",
+    "02-clubhouse-after-match-report_2560x1440.png",
+    "02-clubhouse-after-match-report_390x844.png",
+    "03-clubhouse-after-match_1280x720.png",
+    "03-clubhouse-after-match_1366x768.png",
+    "03-clubhouse-after-match_1920x1080.png",
+    "03-clubhouse-after-match_2560x1440.png",
+    "03-clubhouse-after-match_390x844.png",
+    "03-clubhouse-after-match_1366x768_full.png",
+    "01-clubhouse-pre-season_1280x720_at1.5x.png",
+    "03-clubhouse-after-match_1280x720_at1.5x.png"
+  ],
+  "overflow": {
+    "01-clubhouse-pre-season_1280x720": 0,
+    "01-clubhouse-pre-season_1366x768": 0,
+    "01-clubhouse-pre-season_1920x1080": 0,
+    "01-clubhouse-pre-season_2560x1440": 0,
+    "01-clubhouse-pre-season_390x844": 0,
+    "02-clubhouse-after-match-report_1280x720": 0,
+    "02-clubhouse-after-match-report_1366x768": 0,
+    "02-clubhouse-after-match-report_1920x1080": 0,
+    "02-clubhouse-after-match-report_2560x1440": 0,
+    "02-clubhouse-after-match-report_390x844": 0,
+    "03-clubhouse-after-match_1280x720": 0,
+    "03-clubhouse-after-match_1366x768": 0,
+    "03-clubhouse-after-match_1920x1080": 0,
+    "03-clubhouse-after-match_2560x1440": 0,
+    "03-clubhouse-after-match_390x844": 0,
+    "01-clubhouse-pre-season_1280x720@1.5x": 0,
+    "03-clubhouse-after-match_1280x720@1.5x": 0
+  },
+  "contentTop": {
+    "01-clubhouse-pre-season_1280x720": 290,
+    "01-clubhouse-pre-season_1366x768": 290,
+    "01-clubhouse-pre-season_1920x1080": 290,
+    "01-clubhouse-pre-season_2560x1440": 290,
+    "01-clubhouse-pre-season_390x844": 444,
+    "02-clubhouse-after-match-report_1280x720": 290,
+    "02-clubhouse-after-match-report_1366x768": 290,
+    "02-clubhouse-after-match-report_1920x1080": 290,
+    "02-clubhouse-after-match-report_2560x1440": 290,
+    "02-clubhouse-after-match-report_390x844": 444,
+    "03-clubhouse-after-match_1280x720": 290,
+    "03-clubhouse-after-match_1366x768": 290,
+    "03-clubhouse-after-match_1920x1080": 290,
+    "03-clubhouse-after-match_2560x1440": 290,
+    "03-clubhouse-after-match_390x844": 444,
+    "01-clubhouse-pre-season_1280x720@1.5x": 290,
+    "03-clubhouse-after-match_1280x720@1.5x": 290
+  },
+  "notCaptured": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "perf": {
+    "navigationPreSeason": {
+      "Squad": {
+        "samples": [
+          237,
+          233,
+          157
+        ],
+        "median": 233
+      },
+      "Office": {
+        "samples": [
+          214,
+          237,
+          158
+        ],
+        "median": 214
+      },
+      "Season": {
+        "samples": [
+          579,
+          430,
+          482
+        ],
+        "median": 482
+      },
+      "Settings": {
+        "samples": [
+          124,
+          83,
+          121
+        ],
+        "median": 121
+      },
+      "Clubhouse": {
+        "samples": [
+          262,
+          252,
+          265
+        ],
+        "median": 262
+      }
+    },
+    "navigationAfterOneMatch": {
+      "Squad": {
+        "samples": [
+          163,
+          138,
+          151
+        ],
+        "median": 151
+      },
+      "Office": {
+        "samples": [
+          116,
+          142,
+          152
+        ],
+        "median": 142
+      },
+      "Season": {
+        "samples": [
+          315,
+          550,
+          517
+        ],
+        "median": 517
+      },
+      "Settings": {
+        "samples": [
+          283,
+          82,
+          114
+        ],
+        "median": 114
+      },
+      "Clubhouse": {
+        "samples": [
+          221,
+          233,
+          317
+        ],
+        "median": 233
+      }
+    }
+  },
+  "a11y": {
+    "contrastPre": {
+      "checked": 382,
+      "fails": [
+        {
+          "text": "v",
+          "ratio": 2.59,
+          "fontPx": 34.7237,
+          "fg": "rgb(88, 105, 81)",
+          "bg": "rgb(16, 41, 43)",
+          "cls": "",
+          "tag": "SMALL"
+        }
+      ],
+      "leadMinimum": {
+        "ratio": 2.59,
+        "text": "v"
+      }
+    },
+    "focusPre": {
+      "stops": 29,
+      "withoutVisibleRing": [],
+      "order": [
+        "BUTTON:Clubhouse",
+        "BUTTON:Squad",
+        "BUTTON:Office",
+        "BUTTON:Season",
+        "BUTTON:Settings",
+        "A:Exhibition",
+        "A:Scenarios",
+        "A:Tournaments",
+        "A:Rain matches",
+        "BUTTON:Choose career",
+        "BUTTON:Simulate match",
+        "BUTTON:Play match",
+        "SUMMARY:About these numbers",
+        "SUMMARY:Pre-match tactical briefing (optional) — Aster Q",
+        "INPUT:",
+        "BUTTON:About the model",
+        "BUTTON:Clubhouse",
+        "BUTTON:Squad",
+        "BUTTON:Office",
+        "BUTTON:Season",
+        "BUTTON:Settings",
+        "A:Exhibition",
+        "A:Scenarios",
+        "A:Tournaments",
+        "A:Rain matches",
+        "BUTTON:Choose career",
+        "BUTTON:Simulate match",
+        "BUTTON:Play match",
+        "SUMMARY:About these numbers"
+      ]
+    },
+    "contrastAfter": {
+      "checked": 364,
+      "fails": [],
+      "leadMinimum": {
+        "ratio": 2.59,
+        "text": "v"
+      }
+    },
+    "focusAfter": {
+      "stops": 28,
+      "withoutVisibleRing": [],
+      "order": [
+        "BUTTON:Advance to match day",
+        "SUMMARY:About these numbers",
+        "SUMMARY:Pre-match tactical briefing (optional) — Larchwo",
+        "BUTTON:Post-match analysis",
+        "BUTTON:Read the match report",
+        "INPUT:",
+        "BUTTON:About the model",
+        "BUTTON:Clubhouse",
+        "BUTTON:Squad",
+        "BUTTON:Office",
+        "BUTTON:Season",
+        "BUTTON:Settings",
+        "A:Exhibition",
+        "A:Scenarios",
+        "A:Tournaments",
+        "A:Rain matches",
+        "BUTTON:Choose career",
+        "BUTTON:Advance to match day",
+        "SUMMARY:About these numbers",
+        "SUMMARY:Pre-match tactical briefing (optional) — Larchwo",
+        "BUTTON:Post-match analysis",
+        "BUTTON:Read the match report",
+        "INPUT:",
+        "BUTTON:About the model",
+        "BUTTON:Clubhouse",
+        "BUTTON:Squad",
+        "BUTTON:Office",
+        "BUTTON:Season"
+      ]
+    },
+    "reducedMotionAnimations": 0
+  },
+  "finishedAt": "2026-11-27T09:32:20.567Z"
+}
