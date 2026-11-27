@@ -55,7 +55,8 @@ function play(session: T20Session): T20Session {
 
 describe("Stage C model registry", () => {
   it("registers synthetic-alpha-01 as the only gameplay model, at its pinned hash", () => {
-    expect(PROBABILITY_MODEL_IDS).toEqual([PROBABILITY_MODEL_ID, CALIBRATED_T20_MODEL_ID]);
+    // C6 added a second research id, calibrated-t20-02 (stage-c-calibrated-02-model.test.ts); this id is unchanged.
+    expect(PROBABILITY_MODEL_IDS).toEqual([PROBABILITY_MODEL_ID, CALIBRATED_T20_MODEL_ID, "calibrated-t20-02"]);
     expect(MODEL_REGISTRY[PROBABILITY_MODEL_ID]).toMatchObject({ modelHash: MODEL_PACK_SHA256, gameplay: true, skillPack: null, deliveryPack: null, tacticsPack: null });
     expect(MODEL_REGISTRY[CALIBRATED_T20_MODEL_ID]).toMatchObject({ modelHash: CALIBRATED_T20_MODEL_HASH, gameplay: false });
   });

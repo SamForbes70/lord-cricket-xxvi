@@ -40,12 +40,14 @@ const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "u
 const byId = new Map(world.players.map((p) => [p.playerId, p]));
 /** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
 const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
-if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
+/** C6: calibrated-t20-02 (research only) is accepted as well; it is reached through validateT20ResearchMatchSetup. */
+const RESEARCH_MODELS = ["calibrated-t20-01", "calibrated-t20-02"] as const;
+if (MODEL !== "synthetic-alpha-01" && !(RESEARCH_MODELS as readonly string[]).includes(MODEL)) throw new Error(`unknown model ${MODEL}`);
 const CAPTAIN = process.argv.find((a) => a.startsWith("--captain="))?.slice(10) ?? "V6";
 const advise = captainByName(CAPTAIN);
 const ARGS = process.argv.filter((a) => !a.startsWith("--model=") && !a.startsWith("--captain="));
-const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
-  ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
+const setupFor = (request: unknown) => MODEL !== "synthetic-alpha-01"
+  ? validateT20ResearchMatchSetup(request, bytes, manifest, MODEL as (typeof RESEARCH_MODELS)[number])
   : validateT20MatchSetup(request, bytes, manifest);
 const out = ARGS[2];
 const repeats = Number(ARGS[3] ?? 10);

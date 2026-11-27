@@ -29,6 +29,7 @@ def main():
     ap.add_argument("--pack-version", required=True)
     ap.add_argument("--pack-sha256", required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--model", default="calibrated-t20-01", help="C6: the model id recorded in the output (default unchanged)")
     ap.add_argument("--sign-range", action="store_true", help="C5: correct sign and at most twice the C3 upper bound")
     a = ap.parse_args()
     d = json.loads(a.dose.read_text())
@@ -43,7 +44,7 @@ def main():
                       "insideC3Range": inside, "verdict": "PASS" if ok else "FAIL"}
     gates["variationTradeOff"] = {"dismissalPerPoint": d["variation.dismissal"], "runsPerPoint": d["variation.runs"],
                                   "verdict": "PASS" if d["variation.dismissal"] > 0 and d["variation.runs"] > 0 else "FAIL"}
-    out = {"version": "LC_STAGE_C_C3_PER_POINT_GATE_V1", "researchOnly": True, "model": "calibrated-t20-01",
+    out = {"version": "LC_STAGE_C_C3_PER_POINT_GATE_V1", "researchOnly": True, "model": a.model,
            "rule": "C5 sign and range: correct sign, at most twice the C3 upper bound" if a.sign_range else "C3: inside the range",
            "packVersion": a.pack_version, "packSha256": a.pack_sha256, "attribution": m["attribution"],
            "targets": "c3-mapping.json (fit period, full-member reference, quarters of the game's regular players)",

@@ -12,7 +12,14 @@ export const PROBABILITY_MODEL_ID = "synthetic-alpha-01" as const;
  * game set-up, career, save, UI or default can select this id (only validateT20ResearchMatchSetup can).
  */
 export const CALIBRATED_T20_MODEL_ID = "calibrated-t20-01" as const;
-export const PROBABILITY_MODEL_IDS = [PROBABILITY_MODEL_ID, CALIBRATED_T20_MODEL_ID] as const;
+/**
+ * Stage C C6 (Studio Production Directive 03, 27 November 2026): a second research-only calibrated T20 model, a
+ * separately versioned refit. calibrated-t20-01 is unchanged. As for calibrated-t20-01, only the in-memory request and
+ * context schemas accept the id; every persisted schema keeps its literal, and only validateT20ResearchMatchSetup can
+ * select it.
+ */
+export const CALIBRATED_T20_02_MODEL_ID = "calibrated-t20-02" as const;
+export const PROBABILITY_MODEL_IDS = [PROBABILITY_MODEL_ID, CALIBRATED_T20_MODEL_ID, CALIBRATED_T20_02_MODEL_ID] as const;
 export type ProbabilityModelId = (typeof PROBABILITY_MODEL_IDS)[number];
 export const PROBABILITY_SCALE = 10000 as const;
 export const PROBABILITY_MASS = 4294967296 as const;

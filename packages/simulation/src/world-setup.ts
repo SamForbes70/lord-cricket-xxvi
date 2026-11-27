@@ -1,4 +1,5 @@
 import {
+  CALIBRATED_T20_02_MODEL_ID,
   CALIBRATED_T20_MODEL_ID,
   canonicalJson,
   T20MatchSetupRequestSchema,
@@ -160,9 +161,10 @@ export function validateT20ResearchMatchSetup(
   input: unknown,
   worldBytes: Readonly<Uint8Array>,
   manifestInput: unknown,
-  researchModelId: typeof CALIBRATED_T20_MODEL_ID,
+  researchModelId: typeof CALIBRATED_T20_MODEL_ID | typeof CALIBRATED_T20_02_MODEL_ID,
 ): FrozenT20Setup {
-  assert(researchModelId === CALIBRATED_T20_MODEL_ID, "unsupported research model ID");
+  // C6: calibrated-t20-02 is a second research model, reachable only here, like calibrated-t20-01.
+  assert(researchModelId === CALIBRATED_T20_MODEL_ID || researchModelId === CALIBRATED_T20_02_MODEL_ID, "unsupported research model ID");
   return buildT20MatchSetup(input, worldBytes, manifestInput, T20_RULE, SYNTHETIC_ALPHA_PACK, DELIVERY_STAGE_PACK,
     MODEL_REGISTRY[researchModelId]);
 }

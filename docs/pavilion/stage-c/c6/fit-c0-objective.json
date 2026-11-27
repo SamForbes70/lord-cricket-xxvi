@@ -1,0 +1,351 @@
+{
+ "version": "LC_STAGE_C_C6_OBJECTIVE_V1",
+ "researchOnly": true,
+ "label": "c0",
+ "gameFiles": [
+  "/home/user/lcx-data/c6/fit/c0/cal-balls-0.json",
+  "/home/user/lcx-data/c6/fit/c0/cal-balls-1.json",
+  "/home/user/lcx-data/c6/fit/c0/cal-balls-2.json",
+  "/home/user/lcx-data/c6/fit/c0/cal-balls-3.json"
+ ],
+ "model": [
+  "calibrated-t20-01"
+ ],
+ "captain": [
+  "V6"
+ ],
+ "repeats": [
+  [
+   20,
+   2
+  ],
+  [
+   22,
+   2
+  ],
+  [
+   24,
+   2
+  ],
+  [
+   26,
+   2
+  ]
+ ],
+ "attribution": "Contains information from Cricsheet (https://cricsheet.org/), ODC-By 1.0 (https://cricsheet.org/licensing/). Derived aggregates only. Calibration split only; the holdout is not read.",
+ "game": {
+  "powerplay": {
+   "legalBalls": 28800,
+   "runsPerOver": 7.807708333333333,
+   "wicketsPer100": 5.263888888888889,
+   "dotPercent": 38.1875,
+   "fourPercent": 14.472222222222221,
+   "sixPercent": 4.180555555555555,
+   "caughtPer100": 3.1944444444444446,
+   "bowledPer100": 1.0694444444444444,
+   "lbwPer100": 0.3784722222222222,
+   "runOutPer100": 0.3611111111111111,
+   "stumpedPer100": 0.25
+  },
+  "middle": {
+   "legalBalls": 43084,
+   "runsPerOver": 7.868071673939282,
+   "wicketsPer100": 4.470337016061647,
+   "dotPercent": 27.836319747470057,
+   "fourPercent": 10.846253829727972,
+   "sixPercent": 4.017732801039829,
+   "caughtPer100": 2.7690093770309163,
+   "bowledPer100": 0.796119208987095,
+   "lbwPer100": 0.471172593073995,
+   "runOutPer100": 0.3760096555565871,
+   "stumpedPer100": 0.039457803360876426
+  },
+  "death": {
+   "legalBalls": 22907,
+   "runsPerOver": 9.196053608067404,
+   "wicketsPer100": 9.254812939276205,
+   "dotPercent": 21.635307984458898,
+   "fourPercent": 8.639280569258306,
+   "sixPercent": 8.482123368402672,
+   "caughtPer100": 7.892783865194046,
+   "bowledPer100": 0.45400969136071945,
+   "lbwPer100": 0.04802025581699917,
+   "runOutPer100": 0.7726895708735321,
+   "stumpedPer100": 0.07857860042781682
+  },
+  "firstInningsRuns": 161.355,
+  "firstInningsWickets": 6.9525,
+  "innings": 800
+ },
+ "ratios": {
+  "runs.batter": 1.3710884914011285,
+  "runs.bowler": 0.794339731733464,
+  "boundary.batter": 1.7017135597007358,
+  "boundary.bowler": 0.6743297148535097,
+  "nonDot.batter": 1.235802048413644,
+  "nonDot.bowler": 0.8563937588088585,
+  "dismissal.batter": 0.8388084574907821,
+  "dismissal.bowler": 1.1525200899781096
+ },
+ "real": {
+  "fit": {
+   "powerplay": {
+    "legalBalls": 29936,
+    "runsPerOver": 7.675374131480492,
+    "wicketsPer100": 4.235702832709781,
+    "dotPercent": 42.38709246392303,
+    "fourPercent": 14.51429716729022,
+    "sixPercent": 3.614377338321753,
+    "caughtPer100": 2.765900587920898,
+    "bowledPer100": 0.8551576696953501,
+    "lbwPer100": 0.3741314804917157,
+    "runOutPer100": 0.1803848209513629,
+    "stumpedPer100": 0.056787814003206843
+   },
+   "middle": {
+    "legalBalls": 44114,
+    "runsPerOver": 7.659609194360067,
+    "wicketsPer100": 4.506505871152015,
+    "dotPercent": 27.472004352359797,
+    "fourPercent": 8.249081924105726,
+    "sixPercent": 4.395430022215169,
+    "caughtPer100": 2.892505780477853,
+    "bowledPer100": 0.7117921748197851,
+    "lbwPer100": 0.37629777394931313,
+    "runOutPer100": 0.31282586027111575,
+    "stumpedPer100": 0.20855057351407716
+   },
+   "death": {
+    "legalBalls": 23446,
+    "runsPerOver": 9.749552162415764,
+    "wicketsPer100": 8.922630725923398,
+    "dotPercent": 18.847564616565727,
+    "fourPercent": 11.127697688305041,
+    "sixPercent": 7.4042480593704685,
+    "caughtPer100": 5.600102362876397,
+    "bowledPer100": 1.735903778896187,
+    "lbwPer100": 0.3454747078392903,
+    "runOutPer100": 1.070545082316813,
+    "stumpedPer100": 0.14074895504563678
+   },
+   "firstInningsRuns": 158.93293413173652,
+   "firstInningsWickets": 6.404790419161676,
+   "innings": 835
+  },
+  "selection": {
+   "powerplay": {
+    "legalBalls": 5930,
+    "runsPerOver": 8.300843170320405,
+    "wicketsPer100": 4.78920741989882,
+    "dotPercent": 41.78752107925801,
+    "fourPercent": 15.210792580101181,
+    "sixPercent": 5.311973018549747,
+    "caughtPer100": 3.524451939291737,
+    "bowledPer100": 0.7419898819561551,
+    "lbwPer100": 0.37099494097807756,
+    "runOutPer100": 0.10118043844856661,
+    "stumpedPer100": 0.03372681281618887
+   },
+   "middle": {
+    "legalBalls": 8638,
+    "runsPerOver": 8.272053716137995,
+    "wicketsPer100": 5.116925214169947,
+    "dotPercent": 28.270432970595046,
+    "fourPercent": 8.636258393146562,
+    "sixPercent": 6.564019448946516,
+    "caughtPer100": 3.5887937022458902,
+    "bowledPer100": 0.8335262792313035,
+    "lbwPer100": 0.3473026163463765,
+    "runOutPer100": 0.17365130817318825,
+    "stumpedPer100": 0.17365130817318825
+   },
+   "death": {
+    "legalBalls": 4541,
+    "runsPerOver": 9.837040299493504,
+    "wicketsPer100": 9.138956177053512,
+    "dotPercent": 23.563091829993393,
+    "fourPercent": 11.275049548557586,
+    "sixPercent": 8.478308742567716,
+    "caughtPer100": 6.099977978418851,
+    "bowledPer100": 1.475445937018278,
+    "lbwPer100": 0.3083021360933715,
+    "runOutPer100": 1.0570358951772738,
+    "stumpedPer100": 0.17617264919621228
+   },
+   "firstInningsRuns": 166.0120481927711,
+   "firstInningsWickets": 6.873493975903615,
+   "innings": 166
+  }
+ },
+ "periods": {
+  "fit": {
+   "J": 178.71826774562737,
+   "terms": {
+    "ratio.runs.batter": 1.9329144430573764,
+    "ratio.runs.bowler": 0.0,
+    "ratio.boundary.batter": 5.139607416193705,
+    "ratio.boundary.bowler": 0.0,
+    "ratio.nonDot.batter": 0.0,
+    "ratio.nonDot.bowler": 0.0,
+    "ratio.dismissal.batter": 0.0,
+    "ratio.dismissal.bowler": 0.0,
+    "powerplay.runsPerOver": 0.2801974556804567,
+    "powerplay.wicketsPer100": 16.914665057938375,
+    "powerplay.dotPercent": 7.838478605795168,
+    "powerplay.fourPercent": 0.0017703010024750889,
+    "powerplay.sixPercent": 0.3205577736700467,
+    "powerplay.caughtPer100": 2.938397391425186,
+    "powerplay.bowledPer100": 0.7347011493179052,
+    "powerplay.lbwPer100": 0.0003014726203353726,
+    "middle.runsPerOver": 0.6953056862770307,
+    "middle.wicketsPer100": 0.020930977256768936,
+    "middle.dotPercent": 0.058989203161931195,
+    "middle.fourPercent": 6.745301907353493,
+    "middle.sixPercent": 0.1426551908835742,
+    "middle.caughtPer100": 0.24402178662925644,
+    "middle.bowledPer100": 0.11377677906327445,
+    "middle.lbwPer100": 0.14401970086305763,
+    "death.runsPerOver": 4.901770394651598,
+    "death.wicketsPer100": 1.765520365887516,
+    "death.dotPercent": 3.4540058156588267,
+    "death.fourPercent": 6.192219758364853,
+    "death.sixPercent": 1.1618151818212672,
+    "death.caughtPer100": 84.10221553711217,
+    "death.bowledPer100": 26.292039226534225,
+    "death.lbwPer100": 1.4156664164461041,
+    "firstInningsRuns": 0.36665019188793085,
+    "firstInningsWickets": 4.799772559073471
+   },
+   "ratioRanges": {
+    "runs.batter": [
+     1.3358048697508484,
+     1.4097477706620962
+    ],
+    "runs.bowler": [
+     0.7629678438670676,
+     0.8011653434417653
+    ],
+    "boundary.batter": [
+     1.6047384092726378,
+     1.7806476104640891
+    ],
+    "boundary.bowler": [
+     0.6061066273031681,
+     0.6749210921518775
+    ],
+    "nonDot.batter": [
+     1.2117127487332104,
+     1.2568786714749933
+    ],
+    "nonDot.bowler": [
+     0.8360322838297454,
+     0.8618461267786297
+    ],
+    "dismissal.batter": [
+     0.6252032128383659,
+     1.0
+    ],
+    "dismissal.bowler": [
+     1.0,
+     1.4654884940772652
+    ]
+   },
+   "ratioInside": {
+    "runs.batter": true,
+    "runs.bowler": true,
+    "boundary.batter": true,
+    "boundary.bowler": true,
+    "nonDot.batter": true,
+    "nonDot.bowler": true,
+    "dismissal.batter": true,
+    "dismissal.bowler": true
+   },
+   "ratioPasses": 8
+  },
+  "selection": {
+   "J": 137.04035892217112,
+   "terms": {
+    "ratio.runs.batter": 0.5772625619799487,
+    "ratio.runs.bowler": 0.006130227368856414,
+    "ratio.boundary.batter": 0.0,
+    "ratio.boundary.bowler": 0.0,
+    "ratio.nonDot.batter": 0.0,
+    "ratio.nonDot.bowler": 0.09707529531024221,
+    "ratio.dismissal.batter": 0.0,
+    "ratio.dismissal.bowler": 0.0,
+    "powerplay.runsPerOver": 3.890911479204258,
+    "powerplay.wicketsPer100": 3.605159952041123,
+    "powerplay.dotPercent": 5.760067453823126,
+    "powerplay.fourPercent": 0.5454861735374543,
+    "powerplay.sixPercent": 1.2801054755682122,
+    "powerplay.caughtPer100": 1.7424791464861693,
+    "powerplay.bowledPer100": 1.7156238479103514,
+    "powerplay.lbwPer100": 0.0008945557568645981,
+    "middle.runsPerOver": 2.611223846704684,
+    "middle.wicketsPer100": 6.68922076692701,
+    "middle.dotPercent": 0.08375746244087388,
+    "middle.fourPercent": 4.884079829710658,
+    "middle.sixPercent": 6.483575693307872,
+    "middle.caughtPer100": 10.752741437890721,
+    "middle.bowledPer100": 0.022388622468082417,
+    "middle.lbwPer100": 0.24550033815201203,
+    "death.runsPerOver": 6.573823017366058,
+    "death.wicketsPer100": 0.21476462964360968,
+    "death.dotPercent": 1.6517113578238969,
+    "death.fourPercent": 6.94727811223637,
+    "death.sixPercent": 1.4551370260710865e-05,
+    "death.caughtPer100": 51.42644716249269,
+    "death.bowledPer100": 16.693312063088133,
+    "death.lbwPer100": 1.0839465152032612,
+    "firstInningsRuns": 1.3555061168620355,
+    "firstInningsWickets": 0.09987122949629712
+   },
+   "ratioRanges": {
+    "runs.batter": [
+     1.3920820484469325,
+     1.5368260859501885
+    ],
+    "runs.bowler": [
+     0.7073653344412093,
+     0.7930968363266353
+    ],
+    "boundary.batter": [
+     1.6795331128515716,
+     1.977578179494779
+    ],
+    "boundary.bowler": [
+     0.5846458170666619,
+     0.721948913607982
+    ],
+    "nonDot.batter": [
+     1.1806948283700744,
+     1.2533354697202548
+    ],
+    "nonDot.bowler": [
+     0.8015146066114993,
+     0.8510738348490942
+    ],
+    "dismissal.batter": [
+     0.7885941167789414,
+     1.0
+    ],
+    "dismissal.bowler": [
+     1.0,
+     1.901637928913588
+    ]
+   },
+   "ratioInside": {
+    "runs.batter": false,
+    "runs.bowler": false,
+    "boundary.batter": true,
+    "boundary.bowler": true,
+    "nonDot.batter": true,
+    "nonDot.bowler": false,
+    "dismissal.batter": true,
+    "dismissal.bowler": true
+   },
+   "ratioPasses": 5
+  }
+ },
+ "eligibleSixHeld": true
+}

@@ -1,0 +1,35 @@
+{
+ "version": "LC_STAGE_C_C5_MATCHUPS_V1",
+ "researchOnly": true,
+ "realYardstick": null,
+ "note": "Cricsheet records no bowling style or batting hand, so no real yardstick exists for these effects.",
+ "point": {
+  "batters": 88,
+  "tiltQuarterMeans": [
+   -16.181818181818183,
+   14.090909090909092
+  ],
+  "runsTopMinusBottom": -0.021672996035075505,
+  "dismissalTopMinusBottom": -0.07484929168707062,
+  "runsLeftMinusRight": -0.02828809746588533,
+  "runsSlopePerTiltPoint": -0.00028993591478415886
+ },
+ "ci95": {
+  "runsTopMinusBottom": [
+   -0.05625453439256454,
+   0.017407290242646128
+  ],
+  "dismissalTopMinusBottom": [
+   -0.16042027511276502,
+   0.017569434345963288
+  ],
+  "runsLeftMinusRight": [
+   -0.052310209061429365,
+   0.0026933451681902883
+  ],
+  "runsSlopePerTiltPoint": [
+   -0.0013763140234683358,
+   0.0008438112507769448
+  ]
+ }
+}

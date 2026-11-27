@@ -10,7 +10,8 @@
       "type": "string",
       "enum": [
         "synthetic-alpha-01",
-        "calibrated-t20-01"
+        "calibrated-t20-01",
+        "calibrated-t20-02"
       ]
     },
     "modelHash": {

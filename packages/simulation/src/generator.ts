@@ -315,6 +315,9 @@ function missDismissalCategories(req: GenerateDeliveryRequest, contact: "MISS"|"
     // C5 tactics (calibrated-t20-01 only): a yorker or full ball hits the stumps or pads more often, a short one less.
     ...(tacticsPackOf(req) && executed in tacticsPackOf(req)!.length.dismissal
       ? [{coefficientBp:tacticsPackOf(req)!.length.dismissal[executed as CalibratedLengthId][isMiss ? "BOWLED" : "LBW"],featureBp:10000}] : []),
+    // C6, delivery V3 (calibrated-t20-02 only): bowled and lbw intercepts by phase. calibrated-t20-01 adds no term.
+    ...(deliveryPackOf(req)?.dismissalPhaseBp && req.phase.startsWith("T20_")
+      ? [{coefficientBp:deliveryPackOf(req)!.dismissalPhaseBp![req.phase as "T20_EARLY"|"T20_MIDDLE"|"T20_LATE"][isMiss ? "BOWLED" : "LBW"],featureBp:10000}] : []),
   ],allowed),cat("NONE",1)];
 }
 function runningCategories(req: GenerateDeliveryRequest, contact: "GROUND"|"AERIAL"|"EDGE", coverageBp:number, cover:FieldCover|null, executed:string): ProbabilityCategory[] {
@@ -434,7 +437,10 @@ export function generateDelivery(raw: unknown): GeneratedDelivery {
       if (!forbidden && fielder.coverageBp>0) {
         const dpack=deliveryPackOf(req);
         // V2 (calibrated-t20-01 only): a slog is more often skied, a defensive stroke less often.
-        const opportunityBp=dpack ? clamp(dpack.catchOpportunityBp[contact]+dpack.catchOpportunityAggressionBp[contact]*(req.batting.aggression-2),0,10000)
+        // V3 (calibrated-t20-02 only): a term by phase; calibrated-t20-01's pack has none, so it adds nothing there.
+        const phaseBp=dpack?.catchOpportunityPhaseBp && req.phase.startsWith("T20_")
+          ? dpack.catchOpportunityPhaseBp[req.phase as "T20_EARLY"|"T20_MIDDLE"|"T20_LATE"][contact] : 0;
+        const opportunityBp=dpack ? clamp(dpack.catchOpportunityBp[contact]+dpack.catchOpportunityAggressionBp[contact]*(req.batting.aggression-2)+phaseBp,0,10000)
           : DELIVERY_STAGE_PACK.catchOpportunityBp[contact];
         // C5 tactics (calibrated-t20-01 only): an edge's catch chance follows the keeper and slip cordon's cover.
         const chanceWeight=rounded(opportunityBp,contact === "EDGE" ? calibratedEdgeCoverBp(req,fielder) : fielder.coverageBp);
