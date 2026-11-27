@@ -47,10 +47,13 @@ Owner decision, 26 November 2026: in a career match (the player's league fixture
 - `apps/web/src/main.tsx`: the "Tactical captain" select is disabled in those matches, and `changeAiOpponent` ignores any change. The note beside it reads "In a career match the opposition is always the computer captain." or "In a scenario the opposition is always the computer captain."
 - Exhibitions and quick matches are unchanged. The player can still choose either side, or neither.
 - **Not covered: tournament fixtures.** The page sets the computer opponent when a fixture launches, but after a reload it no longer knows the match is a tournament fixture. A lock there needs the worker to report that binding, as it already does for career fixtures (`careerFixture`). This is remaining work.
-- **Test changes:** `tests/ui/roster-career.spec.ts` and `tests/ui/player-identity-v3.spec.ts` used to switch the opposition to manual. They now check the lock and play against the computer captain. `tests/ui/scenario-mode-stage12.spec.ts` checks the lock in a scenario.
+- **Test changes:** `tests/ui/roster-career.spec.ts`, `tests/ui/player-identity-v3.spec.ts`, `tests/ui/managed-recovery.spec.ts` and `tests/ui/match-navigation.spec.ts` used to switch a career match to manual control. They now check the lock and play against the computer captain through `tests/ui/computer-opponent-helpers.ts`, which clicks the player's decisions and waits for the computer's. `tests/ui/scenario-mode-stage12.spec.ts` checks the lock in a scenario.
+- The first CI run (`3f0da3b`, run 45913872561) failed 13 tests in `managed-recovery.spec.ts` and `match-navigation.spec.ts` on Windows Chromium and Firefox. Those specs still switched to manual control, and I had missed them.
 - The engine, the worker and saved data are unchanged.
 
 | Check | Command | Result |
 | --- | --- | --- |
 | Type check | `NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b`; `npm run typecheck` | PASS (exit 0) |
+| Career specs after the fix (`62d7499`) | same command with `tests/ui/managed-recovery.spec.ts tests/ui/match-navigation.spec.ts tests/ui/roster-career.spec.ts tests/ui/player-identity-v3.spec.ts` | PASS, 17 passed (19.9 min) |
+| `npm run lint` at `62d7499` | | PASS (exit 0) |
 | Affected specs | `LCXXVI_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npx playwright test --config playwright.ui.config.ts tests/ui/roster-career.spec.ts tests/ui/player-identity-v3.spec.ts tests/ui/scenario-mode-stage12.spec.ts --project=chromium --reporter=line --trace off` at `127bf30` | PASS, 9 passed (2.3 min) |
