@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium, expect, firefox, test, type Page } from "@playwright/test";
+import { expectCareerOpponentLocked, playOneAgainstComputer } from "./computer-opponent-helpers.js";
 
 const BANNER = /this result will return to the management career only after the match is complete/i;
 const COMPLETED = "1/14 managed-team fixtures complete.";
@@ -17,7 +18,7 @@ async function startStandardMatch(page: Page) {
   }
   await page.getByRole("button", { name: "Play match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
+  await expectCareerOpponentLocked(page);
 }
 
 async function startEditedWorldMatch(page: Page) {
@@ -34,7 +35,7 @@ async function startEditedWorldMatch(page: Page) {
   }
   await page.getByRole("button", { name: "Play match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
+  await expectCareerOpponentLocked(page);
 }
 
 async function startRosterMatch(page: Page) {
@@ -47,17 +48,11 @@ async function startRosterMatch(page: Page) {
   await expect(page.getByText("0/56 fixtures")).toBeVisible({ timeout: 30_000 });
   await page.getByRole("button", { name: "Play next managed match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
+  await expectCareerOpponentLocked(page);
 }
 
 async function playOne(page: Page) {
-  const phase = await page.locator("#decision").getAttribute("data-phase");
-  const target = phase === "TOSS" ? page.getByRole("button", { name: "Call heads" })
-    : phase === "AWAITING_INNINGS" ? page.getByRole("button", { name: "Bat first" })
-    : phase === "AWAITING_BATTER" || phase === "AWAITING_BOWLER" ? page.locator("button[data-candidate]:enabled").first()
-    : page.getByRole("button", { name: "Finish over", exact: true });
-  await target.click();
-  await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
+  await playOneAgainstComputer(page);
   await expect(page.getByRole("alert")).toHaveCount(0);
 }
 
@@ -96,11 +91,11 @@ async function expectRestored(page: Page, savedRevision: string) {
 }
 
 /**
- * The recovered tab re-enables the AI opponent, whose decisions leave the human candidate buttons disabled
- * until it has acted. The original tab played with manual control, so the spec takes it back before stepping.
+ * A recovered career tab plays against the computer captain, exactly as a fresh launch does (the opposition is locked
+ * to it), so the spec lets any pending computer decision land and the revision settle before stepping.
  */
-async function takeManualControl(page: Page) {
-  await page.getByLabel("Tactical captain").selectOption("");
+async function settleAgainstComputer(page: Page) {
+  await expectCareerOpponentLocked(page);
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
   await settledRevision(page);
 }
@@ -137,7 +132,7 @@ test("a standard managed match is recovered in a fresh tab and its result applie
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await expect(fresh.getByRole("button", { name: "New exhibition" })).toHaveCount(0);
   await awaitWritable(fresh);
-  await takeManualControl(fresh);
+  await settleAgainstComputer(fresh);
   await playToEnd(fresh);
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
@@ -240,7 +235,7 @@ test("an edited-world managed match keeps its edited world when recovered and ap
   await expect(fresh.getByLabel("Tactical captain").locator("option", { hasText: "Quay Rovers" })).toHaveCount(1);
   await expect(fresh.getByTestId("scorestrip")).toContainText("Recovery Park");
   await awaitWritable(fresh);
-  await takeManualControl(fresh);
+  await settleAgainstComputer(fresh);
   await playToEnd(fresh);
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
@@ -267,7 +262,7 @@ test("an imported-roster managed match is recovered in a fresh tab and applies e
   await expectRestored(fresh, revision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await awaitWritable(fresh);
-  await takeManualControl(fresh);
+  await settleAgainstComputer(fresh);
   await playToEnd(fresh);
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(/\d+\/56 fixtures/)).toBeVisible({ timeout: 60_000 });
@@ -309,7 +304,7 @@ test("a match survives closing the whole browser with a retained profile", async
     await expectRestored(reopened, revision);
     await expect(reopened.getByText(BANNER)).toBeVisible();
     await expect(reopened.getByTestId("save-status")).not.toContainText("Read only", { timeout: 45_000 });
-    await takeManualControl(reopened);
+    await settleAgainstComputer(reopened);
     await playToEnd(reopened);
     await reopened.getByRole("button", { name: "Return result to career" }).click();
     await expect(reopened.getByText(COMPLETED, { exact: true })).toBeVisible({ timeout: 60_000 });
@@ -346,7 +341,7 @@ test("a damaged managed-match checkpoint recovers into a new slot, resumes from 
   await expect(fresh.getByText(/Recovered from a valid checkpoint/i)).toBeVisible();
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await awaitWritable(fresh);
-  await takeManualControl(fresh);
+  await settleAgainstComputer(fresh);
   await playSome(fresh, 3);
   const progressedRevision = await settledRevision(fresh);
   expect(Number(progressedRevision)).toBeGreaterThan(Number(olderRevision));
@@ -359,7 +354,7 @@ test("a damaged managed-match checkpoint recovers into a new slot, resumes from 
   await expectRestored(fresh, progressedRevision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await awaitWritable(fresh);
-  await takeManualControl(fresh);
+  await settleAgainstComputer(fresh);
   await playToEnd(fresh);
   await fresh.close();
 
@@ -411,7 +406,7 @@ test("a damaged imported-roster career moves its pending match binding when crea
   await expect(page.getByRole("button", { name: "Play next managed match" })).toBeEnabled({ timeout: 30_000 });
   await page.getByRole("button", { name: "Play next managed match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
+  await expectCareerOpponentLocked(page);
   await playSome(page, 4);
   const revision = await settledRevision(page);
   // Corrupt the newest roster-career checkpoint while its managed match is still pending.
@@ -442,7 +437,7 @@ test("a damaged imported-roster career moves its pending match binding when crea
   await expectRestored(fresh, revision);
   await expect(fresh.getByText(BANNER)).toBeVisible();
   await awaitWritable(fresh);
-  await takeManualControl(fresh);
+  await settleAgainstComputer(fresh);
   await playToEnd(fresh);
   await fresh.getByRole("button", { name: "Return result to career" }).click();
   await expect(fresh.getByText(/\d+\/56 fixtures/)).toBeVisible({ timeout: 60_000 });
@@ -467,7 +462,7 @@ test("A selection from Home takes the field and returns to the next matchday not
   const player = (await pick.innerText()).replace(/^Bring in /, "").replace(/ & play$/, "");
   await pick.click();
   await expect(page.locator("#decision")).toBeVisible({timeout:60_000});
-  await takeManualControl(page);
+  await settleAgainstComputer(page);
   await playToEnd(page);
   await page.getByRole("button", {name:"Return result to career"}).click();
   const notebook = page.locator(".score-notebook");
