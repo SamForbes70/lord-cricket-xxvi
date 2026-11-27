@@ -5,8 +5,8 @@ import { expect, test, type Page } from "@playwright/test";
  * decisions, gives the same result whichever button moves it on. A scenario challenge has a fixed seed and the
  * computer captain as the opponent. "Hold the line" puts the computer's side in to bat, so its batting plans change
  * from ball to ball as batters come and go. It is played twice from its checkpoint, once with "Finish match" and once
- * with repeated "Next delivery", choosing the first available bowler each time, and the saved deliveries and the result
- * must be identical. Before this change "Finish match" bowled an over per command and the computer changed its plans
+ * with repeated "Next delivery", choosing the first available bowler each time, and the saved deliveries, every event,
+ * every command (the computer's included, in the same order) and the result must be identical. Before this change "Finish match" bowled an over per command and the computer changed its plans
  * only at its own decisions, so the two could differ.
  */
 async function savedDeliveries(page: Page) {
@@ -18,10 +18,13 @@ async function savedDeliveries(page: Page) {
     const game = await get(tx.objectStore("games").get(active.value)) as { checkpointGeneration: number };
     const snapshot = await get(tx.objectStore("snapshots").get([active.value, game.checkpointGeneration])) as { payload: string };
     db.close();
-    const session = JSON.parse(snapshot.payload) as { events: { type: string; payload: unknown; stateHash: string }[]; commands: { actorId: string }[] };
+    const session = JSON.parse(snapshot.payload) as { events: { type: string; payload: unknown }[]; commands: { actorId: string; commandId?: string; expectedRevision?: number }[] };
+    // Each attempt has its own game id, which the state hashes cover, so the events and commands are compared
+    // without their hashes, ids and revisions.
     return {
       deliveries: session.events.filter(event => event.type === "DELIVERY_RECORDED").map(event => JSON.stringify(event.payload)),
-      finalStateHash: session.events.at(-1)!.stateHash,
+      events: session.events.map(event => `${event.type}:${JSON.stringify(event.payload)}`),
+      commands: session.commands.map(command => JSON.stringify({ ...command, commandId: undefined, expectedRevision: undefined })),
       captainCommands: session.commands.filter(command => command.actorId.startsWith("AI:")).length,
     };
   });
@@ -63,7 +66,8 @@ test("Hold the line: Finish match and repeated Next delivery play the same match
   expect(byBall.captainCommands).toBeGreaterThan(0);
   expect(byBall.deliveries.length).toBe(byMatch.deliveries.length);
   expect(byBall.deliveries).toEqual(byMatch.deliveries);
-  expect(byBall.finalStateHash).toBe(byMatch.finalStateHash);
+  expect(byBall.events).toEqual(byMatch.events);
+  expect(byBall.commands).toEqual(byMatch.commands);
   expect(byBall.captainCommands).toBe(byMatch.captainCommands);
   expect(byBall.outcome).toBe(byMatch.outcome);
 });
