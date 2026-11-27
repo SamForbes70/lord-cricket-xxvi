@@ -38,16 +38,23 @@
 .stage-call[data-kind="FOUR"] .stage-word { color: var(--colour-boundary); }
 .stage-call[data-kind="WICKET"] .stage-word { color: var(--colour-wicket); }
 .stage-line { font-size: var(--type-sm); }
-.stage-balls { gap: var(--space-1); }
-.stage-balls li { min-width: 2em; height: 2em; font-size: var(--type-sm); }
-.stage-balls li[data-kind="FOUR"] { background-color: var(--colour-boundary-fill); border-color: var(--colour-boundary); color: var(--text-strong); }
-.stage-balls li[data-kind="WICKET"] { background-color: var(--colour-wicket-fill); border-color: var(--colour-wicket); color: var(--text-strong); }
-.stage-balls li[data-kind="EXTRA"] { color: var(--colour-extra); }
-.stage-balls li[data-new-over="true"] { margin-left: var(--space-3); position: relative; }
-.stage-balls li[data-new-over="true"]::before {
-  content: ""; position: absolute; left: calc(-1 * var(--space-2) - 1px); top: 15%; bottom: 15%; width: 2px;
+.stage-balls { gap: var(--space-1) var(--space-3); align-items: flex-end; }
+/* CP08 (CD-018): the strip in overs. Each over is a group headed by its number; a rule divides one over from the next. */
+.stage-over-group { display: grid; gap: 2px; position: relative; }
+.stage-over-group[data-new-over="true"] { padding-left: var(--space-3); }
+.stage-over-group[data-new-over="true"]::before {
+  content: ""; position: absolute; left: 0; top: 2px; bottom: 2px; width: 2px;
   border-radius: 1px; background-color: var(--border-strong);
 }
+.stage-over-number {
+  font-family: var(--font-body); font-size: var(--type-xs); font-weight: 600; line-height: 1.2;
+  color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.stage-over-balls { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.stage-ball { min-width: 2em; height: 2em; font-size: var(--type-sm); }
+.stage-ball[data-kind="FOUR"] { background-color: var(--colour-boundary-fill); border-color: var(--colour-boundary); color: var(--text-strong); }
+.stage-ball[data-kind="WICKET"] { background-color: var(--colour-wicket-fill); border-color: var(--colour-wicket); color: var(--text-strong); }
+.stage-ball[data-kind="EXTRA"] { color: var(--colour-extra); }
 
 /* Batters and bowler. */
 .match-shell > .active {
@@ -183,22 +190,7 @@
 /* The contextual tactical preset card had the same light-theme surface as the legality card. */
 .match-shell .tactical-preset-card.contextual { background-color: var(--surface-2); background-image: none; border-color: var(--colour-positive); color: var(--text-default); }
 
-/* Charts (CP01 found the worm's first innings dark green on dark green and the pitch-length bars cream with near-white
-   labels). Innings colours come from the component; tracks and labels from the tokens. */
-.analytics-over { position: relative; }
-.analytics-over > span { border-radius: 3px 3px 0 0; }
-.analytics-over small { font-size: var(--type-xs); color: var(--text-muted); }
-.analytics-wickets {
-  font: 700 var(--type-xs)/1 var(--font-display); font-style: normal; color: var(--colour-wicket);
-}
-.analytics-worm line { stroke: var(--border-strong); }
-.analytics-worm text { fill: var(--text-muted); font-size: 12px; }
-.analytics-legend span { display: inline-block; width: 14px; height: 4px; border-radius: 2px; vertical-align: middle; }
-.analytics-wheel circle { stroke: var(--border-strong); }
-.analytics-wheel-spoke { stroke: var(--colour-positive); stroke-linecap: round; }
-.analytics-pitch-track { fill: var(--surface-2); stroke: var(--border-subtle); }
-.analytics-pitch-bar { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; }
-.analytics-pitch text { fill: var(--text-default); font-size: 14px; font-weight: 600; }
+/* Charts: CP08 replaced the chart markup; its styles are in analytics-charts.css. */
 
 /* Two columns from 1280 px: decision on the left, the field sticky on the right. */
 @media (min-width: 1280px) {

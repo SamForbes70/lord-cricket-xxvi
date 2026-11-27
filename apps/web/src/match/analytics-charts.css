@@ -1,0 +1,75 @@
+/*
+ * CP08 statistical visualisation: the completed match's charts. Tokens only (tokens.css). Charts are drawn at their
+ * measured width, so type sizes here are true sizes; nothing animates or transitions, so reduced motion needs no rule.
+ */
+.analytics-panel {
+  container-type: inline-size;
+  /* The type tokens are resolved on :root, where --text-scale is 1, so the match screen's Text scale never reached
+     them. Re-declared here, they pick up the --text-scale the match screen sets, and the charts grow with the text. */
+  --type-xs: calc(0.75rem * var(--text-scale));
+  --type-sm: calc(0.875rem * var(--text-scale));
+}
+.analytics-panel .table-wrap { overflow-x: auto; max-width: 100%; margin: 0 0 var(--space-5); }
+.analytics-panel .chart-summary,
+.analytics-panel .chart-note { max-width: 72ch; margin: 0 0 var(--space-2); font-size: var(--type-sm); color: var(--text-muted); }
+.analytics-panel .chart-summary { color: var(--text-default); }
+
+.analytics-panel .chart-legend {
+  list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5);
+  margin: 0 0 var(--space-2); padding: 0; font-size: var(--type-sm); color: var(--text-default);
+}
+.analytics-panel .chart-legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+.analytics-panel .chart-legend svg { flex: none; overflow: visible; }
+.analytics-panel .chart-legend-note { color: var(--text-muted); }
+
+.analytics-panel .chart-frame { width: 100%; max-width: 900px; margin: 0 0 var(--space-4); }
+.analytics-panel .chart-figure { margin: 0 0 var(--space-3); }
+.analytics-panel .chart-caption { margin: 0 0 var(--space-1); font-size: var(--type-sm); font-weight: 600; color: var(--text-default); }
+.analytics-panel .chart-svg { display: block; width: 100%; height: auto; overflow: hidden; }
+
+.analytics-panel .chart-tick { fill: var(--text-muted); font-family: var(--font-body); font-size: var(--type-xs); font-variant-numeric: tabular-nums; }
+.analytics-panel .chart-axis-title { fill: var(--text-muted); font-family: var(--font-body); font-size: var(--type-xs); font-weight: 600; }
+.analytics-panel .chart-grid { stroke: var(--chart-grid); stroke-width: 1; }
+.analytics-panel .chart-axis { stroke: var(--chart-axis); stroke-width: 1; }
+
+.analytics-panel .chart-bar { stroke: var(--surface-sunken); stroke-width: 0.5; }
+.analytics-panel .chart-pattern-ink { fill: rgba(7, 24, 26, 0.62); }
+.analytics-panel .chart-pattern-line { stroke: rgba(7, 24, 26, 0.62); stroke-width: 1.2; }
+.analytics-panel .chart-wicket { fill: var(--chart-marker); stroke: var(--surface-sunken); stroke-width: 1.5; }
+
+.analytics-panel .chart-line { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.analytics-panel .chart-worm-wicket { stroke: var(--surface-sunken); stroke-width: 1.5; }
+
+.analytics-panel .chart-controls { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); margin: 0 0 var(--space-2); }
+.analytics-panel .chart-wheel-layout { display: grid; gap: var(--space-4) var(--space-6); align-items: center; margin: 0 0 var(--space-4); }
+@container (min-width: 760px) {
+  .analytics-panel .chart-wheel-layout { grid-template-columns: minmax(0, 520px) minmax(16rem, 1fr); }
+}
+.analytics-panel .chart-wheel-layout .chart-frame { margin: 0; }
+.analytics-panel .chart-wheel-region { fill: rgba(214, 236, 226, 0.03); stroke: var(--chart-grid); stroke-width: 1; }
+.analytics-panel .chart-wheel-region.is-off { fill: rgba(108, 197, 240, 0.07); }
+.analytics-panel .chart-wheel-region.is-leg { fill: rgba(255, 155, 115, 0.06); }
+.analytics-panel .chart-wheel-rim { fill: none; stroke: var(--chart-axis); stroke-width: 1; }
+.analytics-panel .chart-wheel-pitch { fill: var(--text-faint); opacity: 0.6; }
+.analytics-panel .chart-wheel-value { fill: var(--accent); stroke: var(--surface-sunken); stroke-width: 1; }
+.analytics-panel .chart-wheel-batter { fill: var(--text-strong); }
+.analytics-panel .chart-wheel-label { fill: var(--text-default); font-family: var(--font-body); font-size: var(--type-xs); font-weight: 600; }
+.analytics-panel .chart-wheel-runs { fill: var(--accent-strong); font-variant-numeric: tabular-nums; }
+
+.analytics-panel .analytics-sectors > div {
+  display: grid; grid-template-columns: minmax(7.5rem, 10rem) minmax(4rem, 1fr) 2.75rem; align-items: center;
+  gap: var(--space-2); margin: 0 0 var(--space-2);
+}
+.analytics-panel .analytics-sectors .sector-name { font-size: var(--type-sm); font-weight: 600; color: var(--text-default); }
+.analytics-panel .analytics-sectors .sector-name small { display: block; font-size: var(--type-xs); font-weight: 400; color: var(--text-muted); }
+.analytics-panel .analytics-sectors strong { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-strong); }
+.analytics-panel .analytics-sector-track { height: 10px; border-radius: var(--radius-pill); background-color: var(--chart-track); box-shadow: inset 0 0 0 1px var(--border-subtle); }
+.analytics-panel .analytics-sector-track > span { display: block; height: 100%; border-radius: var(--radius-pill); background-color: var(--accent); }
+
+.analytics-panel .chart-track { fill: var(--chart-track); stroke: var(--border-subtle); stroke-width: 1; }
+.analytics-panel .chart-pitch-bar { fill: var(--accent); }
+.analytics-panel .chart-bar-label { fill: var(--text-default); font-family: var(--font-body); font-size: var(--type-sm); font-weight: 600; }
+.analytics-panel .chart-bar-value { fill: var(--text-strong); font-family: var(--font-body); font-size: var(--type-sm); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.analytics-panel .chart-table { margin: 0 0 var(--space-5); }
+.analytics-panel .chart-table > summary { cursor: pointer; width: fit-content; padding: var(--space-1) 0; color: var(--accent-strong); font-weight: 600; font-size: var(--type-sm); }

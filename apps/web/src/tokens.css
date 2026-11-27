@@ -75,6 +75,17 @@
   --colour-extra: #e6d27a;
   --colour-dot: var(--text-muted);
 
+  /* Chart series (CP08): one per innings, from the same Okabe and Ito hues lightened for the dark ground (sky blue,
+     vermilion, yellow, reddish purple). Each series also has its own bar pattern, line dash and marker shape. */
+  --chart-series-1: var(--colour-positive);
+  --chart-series-2: var(--colour-negative);
+  --chart-series-3: #f0e442;
+  --chart-series-4: #e7a6cf;
+  --chart-marker: var(--text-strong);
+  --chart-track: var(--surface-sunken);
+  --chart-grid: rgba(214, 236, 226, 0.13);
+  --chart-axis: rgba(214, 236, 226, 0.5);
+
   /* Radii. */
   --radius-sm: 6px;
   --radius-md: 10px;

@@ -1,6 +1,7 @@
 import type { View } from "./protocol.js";
 import { ballCall, DISMISSAL } from "./ball-call.js";
 import { stageOverText } from "./broadcast-labels.js";
+import { groupBallsByOver } from "./chart-layout.js";
 import "./match-broadcast.css";
 
 /**
@@ -26,8 +27,9 @@ export function BroadcastStage({ view, quiet = false }: { view: View; quiet?: bo
   const balls = presentation.recentHighlights.filter((c) => c.inningsIndex === view.activeIndex).slice(-12);
   const call = ballCall(cue);
   const legal = view.innings[view.activeIndex]?.innings.legalBalls ?? null;
-  // CP03: a thin divider where one over ends and the next begins, read from each ball's own over label.
-  const overOf = (label: string) => label.split(".")[0];
+  // CP03 drew a divider where one over ends and the next begins; CP08 (CD-018) groups the balls by over and names each
+  // over, read from each ball's own over label ("4.3" is the third ball of over 5).
+  const overs = groupBallsByOver(balls);
   return (
     <section className="broadcast-stage" aria-label="This ball" data-moment={call.kind} data-quiet={quiet ? "true" : undefined} data-testid="broadcast-stage">
       <div className="stage-glow" key={`glow-${cue.sequence}`} aria-hidden="true" />
@@ -41,15 +43,22 @@ export function BroadcastStage({ view, quiet = false }: { view: View; quiet?: bo
       </div>
       {balls.length > 0 && (
         <ol className="stage-balls" aria-label="Recent balls this innings">
-          {balls.map((ball, n) => {
-            const b = ballCall(ball);
-            const newOver = n > 0 && overOf(ball.overBallLabel) !== overOf(balls[n - 1]!.overBallLabel);
-            return (
-              <li key={ball.sequence} data-kind={b.kind} data-new-over={newOver ? "true" : undefined} title={`${ball.overBallLabel}: ${b.word.toLowerCase()}`}>
-                {b.chip}
-              </li>
-            );
-          })}
+          {overs.map((group, g) => (
+            <li key={group.balls[0]!.sequence} className="stage-over-group" data-new-over={g > 0 ? "true" : undefined}>
+              <span className="stage-over-number">{Number.isNaN(group.over) ? "Over" : `Over ${group.over}`}</span>
+              <ol className="stage-over-balls">
+                {group.balls.map((ball) => {
+                  const b = ballCall(ball);
+                  return (
+                    <li key={ball.sequence} className="stage-ball" data-kind={b.kind} title={`${ball.overBallLabel}: ${b.word.toLowerCase()}`}>
+                      <span aria-hidden="true">{b.chip}</span>
+                      <span className="sr-only">{`${ball.overBallLabel}: ${b.word.toLowerCase()}`}</span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </li>
+          ))}
         </ol>
       )}
     </section>
