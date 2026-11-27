@@ -64,6 +64,8 @@ test("every advancement mode asks the computer captain before every ball", async
   const modes = ["Next delivery", "Finish over", "Next key moment", "Next decision", "Finish innings", "Finish match"] as const;
   const pressed = new Set<string>();
   let mode = 0;
+  // Every ball the worker reports bowling, across all presses. A quick match takes a random seed, so its length varies.
+  let ballsBowled = 0;
   for (let n = 0; n < 400 && (await decision.getAttribute("data-phase")) !== "COMPLETE"; n += 1) {
     await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
     const phase = await decision.getAttribute("data-phase");
@@ -99,6 +101,7 @@ test("every advancement mode asks the computer captain before every ball", async
         balls += report.balls;
       }
       expect(balls, name).toBeGreaterThanOrEqual(1);
+      ballsBowled += balls;
       pressed.add(name);
       mode += 1;
     } else await page.waitForTimeout(200);
@@ -109,7 +112,9 @@ test("every advancement mode asks the computer captain before every ball", async
   // own commands are saved with origin AI, as AI_STEP saved them.
   const saved = await savedCommands(page);
   const advances = saved.filter(row => row.command?.kind === "ADVANCE");
-  expect(advances.length).toBeGreaterThan(150);
+  // One saved single-delivery ADVANCE per ball the worker bowled: no ball was played any other way.
+  expect(ballsBowled).toBeGreaterThan(0);
+  expect(advances.length).toBe(ballsBowled);
   expect(advances.every(row => row.command!.payload.scope === "DELIVERY" && row.command!.actorId === "SYSTEM" && row.origin === "HUMAN")).toBe(true);
   const ai = saved.filter(row => row.origin === "AI");
   expect(ai.length).toBeGreaterThan(10);
