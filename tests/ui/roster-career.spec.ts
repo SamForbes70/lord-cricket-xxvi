@@ -18,7 +18,9 @@ test("an imported roster career plays, saves and transfers a managed fixture", a
   await expect(page.getByText("0/56 fixtures")).toBeVisible({ timeout: 30_000 });
   await page.getByRole("button", { name: "Play next managed match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
+  // Owner decision, 26 November 2026: the opposition in a career match is always the computer captain.
+  await expect(page.getByLabel("Tactical captain")).toBeDisabled();
+  await expect(page.getByTestId("ai-opponent-note")).toHaveText("In a career match the opposition is always the computer captain.");
   for (let steps = 0; await page.locator("#decision").getAttribute("data-phase") !== "COMPLETE"; steps++) {
     expect(steps).toBeLessThan(450);
     const phase = await page.locator("#decision").getAttribute("data-phase");

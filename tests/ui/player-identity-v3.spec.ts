@@ -48,8 +48,9 @@ test("the chip opens the player page while the managed match is kept, and stays 
   await page.getByRole("button", { name: "Play match" }).click();
   const decision = page.locator("#decision");
   await expect(decision).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
-  await expect(decision).toHaveAttribute("aria-busy", "false");
+  // Owner decision, 26 November 2026: the opposition in a career match is always the computer captain.
+  await expect(page.getByLabel("Tactical captain")).toBeDisabled();
+  await expect(page.getByTestId("ai-opponent-note")).toHaveText("In a career match the opposition is always the computer captain.");
 
   // Toss, innings choice, openers and bowler, then one delivery so the chips leave their introduction.
   const chips = page.locator("[data-testid^='match-intro-']");
