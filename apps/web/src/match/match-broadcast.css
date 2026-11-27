@@ -61,7 +61,10 @@
 .match-shell > .active .active-player { flex-wrap: wrap; gap: var(--space-1) var(--space-2); margin: 0 0 var(--space-1); }
 .match-shell > .active .active-player .player-portrait { width: 36px; height: 36px; }
 /* The batters panel and a pressed highlight chip share the class name "active"; keep the chip a chip. */
-.match-shell .highlight-chip.active { display: inline-flex; margin: 0; padding: 0.22rem 0.5rem; width: auto; border-radius: var(--radius-sm); }
+.match-shell .highlight-chip.active {
+  display: inline-flex; margin: 0; padding: 0.22rem 0.5rem; width: auto; border-radius: var(--radius-sm); box-shadow: none;
+  background-color: var(--accent); background-image: none; color: var(--text-on-accent); border: 1px solid var(--accent);
+}
 
 /* Decision panel and the advance controls. */
 .match-shell .decision { margin: var(--space-2) 0 var(--space-2); padding: var(--space-3) var(--space-4); }
@@ -175,6 +178,23 @@
 .match-shell .legality-box .legality-counts { color: var(--text-muted); font-size: var(--type-sm); }
 .match-shell .legality-box .legality-ok { color: var(--colour-positive); font-size: var(--type-sm); }
 .match-shell .legality-box .legality-violations { color: #ffd2c4; font-size: var(--type-sm); }
+
+/* Charts (CP01 found the worm's first innings dark green on dark green and the pitch-length bars cream with near-white
+   labels). Innings colours come from the component; tracks and labels from the tokens. */
+.analytics-over { position: relative; }
+.analytics-over > span { border-radius: 3px 3px 0 0; }
+.analytics-over small { font-size: var(--type-xs); color: var(--text-muted); }
+.analytics-wickets {
+  font: 700 var(--type-xs)/1 var(--font-display); font-style: normal; color: var(--colour-wicket);
+}
+.analytics-worm line { stroke: var(--border-strong); }
+.analytics-worm text { fill: var(--text-muted); font-size: 12px; }
+.analytics-legend span { display: inline-block; width: 14px; height: 4px; border-radius: 2px; vertical-align: middle; }
+.analytics-wheel circle { stroke: var(--border-strong); }
+.analytics-wheel-spoke { stroke: var(--colour-positive); stroke-linecap: round; }
+.analytics-pitch-track { fill: var(--surface-2); stroke: var(--border-subtle); }
+.analytics-pitch-bar { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; }
+.analytics-pitch text { fill: var(--text-default); font-size: 14px; font-weight: 600; }
 
 /* Two columns from 1280 px: decision on the left, the field sticky on the right. */
 @media (min-width: 1280px) {
