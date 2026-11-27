@@ -12,6 +12,8 @@ export * from "./delivery-pack.js";
 export * from "./calibrated-t20-pack.js";
 export * from "./calibrated-t20-delivery-pack.js";
 export * from "./calibrated-t20-tactics-pack.js";
+export * from "./calibrated-t20-02-pack.js";
+export * from "./calibrated-t20-02-delivery-pack.js";
 export { FROZEN_WORLD_PINS } from "./world-pins.js";
 export { isBowlingCapable, validateDefaultWorld } from "./world.js";
 export { ELEVEN_ALL_ROUND_BATTING_WEIGHT, ELEVEN_ALL_ROUND_BOWLING_WEIGHT, rankedEleven, suggestedEleven, SUGGESTED_ELEVEN_MIN_BOWLERS, type ElevenCandidate, type ElevenFormat } from "./eleven.js";

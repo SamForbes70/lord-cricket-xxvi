@@ -42,7 +42,9 @@ const base = JSON.parse(readFileSync("tests/fixtures/world/t20-valid-setup.json"
 const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "utf8")) as { cases: { seed: string; caseId: string }[] };
 const byId = new Map(world.players.map((p) => [p.playerId, p]));
 const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "calibrated-t20-01";
-if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
+/** C6: calibrated-t20-02 (research only) is accepted as well; it is reached through validateT20ResearchMatchSetup. */
+const RESEARCH_MODELS = ["calibrated-t20-01", "calibrated-t20-02"] as const;
+if (MODEL !== "synthetic-alpha-01" && !(RESEARCH_MODELS as readonly string[]).includes(MODEL)) throw new Error(`unknown model ${MODEL}`);
 const FORCED = process.argv.find((a) => a.startsWith("--aggression="))?.slice(13);
 const forced = FORCED === undefined ? null : Number(FORCED);
 if (forced !== null && !(Number.isInteger(forced) && forced >= 0 && forced <= 4)) throw new Error("aggression must be 0 to 4");
@@ -55,8 +57,8 @@ const CAPTAIN = process.argv.find((a) => a.startsWith("--captain="))?.slice(10) 
 const adviseT20Captain = captainByName(CAPTAIN);
 const tacticalT20Step = (session: T20Session) => batchStep(session, { advise: adviseT20Captain });
 const ARGS = process.argv.filter((a) => !a.startsWith("--"));
-const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
-  ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
+const setupFor = (request: unknown) => MODEL !== "synthetic-alpha-01"
+  ? validateT20ResearchMatchSetup(request, bytes, manifest, MODEL as (typeof RESEARCH_MODELS)[number])
   : validateT20MatchSetup(request, bytes, manifest);
 const out = ARGS[2];
 const repeats = Number(ARGS[3] ?? 5);

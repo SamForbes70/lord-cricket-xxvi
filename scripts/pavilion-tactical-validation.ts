@@ -36,7 +36,9 @@ const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "u
 const byId = new Map(world.players.map((p) => [p.playerId, p]));
 /** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
 const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
-if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
+/** C6: calibrated-t20-02 (research only) is accepted as well; it is reached through validateT20ResearchMatchSetup. */
+const RESEARCH_MODELS = ["calibrated-t20-01", "calibrated-t20-02"] as const;
+if (MODEL !== "synthetic-alpha-01" && !(RESEARCH_MODELS as readonly string[]).includes(MODEL)) throw new Error(`unknown model ${MODEL}`);
 /** Captain V5 (26 November 2026): `--captain=V4` runs adviseT20CaptainV4 as the good side instead of the current captain;
  * `--advance=OVER` bowls a whole over per ADVANCE (the script up to V4) instead of one ball (the default from V5, as
  * the live game asks the computer opponent before each ball; V5's death plan is ball by ball). Captain V6 (27 November
@@ -47,8 +49,8 @@ const ADVANCE = process.argv.find((a) => a.startsWith("--advance="))?.slice(10) 
 if (ADVANCE !== "OVER" && ADVANCE !== "DELIVERY") throw new Error(`unknown advance ${ADVANCE}`);
 const captainAdvice = CAPTAIN === "V4" ? adviseT20CaptainV4 : CAPTAIN === "V5" ? adviseT20CaptainV5 : adviseT20Captain;
 const ARGS = process.argv.filter((a) => !a.startsWith("--"));
-const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
-  ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
+const setupFor = (request: unknown) => MODEL !== "synthetic-alpha-01"
+  ? validateT20ResearchMatchSetup(request, bytes, manifest, MODEL as (typeof RESEARCH_MODELS)[number])
   : validateT20MatchSetup(request, bytes, manifest);
 const squadOf = (teamId: string) => world.teams.find((t) => t.teamId === teamId)!.squadIds.map((id) => byId.get(id)!);
 const bat = (p: Player) => { const s = p.skills.T20; return s.timing + s.power + s.defence + s.rotation; };

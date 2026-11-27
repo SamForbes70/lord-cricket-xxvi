@@ -29,10 +29,12 @@ const corpus = JSON.parse(readFileSync("tests/fixtures/t20/seed_corpus.json", "u
 const byId = new Map(world.players.map((p) => [p.playerId, p]));
 /** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
 const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
-if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
+/** C6: calibrated-t20-02 (research only) is accepted as well; it is reached through validateT20ResearchMatchSetup. */
+const RESEARCH_MODELS = ["calibrated-t20-01", "calibrated-t20-02"] as const;
+if (MODEL !== "synthetic-alpha-01" && !(RESEARCH_MODELS as readonly string[]).includes(MODEL)) throw new Error(`unknown model ${MODEL}`);
 const ARGS = process.argv.filter((a) => !a.startsWith("--model="));
-const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
-  ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
+const setupFor = (request: unknown) => MODEL !== "synthetic-alpha-01"
+  ? validateT20ResearchMatchSetup(request, bytes, manifest, MODEL as (typeof RESEARCH_MODELS)[number])
   : validateT20MatchSetup(request, bytes, manifest);
 const BAT = ["timing", "power", "defence", "rotation", "vsPace", "vsSpin"] as const;
 const BOWL = ["control", "movement", "variation"] as const;
