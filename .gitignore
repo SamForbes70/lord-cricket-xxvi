@@ -13,6 +13,7 @@ test-results/
 /docs/verification-pass07b/browser-coverage.json
 
 test-results-ui/
+test-results-perf/
 /docs/verification-pass08/
 
 /test-results-m4/
