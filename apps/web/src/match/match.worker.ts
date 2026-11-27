@@ -367,8 +367,7 @@ function commandIdFloor(): number {
   if (!session) return 0;
   let floor = 0;
   for (const command of session.commands) {
-    // ADVANCE_WITH_CAPTAINS commits its commands as ui-N-k; their request id ui-N is taken too.
-    const n = Number(/^ui-(\d+)(?:-\d+)?$/.exec(command.commandId)?.[1] ?? 0);
+    const n = Number(/^ui-(\d+)$/.exec(command.commandId)?.[1] ?? 0);
     if (n < 800_000_000 && n > floor) floor = n;
   }
   return floor;
@@ -629,14 +628,17 @@ async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CA
   if (readOnly || !activeSaveId)
     return decorate(controller.currentResponse(request.requestId, "This save is read-only because another tab owns the writer lease."));
   const saveId = activeSaveId;
-  // A repeated request id never plays again.
-  if (await repository.command(saveId, `${request.requestId}-1`)) return decorate(controller.currentResponse(request.requestId));
+  // A repeated request id never plays again: the first command an advance commits takes the request's own id.
+  if (await repository.command(saveId, request.requestId)) return decorate(controller.currentResponse(request.requestId));
   if (!(await repository.renewLease(saveId, ownerId, nowMs()))) {
     readOnly = true;
     return rollback(new Error("This save is open read-only in this tab."), request.requestId);
   }
   let leaseRenewedAt = nowMs();
-  let serial = 0;
+  // Command ids stay in the ui-N form every saved match already uses. The first is the request's own id, which the
+  // page has never used for a committed command; the rest follow it. The reply's commandIdFloor moves the page's next
+  // id past them, as it does after a reload.
+  let nextCommandNumber = Math.max(Number(request.requestId.slice(3)), commandIdFloor() + 1);
   let failure: unknown = null;
   const firstSequence = start.events.length + 1;
   const flags = { matchAware: request.matchAware, clubStyle: request.clubStyle };
@@ -649,7 +651,7 @@ async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CA
     propose: (session, seat) => proposeCaptainCommand(session, seat, flags, delegation),
     stopRequested: () => stopAdvanceFor === request.requestId,
     async commit(origin, unplaced) {
-      const commandId = `${request.requestId}-${++serial}`;
+      const commandId = `ui-${nextCommandNumber++}`;
       const engineRequest = {
         version: UI_VERSION, type: "COMMAND", origin, requestId: commandId, expectedRevision: revision,
         command: { ...unplaced, commandId, expectedRevision: revision },
@@ -694,7 +696,7 @@ async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CA
   if (stopAdvanceFor === request.requestId) stopAdvanceFor = null;
   if (failure) {
     if (failure instanceof Error && failure.message.startsWith("SAVE_READ_ONLY")) readOnly = true;
-    return { ...(await rollback(failure, request.requestId)), advance: report };
+    return { ...(await rollback(failure, request.requestId)), commandIdFloor: commandIdFloor(), advance: report };
   }
   if (report.commands > 0) await repository.setActiveSaveId(saveId);
   const session = controller.snapshot()!;
@@ -703,6 +705,7 @@ async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CA
   const committed = session.events.length >= firstSequence && session.revision > start.revision;
   return {
     ...reply,
+    commandIdFloor: commandIdFloor(),
     advance: report,
     ...(committed ? { acknowledgement: { commandId: request.requestId, committedRevision: session.revision, fromSequence: firstSequence, toSequence: session.events.length, lastEventHash: session.lastEventHash } } : {}),
   };
