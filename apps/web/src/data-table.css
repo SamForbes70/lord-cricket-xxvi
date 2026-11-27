@@ -1,0 +1,50 @@
+/*
+ * CP08 (CD-022): one shape for data tables. The base stylesheet gives every first header cell 48% of the table and
+ * right-aligns every cell, so a short first column floated numbers mid-row. A `data-table` sizes columns to their
+ * content, left-aligns text, and right-aligns numeric cells (`num`) with tabular figures. The doubled selector
+ * outranks the older per-screen table rules without !important.
+ */
+table.data-table[class] {
+  table-layout: auto;
+  width: auto;
+  min-width: min(100%, 26rem);
+  max-width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+table.data-table[class] :is(th, td) {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  vertical-align: middle;
+}
+table.data-table[class] th:first-child { width: auto; }
+table.data-table[class] :is(th, td).num {
+  text-align: right;
+  white-space: nowrap;
+}
+table.data-table[class] thead th {
+  font-size: var(--type-xs);
+  letter-spacing: var(--tracking-caps);
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+table.data-table[class] thead th.group { text-align: center; }
+/* Row headers (a player's name) read as the row's label, not as another column heading. */
+table.data-table[class] tbody th {
+  font-family: var(--font-body);
+  font-size: inherit;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-strong);
+  background-color: transparent;
+}
+table.data-table[class] caption {
+  text-align: left;
+  font-weight: 600;
+  padding: 0 0 var(--space-2);
+  color: var(--text-default);
+}
+table.data-table[class] abbr { text-decoration: none; cursor: help; }
+/* A wrapper with its own border or surface hugs the table instead of framing empty space. */
+.table-wrap:has(> table.data-table) { width: fit-content; max-width: 100%; }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { SeasonAwardsSummary, SeasonTeamTableRow } from "@lcxxvi/contracts";
 import type { SeasonObjective, SeasonObjectiveStatus, SeasonReview, SquadSeasonLine } from "@lcxxvi/projections";
+import "../data-table.css";
 
 export const seasonFinaleSeenKey = (save: string, season: string) => JSON.stringify(["lcxxvi-season-finale-seen", save, season]);
 
@@ -119,15 +120,15 @@ export function SeasonFinale({ seasonLabel, table, focusTeamId, objective, objec
             own && champion && own.teamId !== champion.teamId && <p>{teamName(own.teamId)} finished {own.rank}{ordinalSuffix(own.rank)}.</p>
           )}
           <div className="table-wrap">
-            <table data-testid="season-finale-table">
+            <table className="data-table" data-testid="season-finale-table">
               <caption className="sr-only">Final league table{focusTeamId ? ". Your club's row is in bold." : ""}</caption>
-              <thead><tr><th scope="col">Pos</th><th scope="col">Club</th><th scope="col">P</th><th scope="col">W</th><th scope="col">L</th><th scope="col">Pts</th></tr></thead>
+              <thead><tr><th scope="col" className="num">Pos</th><th scope="col">Club</th><th scope="col" className="num"><abbr title="Played">P</abbr></th><th scope="col" className="num"><abbr title="Won">W</abbr></th><th scope="col" className="num"><abbr title="Lost">L</abbr></th><th scope="col" className="num"><abbr title="Points">Pts</abbr></th></tr></thead>
               <tbody>
                 {[...table].sort((a, b) => a.rank - b.rank).map((row) => (
                   <tr key={row.teamId} data-own={row.teamId === focusTeamId || undefined}>
-                    <td>{row.rank}</td>
+                    <td className="num">{row.rank}</td>
                     <td>{row.teamId === focusTeamId ? <strong>{teamName(row.teamId)}</strong> : teamName(row.teamId)}</td>
-                    <td>{row.played}</td><td>{row.wins}</td><td>{row.losses}</td><td>{row.points}</td>
+                    <td className="num">{row.played}</td><td className="num">{row.wins}</td><td className="num">{row.losses}</td><td className="num">{row.points}</td>
                   </tr>
                 ))}
               </tbody>
@@ -225,25 +226,25 @@ export function SeasonFinale({ seasonLabel, table, focusTeamId, objective, objec
           {h3("Your cricketers' seasons")}
           <p className="season-review-note">League matches for {focusTeamId ? teamName(focusTeamId) : "your club"} this season.</p>
           <div className="table-wrap">
-            <table className="season-review-squad" data-testid="season-review-squad">
+            <table className="season-review-squad data-table" data-testid="season-review-squad">
               <caption className="sr-only">Season figures for your club's players</caption>
               <thead>
                 <tr>
-                  <th scope="col">Player</th><th scope="col"><abbr title="Matches">M</abbr></th><th scope="col">Runs</th>
-                  <th scope="col"><abbr title="Highest score">HS</abbr></th><th scope="col"><abbr title="Wickets">Wkts</abbr></th>
-                  <th scope="col"><abbr title="Economy: runs an over">Econ</abbr></th><th scope="col">Best</th>
+                  <th scope="col">Player</th><th scope="col" className="num"><abbr title="Matches">M</abbr></th><th scope="col" className="num">Runs</th>
+                  <th scope="col" className="num"><abbr title="Highest score">HS</abbr></th><th scope="col" className="num"><abbr title="Wickets">Wkts</abbr></th>
+                  <th scope="col" className="num"><abbr title="Economy: runs an over">Econ</abbr></th><th scope="col" className="num">Best</th>
                 </tr>
               </thead>
               <tbody>
                 {review.squad.map((line) => (
                   <tr key={line.playerId}>
                     <th scope="row">{playerName(line.playerId)}</th>
-                    <td>{line.matches}</td>
-                    <td>{line.innings > 0 ? line.runs : NONE}</td>
-                    <td>{highScore(line)}</td>
-                    <td>{line.legalBalls > 0 ? line.wickets : NONE}</td>
-                    <td>{line.legalBalls > 0 ? <span title={`${overs(line.legalBalls)} overs`}>{economy(line.runsConceded, line.legalBalls)}</span> : NONE}</td>
-                    <td>{line.bestBowling && line.legalBalls > 0 ? `${line.bestBowling.wickets}/${line.bestBowling.runs}` : NONE}</td>
+                    <td className="num">{line.matches}</td>
+                    <td className="num">{line.innings > 0 ? line.runs : NONE}</td>
+                    <td className="num">{highScore(line)}</td>
+                    <td className="num">{line.legalBalls > 0 ? line.wickets : NONE}</td>
+                    <td className="num">{line.legalBalls > 0 ? <span title={`${overs(line.legalBalls)} overs`}>{economy(line.runsConceded, line.legalBalls)}</span> : NONE}</td>
+                    <td className="num">{line.bestBowling && line.legalBalls > 0 ? `${line.bestBowling.wickets}/${line.bestBowling.runs}` : NONE}</td>
                   </tr>
                 ))}
               </tbody>

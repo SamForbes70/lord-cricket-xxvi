@@ -2124,7 +2124,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             </section>
           )}
           <span id="dugout-scorecard" tabIndex={-1} className="dugout-anchor" role="group" aria-label="Scorecard: analytics, scorecard and commentary" />
-          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} hands={view.hands} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
+          {view.analytics && <AnalyticsPanel data={view.analytics} names={view.names} hands={view.hands} inningsTeams={view.innings.map((l) => tn(l.innings.battingTeamId))} busy={busy || fatal} rebuild={analyticsRebuild} onRebuild={() => send({ type: "REBUILD_ANALYTICS" })} onCancel={cancelAnalyticsRebuild} />}
           <div className="details-grid">
             <section className="panel">
               <h2>Scorecard</h2>
