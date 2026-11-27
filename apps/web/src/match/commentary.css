@@ -1,0 +1,93 @@
+/*
+ * CP10 (commentary), Studio Production Directive 05. The commentary panel: no list numbers (the sequence number was a
+ * log's, not a commentator's), each ball's number as a small label, each over's summary as a band, and the captain's
+ * notes in their own collapsed list. Tokens only; nothing animates here (the latest-moment pulse in pavilion.css is
+ * already off under reduced motion).
+ */
+.commentary .commentary-intro {
+  color: var(--text-muted);
+  font-size: var(--type-sm, 0.875rem);
+  margin: 0 0 var(--space-3);
+}
+
+.commentary ol.commentary-feed {
+  list-style: none;
+  padding: 0 var(--space-2) 0 0;
+  margin: 0 0 var(--space-3);
+}
+
+.commentary ol.commentary-feed > li {
+  position: relative;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  line-height: 1.45;
+  font-size: 0.95em;
+}
+
+.commentary .commentary-ball {
+  display: inline-block;
+  min-width: 3.1em;
+  margin-right: var(--space-2);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-3);
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Over summaries, innings changes and the result: a band, so the overs read as groups. */
+.commentary ol.commentary-feed > li:is([data-category="OVER"], [data-category="INNINGS"], [data-category="RESULT"]) {
+  margin: var(--space-1) 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 0;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-2);
+  color: var(--text-strong);
+}
+
+/* Wickets and milestones carry a mark at the start of the line as well as their words. */
+.commentary ol.commentary-feed > li[data-category="DISMISSAL"] .commentary-ball {
+  background-color: var(--colour-wicket-fill);
+}
+.commentary ol.commentary-feed > li[data-category="MILESTONE"] .commentary-ball {
+  background-color: var(--colour-six-fill);
+}
+
+/* Selections (who bats, who bowls, the toss): quieter than the play. */
+.commentary ol.commentary-feed > li[data-category="SELECTION"] {
+  color: var(--text-muted);
+}
+
+.commentary .captains-notes {
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-3);
+}
+.commentary .captains-notes > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-default);
+}
+.commentary .captains-notes ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 320px;
+  overflow: auto;
+}
+.commentary .captains-notes li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9em;
+}
+.commentary .captains-note-when {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 9.5em;
+}

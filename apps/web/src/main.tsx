@@ -2,11 +2,9 @@ import { CloseFinish, boundaryCount, requiredRate, isCloseFinish, passageReport,
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AWARDS_PROVENANCE_NOTICE, type MatchAwardCandidate } from "@lcxxvi/contracts";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
+import { CommentaryPanel } from "./match/CommentaryPanel.js";
 import { OPPOSITION_CAPTAIN_NOTE, mayIssuePlanCommand, ownSideControls } from "./match/side-control.js";
-import {
-  projectPreMatchBriefing,
-  selectCommentaryTextForMode,
-} from "@lcxxvi/projections";
+import { projectPreMatchBriefing } from "@lcxxvi/projections";
 import { matchSituation, oppositionWatch, t20ChaseWinChance } from "@lcxxvi/projections";
 import { MatchStyleChip } from "./match/MatchStyleChip.js";
 import { careerIntroFor, requestInspectPlayer } from "./match/career-intro-handoff.js";
@@ -2203,42 +2201,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 </article>
               ))}
             </section>
-            <section className="panel commentary" data-testid="match-commentary-panel">
-              <h2>Commentary</h2>
-              <p>From accepted match events only. Latest first.</p>
-              {commentary === "off" ? (
-                <p>Commentary hidden. Match decisions remain above.</p>
-              ) : (
-                <>
-                <ol reversed>
-                  {(showAllCommentary ? view.commentary : view.commentary.slice(-COMMENTARY_WINDOW))
-                    .slice()
-                    .reverse()
-                    .map((e) => (
-                      <li key={e.sequence} value={e.sequence} data-category={e.category} data-moment={e.sequence === view.commentary.at(-1)?.sequence && (e.category === "DISMISSAL" || e.category === "MILESTONE" || e.category === "RESULT" || !!e.milestoneTags?.length)}>
-                        <span>{selectCommentaryTextForMode(e, commentary)}</span>
-                        {commentary !== "brief" && e.milestoneTags && e.milestoneTags.length > 0 && (
-                          <span className="commentary-milestones" aria-label="Milestones">
-                            {e.milestoneTags.map((tag) => (
-                              <span key={tag} className="commentary-milestone-badge">
-                                {tag.replaceAll("_", " ")}
-                              </span>
-                            ))}
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                </ol>
-                {view.commentary.length > COMMENTARY_WINDOW && (
-                  <button type="button" className="secondary" onClick={() => setShowAllCommentary((v) => !v)}>
-                    {showAllCommentary
-                      ? `Show the latest ${COMMENTARY_WINDOW} entries`
-                      : `Show all ${view.commentary.length} entries`}
-                  </button>
-                )}
-                </>
-              )}
-            </section>
+            <CommentaryPanel
+              entries={view.commentary}
+              mode={commentary}
+              windowSize={COMMENTARY_WINDOW}
+              showAll={showAllCommentary}
+              onToggleShowAll={() => setShowAllCommentary((v) => !v)}
+            />
           </div>
         </>
       )}
