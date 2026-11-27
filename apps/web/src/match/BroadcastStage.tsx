@@ -1,5 +1,7 @@
 import type { View } from "./protocol.js";
 import { ballCall, DISMISSAL } from "./ball-call.js";
+import { stageOverText } from "./broadcast-labels.js";
+import "./match-broadcast.css";
 
 /**
  * The broadcast "this ball" stage (visual overhaul, owner order 20 November 2026, step 1): the latest delivery as a big
@@ -14,11 +16,14 @@ export function BroadcastStage({ view }: { view: View }) {
   if (!presentation || !cue || cue.inningsIndex !== view.activeIndex) return null;
   const balls = presentation.recentHighlights.filter((c) => c.inningsIndex === view.activeIndex).slice(-12);
   const call = ballCall(cue);
+  const legal = view.innings[view.activeIndex]?.innings.legalBalls ?? null;
+  // CP03: a thin divider where one over ends and the next begins, read from each ball's own over label.
+  const overOf = (label: string) => label.split(".")[0];
   return (
     <section className="broadcast-stage" aria-label="This ball" data-moment={call.kind} data-testid="broadcast-stage">
       <div className="stage-glow" key={`glow-${cue.sequence}`} aria-hidden="true" />
       <div className="stage-call" key={cue.sequence} data-kind={call.kind}>
-        <span className="stage-over">Over {cue.overBallLabel}</span>
+        <span className="stage-over">{stageOverText(cue.overBallLabel, legal, true)}</span>
         <strong className="stage-word">{call.word}</strong>
         <span className="stage-line">
           {cue.bowlerName} to {cue.strikerName}
@@ -27,10 +32,11 @@ export function BroadcastStage({ view }: { view: View }) {
       </div>
       {balls.length > 0 && (
         <ol className="stage-balls" aria-label="Recent balls this innings">
-          {balls.map((ball) => {
+          {balls.map((ball, n) => {
             const b = ballCall(ball);
+            const newOver = n > 0 && overOf(ball.overBallLabel) !== overOf(balls[n - 1]!.overBallLabel);
             return (
-              <li key={ball.sequence} data-kind={b.kind} title={`${ball.overBallLabel}: ${b.word.toLowerCase()}`}>
+              <li key={ball.sequence} data-kind={b.kind} data-new-over={newOver ? "true" : undefined} title={`${ball.overBallLabel}: ${b.word.toLowerCase()}`}>
                 {b.chip}
               </li>
             );

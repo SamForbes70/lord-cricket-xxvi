@@ -46,7 +46,7 @@ export function PreMatchBriefingPanel({
       open={defaultOpen || undefined}
     >
       <summary>
-        Pre-match tactical briefing (optional) — {briefing.ground.groundName} ·{" "}
+        Pre-match tactical briefing (optional): {briefing.ground.groundName} ·{" "}
         {TENDENCY_LABEL[briefing.ground.pitchTendency]}
       </summary>
       <div className="tactical-disclosure-body">
@@ -71,7 +71,7 @@ export function PreMatchBriefingPanel({
                 className="tactical-card"
                 data-testid={`prematch-team-card-${team.teamId}`}
               >
-                <h3>{team.teamName} — squad readiness &amp; opponent scouting</h3>
+                <h3>{team.teamName}: squad readiness &amp; opponent scouting</h3>
                 <p>{team.balanceSummary}</p>
                 <p>
                   <strong>Opposition ({opp.opponentTeamName}):</strong>
@@ -348,7 +348,7 @@ export function InMatchTacticalAssistantPanel({
                       <strong>{sp.bowlerName}</strong>
                       <small>
                         Inn {sp.inningsIndex + 1} · Spell #{sp.spellNumberInInnings} (Ov{" "}
-                        {sp.startOver}–{sp.endOver}) ·{" "}
+                        {sp.startOver} to {sp.endOver}) ·{" "}
                         {sp.status === "COMPLETED"
                           ? "Completed"
                           : sp.status === "BETWEEN_OVERS"

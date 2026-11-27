@@ -6,13 +6,12 @@
   --brass: #d6ad60;
   --rule: #c7cec0;
   --surface: #fffdf7;
-  --display: Georgia, "Times New Roman", serif;
+  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --gutter: clamp(14px, 2.8vw, 40px);
   background: var(--paper);
   color: var(--ink);
 }
 .career-shell, .match-shell { padding-inline: var(--gutter); }
-:is(.career-shell,.match-shell) :focus-visible { outline: 3px solid #1373ad; outline-offset: 3px; box-shadow: 0 0 0 3px white; }
 :is(.career-shell,.match-shell) :is(button,.button-link) { border-radius: 4px; }
 :is(.career-shell,.match-shell) button.primary { background: var(--pine); color: white; border-color: var(--pine); }
 :is(.career-shell,.match-shell) button.primary:enabled:hover { background: #24614e; }
@@ -220,7 +219,7 @@
 .season-finale-awards dd {margin:.15em 0 0;}
 /* LC_SEASON_REVIEW_V1: the season review inside the finale. Hierarchy from headings and rules, not decoration. */
 .season-finale h3:focus {outline:none;}
-.season-finale h3:focus-visible {outline:3px solid #1373ad;outline-offset:3px;}
+.season-finale h3:focus-visible {outline:var(--focus-ring-width) solid var(--focus-ring-colour);outline-offset:var(--focus-ring-offset);}
 .season-finale table {min-width:0;}
 .season-finale h4 {font:600 1.05em var(--display);margin:1em 0 .35em;padding-bottom:.2em;border-bottom:1px solid var(--rule);}
 .season-finale .season-review-note {font-size:.88em;opacity:.85;margin:.2em 0 .5em;}

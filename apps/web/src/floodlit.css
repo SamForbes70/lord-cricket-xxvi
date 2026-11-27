@@ -1,3 +1,4 @@
+@import "./tokens.css";
 /*
  * Floodlit: the game's night-match broadcast look (docs/design/VISUAL_OVERHAUL_PLAN.md, phase 1).
  * Loaded last, so it re-themes every screen. Every surface keeps a solid background colour under any gradient, so
@@ -139,7 +140,7 @@ button.primary:hover:enabled, :is(.career-shell, .match-shell) button.primary:en
 button:disabled { background-color: #1a2b2a; background-image: none; color: #8ea097; border-color: rgba(214, 236, 226, 0.12); box-shadow: none; }
 .career-shell .player-link { color: var(--fl-link); background: none; border: 0; font-family: var(--fl-body); font-weight: 600; text-decoration: none; }
 .career-shell .player-link:hover { text-decoration: underline; }
-:focus-visible, :is(.career-shell, .match-shell) :focus-visible { outline: 3px solid var(--fl-gold-hi); outline-offset: 3px; box-shadow: none; }
+/* Keyboard focus: the single ring is defined in tokens.css. */
 
 /* Inputs. */
 select, input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea {

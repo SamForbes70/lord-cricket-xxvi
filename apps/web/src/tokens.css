@@ -1,0 +1,123 @@
+/*
+ * Semantic design tokens (Directive 05, pass CP02 slice, introduced with CP03's match screen).
+ *
+ * The Floodlit palette in floodlit.css (`--fl-*`) stays the raw palette; these tokens name what a value is for, so a
+ * screen asks for "muted text on a raised surface" rather than a hex value. New and reworked styles use these tokens
+ * only. Type sizes are in rem multiplied by the match screen's text-scale setting (`--text-scale`, 1 when unset), so the
+ * player's Text size choice still applies. No readable label is set below --type-xs (12 px at 100%).
+ *
+ * Colour pairs are chosen to stay apart for the common colour-vision deficiencies: boundary (sky blue) against wicket
+ * (vermilion), positive (sky blue) against negative (vermilion), after the Okabe and Ito palette, lightened for a dark
+ * ground. Every state that uses colour also carries a letter, word or shape, so colour is never the only signal.
+ */
+:root {
+  --text-scale: 1;
+
+  /* Type scale (rem, at the player's text scale). */
+  --type-xs: calc(0.75rem * var(--text-scale));     /* 12 px: captions, chips, diagram labels */
+  --type-sm: calc(0.875rem * var(--text-scale));    /* 14 px: secondary text, helper lines */
+  --type-md: calc(1rem * var(--text-scale));        /* 16 px: body */
+  --type-lg: calc(1.125rem * var(--text-scale));    /* 18 px: emphasised body, button labels */
+  --type-xl: calc(1.375rem * var(--text-scale));    /* 22 px: panel headings */
+  --type-2xl: calc(1.75rem * var(--text-scale));    /* 28 px: section headings */
+  --type-3xl: calc(2.25rem * var(--text-scale));    /* 36 px: the ball call */
+  --type-display: calc(clamp(2.5rem, 1.75rem + 1.2vw, 3.5rem) * var(--text-scale)); /* the score */
+  --leading-tight: 1.1;
+  --leading-normal: 1.45;
+  --tracking-caps: 0.12em;
+  --font-display: var(--fl-display);
+  --font-body: var(--fl-body);
+
+  /* Spacing scale (4 px base). */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+
+  /* Surfaces, darkest to most raised. */
+  --surface-page: var(--fl-bg);
+  --surface-sunken: #0a1e20;
+  --surface-1: var(--fl-surface);
+  --surface-2: var(--fl-surface-2);
+  --surface-3: var(--fl-surface-3);
+  --surface-raised: var(--fl-raise);
+  --surface-field: #134030;
+  --surface-field-outer: #0e3024;
+  --border-subtle: var(--fl-edge);
+  --border-strong: rgba(214, 236, 226, 0.28);
+  --border-accent: var(--fl-edge-strong);
+
+  /* Text levels. Each is at least 4.5:1 on --surface-1 and --surface-2. */
+  --text-strong: #ffffff;
+  --text-default: var(--fl-text);
+  --text-muted: var(--fl-muted);
+  --text-faint: var(--fl-faint);
+  --text-on-accent: var(--fl-gold-ink);
+
+  /* Accent: the one gold that marks the primary action and the current state. */
+  --accent: var(--fl-gold);
+  --accent-strong: var(--fl-gold-hi);
+  --accent-soft: rgba(231, 187, 95, 0.16);
+
+  /* Semantic cricket colours (fill and the text that sits on it). */
+  --colour-positive: #6cc5f0;
+  --colour-negative: #ff9b73;
+  --colour-boundary: #6cc5f0;
+  --colour-boundary-fill: #164a66;
+  --colour-six: var(--fl-gold-hi);
+  --colour-six-fill: #5a4512;
+  --colour-wicket: #ff8f6b;
+  --colour-wicket-fill: #7a2a17;
+  --colour-extra: #e6d27a;
+  --colour-dot: var(--text-muted);
+
+  /* Radii. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Elevation. */
+  --shadow-1: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-2: var(--fl-shadow);
+
+  /* Motion. Durations fall to zero under reduced motion (below). */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 420ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-emphasis: cubic-bezier(0.2, 1.4, 0.4, 1);
+
+  /* Focus: one ring for every keyboard focus. */
+  --focus-ring-colour: var(--fl-gold-hi);
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
+}
+
+/* One keyboard focus ring everywhere (replaces the light theme's orange and blue rings). */
+:focus-visible,
+:is(.career-shell, .match-shell) :focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-colour);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: none;
+}
+/* Headings and anchors that the game focuses for screen readers draw no box: a mouse user never sees a ring, and a
+   keyboard user gets a quiet gold underline on the heading instead of an outline round a block of text. */
+:is(h1, h2, h3, h4, [role="group"], .dugout-anchor)[tabindex="-1"]:focus { outline: none; box-shadow: none; }
+:is(h1, h2, h3, h4)[tabindex="-1"]:focus-visible {
+  outline: none;
+  text-decoration: underline var(--accent) 2px;
+  text-underline-offset: 6px;
+}

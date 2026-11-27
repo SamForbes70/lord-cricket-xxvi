@@ -12,6 +12,8 @@ import {
 } from "@lcxxvi/projections";
 import type { Action } from "./protocol.js";
 import { OPPOSITION_CAPTAIN_NOTE } from "./side-control.js";
+import { ballCall } from "./ball-call.js";
+import { layoutField, type LayoutMarker } from "./field-label-layout.js";
 
 export type CommittedSequenceWindow = {
   readonly token: number;
@@ -104,6 +106,17 @@ export function LiveFieldPanel({
 
   const [reelQueue, setReelQueue] = useState<DeliveryHighlightCue[]>([]);
   const [pinnedSequence, setPinnedSequence] = useState<number | null>(null);
+  const diagramRef = useRef<SVGSVGElement | null>(null);
+  const [diagramWidth, setDiagramWidth] = useState(400);
+  useEffect(() => {
+    const el = diagramRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return undefined;
+    const measure = () => { const w = el.getBoundingClientRect().width; if (w > 0) setDiagramWidth(Math.round(w)); };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const lastWindowToken = useRef<number>(0);
 
   const committedSignature = useMemo(
@@ -298,28 +311,50 @@ export function LiveFieldPanel({
     [pinnedSequence, presentation.recentHighlights],
   );
 
+  // CP03: the diagram always shows the latest ball unless the player chose a recent ball or a replay is running, and
+  // the caption above it says which ball it is (CP01 found it still showing a key moment from overs earlier).
   const activeCue: DeliveryHighlightCue | null =
-    reelQueue[0] ??
-    pinnedCue ??
-    (pacingMode === "KEY_MOMENT"
-      ? ([...presentation.recentHighlights]
-          .reverse()
-          .find((c) => c.isKeyMoment) ?? presentation.latestHighlight)
-      : presentation.latestHighlight);
+    reelQueue[0] ?? pinnedCue ?? presentation.latestHighlight;
+  const showingLatest =
+    activeCue !== null && activeCue.sequence === presentation.latestHighlight?.sequence && reelQueue.length === 0;
 
   const leftSideLabel = presentation.strikerHand === "L" ? "OFF SIDE" : "LEG SIDE";
   const rightSideLabel = presentation.strikerHand === "L" ? "LEG SIDE" : "OFF SIDE";
 
-  const highlightColor =
+  const highlightKind =
     activeCue?.momentKind === "WICKET"
-      ? "#b42318"
+      ? "wicket"
       : activeCue?.momentKind === "SIX"
-        ? "#6941c6"
+        ? "six"
         : activeCue?.momentKind === "FOUR"
-          ? "#026aa2"
+          ? "four"
           : activeCue?.momentKind === "FREE_HIT"
-            ? "#b54708"
-            : "#2c5e3b";
+            ? "free-hit"
+            : "runs";
+
+  // Markers and labels are sized from the diagram's drawn width, so text stays at least 12 CSS pixels and nothing
+  // overlaps (field-label-layout.ts). Drawing positions only: every slot and its legality are unchanged.
+  const fieldLayout = useMemo(() => {
+    const markers: LayoutMarker[] = [
+      { id: "striker", x: presentation.strikerPoint.x10 / 10, y: presentation.strikerPoint.y10 / 10, code: presentation.strikerHand, weight: "player", fixed: true },
+      { id: "keeper", x: presentation.keeperPoint.x10 / 10, y: presentation.keeperPoint.y10 / 10, code: "WK", weight: "player", fixed: true },
+      { id: "bowler", x: presentation.bowlerReleasePoint.x10 / 10, y: presentation.bowlerReleasePoint.y10 / 10 - 5, code: "B", weight: "player" },
+      { id: "non-striker", x: presentation.nonStrikerPoint.x10 / 10, y: presentation.nonStrikerPoint.y10 / 10, code: "NS", weight: "player" },
+      ...displayPositions.map((pos): LayoutMarker => ({
+        id: pos.slotId,
+        x: pos.point.x10 / 10,
+        y: pos.point.y10 / 10,
+        code: pos.occupiedByName ? (pos.occupantCount > 1 ? `${pos.occupantCount}x` : initials(pos.occupiedByName)) : "",
+        label: pos.label,
+        weight: pos.occupiedByPlayerId ? "player" : "open",
+      })),
+    ];
+    return layoutField(markers, diagramWidth);
+  }, [presentation, displayPositions, diagramWidth]);
+  const placed = new Map(fieldLayout.markers.map((m) => [m.id, m]));
+
+  const call = activeCue ? ballCall(activeCue) : null;
+  const fielderMarker = (slotId: string) => placed.get(slotId);
 
   return (
     <section
@@ -332,176 +367,75 @@ export function LiveFieldPanel({
       data-highlight-playing={isPlayingHighlight ? "true" : "false"}
     >
       <div className="live-field-header">
-        <div>
-          <h2 id="live-field-heading">Live field &amp; highlight view</h2>
-          <p className="live-field-subtitle" data-testid="field-orientation-note">
-            {presentation.orientationNote}
-          </p>
-        </div>
-        <div className="live-field-prefs">
-          <label>
-            Highlight pacing{" "}
-            <select
-              aria-label="Highlight pacing"
-              value={pacingMode}
-              onChange={(event) =>
-                onChangePacingMode(
-                  event.currentTarget.value as HighlightPacingMode,
-                )
-              }
-            >
-              <option value="EVERY_BALL">Every ball</option>
-              <option value="KEY_MOMENT">Key moments</option>
-              <option value="FAST">Fast</option>
-            </select>
-          </label>
-          <label>
-            Highlight motion{" "}
-            <select
-              aria-label="Highlight motion"
-              value={motionMode}
-              onChange={(event) =>
-                onChangeMotionMode(
-                  event.currentTarget.value as HighlightMotionMode,
-                )
-              }
-            >
-              <option value="AUTO">System default</option>
-              <option value="REDUCED">Reduced motion</option>
-            </select>
-          </label>
-          {isPlayingHighlight && (
-            <button
-              type="button"
-              data-testid="skip-highlight-button"
-              onClick={skipHighlight}
-            >
-              Skip highlight ({reelQueue.length})
-            </button>
-          )}
-        </div>
+        <h2 id="live-field-heading">Field and latest ball</h2>
+        <p className="live-field-subtitle" data-testid="field-orientation-note">
+          {presentation.orientationNote}
+        </p>
       </div>
 
       <div className="live-field-layout">
         <div className="live-field-diagram-wrap">
+          {activeCue && call && (
+            <p className="field-ball-caption" data-testid="field-ball-caption" data-latest={showingLatest ? "true" : "false"} data-kind={call.kind}>
+              <span className="field-ball-tag">{showingLatest ? "Latest ball" : isPlayingHighlight ? "Replay" : "Chosen ball"}</span>
+              <strong>{activeCue.overBallLabel}</strong>
+              <span className="field-ball-word">{call.word}</span>
+            </p>
+          )}
           <svg
+            ref={diagramRef}
             viewBox="0 0 200 200"
             role="img"
             aria-label={`Live cricket field diagram for ${presentation.strikerName ?? "current batter"} (${presentation.strikerHand}HB). ${draftLegality.summaryText}`}
             className="live-field-svg"
             data-testid="live-field-svg"
           >
-            <circle
-              cx="100"
-              cy="100"
-              r="92"
-              fill="#eef5ec"
-              stroke="#c8d9c3"
-              strokeWidth="1"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r={presentation.boundaryRadiusX10 / 10}
-              fill="#dfeee0"
-              stroke="#2f5d3a"
-              strokeWidth="1.4"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r={presentation.circleRadiusX10 / 10}
-              fill="none"
-              stroke="#4e7a58"
-              strokeWidth="0.9"
-              strokeDasharray="3 2.5"
-            />
+            <circle className="fd-outer" cx="100" cy="100" r="92" />
+            <circle className="fd-ground" cx="100" cy="100" r={presentation.boundaryRadiusX10 / 10} />
+            <circle className="fd-ring" cx="100" cy="100" r={presentation.circleRadiusX10 / 10} />
             {[0, 1, 2, 3, 4, 5, 6, 7].map((sector) => {
               const angle = (sector - 3.5) * (Math.PI / 4);
               const x2 = 100 + Math.sin(angle) * 84;
               const y2 = 100 - Math.cos(angle) * 84;
-              return (
-                <line
-                  key={sector}
-                  x1="100"
-                  y1="100"
-                  x2={x2.toFixed(1)}
-                  y2={y2.toFixed(1)}
-                  stroke="#cde0ce"
-                  strokeWidth="0.45"
-                />
-              );
+              return <line key={sector} className="fd-sector" x1="100" y1="100" x2={x2.toFixed(1)} y2={y2.toFixed(1)} />;
             })}
-            <text
-              x="30"
-              y="20"
-              fontSize="5"
-              fontWeight="700"
-              fill="#294a32"
-              textAnchor="middle"
-              data-testid="field-left-side-label"
-            >
+            <text className="fd-side" x="4" y={fieldLayout.sideLabelSize + 2} fontSize={fieldLayout.sideLabelSize} textAnchor="start" data-testid="field-left-side-label">
               {leftSideLabel}
             </text>
-            <text
-              x="170"
-              y="20"
-              fontSize="5"
-              fontWeight="700"
-              fill="#294a32"
-              textAnchor="middle"
-              data-testid="field-right-side-label"
-            >
+            <text className="fd-side" x="196" y={fieldLayout.sideLabelSize + 2} fontSize={fieldLayout.sideLabelSize} textAnchor="end" data-testid="field-right-side-label">
               {rightSideLabel}
             </text>
 
-            {/* Pitch strip & creases */}
-            <rect
-              x="95.5"
-              y="72"
-              width="9"
-              height="48"
-              rx="1"
-              fill="#e5d3ad"
-              stroke="#9b8254"
-              strokeWidth="0.7"
-            />
-            <line x1="93.5" y1="76" x2="106.5" y2="76" stroke="#6f5a34" strokeWidth="0.6" />
-            <line x1="93.5" y1="116" x2="106.5" y2="116" stroke="#6f5a34" strokeWidth="0.6" />
-            <line x1="98.5" y1="74" x2="101.5" y2="74" stroke="#3f2f16" strokeWidth="1.1" />
-            <line x1="98.5" y1="118" x2="101.5" y2="118" stroke="#3f2f16" strokeWidth="1.1" />
+            {/* Pitch strip and creases */}
+            <rect className="fd-pitch" x="95.5" y="72" width="9" height="48" rx="1" />
+            <line className="fd-crease" x1="93.5" y1="76" x2="106.5" y2="76" />
+            <line className="fd-crease" x1="93.5" y1="116" x2="106.5" y2="116" />
+            <line className="fd-stumps" x1="98.5" y1="74" x2="101.5" y2="74" />
+            <line className="fd-stumps" x1="98.5" y1="118" x2="101.5" y2="118" />
 
             {/* Illustrative highlight cue path */}
             {activeCue && (
               <g
                 key={`${activeCue.sequence}-${isPlayingHighlight ? "anim" : "static"}`}
+                className={`fd-cue fd-cue-${highlightKind}`}
                 data-testid="field-highlight-layer"
                 data-cue-sequence={activeCue.sequence}
                 data-sector-status={activeCue.sectorStatus}
               >
                 <line
+                  className="fd-cue-delivery"
                   x1={activeCue.releasePoint.x10 / 10}
                   y1={activeCue.releasePoint.y10 / 10}
                   x2={activeCue.pitchBouncePoint.x10 / 10}
                   y2={activeCue.pitchBouncePoint.y10 / 10}
-                  stroke="#5c4827"
-                  strokeWidth="1"
-                  strokeDasharray="2 1.5"
                 />
-                <circle
-                  cx={activeCue.pitchBouncePoint.x10 / 10}
-                  cy={activeCue.pitchBouncePoint.y10 / 10}
-                  r="2.1"
-                  fill={highlightColor}
-                  stroke="#ffffff"
-                  strokeWidth="0.6"
-                />
+                <circle className="fd-cue-dot" cx={activeCue.pitchBouncePoint.x10 / 10} cy={activeCue.pitchBouncePoint.y10 / 10} r="2.1" />
                 <line
+                  className="fd-cue-line"
                   x1={activeCue.pitchBouncePoint.x10 / 10}
                   y1={activeCue.pitchBouncePoint.y10 / 10}
                   x2={activeCue.strikerCreasePoint.x10 / 10}
                   y2={activeCue.strikerCreasePoint.y10 / 10}
-                  stroke={highlightColor}
                   strokeWidth="1.2"
                 />
                 {activeCue.sectorStatus === "RECORDED_SECTOR" ? (
@@ -511,8 +445,7 @@ export function LiveFieldPanel({
                       y1={activeCue.strikerCreasePoint.y10 / 10}
                       x2={activeCue.targetPoint.x10 / 10}
                       y2={activeCue.targetPoint.y10 / 10}
-                      stroke={highlightColor}
-                      strokeWidth={activeCue.isKeyMoment ? "2.2" : "1.5"}
+                      strokeWidth={activeCue.isKeyMoment ? "2.4" : "1.8"}
                       strokeDasharray={
                         activeCue.trajectory === "AERIAL"
                           ? "4 2"
@@ -520,115 +453,38 @@ export function LiveFieldPanel({
                             ? "1.5 1.5"
                             : undefined
                       }
-                      className={
-                        isPlayingHighlight ? "field-shot-line-animated" : undefined
-                      }
+                      className={`fd-cue-line${isPlayingHighlight ? " field-shot-line-animated" : ""}`}
                     />
-                    <circle
-                      cx={activeCue.targetPoint.x10 / 10}
-                      cy={activeCue.targetPoint.y10 / 10}
-                      r={activeCue.isKeyMoment ? "3.6" : "2.6"}
-                      fill={highlightColor}
-                      stroke="#ffffff"
-                      strokeWidth="0.9"
-                    />
+                    <circle className="fd-cue-dot" cx={activeCue.targetPoint.x10 / 10} cy={activeCue.targetPoint.y10 / 10} r={activeCue.isKeyMoment ? "3.8" : "3"} />
                   </>
                 ) : (
-                  <circle
-                    cx={activeCue.targetPoint.x10 / 10}
-                    cy={activeCue.targetPoint.y10 / 10}
-                    r="2.8"
-                    fill={highlightColor}
-                    stroke="#ffffff"
-                    strokeWidth="0.9"
-                  />
+                  <circle className="fd-cue-dot" cx={activeCue.targetPoint.x10 / 10} cy={activeCue.targetPoint.y10 / 10} r="2.8" />
                 )}
               </g>
             )}
 
-            {/* Bowler, Keeper, Striker, Non-striker markers */}
+            {/* Bowler, keeper, striker and non-striker: fielding side in light discs, batters in gold. */}
             <g aria-hidden="true">
-              <circle
-                cx={presentation.bowlerReleasePoint.x10 / 10}
-                cy={presentation.bowlerReleasePoint.y10 / 10 - 5}
-                r="3.4"
-                fill="#1f4d36"
-                stroke="#ffffff"
-                strokeWidth="0.8"
-              />
-              <text
-                x={presentation.bowlerReleasePoint.x10 / 10}
-                y={presentation.bowlerReleasePoint.y10 / 10 - 3.9}
-                fontSize="3.1"
-                fontWeight="700"
-                fill="#ffffff"
-                textAnchor="middle"
-              >
-                BWL
-              </text>
-
-              <circle
-                cx={presentation.keeperPoint.x10 / 10}
-                cy={presentation.keeperPoint.y10 / 10}
-                r="3.6"
-                fill="#1d3557"
-                stroke="#ffffff"
-                strokeWidth="0.8"
-              />
-              <text
-                x={presentation.keeperPoint.x10 / 10}
-                y={presentation.keeperPoint.y10 / 10 + 1.1}
-                fontSize="3.1"
-                fontWeight="700"
-                fill="#ffffff"
-                textAnchor="middle"
-              >
-                WK
-              </text>
-
-              <circle
-                cx={presentation.strikerPoint.x10 / 10}
-                cy={presentation.strikerPoint.y10 / 10}
-                r="3.6"
-                fill="#7a2e0e"
-                stroke="#ffffff"
-                strokeWidth="0.9"
-              />
-              <text
-                x={presentation.strikerPoint.x10 / 10}
-                y={presentation.strikerPoint.y10 / 10 + 1.1}
-                fontSize="2.9"
-                fontWeight="700"
-                fill="#ffffff"
-                textAnchor="middle"
-              >
-                {presentation.strikerHand}*
-              </text>
-
-              <circle
-                cx={presentation.nonStrikerPoint.x10 / 10}
-                cy={presentation.nonStrikerPoint.y10 / 10}
-                r="3"
-                fill="#8c5a2b"
-                stroke="#ffffff"
-                strokeWidth="0.7"
-              />
-              <text
-                x={presentation.nonStrikerPoint.x10 / 10}
-                y={presentation.nonStrikerPoint.y10 / 10 + 1}
-                fontSize="2.7"
-                fontWeight="700"
-                fill="#ffffff"
-                textAnchor="middle"
-              >
-                NS
-              </text>
+              {(["bowler", "keeper", "striker", "non-striker"] as const).map((id) => {
+                const m = placed.get(id);
+                if (!m) return null;
+                const batting = id === "striker" || id === "non-striker";
+                return (
+                  <g key={id} className={batting ? "fd-batter" : "fd-fielder"} data-marker={id}>
+                    <circle cx={m.x} cy={m.y} r={m.r} />
+                    <text x={m.x} y={m.y + m.codeSize * 0.36} fontSize={m.codeSize} textAnchor="middle">
+                      {id === "striker" ? presentation.strikerHand : id === "keeper" ? "WK" : id === "bowler" ? "B" : "NS"}
+                    </text>
+                  </g>
+                );
+              })}
             </g>
 
             {/* Named outfield positions */}
             {displayPositions.map((pos) => {
-              const cx = pos.point.x10 / 10;
-              const cy = pos.point.y10 / 10;
+              const m = fielderMarker(pos.slotId);
+              const cx = m?.x ?? pos.point.x10 / 10;
+              const cy = m?.y ?? pos.point.y10 / 10;
               const occupied = pos.occupiedByPlayerId !== null;
               const isSelected =
                 pos.occupiedByPlayerId !== null &&
@@ -636,15 +492,17 @@ export function LiveFieldPanel({
               const hasViolation = draftLegality.violations.some((v) =>
                 v.affectedSlotIds.includes(pos.slotId),
               );
+              const state = hasViolation ? "violation" : isSelected ? "selected" : occupied ? "occupied" : "open";
               return (
                 <g
                   key={pos.slotId}
+                  className={`fd-slot fd-slot-${state}`}
                   data-slot-id={pos.slotId}
                   data-occupied={occupied ? "true" : "false"}
                   data-leg-side={pos.legSideForStriker ? "true" : "false"}
                   data-inside-circle={pos.insideCircle ? "true" : "false"}
-                  data-cx={cx.toFixed(1)}
-                  data-cy={cy.toFixed(1)}
+                  data-cx={(pos.point.x10 / 10).toFixed(1)}
+                  data-cy={(pos.point.y10 / 10).toFixed(1)}
                   style={{ cursor: canEditField && !busy ? "pointer" : "default" }}
                   onPointerDown={() => {
                     if (canEditField && !busy && pos.occupiedByPlayerId) {
@@ -671,70 +529,28 @@ export function LiveFieldPanel({
                     }
                   }}
                 >
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={occupied ? "5.1" : "3.7"}
-                    fill={
-                      hasViolation
-                        ? "#fef3f2"
-                        : occupied
-                          ? isSelected
-                            ? "#0f52ba"
-                            : "#1e3a2f"
-                          : "#ffffff"
-                    }
-                    fillOpacity={occupied ? "0.95" : "0.75"}
-                    stroke={
-                      hasViolation
-                        ? "#d92d20"
-                        : isSelected
-                          ? "#ffbf47"
-                          : "#2f5d3a"
-                    }
-                    strokeWidth={isSelected || hasViolation ? "1.4" : "0.8"}
-                  />
-                  <text
-                    x={cx}
-                    y={cy + 1.1}
-                    fontSize="3.1"
-                    fontWeight="700"
-                    fill={
-                      hasViolation
-                        ? "#b42318"
-                        : occupied
-                          ? "#ffffff"
-                          : "#355e3b"
-                    }
-                    textAnchor="middle"
-                  >
-                    {occupied && pos.occupiedByName
-                      ? pos.occupantCount > 1
-                        ? `${pos.occupantCount}x`
-                        : initials(pos.occupiedByName)
-                      : "·"}
-                  </text>
-                  <text
-                    x={cx}
-                    y={cy + 8.4}
-                    fontSize="3.3"
-                    fontWeight={occupied ? "700" : "500"}
-                    fill="#182b1e"
-                    textAnchor="middle"
-                  >
-                    {pos.label}
-                  </text>
+                  <circle cx={cx} cy={cy} r={m?.r ?? 5} />
+                  {occupied && pos.occupiedByName && m && (
+                    <text className="fd-code" x={cx} y={cy + m.codeSize * 0.36} fontSize={m.codeSize} textAnchor="middle">
+                      {pos.occupantCount > 1 ? `${pos.occupantCount}x` : initials(pos.occupiedByName)}
+                    </text>
+                  )}
+                  {m?.label && (
+                    <text className="fd-label" x={m.label.x} y={m.label.y} fontSize={m.label.size} textAnchor={m.label.anchor}>
+                      {m.label.text}
+                    </text>
+                  )}
                 </g>
               );
             })}
           </svg>
 
           <p className="live-field-legend">
-            <strong>Striker:</strong> {presentation.strikerName ?? "—"} ({""}
+            <strong>Striker:</strong> {presentation.strikerName ?? "none"} ({""}
             {presentation.strikerHand}HB) · <strong>Non-striker:</strong>{" "}
-            {presentation.nonStrikerName ?? "—"} · <strong>Bowler:</strong>{" "}
-            {presentation.bowlerName ?? "—"} · <strong>Keeper:</strong>{" "}
-            {presentation.keeperName ?? "—"}
+            {presentation.nonStrikerName ?? "none"} · <strong>Bowler:</strong>{" "}
+            {presentation.bowlerName ?? "none"} · <strong>Keeper:</strong>{" "}
+            {presentation.keeperName ?? "none"}
           </p>
         </div>
 
@@ -747,7 +563,7 @@ export function LiveFieldPanel({
             <h3>
               {isPlayingHighlight
                 ? `Playing highlight (${pacingMode === "EVERY_BALL" ? "Every ball" : "Key moment"})`
-                : "Delivery highlight summary"}
+                : "This ball"}
             </h3>
             {activeCue ? (
               <>
@@ -765,7 +581,7 @@ export function LiveFieldPanel({
                   </p>
                 )}
                 <p className="highlight-disclaimer">
-                  {activeCue.trackingDisclaimer}
+                  {activeCue.trackingDisclaimer.replace(/\s[\u2013\u2014]\s/g, ": ")}
                 </p>
               </>
             ) : (
@@ -793,7 +609,7 @@ export function LiveFieldPanel({
                       );
                     }}
                   >
-                    {cue.overBallLabel}{" "}
+                    {cue.overBallLabel}{" · "}
                     {cue.momentKind === "WICKET"
                       ? "W"
                       : cue.momentKind === "SIX"
@@ -874,7 +690,7 @@ export function LiveFieldPanel({
                       );
                       return (
                         <option key={slot.playerId} value={slot.playerId}>
-                          {shortName(names[slot.playerId] ?? slot.playerId)} —{" "}
+                          {shortName(names[slot.playerId] ?? slot.playerId)}:{" "}
                           {posMeta?.label ?? slot.slotId}
                         </option>
                       );
@@ -897,7 +713,7 @@ export function LiveFieldPanel({
                           pos.insideCircle ? "in circle" : "deep"
                         }, {pos.legSideForStriker ? "leg" : "off"}{
                           pos.behindSquare ? ", behind sq" : ""
-                        }) —{" "}
+                        }):{" "}
                         {pos.occupiedByName
                           ? `occupied (${shortName(pos.occupiedByName)})`
                           : "open"}
@@ -977,6 +793,48 @@ export function LiveFieldPanel({
               </div>
             </div>
           )}
+          <div className="live-field-prefs">
+            <label>
+              Highlight pacing{" "}
+              <select
+                aria-label="Highlight pacing"
+                value={pacingMode}
+                onChange={(event) =>
+                  onChangePacingMode(
+                    event.currentTarget.value as HighlightPacingMode,
+                  )
+                }
+              >
+                <option value="EVERY_BALL">Every ball</option>
+                <option value="KEY_MOMENT">Key moments</option>
+                <option value="FAST">Fast</option>
+              </select>
+            </label>
+            <label>
+              Highlight motion{" "}
+              <select
+                aria-label="Highlight motion"
+                value={motionMode}
+                onChange={(event) =>
+                  onChangeMotionMode(
+                    event.currentTarget.value as HighlightMotionMode,
+                  )
+                }
+              >
+                <option value="AUTO">System default</option>
+                <option value="REDUCED">Reduced motion</option>
+              </select>
+            </label>
+            {isPlayingHighlight && (
+              <button
+                type="button"
+                data-testid="skip-highlight-button"
+                onClick={skipHighlight}
+              >
+                Skip highlight ({reelQueue.length})
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </section>
