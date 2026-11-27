@@ -104,7 +104,7 @@ export function battersAtCrease(session: Readonly<T20Session>): { striker: Batte
 
 /** How the batch step runs the tactical captain. */
 export type T20TacticalStepOptions = Readonly<{
-  /** The captain; the current one (adviseT20Captain, V5) by default. adviseT20CaptainV4 replays V4's choices. */
+  /** The captain; the current one (adviseT20Captain, V6) by default. adviseT20CaptainV4 and V5 replay those choices. */
   advise?: (view: T20TacticalPublicView) => T20TacticalAdvice;
   /** What one ADVANCE bowls when the captain has nothing to change. DELIVERY (the default from captain V5) asks the
    * captain before every ball, as the live game's passages ask the computer opponent. OVER bowls the rest of the over,
@@ -113,7 +113,7 @@ export type T20TacticalStepOptions = Readonly<{
   advance?: "OVER" | "DELIVERY";
 }>;
 
-/** The T20 tactical captain (adviseT20Captain, now V5) chooses only legal engine commands; accepted LC_T20_MATCH_V1 owns delivery sampling. */
+/** The T20 tactical captain (adviseT20Captain, now V6) chooses only legal engine commands; accepted LC_T20_MATCH_V1 owns delivery sampling. */
 export function tacticalT20Step(session: Readonly<T20Session>, options: T20TacticalStepOptions = {}): T20Command {
   const advise = options.advise ?? adviseT20Captain;
   const fallback = fixtureAutopilotStep(session as T20Session);
