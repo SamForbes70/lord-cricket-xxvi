@@ -112,7 +112,7 @@ describe("calibrated-t20-02 (C6), research only", () => {
     walk([CALIBRATED_T20_02_DELIVERY_PACK.catchOpportunityPhaseBp, CALIBRATED_T20_02_DELIVERY_PACK.dismissalPhaseBp, r]);
     for (const v of values) expect(Number.isInteger(v)).toBe(true);
   });
-  it("is reachable only through the research set-up, and deterministic", () => {
+  it("is reachable only through the research set-up, deterministic, and distinct from calibrated-t20-01", () => {
     const request = corpusRequest(0);
     expect(validateT20MatchSetup(request, bytes, manifest).versions.model).toBe(PROBABILITY_MODEL_ID);
     const setup = validateT20ResearchMatchSetup(request, bytes, manifest, CALIBRATED_T20_02_MODEL_ID);
@@ -123,5 +123,13 @@ describe("calibrated-t20-02 (C6), research only", () => {
     const b = play(createT20Session(validateT20ResearchMatchSetup(request, bytes, manifest, CALIBRATED_T20_02_MODEL_ID)));
     expect(b.events.length).toBe(a.events.length);
     expect(JSON.stringify(b.events)).toBe(JSON.stringify(a.events));
+    const c = play(createT20Session(validateT20ResearchMatchSetup(request, bytes, manifest, CALIBRATED_T20_MODEL_ID)));
+    expect(JSON.stringify(c.events)).not.toBe(JSON.stringify(a.events));
+  });
+  it("carries the fitted phase terms of the chosen candidate (c6) in the generator's bowled and lbw categories", () => {
+    const d = CALIBRATED_T20_02_DELIVERY_PACK;
+    expect(d.dismissalPhaseBp.T20_LATE.BOWLED).toBeGreaterThan(0);
+    expect(d.catchOpportunityPhaseBp.T20_LATE.AERIAL).toBeLessThan(0);
+    expect(d.catchOpportunityPhaseBp.T20_EARLY.AERIAL).toBeLessThan(0);
   });
 });

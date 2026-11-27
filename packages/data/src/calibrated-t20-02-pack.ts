@@ -50,12 +50,12 @@ export const CALIBRATED_T20_02_PACK = deepFreeze({
     EDGE: { VARIATION: 8000 },
   } as CalibratedTerms,
   runs: {
-    "0": { CONTROL: 24000, ROTATION: -13000 },
-    "4": { TIMING: 1200, POWER: 1200, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
-    "6": { TIMING: 1200, POWER: 1200, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
+    "0": { CONTROL: 24000, ROTATION: -13700 },
+    "4": { TIMING: 1400, POWER: 1400, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
+    "6": { TIMING: 1400, POWER: 1400, CONTROL: -13000, MOVEMENT: -13000, VARIATION: 3000 },
   } as CalibratedTerms,
   cancelMissDismissalSkill: true,
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_02_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_02_PACK_SHA256 = "266f6d79335ca644025d2a2aea1d49ac03cc817850f36f99dd0ff7b400b0c650";
+export const CALIBRATED_T20_02_PACK_SHA256 = "188c50996df1cc25976c7f35fbbf36c2d4c11eba1bcfaaaf0bdce6beccacdb6f";

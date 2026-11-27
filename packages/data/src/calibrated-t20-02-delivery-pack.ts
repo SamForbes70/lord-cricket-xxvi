@@ -27,7 +27,7 @@ export const CALIBRATED_T20_02_DELIVERY_PACK = deepFreeze({
     base: {
       probabilityPackSha256: "d47d5caca955b7a374b0052d712b1674bca6d855e222194ce9f0587d8580b7ab",
       stagePackSha256: "34efa3037702e44a134ea38b414eab3e97c6f79f10b3e5458bc2ab05412e5d7a",
-      skillPackSha256: "266f6d79335ca644025d2a2aea1d49ac03cc817850f36f99dd0ff7b400b0c650",
+      skillPackSha256: "188c50996df1cc25976c7f35fbbf36c2d4c11eba1bcfaaaf0bdce6beccacdb6f",
     },
     source: {
       dataset: "Cricsheet t20s_json.zip",
@@ -84,23 +84,23 @@ export const CALIBRATED_T20_02_DELIVERY_PACK = deepFreeze({
    * catches came from edges).
    */
   catchOpportunityPhaseBp: {
-    T20_EARLY: { AERIAL: 0, EDGE: 0 },
-    T20_MIDDLE: { AERIAL: 0, EDGE: 0 },
-    T20_LATE: { AERIAL: 0, EDGE: 0 },
+    T20_EARLY: { AERIAL: -350, EDGE: -350 },
+    T20_MIDDLE: { AERIAL: 50, EDGE: 50 },
+    T20_LATE: { AERIAL: -750, EDGE: -750 },
   },
   /** V3 (C6): additive intercepts (bp) on the bowled and lbw chance after a miss or pad, by phase. */
   dismissalPhaseBp: {
-    T20_EARLY: { BOWLED: 0, LBW: 0 },
-    T20_MIDDLE: { BOWLED: 0, LBW: 0 },
-    T20_LATE: { BOWLED: 0, LBW: 0 },
+    T20_EARLY: { BOWLED: -1800, LBW: -300 },
+    T20_MIDDLE: { BOWLED: -1500, LBW: -3000 },
+    T20_LATE: { BOWLED: 19100, LBW: 23400 },
   },
 });
 
 /** SHA-256 of LC canonical JSON of CALIBRATED_T20_02_DELIVERY_PACK; verified by the simulation model registry at load. */
-export const CALIBRATED_T20_02_DELIVERY_PACK_SHA256 = "d8470a2e2e07f0df492890eb1c5392705aca59b3e4c5f5dbc8683e6f3847092f";
+export const CALIBRATED_T20_02_DELIVERY_PACK_SHA256 = "956f0d640253fc3c83fedf83b890095c65dcfa3c542d1bed508c46f3ffc4dd3b";
 /**
  * calibrated-t20-02's model hash, recorded in a research set-up's `versions.modelHash`: SHA-256 of LC canonical JSON of
  * { deliveryPackSha256, skillPackSha256, tacticsPackSha256 }, as for calibrated-t20-01. The tactics component is
  * calibrated-t20-01's LC_CALIBRATED_T20_TACTICS_V1, unchanged and shared (not refitted).
  */
-export const CALIBRATED_T20_02_MODEL_HASH = "3c9d6ea8c64feaa84668a764369cb6966682d732e8c1008b33c7b605a81f0aae";
+export const CALIBRATED_T20_02_MODEL_HASH = "be97f9a991e9263dc392dc0e91e1a70187fc60a21fd2ab85495de4b8b6965444";
