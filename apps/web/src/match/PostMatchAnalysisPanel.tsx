@@ -1,4 +1,4 @@
-import type { PostMatchAnalysis, PostMatchDecision } from "@lcxxvi/projections";
+import type { PostMatchAnalysis, PostMatchAnalysisV2, PostMatchDecision, PostMatchMeasuredEffectV2 } from "@lcxxvi/projections";
 import { POST_MATCH_MEASURED_NOTES, POST_MATCH_ANALYSIS_RULES } from "@lcxxvi/projections";
 import "./post-match-analysis.css";
 
@@ -18,7 +18,11 @@ function overs(legalBalls: number): string {
   return legalBalls % 6 === 0 ? `${legalBalls / 6}` : `${Math.floor(legalBalls / 6)}.${legalBalls % 6}`;
 }
 
-export function DecisionItem({ decision }: { decision: Pick<PostMatchDecision, "kind" | "when" | "summary" | "followed" | "measured"> }) {
+/** V1 decisions (the archived view) carry a V1 effect key; V2 decisions carry their own note, measured under named versions. */
+type DecisionLine = Pick<PostMatchDecision, "kind" | "when" | "summary" | "followed">
+  & ({ measured: PostMatchDecision["measured"]; measuredNote?: undefined } | { measured: PostMatchMeasuredEffectV2; measuredNote: string });
+
+export function DecisionItem({ decision }: { decision: DecisionLine }) {
   return (
     <li className="pma-decision" data-kind={decision.kind} data-measured={decision.measured}>
       <p className="pma-decision-head">
@@ -32,7 +36,7 @@ export function DecisionItem({ decision }: { decision: Pick<PostMatchDecision, "
           {decision.followed}
         </p>
       )}
-      <p className="pma-measured">{POST_MATCH_MEASURED_NOTES[decision.measured]}</p>
+      <p className="pma-measured">{decision.measuredNote ?? POST_MATCH_MEASURED_NOTES[decision.measured as PostMatchDecision["measured"]]}</p>
     </li>
   );
 }
@@ -116,12 +120,46 @@ export function TurningPoints({ points, headingLevel = 4, idPrefix = "pma" }: {
   );
 }
 
+/** LC_POST_MATCH_ANALYSIS_V2: the versions the match records, and the versions and date of the evidence behind the notes. */
+function VersionsSection({ analysis }: { analysis: PostMatchAnalysisV2 }) {
+  const v = analysis.versions, e = analysis.evidence;
+  return (
+    <section aria-labelledby="pma-versions-heading" data-testid="pma-versions">
+      <h4 id="pma-versions-heading">Model and versions</h4>
+      <ul className="pma-versions">
+        <li data-testid="pma-versions-model">
+          {v.model
+            ? <>Model: <code>{v.model}</code>, as recorded in this match&apos;s setup.</>
+            : <>Model: not available from this match&apos;s record.</>}
+        </li>
+        <li data-testid="pma-versions-captain">
+          {v.computerDecisions === 0 ? (
+            <>No decision in this match is credited to the computer, so no computer captain version applies.</>
+          ) : (
+            <>
+              Computer captain: not recorded. The match record keeps the computer&apos;s {v.computerDecisions}{" "}
+              {v.computerDecisions === 1 ? "decision" : "decisions"} as commands, without the captain or batting policy version that chose them.
+              This build&apos;s computer captain is <code>{v.buildCaptain.captain}</code> with batting policy <code>{v.buildCaptain.battingPolicy}</code>;
+              a match started in an earlier build, or saved and resumed, can hold decisions from an earlier captain.
+            </>
+          )}
+        </li>
+        <li data-testid="pma-versions-evidence">
+          Measured notes: tactical validation of {e.dateText}, model <code>{e.model}</code> with computer captain <code>{e.captain}</code>{" "}
+          and batting policy <code>{e.battingPolicy}</code>, {e.matchesPerExperiment} simulated matches for each experiment.
+          {!v.evidenceModelMatches && " This match's model is not the one the notes were measured under, so the notes do not describe this match's model."}
+        </li>
+      </ul>
+    </section>
+  );
+}
+
 /**
- * LC_POST_MATCH_ANALYSIS_V1. Presentation of a read-only analysis derived from the match record.
+ * LC_POST_MATCH_ANALYSIS_V2. Presentation of a read-only analysis derived from the match record.
  * `focusTeamIds` are the sides the player managed: one against a computer opponent, both in a two-player match.
  */
 export function PostMatchAnalysisPanel({ analysis, focusTeamIds, teamName }: {
-  analysis: PostMatchAnalysis;
+  analysis: PostMatchAnalysisV2;
   focusTeamIds: readonly string[];
   teamName: (teamId: string) => string;
 }) {
@@ -175,21 +213,35 @@ export function PostMatchAnalysisPanel({ analysis, focusTeamIds, teamName }: {
         })}
       </section>
 
+      <VersionsSection analysis={analysis} />
+
       <details className="technical-details pma-footnote" data-testid="pma-footnote">
         <summary>What is and is not measured</summary>
         <ul>
           <li>
-            The measured notes come from the tactical validation of 25 November 2026: 200 simulated matches for each kind of
-            decision, comparing good and deliberately poor management under the current model. They are simulated matches, not human play.
+            The measured notes come from the tactical validation of {analysis.evidence.dateText} (batting policy V3 page): {analysis.evidence.matchesPerExperiment} simulated
+            matches for each experiment under <code>{analysis.evidence.model}</code>, with the computer captain <code>{analysis.evidence.captain}</code> and
+            batting policy <code>{analysis.evidence.battingPolicy}</code> making every choice on both sides except the one under test, asked before every ball.
+            They are simulated matches, not human play.
           </li>
-          <li>Who is picked and the batting order showed clear effects on results. Batting aggression showed a small effect at most.</li>
-          <li>Bowler choice, bowling plans and field settings showed no detectable effect on results in the current model, so what followed them is shown as a record only.</li>
+          <li>
+            Each experiment held one poor setting on one side for a whole match or innings. A single change during a match, as listed above, was not measured:
+            the notes say what a setting did over whole matches.
+          </li>
+          <li>
+            Batting order and the old selection rule showed clear effects on results; the weakest eleven did not show one the measurement could tell apart from none.
+            Blocking every ball showed a clear effect; attacking every ball did not change results measurably.
+          </li>
+          <li>Bowler choice, the four bowling plans tested and the two-slip field held all innings showed no detectable effect on results, so what followed them is shown as a record only.</li>
           <li>Batting intent, the toss and the choice to bat or bowl were not measured.</li>
           <li>
             &quot;What followed&quot; covers the next {POST_MATCH_ANALYSIS_RULES.followLegalBalls / 6} overs of that innings. Picks made by the
             routine-picks setting are sent as your own commands, so they are listed as yours. A super over, if any, is not included.
           </li>
-          <li>Analysis version {analysis.version}. Nothing here is saved; it is worked out again from the match record each time.</li>
+          <li>
+            Analysis version {analysis.version}, with the {analysis.rulesVersion} rules for phases, turning points and what followed.
+            Nothing here is saved; it is worked out again from the match record each time.
+          </li>
         </ul>
       </details>
     </section>

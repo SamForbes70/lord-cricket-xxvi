@@ -27,6 +27,11 @@ function setupWithSeed(seed?: string) {
 const setup = setupWithSeed();
 const USER_TEAM = setup.teams[0].teamId;
 
+/** A decision's recorded facts, without its measured note (V1 and V2 differ only there). */
+function facts(d: { kind: string; teamId: string; actor: string; inningsIndex: number | null; atLegalBall: number | null; when: string; summary: string; followUp: unknown; followed: string | null }) {
+  return { kind: d.kind, teamId: d.teamId, actor: d.actor, inningsIndex: d.inningsIndex, atLegalBall: d.atLegalBall, when: d.when, summary: d.summary, followUp: d.followUp, followed: d.followed };
+}
+
 /** Plays the fixture autopilot, with team-01's picks sent as the player's own commands and two plan changes made. */
 function managedMatch(): T20Session {
   let s = createT20Session(setup);
@@ -175,7 +180,9 @@ describe("LC_POST_MATCH_ANALYSIS_V1", () => {
   });
 });
 
-describe("LC_POST_MATCH_ANALYSIS_V1 in the match view", () => {
+// Since LC_POST_MATCH_ANALYSIS_V2 the match view carries V2, which keeps V1's phases, turning points and decisions
+// (tests/unit/post-match-analysis-v2.test.ts). This test checks the V1 parts of the view against the V1 projection.
+describe("LC_POST_MATCH_ANALYSIS_V1 parts of the match view", () => {
   test("appears only at full time, leaves the record and its verification unchanged, and lists the player's commands", async () => {
     const { createMatchController } = await import("../../apps/web/src/match/controller.js");
     const { UI_VERSION } = await import("../../apps/web/src/match/protocol.js");
@@ -200,18 +207,22 @@ describe("LC_POST_MATCH_ANALYSIS_V1 in the match view", () => {
     }
     const view = response.view!;
     const analysis = view.postMatchAnalysis!;
-    expect(analysis.version).toBe(POST_MATCH_ANALYSIS_VERSION);
+    expect(analysis.version).toBe("LC_POST_MATCH_ANALYSIS_V2");
+    expect(analysis.rulesVersion).toBe(POST_MATCH_ANALYSIS_VERSION);
     expect(analysis.decisions.find((d) => d.kind === "SELECTION" && d.teamId === teams[0]!.id)!.summary).toBe("The eleven matched the suggested eleven.");
     expect(analysis.commandCounts[teams[0]!.id]!.user).toBeGreaterThan(0);
     // The same analysis as projecting the stored session directly.
     const s = c.snapshot()!;
     const names = view.names;
-    expect(analysis).toEqual(projectPostMatchAnalysis({
+    const v1 = projectPostMatchAnalysis({
       events: s.events, commands: s.commands, scorecard: projectT20Scorecard(s),
       teams: s.setup.teams.map((t) => ({ teamId: t.teamId, playerIds: [...t.playerIds] })),
       suggestedXi: Object.fromEntries(teams.map((t) => [t.id, t.suggested.playerIds])),
       names, teamNames: Object.fromEntries(view.teams.map((t) => [t.id, t.name])),
-    }));
+    });
+    expect({ phases: analysis.phases, turningPoints: analysis.turningPoints, commandCounts: analysis.commandCounts, matchId: analysis.matchId })
+      .toEqual({ phases: v1.phases, turningPoints: v1.turningPoints, commandCounts: v1.commandCounts, matchId: v1.matchId });
+    expect(analysis.decisions.map(facts)).toEqual(v1.decisions.map(facts));
     const before = JSON.stringify(c.snapshot());
     const verified = c.handle({ version: UI_VERSION, requestId: "ui-999999", expectedRevision: s.revision, type: "VERIFY" });
     expect(verified.error).toBeNull();
