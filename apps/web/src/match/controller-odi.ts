@@ -402,6 +402,10 @@ export function createODIMatchController(
       })),
     );
   }
+  /** The live session without a copy, for read-only callers (the worker's advance loop). Never mutate it. */
+  function peek(): Readonly<ODISession> | null {
+    return session;
+  }
   function snapshot(): ODISession | null {
     return session ? structuredClone(session) : null;
   }
@@ -424,6 +428,7 @@ export function createODIMatchController(
     restore,
     setWorldCopy,
     snapshot,
+    peek,
     currentResponse,
     handle(raw: unknown): Response {
       let id = "invalid",

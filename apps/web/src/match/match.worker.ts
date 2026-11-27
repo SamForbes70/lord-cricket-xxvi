@@ -621,7 +621,8 @@ let stopAdvanceFor: string | null = null;
  * its own before the next is chosen, with the same request, response and command records a COMMAND or AI_STEP writes.
  */
 async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CAPTAINS" }>): Promise<Response> {
-  const start = controller.snapshot();
+  // The loop only reads the session, so it uses the live one rather than a copy per ball.
+  const start = controller.peek();
   if (!start) return decorate(controller.currentResponse(request.requestId, "Start a match first."));
   if (request.expectedRevision !== start.revision)
     return decorate(controller.currentResponse(request.requestId, "Stale revision. Review the current decision and try again."));
@@ -647,7 +648,7 @@ async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CA
   let refused: string | null = null;
   let revision = start.revision;
   const report = await advanceWithCaptains({
-    session: () => controller.snapshot()!,
+    session: () => controller.peek()! as AnySession,
     propose: (session, seat) => proposeCaptainCommand(session, seat, flags, delegation),
     stopRequested: () => stopAdvanceFor === request.requestId,
     async commit(origin, unplaced) {
@@ -661,7 +662,7 @@ async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CA
         refused = response.error;
         return { error: response.error, blocked: false };
       }
-      const session = controller.snapshot()!;
+      const session = controller.peek()!;
       try {
         // The writer lease lasts 12 s; the timer below renews it every 4 s, and each commit checks it atomically.
         if (nowMs() - leaseRenewedAt > 4_000) {
@@ -699,7 +700,7 @@ async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CA
     return { ...(await rollback(failure, request.requestId)), commandIdFloor: commandIdFloor(), advance: report };
   }
   if (report.commands > 0) await repository.setActiveSaveId(saveId);
-  const session = controller.snapshot()!;
+  const session = controller.peek()!;
   const reply = await decorate(controller.currentResponse(request.requestId,
     report.stop === "LIMIT" ? "Simulation stopped at its command limit." : report.stop === "ERROR" ? (refused ?? "The advance stopped: a command was refused.") : null));
   const committed = session.events.length >= firstSequence && session.revision > start.revision;
