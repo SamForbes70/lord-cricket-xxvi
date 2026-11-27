@@ -1,11 +1,14 @@
 import { TeamCrest } from "../world/TeamCrest.js";
-import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
+import { groundArtBackground } from "../world/ground-art.js";
+import { PlayerPortrait } from "../world/PlayerPortrait.js";
 import { PitchInspection } from "../match/PitchInspection.js";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
-import { useState } from "react";
-import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, playerForm, playingStyle, projectSeasonReview, rankClubStrength, selectionAdvice, SELECTION_ADVICE_NOTE, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus, type SeasonReview } from "@lcxxvi/projections";
+import { useMemo, useState } from "react";
+import { buildFixturePreview, buildMatchReport, computeMatchAwardFromCompletion, playerForm, playerMilestones, playingStyle, projectSeasonReview, rankClubStrength, selectionAdvice, SELECTION_ADVICE_NOTE, seasonObjective, seasonObjectivePhrase, seasonObjectiveStatus, type SeasonReview } from "@lcxxvi/projections";
 import { overallRating, playerStrengths } from "../world/player-visuals.js";
-import { percentageBp, formatGameDate } from "./format.js";
+import { formatGameDate } from "./format.js";
+import { clubFormGuide, clubStanding, FORM_OUTCOME_WORD, ordinal, squadStrip, type SquadStripPlayer } from "./clubhouse-front-page.js";
+import "./clubhouse.css";
 import { MatchReportPanel, matchReportSeenKey, readReportSeen, writeReportSeen } from "./MatchReportPanel.js";
 import { SeasonFinale, readFinaleSeen, seasonFinaleSeenKey, writeFinaleSeen } from "./SeasonFinale.js";
 import { CareerApplicationService } from "./service.js";
@@ -16,7 +19,17 @@ export const selectionNoteKey = (
   fixture: string,
 ) => JSON.stringify(["lcxxvi-selection-focus", save, season, fixture]);
 
-/** The career Home screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
+/**
+ * The ground painting sits in its own region beside (or, on a phone, above) the lead story, so no text is set over it.
+ * It needs no wash; clubhouse.css blends its inner edge into the panel for each layout.
+ */
+const LEAD_ART_WASH = "linear-gradient(rgba(16, 41, 43, 0), rgba(16, 41, 43, 0))";
+
+/**
+ * The career Home screen, the Clubhouse (split out of CareerApp.tsx, audit Phase 5). CP07 lays it out as a front page:
+ * the next match leads; the last result, the table and the board sit in the rail; squad news and match preparation
+ * follow. Every value comes from the season projection, the squad view or an existing projection.
+ */
 export function HomeScreen(props: HomeScreenProps) {
   const {
     service,
@@ -34,9 +47,9 @@ export function HomeScreen(props: HomeScreenProps) {
     displayWorld,
     showTacticalBriefings,
     controlledTeam,
-    tableRow,
     completedManaged,
     openAnalysis,
+    openPlayer,
   } = props;
   const call = pendingMatch ? null : service.selectionCall();
   const previous = state.completedMatches
@@ -87,6 +100,11 @@ export function HomeScreen(props: HomeScreenProps) {
     : null;
   // E2: the board's objective, from each club's best eleven, and the club's standing against it.
   const playersById = new Map(displayWorld.players.map((player) => [player.playerId, player]));
+  // Career totals for the milestones in the squad strip, as the Squad screen works them out; once per saved state.
+  const careerTotals = useMemo(() => {
+    const records = service.historicalStatistics({})?.players ?? [];
+    return new Map(records.map((record) => [record.playerId, { runs: record.runs, wickets: record.bowlingWickets, matches: record.matches }]));
+  }, [service, state]);
   const objective = controlledTeam
     ? seasonObjective(
         rankClubStrength(
@@ -204,10 +222,42 @@ export function HomeScreen(props: HomeScreenProps) {
       )}
     </MatchReportPanel>
   ) : null;
+  // CP07: the front page reads the table, the club's applied results and the squad the screen already projects.
+  const standing = controlledTeam ? clubStanding(state.projection.table, controlledTeam) : null;
+  const formGuide = controlledTeam ? clubFormGuide(state.projection.appliedMatches, controlledTeam) : [];
+  const teamColours = (teamId: string) => displayWorld.teams.find((team) => team.teamId === teamId)?.colours ?? [];
+  const squadCondition = service.squadView();
+  const contractSeason = persistentWorld?.currentSeasonNumber ?? null;
+  const strip = squadStrip(
+    (squadCondition?.players ?? []).flatMap((condition): SquadStripPlayer[] => {
+      const player = playersById.get(condition.playerId);
+      if (!player) return [];
+      const form = playerForm(state.completedMatches, player.playerId);
+      const contract = contractSeason !== null ? service.playerContract(player.playerId) : null;
+      return [{
+        playerId: player.playerId,
+        rating: overallRating(player, "T20"),
+        unavailable: condition.availability === "UNAVAILABLE",
+        unavailableReason: condition.availabilityReason,
+        fatigueBp: condition.fatigueBp,
+        formTrend: form.trend,
+        formText: form.text,
+        formDiscipline: form.discipline,
+        milestones: playerMilestones(careerTotals.get(player.playerId) ?? { runs: 0, wickets: 0, matches: 0 }).map((milestone) => milestone.text),
+        contractEnding: !!contract && contract.expiresAfterSeasonNumber === contractSeason,
+        style: playingStyle({ playerId: player.playerId, role: player.role, bowlingStyle: player.bowlingStyle, skills: player.skills.T20 }).primary.label,
+      }];
+    }),
+    completedManaged.length,
+  );
+  const squadSize = squadCondition?.players.length ?? 0;
+  const actionsLocked = busy || inspectionOnly || service.isReadOnly();
+  const leadArt = state.phase !== "COMPLETE" && nextFixture ? groundArtBackground(service.groundName(nextFixture.groundId), LEAD_ART_WASH) : undefined;
+  const reportInSide = !reportOpen;
   return (
-    <section aria-labelledby="home-heading">
+    <section aria-labelledby="home-heading" className="clubhouse">
       <h2 id="home-heading">Clubhouse</h2>
-      <div className="dashboard-grid">
+      <div className="dashboard-grid clubhouse-front">
         {finaleOpen && (
           <SeasonFinale
             seasonLabel={`SEASON ${persistentWorld?.currentSeasonNumber ?? 1}`}
@@ -223,12 +273,13 @@ export function HomeScreen(props: HomeScreenProps) {
             onDone={() => { writeFinaleSeen(finaleKey); setFinaleClosed((keys) => [...keys, finaleKey]); setFinaleReplay(null); }}
           />
         )}
-        {!finaleOpen && reportOpen && reportPanel}
-        <article className="career-panel emphasis fixture-lead" data-quay={nextFixture?.groundId === "ground-01"} data-art={nextFixture ? "true" : undefined} style={nextFixture ? groundArtBackground(service.groundName(nextFixture.groundId), ART_WASH.fixture) : undefined}>
-          <h3>Next required action</h3>
+        {reportOpen && reportPanel}
+        <article className="career-panel clubhouse-lead" data-testid="clubhouse-lead" data-art={leadArt ? "true" : undefined} aria-labelledby="clubhouse-lead-heading">
+          <div className="clubhouse-lead-copy">
           {state.phase === "COMPLETE" ? (
             <>
-              <p className="big-stat">Season complete</p>
+              <p className="eyebrow clubhouse-kicker">Season over</p>
+              <h3 id="clubhouse-lead-heading" className="clubhouse-headline">Season complete</h3>
               {!finaleOpen && (
                 <button type="button" data-testid="season-finale-replay" onClick={() => setFinaleReplay(finaleKey)}>
                   See the season finale again
@@ -270,43 +321,46 @@ export function HomeScreen(props: HomeScreenProps) {
                   >
                     Copy into multi-season world (Season 2)
                   </button>
-                </div>
-              )}
+                  </div>
+                )}
             </>
           ) : nextFixture ? (
             <>
-              <p className="fixture-round">Round {nextFixture.roundNumber} · T20</p>
-              <p className="fixture-opponents">
+              <p className="fixture-round clubhouse-kicker">Next match · Round {nextFixture.roundNumber} · T20</p>
+              <h3 id="clubhouse-lead-heading" className="fixture-opponents clubhouse-headline">
                 {[nextFixture.homeTeamId, nextFixture.awayTeamId].map((id, index) => (
-                  <span key={id}>{index === 1 && <small>v </small>}
-                    <TeamCrest teamId={id} name={service.teamName(id)} colours={displayWorld.teams.find(t => t.teamId === id)?.colours ?? []} size={34} decorative />
-                    {service.teamName(id)}
+                  <span key={id} className="clubhouse-side-name">
+                    <span className="clubhouse-versus">{index === 1 ? "v" : ""}</span>
+                    <TeamCrest teamId={id} name={service.teamName(id)} colours={teamColours(id)} size={40} decorative />
+                    <span className="clubhouse-team-name">{service.teamName(id)}</span>
                   </span>
                 ))}
-              </p>
-              <p className="fixture-venue">{formatGameDate(nextFixture.matchDayDate)} · {service.groundName(nextFixture.groundId)}</p>
+              </h3>
+              <p className="fixture-venue clubhouse-dateline">{formatGameDate(nextFixture.matchDayDate)} · {service.groundName(nextFixture.groundId)}</p>
               {state.careerState.currentDate < nextFixture.matchDayDate ? (
-                <button
-                  className="primary"
-                  disabled={busy || inspectionOnly || service.isReadOnly()}
-                  onClick={() =>
-                    action(async () => {
-                      await service.simulateToNextUserFixture();
-                    })
-                  }
-                >
-                  Advance to match day
-                </button>
-              ) : (
-                <div className="action-row">
+                <div className="action-row clubhouse-actions">
                   <button
-                    disabled={busy || inspectionOnly || service.isReadOnly()}
+                    className="primary"
+                    disabled={actionsLocked}
+                    onClick={() =>
+                      action(async () => {
+                        await service.simulateToNextUserFixture();
+                      })
+                    }
+                  >
+                    Advance to match day
+                  </button>
+                </div>
+              ) : (
+                <div className="action-row clubhouse-actions">
+                  <button
+                    disabled={actionsLocked}
                     onClick={() => action(simulateMatch)}
                   >
                     Simulate match
                   </button>
                   <button
-                    disabled={busy || inspectionOnly || service.isReadOnly()}
+                    disabled={actionsLocked}
                     className="primary"
                     onClick={() => void playMatch()}
                   >
@@ -320,6 +374,33 @@ export function HomeScreen(props: HomeScreenProps) {
                   {pendingMatch.round ?? nextFixture.roundNumber} is already in
                   progress. Play match resumes it.
                 </p>
+              )}
+              {/* The context sits below the match action so the action stays in view at 150% text scale. */}
+              {preview && (
+                <div className="fixture-preview clubhouse-context" data-testid="fixture-preview">
+                  <p className="fixture-meaning" data-testid="fixture-meaning">
+                    {preview.rivalry && <span className="rival-mark" data-testid="fixture-rival" title={preview.rivalry.reason}>Rival</span>}
+                    {preview.meaning}
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>{service.teamName(preview.opponentTeamId)}</dt>
+                      <dd>
+                        {preview.opponentPosition !== null && state.projection.table.some((row) => row.played > 0) ? `${ordinal(preview.opponentPosition)} on the table` : "Yet to play"}
+                        {preview.opponentForm.length > 0 && <> · Form <span aria-label={`Recent results, oldest first: ${preview.opponentForm.join(" ")}`}>{preview.opponentForm.join(" ")}</span></>}
+                      </dd>
+                    </div>
+                    <div data-testid="fixture-head-to-head">
+                      <dt>Head to head</dt>
+                      <dd>
+                        {preview.headToHead.played === 0
+                          ? "First meeting on record."
+                          : `Played ${preview.headToHead.played}: won ${preview.headToHead.won}, lost ${preview.headToHead.lost}${preview.headToHead.other ? `, other ${preview.headToHead.other}` : ""}. ${preview.headToHead.lastMeeting ?? ""}`}
+                        {preview.rivalry && <> {preview.rivalry.reason}</>}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
               )}
               {call && (
                 <section className="selection-call" aria-label="Selection call">
@@ -406,133 +487,152 @@ export function HomeScreen(props: HomeScreenProps) {
                   )}
                 </section>
               )}
-              {/* The preview sits below the match action so the action stays in view at 150% text scale. */}
-              {preview && (
-                <div className="fixture-preview" data-testid="fixture-preview">
-                  <p className="fixture-meaning" data-testid="fixture-meaning">
-                    {preview.rivalry && <span className="rival-mark" data-testid="fixture-rival" title={preview.rivalry.reason}>Rival</span>}
-                    {preview.meaning}
-                  </p>
-                  <dl>
-                    <div>
-                      <dt>{service.teamName(preview.opponentTeamId)}</dt>
-                      <dd>
-                        {preview.opponentPosition !== null && state.projection.table.some((row) => row.played > 0) ? `${preview.opponentPosition}${["th","st","nd","rd","th","th","th","th","th","th"][preview.opponentPosition % 10]} on the table` : "Yet to play"}
-                        {preview.opponentForm.length > 0 && <> · Form <span aria-label={`Recent results, oldest first: ${preview.opponentForm.join(" ")}`}>{preview.opponentForm.join(" ")}</span></>}
-                      </dd>
-                    </div>
-                    <div data-testid="fixture-head-to-head">
-                      <dt>Head to head</dt>
-                      <dd>
-                        {preview.headToHead.played === 0
-                          ? "First meeting on record."
-                          : `Played ${preview.headToHead.played}: won ${preview.headToHead.won}, lost ${preview.headToHead.lost}${preview.headToHead.other ? `, other ${preview.headToHead.other}` : ""}. ${preview.headToHead.lastMeeting ?? ""}`}
-                        {preview.rivalry && <> {preview.rivalry.reason}</>}
-                      </dd>
-                    </div>
-                    {(preview.dangerBatter || preview.dangerBowler) && (
-                      <div data-testid="fixture-danger">
-                        <dt>Players to watch</dt>
-                        <dd>
-                          {preview.dangerBatter && <>{service.playerName(preview.dangerBatter.playerId)}, {preview.dangerBatter.text}. </>}
-                          {preview.dangerBowler && <>{service.playerName(preview.dangerBowler.playerId)}, {preview.dangerBowler.text}.</>}
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-              )}
-              <PitchInspection
-                ground={displayWorld.grounds.find(
-                  (ground) => ground.groundId === nextFixture.groundId,
-                )}
-                format="T20"
-              />
-              {showTacticalBriefings &&
-                (() => {
-                  const briefing = service.fixtureBriefing(
-                    nextFixture.fixtureId,
-                  );
-                  return briefing ? (
-                    <PreMatchBriefingPanel
-                      briefing={briefing}
-                      focusTeamId={controlledTeam}
-                    />
-                  ) : null;
-                })()}
             </>
           ) : (
-            <p>No remaining managed fixture.</p>
+            <>
+              <p className="eyebrow clubhouse-kicker">Fixtures</p>
+              <h3 id="clubhouse-lead-heading" className="clubhouse-headline">No remaining managed fixture.</h3>
+            </>
           )}
+          </div>
+          {leadArt && <div className="clubhouse-lead-art" aria-hidden="true" style={leadArt} />}
         </article>
-        {(finaleOpen || !reportOpen) && reportPanel}
-        {objective && objectiveStatus && (
-          <article className="career-panel board-card" data-testid="board-card" data-status={objectiveStatus.kind}>
-            <p className="eyebrow">THE BOARD · SEASON OBJECTIVE</p>
-            <h3 data-testid="board-objective">{objective.label}</h3>
-            <p>
-              <strong data-testid="board-status">{objectiveStatus.label}</strong> · {objectiveStatus.sentence}
-            </p>
-            <small>{objective.reason}</small>
-          </article>
-        )}
-        <article className="career-panel">
-          <h3>League position</h3>
-          <p className="big-stat">{tableRow ? `#${tableRow.rank}` : "–"}</p>
-          {tableRow && (
-            <p>
-              {tableRow.wins}W · {tableRow.losses}L · {tableRow.ties}T ·{" "}
-              {tableRow.noResults}NR · {tableRow.points} pts · NRR{" "}
-              {tableRow.nrrX1000 === null
-                ? "–"
-                : (tableRow.nrrX1000 / 1000).toFixed(3)}
-            </p>
-          )}
-        </article>
-        <article className="career-panel">
-          <h3>Condition</h3>
-          {(() => {
-            const squad = service.squadView();
-            const avg = squad
-              ? Math.round(
-                  squad.players.reduce(
-                    (sum, player) => sum + player.fatigueBp,
-                    0,
-                  ) / squad.players.length,
-                )
-              : 0;
-            const unavailable =
-              squad?.players.filter(
-                (player) => player.availability === "UNAVAILABLE",
-              ).length ?? 0;
-            return (
+        <div className="clubhouse-rail">
+          {reportInSide && reportPanel}
+          <article className="career-panel clubhouse-standing" data-testid="clubhouse-standing" aria-labelledby="clubhouse-standing-heading">
+            <p className="eyebrow" id="clubhouse-standing-heading">The table</p>
+            {standing?.kind === "TABLE" ? (
               <>
-                <p className="big-stat">{percentageBp(avg)} fatigue</p>
-                <p>
-                  {unavailable} unavailable ·{" "}
-                  {squad?.players.filter((p) => p.directive !== "REST")
-                    .length ?? 0}{" "}
-                  in practice
+                <p className="clubhouse-position" data-testid="clubhouse-position">
+                  <span className="big-stat">#{standing.rank}</span>
+                  <span className="clubhouse-position-of">of {standing.teams}</span>
+                  <span className="clubhouse-position-gap">
+                    {standing.rank === 1 ? "Top of the table" : standing.pointsOffTop === 0 ? "Level on points with the top" : `${standing.pointsOffTop} ${standing.pointsOffTop === 1 ? "point" : "points"} off top`}
+                  </span>
                 </p>
+                <p className="clubhouse-record">
+                  P{standing.played} · {standing.wins}W · {standing.losses}L · {standing.ties}T · {standing.noResults}NR · <strong>{standing.points} pts</strong> · NRR {standing.nrr ?? "not yet"}
+                </p>
+                {formGuide.length > 0 && (
+                  <div className="clubhouse-form" data-testid="clubhouse-form">
+                    <span className="clubhouse-form-label" id="clubhouse-form-label">Form</span>
+                    <ol aria-labelledby="clubhouse-form-label" className="clubhouse-form-guide">
+                      {formGuide.map((entry) => {
+                        const label = `Round ${entry.roundNumber}, ${entry.home ? "home to" : "away to"} ${service.teamName(entry.opponentTeamId)}: ${FORM_OUTCOME_WORD[entry.outcome]}`;
+                        return (
+                          <li key={entry.fixtureId} data-outcome={entry.outcome} title={label} aria-label={label}>
+                            <span aria-hidden="true">{entry.outcome}</span>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                    <small>Oldest first</small>
+                  </div>
+                )}
               </>
-            );
-          })()}
-        </article>
-        <article className="career-panel">
-          <h3>Progress</h3>
-          <p className="big-stat">{state.completedMatches.length}/56</p>
-          <p>{completedManaged.length}/14 managed-team fixtures complete.</p>
-          {persistentWorld && (
-            <p data-testid="persistent-world-progress">
-              Season {persistentWorld.currentSeasonNumber} (
-              {persistentWorld.currentCalendarYear}) ·{" "}
-              {persistentWorld.completedSeasons.length} completed{" "}
-              {persistentWorld.completedSeasons.length === 1
-                ? "season"
-                : "seasons"}
-            </p>
+            ) : standing?.kind === "NOT_STARTED" ? (
+              <>
+                <p className="clubhouse-not-started" data-testid="clubhouse-season-not-started">Season not started</p>
+                <p className="clubhouse-record">{standing.roundsToPlay} rounds to play. The table and form guide open after your first match.</p>
+              </>
+            ) : null}
+            <p className="clubhouse-progress">{completedManaged.length}/14 managed-team fixtures complete.</p>
+            {persistentWorld && (
+              <p className="clubhouse-progress" data-testid="persistent-world-progress">
+                Season {persistentWorld.currentSeasonNumber} (
+                {persistentWorld.currentCalendarYear}) ·{" "}
+                {persistentWorld.completedSeasons.length} completed{" "}
+                {persistentWorld.completedSeasons.length === 1
+                  ? "season"
+                  : "seasons"}
+              </p>
+            )}
+          </article>
+          {objective && objectiveStatus && (
+            <article className="career-panel board-card" data-testid="board-card" data-status={objectiveStatus.kind}>
+              <p className="eyebrow">THE BOARD · SEASON OBJECTIVE</p>
+              <h3 data-testid="board-objective">{objective.label}</h3>
+              <p>
+                <strong data-testid="board-status">{objectiveStatus.label}</strong> · {objectiveStatus.sentence}
+              </p>
+              <small>{objective.reason}</small>
+            </article>
           )}
-        </article>
+        </div>
+        {squadSize > 0 && controlledTeam && (
+          <section className="career-panel clubhouse-squad" data-testid="clubhouse-squad" aria-labelledby="clubhouse-squad-heading">
+            <div className="clubhouse-section-head">
+              <h3 id="clubhouse-squad-heading">{strip.developments ? "Squad news" : "Leading players"}</h3>
+              <p data-testid="clubhouse-squad-summary">
+                {strip.unavailable === 0 ? `All ${squadSize} players available` : `${strip.unavailable} of ${squadSize} unavailable`}
+                {strip.tired !== null && <> · {strip.tired === 0 ? "nobody tired" : `${strip.tired} tired`}</>}
+                {strip.contractsEnding > 0 && <> · {strip.contractsEnding} {strip.contractsEnding === 1 ? "contract ends" : "contracts end"} this season</>}
+              </p>
+            </div>
+            {!strip.developments && <p className="clubhouse-squad-quiet">No form, fitness or milestone news yet, so these are the highest-rated players in the squad.</p>}
+            <ul className="clubhouse-faces">
+              {strip.faces.map((face) => {
+                const player = playersById.get(face.playerId);
+                if (!player) return null;
+                return (
+                  <li key={face.playerId} data-note={face.notes[0]?.kind}>
+                    <PlayerPortrait playerId={player.playerId} role={player.role} kit={teamColours(controlledTeam)} size={52} />
+                    <div>
+                      {openPlayer ? (
+                        <button
+                          type="button"
+                          className="player-link"
+                          id={`player-link-HOME-${player.playerId}`}
+                          aria-label={`View ${player.name}`}
+                          onClick={() => openPlayer(player.playerId)}
+                        >
+                          {player.name}
+                        </button>
+                      ) : (
+                        <strong>{player.name}</strong>
+                      )}
+                      {face.notes.slice(0, 2).map((note) => (
+                        <small key={note.kind + note.text} data-kind={note.kind}>{note.text}</small>
+                      ))}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
+        {state.phase !== "COMPLETE" && nextFixture && (
+          <section className="career-panel clubhouse-prep" aria-labelledby="clubhouse-prep-heading">
+            <div className="clubhouse-section-head">
+              <h3 id="clubhouse-prep-heading">Match preparation</h3>
+              {preview && (preview.dangerBatter || preview.dangerBowler) && (
+                <p data-testid="fixture-danger">
+                  <span className="clubhouse-label">Players to watch</span>{" "}
+                  {preview.dangerBatter && <>{service.playerName(preview.dangerBatter.playerId)}, {preview.dangerBatter.text}. </>}
+                  {preview.dangerBowler && <>{service.playerName(preview.dangerBowler.playerId)}, {preview.dangerBowler.text}.</>}
+                </p>
+              )}
+            </div>
+            <PitchInspection
+              ground={displayWorld.grounds.find(
+                (ground) => ground.groundId === nextFixture.groundId,
+              )}
+              format="T20"
+            />
+            {showTacticalBriefings &&
+              (() => {
+                const briefing = service.fixtureBriefing(
+                  nextFixture.fixtureId,
+                );
+                return briefing ? (
+                  <PreMatchBriefingPanel
+                    briefing={briefing}
+                    focusTeamId={controlledTeam}
+                  />
+                ) : null;
+              })()}
+          </section>
+        )}
       </div>
     </section>
   );
@@ -564,8 +664,11 @@ export type HomeScreenProps = {
   displayWorld: ReturnType<CareerApplicationService["getWorld"]>;
   showTacticalBriefings: boolean;
   controlledTeam: string | null;
+  /** The club's table row. Kept for callers; the Clubhouse reads the whole table through clubStanding. */
   tableRow: ActiveState["projection"]["table"][number] | null;
   completedManaged: ActiveState["completedMatches"];
   /** Opens the post-match analysis of a completed fixture from its stored record (LC_POST_MATCH_ANALYSIS_ARCHIVE_V1). */
   openAnalysis?: (fixtureId: string) => Promise<void>;
+  /** Opens a player's page from the squad strip; Back returns to the Clubhouse. */
+  openPlayer?: (playerId: string) => void;
 };

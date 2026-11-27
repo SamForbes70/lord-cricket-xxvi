@@ -42,6 +42,14 @@ export function MatchReportPanel({ report, open, onClose, onOpen, teamName, play
       <article className="career-panel score-notebook" data-testid="match-report-summary">
         <p className="eyebrow">{eyebrow}</p>
         <h3>{report.resultLine}</h3>
+        <ul className="last-result-scores" data-testid="match-report-scores" aria-label="Scores">
+          {report.innings.map((innings) => (
+            <li key={innings.battingTeamId}>
+              <span>{teamName(innings.battingTeamId)}</span>{" "}
+              <strong>{innings.runs}/{innings.wickets}</strong> <small>({innings.overs} overs)</small>
+            </li>
+          ))}
+        </ul>
         {children}
         <button type="button" data-testid="match-report-open" onClick={onOpen}>
           Read the match report

@@ -1,0 +1,176 @@
+/*
+ * CP07 Clubhouse front page (Studio Production Directive 05). Kept apart from floodlit.css so the token foundation
+ * can change there without conflicts: everything here reads the floodlit variables through the Clubhouse names below.
+ * This file loads after floodlit.css (it is imported by HomeScreen.tsx), and its selectors carry the shell or section
+ * class so they win over the older Pavilion and Floodlit rules without !important.
+ */
+.career-shell .clubhouse {
+  --club-surface: var(--fl-surface, #10292b);
+  --club-surface-raised: var(--fl-surface-2, #163536);
+  --club-surface-sunk: var(--fl-bg-2, #0c2226);
+  --club-rule: var(--fl-edge, rgba(214, 236, 226, 0.14));
+  --club-text: var(--fl-text, #eef4ef);
+  --club-text-muted: var(--fl-muted, #b6c8bf);
+  --club-accent: var(--fl-gold, #e7bb5f);
+  --club-accent-strong: var(--fl-gold-hi, #f6d58d);
+  --club-on-accent: var(--fl-gold-ink, #1b1305);
+  --club-good: var(--fl-green, #79d79e);
+  --club-bad: var(--fl-red, #f07a6c);
+  --club-display: var(--fl-display, "Barlow Condensed", system-ui, sans-serif);
+  --club-radius: var(--fl-radius, 10px);
+  --club-gap: 16px;
+  --club-headline-size: clamp(1.75em, 2.9vw, 2.9em);
+  --club-rail-width: minmax(17rem, 23rem);
+  --club-art-min-height: 15rem;
+}
+
+/* Compact masthead and navigation, so the page content starts high (audit CD-010). Shared by every career place. */
+main.career-shell:not(.club-selection) { padding-top: 0; }
+main.career-shell:not(.club-selection) > .career-masthead { padding-block: 7px; gap: 14px; align-items: center; }
+main.career-shell:not(.club-selection) > .career-masthead .eyebrow { margin: 0; font-size: 0.68em; line-height: 1.3; }
+main.career-shell:not(.club-selection) > .career-masthead h1 {
+  display: flex; align-items: center; gap: 0.35em; margin: 0.08em 0 0; font-size: 1.7em; line-height: 1.05;
+}
+main.career-shell:not(.club-selection) > .career-masthead h1 .team-crest { flex: none; }
+main.career-shell:not(.club-selection) > .career-masthead .team-colours { display: none; }
+main.career-shell:not(.club-selection) > .career-masthead [data-testid="career-masthead-subtitle"] {
+  margin: 0.15em 0 0; font-size: 0.9em; color: var(--fl-muted, #b6c8bf);
+}
+main.career-shell:not(.club-selection) > .career-masthead .save-badge { padding: 5px 10px; min-width: 0; }
+main.career-shell:not(.club-selection) > .career-nav { margin: 6px 0 0; padding-bottom: 3px; }
+main.career-shell:not(.club-selection) > .career-nav :is(button, a) { min-height: 36px; padding-block: 0.3em; }
+main.career-shell:not(.club-selection) > .career-nav-modes { margin: 0 0 10px; padding-top: 0; }
+main.career-shell:not(.club-selection) > .career-nav-modes :is(button, a) { min-height: 30px; }
+
+/*
+ * The page: a lead story with a rail beside it, then squad news and match preparation. Named areas keep the reading
+ * order of the markup; the rail spans the flexible last row, so it never pushes the main column apart. Rows have no
+ * gap of their own (an empty row would still take one); each block carries its own bottom margin instead.
+ */
+.career-shell .clubhouse .clubhouse-front {
+  display: grid; grid-template-columns: minmax(0, 1fr) var(--club-rail-width); column-gap: var(--club-gap); row-gap: 0;
+  grid-template-areas: "finale finale" "report report" "lead rail" "squad rail" "prep rail";
+  grid-template-rows: auto auto auto auto 1fr; align-items: start;
+}
+.career-shell .clubhouse .clubhouse-front > * { min-width: 0; margin: 0 0 var(--club-gap); }
+.career-shell .clubhouse .clubhouse-front > .season-finale { grid-area: finale; }
+.career-shell .clubhouse .clubhouse-front > .match-report { grid-area: report; }
+.career-shell .clubhouse .clubhouse-front > .clubhouse-lead { grid-area: lead; }
+.career-shell .clubhouse .clubhouse-front > .clubhouse-rail { grid-area: rail; display: grid; gap: var(--club-gap); align-content: start; }
+.career-shell .clubhouse .clubhouse-front > .clubhouse-squad { grid-area: squad; }
+.career-shell .clubhouse .clubhouse-front > .clubhouse-prep { grid-area: prep; }
+
+/* Lead: the next match. Text sits on the solid panel; the ground painting has its own region. */
+.career-shell .clubhouse .clubhouse-lead {
+  display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); padding: 0; overflow: hidden;
+  background-color: var(--club-surface); border-top: 3px solid var(--club-accent);
+}
+.career-shell .clubhouse .clubhouse-lead:not([data-art]) { grid-template-columns: minmax(0, 1fr); }
+.clubhouse .clubhouse-lead-copy { padding: clamp(16px, 2vw, 28px); min-width: 0; }
+.clubhouse .clubhouse-lead-art {
+  min-height: var(--club-art-min-height); background-color: var(--club-surface-sunk);
+  background-size: cover; background-position: center 58%; background-repeat: no-repeat;
+}
+.career-shell .clubhouse .clubhouse-kicker {
+  margin: 0 0 0.35em; color: var(--club-accent-strong); font: 700 0.8em/1.3 var(--club-display); letter-spacing: 0.16em; text-transform: uppercase;
+}
+.career-shell .clubhouse .clubhouse-headline {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.12em; margin: 0 0 0.25em;
+  font: 700 var(--club-headline-size)/1.05 var(--club-display); letter-spacing: 0.005em; text-transform: none; color: var(--club-text);
+}
+/* Each side on its own line, crests aligned, the "v" in a narrow gutter before the second side. */
+.clubhouse .clubhouse-side-name { display: grid; grid-template-columns: 0.75em auto minmax(0, 1fr); align-items: center; column-gap: 0.3em; }
+.clubhouse .clubhouse-side-name .team-crest { flex: none; margin: 0; }
+.clubhouse .clubhouse-team-name { overflow-wrap: anywhere; }
+.clubhouse .clubhouse-versus { font-size: 0.55em; font-weight: 600; font-style: italic; color: var(--club-text-muted); text-align: start; }
+.career-shell .clubhouse .clubhouse-dateline { margin: 0 0 0.9em; color: var(--club-text-muted); font-size: 1em; }
+.career-shell .clubhouse .clubhouse-actions { margin: 0 0 1em; gap: 10px; }
+.career-shell .clubhouse .clubhouse-actions button { min-height: 44px; padding-inline: 1.1em; font-size: 1.1em; }
+.clubhouse .clubhouse-context { margin: 0; padding-top: 0.85em; border-top: 1px solid var(--club-rule); }
+.career-shell .clubhouse .clubhouse-context .fixture-meaning { margin: 0 0 0.45em; color: var(--club-text); font: 600 1.2em/1.25 var(--club-display); }
+.clubhouse .clubhouse-context dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 0.4em 1.4em; margin: 0; }
+.clubhouse .clubhouse-context dt {
+  font: 700 0.74em/1.3 var(--club-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--club-text-muted); opacity: 1;
+}
+.clubhouse .clubhouse-context dd { margin: 0.1em 0 0; color: var(--club-text); }
+.career-shell .clubhouse .clubhouse-lead .selection-call { margin: 1em 0 0; }
+
+/* Rail: last result, the table, the board. */
+.career-shell .clubhouse .clubhouse-rail > .career-panel { padding: 14px 16px; margin: 0; }
+.clubhouse .clubhouse-rail .eyebrow { margin: 0 0 0.3em; font-size: 0.74em; }
+.career-shell .clubhouse .clubhouse-rail h3 { margin: 0.1em 0 0.35em; font: 700 1.25em/1.15 var(--club-display); text-transform: none; letter-spacing: 0.01em; }
+.clubhouse .last-result-scores { list-style: none; margin: 0 0 0.6em; padding: 0; display: grid; gap: 2px; font-variant-numeric: tabular-nums; }
+.clubhouse .last-result-scores li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35em; }
+.clubhouse .last-result-scores span { flex: 1 1 auto; min-width: 0; }
+.clubhouse .last-result-scores strong { font: 700 1.25em/1.1 var(--club-display); color: var(--club-text); }
+.clubhouse .last-result-scores small { color: var(--club-text-muted); }
+.clubhouse .clubhouse-rail .score-notebook > p { margin: 0.2em 0 0.6em; font-size: 0.92em; }
+.clubhouse .clubhouse-rail .score-notebook > button { margin: 4px 6px 0 0; min-height: 38px; padding-inline: 0.7em; font-size: 0.95em; }
+.clubhouse .clubhouse-position { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2em 0.5em; margin: 0 0 0.2em; }
+.career-shell .clubhouse .clubhouse-position .big-stat { margin: 0; font-size: 2.6em; line-height: 1; color: var(--club-accent-strong); }
+.clubhouse .clubhouse-position-of { color: var(--club-text-muted); }
+.clubhouse .clubhouse-position-gap { flex-basis: 100%; font-weight: 600; color: var(--club-text); }
+.clubhouse .clubhouse-not-started { margin: 0.1em 0 0.25em; font: 700 1.7em/1.1 var(--club-display); color: var(--club-accent-strong); }
+.clubhouse .clubhouse-record { margin: 0.2em 0 0.6em; font-variant-numeric: tabular-nums; }
+.clubhouse .clubhouse-progress { margin: 0.25em 0 0; font-size: 0.88em; color: var(--club-text-muted); }
+.clubhouse .clubhouse-form { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 0.6em; }
+.clubhouse .clubhouse-form-label { font: 700 0.74em var(--club-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--club-text-muted); }
+.clubhouse .clubhouse-form small { color: var(--club-text-muted); font-size: 0.78em; }
+.clubhouse .clubhouse-form-guide { display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+.clubhouse .clubhouse-form-guide li {
+  display: grid; place-items: center; width: 1.9em; height: 1.9em; border-radius: 5px;
+  font: 700 0.95em/1 var(--club-display); background-color: var(--club-surface-raised); color: var(--club-text);
+  border: 1px solid var(--club-rule);
+}
+.clubhouse .clubhouse-form-guide li[data-outcome="W"] { background-color: var(--club-good); color: var(--fl-bg, #08171a); border-color: transparent; }
+.clubhouse .clubhouse-form-guide li[data-outcome="L"] { background-color: var(--club-bad); color: var(--fl-bg, #08171a); border-color: transparent; }
+.career-shell .clubhouse .clubhouse-rail .board-card h3 { text-transform: uppercase; letter-spacing: 0.04em; }
+.clubhouse .clubhouse-rail .board-card p { margin: 0.2em 0 0.45em; }
+
+/* Squad news: faces with what the records say about them. */
+.career-shell .clubhouse .clubhouse-squad, .career-shell .clubhouse .clubhouse-prep { padding: 14px 16px 16px; }
+.clubhouse .clubhouse-section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 18px; margin-bottom: 10px; }
+.career-shell .clubhouse .clubhouse-section-head h3 { margin: 0; font: 700 1.25em/1.15 var(--club-display); letter-spacing: 0.04em; }
+.clubhouse .clubhouse-section-head p { margin: 0; color: var(--club-text-muted); }
+.clubhouse .clubhouse-squad-quiet { margin: -4px 0 10px; font-size: 0.9em; color: var(--club-text-muted); }
+.clubhouse .clubhouse-label { font: 700 0.8em var(--club-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--club-accent-strong); }
+.clubhouse .clubhouse-faces { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr)); gap: 8px 14px; }
+.clubhouse .clubhouse-faces li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px 8px 8px; border-radius: 8px; background-color: var(--club-surface-sunk); border-left: 3px solid var(--club-rule); min-width: 0; }
+.clubhouse .clubhouse-faces li > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.clubhouse .clubhouse-faces li[data-note="UNAVAILABLE"], .clubhouse .clubhouse-faces li[data-note="FORM_DOWN"] { border-left-color: var(--club-bad); }
+.clubhouse .clubhouse-faces li[data-note="TIRED"], .clubhouse .clubhouse-faces li[data-note="CONTRACT"] { border-left-color: var(--club-accent); }
+.clubhouse .clubhouse-faces li[data-note="MILESTONE"] { border-left-color: var(--club-accent-strong); }
+.clubhouse .clubhouse-faces li[data-note="FORM_UP"] { border-left-color: var(--club-good); }
+.career-shell .clubhouse .clubhouse-faces .player-link { font-size: 1em; text-align: left; overflow-wrap: anywhere; }
+.clubhouse .clubhouse-faces strong { overflow-wrap: anywhere; }
+.clubhouse .clubhouse-faces small { font-size: 0.86em; line-height: 1.3; color: var(--club-text-muted); overflow-wrap: anywhere; }
+.clubhouse .clubhouse-faces small[data-kind="UNAVAILABLE"], .clubhouse .clubhouse-faces small[data-kind="FORM_DOWN"] { color: var(--club-bad); }
+.clubhouse .clubhouse-faces small[data-kind="FORM_UP"] { color: var(--club-good); }
+.clubhouse .clubhouse-faces small[data-kind="TIRED"], .clubhouse .clubhouse-faces small[data-kind="MILESTONE"] { color: var(--club-accent-strong); }
+
+/* Match preparation: players to watch, the pitch and the optional briefing. */
+.career-shell .clubhouse .clubhouse-prep .pitch-inspection { max-width: none; margin: 0 0 10px; }
+
+/* Narrower screens: one column in reading order (lead, rail, squad, preparation); the painting becomes a banner. */
+@media (max-width: 960px) {
+  .career-shell .clubhouse .clubhouse-front {
+    grid-template-columns: minmax(0, 1fr); grid-template-areas: "finale" "report" "lead" "rail" "squad" "prep"; grid-template-rows: none;
+  }
+  .career-shell .clubhouse .clubhouse-front > .clubhouse-rail { grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); align-items: start; }
+}
+@media (max-width: 700px) {
+  .career-shell .clubhouse .clubhouse-lead[data-art] { grid-template-columns: minmax(0, 1fr); }
+  .clubhouse .clubhouse-lead-art { order: -1; min-height: 0; height: 104px; background-position: center 60%; }
+  main.career-shell:not(.club-selection) > .career-masthead { flex-direction: row; flex-wrap: nowrap; align-items: flex-start; }
+  main.career-shell:not(.club-selection) > .career-masthead h1 { font-size: 1.4em; }
+  main.career-shell:not(.club-selection) > .career-masthead .save-badge small { display: none; }
+}
+
+/* The painting's inner edge fades into the panel: from the left beside the text, from below on a phone banner. */
+.clubhouse .clubhouse-lead-art { position: relative; }
+.clubhouse .clubhouse-lead-art::after {
+  content: ""; position: absolute; inset: 0; background-image: linear-gradient(90deg, var(--club-surface) 0%, rgba(16, 41, 43, 0) 38%);
+}
+@media (max-width: 700px) {
+  .clubhouse .clubhouse-lead-art::after { background-image: linear-gradient(0deg, var(--club-surface) 0%, rgba(16, 41, 43, 0) 60%); }
+}
