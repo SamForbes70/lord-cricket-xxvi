@@ -1,8 +1,9 @@
 /** Freeze verification across additive Pass 07B. No dependence on original ZIP at runtime.
- * Checks the current inventory (refreshed 25 November 2026, regenerate with scripts/generate-t20-inventory.mjs).
+ * Checks the current inventory (refreshed 25 and 27 November 2026, regenerate with scripts/generate-t20-inventory.mjs).
  * The Pass 07A inventory is kept unchanged as the historical record; every Pass 07A hash except the
  * entries listed in SUPERSEDED_07A must still appear unchanged in the current inventory, so a refresh
- * cannot quietly loosen the 07A freeze. See docs/verification-pass07a/INVENTORY_REFRESH_2026-11-25.md. */
+ * cannot quietly loosen the 07A freeze. See docs/verification-pass07a/INVENTORY_REFRESH_2026-11-25.md and
+ * INVENTORY_REFRESH_2026-11-27.md. */
 import {readFileSync,readdirSync} from "node:fs";
 import {createHash} from "node:crypto";
 const historicalPath="tests/fixtures/t20/pass07a-inventory.json";
@@ -12,7 +13,8 @@ if(hash(readFileSync(historicalPath))!=="9fe7817690cb2c7ccc3cb87fe5117961b67d28f
 const historical=JSON.parse(readFileSync(historicalPath,"utf8"));
 const inventory=JSON.parse(readFileSync("tests/fixtures/t20/current-inventory.json","utf8"));
 // Pass 07A entries whose bytes have changed since: the lockfile (dependency updates) and five in-memory
-// request schemas widened by Stage C (pull request #143, merged as 899f911) to accept calibrated-t20-01.
+// request schemas widened by Stage C (pull request #143, merged as 899f911) to accept calibrated-t20-01, and again by
+// C6 (pull request #174, merged as 976ee76) to accept calibrated-t20-02.
 const SUPERSEDED_07A=new Set(["package-lock.json",...["GenerateDeliveryRequestSchema","NormaliseCategoriesRequestSchema",
   "ProbabilityContextSchema","ProbabilityRequestSchema","SampleCategoryRequestSchema"]
   .map(name=>`packages/contracts/schemas/${name}.json`)]);
