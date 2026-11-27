@@ -166,7 +166,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   const [restoreEditorFocus, setRestoreEditorFocus] = useState(false);
   const editWorldButton = useRef<HTMLButtonElement>(null);
   const [playerOrigin, setPlayerOrigin] = useState<
-    "SQUAD" | "STATISTICS" | "CONTRACTS" | "CAREER" | "FIXTURES"
+    "HOME" | "SQUAD" | "STATISTICS" | "CONTRACTS" | "CAREER" | "FIXTURES"
   >("SQUAD");
   const [restorePlayerFocus, setRestorePlayerFocus] = useState<string | null>(null);
   const [playerFormat, setPlayerFormat] = useState<PlayerFormat>(() => {
@@ -192,7 +192,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
 
   function openPlayer(
     id: string,
-    origin: "SQUAD" | "STATISTICS" | "CONTRACTS" | "CAREER" | "FIXTURES",
+    origin: "HOME" | "SQUAD" | "STATISTICS" | "CONTRACTS" | "CAREER" | "FIXTURES",
   ) {
     setPlayerId(id);
     setPlayerOrigin(origin);
@@ -1375,6 +1375,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
           tableRow={tableRow}
           completedManaged={completedManaged}
           openAnalysis={openAnalysisFromReport}
+          openPlayer={(id) => openPlayer(id, "HOME")}
         />
       )}
 
@@ -1605,7 +1606,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                   setScreen(playerOrigin);
                 }}
                 backLabel={
-                  playerOrigin === "SQUAD"
+                  playerOrigin === "HOME"
+                    ? "Back to Clubhouse"
+                    : playerOrigin === "SQUAD"
                     ? "Back to squad"
                     : playerOrigin === "CONTRACTS"
                       ? "Back to contracts"

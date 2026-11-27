@@ -87,8 +87,8 @@ test("pitch inspection keeps the primary match action in view at 150 percent", a
   expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height);
   await expect(page.getByRole("region", { name: "Pitch and conditions" })).toBeVisible();
   await expect(page.getByText("Seam assistance", { exact: true })).toBeVisible();
-  const fixture = page.getByRole("heading", { name: "Next required action" }).locator("xpath=..");
-  const fixtureSummary = await fixture.locator(":scope > p").nth(2).innerText();
+  // The Clubhouse lead (CP07) gives the next match's date and ground on its dateline.
+  const fixtureSummary = await page.getByTestId("clubhouse-lead").locator(".clubhouse-dateline").innerText();
   const ground = world.grounds.find(candidate => fixtureSummary.includes(candidate.name));
   expect(ground).toBeDefined();
   const pitch = page.getByRole("region", { name: "Pitch and conditions" });
