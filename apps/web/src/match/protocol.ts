@@ -122,6 +122,7 @@ export const CareerFixtureLaunchSchema = z.discriminatedUnion("launchVersion", [
   }),
 ]);
 
+export const ADVANCE_WITH_CAPTAINS_VERSION = "LC_ADVANCE_WITH_CAPTAINS_V1" as const;
 export const RequestSchema = z.discriminatedUnion("type", [
   z.strictObject({ ...base, type: z.literal("BOOT"), fresh: z.boolean().optional(), careerFixture: CareerFixtureLaunchSchema.nullable().optional() }),
   z.strictObject({
@@ -141,6 +142,22 @@ export const RequestSchema = z.discriminatedUnion("type", [
     command: z.union([T20CommandSchema, ODICommandSchema, Red5CommandSchema]),
   }),
   z.strictObject({ ...base, type: z.literal("AI_STEP"), clubStyle: z.boolean().optional(), matchAware: z.boolean().optional(), teamId: z.string().min(1).max(128), delegated: z.boolean().optional(), redBallProfile: RedBallTacticalProfileSchema.optional() }),
+  /**
+   * Directive 03 (docs/pavilion/UNIFIED_ADVANCE.md): every advancement mode. The worker asks the computer seats for
+   * their commands before every ball and after the last, then bowls one delivery, until the scope ends or a decision
+   * is the player's. Each engine command is committed on its own, as a COMMAND would be.
+   */
+  z.strictObject({
+    ...base,
+    type: z.literal("ADVANCE_WITH_CAPTAINS"),
+    advanceVersion: z.literal(ADVANCE_WITH_CAPTAINS_VERSION),
+    scope: z.enum(["DELIVERY", "OVER"]),
+    aiTeamId: z.string().min(1).max(128).nullable(),
+    matchAware: z.boolean(),
+    clubStyle: z.boolean(),
+  }),
+  /** Asks a running ADVANCE_WITH_CAPTAINS to stop before its next ball. Handled at once, outside the request queue. */
+  z.strictObject({ ...base, type: z.literal("STOP_ADVANCE"), targetRequestId: z.string().regex(/^ui-[0-9]+$/) }),
   z.strictObject({ ...base, type: z.literal("SET_DELEGATION"), teamId: z.string().min(1).max(128), expectedDelegationRevision: z.number().int().nonnegative(), categories: z.array(DelegationCategorySchema).max(10).refine(values => new Set(values).size === values.length), redBallProfile: RedBallTacticalProfileSchema.optional() }),
   z.strictObject({ ...base, type: z.literal("VERIFY") }),
   z.strictObject({ ...base, type: z.literal("CHECK_SEEDED_WEATHER") }),
@@ -412,6 +429,8 @@ export type Response = {
   /** On BOOT and restores: the highest committed ui-N id, so the page can start its ids above it. */
   commandIdFloor?: number;
   acknowledgement?: { commandId: string; committedRevision: number; fromSequence: number; toSequence: number; lastEventHash: string };
+  /** Set on the reply to ADVANCE_WITH_CAPTAINS: what the advance did and why it stopped. */
+  advance?: import("./advance-with-captains.js").AdvanceReport;
   analyticsRebuild?: { state: "COMPLETE" | "CANCELLED"; applied: number; total: number };
   delegation?: DelegationJournal;
   diagnosticPreview?: import("./diagnostic-export.js").DiagnosticPreview;

@@ -69,7 +69,8 @@ test("cancellation waits for the current command to commit", async ({ page }) =>
     const original = Worker.prototype.postMessage;
     Worker.prototype.postMessage = function (message: unknown, ...options: unknown[]) {
       const request = message as { type?: string; command?: { kind?: string } };
-      if (request.type === "COMMAND" && request.command?.kind === "ADVANCE") {
+      // Every advance is one ADVANCE_WITH_CAPTAINS request (docs/pavilion/UNIFIED_ADVANCE.md).
+      if (request.type === "ADVANCE_WITH_CAPTAINS" || (request.type === "COMMAND" && request.command?.kind === "ADVANCE")) {
         setTimeout(() => Reflect.apply(original, this, [message, ...options]), 500);
       } else Reflect.apply(original, this, [message, ...options]);
     };

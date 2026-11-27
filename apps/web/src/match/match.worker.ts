@@ -1,6 +1,6 @@
 import worldText from "../../../../packages/data/worlds/fictional-eight-01.json?raw";
 import manifest from "../../../../packages/data/worlds/fictional-eight-01.manifest.json" with { type: "json" };
-import { canonicalJson, delegationForTeam, redBallProfileForTeam, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
+import { canonicalJson, type DelegationJournal, type NewGameWorldCopy, type StagedRosterPack } from "@lcxxvi/contracts";
 import { createMatchAnalyticsAccumulator } from "@lcxxvi/projections";
 import {
   nextSafeBoundaryWeatherInterruption,
@@ -21,7 +21,7 @@ import {
 } from "@lcxxvi/persistence";
 import { createMatchController } from "./controller.js";
 import { createDiagnostic, type DiagnosticFailure, type DiagnosticPreview } from "./diagnostic-export.js";
-import { proposeOpponentODICommand, proposeOpponentRed5Command, proposeOpponentT20Command } from "./ai-opponent.js";
+import { advanceWithCaptains, captainSeats, proposeCaptainCommand } from "./advance-with-captains.js";
 import { createODIMatchController } from "./controller-odi.js";
 import { createRed5MatchController } from "./controller-red5.js";
 import {
@@ -613,6 +613,104 @@ async function commitCandidate(
     return rollback(error, request.requestId);
   }
 }
+/** The advance the player has asked to stop, if any (STOP_ADVANCE arrives outside the request queue). */
+let stopAdvanceFor: string | null = null;
+/**
+ * Directive 03: plays the balls of an advance inside the worker, asking the computer seats before every ball and after
+ * the last (advance-with-captains.ts). Every engine command goes through the controller and is durably committed on
+ * its own before the next is chosen, with the same request, response and command records a COMMAND or AI_STEP writes.
+ */
+async function advanceRequest(request: Extract<Request, { type: "ADVANCE_WITH_CAPTAINS" }>): Promise<Response> {
+  // The loop only reads the session, so it uses the live one rather than a copy per ball.
+  const start = controller.peek();
+  if (!start) return decorate(controller.currentResponse(request.requestId, "Start a match first."));
+  if (request.expectedRevision !== start.revision)
+    return decorate(controller.currentResponse(request.requestId, "Stale revision. Review the current decision and try again."));
+  if (readOnly || !activeSaveId)
+    return decorate(controller.currentResponse(request.requestId, "This save is read-only because another tab owns the writer lease."));
+  const saveId = activeSaveId;
+  // A repeated request id never plays again: the first command an advance commits takes the request's own id.
+  if (await repository.command(saveId, request.requestId)) return decorate(controller.currentResponse(request.requestId));
+  if (!(await repository.renewLease(saveId, ownerId, nowMs()))) {
+    readOnly = true;
+    return rollback(new Error("This save is open read-only in this tab."), request.requestId);
+  }
+  let leaseRenewedAt = nowMs();
+  // Command ids stay in the ui-N form every saved match already uses. The first is the request's own id, which the
+  // page has never used for a committed command; the rest follow it. The reply's commandIdFloor moves the page's next
+  // id past them, as it does after a reload.
+  let nextCommandNumber = Math.max(Number(request.requestId.slice(3)), commandIdFloor() + 1);
+  let failure: unknown = null;
+  const firstSequence = start.events.length + 1;
+  const flags = { matchAware: request.matchAware, clubStyle: request.clubStyle };
+  const seats = captainSeats(start, request.aiTeamId, delegation);
+  const initialView = controller.currentResponse(request.requestId).view;
+  let refused: string | null = null;
+  let revision = start.revision;
+  const report = await advanceWithCaptains({
+    session: () => controller.peek()! as AnySession,
+    propose: (session, seat) => proposeCaptainCommand(session, seat, flags, delegation),
+    stopRequested: () => stopAdvanceFor === request.requestId,
+    async commit(origin, unplaced) {
+      const commandId = `ui-${nextCommandNumber++}`;
+      const engineRequest = {
+        version: UI_VERSION, type: "COMMAND", origin, requestId: commandId, expectedRevision: revision,
+        command: { ...unplaced, commandId, expectedRevision: revision },
+      } as Extract<Request, { type: "COMMAND" }>;
+      const response = controller.handle(engineRequest);
+      if (response.error) {
+        refused = response.error;
+        return { error: response.error, blocked: false };
+      }
+      const session = controller.peek()!;
+      try {
+        // The writer lease lasts 12 s; the timer below renews it every 4 s, and each commit checks it atomically.
+        if (nowMs() - leaseRenewedAt > 4_000) {
+          if (!(await repository.renewLease(saveId, ownerId, nowMs()))) throw new Error("This save is open read-only in this tab.");
+          leaseRenewedAt = nowMs();
+        }
+        await repository.commit({
+          saveId,
+          kind: "AUTO",
+          title: defaultTitle(session, activeWorldCopy),
+          expectedRevision: revision,
+          session,
+          revision: session.revision,
+          events: session.events,
+          command: { commandId, requestCanonical: canonicalJson(engineRequest), responseJson: canonicalJson(response), committedRevision: session.revision },
+          metadata: metadata(session, activeWorldCopy),
+          worldCopy: persistedWorldCopy(),
+          rosterPack: activeRosterPack,
+          ownerId,
+          now: nowMs(),
+          updatedAt: nowIso(),
+        });
+      } catch (error) {
+        failure = error;
+        return { error: error instanceof Error ? error.message : "Durable save failed.", blocked: false };
+      }
+      revision = session.revision;
+      const view = response.view;
+      return { error: null, blocked: Boolean(view && view.phase === "READY" && view.advanceReason) };
+    },
+  }, request.scope, seats, Boolean(initialView && initialView.phase === "READY" && initialView.advanceReason));
+  if (stopAdvanceFor === request.requestId) stopAdvanceFor = null;
+  if (failure) {
+    if (failure instanceof Error && failure.message.startsWith("SAVE_READ_ONLY")) readOnly = true;
+    return { ...(await rollback(failure, request.requestId)), commandIdFloor: commandIdFloor(), advance: report };
+  }
+  if (report.commands > 0) await repository.setActiveSaveId(saveId);
+  const session = controller.peek()!;
+  const reply = await decorate(controller.currentResponse(request.requestId,
+    report.stop === "LIMIT" ? "Simulation stopped at its command limit." : report.stop === "ERROR" ? (refused ?? "The advance stopped: a command was refused.") : null));
+  const committed = session.events.length >= firstSequence && session.revision > start.revision;
+  return {
+    ...reply,
+    commandIdFloor: commandIdFloor(),
+    advance: report,
+    ...(committed ? { acknowledgement: { commandId: request.requestId, committedRevision: session.revision, fromSequence: firstSequence, toSequence: session.events.length, lastEventHash: session.lastEventHash } } : {}),
+  };
+}
 async function handlePersistence(request: Request): Promise<Response | null> {
   if (request.type === "LIST_SAVES")
     return decorate(controller.currentResponse(request.requestId));
@@ -1159,14 +1257,8 @@ async function handleInner(raw: unknown): Promise<Response> {
       return decorate(controller.currentResponse(request.requestId, "Stale AI decision revision."));
     if (readOnly || !activeSaveId)
       return decorate(controller.currentResponse(request.requestId, "AI decision requires a writable durable save."));
-    const delegatedCategories = request.delegated ? delegationForTeam(delegation, request.teamId) : undefined;
-    const profile = request.redBallProfile ?? redBallProfileForTeam(delegation, request.teamId);
-    const command =
-      session.setup.format === "T20"
-        ? proposeOpponentT20Command(session as T20Session, request.teamId, delegatedCategories, !request.delegated && request.matchAware, !request.delegated && request.clubStyle)
-        : session.setup.format === "ODI"
-          ? proposeOpponentODICommand(session as ODISession, request.teamId, delegatedCategories)
-          : proposeOpponentRed5Command(session as Red5Session, request.teamId, profile, delegatedCategories);
+    const command = proposeCaptainCommand(session, { teamId: request.teamId, delegated: Boolean(request.delegated) },
+      { matchAware: request.matchAware, clubStyle: request.clubStyle, redBallProfile: request.redBallProfile }, delegation);
     if (!command) return decorate(controller.currentResponse(request.requestId));
     // AI chooses a legal *engine* command through a public view. It receives no seed/future draws.
     // Every AI command is individually committed through the same atomic path as a human command.
@@ -1180,6 +1272,7 @@ async function handleInner(raw: unknown): Promise<Response> {
     const response = controller.handle(aiRequest);
     return commitCandidate(aiRequest, response);
   }
+  if (request.type === "ADVANCE_WITH_CAPTAINS") return advanceRequest(request);
   if (request.type === "CHECK_SEEDED_WEATHER") {
     const session = controller.snapshot();
     if (!session)
@@ -1262,6 +1355,10 @@ let queue = Promise.resolve();
 self.onmessage = (event: MessageEvent<unknown>) => {
   const raw = event.data;
   const parsed = RequestSchema.safeParse(raw);
+  if (parsed.success && parsed.data.type === "STOP_ADVANCE") {
+    stopAdvanceFor = parsed.data.targetRequestId;
+    return;
+  }
   if (parsed.success && parsed.data.type === "CANCEL_ANALYTICS") {
     if (activeAnalyticsRebuild?.requestId === parsed.data.targetRequestId && activeAnalyticsRebuild.revision === parsed.data.expectedRevision) activeAnalyticsRebuild.cancelled = true;
     return;

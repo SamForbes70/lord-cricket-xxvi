@@ -31,6 +31,7 @@ import { createRoot } from "react-dom/client";
 import {
   PINS,
   UI_VERSION,
+  ADVANCE_WITH_CAPTAINS_VERSION,
   type Action,
   type Catalog,
   type Selection,
@@ -212,15 +213,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const passage = useRef<Passage | null>(null);
   const [finishReport, setFinishReport] = useState("");
   const [playingPassage, setPlayingPassage] = useState(false);
-  // "Finish over" plays one delivery per command so that the computer captain (and any delegated choice) can act
-  // between balls, as it does during a passage. One ADVANCE { scope: "OVER" } bowled the rest of the over on the
-  // plans in force, so a batter who took strike mid-over kept an older plan (docs/pavilion/FINISH_OVER_PER_BALL.md).
-  const overRun = useRef<{ saveId: string | null; inningsIndex: number; over: number; steps: number } | null>(null);
-  const [finishingOver, setFinishingOver] = useState(false);
-  function endOverRun() {
-    overRun.current = null;
-    setFinishingOver(false);
-  }
+  // Directive 03 (docs/pavilion/UNIFIED_ADVANCE.md): every way of moving the match on is one ADVANCE_WITH_CAPTAINS
+  // request, in which the worker asks the computer captain (and any delegated choice) before every ball and after the
+  // last. The request in flight, so that "Stop simulation" and a held panel click can stop it before its next ball.
+  const advanceInFlight = useRef<{ requestId: string; finishOver: boolean; stampSuffix: string } | null>(null);
   // While the computer side takes its automatic step, the captain's panel stays usable: a click there is held and
   // applied once the step returns, against the view it produces (run 44839086294 lost a plan click that landed on
   // buttons disabled for that step). Only the latest click is kept.
@@ -294,9 +290,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     [fatal, setFatal] = useState(false),
     [error, setError] = useState("");
   useEffect(() => {
-    offlineUpdateCoordinator.setBusySource("match", busy || batchState !== "idle" || finishingOver);
+    offlineUpdateCoordinator.setBusySource("match", busy || batchState !== "idle");
     return () => offlineUpdateCoordinator.setBusySource("match", false);
-  }, [busy, batchState, finishingOver]);
+  }, [busy, batchState]);
   const [verification, setVerification] = useState<Verification | null>(null);
   const rebuildRequest = useRef<string | null>(null);
   const [analyticsRebuild, setAnalyticsRebuild] = useState<{ state: "IDLE" | "RUNNING" | "STOPPING" | "COMPLETE" | "CANCELLED"; applied: number; total: number }>({ state: "IDLE", applied: 0, total: 0 });
@@ -413,7 +409,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       audioBootSyncRef.current = false;
       audioManagerRef.current?.unlockFromUserGesture();
     }
-    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); endOverRun(); setPaceOverride(null); heldPanelClick.current = null; }
+    if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); heldPanelClick.current = null; }
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -474,6 +470,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       repliesReceived.current += 1;
       const wasAiStep = aiStepRequest.current === r.requestId;
       if (wasAiStep) { aiStepRequest.current = null; setAiStepping(false); }
+      const advanced = advanceInFlight.current?.requestId === r.requestId ? advanceInFlight.current : null;
+      if (advanced) {
+        advanceInFlight.current = null;
+        // The worker asked every computer seat at this revision and none had anything left to do, so the page's own
+        // AI_STEP for this view would only repeat that question.
+        if (r.advance && r.advance.settledRevision === r.revision)
+          for (const key of r.advance.seats) lastAiChecked.current[key] = `${r.revision}:${advanced.stampSuffix}`;
+      }
       currentRevision.current = r.revision;
       serial.current = Math.max(serial.current, 10000 + r.revision, r.commandIdFloor ?? 0);
       if (r.careerFixture && !careerLaunch.current) {
@@ -513,8 +517,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         } else if (continueBatch) {
           const requestId = `ui-${++serial.current}`;
           inflight.current = requestId;
-          w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
-            command: { kind: "ADVANCE", payload: { scope: batch.scope === "KEY" ? "DELIVERY" : "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
+          postAdvance(w, requestId, r.revision, batch.scope === "KEY" ? "DELIVERY" : "OVER");
         } else {
           if (!r.error && !acknowledged) batchError = "Simulation stopped because the last command was not acknowledged.";
           else if (!r.error && batch.remaining <= 0) batchError = "Simulation stopped at its command limit.";
@@ -536,8 +539,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           setBatchState("running");
           const requestId = `ui-${++serial.current}`;
           inflight.current = requestId;
-          w.postMessage({ version: UI_VERSION, type: "COMMAND", requestId, expectedRevision: r.revision, origin: "HUMAN",
-            command: { kind: "ADVANCE", payload: { scope: resume.scope === "KEY" ? "DELIVERY" : "OVER" }, commandId: requestId, expectedRevision: r.revision, actorId: "SYSTEM" } });
+          postAdvance(w, requestId, r.revision, resume.scope === "KEY" ? "DELIVERY" : "OVER");
         } else if (r.view.decisionTeamId !== routineContext.current.aiTeamId) resumeAfterAi.current = null;
       }
       if (!stoppedByPlayer && !advanceBatch.current && !inflight.current && r.view && !r.error && !r.persistence?.readOnly) {
@@ -830,6 +832,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   // The worker reply handler is created once, so it reads the current routine-pick context through a ref.
   const routineContext = useRef({ on: routinePicks, captainedTeam, aiTeamId, scenario: Boolean(scenario), delegation });
   routineContext.current = { on: routinePicks, captainedTeam, aiTeamId, scenario: Boolean(scenario), delegation };
+  // What an advance sends the worker for the computer seats: the same settings the AI_STEP effect sends.
+  const captainContext = useRef({ aiTeamId, matchAware, highlights, delegationChanges: delegation.changes.length });
+  captainContext.current = { aiTeamId, matchAware, highlights, delegationChanges: delegation.changes.length };
   function routinePickFor(v: View): { decision: "BATTER" | "BOWLER"; playerId: string; name: string } | null {
     const ctx = routineContext.current;
     if (!ctx.on || !routineArmed.current || ctx.scenario || v.format === "RED_BALL") return null;
@@ -876,41 +881,25 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       endPassage(passageReport(active, view));
     }
   }, [view, captainedTeam, rivalTeam, busy, error, fatal, persistence, aiTeamId]);
-  // "Finish over": the next delivery is sent only once the computer's step for the drawn view has been sent and
-  // answered (the effect above runs first and marks the request in flight), so its plans apply to every ball.
-  useEffect(() => {
-    const run = overRun.current;
-    if (!run || !view || busy || inflight.current || repliesDrawn.current !== repliesReceived.current) return;
-    if (passage.current || heldPanelClick.current) { endOverRun(); return; }
-    if (dueAiStep()) return;
-    const innings = view.innings[view.activeIndex]?.innings;
-    const sameOver = Boolean(innings) && view.activeIndex === run.inningsIndex && Math.floor(innings!.legalBalls / 6) === run.over;
-    if (error || fatal || persistence?.readOnly || persistence?.saveId !== run.saveId || view.phase === "COMPLETE" || !sameOver ||
-        view.advanceReason || run.steps >= 40) {
-      endOverRun();
-      return;
-    }
-    if (view.phase === "READY") {
-      run.steps += 1;
-      act({ kind: "ADVANCE", payload: { scope: "DELIVERY" } });
-      return;
-    }
-    // A new batter mid-over: carry on after the computer's own pick, stop for the player's (as the engine's over did).
-    if (!aiTeamId || view.decisionTeamId !== aiTeamId) endOverRun();
-  }, [view, busy, aiTeamId, delegation, error, fatal, persistence, matchAware, highlights]);
+  // "Finish over" is one request: the worker bowls the rest of the over a ball at a time and asks the computer seats
+  // before every ball, as every other advance now does (docs/pavilion/UNIFIED_ADVANCE.md). It stops earlier at a
+  // decision that is the player's, at the end of the innings, or when a held panel click asks it to stop.
   function finishOver() {
     if (!view || inflight.current || fatal || view.advanceReason || view.phase !== "READY") return;
-    const innings = view.innings[view.activeIndex]?.innings;
-    if (!innings) return;
-    // With no computer side and nothing delegated there is no one to ask between balls, and one command plays the
-    // same balls (draws are keyed by attempt ordinal), so keep the single-command over: it is about six times fewer
-    // saved commands, which a five-day match played over by over needs (Windows Firefox CI run 45890451039).
-    const computerActs = Boolean(aiTeamId && view.teams.some(team => team.id === aiTeamId)) ||
-      view.teams.some(team => delegationForTeam(delegation, team.id).length > 0);
-    if (!computerActs) { act({ kind: "ADVANCE", payload: { scope: "OVER" } }); return; }
-    overRun.current = { saveId: persistence?.saveId ?? null, inningsIndex: view.activeIndex, over: Math.floor(innings.legalBalls / 6), steps: 1 };
-    setFinishingOver(true);
-    act({ kind: "ADVANCE", payload: { scope: "DELIVERY" } });
+    act({ kind: "ADVANCE", payload: { scope: "OVER" } }, false, true);
+  }
+  /** Asks the advance in flight to stop before its next ball. The worker handles this at once, outside its queue. */
+  function stopAdvanceInFlight() {
+    const running = advanceInFlight.current;
+    if (!running) return;
+    worker.current?.postMessage({ version: UI_VERSION, type: "STOP_ADVANCE", requestId: auxId(), expectedRevision: currentRevision.current, targetRequestId: running.requestId });
+  }
+  /** Sends one ADVANCE_WITH_CAPTAINS with the current tactical captain and its settings, exactly as AI_STEP sends them. */
+  function postAdvance(w: Worker | null, requestId: string, revision: number, scope: "DELIVERY" | "OVER", fromFinishOver = false) {
+    const ctx = captainContext.current;
+    advanceInFlight.current = { requestId, finishOver: fromFinishOver, stampSuffix: `${ctx.delegationChanges}:${ctx.matchAware}:${ctx.highlights}` };
+    w?.postMessage({ version: UI_VERSION, type: "ADVANCE_WITH_CAPTAINS", requestId, expectedRevision: revision, advanceVersion: ADVANCE_WITH_CAPTAINS_VERSION,
+      scope, aiTeamId: ctx.aiTeamId || null, matchAware: ctx.matchAware, clubStyle: ctx.highlights });
   }
   // Stage 14: the tactical captain makes its side's super-over choices.
   const lastSuperOverAi = useRef("");
@@ -970,7 +959,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     const archive = new Uint8Array(await file.arrayBuffer());
     send({ type: "IMPORT_SAVE", archive });
   }
-  function act(action: Action, continuingPassage = false) {
+  function act(action: Action, continuingPassage = false, fromFinishOver = false) {
     if (!view || inflight.current || fatal) return;
     // Own-side controls: never send a plan or field command for the side the computer captain runs. Input layer only;
     // the worker still accepts such commands already in a saved match, so old saves and replays reproduce unchanged.
@@ -995,6 +984,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     setBusy(true);
     setError("");
     setVerification(null);
+    // Every advance goes through the worker's one path, which asks the computer seats before each ball.
+    if (action.kind === "ADVANCE") {
+      postAdvance(worker.current, requestId, view.revision, action.payload.scope, fromFinishOver);
+      return;
+    }
     worker.current?.postMessage({
       version: UI_VERSION,
       type: "COMMAND",
@@ -1005,7 +999,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         ...action,
         commandId: requestId,
         expectedRevision: view.revision,
-        actorId: action.kind === "ADVANCE" || action.kind === "ADD_RAIN_DELAY" ? "SYSTEM" : `USER:${team}`,
+        actorId: action.kind === "ADD_RAIN_DELAY" ? "SYSTEM" : `USER:${team}`,
       },
     });
   }
@@ -1043,6 +1037,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     return inflight.current !== null || repliesDrawn.current !== repliesReceived.current;
   }
 
+  /** Keeps a panel click for the next drawn view. A "Finish over" in flight stops before its next ball, as it did when
+   * the page sent one ball at a time, so the click applies from the next ball rather than the next over. */
+  function holdPanelClick(click: NonNullable<typeof heldPanelClick.current>) {
+    heldPanelClick.current = click;
+    if (advanceInFlight.current?.finishOver) stopAdvanceInFlight();
+  }
   function replayScenario() {
     if (scenario) send({ type: "SCENARIO_START", scenarioId: scenario.scenarioId });
   }
@@ -1064,6 +1064,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     resumeAfterAi.current = null;
     setCancelSignal(current => current + 1);
     if (!advanceBatch.current) return;
+    stopAdvanceInFlight();
     advanceBatch.current.cancel = true;
     setBatchState("stopping");
   }
@@ -1220,11 +1221,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
             playing={playingPassage}
             report={finishReport}
             stop={stopPassage}
-            replay={scenario ? () => (panelMustWait() ? (heldPanelClick.current = { kind: "replay" }) : replayScenario()) : undefined}
+            replay={scenario ? () => (panelMustWait() ? holdPanelClick({ kind: "replay" }) : replayScenario()) : undefined}
             command={(action: Action, label: string) =>
-              panelMustWait() ? (heldPanelClick.current = { kind: "plan", action, label }) : startPassage(action, label)
+              panelMustWait() ? holdPanelClick({ kind: "plan", action, label }) : startPassage(action, label)
             }
-            select={(action: Action) => (panelMustWait() ? (heldPanelClick.current = { kind: "select", action }) : act(action))}
+            select={(action: Action) => (panelMustWait() ? holdPanelClick({ kind: "select", action }) : act(action))}
           />
           <a
             href="#decision"
@@ -1517,7 +1518,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           <section
             className="decision"
             id="decision"
-            aria-busy={busy || aiStepPending || finishingOver}
+            aria-busy={busy || aiStepPending}
             data-phase={view.phase}
             data-revision={view.revision}
           >
@@ -1529,13 +1530,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                 </h2>
               </div>
               <span role="status" className="working">
-                {batchState === "stopping" ? "Stopping after this commit…" : busy || aiStepPending || finishingOver ? "Applying…" : "Up to date"}
+                {batchState === "stopping" ? "Stopping after this commit…" : busy || aiStepPending ? "Applying…" : "Up to date"}
               </span>
             </div>
             {batchState !== "idle" && <button type="button" disabled={batchState === "stopping"} onClick={stopAdvance}>Stop simulation</button>}
             {keyMoment && !batchState.startsWith("run") && <p role="status" className="key-moment" data-testid="key-moment">Key moment: {keyMoment}</p>}
             {batchProgress && !(view.phase === "COMPLETE" && view.resultText) && <p role="status">Saved match events {batchProgress.from} to {batchProgress.to}.</p>}
-            <fieldset disabled={busy || aiStepPending || finishingOver || fatal || persistence?.readOnly}>
+            <fieldset disabled={busy || aiStepPending || fatal || persistence?.readOnly}>
               <legend className="sr-only">Match decisions</legend>
               {view.phase === "TOSS" && (
                 <div className="actions">

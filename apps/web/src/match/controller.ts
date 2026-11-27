@@ -524,6 +524,10 @@ export function createMatchController(
       })),
     );
   }
+  /** The live session without a copy, for read-only callers (the worker's advance loop). Never mutate it. */
+  function peek(): Readonly<T20Session> | null {
+    return session;
+  }
   function snapshot(): T20Session | null {
     return session ? structuredClone(session) : null;
   }
@@ -548,6 +552,7 @@ export function createMatchController(
     restore,
     setWorldCopy,
     snapshot,
+    peek,
     /** The career launch this controller is currently bound to, if any. */
     boundFixture: () => careerFixture,
     currentResponse,

@@ -418,6 +418,10 @@ export function createRed5MatchController(
       })),
     );
   }
+  /** The live session without a copy, for read-only callers (the worker's advance loop). Never mutate it. */
+  function peek(): Readonly<Red5Session> | null {
+    return session;
+  }
   function snapshot(): Red5Session | null {
     return session ? structuredClone(session) : null;
   }
@@ -440,6 +444,7 @@ export function createRed5MatchController(
     restore,
     setWorldCopy,
     snapshot,
+    peek,
     currentResponse,
     handle(raw: unknown): Response {
       let id = "invalid",
