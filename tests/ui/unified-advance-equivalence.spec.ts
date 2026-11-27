@@ -32,6 +32,9 @@ async function playScenario(page: Page, button: "Finish match" | "Next delivery"
   await page.getByRole("button", { name: "Play Hold the line" }).click();
   await expect(page.getByTestId("scenario-banner")).toBeVisible({ timeout: 60_000 });
   const decision = page.locator("#decision");
+  // A second play replaces the finished first one: wait for the new match at its checkpoint.
+  await expect(decision).not.toHaveAttribute("data-phase", "COMPLETE", { timeout: 60_000 });
+  await expect(page.getByTestId("scenario-outcome")).toHaveCount(0);
   await expect(page.locator("#ai-opponent-select")).toHaveValue("team-06");
   let presses = 0;
   for (let steps = 0; (await decision.getAttribute("data-phase")) !== "COMPLETE"; steps += 1) {
