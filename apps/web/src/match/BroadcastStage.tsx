@@ -10,7 +10,16 @@ import "./match-broadcast.css";
  * is off under reduced motion. Presentation only: it reads the committed field presentation and changes nothing.
  * Names appear inside a sentence, never alone, so lookups by a player's exact name still find a single element.
  */
-export function BroadcastStage({ view }: { view: View }) {
+export function stageShows(view: View): boolean {
+  const cue = view.fieldPresentation?.latestHighlight;
+  return Boolean(cue && cue.inningsIndex === view.activeIndex);
+}
+
+/**
+ * CP04: `quiet` while a batched advance runs (Finish innings, Finish match, Next key moment). The stage still shows
+ * the latest ball, but its flash and lift are not replayed for every over the batch passes through.
+ */
+export function BroadcastStage({ view, quiet = false }: { view: View; quiet?: boolean }) {
   const presentation = view.fieldPresentation;
   const cue = presentation?.latestHighlight;
   if (!presentation || !cue || cue.inningsIndex !== view.activeIndex) return null;
@@ -20,7 +29,7 @@ export function BroadcastStage({ view }: { view: View }) {
   // CP03: a thin divider where one over ends and the next begins, read from each ball's own over label.
   const overOf = (label: string) => label.split(".")[0];
   return (
-    <section className="broadcast-stage" aria-label="This ball" data-moment={call.kind} data-testid="broadcast-stage">
+    <section className="broadcast-stage" aria-label="This ball" data-moment={call.kind} data-quiet={quiet ? "true" : undefined} data-testid="broadcast-stage">
       <div className="stage-glow" key={`glow-${cue.sequence}`} aria-hidden="true" />
       <div className="stage-call" key={cue.sequence} data-kind={call.kind}>
         <span className="stage-over">{stageOverText(cue.overBallLabel, legal, true)}</span>

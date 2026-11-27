@@ -14,6 +14,7 @@ import type { Action } from "./protocol.js";
 import { OPPOSITION_CAPTAIN_NOTE } from "./side-control.js";
 import { ballCall } from "./ball-call.js";
 import { layoutField, type LayoutMarker } from "./field-label-layout.js";
+import { plainBallText } from "./broadcast-labels.js";
 
 export type CommittedSequenceWindow = {
   readonly token: number;
@@ -548,7 +549,13 @@ export function LiveFieldPanel({
           <p className="live-field-legend">
             <strong>Striker:</strong> {presentation.strikerName ?? "none"} ({""}
             {presentation.strikerHand}HB) · <strong>Non-striker:</strong>{" "}
-            {presentation.nonStrikerName ?? "none"} · <strong>Bowler:</strong>{" "}
+            {presentation.nonStrikerName ?? "none"} ·{" "}
+            <strong>
+              {/* CP04: between overs this is the bowler of the next ball, not of the ball just shown. */}
+              {presentation.bowlerId && presentation.latestHighlight && presentation.latestHighlight.bowlerId !== presentation.bowlerId
+                ? "Bowling next:"
+                : "Bowler:"}
+            </strong>{" "}
             {presentation.bowlerName ?? "none"} · <strong>Keeper:</strong>{" "}
             {presentation.keeperName ?? "none"}
           </p>
@@ -570,7 +577,12 @@ export function LiveFieldPanel({
                 <p className="highlight-headline" data-testid="highlight-headline">
                   <strong>{activeCue.headline}</strong>
                 </p>
-                <p data-testid="highlight-detail">{activeCue.detailText}</p>
+                {/* CP04: plain cricket words first; the tracking record (sectors) sits behind a disclosure. */}
+                <p className="highlight-plain" data-testid="highlight-plain">{plainBallText(activeCue)}</p>
+                <details className="highlight-tracking">
+                  <summary>Tracking detail</summary>
+                  <p data-testid="highlight-detail">{activeCue.detailText}</p>
+                </details>
                 {activeCue.sectorStatus === "PITCH_CHANNEL_ONLY" && (
                   <p
                     className="highlight-fallback-note"
@@ -840,3 +852,4 @@ export function LiveFieldPanel({
     </section>
   );
 }
+

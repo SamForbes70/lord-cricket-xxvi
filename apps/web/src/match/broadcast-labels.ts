@@ -27,3 +27,12 @@ export function stageOverText(overBallLabel: string, inningsLegalBalls: number |
   const ended = isLatestOfInnings && inningsLegalBalls !== null && inningsLegalBalls > 0 && inningsLegalBalls % 6 === 0;
   return ended ? `Over ${overBallLabel} · end of over` : `Over ${overBallLabel}`;
 }
+
+/** CP04: the delivery in plain cricket words, from the cue's recorded length and trajectory only. */
+export function plainBallText(cue: { overBallLabel: string; executedLength: string | null; trajectory: string | null }): string {
+  const length: Record<string, string> = { YORKER: "A yorker", FULL: "Full", GOOD: "Good length", SHORT: "Short", FULL_TOSS: "A full toss" };
+  const path: Record<string, string> = { GROUND: "played along the ground", AERIAL: "hit in the air", EDGE: "off the edge" };
+  const first = cue.executedLength ? (length[cue.executedLength] ?? "Length not recorded") : "Length not recorded";
+  const second = cue.trajectory ? path[cue.trajectory] : null;
+  return `Ball ${cue.overBallLabel}: ${first}${second ? `, ${second}` : ""}.`;
+}

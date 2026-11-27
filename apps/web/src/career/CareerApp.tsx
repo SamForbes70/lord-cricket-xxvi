@@ -1,4 +1,5 @@
 import { formatGameDate } from "./format.js";
+import { readMomentsPreference, writeMomentsPreference, type MomentsPreference } from "../match/match-moments.js";
 import { AboutDetails } from "../AboutDetails.js";
 import { TeamCrest } from "../world/TeamCrest.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -264,6 +265,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     const saved = localStorage.getItem("lcxxvi-highlight-motion");
     return saved === "AUTO" || saved === "REDUCED" ? saved : "AUTO";
   });
+  const [matchMoments, setMatchMoments] = useState<MomentsPreference>(() => readMomentsPreference());
+  useEffect(() => writeMomentsPreference(matchMoments), [matchMoments]);
   const [matchCommentary, setMatchCommentary] = useState(() => {
     const saved = localStorage.getItem("lcxxvi-match-commentary");
     if (saved === "standard") return "full";
@@ -1685,6 +1688,21 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               >
                 <option value="AUTO">System default</option>
                 <option value="REDUCED">Reduced motion</option>
+              </select>
+            </label>
+            <label>
+              Match moments
+              <select
+                aria-label="Match moments"
+                value={matchMoments}
+                onChange={(event) => {
+                  const value = event.currentTarget.value;
+                  setMatchMoments(value === "brief" || value === "off" ? value : "full");
+                }}
+              >
+                <option value="full">Full</option>
+                <option value="brief">Brief</option>
+                <option value="off">Off</option>
               </select>
             </label>
             <label>

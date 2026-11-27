@@ -61,7 +61,11 @@ import "@fontsource/barlow-condensed/latin-700.css";
 import "./floodlit.css";
 import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
-import { BroadcastStage } from "./match/BroadcastStage.js";
+import { BroadcastStage, stageShows } from "./match/BroadcastStage.js";
+import { MatchMomentBanner, type ShownMoment } from "./match/MatchMomentBanner.js";
+import { continuesFrom, momentBaseline, readMomentsPreference, settleMoment, writeMomentsPreference, type MomentBaseline, type MomentsPreference } from "./match/match-moments.js";
+import { batterStatusText } from "./match/dismissal-text.js";
+import { playerOfTheMatch, resultFacts, topPerformances, turningPointLines } from "./match/result-card.js";
 import { advanceEffectText, bowlerCardLabel } from "./match/broadcast-labels.js";
 import { GuidedCoach } from "./match/GuidedCoach.js";
 import { CrowdAmbience } from "./ui-sound.js";
@@ -130,43 +134,85 @@ function keySnapshot(v: View): KeyMomentSnapshot | null {
 }
 
 /**
- * Pavilion B3: the result as a moment. At full time the decision panel shows the result, both scores, the player of
- * the match and what to do next, in place of five disabled advance buttons. Reads the view only.
+ * Pavilion B3, extended in CP11 (CD-024): the result card. At full time the decision panel shows who won and how, both
+ * scores with crests, the player of the match (the game's existing award) with their portrait, the best batting and
+ * bowling of each innings, the turning points the post-match analysis already found, and what to do next. A defeat
+ * is explained by its margin and turning points, never judged. Reads the view only.
  */
-function ResultMoment({ view, superOverPending, hasOwnExit, onNewMatch }: {
+function ResultMoment({ view, superOverPending, hasOwnExit, onNewMatch, focusTeamId, onContinue }: {
   view: View;
   superOverPending: boolean;
   hasOwnExit: boolean;
   onNewMatch: () => void;
+  /** The side the player captained, when there is one; the card then speaks from that side. */
+  focusTeamId: string | null;
+  /** Career matches: record the result and go back to the career. */
+  onContinue: (() => void) | null;
 }) {
   const teamName = (id: string) => view.teams.find((t) => t.id === id)?.name ?? id;
-  const award = view.matchAward;
-  const winner = award?.status === "AWARDED" && award.winnerPlayerId ? award.winnerPlayerId : null;
-  const winnerLine = winner ? award?.candidates.find((c) => c.playerId === winner)?.summaryLine : undefined;
+  const colours = (id: string) => view.teams.find((t) => t.id === id)?.colours ?? [];
+  const potm = playerOfTheMatch(view);
+  const facts = resultFacts(view, focusTeamId);
+  const top = topPerformances(view);
+  const turns = turningPointLines(view);
   const tournament = view.matchId?.startsWith("tour-m");
+  const outcomeLabel = facts.outcome === "WON" ? "Victory" : facts.outcome === "LOST" ? "Defeat" : facts.outcome === "TIED" ? "Tied" : facts.outcome === "NO_RESULT" ? "No result" : null;
   return (
-    <div className="result-moment" data-testid="result-moment">
+    <div className="result-moment result-card" data-testid="result-moment" data-outcome={facts.outcome ?? facts.kind}>
+      {outcomeLabel && <p className="result-outcome" data-testid="result-outcome">{outcomeLabel} for {teamName(focusTeamId ?? "")}</p>}
       <ul className="result-scores" aria-label="Final scores">
         {view.innings.map((ledger, n) => (
-          <li key={n}>
+          <li key={n} data-winner={facts.winnerTeamId === ledger.innings.battingTeamId ? "true" : undefined}>
+            <TeamCrest teamId={ledger.innings.battingTeamId} name={teamName(ledger.innings.battingTeamId)} colours={colours(ledger.innings.battingTeamId)} size={28} decorative />
             <strong>{teamName(ledger.innings.battingTeamId)}</strong>{" "}
-            {ledger.innings.runs}
-            {ledger.innings.wickets < 10 ? `/${ledger.innings.wickets}` : " all out"}{" "}
+            <span className="result-score-runs">{ledger.innings.runs}
+            {ledger.innings.wickets < 10 ? `/${ledger.innings.wickets}` : " all out"}</span>{" "}
             <span>({overs(ledger.innings.legalBalls)} overs)</span>
           </li>
         ))}
       </ul>
-      {winner && (
-        <p className="result-award" data-testid="result-player-of-match">
-          Player of the match: <strong>{view.names[winner] ?? winner}</strong>
-          {award?.winnerTeamId ? ` (${teamName(award.winnerTeamId)})` : ""}
-          {winnerLine ? `. ${winnerLine}` : ""}
-        </p>
+      {facts.marginNote && <p className="result-margin" data-testid="result-margin">{facts.marginNote}</p>}
+      {potm && (
+        <div className="result-award" data-testid="result-player-of-match">
+          <PlayerPortrait playerId={potm.playerId} role={activeRole(view, potm.playerId)} kit={activeKit(view, potm.playerId)} size={56} />
+          <p>
+            <span className="result-label">Player of the match</span>{" "}
+            <strong>{view.names[potm.playerId] ?? potm.playerId}</strong>
+            {potm.teamId ? ` (${teamName(potm.teamId)})` : ""}
+            {potm.line ? `. ${potm.line}` : ""}
+            <small className="result-rule"> Game award: the game's own points rule, explained under the result below.</small>
+          </p>
+        </div>
+      )}
+      {(top.batting.length > 0 || top.bowling.length > 0) && (
+        <dl className="result-tops" data-testid="result-top-performances">
+          {([["Top batting", top.batting], ["Top bowling", top.bowling]] as const).map(([label, list]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>
+                {list.map((p) => (
+                  <span key={p.playerId}>
+                    <TeamCrest teamId={p.teamId} name={teamName(p.teamId)} colours={colours(p.teamId)} size={18} decorative /> {p.text}
+                    <span className="sr-only"> ({teamName(p.teamId)})</span>
+                  </span>
+                ))}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {turns.length > 0 && (
+        <div className="result-turns" data-testid="result-turning-points">
+          <span className="result-label">Where it turned</span>
+          <ul>{turns.map((text) => <li key={text}>{text}</li>)}</ul>
+        </div>
       )}
       {superOverPending && <p className="result-note">The scores are level: a super over decides it, below.</p>}
+      {onContinue && <p className="result-next">Continue records the result in your career, where the table and your next fixture are waiting.</p>}
       <div className="actions result-actions">
-        {/* Career and tournament matches keep their own "return" control in the banner above. */}
-        <button type="button" className="primary" onClick={() => jumpToDugout("scorecard")}>Scorecard and match report</button>
+        {onContinue && <button type="button" className="primary" data-testid="result-continue" onClick={onContinue}>Continue to career</button>}
+        {/* Career and tournament matches also keep their own "return" control in the banner above. */}
+        <button type="button" className={onContinue ? undefined : "primary"} onClick={() => jumpToDugout("scorecard")}>Scorecard and match report</button>
         {!hasOwnExit && !tournament && (
           <>
             <button type="button" onClick={onNewMatch}>New match</button>
@@ -333,6 +379,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       const saved = localStorage.getItem("lcxxvi-highlight-motion");
       return saved === "REDUCED" ? "REDUCED" : "AUTO";
     }),
+    [momentsPref, setMomentsPref] = useState<MomentsPreference>(() => readMomentsPreference()),
     [committedWindow, setCommittedWindow] = useState<CommittedSequenceWindow | null>(null),
     [cancelSignal, setCancelSignal] = useState(0);
   const [audioPrefs, setAudioPrefs] = useState<AudioPreferences>(() => loadStoredAudioPreferences());
@@ -355,6 +402,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     localStorage.setItem("lcxxvi-highlight-pacing", highlightPacing);
     localStorage.setItem("lcxxvi-highlight-motion", highlightMotion);
   }, [scale, commentary, density, briefingsPref, highlightPacing, highlightMotion]);
+  useEffect(() => writeMomentsPreference(momentsPref), [momentsPref]);
   useEffect(() => {
     const manager = audioManagerRef.current;
     if (!manager) return;
@@ -788,6 +836,25 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     setPaceOverride(saved === "highlights" ? true : saved === "manual" ? false : null);
   }, [persistence?.saveId]);
   const highlights = paceOverride ?? (!!scenario && isCloseFinish(scenario.scenarioId));
+  // CP04: match moments. A batched advance (Finish innings, Finish match, Next key moment) keeps the baseline from
+  // its start and settles once when it ends, so at most one moment (the batch's most significant) is shown and no
+  // backlog is replayed. A single reply (Next delivery, Finish over) settles at once. See match-moments.ts.
+  const momentBatching = batchState !== "idle" || resumeAfterAi.current !== null;
+  const momentBase = useRef<MomentBaseline | null>(null);
+  const momentToken = useRef(0);
+  const [shownMoment, setShownMoment] = useState<ShownMoment | null>(null);
+  useEffect(() => {
+    if (!view) { momentBase.current = null; setShownMoment(null); return; }
+    const base = momentBase.current;
+    if (!base || !continuesFrom(base, view)) { momentBase.current = momentBaseline(view); setShownMoment(null); return; }
+    if (momentBatching || view.revision === base.revision) return;
+    const settled = settleMoment(base, view);
+    momentBase.current = momentBaseline(view);
+    if (settled.moment && momentsPref !== "off") setShownMoment({ moment: settled.moment, summary: settled.summary, token: ++momentToken.current });
+    // A ball bowled since makes the moment on screen out of date: it goes, so nothing stale lingers over the play.
+    else if ((view.fieldPresentation?.latestHighlight?.sequence ?? 0) > base.lastSequence) setShownMoment(null);
+  }, [view, momentBatching, momentsPref]);
+  useEffect(() => { if (momentsPref === "off" || momentBatching) setShownMoment(null); }, [momentsPref, momentBatching]);
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.
   // Apply a captain's-panel click held during the computer side's step, before that side is asked to act again.
@@ -1088,6 +1155,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   const ledger = view?.innings[view.activeIndex],
     i = ledger?.innings;
   const tn = (id: string) => view?.teams.find((t) => t.id === id)?.name ?? id;
+  /** Records a finished career match and goes back to the career (the banner's button and the result card's Continue). */
+  function returnToCareer() {
+    const roster = careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER";
+    if (onReturnCareer) onReturnCareer(roster); else window.location.hash = roster ? "#roster-career" : "#career";
+  }
   const striker =
     i?.strikerEnd === "NORTH" ? i.northBatterId : i?.southBatterId;
   // E4: the situation in plain words, read from the board only.
@@ -1148,6 +1220,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           >
             <option value="comfortable">Comfortable</option>
             <option value="compact">Compact</option>
+          </select>
+        </label>
+        <label>
+          Match moments{" "}
+          <select
+            aria-label="Match moments"
+            value={momentsPref}
+            onChange={(e) => setMomentsPref(e.target.value === "brief" || e.target.value === "off" ? e.target.value : "full")}
+          >
+            <option value="full">Full</option>
+            <option value="brief">Brief</option>
+            <option value="off">Off</option>
           </select>
         </label>
         <label>
@@ -1323,7 +1407,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           <strong>Scheduled career match</strong>
           <span>Round {careerLaunch.current.roundNumber} · this result will return to the management career only after the match is complete.</span>
           {view?.phase === "COMPLETE" && (
-            <button className="primary" onClick={() => { const roster = careerLaunch.current?.launchVersion === "LC_CAREER_USER_MATCH_LAUNCH_V3_ROSTER"; if (onReturnCareer) onReturnCareer(roster); else window.location.hash = roster ? "#roster-career" : "#career"; }}>Return result to career</button>
+            <button className="primary" onClick={returnToCareer}>Return result to career</button>
           )}
         </div>
       )}
@@ -1459,7 +1543,19 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </details>
             );
           })()}
-          <BroadcastStage view={view} />
+          <div className="stage-slot" data-stage={stageShows(view) ? "true" : "false"}>
+            <BroadcastStage view={view} quiet={momentBatching} />
+            {shownMoment && momentsPref !== "off" && (
+              <MatchMomentBanner
+                key={shownMoment.token}
+                shown={shownMoment}
+                mode={momentsPref}
+                portrait={(id) => <PlayerPortrait playerId={id} role={activeRole(view, id)} kit={activeKit(view, id)} size={56} />}
+                crest={(id) => <TeamCrest teamId={id} name={tn(id)} colours={view.teams.find((t) => t.id === id)?.colours ?? []} size={56} decorative />}
+                onDone={() => setShownMoment(null)}
+              />
+            )}
+          </div>
           {highlights && pacePanel}
           <section
             className="active"
@@ -1763,6 +1859,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   superOverPending={Boolean(superOver && superOver.phase !== "COMPLETE")}
                   hasOwnExit={Boolean(careerLaunch.current) || Boolean(scenario)}
                   onNewMatch={() => send({ type: "BOOT", fresh: true })}
+                  focusTeamId={aiTeamId && captainedTeam ? captainedTeam : null}
+                  onContinue={careerLaunch.current ? returnToCareer : null}
                 />
               ) : (
               <div className="advance" data-testid="advance-controls">
@@ -2059,16 +2157,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         <tr key={id}>
                           <th>
                             {view.names[id]}
-                            <small>
-                              {b.dismissed
-                                ? "Out"
-                                : [
-                                      l.innings.northBatterId,
-                                      l.innings.southBatterId,
-                                    ].includes(id)
-                                  ? "Not out"
-                                  : "Did not bat"}
-                            </small>
+                            <small className="how-out" data-testid="how-out">{batterStatusText(id, l, view.names)}</small>
                           </th>
                           <td>{b.runs}</td>
                           <td>{b.ballsFaced}</td>
