@@ -11,9 +11,10 @@ import {
   projectMatchCommentary,
   bowlingStyleOf,
   playingStyle,
-  projectPostMatchAnalysis,
-  type PostMatchAnalysis,
+  projectPostMatchAnalysisV2,
+  type PostMatchAnalysisV2,
 } from "@lcxxvi/projections";
+import { T20_BATTING_POLICY_V3_ID, T20_TACTICAL_CAPTAIN_ID } from "@lcxxvi/ai";
 import {
   type T20Session,
   type RosterT20Session,
@@ -153,11 +154,11 @@ export function createMatchController(
   let cachedAssistant: InMatchTacticalAssistantView | null = null;
   let cachedFieldPresentation: LiveFieldPresentation | null = null;
   let cachedMatchAward: MatchAwardRecord | null = null;
-  let cachedAnalysis: { session: T20Session; world: typeof displayWorld; value: PostMatchAnalysis | null } | null = null;
-  /** LC_POST_MATCH_ANALYSIS_V1: read-only, from the completed session's own record. Never fails the view. */
-  function postMatchAnalysis(s: T20Session, scorecard: ReturnType<typeof projectT20Scorecard>, names: Record<string, string>): PostMatchAnalysis | null {
+  let cachedAnalysis: { session: T20Session; world: typeof displayWorld; value: PostMatchAnalysisV2 | null } | null = null;
+  /** LC_POST_MATCH_ANALYSIS_V2: read-only, from the completed session's own record. Never fails the view. */
+  function postMatchAnalysis(s: T20Session, scorecard: ReturnType<typeof projectT20Scorecard>, names: Record<string, string>): PostMatchAnalysisV2 | null {
     if (cachedAnalysis?.session === s && cachedAnalysis.world === displayWorld) return cachedAnalysis.value;
-    let value: PostMatchAnalysis | null = null;
+    let value: PostMatchAnalysisV2 | null = null;
     try {
       const suggestedXi: Record<string, string[]> = {};
       for (const t of s.setup.teams) {
@@ -168,7 +169,7 @@ export function createMatchController(
           try { suggestedXi[t.teamId] = suggestedEleven(players as NonNullable<(typeof players)[number]>[], "T20").playerIds; } catch { /* no keeper: nothing to compare */ }
         }
       }
-      value = projectPostMatchAnalysis({
+      value = projectPostMatchAnalysisV2({
         events: s.events,
         commands: s.commands,
         scorecard,
@@ -176,6 +177,9 @@ export function createMatchController(
         suggestedXi,
         names,
         teamNames: Object.fromEntries(s.setup.teams.map((t) => [t.teamId, displayWorld.teams.find((team) => team.teamId === t.teamId)?.name ?? t.teamId])),
+        // The match's own record: the model and rules pinned in its setup. The captain version is not recorded.
+        recordedVersions: { model: s.setup.versions.model, modelHash: s.setup.versions.modelHash, rules: s.setup.versions.rules },
+        buildCaptain: { captain: T20_TACTICAL_CAPTAIN_ID, battingPolicy: T20_BATTING_POLICY_V3_ID },
       });
     } catch {
       value = null;

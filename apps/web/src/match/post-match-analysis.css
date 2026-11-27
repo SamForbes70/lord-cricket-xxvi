@@ -36,6 +36,10 @@
 .pma-picks { margin: 0.6em 0; }
 .pma-picks summary, .pma-footnote summary { cursor: pointer; }
 .pma-footnote ul { margin: 0.4em 0; padding-left: 1.2em; }
+/* LC_POST_MATCH_ANALYSIS_V2: version identifiers are long; let them wrap at phone width. */
+.pma-versions { margin: 0.3em 0; padding-left: 1.2em; font-size: 0.9em; }
+.pma-versions li { margin: 0.25em 0; }
+.post-match-analysis code { display: inline; margin: 0; font-size: 0.9em; overflow-wrap: anywhere; }
 @media (max-width: 480px) {
   .post-match-analysis { padding: 0.75em; }
   .pma-phases { font-size: 0.85em; }

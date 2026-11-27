@@ -297,8 +297,9 @@ export type View = {
   tacticalAssistant?: InMatchTacticalAssistantView | null;
   fieldPresentation?: LiveFieldPresentation | null;
   matchAward?: MatchAwardRecord | null;
-  /** LC_POST_MATCH_ANALYSIS_V1, completed T20 matches only: derived from the event chain, commands and scorecard. Never saved. */
-  postMatchAnalysis?: import("@lcxxvi/projections").PostMatchAnalysis | null;
+  /** LC_POST_MATCH_ANALYSIS_V2, completed T20 matches only: derived from the event chain, commands, scorecard and the
+   * setup's recorded versions. Never saved. */
+  postMatchAnalysis?: import("@lcxxvi/projections").PostMatchAnalysisV2 | null;
   resultText: string | null;
   eventCount: number;
   lastEventHash: string;
