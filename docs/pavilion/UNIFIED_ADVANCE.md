@@ -103,7 +103,7 @@ Reading the table:
 - **"Finish match" against the computer is about the same to 50 per cent slower per ball** (T20 83 to 80, ODI 71 to 109, five-day 163 to 187 ms). Before, it saved one command per over and skipped the computer's steps between balls; it now saves one per ball plus the computer's commands, which is the price of asking the computer before every ball.
 - **Manual matches** take the same path as before (one engine command per over); the differences are within the run-to-run noise.
 
-The five-day manual match in `tests/ui/analytics-formats.spec.ts` (RED_BALL, 10-minute limit) is recorded in the validation table below.
+The five-day manual match in `tests/ui/analytics-formats.spec.ts` (RED_BALL, played over by over, 10-minute limit) took 3.0 minutes in Chromium and 4.8 minutes in Firefox locally on `d0c6d7e`. Hosted Windows Firefox passed it on the same head.
 
 ## What is not covered
 
@@ -123,4 +123,21 @@ The five-day manual match in `tests/ui/analytics-formats.spec.ts` (RED_BALL, 10-
 
 ## Validation
 
-Commands and results are recorded in the pull request description for the final head.
+All on `d0c6d7e` (this branch with `origin/main` at `808f594` merged), Linux container, Node 22, unless stated. Browser runs from a separate clean clone with `npm ci` and `npm run build`, served on port 4181 (`LCXXVI_PREVIEW_PORT=4181` and a local copy of `playwright.ui.config.ts` with that port, because another agent's run held 4180 on this machine).
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Build of packages | `NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b` | PASS (exit 0) |
+| Type check including tests | `npm run typecheck` | PASS (exit 0) |
+| Lint | `npm run lint` | PASS (exit 0) |
+| Inventory | `node scripts/check-pass07b-inventory.mjs` | PASS (exit 0) |
+| Unit suite | `npm run build`, then `npx vitest run --maxWorkers=2` | PASS: 136 files, 1169 tests (26.0 min) |
+| New unit tests, within that run | `tests/unit/unified-advance.test.ts`, `tests/unit/unified-advance-red-ball.test.ts` | PASS: 4 tests (116 s) and 1 test (145 s) |
+| Browser, Chromium | `LCXXVI_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npx playwright test --config <ui config, port 4181> <36 specs> --project=chromium --reporter=list --trace off` | PASS: 95 passed (38.8 min) |
+| Browser, Firefox | same, `--project=firefox` | PASS: 95 passed (49.1 min) |
+| New specs against the old page | the two new specs with `apps/web` from main `ba04017` | FAIL as expected (see Equivalence evidence) |
+| Hosted CI | `pass07a`, `windows-acceptance` (core, Chromium, Firefox), `windows-browser-acceptance`, run 45929623013 | PASS on `d0c6d7e` |
+
+The 36 browser specs are every file in `tests/ui` that presses Next delivery, Finish over, Next decision, Next key moment, Finish innings or Finish match, directly or through `computer-opponent-helpers.ts` or `post-match-helpers.ts`, plus `command-ack.spec.ts` and the new `unified-advance-equivalence.spec.ts`.
+
+An earlier full unit run at `be1ae60`, made while the Chromium browser suite ran on the same four cores, had one failure: `tests/unit/player-lifecycle-stage3.test.ts` timed out at 121.9 s against its 120 s limit, with one Vitest RPC timeout. That file does not touch match advancement. The run above, on the merged head, passed it.
