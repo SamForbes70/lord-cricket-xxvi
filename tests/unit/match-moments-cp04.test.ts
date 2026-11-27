@@ -92,7 +92,7 @@ describe("CP04 dismissal text (CD-017)", () => {
   });
   it("uses no en or em dashes", () => {
     for (const kind of ["BOWLED", "LBW", "CAUGHT", "RUN_OUT", "STUMPED", "HIT_WICKET"] as const)
-      expect(dismissalText({ kind, creditedBowlerId: "b1", fielderId: "b2" }, n)).not.toMatch(/[–—]/);
+      expect(dismissalText({ kind, creditedBowlerId: "b1", fielderId: "b2" }, n)).not.toMatch(/[\u2013\u2014]/);
   });
 });
 
@@ -197,7 +197,7 @@ describe("CP11 result card facts", () => {
     const facts = resultFacts(v, "A");
     expect(facts.outcome).toBe("LOST");
     expect(facts.marginNote).toBe("Moonstone Bay finished 3 runs short of the target.");
-    expect(facts.marginNote).not.toMatch(/[–—]/);
+    expect(facts.marginNote).not.toMatch(/[\u2013\u2014]/);
     const w = { ...base, scorecard: { result: { kind: "WIN", winnerTeamId: "A", marginType: "WICKETS", marginRuns: null, marginWickets: 1 } } } as unknown as View;
     expect(resultFacts(w, "A")).toMatchObject({ outcome: "WON", marginNote: "Moonstone Bay reached the target with 1 wicket in hand and 117 balls to spare." });
   });
