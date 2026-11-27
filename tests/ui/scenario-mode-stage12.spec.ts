@@ -37,8 +37,10 @@ test("Stage 12 scenario challenge starts at its checkpoint, plays to a result an
   await expect(banner).toBeVisible({ timeout: 60_000 });
   await expect(page.getByTestId("scenario-objective")).toHaveText("Objective: Score 23 from the last 24 balls with 5 wickets in hand.");
   await expect(banner).toContainText("Northlight Ridge are 68 for 5 after 16 overs");
-  // The player's opponent is the tactical captain.
+  // The player's opponent is the tactical captain, and the player cannot take it over.
   await expect(page.locator("#ai-opponent-select")).toHaveValue("team-06");
+  await expect(page.locator("#ai-opponent-select")).toBeDisabled();
+  await expect(page.getByTestId("ai-opponent-note")).toHaveText("In a scenario the opposition is always the computer captain.");
   await expect(page.locator("#decision")).not.toHaveAttribute("data-phase", "COMPLETE");
 
   await playToEnd(page);

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectCareerOpponentLocked, playOneAgainstComputer } from "./computer-opponent-helpers.js";
 
 test("a managed match stays authoritative while inspecting career screens", async ({ page }) => {
   await page.addInitScript(() => {
@@ -22,7 +23,7 @@ test("a managed match stays authoritative while inspecting career screens", asyn
   }
   await page.getByRole("button", { name: "Play match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
+  await expectCareerOpponentLocked(page);
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
   const revision = await page.locator("#decision").getAttribute("data-revision");
   const phase = await page.locator("#decision").getAttribute("data-phase");
@@ -58,16 +59,10 @@ test("a managed match stays authoritative while inspecting career screens", asyn
   await page.reload();
   await expect(page.locator("#decision")).toHaveAttribute("data-revision", revision!, { timeout: 60_000 });
   await expect(page.getByRole("alert")).toHaveCount(0);
-  await page.getByLabel("Tactical captain").selectOption("");
+  await expectCareerOpponentLocked(page);
   for (let steps = 0; await page.locator("#decision").getAttribute("data-phase") !== "COMPLETE"; steps++) {
     expect(steps).toBeLessThan(450);
-    const current = await page.locator("#decision").getAttribute("data-phase");
-    const target = current === "TOSS" ? page.getByRole("button", { name: "Call heads" })
-      : current === "AWAITING_INNINGS" ? page.getByRole("button", { name: "Bat first" })
-      : current === "AWAITING_BATTER" || current === "AWAITING_BOWLER" ? page.locator("button[data-candidate]:enabled").first()
-      : page.getByRole("button", { name: "Finish over", exact: true });
-    await target.click();
-    await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
+    await playOneAgainstComputer(page);
     await expect(page.getByRole("alert")).toHaveCount(0);
   }
   await page.getByRole("button", { name: "Return result to career" }).click();
@@ -87,7 +82,7 @@ test("an imported-roster match stays active while its career is inspected", asyn
   await expect(page.getByText("0/56 fixtures")).toBeVisible({ timeout: 30_000 });
   await page.getByRole("button", { name: "Play next managed match" }).click();
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
-  await page.getByLabel("Tactical captain").selectOption("");
+  await expectCareerOpponentLocked(page);
   await expect(page.locator("#decision")).toHaveAttribute("aria-busy", "false");
   const revision = await page.locator("#decision").getAttribute("data-revision");
   await page.getByRole("button", { name: "Inspect career" }).click();

@@ -922,7 +922,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     lastSuperOverAi.current = stamp;
     send({ type: "SUPER_OVER", action: { kind: "AI", teamId: aiTeamId } });
   }, [superOver, aiTeamId, busy, fatal, persistence?.readOnly]);
+  // Owner decision, 26 November 2026: in a career match (the player's league fixture) and in a scenario challenge, the
+  // other side is always the computer captain. The player cannot hand it to themselves or take both sides.
+  const opponentLocked = Boolean(careerLaunch.current?.managedTeamId) || Boolean(scenario);
   function changeAiOpponent(id: string) {
+    if (opponentLocked) return;
     const next = id || null;
     setAiTeamId(next);
     lastAiChecked.current = {};
@@ -2134,12 +2138,18 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
           {preferences}
           <section className="career-match-banner opponent-control" aria-label="Opponent captain control">
             <label htmlFor="ai-opponent-select"><strong>Tactical captain</strong></label>{" "}
-            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly)}
-              onChange={e => changeAiOpponent(e.target.value)}>
+            <select id="ai-opponent-select" value={aiTeamId ?? ""} disabled={busy || Boolean(persistence?.readOnly) || opponentLocked}
+              aria-describedby="ai-opponent-note" onChange={e => changeAiOpponent(e.target.value)}>
               <option value="">Manual decisions for both teams</option>
               {view.teams.map(t => <option key={t.id} value={t.id}>{t.name} controlled by AI</option>)}
             </select>
-            <span>The computer picks this team's batters, bowlers and tactics. You still play each ball.</span>
+            <span id="ai-opponent-note" data-testid="ai-opponent-note">
+              {opponentLocked
+                ? scenario
+                  ? "In a scenario the opposition is always the computer captain."
+                  : "In a career match the opposition is always the computer captain."
+                : "The computer picks this team's batters, bowlers and tactics. You still play each ball."}
+            </span>
           </section>
           {(() => {
             const selectedTeam = view.teams.find(team => team.id === delegationTeam) ?? view.teams[0]!;
