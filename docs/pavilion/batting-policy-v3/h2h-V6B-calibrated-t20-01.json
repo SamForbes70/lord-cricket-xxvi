@@ -1,0 +1,22 @@
+{
+  "version": "LC_PAVILION_BATTING_V3_H2H_V1",
+  "model": "calibrated-t20-01",
+  "candidate": "V6B",
+  "against": "V5",
+  "advance": "DELIVERY",
+  "matches": 200,
+  "candidateWins": 95,
+  "v5Wins": 97,
+  "tiesOrNoResult": 8,
+  "candidatePercentOfDecided": 49.5,
+  "candidatePercentOfDecided95": [
+    42.5,
+    56.5
+  ],
+  "meanRunDifferenceCandidateMinusV5": -0.4,
+  "meanRunDifference95": [
+    -5.1,
+    4.4
+  ],
+  "design": "100 frozen corpus seeds (repeat 0), suggested elevens, each twice: the candidate on one side and V5 on the other, then swapped; each step takes the batting side's captain"
+}
