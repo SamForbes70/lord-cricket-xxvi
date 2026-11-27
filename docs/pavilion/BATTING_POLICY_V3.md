@@ -34,13 +34,13 @@ As the C5 re-measure ([C5_REMEASURE_BALL_BY_BALL.md](stage-c/C5_REMEASURE_BALL_B
 - **Matches.** The frozen 100-seed corpus, suggested elevens, the same captain on both sides, repeats 0 to 19 (2,000 matches; repeat r > 0 appends `-c1r<r>` to the seed). The batch harness asks the captain before every ball (`tacticalT20Step`, `ADVANCE { scope: "DELIVERY" }`).
 - **Before.** The C5 re-measure's own files for `calibrated-t20-01` (`/home/user/lcx-data/c5rm/`, captain V5 at `5fc98e3`). A check: `c4-delivery-balls.ts ... 1 0 --captain=V5` on this branch reproduced the first 100 matches of `c5rm/g-0.json` column for column, and the paired summaries reproduce every c5rm death figure (9.73 runs an over, 9.89% wickets, 17.9% dots, 8.24 caught per 100 balls). For `synthetic-alpha-01` the C5 re-measure has no V5 ball-by-ball files, so V5 and V6 were both run on this branch (`--captain=V5` and `--captain=V6`).
 - **Scripts.** `scripts/stage-c/c1-game-balls.ts` (for the gates) and `scripts/stage-c/c4-delivery-balls.ts` (death figures) take a new `--captain=V4|V5|V6|V6B` option; the default is the current captain. `scripts/pavilion-tactical-validation.ts` takes `--captain=V4|V5|V6` (default V6). `scripts/pavilion-captain-v5-measure.ts` now imports `adviseT20CaptainV5` under its old name, so it measures what it measured before.
-- **Gates.** `c1-analyse.py` (95% match-bootstrap intervals) and the real ranges of `c2-report.py`, as in the C5 re-measure; the fit and selection periods with `c5-adjusted-quick.py` and `c5-real-adjusted.json`.
+- **Gates.** `c1-analyse.py` (P10 to P90 match-bootstrap brackets) and the real ranges of `c2-report.py`, as in the C5 re-measure; the fit and selection periods with `c5-adjusted-quick.py` and `c5-real-adjusted.json`.
 - **Death figures.** New `scripts/pavilion-batting-v3-summary.py`: first innings, overs 16 to 20, the definitions of `c5-summary.py`, 1,000 match-bootstrap resamples, and the change after minus before **paired** by match (same seeds). It also splits death balls by the striker's class (tail-ender or recognised) from the `c1-game-balls.ts` files.
 - **Strength.** New `scripts/pavilion-batting-v3-h2h.ts`: each corpus seed twice, V6 (or candidate B) on one side and V5 on the other, then swapped; each ball takes the batting side's captain (V5 and V6 bowl and field identically). Tactical validation: all 11 experiments, 200 matches each, both models.
 
 ## 3. Results: the 8 adjusted gates (`calibrated-t20-01`)
 
-Real range: the full-member calibration split (`c2-report.py`). Game: 95% match-bootstrap intervals from `c1-analyse.py`. "V5" is the C5 re-measure.
+Real range: the full-member calibration split (`c2-report.py`). Game: P10 to P90 match-bootstrap brackets from `c1-analyse.py`. These brackets are the P10 to P90 percentiles of the match bootstrap (100 replicates), not 95% intervals; this page first labelled them 95% (corrected 27 November 2026, see `stage-c/C6_REFIT.md` section 3). No verdict used them. "V5" is the C5 re-measure.
 
 | Effect | Real range | V5 (C5 re-measure) | **V6 (candidate A)** | Candidate B |
 | --- | --- | --- | --- | --- |
