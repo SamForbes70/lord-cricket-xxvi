@@ -46,7 +46,8 @@ import {
 } from "./match/protocol.js";
 import { SuperOverPanel } from "./match/SuperOverPanel.js";
 import { ScenariosApp, SCENARIO_LAUNCH_KEY } from "./scenario/ScenariosApp.js";
-import { TournamentsApp, TOURNAMENT_LAUNCH_KEY, type TournamentLaunch } from "./tournament/TournamentsApp.js";
+import { readPlayerTeam, TournamentsApp, TOURNAMENT_LAUNCH_KEY, type TournamentLaunch } from "./tournament/TournamentsApp.js";
+import { tournamentComputerTeam } from "./tournament/tournament-binding.js";
 import { RainApp } from "./rain/RainApp.js";
 import { TeamCrest } from "./world/TeamCrest.js";
 import "./styles.css";
@@ -208,6 +209,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     }
   })());
   const [scenario, setScenario] = useState<ScenarioStatus | null>(null);
+  /** The stored tournament fixture the open match belongs to, as the worker reports it, and the side the computer plays. */
+  const [tournamentOpponent, setTournamentOpponent] = useState<string | null>(null);
   const [paceOverride, setPaceOverride] = useState<boolean | null>(null);
   const [matchAware, setMatchAware] = useState(() => localStorage.getItem("lcxxvi-captain-challenge") === "match-aware");
   const passage = useRef<Passage | null>(null);
@@ -577,6 +580,15 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         // The scenario's opponent is always the tactical captain; the player owns their own side.
         if (nextScenario && !careerLaunch.current) setAiTeamId(nextScenario.opponentTeamId);
       } else if (!r.error) setScenario(null);
+      if (r.view && "tournament" in r) {
+        // A tournament fixture: the side the player did not pick is always the tactical captain's, after a reload too.
+        const opponent = r.tournament ? tournamentComputerTeam(r.tournament, readPlayerTeam(r.tournament.runId)) : null;
+        setTournamentOpponent(opponent);
+        if (opponent && !careerLaunch.current) {
+          setAiTeamId(opponent);
+          try { sessionStorage.setItem("lcxxvi-optional-ai-team", opponent); } catch { /* preference only */ }
+        }
+      } else if (!r.error) setTournamentOpponent(null);
       if (!careerLaunch.current && tournamentLaunch.current && !r.error && (r.catalog || r.view)) {
         const launch = tournamentLaunch.current;
         tournamentLaunch.current = null;
@@ -913,7 +925,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   }, [superOver, aiTeamId, busy, fatal, persistence?.readOnly]);
   // Owner decision, 26 November 2026: in a career match (the player's league fixture) and in a scenario challenge, the
   // other side is always the computer captain. The player cannot hand it to themselves or take both sides.
-  const opponentLocked = Boolean(careerLaunch.current?.managedTeamId) || Boolean(scenario);
+  // The same holds for the player's fixture in a stored tournament run (the worker reports the run and fixture).
+  const opponentLocked = Boolean(careerLaunch.current?.managedTeamId) || Boolean(scenario) || Boolean(tournamentOpponent);
   function changeAiOpponent(id: string) {
     if (opponentLocked) return;
     const next = id || null;
@@ -2148,7 +2161,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               {opponentLocked
                 ? scenario
                   ? "In a scenario the opposition is always the computer captain."
-                  : "In a career match the opposition is always the computer captain."
+                  : tournamentOpponent && !careerLaunch.current
+                    ? "In a tournament match the opposition is always the computer captain."
+                    : "In a career match the opposition is always the computer captain."
                 : "The computer picks this team's batters, bowlers and tactics. You still play each ball."}
             </span>
           </section>
