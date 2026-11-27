@@ -2,6 +2,8 @@
 
 Owner direction, 26 November 2026: "Finish over" should let the computer decide per ball.
 
+**Update, 27 November 2026:** the per-ball loop described here has moved into the match worker and now serves every advancement mode, not only "Finish over". See [UNIFIED_ADVANCE.md](UNIFIED_ADVANCE.md). This page is kept as the record of #168.
+
 ## Problem
 
 "Finish over" sent one engine command, `ADVANCE { scope: "OVER" }`. The engine (`runAdvance` in `packages/simulation/src/t20-match.ts`, and the ODI and red-ball equivalents) bowled every remaining ball of the over inside that one command. The computer captain's step (`AI_STEP` in `apps/web/src/match/match.worker.ts`) runs between commands, so it could not act until the over ended. Batting plans are set per batter. A batter who took strike part way through the over therefore batted on an older plan, or on the engine default of aggression 2. Captain V5's measurement found the same fault in the batch harness (`docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md`, section 2).
