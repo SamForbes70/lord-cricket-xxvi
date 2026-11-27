@@ -31,7 +31,7 @@ So every difference below comes from the captain (V4 to V5) and the harness (ove
 
 ## 2. Results: the 8 adjusted gates (criterion 1, adjusted for phase and opponent; top-rated / bottom-rated quarter)
 
-Real range: the full-member calibration split (`c2-report.py`, as in C5 section 3d). Game brackets are 95% match-bootstrap intervals from `c1-analyse.py` (`crossedEffectsBootstrap`).
+Real range: the full-member calibration split (`c2-report.py`, as in C5 section 3d). Game brackets are P10 to P90 match-bootstrap brackets from `c1-analyse.py` (`crossedEffectsBootstrap`). These brackets are the P10 to P90 percentiles of the match bootstrap (100 replicates), not 95% intervals; this page first labelled them 95% (corrected 27 November 2026, see `stage-c/C6_REFIT.md` section 3). No verdict used them.
 
 | Effect | Real range | Before (C5 after) | Now | Change |
 | --- | --- | --- | --- | --- |
