@@ -186,8 +186,19 @@ function ResultMoment({ view, superOverPending, hasOwnExit, onNewMatch, focusTea
       )}
       {(top.batting.length > 0 || top.bowling.length > 0) && (
         <dl className="result-tops" data-testid="result-top-performances">
-          <div><dt>Top batting</dt><dd>{top.batting.map((p) => <span key={p.playerId}>{p.text}</span>)}</dd></div>
-          <div><dt>Top bowling</dt><dd>{top.bowling.map((p) => <span key={p.playerId}>{p.text}</span>)}</dd></div>
+          {([["Top batting", top.batting], ["Top bowling", top.bowling]] as const).map(([label, list]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>
+                {list.map((p) => (
+                  <span key={p.playerId}>
+                    <TeamCrest teamId={p.teamId} name={teamName(p.teamId)} colours={colours(p.teamId)} size={18} decorative /> {p.text}
+                    <span className="sr-only"> ({teamName(p.teamId)})</span>
+                  </span>
+                ))}
+              </dd>
+            </div>
+          ))}
         </dl>
       )}
       {turns.length > 0 && (

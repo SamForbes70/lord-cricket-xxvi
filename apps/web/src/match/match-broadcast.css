@@ -325,7 +325,8 @@
 .result-card .result-rule { display: block; color: var(--text-faint); font-size: var(--type-xs); }
 .result-card .result-tops { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--space-2) var(--space-4); margin: 0; }
 .result-card .result-tops dt { font: 600 var(--type-xs)/1.2 var(--font-display); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-muted); }
-.result-card .result-tops dd { margin: 2px 0 0; display: grid; gap: 2px; font-size: var(--type-sm); color: var(--text-default); font-variant-numeric: tabular-nums; }
+.result-card .result-tops dd span:not(.sr-only) { display: inline-flex; align-items: center; gap: var(--space-1); }
+.result-card .result-tops dd { margin: 2px 0 0; display: grid; gap: 4px; font-size: var(--type-sm); color: var(--text-default); font-variant-numeric: tabular-nums; }
 .result-card .result-turns ul { margin: 2px 0 0; padding-left: 1.1rem; font-size: var(--type-sm); }
 .result-card .result-next { margin: 0; font-size: var(--type-sm); color: var(--text-muted); }
 /* At full time there is no next pick to make, so the routine-picks switch gives way to the result card. */
