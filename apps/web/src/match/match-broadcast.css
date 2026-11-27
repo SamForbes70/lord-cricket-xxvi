@@ -1,0 +1,203 @@
+/*
+ * CP03 (Directive 05): the live match screen as a broadcast. Imported by BroadcastStage.tsx, so it loads after
+ * floodlit.css. Uses the semantic tokens in tokens.css only. Presentation only: no rule here hides a control that the
+ * match needs, and every control keeps its name.
+ *
+ * From 1280 px the match is two columns: the score, the ball, the players and the decision on the left; the field on the
+ * right, sticky, so it stays in view while the player scrolls the tactics, scorecard and commentary.
+ */
+
+/* Compact header on the match screen: one line, so the score starts high. */
+.match-shell[data-live="true"] { padding-top: var(--space-2); }
+.match-shell .masthead { padding-block: var(--space-1); }
+.match-shell .masthead > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-4); }
+.match-shell .masthead h1 { order: 1; margin: 0; font-size: var(--type-xl); line-height: var(--leading-tight); }
+.match-shell .masthead .eyebrow { order: 2; min-height: 0; padding: 0; font-size: var(--type-xs); }
+.match-shell .career-match-banner {
+  margin: var(--space-2) 0; padding: var(--space-1) var(--space-3); gap: var(--space-1) var(--space-3);
+  font-size: var(--type-sm); border-radius: var(--radius-sm); box-shadow: none; border-left-width: 3px;
+}
+.match-shell .career-match-banner > strong { font-family: var(--font-display); font-size: var(--type-md); letter-spacing: 0.02em; }
+.match-shell .career-match-banner > span { flex: 1 1 18rem; color: var(--text-muted); }
+.match-shell .career-match-banner p { margin: 0; }
+
+/* Score bug: tighter, with the score at display size. */
+.match-shell .scorestrip { padding: var(--space-2) var(--space-5); gap: var(--space-3); }
+.match-shell .scorestrip h2, .match-shell .scorestrip p { margin: 0 0 2px; }
+.match-shell .scorestrip .score { font-size: var(--type-display); line-height: 1; }
+.match-shell .scorestrip h2 { font-size: var(--type-md); }
+.match-shell .scorestrip p { font-size: var(--type-sm); }
+.match-shell .situation-strip { margin: var(--space-2) 0; font-size: var(--type-sm); }
+
+/* "This ball" stage: semantic colours (boundary sky blue, wicket vermilion, six gold) and over dividers. */
+.match-shell .broadcast-stage { margin: var(--space-2) 0; padding: var(--space-2) var(--space-5); }
+.broadcast-stage[data-moment="FOUR"] { --stage-glow: rgba(108, 197, 240, 0.42); border-color: var(--colour-boundary); }
+.broadcast-stage[data-moment="WICKET"] { --stage-glow: rgba(255, 143, 107, 0.45); border-color: var(--colour-wicket); }
+.stage-over { font-size: var(--type-xs); }
+.stage-word { font-size: var(--type-3xl); }
+.stage-call[data-kind="FOUR"] .stage-word { color: var(--colour-boundary); }
+.stage-call[data-kind="WICKET"] .stage-word { color: var(--colour-wicket); }
+.stage-line { font-size: var(--type-sm); }
+.stage-balls { gap: var(--space-1); }
+.stage-balls li { min-width: 2em; height: 2em; font-size: var(--type-sm); }
+.stage-balls li[data-kind="FOUR"] { background-color: var(--colour-boundary-fill); border-color: var(--colour-boundary); color: var(--text-strong); }
+.stage-balls li[data-kind="WICKET"] { background-color: var(--colour-wicket-fill); border-color: var(--colour-wicket); color: var(--text-strong); }
+.stage-balls li[data-kind="EXTRA"] { color: var(--colour-extra); }
+.stage-balls li[data-new-over="true"] { margin-left: var(--space-3); position: relative; }
+.stage-balls li[data-new-over="true"]::before {
+  content: ""; position: absolute; left: calc(-1 * var(--space-2) - 1px); top: 15%; bottom: 15%; width: 2px;
+  border-radius: 1px; background-color: var(--border-strong);
+}
+
+/* Batters and bowler. */
+.match-shell > .active {
+  margin: 0 0 var(--space-2); padding: var(--space-2) var(--space-4); gap: var(--space-1) var(--space-5);
+}
+@media (min-width: 801px) {
+  .match-shell > .active { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr) minmax(0, 0.8fr); }
+}
+.match-shell > .active > div > span { font-size: var(--type-xs); color: var(--text-muted); letter-spacing: var(--tracking-caps); margin-bottom: var(--space-1); }
+.match-shell > .active p { font-size: var(--type-sm); margin: 0 0 var(--space-1); }
+.match-shell > .active .active-player { flex-wrap: wrap; gap: var(--space-1) var(--space-2); margin: 0 0 var(--space-1); }
+.match-shell > .active .active-player .player-portrait { width: 36px; height: 36px; }
+/* The batters panel and a pressed highlight chip share the class name "active"; keep the chip a chip. */
+.match-shell .highlight-chip.active { display: inline-flex; margin: 0; padding: 0.22rem 0.5rem; width: auto; border-radius: var(--radius-sm); }
+
+/* Decision panel and the advance controls. */
+.match-shell .decision { margin: var(--space-2) 0 var(--space-2); padding: var(--space-3) var(--space-4); }
+.match-shell .decision-top .eyebrow { min-height: 0; padding: 0; font-size: var(--type-xs); }
+.match-shell .decision-top h2 { font-size: var(--type-xl); margin: 0; }
+.match-shell .decision-top { gap: var(--space-3); }
+.match-shell .decision .routine-picks { margin: var(--space-1) 0; font-size: var(--type-sm); }
+.match-shell .advance {
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-2) var(--space-5); margin-top: var(--space-2);
+}
+.advance-primary { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; gap: var(--space-1) var(--space-2); }
+.match-shell .advance-primary button { min-height: 46px; padding: 0 var(--space-4); font-size: var(--type-lg); }
+.match-shell .advance-primary button.advance-strong:enabled {
+  background-color: var(--surface-2); background-image: none; color: var(--accent-strong); border: 2px solid var(--accent);
+}
+.match-shell .advance-primary button.advance-strong:enabled:hover { background-color: var(--surface-3); }
+.match-shell .advance .advance-effect { grid-column: 1 / -1; margin: 0; font-size: var(--type-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+/* The group's label sits above its buttons without widening the row, so the primary pair and the skips share a line. */
+.advance-skip {
+  position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2);
+  padding: calc(var(--type-xs) * 1.2 + var(--space-1)) 0 0 var(--space-4); border-left: 1px solid var(--border-subtle);
+}
+.match-shell .advance .advance-skip-label {
+  position: absolute; top: 0; left: var(--space-4); flex: none; min-width: 0; white-space: nowrap; font: 600 var(--type-xs)/1.2 var(--font-display); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--text-muted);
+}
+.match-shell .advance-skip button {
+  white-space: nowrap; min-height: 36px; padding: 0 10px; font-size: var(--type-sm); background-color: transparent; background-image: none;
+  border-color: var(--border-strong); color: var(--text-default); box-shadow: none;
+}
+.match-shell .advance-skip button:hover:enabled { background-color: var(--surface-2); border-color: var(--accent); }
+.match-shell .advance #advance-reason { flex: 1 0 100%; min-width: 0; font-size: var(--type-xs); color: var(--text-muted); }
+.match-shell .dugout-jump { padding: var(--space-1) 0; font-size: var(--type-sm); }
+.match-shell .dugout-jump button { min-height: 34px; padding: 0 var(--space-3); font-size: var(--type-sm); }
+.match-shell .dugout-jump > span { font-size: var(--type-xs); color: var(--text-muted); opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .match-shell .advance button { transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); }
+}
+
+/* Field panel: diagram first, the latest ball named above it, legality and placement below. */
+.match-shell .live-field-panel { container-type: inline-size; margin-top: var(--space-3); padding: var(--space-4); }
+.live-field-header { display: block; margin-bottom: var(--space-2); }
+.live-field-header h2 { margin: 0; font-size: var(--type-xl); }
+.match-shell .live-field-subtitle { margin: var(--space-1) 0 0; font-size: var(--type-sm); color: var(--text-muted); }
+.live-field-layout { grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: var(--space-4); }
+@container (max-width: 760px) { .live-field-layout { grid-template-columns: minmax(0, 1fr); } }
+.live-field-diagram-wrap { align-items: stretch; }
+.match-shell .live-field-svg { width: 100%; max-width: 520px; margin-inline: auto; border: 0; border-radius: var(--radius-md); background-color: var(--surface-sunken); }
+.match-shell .live-field-legend { font-size: var(--type-xs); color: var(--text-muted); }
+.match-shell .live-field-sidebar { gap: var(--space-3); }
+.match-shell .live-field-card { padding: var(--space-3) var(--space-4); }
+.match-shell .live-field-card h3 { margin: 0 0 var(--space-1); font-size: var(--type-md); }
+.match-shell .highlight-disclaimer { font-size: var(--type-xs); }
+.match-shell .live-field-prefs { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); font-size: var(--type-sm); color: var(--text-muted); }
+.match-shell .highlight-chip { font-size: var(--type-xs); font-variant-numeric: tabular-nums; }
+
+.field-ball-caption { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-2); margin: 0 0 var(--space-2); }
+.field-ball-tag {
+  font: 600 var(--type-xs)/1.2 var(--font-display); letter-spacing: var(--tracking-caps); text-transform: uppercase;
+  color: var(--text-muted);
+}
+.field-ball-caption[data-latest="false"] .field-ball-tag { color: var(--accent-strong); }
+.field-ball-caption strong { font: 700 var(--type-lg)/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--text-default); }
+.field-ball-word { font: 700 var(--type-lg)/1 var(--font-display); text-transform: uppercase; color: var(--text-default); }
+.field-ball-caption[data-kind="FOUR"] .field-ball-word { color: var(--colour-boundary); }
+.field-ball-caption[data-kind="SIX"] .field-ball-word { color: var(--colour-six); }
+.field-ball-caption[data-kind="WICKET"] .field-ball-word { color: var(--colour-wicket); }
+.field-ball-caption[data-kind="DOT"] .field-ball-word { color: var(--text-muted); }
+
+/* The diagram: a night field, fielding side in light discs, batters in gold, labels with a dark halo. */
+.fd-outer { fill: var(--surface-field-outer); stroke: rgba(236, 244, 239, 0.12); stroke-width: 1; }
+.fd-ground { fill: var(--surface-field); stroke: rgba(236, 244, 239, 0.55); stroke-width: 1.2; }
+.fd-ring { fill: none; stroke: rgba(236, 244, 239, 0.5); stroke-width: 0.8; stroke-dasharray: 3 2.5; }
+.fd-sector { stroke: rgba(236, 244, 239, 0.08); stroke-width: 0.45; }
+.fd-side { fill: var(--text-muted); font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; }
+.fd-pitch { fill: #c9b383; stroke: #8f7a4c; stroke-width: 0.6; }
+.fd-crease { stroke: #5b4a28; stroke-width: 0.6; }
+.fd-stumps { stroke: #2e2210; stroke-width: 1.1; }
+.fd-fielder circle, .fd-slot-occupied circle { fill: #eef4ef; stroke: #0b2a1f; stroke-width: 0.8; }
+.fd-fielder text, .fd-code { fill: #0b2a1f; font-family: var(--font-display); font-weight: 700; }
+.fd-batter circle { fill: var(--accent); stroke: #0b2a1f; stroke-width: 0.8; }
+.fd-batter text { fill: var(--text-on-accent); font-family: var(--font-display); font-weight: 700; }
+.fd-slot-open circle { fill: rgba(11, 42, 31, 0.6); stroke: rgba(236, 244, 239, 0.6); stroke-width: 0.7; stroke-dasharray: 1.4 1.1; }
+.fd-slot-selected circle { fill: var(--colour-boundary); stroke: #ffffff; stroke-width: 1.3; }
+.fd-slot-selected .fd-code { fill: #06202c; }
+.fd-slot-violation circle { fill: var(--colour-wicket-fill); stroke: var(--colour-wicket); stroke-width: 1.3; }
+.fd-slot-violation .fd-code { fill: #ffffff; }
+.fd-label {
+  fill: var(--text-default); font-family: var(--font-body); font-weight: 600;
+  paint-order: stroke; stroke: #071c15; stroke-width: 0.28em; stroke-linejoin: round;
+}
+.fd-slot-open .fd-label { fill: var(--text-muted); font-weight: 500; }
+.fd-cue { --cue: #ffffff; }
+.fd-cue-wicket { --cue: var(--colour-wicket); }
+.fd-cue-six { --cue: var(--colour-six); }
+.fd-cue-four { --cue: var(--colour-boundary); }
+.fd-cue-free-hit { --cue: var(--colour-extra); }
+.fd-cue-line { stroke: var(--cue); fill: none; stroke-linecap: round; }
+.fd-cue-delivery { stroke: rgba(255, 255, 255, 0.6); stroke-width: 1; stroke-dasharray: 2 1.5; }
+.fd-cue-dot { fill: var(--cue); stroke: #071c15; stroke-width: 0.7; }
+
+/* Field legality: a dark card with token text (CP01 measured the old light card at 1.06:1 to 1.66:1). */
+.match-shell .live-field-card.legality-box,
+.match-shell .live-field-card.legality-box.legal {
+  background-color: var(--surface-2); background-image: none; border-color: var(--border-subtle); color: var(--text-default);
+}
+.match-shell .live-field-card.legality-box.legal { border-left: 3px solid var(--colour-positive); }
+.match-shell .live-field-card.legality-box.illegal { background-color: #3a1915; border-color: var(--colour-wicket); border-left-width: 3px; color: #ffe1d6; }
+.match-shell .legality-box h3 { color: var(--text-default); }
+.match-shell .legality-box .legality-phase { margin: var(--space-1) 0; color: var(--text-default); font-weight: 700; font-size: var(--type-sm); }
+.match-shell .legality-box .legality-counts { color: var(--text-muted); font-size: var(--type-sm); }
+.match-shell .legality-box .legality-ok { color: var(--colour-positive); font-size: var(--type-sm); }
+.match-shell .legality-box .legality-violations { color: #ffd2c4; font-size: var(--type-sm); }
+
+/* Two columns from 1280 px: decision on the left, the field sticky on the right. */
+@media (min-width: 1280px) {
+  .match-shell[data-live="true"] {
+    max-width: 1760px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(380px, 32vw, 640px);
+    column-gap: var(--space-5);
+    align-items: start;
+  }
+  .match-shell[data-live="true"] > * { grid-column: 1; min-width: 0; }
+  .match-shell[data-live="true"] > .masthead { grid-column: 1 / -1; }
+  .match-shell[data-live="true"] > .live-field-panel {
+    grid-column: 2; grid-row: 2 / span 90; position: sticky; top: var(--space-3); margin-top: var(--space-2);
+    max-height: calc(100vh - 2 * var(--space-3)); overflow-y: auto; overscroll-behavior: contain;
+  }
+}
+/* Large displays: the match screen scales up rather than leaving half the screen empty. */
+@media (min-width: 2200px) {
+  html:has(.match-shell[data-live="true"]) { font-size: 125%; }
+  .match-shell[data-live="true"] { max-width: 2200px; }
+}
+@media (max-width: 700px) {
+  .advance-skip { padding-left: 0; border-left: 0; }
+  .match-shell .advance-primary { flex: 1 1 100%; grid-template-columns: 1fr 1fr; }
+}

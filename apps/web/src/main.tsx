@@ -61,6 +61,7 @@ import "./floodlit.css";
 import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
 import { BroadcastStage } from "./match/BroadcastStage.js";
+import { advanceEffectText, bowlerCardLabel } from "./match/broadcast-labels.js";
 import { GuidedCoach } from "./match/GuidedCoach.js";
 import { CrowdAmbience } from "./ui-sound.js";
 import { GUIDED_MATCH_KEY, QUICK_MATCH_KEY, TitleScreen } from "./TitleScreen.js";
@@ -1258,8 +1259,9 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   );
   return (
     <main
-      style={{ fontSize: `${Number(scale) / 100}rem` }}
+      style={{ fontSize: `${Number(scale) / 100}rem`, ["--text-scale" as string]: Number(scale) / 100 }}
       data-motion={highlightMotion} className={`match-shell density-${density}`}
+      data-live={view ? "true" : undefined}
     >
       <a
         className="skip"
@@ -1479,7 +1481,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               )}
             </div>
             <div>
-              <span>Bowler</span>
+              <span data-testid="bowler-card-label">{bowlerCardLabel(view, i?.bowlerId ?? null)}</span>
               <p className={i?.bowlerId ? "active-player" : undefined}>
                 {i?.bowlerId && <PlayerPortrait playerId={i.bowlerId} role="BOWLER" kit={activeKit(view, i.bowlerId)} size={44} />}
                 <strong>
@@ -1750,38 +1752,46 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   onNewMatch={() => send({ type: "BOOT", fresh: true })}
                 />
               ) : (
-              <div className="advance">
-                <button
-                  disabled={!!view.advanceReason}
-                  aria-describedby="advance-reason"
-                  onClick={() =>
-                    act({ kind: "ADVANCE", payload: { scope: "DELIVERY" } })
-                  }
-                >
-                  Next delivery
-                </button>
-                {limitedOvers && (
+              <div className="advance" data-testid="advance-controls">
+                {/* CP03: one primary pair (ball by ball, or to the end of the over), then the longer skips as a labelled
+                    secondary group. Same buttons, handlers and names as before; only their grouping and weight changed. */}
+                <div className="advance-primary">
                   <button
                     className="primary"
-                    data-testid="next-key-moment"
                     disabled={!!view.advanceReason}
                     aria-describedby="advance-reason"
-                    onClick={() => advanceTo("KEY")}
+                    onClick={() =>
+                      act({ kind: "ADVANCE", payload: { scope: "DELIVERY" } })
+                    }
                   >
-                    Next key moment
+                    Next delivery
                   </button>
-                )}
-                <button
-                  className={limitedOvers ? undefined : "primary"}
-                  disabled={!!view.advanceReason}
-                  aria-describedby="advance-reason"
-                  onClick={finishOver}
-                >
-                  Finish over
-                </button>
-                <button disabled={!!view.advanceReason} onClick={() => advanceTo("DECISION")}>Next decision</button>
-                <button disabled={!!view.advanceReason} onClick={() => advanceTo("INNINGS")}>Finish innings</button>
-                <button disabled={!!view.advanceReason} onClick={() => advanceTo("MATCH")}>Finish match</button>
+                  <button
+                    className="advance-strong"
+                    disabled={!!view.advanceReason}
+                    aria-describedby="advance-reason"
+                    onClick={finishOver}
+                  >
+                    Finish over
+                  </button>
+                  {!view.advanceReason && i && <small className="advance-effect" data-testid="advance-effect">{advanceEffectText(i.legalBalls)}</small>}
+                </div>
+                <div className="advance-skip" role="group" aria-labelledby="advance-skip-label">
+                  <span id="advance-skip-label" className="advance-skip-label">Skip ahead</span>
+                  {limitedOvers && (
+                    <button
+                      data-testid="next-key-moment"
+                      disabled={!!view.advanceReason}
+                      aria-describedby="advance-reason"
+                      onClick={() => advanceTo("KEY")}
+                    >
+                      Next key moment
+                    </button>
+                  )}
+                  <button disabled={!!view.advanceReason} onClick={() => advanceTo("DECISION")}>Next decision</button>
+                  <button disabled={!!view.advanceReason} onClick={() => advanceTo("INNINGS")}>Finish innings</button>
+                  <button disabled={!!view.advanceReason} onClick={() => advanceTo("MATCH")}>Finish match</button>
+                </div>
                 <span id="advance-reason">
                   {view.advanceReason ||
                     (routineNote ? <span role="status" className="routine-note" data-testid="routine-note">{routineNote}</span> : "Each option stops at your own decisions.")}

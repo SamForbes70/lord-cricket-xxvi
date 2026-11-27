@@ -38,7 +38,7 @@ export function AnalyticsPanel({ data, names, hands, busy, rebuild, onRebuild, o
     <svg className="analytics-worm" viewBox="0 0 640 260" role="img" aria-label="Cumulative runs by legal balls, with one line per innings">
       <line x1="35" y1="225" x2="620" y2="225" stroke="currentColor" /><line x1="35" y1="15" x2="35" y2="225" stroke="currentColor" />
       {data.finalRuns.map((_, innings) => <polyline key={innings} fill="none" stroke={colours[innings % colours.length]} strokeWidth="3" points={[[35, 225], ...data.worm.filter(point => point.inningsIndex === innings).map(point => [35 + point.legalBalls / maxBalls * 585, 225 - point.totalRuns / maxRuns * 210])].map(point => point.join(",")).join(" ")}><title>Innings {innings + 1}</title></polyline>)}
-      <text x="325" y="252" textAnchor="middle">Legal balls (0–{maxBalls})</text><text x="40" y="14">Runs (0–{maxRuns})</text>
+      <text x="325" y="252" textAnchor="middle">Legal balls (0 to {maxBalls})</text><text x="40" y="14">Runs (0 to {maxRuns})</text>
     </svg>
     <ul className="analytics-legend">{data.finalRuns.map((_, innings) => <li key={innings}><span aria-hidden="true" style={{ backgroundColor: colours[innings % colours.length] }} /> Innings {innings + 1}</li>)}</ul>
     <table><caption>Score progression at over boundaries</caption><thead><tr><th>Innings</th><th>Over</th><th>Score</th><th>Wickets</th></tr></thead>

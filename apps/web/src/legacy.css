@@ -28,7 +28,7 @@ main {
   font-weight: bold;
 }
 h1 {
-  font-family: Georgia, serif;
+  font-family: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   font-size: 3em;
   line-height: 1.05;
   margin: 20px 0;

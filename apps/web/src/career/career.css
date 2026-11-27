@@ -14,7 +14,7 @@
 .career-panel { background:#fffdf6; border:1px solid #d3d8c9; border-radius:8px; padding:16px; min-width:0; }
 .career-panel.emphasis { border-color:#6d8f7d; }
 .dashboard-grid, .career-summary-grid, .stats-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
-.big-stat { font-family:Georgia,serif; font-size:1.9em; margin:.15em 0 .35em; }
+.big-stat { font-family:var(--font-display, "Barlow Condensed", system-ui, sans-serif); font-size:1.9em; margin:.15em 0 .35em; }
 .save-badge { border:1px solid #8a9a8f; border-radius:6px; padding:8px 12px; min-width:145px; text-align:right; background:#fff; }
 .save-badge small { margin-top:3px; }
 .save-badge[data-status="saving"] { background:#fff7dc; }
