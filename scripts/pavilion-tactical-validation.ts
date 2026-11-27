@@ -3,7 +3,7 @@
  * "Tactical validation").
  *
  * Each experiment changes ONE decision area. The "good" side is the tactical captain (the code's adviseT20Captain,
- * recorded in the output as `captain`; V2 when first measured, V4 from 25 November 2026, V5 from 26 November 2026) with the
+ * recorded in the output as `captain`; V2 when first measured, V4 from 25 November 2026, V5 from 26 November 2026, V6 from 27 November 2026) with the
  * suggested eleven. The "poor" side is identical except in that one area. Each of the 100 frozen corpus seeds is
  * played twice, the poor management on one side and then on the other, so team strength, toss and seed cancel out.
  *
@@ -11,11 +11,14 @@
  * innings by each side, and the mean difference with a 95% interval (paired by match, normal approximation).
  * Deterministic: the same command gives the same output. Read-only: no game file is changed.
  *
- *   node --import tsx scripts/pavilion-tactical-validation.ts [output.json] [experiment ...] [--model=...] [--captain=V4|V5] [--advance=OVER|DELIVERY]
+ *   node --import tsx scripts/pavilion-tactical-validation.ts [output.json] [experiment ...] [--model=...] [--captain=V4|V5|V6] [--advance=OVER|DELIVERY]
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { isBowlingCapable, suggestedEleven } from "@lcxxvi/data";
-import { adviseT20Captain, adviseT20CaptainV4, feasibleBowlerChoice, bowlersWithOversLeft, T20_TACTICAL_CAPTAIN_ID, T20_TACTICAL_CAPTAIN_V4_ID } from "@lcxxvi/ai";
+import {
+  adviseT20Captain, adviseT20CaptainV4, adviseT20CaptainV5, feasibleBowlerChoice, bowlersWithOversLeft, T20_TACTICAL_CAPTAIN_ID, T20_TACTICAL_CAPTAIN_V4_ID,
+  T20_TACTICAL_CAPTAIN_V5_ID,
+} from "@lcxxvi/ai";
 import {
   createT20CorpusRequest, createT20Session, executeT20Command, validateT20ResearchMatchSetup, fixtureAutopilotStep, validateT20MatchSetup,
   type T20Session,
@@ -36,12 +39,13 @@ const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "s
 if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
 /** Captain V5 (26 November 2026): `--captain=V4` runs adviseT20CaptainV4 as the good side instead of the current captain;
  * `--advance=OVER` bowls a whole over per ADVANCE (the script up to V4) instead of one ball (the default from V5, as
- * the live game asks the computer opponent before each ball; V5's death plan is ball by ball). */
-const CAPTAIN = process.argv.find((a) => a.startsWith("--captain="))?.slice(10) ?? "V5";
-if (CAPTAIN !== "V4" && CAPTAIN !== "V5") throw new Error(`unknown captain ${CAPTAIN}`);
+ * the live game asks the computer opponent before each ball; V5's death plan is ball by ball). Captain V6 (27 November
+ * 2026) is the default; `--captain=V5` runs adviseT20CaptainV5. */
+const CAPTAIN = process.argv.find((a) => a.startsWith("--captain="))?.slice(10) ?? "V6";
+if (CAPTAIN !== "V4" && CAPTAIN !== "V5" && CAPTAIN !== "V6") throw new Error(`unknown captain ${CAPTAIN}`);
 const ADVANCE = process.argv.find((a) => a.startsWith("--advance="))?.slice(10) ?? "DELIVERY";
 if (ADVANCE !== "OVER" && ADVANCE !== "DELIVERY") throw new Error(`unknown advance ${ADVANCE}`);
-const captainAdvice = CAPTAIN === "V4" ? adviseT20CaptainV4 : adviseT20Captain;
+const captainAdvice = CAPTAIN === "V4" ? adviseT20CaptainV4 : CAPTAIN === "V5" ? adviseT20CaptainV5 : adviseT20Captain;
 const ARGS = process.argv.filter((a) => !a.startsWith("--"));
 const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
   ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
@@ -217,7 +221,7 @@ const results = chosen.map((name) => { const r = experiment(name); console.error
 const output = {
   version: "LC_PAVILION_TACTICAL_VALIDATION_V1",
   model: MODEL,
-  captain: CAPTAIN === "V4" ? T20_TACTICAL_CAPTAIN_V4_ID : T20_TACTICAL_CAPTAIN_ID,
+  captain: CAPTAIN === "V4" ? T20_TACTICAL_CAPTAIN_V4_ID : CAPTAIN === "V5" ? T20_TACTICAL_CAPTAIN_V5_ID : T20_TACTICAL_CAPTAIN_ID,
   advance: ADVANCE,
   design: "100 frozen corpus seeds, each played twice with the poor management on each side; good = the tactical captain named in `captain`, suggested eleven, engine default field",
   note: "Second-innings runs stop when the target is reached, so the run difference understates the gap in matches the chasing side wins.",

@@ -18,7 +18,7 @@
  *   --batting: V4 (LC_T20_BATTING_POLICY_V1) or V5 (LC_T20_BATTING_POLICY_V2).
  * The powerplay and middle-overs plans and the field are the same in V4 and V5; from the second V5 pass (pace
  * preference at the death) bowler choice can differ, and goes with --bowling. V4 + V4 is
- * adviseT20CaptainV4; V5 + V5 is adviseT20Captain. Reports first-innings runs and wickets, phase rates, the death
+ * adviseT20CaptainV4; V5 + V5 is adviseT20CaptainV5 (adviseT20Captain until captain V6, 27 November 2026). Reports first-innings runs and wickets, phase rates, the death
  * plan mix, aggression by phase and each one's share of death runs and wickets, with 95% match-bootstrap intervals.
  *
  * Head-to-head mode: each corpus seed (repeat 0) twice, V5 on one side and V4 on the other, then swapped.
@@ -32,7 +32,7 @@ import {
 } from "@lcxxvi/simulation";
 import type { T20Command, WorldPack } from "@lcxxvi/contracts";
 import {
-  adviseT20Batting, adviseT20BattingV2, adviseT20Captain, adviseT20CaptainV4, type T20TacticalAdvice, type T20TacticalPublicView,
+  adviseT20Batting, adviseT20BattingV2, adviseT20CaptainV5 as adviseT20Captain, adviseT20CaptainV4, type T20TacticalAdvice, type T20TacticalPublicView,
 } from "@lcxxvi/ai";
 import { publicT20CaptainView } from "../apps/batch/src/tactical-match.js";
 

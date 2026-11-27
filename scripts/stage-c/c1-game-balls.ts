@@ -8,7 +8,10 @@
  * seed (research only: the corpus file and its seeds are not changed). Model `synthetic-alpha-01`, unchanged.
  * Deterministic: the same command gives the same file. Read-only: no game file is changed.
  *
- *   node --import tsx scripts/stage-c/c1-game-balls.ts <output.json> [repeats=10] [firstRepeat=0]
+ *   node --import tsx scripts/stage-c/c1-game-balls.ts <output.json> [repeats=10] [firstRepeat=0] [--model=...] [--captain=V4|V5|V6|V6B]
+ *
+ * `--captain` (batting policy V3, 27 November 2026) names the captain on both sides (scripts/pavilion-batting-v3-candidates.ts);
+ * the default is the current captain, adviseT20Captain.
  *
  * Repeats firstRepeat .. firstRepeat+repeats-1 are played, so several processes can share the work.
  */
@@ -19,6 +22,7 @@ import {
 } from "@lcxxvi/simulation";
 import type { WorldPack } from "@lcxxvi/contracts";
 import { tacticalT20Step } from "../../apps/batch/src/tactical-match.js";
+import { captainByName } from "../pavilion-batting-v3-candidates.js";
 
 type Delivery = {
   type: string; inningsIndex: number; strikerId: string; nonStrikerId: string; bowlerId: string; legalBall: boolean;
@@ -37,7 +41,9 @@ const byId = new Map(world.players.map((p) => [p.playerId, p]));
 /** Research model selection (Stage C): `--model=calibrated-t20-01` uses validateT20ResearchMatchSetup; default synthetic-alpha-01. */
 const MODEL = process.argv.find((a) => a.startsWith("--model="))?.slice(8) ?? "synthetic-alpha-01";
 if (MODEL !== "synthetic-alpha-01" && MODEL !== "calibrated-t20-01") throw new Error(`unknown model ${MODEL}`);
-const ARGS = process.argv.filter((a) => !a.startsWith("--model="));
+const CAPTAIN = process.argv.find((a) => a.startsWith("--captain="))?.slice(10) ?? "V6";
+const advise = captainByName(CAPTAIN);
+const ARGS = process.argv.filter((a) => !a.startsWith("--model=") && !a.startsWith("--captain="));
 const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
   ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
   : validateT20MatchSetup(request, bytes, manifest);
@@ -63,7 +69,7 @@ for (let r = first; r < first + repeats; r += 1) {
     let session: T20Session = createT20Session(setupFor(request));
     for (let n = 0; session.core.phase !== "COMPLETE"; n += 1) {
       if (n > 3000) throw new Error("NO_PROGRESS");
-      session = executeT20Command(session, tacticalT20Step(session)).session;
+      session = executeT20Command(session, tacticalT20Step(session, { advise })).session;
     }
     const matchId = `${raw.caseId}-r${r}`;
     const legal = [0, 0], order: Map<string, number>[] = [new Map(), new Map()];
@@ -92,7 +98,7 @@ const players = [...selected].sort().map((id) => {
   };
 });
 writeFileSync(out, JSON.stringify({
-  version: "LC_STAGE_C_C1_GAME_BALLS_V1", model: MODEL, repeats, firstRepeat: first,
+  version: "LC_STAGE_C_C1_GAME_BALLS_V1", model: MODEL, captain: CAPTAIN, repeats, firstRepeat: first,
   setUp: "frozen 100-seed corpus, suggested elevens, tactical captain both sides; repeat r>0 seeds suffixed -c1r<r>",
   players, columns: cols,
 }));

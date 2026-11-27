@@ -132,3 +132,41 @@ export function adviseT20BattingV2(view: Readonly<T20BattingView>): T20BattingAd
   if (!held) return { ...v1, policyId: T20_BATTING_POLICY_V2_ID };
   return { ...v1, policyId: T20_BATTING_POLICY_V2_ID, aggression: 3, reason: `${v1.reason}; death overs: attack at 3` };
 }
+
+/** LC_T20_BATTING_POLICY_V3 (captain V6, 27 November 2026). */
+export const T20_BATTING_POLICY_V3_ID = "LC_T20_BATTING_POLICY_V3" as const;
+export type T20BattingAdviceV3 = Readonly<{
+  policyId: typeof T20_BATTING_POLICY_V3_ID;
+  aggression: 0 | 1 | 2 | 3 | 4;
+  intent: BattingIntent;
+  reason: string;
+}>;
+
+/**
+ * V2 everywhere except a tail-ender (batting skill below TAIL_BELOW) on strike in the first innings's death overs
+ * (overs 16 to 20, setting a total) with more than one over left (docs/pavilion/BATTING_POLICY_V3.md):
+ *
+ * - with a recognised batter at the other end: aggression 2 and ROTATE. The tail-ender's job is to give the strike to
+ *   the batter who can clear the rope, not to slog himself (V2: 3 while more than 12 balls were left, then 4).
+ * - with another tail-ender at the other end: aggression 3 at most. No recognised batter is left to farm the strike
+ *   to, so he attacks, but not with a full slog until the last over (V2 reached 4 with 12 balls left).
+ *
+ * In the last over (6 balls or fewer left) everyone swings, as in V2. Recognised batters, the chase and the powerplay
+ * and middle overs are V2's. An unknown partner counts as recognised, as in V1. Cricket judgement written before
+ * measuring, not fitted to any total or gate. Pure and deterministic.
+ */
+export function adviseT20BattingV3(view: Readonly<T20BattingView>): T20BattingAdviceV3 {
+  const v2 = adviseT20BattingV2(view);
+  const advice = { ...v2, policyId: T20_BATTING_POLICY_V3_ID };
+  const setting = view.targetToWin === null;
+  const death = view.inningsLegalBalls >= 90;
+  const ballsLeft = Math.max(1, 120 - view.inningsLegalBalls);
+  const tailStriker = view.striker !== null && battingSkill(view.striker) < TAIL_BELOW;
+  if (!setting || !death || !tailStriker || ballsLeft <= 6) return advice;
+  const tailPartner = view.partner !== null && battingSkill(view.partner) < TAIL_BELOW;
+  if (!tailPartner) {
+    return { ...advice, aggression: 2, intent: "ROTATE", reason: `${v2.reason}; death overs: tail-ender gives the strike to the recognised batter` };
+  }
+  if (v2.aggression <= 3) return advice;
+  return { ...advice, aggression: 3, reason: `${v2.reason}; death overs: two tail-enders, attack at 3 until the last over` };
+}

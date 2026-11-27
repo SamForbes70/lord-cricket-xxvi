@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { adviseT20Batting, adviseT20BattingV2, adviseT20Captain, adviseT20CaptainV4, battingSkill, TAIL_BELOW, T20_BATTING_POLICY_ID } from "@lcxxvi/ai";
+import { adviseT20Batting, adviseT20BattingV2, adviseT20CaptainV5, adviseT20CaptainV4, battingSkill, TAIL_BELOW, T20_BATTING_POLICY_ID } from "@lcxxvi/ai";
 
 const specialist = { timing: 70, power: 65, defence: 60, rotation: 65 };
 const tailender = { timing: 35, power: 40, defence: 30, rotation: 30 };
@@ -71,7 +71,7 @@ describe("Pavilion P04 stage B: LC_T20_BATTING_POLICY_V1", () => {
     const batting = adviseT20Batting(captainView);
     expect(v4.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V4");
     expect([v4.aggression, v4.battingIntent]).toEqual([batting.aggression, batting.intent]);
-    const v5 = adviseT20Captain(captainView);
+    const v5 = adviseT20CaptainV5(captainView);
     const v2 = adviseT20BattingV2(captainView);
     expect(v5.policyId).toBe("LC_T20_TACTICAL_CAPTAIN_V5");
     expect([v5.aggression, v5.battingIntent]).toEqual([v2.aggression, v2.intent]);

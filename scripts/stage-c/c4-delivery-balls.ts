@@ -11,12 +11,14 @@
  *
  *   node --import tsx scripts/stage-c/c4-delivery-balls.ts <output.json> [repeats=5] [firstRepeat=0]
  *        [--model=calibrated-t20-01|synthetic-alpha-01] [--aggression=0..4] [--length=GOOD|FULL|YORKER]
- *        [--effort=CONSERVE|NORMAL|MAXIMUM]
+ *        [--effort=CONSERVE|NORMAL|MAXIMUM] [--captain=V4|V5|V6|V6B]
  *
  * `--aggression=k` replaces every batting plan the captain sets with aggression k and intent NORMAL (both sides,
  * every ball), for the aggression trade-off. C5: `--length` and `--effort` likewise hold that part of every bowling
  * plan (both sides, every ball; the other part stays the captain's), for the bowling-plan levers. Each delivery also
  * records the plan's intended length and effort. Deterministic: the same command gives the same file.
+ * `--captain` (batting policy V3, 27 November 2026) names the captain on both sides (scripts/pavilion-batting-v3-candidates.ts);
+ * the default is the current captain, adviseT20Captain.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { suggestedEleven } from "@lcxxvi/data";
@@ -24,8 +26,8 @@ import {
   createT20CorpusRequest, createT20Session, executeT20Command, validateT20ResearchMatchSetup, validateT20MatchSetup, type T20Session,
 } from "@lcxxvi/simulation";
 import type { T20Command, WorldPack } from "@lcxxvi/contracts";
-import { adviseT20Captain } from "@lcxxvi/ai";
-import { publicT20CaptainView, tacticalT20Step } from "../../apps/batch/src/tactical-match.js";
+import { publicT20CaptainView, tacticalT20Step as batchStep } from "../../apps/batch/src/tactical-match.js";
+import { captainByName } from "../pavilion-batting-v3-candidates.js";
 
 type Delivery = {
   type: string; inningsIndex: number; strikerId: string; legality: string; legalBall: boolean; batRuns: number;
@@ -49,6 +51,9 @@ const FORCED_EFFORT = process.argv.find((a) => a.startsWith("--effort="))?.slice
 if (FORCED_LENGTH !== undefined && !["GOOD", "FULL", "YORKER"].includes(FORCED_LENGTH)) throw new Error("length must be GOOD, FULL or YORKER");
 if (FORCED_EFFORT !== undefined && !["CONSERVE", "NORMAL", "MAXIMUM"].includes(FORCED_EFFORT)) throw new Error("effort must be CONSERVE, NORMAL or MAXIMUM");
 const forcedPlan = { ...(FORCED_LENGTH ? { length: FORCED_LENGTH } : {}), ...(FORCED_EFFORT ? { effort: FORCED_EFFORT } : {}) };
+const CAPTAIN = process.argv.find((a) => a.startsWith("--captain="))?.slice(10) ?? "V6";
+const adviseT20Captain = captainByName(CAPTAIN);
+const tacticalT20Step = (session: T20Session) => batchStep(session, { advise: adviseT20Captain });
 const ARGS = process.argv.filter((a) => !a.startsWith("--"));
 const setupFor = (request: unknown) => MODEL === "calibrated-t20-01"
   ? validateT20ResearchMatchSetup(request, bytes, manifest, "calibrated-t20-01")
@@ -124,7 +129,7 @@ for (let r = first; r < first + repeats; r += 1) {
   console.error(`repeat ${r} done, ${((Date.now() - started) / 1000).toFixed(0)} s`);
 }
 writeFileSync(out, JSON.stringify({
-  version: "LC_STAGE_C_C4_DELIVERY_BALLS_V2", model: MODEL, forcedAggression: forced, forcedPlan, repeats, firstRepeat: first,
+  version: "LC_STAGE_C_C4_DELIVERY_BALLS_V2", model: MODEL, captain: CAPTAIN, forcedAggression: forced, forcedPlan, repeats, firstRepeat: first,
   setUp: "frozen 100-seed corpus, suggested elevens, tactical captain both sides; repeat r>0 seeds suffixed -c1r<r>",
   columns: cols,
 }));

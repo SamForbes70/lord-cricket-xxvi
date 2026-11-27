@@ -8,6 +8,8 @@ Rerun with captains V3 and V4 (25 November 2026): [CAPTAIN_V4_DEATH_OVERS.md](CA
 
 Rerun with captain V5 (26 November 2026), both models: [CAPTAIN_V5_DEATH_OVERS.md](CAPTAIN_V5_DEATH_OVERS.md).
 
+Rerun with captain V6 (batting policy V3, 27 November 2026), both models: [BATTING_POLICY_V3.md](BATTING_POLICY_V3.md).
+
 ## Method
 
 `node --import tsx scripts/pavilion-tactical-validation.ts docs/pavilion/tactical-validation.json`

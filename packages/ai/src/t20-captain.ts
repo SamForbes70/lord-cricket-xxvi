@@ -1,4 +1,4 @@
-/** LC_T20_TACTICAL_CAPTAIN_V5. Pure deterministic, public-observation-only choices.
+/** LC_T20_TACTICAL_CAPTAIN_V6. Pure deterministic, public-observation-only choices.
  * V2 (Pavilion P04, 25 November 2026): never picks a bowler after whom the rest of the innings cannot be bowled
  * (bowling-plan.ts); otherwise the same choices as V1.
  * V3 (Pavilion P04 stage B): batting aggression and intent come from LC_T20_BATTING_POLICY_V1 (batting-policy.ts),
@@ -13,7 +13,10 @@
  * preference for the death overs (t20DeathSuitabilityV5, in both the death-over reservation and the choice within the
  * death). The rest of bowler choice, the powerplay and middle-overs plans and field intent are V4's
  * (docs/pavilion/CAPTAIN_V5_DEATH_OVERS.md).
- * V4 stays available as adviseT20CaptainV4 for measurement and comparison. A captain's choices are recorded as
+ * V6 (Pavilion, 27 November 2026): V5 with LC_T20_BATTING_POLICY_V3 (batting-policy.ts): a tail-ender on strike in the
+ * first innings's death overs gives the strike to a recognised partner, or attacks at 3 with another tail-ender, until
+ * the last over. Bowler choice, the bowling plans and field intent are V5's (docs/pavilion/BATTING_POLICY_V3.md).
+ * V4 and V5 stay available as adviseT20CaptainV4 and adviseT20CaptainV5 for measurement and comparison. A captain's choices are recorded as
  * match commands, so a match played under an older version replays from its commands, not from this code.
  * The caller owns legality; candidates here are already filtered by the cricket engine.
  * No match seed, random counter, hidden player attributes or opponent future actions occur in this DTO.
@@ -63,10 +66,11 @@ export type PreviousOverBowler = Readonly<{
   style?: T20BowlerStyle | null;
 }>;
 /** The current tactical captain. */
-export const T20_TACTICAL_CAPTAIN_ID = "LC_T20_TACTICAL_CAPTAIN_V5" as const;
-/** The previous version, kept for measurement and comparison (adviseT20CaptainV4). */
+export const T20_TACTICAL_CAPTAIN_ID = "LC_T20_TACTICAL_CAPTAIN_V6" as const;
+/** Earlier versions, kept for measurement and comparison (adviseT20CaptainV5, adviseT20CaptainV4). */
+export const T20_TACTICAL_CAPTAIN_V5_ID = "LC_T20_TACTICAL_CAPTAIN_V5" as const;
 export const T20_TACTICAL_CAPTAIN_V4_ID = "LC_T20_TACTICAL_CAPTAIN_V4" as const;
-export type T20TacticalCaptainId = typeof T20_TACTICAL_CAPTAIN_ID | typeof T20_TACTICAL_CAPTAIN_V4_ID;
+export type T20TacticalCaptainId = typeof T20_TACTICAL_CAPTAIN_ID | typeof T20_TACTICAL_CAPTAIN_V5_ID | typeof T20_TACTICAL_CAPTAIN_V4_ID;
 export type T20BowlingLength = "GOOD" | "FULL" | "YORKER" | "SHORT";
 export type T20BowlingEffort = "CONSERVE" | "NORMAL" | "MAXIMUM";
 export type T20TacticalAdvice = Readonly<{
@@ -81,7 +85,7 @@ export type T20TacticalAdvice = Readonly<{
 }>;
 
 import { feasibleBowlerChoice, type BowlerOvers } from "./bowling-plan.js";
-import { adviseT20Batting, adviseT20BattingV2, battingSkill, TAIL_BELOW, type BatterSkills, type BattingIntent } from "./batting-policy.js";
+import { adviseT20Batting, adviseT20BattingV2, adviseT20BattingV3, battingSkill, TAIL_BELOW, type BatterSkills, type BattingIntent } from "./batting-policy.js";
 
 /** Every bowling-capable player with overs left, the previous over's bowler included, in whole overs. */
 export function bowlersWithOversLeft(
@@ -273,15 +277,24 @@ export function t20DeathBowlingPlanV5(input: Readonly<{ ballOfOver: number; styl
   return input.fatigueBp >= 7000 ? { length: plan.length, effort: "CONSERVE" } : plan;
 }
 
-/** LC_T20_TACTICAL_CAPTAIN_V5, the current captain. Rule-based expected-utility proxy on allowed observable values. */
-export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
+/** V5's bowler choice, death-overs plan and field with the given batting policy (V5 and V6 differ only in batting). */
+function captainV5Plan(view: Readonly<T20TacticalPublicView>, policyId: T20TacticalCaptainId, batting: Readonly<{ aggression: 0 | 1 | 2 | 3 | 4; intent: BattingIntent }>): T20TacticalAdvice {
   const { phase, chosen, reason } = captainCore(view, t20DeathSuitabilityV5);
-  const batting = adviseT20BattingV2(battingView(view));
   // The plan is for the ball about to be bowled, by the bowler of the current over: in the death that bowler is the
   // chosen one (V4's choice of the best available bowler), or the one already bowling the over.
   const strikerIsTail = view.striker !== null && view.striker !== undefined && battingSkill(view.striker) < TAIL_BELOW;
   const plan = phase === "DEATH"
     ? t20DeathBowlingPlanV5({ ballOfOver: view.inningsLegalBalls % 6, style: view.bowlerStyle ?? "PACE", strikerIsTail, fatigueBp: chosen?.fatigueBp ?? 0 })
     : { length: lengthV4(phase), effort: effortV4(phase, chosen) };
-  return advice(T20_TACTICAL_CAPTAIN_ID, batting, chosen, plan, fieldIntent(view, phase), reason);
+  return advice(policyId, batting, chosen, plan, fieldIntent(view, phase), reason);
+}
+
+/** LC_T20_TACTICAL_CAPTAIN_V5, unchanged: kept for measurement and comparison (LC_T20_BATTING_POLICY_V2). */
+export function adviseT20CaptainV5(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
+  return captainV5Plan(view, T20_TACTICAL_CAPTAIN_V5_ID, adviseT20BattingV2(battingView(view)));
+}
+
+/** LC_T20_TACTICAL_CAPTAIN_V6, the current captain: V5 with LC_T20_BATTING_POLICY_V3. Rule-based, not fitted. */
+export function adviseT20Captain(view: Readonly<T20TacticalPublicView>): T20TacticalAdvice {
+  return captainV5Plan(view, T20_TACTICAL_CAPTAIN_ID, adviseT20BattingV3(battingView(view)));
 }
