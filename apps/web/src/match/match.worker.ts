@@ -49,6 +49,7 @@ import { findTournamentBinding } from "../tournament/tournament-binding.js";
 import { tourCompetition } from "../tournament/generated-roster.js";
 import { verifySuperOverRecord } from "@lcxxvi/simulation";
 import type { SuperOverView } from "./protocol.js";
+import { createLeaseRenewalGate } from "./lease-renewal-gate.js";
 
 const worldBytes = new TextEncoder().encode(worldText);
 const repository = new IndexedDbSaveRepository();
@@ -59,6 +60,8 @@ let activeSaveId: string | null = null;
 let activeWorldCopy: NewGameWorldCopy | null = null;
 let activeRosterPack: StagedRosterPack | null = null;
 let readOnly = false;
+/** Keeps a background lease renewal from marking read only a state that a request changed while it was in flight. */
+const leaseRenewal = createLeaseRenewalGate();
 /**
  * True while the open match is the one this worker recovered from an older checkpoint into a new slot. It stays true
  * as that match is played on, and is cleared only when another match is opened, started, imported or deleted.
@@ -1139,6 +1142,8 @@ async function handleInner(raw: unknown): Promise<Response> {
     return decorate(controller.currentResponse(request.requestId));
   }
   if (request.type === "RETRY_WRITER") {
+    // With no open save there is no lease to be read only about; clear any leftover flag so a new match can start.
+    if (!activeSaveId) readOnly = false;
     if (!activeSaveId || !readOnly) return decorate(controller.currentResponse(request.requestId));
     try {
       // restoreSave takes the lease only when it is free or already ours, so a live lease held by
@@ -1418,6 +1423,7 @@ self.onmessage = (event: MessageEvent<unknown>) => {
     return;
   }
   queue = queue.then(async () => {
+    leaseRenewal.requestStarted();
     try {
       const response = await handle(raw);
       const parsed = RequestSchema.safeParse(raw);
@@ -1450,17 +1456,21 @@ self.onmessage = (event: MessageEvent<unknown>) => {
           ),
         ),
       );
+    } finally {
+      leaseRenewal.requestFinished();
     }
   });
 };
 setInterval(() => {
-  if (activeSaveId && !readOnly)
-    void repository
-      .renewLease(activeSaveId, ownerId, nowMs())
-      .then((ok) => {
-        if (!ok) readOnly = true;
-      })
-      .catch(() => {
-        readOnly = true;
-      });
+  if (!activeSaveId || readOnly) return;
+  const ticket = leaseRenewal.begin(activeSaveId);
+  const lost = () => {
+    if (leaseRenewal.failureApplies(ticket, activeSaveId, readOnly)) readOnly = true;
+  };
+  void repository
+    .renewLease(ticket.saveId, ownerId, nowMs())
+    .then((ok) => {
+      if (!ok) lost();
+    })
+    .catch(lost);
 }, 4_000);
