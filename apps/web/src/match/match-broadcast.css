@@ -97,6 +97,7 @@
 }
 .match-shell .advance-skip button:hover:enabled { background-color: var(--surface-2); border-color: var(--accent); }
 .match-shell .advance #advance-reason { flex: 1 0 100%; min-width: 0; font-size: var(--type-xs); color: var(--text-muted); }
+.match-shell .decision[data-phase="COMPLETE"] .routine-note { display: none; } /* a pick for "the next over" is stale at full time */
 .match-shell .dugout-jump { padding: var(--space-1) 0; font-size: var(--type-sm); }
 .match-shell .dugout-jump button { min-height: 34px; padding: 0 var(--space-3); font-size: var(--type-sm); }
 .match-shell .dugout-jump > span { font-size: var(--type-xs); color: var(--text-muted); opacity: 1; }
@@ -178,6 +179,9 @@
 .match-shell .legality-box .legality-counts { color: var(--text-muted); font-size: var(--type-sm); }
 .match-shell .legality-box .legality-ok { color: var(--colour-positive); font-size: var(--type-sm); }
 .match-shell .legality-box .legality-violations { color: #ffd2c4; font-size: var(--type-sm); }
+
+/* The contextual tactical preset card had the same light-theme surface as the legality card. */
+.match-shell .tactical-preset-card.contextual { background-color: var(--surface-2); background-image: none; border-color: var(--colour-positive); color: var(--text-default); }
 
 /* Charts (CP01 found the worm's first innings dark green on dark green and the pitch-length bars cream with near-white
    labels). Innings colours come from the component; tracks and labels from the tokens. */
