@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** E10: one squad preset sets every player's training; a per-player change is kept as an override across reload. */
 test("a training preset changes the whole squad and an override survives reload", async ({ page }) => {
   test.setTimeout(240_000);
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await page.getByRole("button", { name: "Squad", exact: true }).click();
   const selects = page.locator('select[id^="training-"]');

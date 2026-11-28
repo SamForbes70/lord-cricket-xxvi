@@ -6,7 +6,7 @@ const world = JSON.parse(readFileSync("packages/data/worlds/fictional-eight-01.j
 };
 
 async function startCareer(page: import("@playwright/test").Page) {
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible();
 }

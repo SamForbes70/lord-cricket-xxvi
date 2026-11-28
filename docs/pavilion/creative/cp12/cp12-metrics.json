@@ -1,0 +1,468 @@
+{
+ "before": {
+  "base": "served build (main at f05ecf5)",
+  "startedAt": "2026-11-28T08:55:23.276Z",
+  "overflow": {
+   "01-bare-address_1366x768": 0,
+   "01-bare-address_390x844": 0,
+   "02-title-first-launch_1366x768": 0,
+   "02-title-first-launch_390x844": 0,
+   "03-title-after-sound_1366x768": 0,
+   "03-title-after-sound_390x844": 0,
+   "04-exhibition-setup_1366x768": 0,
+   "04-exhibition-setup_390x844": 0,
+   "05-guided-toss_1366x768": 0,
+   "05-guided-toss_390x844": 0,
+   "06-guided-first-ball_1366x768": 0,
+   "06-guided-first-ball_390x844": 0,
+   "07-career-club-selection_1366x768": 0,
+   "07-career-club-selection_390x844": 0,
+   "08-career-home_1366x768": 0,
+   "08-career-home_390x844": 0,
+   "09-title-returning-career_1366x768": 0,
+   "09-title-returning-career_390x844": 0
+  },
+  "headings": {
+   "01-bare-address": [
+    "h1 Start a Career",
+    "h2 New career",
+    "h2 Import portable career"
+   ],
+   "02-title-first-launch": [
+    "h2 Play with sound?",
+    "h1 Lord Cricket XXVI"
+   ],
+   "03-title-after-sound": [
+    "h1 Lord Cricket XXVI"
+   ],
+   "04-exhibition-setup": [
+    "h1 Exhibition match",
+    "h2 Take the captain’s chair.",
+    "h3 Pitch and conditions",
+    "h3 Pitch & format playing conditions",
+    "h3 Aster Harbour: squad readiness & opponent scouting",
+    "h3 Copper Vale: squad readiness & opponent scouting",
+    "h3 Playing XI 11/11",
+    "h3 Playing XI 11/11",
+    "h2 Match diagnostic"
+   ],
+   "05-guided-toss": [
+    "h1 Exhibition match",
+    "h2 Aster Harbour v Copper Vale",
+    "h2 The toss",
+    "h2 Aster Harbour: call the toss",
+    "h2 Tactical assistant & spell review",
+    "h3 Spell plan vs factual outcomes",
+    "h2 Scorecard",
+    "h2 Commentary",
+    "h2 Match settings",
+    "h2 Match diagnostic",
+    "h2 Continue or manage a match"
+   ],
+   "06-guided-first-ball": [
+    "h1 Exhibition match",
+    "h2 Copper Vale",
+    "h2 Play the first ball",
+    "h2 Ready: set tactics or advance play",
+    "h2 Opposition: their batting",
+    "h2 Tactics",
+    "h3 Batting aggression",
+    "h3 Bowling plan",
+    "h3 Named field",
+    "h2 Field and latest ball",
+    "h3 This ball",
+    "h3 Field legality (RHB)",
+    "h3 Keyboard & diagram field placement",
+    "h2 Tactical assistant & spell review",
+    "h3 Batting presets (striker)",
+    "h3 Bowling plan presets",
+    "h3 Phase-legal field presets",
+    "h3 Spell plan vs factual outcomes",
+    "h2 Scorecard",
+    "h3 Copper Vale · 0/0 (0.0)",
+    "h2 Commentary",
+    "h2 Match settings",
+    "h2 Match diagnostic",
+    "h2 Continue or manage a match"
+   ],
+   "07-career-club-selection": [
+    "h1 Start a Career",
+    "h2 New career",
+    "h2 Import portable career"
+   ],
+   "08-career-home": [
+    "h1 AHAster Harbour",
+    "h2 Clubhouse",
+    "h3 AHAster HarbourvMBMoonstone Bay",
+    "h3 Win the title",
+    "h3 Leading players",
+    "h3 Match preparation",
+    "h3 Pitch and conditions",
+    "h3 Pitch & format playing conditions",
+    "h3 Aster Harbour: squad readiness & opponent scouting",
+    "h3 Moonstone Bay: squad readiness & opponent scouting"
+   ],
+   "09-title-returning-career": [
+    "h1 AHAster Harbour",
+    "h2 Clubhouse",
+    "h3 AHAster HarbourvMBMoonstone Bay",
+    "h3 Win the title",
+    "h3 Leading players",
+    "h3 Match preparation",
+    "h3 Pitch and conditions",
+    "h3 Pitch & format playing conditions",
+    "h3 Aster Harbour: squad readiness & opponent scouting",
+    "h3 Moonstone Bay: squad readiness & opponent scouting"
+   ]
+  },
+  "tabOrder": {
+   "02-title-first-launch": [
+    "button Turn sound on",
+    "button Keep sound off",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions.",
+    "a[#scenarios] ScenariosTake over a match at the crunch.",
+    "a[#rain] Rain and reviewsWeather stoppages and player revie",
+    "a[#exhibition] Custom matchPick the format, ground and both XIs.",
+    "button Sound: off",
+    "(body)",
+    "button Turn sound on",
+    "button Keep sound off",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and"
+   ],
+   "03-title-after-sound": [
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions.",
+    "a[#scenarios] ScenariosTake over a match at the crunch.",
+    "a[#rain] Rain and reviewsWeather stoppages and player revie",
+    "a[#exhibition] Custom matchPick the format, ground and both XIs.",
+    "button Sound: off",
+    "(body)",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions.",
+    "a[#scenarios] ScenariosTake over a match at the crunch.",
+    "a[#rain] Rain and reviewsWeather stoppages and player revie",
+    "a[#exhibition] Custom matchPick the format, ground and both XIs."
+   ],
+   "09-title-returning-career": [
+    "button Clubhouse",
+    "button Squad",
+    "button Office",
+    "button Season",
+    "button Settings",
+    "a[#exhibition] Exhibition",
+    "a[#scenarios] Scenarios",
+    "a[#tournaments] Tournaments",
+    "a[#rain] Rain matches",
+    "button Choose career",
+    "button Simulate match",
+    "button Play match",
+    "button View Arven Valebridge",
+    "button View Isen Kelholt",
+    "button View Sela Sablestone",
+    "button View Nave Elmford"
+   ]
+  },
+  "animations": {},
+  "soundQuestion": {
+   "1366x768": {
+    "top": 18,
+    "bottom": 78,
+    "viewport": 768
+   },
+   "390x844": {
+    "top": 18,
+    "bottom": 149,
+    "viewport": 844
+   }
+  },
+  "notCaptured": [
+   {
+    "name": "title-returning-career",
+    "error": "locator.waitFor: Timeout 10000ms exceeded."
+   },
+   {
+    "name": "title-returning-match",
+    "error": "locator.waitFor: Timeout 60000ms exceeded."
+   },
+   {
+    "name": "settings-with-career",
+    "error": "locator.click: Timeout 30000ms exceeded."
+   },
+   {
+    "name": "settings-no-career",
+    "error": "locator.click: Timeout 30000ms exceeded."
+   }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "bareAddress": {
+   "hash": "",
+   "h1": "START A CAREER"
+  },
+  "focusAfterSoundAnswer": "body AHCVNRWIEPSFLAMBFictional cricket manage",
+  "setupIntro": "TAKE THE CAPTAIN’S CHAIR.\n\nSelect your side and an opponent. You make decisions for both teams initially. After starting a match, you can optionally delegate either team or individual decisions to the computer captain.",
+  "guidedTarget": [],
+  "finishedAt": "2026-11-28T08:57:59.460Z"
+ },
+ "after": {
+  "base": "served build (this branch)",
+  "startedAt": "2026-11-28T09:07:44.721Z",
+  "overflow": {
+   "01-bare-address_1366x768": 0,
+   "01-bare-address_390x844": 0,
+   "02-title-first-launch_1366x768": 0,
+   "02-title-first-launch_390x844": 0,
+   "03-title-after-sound_1366x768": 0,
+   "03-title-after-sound_390x844": 0,
+   "04-exhibition-setup_1366x768": 0,
+   "04-exhibition-setup_390x844": 0,
+   "05-guided-toss_1366x768": 0,
+   "05-guided-toss_390x844": 0,
+   "06-guided-first-ball_1366x768": 0,
+   "06-guided-first-ball_390x844": 0,
+   "07-career-club-selection_1366x768": 0,
+   "07-career-club-selection_390x844": 0,
+   "08-career-home_1366x768": 0,
+   "08-career-home_390x844": 0,
+   "09-title-returning-career_1366x768": 0,
+   "09-title-returning-career_390x844": 0,
+   "10-continue-career_1366x768": 0,
+   "10-continue-career_390x844": 0,
+   "11-title-returning-match_1366x768": 0,
+   "11-title-returning-match_390x844": 0,
+   "12-continue-match_1366x768": 0,
+   "12-continue-match_390x844": 0,
+   "13-settings-with-career_1366x768": 0,
+   "13-settings-with-career_390x844": 0,
+   "14-settings-no-career_1366x768": 0,
+   "14-settings-no-career_390x844": 0
+  },
+  "headings": {
+   "01-bare-address": [
+    "h1 Lord Cricket XXVI",
+    "h2 Play with sound?"
+   ],
+   "02-title-first-launch": [
+    "h1 Lord Cricket XXVI",
+    "h2 Play with sound?"
+   ],
+   "03-title-after-sound": [
+    "h1 Lord Cricket XXVI"
+   ],
+   "04-exhibition-setup": [
+    "h1 Exhibition match",
+    "h2 Take the captain’s chair.",
+    "h3 Pitch and conditions",
+    "h3 Pitch & format playing conditions",
+    "h3 Aster Harbour: squad readiness & opponent scouting",
+    "h3 Copper Vale: squad readiness & opponent scouting",
+    "h3 Playing XI 11/11",
+    "h3 Playing XI 11/11",
+    "h2 Match diagnostic"
+   ],
+   "05-guided-toss": [
+    "h1 Exhibition match",
+    "h2 Aster Harbour v Copper Vale",
+    "h2 The toss",
+    "h2 Aster Harbour: call the toss",
+    "h2 Tactical assistant & spell review",
+    "h3 Spell plan vs factual outcomes",
+    "h2 Scorecard",
+    "h2 Commentary",
+    "h2 Match settings",
+    "h2 Match diagnostic",
+    "h2 Continue or manage a match"
+   ],
+   "06-guided-first-ball": [
+    "h1 Exhibition match",
+    "h2 Aster Harbour",
+    "h2 Play the first ball",
+    "h2 Ready: set tactics or advance play",
+    "h2 Tactics",
+    "h3 Batting aggression",
+    "h3 Bowling plan",
+    "h3 Named field",
+    "h2 Field and latest ball",
+    "h3 This ball",
+    "h3 Field legality (LHB)",
+    "h2 Tactical assistant & spell review",
+    "h3 Batting presets (striker)",
+    "h3 Bowling plan presets",
+    "h3 Phase-legal field presets",
+    "h3 Spell plan vs factual outcomes",
+    "h2 Scorecard",
+    "h3 Aster Harbour · 0/0 (0.0)",
+    "h2 Commentary",
+    "h2 Match settings",
+    "h2 Match diagnostic",
+    "h2 Continue or manage a match"
+   ],
+   "07-career-club-selection": [
+    "h1 Start a Career",
+    "h2 New career",
+    "h2 Import portable career"
+   ],
+   "08-career-home": [
+    "h1 AHAster Harbour",
+    "h2 Clubhouse",
+    "h3 AHAster HarbourvMBMoonstone Bay",
+    "h3 Win the title",
+    "h3 Leading players",
+    "h3 Match preparation",
+    "h3 Pitch and conditions",
+    "h3 Pitch & format playing conditions",
+    "h3 Aster Harbour: squad readiness & opponent scouting",
+    "h3 Moonstone Bay: squad readiness & opponent scouting"
+   ],
+   "09-title-returning-career": [
+    "h1 Lord Cricket XXVI"
+   ],
+   "10-continue-career": [
+    "h1 AHAster Harbour",
+    "h2 Clubhouse",
+    "h3 AHAster HarbourvMBMoonstone Bay",
+    "h3 Win the title",
+    "h3 Leading players",
+    "h3 Match preparation",
+    "h3 Pitch and conditions",
+    "h3 Pitch & format playing conditions",
+    "h3 Aster Harbour: squad readiness & opponent scouting",
+    "h3 Moonstone Bay: squad readiness & opponent scouting"
+   ],
+   "11-title-returning-match": [
+    "h1 Lord Cricket XXVI"
+   ],
+   "12-continue-match": [
+    "h1 Exhibition match",
+    "h2 Aster Harbour",
+    "h2 Keep the match moving",
+    "h2 Ready: set tactics or advance play",
+    "h2 Opposition: their bowling",
+    "h2 Tactics",
+    "h3 Batting aggression",
+    "h3 Bowling plan",
+    "h3 Named field",
+    "h2 Field and latest ball",
+    "h3 This ball",
+    "h3 Field legality (LHB)",
+    "h2 Tactical assistant & spell review",
+    "h3 Batting presets (striker)",
+    "h3 Bowling plan presets",
+    "h3 Phase-legal field presets",
+    "h3 Spell plan vs factual outcomes",
+    "h2 Scorecard",
+    "h3 Aster Harbour · 0/0 (0.1)",
+    "h2 Commentary",
+    "h2 Match settings",
+    "h2 Match diagnostic",
+    "h2 Continue or manage a match"
+   ],
+   "13-settings-with-career": [
+    "h1 AHAster Harbour",
+    "h2 Settings",
+    "h3 Career file & recovery",
+    "h3 Career copy"
+   ],
+   "14-settings-no-career": [
+    "h1 Settings",
+    "h2 Display, matches and sound"
+   ]
+  },
+  "tabOrder": {
+   "02-title-first-launch": [
+    "button Turn sound on",
+    "button Keep sound off",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions.",
+    "a[#scenarios] ScenariosTake over a match at the crunch.",
+    "a[#rain] Rain and reviewsWeather stoppages and player revie",
+    "a[#exhibition] Custom matchPick the format, ground and both XIs.",
+    "a[#settings] Settings",
+    "button Sound: off",
+    "(body)",
+    "button Turn sound on",
+    "button Keep sound off",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes"
+   ],
+   "03-title-after-sound": [
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions.",
+    "a[#scenarios] ScenariosTake over a match at the crunch.",
+    "a[#rain] Rain and reviewsWeather stoppages and player revie",
+    "a[#exhibition] Custom matchPick the format, ground and both XIs.",
+    "a[#settings] Settings",
+    "button Sound: off",
+    "(body)",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions.",
+    "a[#scenarios] ScenariosTake over a match at the crunch.",
+    "a[#rain] Rain and reviewsWeather stoppages and player revie",
+    "a[#exhibition] Custom matchPick the format, ground and both XIs."
+   ],
+   "09-title-returning-career": [
+    "a[#career] Continue careerAster Harbour 2027Season 1 · 0/56 f",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions.",
+    "a[#scenarios] ScenariosTake over a match at the crunch.",
+    "a[#rain] Rain and reviewsWeather stoppages and player revie",
+    "a[#exhibition] Custom matchPick the format, ground and both XIs.",
+    "a[#settings] Settings",
+    "button Sound: off",
+    "(body)",
+    "a[#career] Continue careerAster Harbour 2027Season 1 · 0/56 f",
+    "button Quick matchT20 · suggested XIs · one click",
+    "button Guided first matchLearn each decision as it comes",
+    "a[#career] CareerManage a club through seasons, contracts and",
+    "a[#tournaments] TournamentsCups, series, tours and auctions."
+   ]
+  },
+  "animations": {},
+  "soundQuestion": {
+   "1366x768": {
+    "top": 331,
+    "bottom": 412,
+    "viewport": 768
+   },
+   "390x844": {
+    "top": 333,
+    "bottom": 464,
+    "viewport": 844
+   }
+  },
+  "notCaptured": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "bareAddress": {
+   "hash": "",
+   "h1": "LORD CRICKET XXVI"
+  },
+  "focusAfterSoundAnswer": "button Quick matchT20 · suggested XIs · one cli",
+  "setupIntro": "TAKE THE CAPTAIN’S CHAIR.\n\nPick the format, the ground and both XIs. A custom match starts with you deciding for both teams. Once it starts, Tactical captain in Match settings hands either side to the computer captain. To play the computer straight away, use Quick match on the title screen.",
+  "guidedTarget": [],
+  "continueCareer": "CONTINUE CAREER\nAster Harbour 2027\nSeason 1 · 0/56 fixtures · Mon 1 March 2027",
+  "continueCareerLanded": "#career",
+  "continueMatch": "CONTINUE MATCH\nAster Harbour v Copper Vale\nIn progress: ready for the next ball",
+  "continueMatchLanded": {
+   "hash": "#exhibition",
+   "phase": "READY"
+  },
+  "finishedAt": "2026-11-28T09:08:24.304Z"
+ }
+}

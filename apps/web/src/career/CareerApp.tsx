@@ -54,6 +54,7 @@ import { FixturesScreen } from "./FixturesScreen.js";
 import { handOverCareerIntro, takeInspectPlayer } from "../match/career-intro-handoff.js";
 import { NoValue } from "../NoValue.js";
 import { AWARD_NOTICE_TEXT, careerPhaseLabel } from "../display-labels.js";
+import { ModeMasthead } from "../ModeMasthead.js";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
 const LAUNCH_KEY = "lcxxvi-career-match-launch";
@@ -160,9 +161,10 @@ const CLUB_PLACES: readonly { id: string; label: string; screens: readonly Scree
 ];
 const SECTION_LABEL: Partial<Record<Screen, string>> = { FIXTURES: "Fixtures", STATISTICS: "Statistics", CAREER: "Stories" };
 
-export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean } = {}) {
+export function CareerApp({ inspectionOnly = false, openSettings = false }: { inspectionOnly?: boolean; openSettings?: boolean } = {}) {
   const [, redraw] = useState(0);
-  const [screen, setScreen] = useState<Screen>("HOME");
+  // CP12 (CD-046): the title screen's Settings link (`#settings`) opens the Settings screen of the active career.
+  const [screen, setScreen] = useState<Screen>(openSettings ? "SETTINGS" : "HOME");
   const [pendingMatch, setPendingMatch] = useState<{ round: number | null } | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [stagedWorld, setStagedWorld] = useState<NewGameWorldCopy | null>(null);
@@ -924,10 +926,259 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
     </section>
   );
 
+  /**
+   * The preferences on the career's Settings screen. CP12 (CD-046): the same controls, writing the same stored values,
+   * also make the Settings page that the title screen opens when no career is loaded.
+   */
+  const settingsGrid = (
+    <div className="settings-grid">
+      <label>
+        Text scale
+        <select value={scale} onChange={(event) => setScale(event.currentTarget.value)}>
+          <option value="90">90%</option>
+          <option value="100">100%</option>
+          <option value="115">115%</option>
+          <option value="125">125%</option>
+          <option value="150">150%</option>
+        </select>
+      </label>
+      <label>
+        Layout density
+        <select value={density} onChange={(event) => setDensity(event.currentTarget.value)}>
+          <option value="comfortable">Comfortable</option>
+          <option value="compact">Compact</option>
+        </select>
+      </label>
+      <label className="check-label">
+        <input
+          type="checkbox"
+          checked={reducedMotion}
+          onChange={(event) => setReducedMotion(event.currentTarget.checked)}
+        />{" "}
+        Reduced motion
+      </label>
+      <label className="check-label">
+        <input
+          type="checkbox"
+          checked={showTacticalBriefings}
+          onChange={(event) => setShowTacticalBriefings(event.currentTarget.checked)}
+        />{" "}
+        Show tactical briefings &amp; assistant
+      </label>
+      <label>
+        Highlight pacing
+        <select
+          aria-label="Highlight pacing"
+          value={highlightPacing}
+          onChange={(event) =>
+            setHighlightPacing(event.currentTarget.value as HighlightPacingMode)
+          }
+        >
+          <option value="EVERY_BALL">Every ball</option>
+          <option value="KEY_MOMENT">Key moments</option>
+          <option value="FAST">Fast</option>
+        </select>
+      </label>
+      <label>
+        Highlight motion
+        <select
+          aria-label="Highlight motion"
+          value={highlightMotion}
+          onChange={(event) =>
+            setHighlightMotion(event.currentTarget.value as HighlightMotionMode)
+          }
+        >
+          <option value="AUTO">System default</option>
+          <option value="REDUCED">Reduced motion</option>
+        </select>
+      </label>
+      <label>
+        Match moments
+        <select
+          aria-label="Match moments"
+          value={matchMoments}
+          onChange={(event) => {
+            const value = event.currentTarget.value;
+            setMatchMoments(value === "brief" || value === "off" ? value : "full");
+          }}
+        >
+          <option value="full">Full</option>
+          <option value="brief">Brief</option>
+          <option value="off">Off</option>
+        </select>
+      </label>
+      <label>
+        Match commentary
+        <select
+          aria-label="Match commentary"
+          value={matchCommentary}
+          onChange={(event) => setMatchCommentary(event.currentTarget.value)}
+        >
+          <option value="full">Standard</option>
+          <option value="detailed">Detailed</option>
+          <option value="brief">Brief</option>
+          <option value="off">Off</option>
+        </select>
+      </label>
+      <label>
+        Match sound
+        <select
+          aria-label="Match sound"
+          value={audioPrefs.muted ? "muted" : "on"}
+          onChange={(event) => {
+            const muted = event.currentTarget.value === "muted";
+            setAudioPrefs((prev) => ({
+              ...prev,
+              muted,
+            }));
+          }}
+        >
+          <option value="on">On</option>
+          <option value="muted">Muted (silent)</option>
+        </select>
+      </label>
+      <label>
+        Crowd volume ({audioPrefs.crowdVolume}%)
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={5}
+          aria-label="Career crowd volume"
+          value={audioPrefs.crowdVolume}
+          onChange={(event) => {
+            const crowdVolume = Number(event.currentTarget.value);
+            setAudioPrefs((prev) => ({
+              ...prev,
+              crowdVolume,
+            }));
+          }}
+        />
+      </label>
+      <label>
+        Effects volume ({audioPrefs.effectsVolume}%)
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={5}
+          aria-label="Career effects volume"
+          value={audioPrefs.effectsVolume}
+          onChange={(event) => {
+            const effectsVolume = Number(event.currentTarget.value);
+            setAudioPrefs((prev) => ({
+              ...prev,
+              effectsVolume,
+            }));
+          }}
+        />
+      </label>
+      <label>
+        Commentary narration volume ({audioPrefs.commentaryVolume}%)
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={5}
+          aria-label="Career commentary narration volume"
+          value={audioPrefs.commentaryVolume}
+          onChange={(event) => {
+            const commentaryVolume = Number(event.currentTarget.value);
+            setAudioPrefs((prev) => ({
+              ...prev,
+              commentaryVolume,
+            }));
+          }}
+        />
+      </label>
+      <label>
+        Interface volume ({audioPrefs.interfaceVolume}%)
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={5}
+          aria-label="Career interface volume"
+          value={audioPrefs.interfaceVolume}
+          onChange={(event) => {
+            const interfaceVolume = Number(event.currentTarget.value);
+            setAudioPrefs((prev) => ({
+              ...prev,
+              interfaceVolume,
+            }));
+          }}
+        />
+      </label>
+      <label>
+        Spoken narration
+        <select
+          aria-label="Spoken narration"
+          value={audioPrefs.narrationEnabled ? "on" : "off"}
+          onChange={(event) => {
+            const narrationEnabled = event.currentTarget.value === "on";
+            setAudioPrefs((prev) => ({
+              ...prev,
+              narrationEnabled,
+            }));
+          }}
+        >
+          <option value="off">Off</option>
+          <option value="on">On (browser speech)</option>
+        </select>
+      </label>
+      <label>
+        Audio captions
+        <select
+          aria-label="Audio captions"
+          value={audioPrefs.captionsEnabled ? "shown" : "hidden"}
+          onChange={(event) => {
+            const captionsEnabled = event.currentTarget.value === "shown";
+            setAudioPrefs((prev) => ({
+              ...prev,
+              captionsEnabled,
+            }));
+          }}
+        >
+          <option value="shown">Shown</option>
+          <option value="hidden">Hidden</option>
+        </select>
+      </label>
+    </div>
+  );
+
   if (busy && !state && savedCareers.length === 0) {
     return (
       <main className="career-shell">
         <p>Loading Lord Cricket XXVI…</p>
+      </main>
+    );
+  }
+
+  // CP12 (CD-046): Settings from the title screen when no career is loaded. The same controls as the career's Settings
+  // screen, writing the same values already kept in this browser; nothing new is stored.
+  if (!state && openSettings) {
+    return (
+      <main
+        className={`career-shell text-scale-root density-${density}`}
+        style={{ fontSize: `${Number(scale) / 100}rem`, ["--text-scale" as string]: Number(scale) / 100 }}
+        data-testid="settings-screen"
+      >
+        <ModeMasthead title="Settings" back={{ label: "Title screen", href: "#title" }} />
+        {activeError && <ErrorBanner rawError={activeError} />}
+        <section aria-labelledby="settings-heading">
+          <h2 id="settings-heading">Display, matches and sound</h2>
+          <p>
+            Kept in this browser, not in a save. Text scale, layout density and reduced motion apply to the career
+            screens; a match has its own text size and layout under Match settings. The match and sound settings apply
+            everywhere. Career file actions appear here once a career is loaded.
+          </p>
+          {settingsGrid}
+          <p>
+            <a className="button-link" href="#career">
+              Start or continue a career
+            </a>
+          </p>
+        </section>
       </main>
     );
   }
@@ -1234,6 +1485,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
         {!inspectionOnly && <a href="#scenarios">Scenarios</a>}
         {!inspectionOnly && <a href="#tournaments">Tournaments</a>}
         {!inspectionOnly && <a href="#rain">Rain matches</a>}
+        {/* CP12: a way back to the front door from inside a career (before, only Choose career, then its Title link). */}
+        {!inspectionOnly && <a href="#title">Title screen</a>}
         <button
           disabled={busy || inspectionOnly}
           onClick={() =>
@@ -1633,219 +1886,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
       {screen === "SETTINGS" && (
         <section aria-labelledby="settings-heading">
           <h2 id="settings-heading">Settings</h2>
-          <div className="settings-grid">
-            <label>
-              Text scale
-              <select value={scale} onChange={(event) => setScale(event.currentTarget.value)}>
-                <option value="90">90%</option>
-                <option value="100">100%</option>
-                <option value="115">115%</option>
-                <option value="125">125%</option>
-                <option value="150">150%</option>
-              </select>
-            </label>
-            <label>
-              Layout density
-              <select value={density} onChange={(event) => setDensity(event.currentTarget.value)}>
-                <option value="comfortable">Comfortable</option>
-                <option value="compact">Compact</option>
-              </select>
-            </label>
-            <label className="check-label">
-              <input
-                type="checkbox"
-                checked={reducedMotion}
-                onChange={(event) => setReducedMotion(event.currentTarget.checked)}
-              />{" "}
-              Reduced motion
-            </label>
-            <label className="check-label">
-              <input
-                type="checkbox"
-                checked={showTacticalBriefings}
-                onChange={(event) => setShowTacticalBriefings(event.currentTarget.checked)}
-              />{" "}
-              Show tactical briefings &amp; assistant
-            </label>
-            <label>
-              Highlight pacing
-              <select
-                aria-label="Highlight pacing"
-                value={highlightPacing}
-                onChange={(event) =>
-                  setHighlightPacing(event.currentTarget.value as HighlightPacingMode)
-                }
-              >
-                <option value="EVERY_BALL">Every ball</option>
-                <option value="KEY_MOMENT">Key moments</option>
-                <option value="FAST">Fast</option>
-              </select>
-            </label>
-            <label>
-              Highlight motion
-              <select
-                aria-label="Highlight motion"
-                value={highlightMotion}
-                onChange={(event) =>
-                  setHighlightMotion(event.currentTarget.value as HighlightMotionMode)
-                }
-              >
-                <option value="AUTO">System default</option>
-                <option value="REDUCED">Reduced motion</option>
-              </select>
-            </label>
-            <label>
-              Match moments
-              <select
-                aria-label="Match moments"
-                value={matchMoments}
-                onChange={(event) => {
-                  const value = event.currentTarget.value;
-                  setMatchMoments(value === "brief" || value === "off" ? value : "full");
-                }}
-              >
-                <option value="full">Full</option>
-                <option value="brief">Brief</option>
-                <option value="off">Off</option>
-              </select>
-            </label>
-            <label>
-              Match commentary
-              <select
-                aria-label="Match commentary"
-                value={matchCommentary}
-                onChange={(event) => setMatchCommentary(event.currentTarget.value)}
-              >
-                <option value="full">Standard</option>
-                <option value="detailed">Detailed</option>
-                <option value="brief">Brief</option>
-                <option value="off">Off</option>
-              </select>
-            </label>
-            <label>
-              Match sound
-              <select
-                aria-label="Match sound"
-                value={audioPrefs.muted ? "muted" : "on"}
-                onChange={(event) => {
-                  const muted = event.currentTarget.value === "muted";
-                  setAudioPrefs((prev) => ({
-                    ...prev,
-                    muted,
-                  }));
-                }}
-              >
-                <option value="on">On</option>
-                <option value="muted">Muted (silent)</option>
-              </select>
-            </label>
-            <label>
-              Crowd volume ({audioPrefs.crowdVolume}%)
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                aria-label="Career crowd volume"
-                value={audioPrefs.crowdVolume}
-                onChange={(event) => {
-                  const crowdVolume = Number(event.currentTarget.value);
-                  setAudioPrefs((prev) => ({
-                    ...prev,
-                    crowdVolume,
-                  }));
-                }}
-              />
-            </label>
-            <label>
-              Effects volume ({audioPrefs.effectsVolume}%)
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                aria-label="Career effects volume"
-                value={audioPrefs.effectsVolume}
-                onChange={(event) => {
-                  const effectsVolume = Number(event.currentTarget.value);
-                  setAudioPrefs((prev) => ({
-                    ...prev,
-                    effectsVolume,
-                  }));
-                }}
-              />
-            </label>
-            <label>
-              Commentary narration volume ({audioPrefs.commentaryVolume}%)
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                aria-label="Career commentary narration volume"
-                value={audioPrefs.commentaryVolume}
-                onChange={(event) => {
-                  const commentaryVolume = Number(event.currentTarget.value);
-                  setAudioPrefs((prev) => ({
-                    ...prev,
-                    commentaryVolume,
-                  }));
-                }}
-              />
-            </label>
-            <label>
-              Interface volume ({audioPrefs.interfaceVolume}%)
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                aria-label="Career interface volume"
-                value={audioPrefs.interfaceVolume}
-                onChange={(event) => {
-                  const interfaceVolume = Number(event.currentTarget.value);
-                  setAudioPrefs((prev) => ({
-                    ...prev,
-                    interfaceVolume,
-                  }));
-                }}
-              />
-            </label>
-            <label>
-              Spoken narration
-              <select
-                aria-label="Spoken narration"
-                value={audioPrefs.narrationEnabled ? "on" : "off"}
-                onChange={(event) => {
-                  const narrationEnabled = event.currentTarget.value === "on";
-                  setAudioPrefs((prev) => ({
-                    ...prev,
-                    narrationEnabled,
-                  }));
-                }}
-              >
-                <option value="off">Off</option>
-                <option value="on">On (browser speech)</option>
-              </select>
-            </label>
-            <label>
-              Audio captions
-              <select
-                aria-label="Audio captions"
-                value={audioPrefs.captionsEnabled ? "shown" : "hidden"}
-                onChange={(event) => {
-                  const captionsEnabled = event.currentTarget.value === "shown";
-                  setAudioPrefs((prev) => ({
-                    ...prev,
-                    captionsEnabled,
-                  }));
-                }}
-              >
-                <option value="shown">Shown</option>
-                <option value="hidden">Hidden</option>
-              </select>
-            </label>
-          </div>
+          {settingsGrid}
           <div className="career-panel settings-actions">
             <h3>Career file &amp; recovery</h3>
             <div className="action-row">

@@ -1003,6 +1003,8 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   // other side is always the computer captain. The player cannot hand it to themselves or take both sides.
   // The same holds for the player's fixture in a stored tournament run (the worker reports the run and fixture).
   const opponentLocked = Boolean(careerLaunch.current?.managedTeamId) || Boolean(scenario) || Boolean(tournamentOpponent);
+  /** CP12 (CD-052): the decision on screen is the player's (not the computer captain's), so the guided coach points at it. */
+  const playerDecides = !aiTeamId || view?.decisionTeamId !== aiTeamId;
   function changeAiOpponent(id: string) {
     if (opponentLocked) return;
     const next = id || null;
@@ -1432,11 +1434,22 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         <>
           <section className="intro">
             <h2>Take the captain’s chair.</h2>
-            <p>
-              Select your side and an opponent. You make decisions for{" "}
-              <strong>both teams</strong> initially. After starting a match, you can optionally
-              delegate either team or individual decisions to the computer captain.
-            </p>
+            {/* CP12 (CD-047): says what a custom match actually does. Only a quick or guided match hands the opponent to
+                the computer captain by itself; a custom match keeps any side handed over earlier in this session. */}
+            {aiTeamId ? (
+              <p data-testid="setup-control-note">
+                Pick the format, the ground and both XIs. The computer captain still plays{" "}
+                <strong>{displayCatalog?.teams.find((team) => team.id === aiTeamId)?.name ?? "the side you handed it"}</strong>{" "}
+                from earlier in this session if that side is in the match; you decide for the other. Change it under
+                Tactical captain in Match settings once the match starts.
+              </p>
+            ) : (
+              <p data-testid="setup-control-note">
+                Pick the format, the ground and both XIs. A custom match starts with you deciding for{" "}
+                <strong>both teams</strong>. Once it starts, Tactical captain in Match settings hands either side to
+                the computer captain. To play the computer straight away, use Quick match on the title screen.
+              </p>
+            )}
           </section>
           {displayCatalog ? (
             <>
@@ -1631,10 +1644,11 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
               </p>
             </div>
           </section>
-          {guided && <GuidedCoach view={view} onEnd={() => { try { localStorage.removeItem(GUIDED_MATCH_KEY); } catch { /* ignore */ } setGuided(false); }} />}
+          {guided && <GuidedCoach view={view} yourMove={playerDecides} onEnd={() => { try { localStorage.removeItem(GUIDED_MATCH_KEY); } catch { /* ignore */ } setGuided(false); }} />}
           <section
             className="decision"
             id="decision"
+            data-coached={guided && view.phase !== "COMPLETE" && playerDecides ? "true" : undefined}
             aria-busy={busy || aiStepPending}
             data-phase={view.phase}
             data-revision={view.revision}
@@ -2913,12 +2927,17 @@ function Tactics({
     </section>
   );
 }
+/**
+ * CP12 (CD-046): the bare address opens the title screen, the game's front door. Every explicit route behaves as
+ * before, and any other hash still opens the career screen.
+ */
+const DEFAULT_ROUTE = "#title";
 function RootApp() {
-  const [hash, setHash] = useState(window.location.hash || "#career");
+  const [hash, setHash] = useState(window.location.hash || DEFAULT_ROUTE);
   const [retainedMatch, setRetainedMatch] = useState(() => sessionStorage.getItem("lcxxvi-inspecting-match") === "1");
   const [offlineState, setOfflineState] = useState(() => offlineUpdateCoordinator.getState());
   useEffect(() => {
-    const onHash = () => setHash(window.location.hash || "#career");
+    const onHash = () => setHash(window.location.hash || DEFAULT_ROUTE);
     window.addEventListener("hashchange", onHash);
     const unsub = offlineUpdateCoordinator.subscribe(setOfflineState);
     void offlineUpdateCoordinator.register();
@@ -2956,7 +2975,7 @@ function RootApp() {
     {hash === "#scenarios" && <ScenariosApp />}
     {hash === "#tournaments" && <TournamentsApp />}
     {hash === "#rain" && <RainApp />}
-    {hash !== "#exhibition" && hash !== "#title" && hash !== "#scenarios" && hash !== "#tournaments" && hash !== "#rain" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} />)}
+    {hash !== "#exhibition" && hash !== "#title" && hash !== "#scenarios" && hash !== "#tournaments" && hash !== "#rain" && (hash === "#roster-career" ? <RosterCareerApp inspectionOnly={retainedMatch} /> : <CareerApp inspectionOnly={retainedMatch} openSettings={hash === "#settings"} />)}
   </>;
 }
 

@@ -72,7 +72,7 @@ test("the pitch inspection gives a verdict in plain words", async ({ page }) => 
 });
 
 test("career dates read as words, such as Mon 1 March 2027", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await expect(page.getByTestId("career-masthead-subtitle")).toContainText("Round 1 · Mon 1 March 2027", { timeout: 30_000 });
   await expect(page.getByTestId("career-masthead-subtitle")).not.toContainText("2027-03-01");

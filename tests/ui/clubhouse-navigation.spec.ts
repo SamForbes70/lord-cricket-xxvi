@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** E8: five places in the club, and the other game modes in their own navigation region. */
 test("club screens and other game modes are separate navigation regions, in keyboard order", async ({ page }) => {
   test.setTimeout(120_000);
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   const club = page.getByRole("navigation", { name: "Career navigation" });
   const modes = page.getByRole("navigation", { name: "Other ways to play" });
@@ -32,7 +32,7 @@ test("club screens and other game modes are separate navigation regions, in keyb
   await club.getByRole("button", { name: "Clubhouse" }).click();
   // Everything that leaves the club is in the second row; nothing reachable before is lost.
   expect((await modes.locator("button, a").allTextContents()).map((text) => text.trim().toLowerCase())).toEqual(
-    ["exhibition", "scenarios", "tournaments", "rain matches", "choose career"]);
+    ["exhibition", "scenarios", "tournaments", "rain matches", "title screen", "choose career"]);
 
   // Keyboard order follows the visual order: the club row first, then the modes row.
   await club.getByRole("button", { name: "Settings" }).focus();

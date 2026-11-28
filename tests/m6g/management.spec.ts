@@ -4,7 +4,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
   test.setTimeout(300_000);
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
-  await page.goto("/");
+  await page.goto("/#career");
   await expect(page.getByRole("heading", { name: /Start a Career/i })).toBeVisible();
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible();
@@ -95,7 +95,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
 });
 
 test("M6G primary career controls are keyboard reachable at 1366x768", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#career");
   await expect(page.getByRole("heading", { name: /Start a Career/i })).toBeVisible();
   await page.keyboard.press("Tab");
   const focused = await page.locator(":focus").evaluate((node) => ({ tag: node.tagName, text: node.textContent }));

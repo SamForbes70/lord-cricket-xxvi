@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TeamCrest } from "./world/TeamCrest.js";
 import { markSoundQuestionAnswered, playUiClick, setSoundOn, soundOn, soundQuestionAnswered } from "./ui-sound.js";
 import { CricketerFigure } from "./world/CricketerFigure.js";
 import { careerWorld } from "./career/world-state.js";
+import { readContinueTarget, type ContinueTarget } from "./title-continue.js";
 
 /** Session flag read by the exhibition setup: start a T20 with the suggested XIs straight away (valid for a minute). */
 export const QUICK_MATCH_KEY = "lcxxvi-quick-match";
@@ -32,37 +33,45 @@ const MODES: { href: string; title: string; text: string; icon: string }[] = [
 /**
  * The title screen (owner order of 20 November 2026, step 2): the game's front door, in the night-match style the
  * owner set as the bar for menus. Quick match starts a T20 with the suggested XIs in one click; the guided first
- * match is the same with a coach explaining each decision. Opened by the launchers at `#title`; the root address
- * still opens the career screen.
+ * match is the same with a coach explaining each decision. Opened by the launchers at `#title`, and since CP12
+ * (CD-046) also at the bare address. Continue resumes the most recent active match or career, read from what the game
+ * already stores (`title-continue.ts`); Settings opens the shared settings (`#settings`).
  */
 export function TitleScreen() {
   const teams = careerWorld.teams;
   const [sound, setSound] = useState(() => soundOn());
   const [asked, setAsked] = useState(() => soundQuestionAnswered());
+  const [resume, setResume] = useState<ContinueTarget | null>(null);
+  const firstAction = useRef<HTMLElement | null>(null);
+  const answeredByQuestion = useRef(false);
+  useEffect(() => {
+    let alive = true;
+    void readContinueTarget().then((target) => {
+      if (alive) setResume(target);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  // CP12: once the first-run question is answered it leaves the page, so focus moves on to the first action instead
+  // of falling back to the top of the document.
+  useEffect(() => {
+    if (asked && answeredByQuestion.current) {
+      answeredByQuestion.current = false;
+      firstAction.current?.focus();
+    }
+  }, [asked]);
   const chooseSound = (on: boolean) => {
     setSound(!setSoundOn(on).muted);
     markSoundQuestionAnswered();
     setAsked(true);
   };
+  const answerQuestion = (on: boolean) => {
+    answeredByQuestion.current = true;
+    chooseSound(on);
+  };
   return (
     <main className="title-screen" data-testid="title-screen">
-      {/* CP09 (CD-028): the first-run sound question is a compact bar above everything, so it is in view on first launch. */}
-      {!asked && (
-        <section className="title-sound-question" aria-labelledby="sound-question-heading" data-testid="sound-question">
-          <div className="title-sound-question-text">
-            <h2 id="sound-question-heading">Play with sound?</h2>
-            <p>Crowd, bat and ball, and menu sounds. You can change this at any time.</p>
-          </div>
-          <div className="title-sound-question-actions">
-            <button type="button" className="primary" onClick={() => chooseSound(true)}>
-              Turn sound on
-            </button>
-            <button type="button" onClick={() => chooseSound(false)}>
-              Keep sound off
-            </button>
-          </div>
-        </section>
-      )}
       <div className="title-hero">
         <CricketerFigure className="title-figure title-figure-left" pose="batter" kit={teams[0]?.colours ?? []} seed="title-batter" height={380} />
         <CricketerFigure className="title-figure title-figure-right" pose="bowler" kit={teams[7]?.colours ?? teams[1]?.colours ?? []} seed="title-bowler" height={380} />
@@ -76,8 +85,49 @@ export function TitleScreen() {
           Lord Cricket <span>XXVI</span>
         </h1>
         <p className="title-tagline">Eight clubs, eight grounds, every ball decided by you or your captain.</p>
+        {/* CP09 (CD-028) put the first-run sound question in view on first launch; CP12 keeps it in view but places it
+            after the wordmark, so the page's one h1 comes before this h2 and the question sits just above the actions. */}
+        {!asked && (
+          <section className="title-sound-question" aria-labelledby="sound-question-heading" data-testid="sound-question">
+            <div className="title-sound-question-text">
+              <h2 id="sound-question-heading">Play with sound?</h2>
+              <p>Crowd, bat and ball, and menu sounds. You can change this at any time.</p>
+            </div>
+            <div className="title-sound-question-actions">
+              <button type="button" className="primary" onClick={() => answerQuestion(true)}>
+                Turn sound on
+              </button>
+              <button type="button" onClick={() => answerQuestion(false)}>
+                Keep sound off
+              </button>
+            </div>
+          </section>
+        )}
+        {resume && (
+          <a
+            ref={(el) => {
+              firstAction.current = el;
+            }}
+            className="title-continue"
+            href={resume.href}
+            data-testid="title-continue"
+            data-kind={resume.kind}
+            onClick={() => playUiClick()}
+          >
+            <span className="title-continue-action">{resume.action}</span>
+            <strong>{resume.title}</strong>
+            <small>{resume.detail}</small>
+          </a>
+        )}
         <div className="title-actions">
-          <button type="button" className="primary title-play" onClick={() => launchQuickMatch(false)}>
+          <button
+            type="button"
+            ref={(el) => {
+              if (!resume) firstAction.current = el;
+            }}
+            className={resume ? "title-play" : "primary title-play"}
+            onClick={() => launchQuickMatch(false)}
+          >
             Quick match
             <small>T20 · suggested XIs · one click</small>
           </button>
@@ -99,6 +149,10 @@ export function TitleScreen() {
         ))}
       </nav>
       <div className="title-sound">
+        {/* CP12 (CD-046): the shared settings, with or without a career. */}
+        <a className="button-link" href="#settings" onClick={() => playUiClick()}>
+          Settings
+        </a>
         <button type="button" aria-pressed={sound} onClick={() => chooseSound(!sound)}>
           Sound: {sound ? "on" : "off"}
         </button>

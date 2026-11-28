@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** E1: after a managed fixture, Home opens on a match report built from the recorded scorecard. */
 test("a simulated career match is followed by a match report that can be closed and reopened", async ({ page }) => {
   test.setTimeout(180_000);
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await expect(page.getByTestId("match-report")).toHaveCount(0);
   await page.getByRole("button", { name: "Simulate match" }).click();

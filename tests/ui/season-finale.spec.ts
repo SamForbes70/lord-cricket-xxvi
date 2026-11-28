@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** E9: when the last fixture is complete, Home presents the finale step by step (extended by LC_SEASON_REVIEW_V1), and the rollover is unchanged. */
 test("a completed season is presented as a finale and then rolls over as before", async ({ page }) => {
   test.setTimeout(600_000);
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await expect(page.getByTestId("season-finale")).toHaveCount(0);
   for (let round = 1; round <= 14; round += 1) {

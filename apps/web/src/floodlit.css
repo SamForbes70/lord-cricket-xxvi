@@ -462,7 +462,7 @@ body .captain-station .field-read { color: var(--fl-muted); }
 .title-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
 .title-actions button { display: grid; gap: 2px; min-width: 15rem; padding: 14px 26px; font-size: 1.35em; text-transform: uppercase; }
 .title-actions button small { font: 500 0.55em var(--fl-body); text-transform: none; letter-spacing: 0; opacity: 0.85; }
-.title-actions .title-guided { background-color: rgba(10, 34, 31, 0.9); border-color: rgba(231, 187, 95, 0.6); color: var(--fl-text); }
+.title-actions .title-guided, .title-actions .title-play:not(.primary) { background-color: rgba(10, 34, 31, 0.9); border-color: rgba(231, 187, 95, 0.6); color: var(--fl-text); }
 .title-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr)); gap: 12px; margin-top: 18px; }
 .title-mode {
   display: grid; gap: 4px; align-content: start; padding: 16px; border-radius: var(--fl-radius); text-decoration: none;
@@ -488,7 +488,17 @@ body .captain-station .field-read { color: var(--fl-muted); }
 .guided-coach p { margin: 0; max-width: 48rem; }
 .guided-step { font: 700 0.75em var(--fl-display); letter-spacing: 0.18em; text-transform: uppercase; color: #ffe6b0; }
 .guided-actions { display: flex; gap: 10px; align-items: center; }
-.title-actions .title-play small { color: var(--fl-gold-ink); opacity: 0.8; }
+/* CP12 (CD-052): the coach names the control and points at the decision tray just below, which carries a matching
+   outline. Static: nothing moves, so reduced motion needs no rule. */
+.guided-coach { position: relative; }
+.guided-coach .guided-move { margin-top: 8px; color: #ffe6b0; }
+.guided-coach .guided-move strong { color: var(--fl-gold-hi); }
+.guided-coach[data-pointing="true"]::after {
+  content: ""; position: absolute; left: 36px; bottom: -11px; width: 18px; height: 18px; transform: rotate(45deg);
+  background-color: #23301b; border-right: 1px solid #8a6a24; border-bottom: 1px solid #8a6a24;
+}
+.decision[data-coached="true"] { outline: 2px solid var(--fl-gold); outline-offset: 3px; }
+.title-actions .primary.title-play small { color: var(--fl-gold-ink); opacity: 0.8; }
 
 /* Full-figure cricketers (owner order, step 3): original, code-drawn art in club kits for the menus. */
 .title-figure { position: absolute; bottom: -6px; z-index: -1; filter: drop-shadow(0 0 18px rgba(231, 187, 95, 0.28)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)); }
@@ -501,11 +511,24 @@ body .captain-station .field-read { color: var(--fl-muted); }
 
 /* Motion (owner order, step 4). Screens fade in (opacity only, so nothing shifts under the pointer); the lot on the
    block and a changed score pop once; buttons give under the press. All of it is off under reduced motion. */
-.title-sound { display: flex; justify-content: center; margin-top: 14px; }
+.title-sound { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px; }
+/* CP12 (CD-046): Continue, above the quick match, for a returning player. */
+.title-continue {
+  display: grid; gap: 2px; justify-items: center; width: min(100%, 30rem); margin: -8px auto 16px; padding: 12px 22px;
+  border-radius: var(--fl-radius); text-decoration: none; color: var(--fl-gold-ink);
+  background-color: var(--fl-gold); border: 1px solid var(--fl-gold-hi); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.title-continue-action { font: 700 1.35em var(--fl-display); text-transform: uppercase; letter-spacing: 0.03em; }
+.title-continue strong { font-weight: 700; overflow-wrap: anywhere; }
+.title-continue strong, .title-continue small { color: var(--fl-gold-ink); }
+.title-continue small { font-size: 0.9em; opacity: 0.85; }
+.title-continue:hover, .title-continue:focus-visible { background-color: var(--fl-gold-hi); }
+.title-continue:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .title-sound button[aria-pressed="true"] { border-color: var(--fl-gold); color: var(--fl-gold-hi); }
 /* E5: the first-run sound question, in the page flow so it never covers another control. */
-/* CP09 (CD-028): a compact bar at the top of the title screen, so the question is in view on first launch. */
-.title-sound-question { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 12px; padding: 8px 14px; border: 1px solid var(--fl-gold); border-radius: 10px; }
+/* CP09 (CD-028): a compact bar, so the question is in view on first launch. CP12: it sits in the hero after the
+   wordmark (heading order), above the actions, on a solid backing so it reads over the ground art. */
+.title-sound-question { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; max-width: 46rem; margin: -10px auto 18px; padding: 8px 14px; text-align: left; background-color: rgba(6, 20, 22, 0.88); border: 1px solid var(--fl-gold); border-radius: 10px; }
 .title-sound-question-text { min-width: 0; flex: 1 1 18rem; }
 .title-sound-question h2 { margin: 0; font-size: 1rem; }
 .title-sound-question p { margin: 2px 0 0; font-size: 0.9rem; }
