@@ -46,6 +46,23 @@ export function TitleScreen() {
   };
   return (
     <main className="title-screen" data-testid="title-screen">
+      {/* CP09 (CD-028): the first-run sound question is a compact bar above everything, so it is in view on first launch. */}
+      {!asked && (
+        <section className="title-sound-question" aria-labelledby="sound-question-heading" data-testid="sound-question">
+          <div className="title-sound-question-text">
+            <h2 id="sound-question-heading">Play with sound?</h2>
+            <p>Crowd, bat and ball, and menu sounds. You can change this at any time.</p>
+          </div>
+          <div className="title-sound-question-actions">
+            <button type="button" className="primary" onClick={() => chooseSound(true)}>
+              Turn sound on
+            </button>
+            <button type="button" onClick={() => chooseSound(false)}>
+              Keep sound off
+            </button>
+          </div>
+        </section>
+      )}
       <div className="title-hero">
         <CricketerFigure className="title-figure title-figure-left" pose="batter" kit={teams[0]?.colours ?? []} seed="title-batter" height={380} />
         <CricketerFigure className="title-figure title-figure-right" pose="bowler" kit={teams[7]?.colours ?? teams[1]?.colours ?? []} seed="title-bowler" height={380} />
@@ -81,20 +98,6 @@ export function TitleScreen() {
           </a>
         ))}
       </nav>
-      {!asked && (
-        <section className="title-sound-question" aria-labelledby="sound-question-heading" data-testid="sound-question">
-          <h2 id="sound-question-heading">Play with sound?</h2>
-          <p>Crowd, bat and ball, and menu sounds. You can change this at any time.</p>
-          <div className="title-sound-question-actions">
-            <button type="button" className="primary" onClick={() => chooseSound(true)}>
-              Turn sound on
-            </button>
-            <button type="button" onClick={() => chooseSound(false)}>
-              Keep sound off
-            </button>
-          </div>
-        </section>
-      )}
       <div className="title-sound">
         <button type="button" aria-pressed={sound} onClick={() => chooseSound(!sound)}>
           Sound: {sound ? "on" : "off"}

@@ -227,6 +227,7 @@ export function createODIMatchController(
         format: "ODI",
         matchId: s.setup.matchId,
         commentaryEntries: cachedCommentary,
+        events: s.events,
       }).cues;
       cachedAssistant = projectInMatchTacticalAssistant({
         format: "ODI",
