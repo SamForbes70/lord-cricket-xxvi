@@ -4,6 +4,7 @@ import { markSoundQuestionAnswered, playUiClick, setSoundOn, soundOn, soundQuest
 import { CricketerFigure } from "./world/CricketerFigure.js";
 import { careerWorld } from "./career/world-state.js";
 import { readContinueTarget, type ContinueTarget } from "./title-continue.js";
+import { requestNewMatch } from "./new-match-request.js";
 
 /** Session flag read by the exhibition setup: start a T20 with the suggested XIs straight away (valid for a minute). */
 export const QUICK_MATCH_KEY = "lcxxvi-quick-match";
@@ -12,6 +13,8 @@ export const GUIDED_MATCH_KEY = "lcxxvi-guided-match";
 
 function launchQuickMatch(guided: boolean) {
   playUiClick();
+  // CP12B: a new match, not the unfinished one (Continue resumes that); the match screen sets the old one aside.
+  requestNewMatch();
   try {
     sessionStorage.setItem(QUICK_MATCH_KEY, String(Date.now()));
     if (guided) localStorage.setItem(GUIDED_MATCH_KEY, "1");
@@ -136,10 +139,24 @@ export function TitleScreen() {
             <small>Learn each decision as it comes</small>
           </button>
         </div>
+        {resume?.kind === "MATCH" && (
+          <p className="title-new-match-note" data-testid="title-new-match-note">
+            Quick match and Custom match start a new match. Your unfinished match stays in Saved games.
+          </p>
+        )}
       </div>
       <nav className="title-modes" aria-label="Game modes">
         {MODES.map((mode) => (
-          <a key={mode.href} className="title-mode" href={mode.href} onClick={() => playUiClick()}>
+          <a
+            key={mode.href}
+            className="title-mode"
+            href={mode.href}
+            onClick={() => {
+              playUiClick();
+              // CP12B: Custom match opens a new match's setup; the career's Exhibition link still resumes.
+              if (mode.title === "Custom match") requestNewMatch();
+            }}
+          >
             <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d={mode.icon} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
