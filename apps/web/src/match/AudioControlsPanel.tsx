@@ -91,7 +91,7 @@ export function AudioControlsPanel({
           <strong>Audio caption:</strong>{" "}
           {snapshot.lastCaption
             ? snapshot.lastCaption
-            : "Ready — match audio captions appear here even in silent mode."}
+            : "Ready: match audio captions appear here even in silent mode."}
         </p>
       )}
 

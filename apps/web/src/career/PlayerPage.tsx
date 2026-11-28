@@ -6,7 +6,6 @@ import { overallRating, playerStrengths } from "../world/player-visuals.js";
 import { careerWorld } from "./world-state.js";
 import { derivePlayerIdentity, styleWithBasis, type PlayerIdentity, type StoryRecord } from "@lcxxvi/projections";
 import {
-  AWARDS_PROVENANCE_NOTICE,
   type HistoricalPlayerRecord,
   type PersistentCareerPlayerStats,
   type PlayerContract,
@@ -17,6 +16,8 @@ import {
   type SquadPlayerTrainingConditionView,
   type WorldPack,
 } from "@lcxxvi/contracts";
+import { NoValue } from "../NoValue.js";
+import { AWARD_NOTICE_TEXT, NO_VALUE_TEXT, roleLabel } from "../display-labels.js";
 
 export type PlayerAwardsSummary = {
   playerOfTheMatchCount: number;
@@ -46,7 +47,7 @@ const skillNames: ReadonlyArray<
 ];
 
 function decimal(value: number | null): string {
-  return value === null ? "–" : (value / 100).toFixed(2);
+  return value === null ? NO_VALUE_TEXT : (value / 100).toFixed(2);
 }
 
 export type PlayerSeasonBreakdownRow = {
@@ -120,7 +121,7 @@ export function PlayerPage({
         Player: {player.name}
       </h2>
       <p data-testid="player-bio-line">
-        {player.playerId} · {player.role.replaceAll("_", " ")} ·{" "}
+        {roleLabel(player.role)} ·{" "}
         {player.batHand === "L" ? "Left" : "Right"}-hand batting
         {age !== null ? ` · Age ${age}` : ""}
         {skillLedgerEntry ? ` · Debut Season ${skillLedgerEntry.debutSeasonNumber}` : ""}
@@ -174,7 +175,7 @@ export function PlayerPage({
               {careerClubNames.length > 0 ? ` · Clubs: ${careerClubNames.join(" → ")}` : ""}
             </p>
           ) : (
-            <p>Uncontracted free agent — eligible for domestic contract offers.</p>
+            <p>Uncontracted free agent, eligible for domestic contract offers.</p>
           )}
         </div>
       )}
@@ -390,7 +391,7 @@ export function PlayerPage({
             <dd>
               {historicalRecord.battingInnings > 0
                 ? `${historicalRecord.highScoreRuns}${historicalRecord.highScoreNotOut ? "*" : ""}`
-                : "–"}
+                : <NoValue />}
             </dd>
             <dt>50s / 100s / Ducks</dt>
             <dd>
@@ -405,7 +406,7 @@ export function PlayerPage({
             <dd>
               {historicalRecord.bestBowlingRuns !== null
                 ? `${historicalRecord.bestBowlingWickets}/${historicalRecord.bestBowlingRuns}`
-                : "–"}
+                : <NoValue />}
             </dd>
             <dt>3W / 4W / 5W hauls</dt>
             <dd>
@@ -454,23 +455,23 @@ export function PlayerPage({
                               <small> · Bat #{entry.battingPosition}</small>
                             ) : null}
                           </td>
-                          <td>{entry.groundId ? groundName(entry.groundId) : "–"}</td>
+                          <td>{entry.groundId ? groundName(entry.groundId) : <NoValue />}</td>
                           <td>
                             {entry.battedInnings !== null
                               ? `${entry.runsScored ?? 0}${entry.notOut ? "*" : ""} (${entry.ballsFaced ?? 0})`
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td>
                             {legalBalls > 0
                               ? `${entry.bowlingWickets ?? 0}/${entry.bowlingRunsConceded ?? 0} (${Math.floor(legalBalls / 6)}.${legalBalls % 6})`
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td>
                             {entry.archiveEvaluated
                               ? catches + stumpings + runOuts > 0
                                 ? `${catches}c ${stumpings}st ${runOuts}ro`
                                 : "0"
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td>
                             {onOpenReplay && entry.archiveReplayAvailable ? (
@@ -483,7 +484,7 @@ export function PlayerPage({
                                 View replay
                               </button>
                             ) : (
-                              "–"
+                              <NoValue />
                             )}
                           </td>
                         </tr>
@@ -552,10 +553,10 @@ export function PlayerPage({
                           <strong>{award.label}</strong>
                           {award.tieBroken ? <small> · Tie-break applied</small> : null}
                         </td>
-                        <td>{award.winnerTeamId ? teamName(award.winnerTeamId) : "–"}</td>
-                        <td>{award.headlineStat ?? "–"}</td>
+                        <td>{award.winnerTeamId ? teamName(award.winnerTeamId) : <NoValue />}</td>
+                        <td>{award.headlineStat ?? <NoValue />}</td>
                         <td>
-                          {award.scoreX100 !== null ? `${(award.scoreX100 / 100).toFixed(2)} pts` : "–"}
+                          {award.scoreX100 !== null ? `${(award.scoreX100 / 100).toFixed(2)} pts` : <NoValue />}
                         </td>
                       </tr>
                     ))}
@@ -564,7 +565,7 @@ export function PlayerPage({
               </div>
             );
           })()}
-          <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+          <p className="award-notice">{AWARD_NOTICE_TEXT}</p>
         </section>
       )}
     </section>
@@ -701,7 +702,6 @@ function PlayerHero({ player, format }: { player: WorldPack["players"][number]; 
     <div className="player-hero" aria-hidden="true">
       <PlayerPortrait playerId={player.playerId} role={player.role} kit={kit} size={112} />
       <div className="player-hero-main">
-        <strong className="player-hero-name">{player.name}</strong>
         <RoleChip role={player.role} decorative />
       </div>
       <RatingBadge rating={overallRating(player, format)} label={`${format === "RED_BALL" ? "RED" : format} OVR`} decorative />
@@ -710,7 +710,7 @@ function PlayerHero({ player, format }: { player: WorldPack["players"][number]; 
           <div key={label} className="player-hero-bar">
             <span>{label}</span>
             <span className="skill-bar" style={{ "--v": String(value) } as React.CSSProperties} />
-            <b>{value || "–"}</b>
+            <b>{value || <NoValue />}</b>
           </div>
         ))}
       </div>

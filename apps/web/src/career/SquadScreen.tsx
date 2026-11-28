@@ -13,6 +13,9 @@ import { useMemo } from "react";
 import { isBowlingCapable } from "@lcxxvi/data";
 import { playerForm, playerMilestones, playingStyle, squadPlayerTags } from "@lcxxvi/projections";
 import { TRAINING_PRESETS, matchingPreset, planTrainingPreset, type TrainingPresetPlayer } from "./training-presets.js";
+import { NoValue } from "../NoValue.js";
+import "../data-table.css";
+import { availabilityLabel, enumLabel, roleLabel } from "../display-labels.js";
 
 /** Display labels for the stored youth intake tier. The tier only sets a starting-skill bonus (+0, +2 or +5); see generateYouthProspect. */
 const INTAKE_GRADE_LABEL: Record<"ACADEMY_GRADUATE" | "FIRST_TEAM_PROSPECT" | "HIGH_CEILING_PROSPECT", string> = {
@@ -171,7 +174,7 @@ export function SquadScreen(props: SquadScreenProps) {
                         <RatingBadge rating={overallRating(player, "T20")} label="T20" />
                         </div>
                       </td>
-                      {lifecycleState && <td>{age ?? "–"}</td>}
+                      {lifecycleState && <td>{age ?? <NoValue />}</td>}
                       <td><RoleChip role={player.role} /></td>
                       <td data-testid={`player-form-${player.playerId}`}>
                         {(() => {
@@ -200,12 +203,12 @@ export function SquadScreen(props: SquadScreenProps) {
                               </small>
                             </>
                           ) : (
-                            "–"
+                            <NoValue />
                           )}
                         </td>
                       )}
                       <td>
-                        {condition.availability}
+                        {availabilityLabel(condition.availability)}
                         {condition.availabilityReason ? (
                           <small>{condition.availabilityReason}</small>
                         ) : null}
@@ -247,7 +250,7 @@ export function SquadScreen(props: SquadScreenProps) {
                         >
                           {directives.map((directive) => (
                             <option key={directive} value={directive}>
-                              {directive.replaceAll("_", " ")}
+                              {enumLabel(directive)}
                             </option>
                           ))}
                         </select>
@@ -279,7 +282,7 @@ export function SquadScreen(props: SquadScreenProps) {
                 <p>No active academy prospects remain for {service.teamName(controlledTeam)} this season.</p>
               ) : (
                 <div className="table-wrap">
-                  <table>
+                  <table className="data-table academy-table">
                     <thead>
                       <tr>
                         <th>Prospect</th>
@@ -312,10 +315,9 @@ export function SquadScreen(props: SquadScreenProps) {
                           <tr key={prospect.prospectId} data-testid={`youth-row-${prospect.prospectId}`}>
                             <td>
                               <strong>{prospect.player.name}</strong>
-                              <small>{prospect.prospectId}</small>
                             </td>
                             <td>{prospectAge}</td>
-                            <td>{prospect.player.role.replaceAll("_", " ")}</td>
+                            <td>{roleLabel(prospect.player.role)}</td>
                             <td>{INTAKE_GRADE_LABEL[prospect.fictionalCeilingTier]}</td>
                             <td>
                               Tim {t20.timing} · Pow {t20.power} · Ctl {t20.control} · Cat{" "}
@@ -343,7 +345,7 @@ export function SquadScreen(props: SquadScreenProps) {
                               >
                                 {academyFocusOptions.map((opt) => (
                                   <option key={opt} value={opt}>
-                                    {opt.replaceAll("_", " ")}
+                                    {enumLabel(opt)}
                                   </option>
                                 ))}
                               </select>
@@ -423,14 +425,13 @@ export function SquadScreen(props: SquadScreenProps) {
                           >
                             {retired.player.name}
                           </button>
-                          <small>{retired.playerId}</small>
                         </td>
                         <td>{service.teamName(retired.lastTeamId)}</td>
                         <td>
                           Season {retired.retiredAfterSeasonNumber} ({retired.retiredCalendarYear})
                         </td>
                         <td>{retired.ageAtRetirement}</td>
-                        <td>{retired.retirementReason.replaceAll("_", " ").toLowerCase()}</td>
+                        <td>{enumLabel(retired.retirementReason)}</td>
                       </tr>
                     ))}
                   </tbody>

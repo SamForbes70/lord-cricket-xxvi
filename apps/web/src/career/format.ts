@@ -1,10 +1,11 @@
 import type { AcademyTrainingFocus, TrainingDirective } from "@lcxxvi/contracts";
+import { NO_VALUE_TEXT } from "../display-labels.js";
 
 /** Display helpers shared by the career screens. */
 
-/** A rate stored as an integer times 100, shown to two decimals; null (no denominator) shows a dash. */
+/** A rate stored as an integer times 100, shown to two decimals; null (no denominator) shows "none". */
 export function metric(value: number | null, divisor = 100): string {
-  return value === null ? "–" : (value / divisor).toFixed(2);
+  return value === null ? NO_VALUE_TEXT : (value / divisor).toFixed(2);
 }
 
 /** A basis-point value shown as a percentage to one decimal. */

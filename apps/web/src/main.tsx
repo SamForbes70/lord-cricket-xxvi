@@ -1,6 +1,6 @@
 import { CloseFinish, boundaryCount, requiredRate, isCloseFinish, passageReport, type Passage } from "./match/CloseFinish.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AWARDS_PROVENANCE_NOTICE, type MatchAwardCandidate } from "@lcxxvi/contracts";
+import { type MatchAwardCandidate } from "@lcxxvi/contracts";
 import { AnalyticsPanel } from "./match/AnalyticsPanel.js";
 import { CommentaryPanel } from "./match/CommentaryPanel.js";
 import { OPPOSITION_CAPTAIN_NOTE, mayIssuePlanCommand, ownSideControls } from "./match/side-control.js";
@@ -57,6 +57,7 @@ import "@fontsource/barlow-condensed/latin-500.css";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-700.css";
 import "./floodlit.css";
+import "./data-table.css";
 import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
 import { BroadcastStage, stageShows } from "./match/BroadcastStage.js";
@@ -93,6 +94,8 @@ import { keyMomentBetween, type KeyMomentSnapshot } from "./match/key-moments.js
 import { PostMatchAnalysisPanel } from "./match/PostMatchAnalysisPanel.js";
 import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, suggestedEleven, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
+import { AWARD_NOTICE_TEXT, enumLabel, matchPhaseLabel } from "./display-labels.js";
+import { ModeMasthead } from "./ModeMasthead.js";
 
 type Body = Request extends infer R
   ? R extends Request
@@ -1355,7 +1358,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   return (
     <main
       style={{ fontSize: `${Number(scale) / 100}rem`, ["--text-scale" as string]: Number(scale) / 100 }}
-      data-motion={highlightMotion} className={`match-shell density-${density}`}
+      data-motion={highlightMotion} className={`match-shell text-scale-root density-${density}`}
       data-live={view ? "true" : undefined}
     >
       <a
@@ -1370,14 +1373,12 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       >
         Skip to next decision
       </a>
-      <header className="masthead">
-        <div>
-          <p className="eyebrow">{careerLaunch.current ? "CAREER MATCHDAY" : view?.matchId?.startsWith("tour-m") ? "TOURNAMENT MATCHDAY" : scenario ? "SCENARIO CHALLENGE" : "THE FICTIONAL CRICKET EXHIBITION"}</p>
-          <h1>
-            Lord Cricket <span>XXVI</span>
-          </h1>
-        </div>
-      </header>
+      {/* CD-026: the shared masthead. A career match returns through its own result flow, so it has no back link. */}
+      <ModeMasthead
+        compact
+        title={careerLaunch.current ? "Career match" : view?.matchId?.startsWith("tour-m") ? "Tournament match" : scenario ? "Scenario challenge" : "Exhibition match"}
+        back={careerLaunch.current ? undefined : view?.matchId?.startsWith("tour-m") ? { label: "Tournaments", href: "#tournaments" } : scenario ? { label: "Scenarios", href: "#scenarios" } : { label: "Title screen", href: "#title" }}
+      />
       {!view && preferences}
       {view?.matchId?.startsWith("tour-m") && (
         <section className="career-match-banner" data-testid="tournament-banner" aria-label="Tournament match">
@@ -2080,7 +2081,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         Game award · {view.matchAward.awardVersion}
                       </span>
                     </p>
-                    <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+                    <p className="award-notice">{AWARD_NOTICE_TEXT}</p>
                   </details>
                 </div>
               )}
@@ -2139,28 +2140,28 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                       {l.innings.wickets} ({overs(l.innings.legalBalls)})
                     </h3>
                   </div>
-                  <table>
+                  <table className="data-table scorecard-table">
                     <caption>Innings {index + 1} batting</caption>
                     <thead>
                       <tr>
-                        <th>Batter</th>
-                        <th>Runs</th>
-                        <th>Balls</th>
-                        <th>4s</th>
-                        <th>6s</th>
+                        <th scope="col">Batter</th>
+                        <th scope="col" className="num">Runs</th>
+                        <th scope="col" className="num">Balls</th>
+                        <th scope="col" className="num">4s</th>
+                        <th scope="col" className="num">6s</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Object.entries(l.batting).map(([id, b]) => (
                         <tr key={id}>
-                          <th>
+                          <th scope="row">
                             {view.names[id]}
                             <small className="how-out" data-testid="how-out">{batterStatusText(id, l, view.names)}</small>
                           </th>
-                          <td>{b.runs}</td>
-                          <td>{b.ballsFaced}</td>
-                          <td>{b.fours}</td>
-                          <td>{b.sixes}</td>
+                          <td className="num">{b.runs}</td>
+                          <td className="num">{b.ballsFaced}</td>
+                          <td className="num">{b.fours}</td>
+                          <td className="num">{b.sixes}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -2172,14 +2173,14 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                     no-balls, {l.innings.extras.byes} byes,{" "}
                     {l.innings.extras.legByes} leg-byes.
                   </p>
-                  <table>
+                  <table className="data-table scorecard-table">
                     <caption>Innings {index + 1} bowling</caption>
                     <thead>
                       <tr>
-                        <th>Bowler</th>
-                        <th>Overs</th>
-                        <th>Runs</th>
-                        <th>Wkts</th>
+                        <th scope="col">Bowler</th>
+                        <th scope="col" className="num">Overs</th>
+                        <th scope="col" className="num">Runs</th>
+                        <th scope="col" className="num"><abbr title="Wickets">Wkts</abbr></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2190,10 +2191,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                         )
                         .map(([id, b]) => (
                           <tr key={id}>
-                            <th>{view.names[id]}</th>
-                            <td>{overs(b.legalBalls)}</td>
-                            <td>{b.runsConceded}</td>
-                            <td>{b.wickets}</td>
+                            <th scope="row">{view.names[id]}</th>
+                            <td className="num">{overs(b.legalBalls)}</td>
+                            <td className="num">{b.runsConceded}</td>
+                            <td className="num">{b.wickets}</td>
                           </tr>
                         ))}
                     </tbody>
@@ -2351,8 +2352,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
                   <div>
                     <strong>{save.title}</strong>
                     <p>
-                      {save.phase.replaceAll("_", " ")} · revision{" "}
-                      {save.revision} ·{" "}
+                      {matchPhaseLabel(save.phase)} ·{" "}
                       {new Date(save.updatedAt).toLocaleString()}
                     </p>
                   </div>
@@ -2781,7 +2781,7 @@ function Tactics({
             <label>
               Variation
               <select aria-label="Variation" value="stock" disabled>
-                <option>stock</option>
+                <option value="stock">Stock ball</option>
               </select>
             </label>
             <small>Only the stock ball is available for now.</small>
@@ -2800,7 +2800,7 @@ function Tactics({
                 }
               >
                 {["CONSERVE", "NORMAL", "MAXIMUM"].map((v) => (
-                  <option key={v} value={v}>{v}{view.recommendation?.bowling?.effort === v ? " (recommended)" : ""}</option>
+                  <option key={v} value={v}>{enumLabel(v)}{view.recommendation?.bowling?.effort === v ? " (recommended)" : ""}</option>
                 ))}
               </select>
             </label>
@@ -2819,7 +2819,7 @@ function Tactics({
                 }
               >
                 {["OFF", "STUMPS", "LEG"].map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>{enumLabel(v)}</option>
                 ))}
               </select>
             </label>
@@ -2838,7 +2838,7 @@ function Tactics({
                 }
               >
                 {["YORKER", "FULL", "GOOD", "SHORT"].map((v) => (
-                  <option key={v} value={v}>{v}{view.recommendation?.bowling?.length === v ? " (recommended)" : ""}</option>
+                  <option key={v} value={v}>{enumLabel(v)}{view.recommendation?.bowling?.length === v ? " (recommended)" : ""}</option>
                 ))}
               </select>
             </label>

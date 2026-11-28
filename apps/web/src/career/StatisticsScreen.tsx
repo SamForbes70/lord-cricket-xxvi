@@ -14,6 +14,9 @@ import {
 import {
   CareerApplicationService,
 } from "./service.js";
+import { NoValue } from "../NoValue.js";
+import "../data-table.css";
+import { AWARD_NOTICE_TEXT } from "../display-labels.js";
 
 
 /** The career Statistics screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
@@ -89,7 +92,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
             <div data-testid="all-time-career-statistics">
               <h3>All-time club honours &amp; records</h3>
               <div className="table-wrap">
-                <table>
+                <table className="data-table lead-1">
                   <thead>
                     <tr>
                       <th>Team</th>
@@ -162,7 +165,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
               </div>
               <h3>All-time player statistics</h3>
               <div className="table-wrap">
-                <table>
+                <table className="data-table lead-2">
                   <thead>
                     <tr>
                       <th>Player</th>
@@ -199,7 +202,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                         <td>
                           {player.battingInnings > 0
                             ? `${player.highScoreRuns}${player.highScoreNotOut ? "*" : ""}`
-                            : "–"}
+                            : <NoValue />}
                         </td>
                         <td>{metric(player.battingAverageX100)}</td>
                         <td>{metric(player.strikeRateX100)}</td>
@@ -230,7 +233,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                       : "League table"}
                   </h3>
                   <div className="table-wrap">
-                    <table className="league-table">
+                    <table className="league-table data-table lead-2">
                       <thead>
                         <tr>
                           <th>Pos</th>
@@ -259,7 +262,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                             <td>{row.noResults}</td>
                             <td>{row.points}</td>
                             <td>
-                              {row.nrrX1000 === null ? "–" : (row.nrrX1000 / 1000).toFixed(3)}
+                              {row.nrrX1000 === null ? <NoValue /> : (row.nrrX1000 / 1000).toFixed(3)}
                             </td>
                           </tr>
                         ))}
@@ -293,7 +296,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                   </div>
                   <h3>Full player statistics</h3>
                   <div className="table-wrap">
-                    <table>
+                    <table className="data-table lead-2">
                       <thead>
                         <tr>
                           <th>Player</th>
@@ -482,12 +485,12 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                         {band === "ALL"
                           ? "All batting positions"
                           : band === "OPENER"
-                            ? "Openers (1–2)"
+                            ? "Openers (1 to 2)"
                             : band === "TOP_ORDER"
-                              ? "Top order (1–3)"
+                              ? "Top order (1 to 3)"
                               : band === "MIDDLE_ORDER"
-                                ? "Middle order (4–6)"
-                                : "Lower order (7–11)"}
+                                ? "Middle order (4 to 6)"
+                                : "Lower order (7 to 11)"}
                       </option>
                     ))}
                   </select>
@@ -557,7 +560,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                       <p>No players meet the qualification threshold for this filter slice yet.</p>
                     ) : (
                       <div className="table-wrap">
-                        <table data-testid="historical-leaderboard-table">
+                        <table className="data-table" data-testid="historical-leaderboard-table">
                           <thead>
                             <tr>
                               <th>Rank</th>
@@ -578,7 +581,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                               return (
                                 <tr key={entry.playerId}>
                                   <td>
-                                    {entry.qualified ? entry.rank : "–"}
+                                    {entry.qualified ? entry.rank : <NoValue />}
                                     {entry.qualified && entry.tied ? <small> (T)</small> : null}
                                   </td>
                                   <td>
@@ -611,7 +614,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                                         View replay ({entry.contributingFixtureIds.length})
                                       </button>
                                     ) : (
-                                      "–"
+                                      <NoValue />
                                     )}
                                   </td>
                                 </tr>
@@ -629,7 +632,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                 Filtered career &amp; fielding records ({historicalProjection.players.length})
               </h4>
               <div className="table-wrap">
-                <table data-testid="historical-player-records-table">
+                <table className="data-table lead-2" data-testid="historical-player-records-table">
                   <thead>
                     <tr>
                       <th>Player</th>
@@ -671,7 +674,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                           <td>
                             {rec.battingInnings > 0
                               ? `${rec.highScoreRuns}${rec.highScoreNotOut ? "*" : ""}`
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td>{metric(rec.battingAverageX100)}</td>
                           <td>{metric(rec.strikeRateX100)}</td>
@@ -682,7 +685,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                           <td>
                             {rec.bestBowlingRuns !== null
                               ? `${rec.bestBowlingWickets}/${rec.bestBowlingRuns}`
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td>{metric(rec.economyX100)}</td>
                           <td>
@@ -700,7 +703,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                                 View replay
                               </button>
                             ) : (
-                              "–"
+                              <NoValue />
                             )}
                           </td>
                         </tr>
@@ -779,10 +782,10 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                             >
                               <strong>{service.playerName(award.winnerPlayerId)}</strong>
                             </button>{" "}
-                            ({award.winnerTeamId ? service.teamName(award.winnerTeamId) : "–"})
+                            ({award.winnerTeamId ? service.teamName(award.winnerTeamId) : <NoValue />})
                           </p>
                           <p className="season-award-stat">
-                            {award.headlineStat ?? "–"}{" "}
+                            {award.headlineStat ?? <NoValue />}{" "}
                             {award.scoreX100 !== null
                               ? `· ${(award.scoreX100 / 100).toFixed(2)} pts`
                               : ""}
@@ -801,7 +804,7 @@ export function StatisticsScreen(props: StatisticsScreenProps) {
                     </article>
                   ))}
                 </div>
-                <p className="award-notice">{activeSummary.provenanceNotice}</p>
+                <p className="award-notice">{AWARD_NOTICE_TEXT}</p>
               </section>
             );
           })()}

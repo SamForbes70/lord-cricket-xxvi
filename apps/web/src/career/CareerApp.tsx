@@ -14,7 +14,6 @@ import type {
   T20SeasonMatchCompletion,
 } from "@lcxxvi/contracts";
 import {
-  AWARDS_PROVENANCE_NOTICE,
 } from "@lcxxvi/contracts";
 import {
   CareerApplicationService,
@@ -43,6 +42,8 @@ import { archivedPostMatchAnalysis } from "./archived-post-match-analysis.js";
 import type { NewGameWorldCopy } from "../world/new-game-world.js";
 import { offlineUpdateCoordinator } from "../offline-update.js";
 import "./career.css";
+import "./settings.css";
+import "../data-table.css";
 import { StatisticsScreen } from "./StatisticsScreen.js";
 import { ContractsScreen } from "./ContractsScreen.js";
 import { SquadScreen } from "./SquadScreen.js";
@@ -51,6 +52,8 @@ import { HomeScreen, selectionNoteKey } from "./HomeScreen.js";
 import { FixturesScreen } from "./FixturesScreen.js";
 
 import { handOverCareerIntro, takeInspectPlayer } from "../match/career-intro-handoff.js";
+import { NoValue } from "../NoValue.js";
+import { AWARD_NOTICE_TEXT, careerPhaseLabel } from "../display-labels.js";
 
 const OWNER_KEY = "lcxxvi-career-writer-owner";
 const LAUNCH_KEY = "lcxxvi-career-match-launch";
@@ -802,7 +805,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                   >
                     <strong>{service.playerName(matchAward.winnerPlayerId)}</strong>
                   </button>{" "}
-                  ({matchAward.winnerTeamId ? service.teamName(matchAward.winnerTeamId) : "–"}
+                  ({matchAward.winnerTeamId ? service.teamName(matchAward.winnerTeamId) : <NoValue />}
                   {matchAward.fromLosingTeam ? " · losing side" : ""}) ·{" "}
                   {((matchAward.scoreTotalX100 ?? 0) / 100).toFixed(2)} pts
                 </p>
@@ -822,7 +825,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
             ) : (
               <p data-testid="replay-match-award-winner">{matchAward.explanationText}</p>
             )}
-            <p className="award-notice">{AWARDS_PROVENANCE_NOTICE}</p>
+            <p className="award-notice">{AWARD_NOTICE_TEXT}</p>
           </div>
         );
       })()}
@@ -888,7 +891,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                 })}
               </div>
               <div className="table-wrap">
-                <table>
+                <table className="data-table">
                   <thead>
                     <tr>
                       <th>Seq</th>
@@ -909,7 +912,7 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                         <td>{service.playerName(d.strikerId)}</td>
                         <td>{service.playerName(d.bowlerId)}</td>
                         <td>{d.totalRuns}</td>
-                        <td>{d.wicketKind ?? "–"}</td>
+                        <td>{d.wicketKind ?? <NoValue />}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -932,8 +935,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
   if (!state) {
     return (
       <main
-        className={`career-shell club-selection density-${density}`}
-        style={{ fontSize: `${Number(scale) / 100}rem` }}
+        className={`career-shell club-selection text-scale-root density-${density}`}
+        style={{ fontSize: `${Number(scale) / 100}rem`, ["--text-scale" as string]: Number(scale) / 100 }}
       >
         {inspectionOnly && (
           <p role="status">
@@ -1025,9 +1028,9 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
                         })
                       }
                     >
-                      {save.title} · {save.completedFixtures}/56 · {save.phase}
+                      {save.title} · {save.completedFixtures}/56 fixtures · {careerPhaseLabel(save.phase)}
                       <small>
-                        {modeLabel} · {formatGameDate(save.currentDate)} · revision {save.revision}
+                        {modeLabel} · {formatGameDate(save.currentDate)}
                       </small>
                     </button>
                     <button
@@ -1146,8 +1149,8 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
 
   return (
     <main
-      className={`career-shell density-${density} ${reducedMotion ? "reduced-motion" : ""}`}
-      style={{ fontSize: `${Number(scale) / 100}rem` }}
+      className={`career-shell text-scale-root density-${density} ${reducedMotion ? "reduced-motion" : ""}`}
+      style={{ fontSize: `${Number(scale) / 100}rem`, ["--text-scale" as string]: Number(scale) / 100 }}
     >
       {inspectionOnly && (
         <p role="status">
@@ -1174,10 +1177,11 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               : `Round ${currentRound} · ${formatGameDate(state.careerState.currentDate)}`}
           </p>
         </div>
-        <div className="save-badge" data-status={status.toLowerCase()}>
+        {/* The save revision stays on the badge as data for support and tests; players see fixtures, not revisions (CD-031). */}
+        <div className="save-badge" data-status={status.toLowerCase()} data-revision={activeRevision}>
           <strong>{status}</strong>
           <small>
-            {state.completedMatches.length}/56 fixtures · rev {activeRevision}
+            {state.completedMatches.length}/56 fixtures
           </small>
         </div>
       </header>
@@ -1871,31 +1875,35 @@ export function CareerApp({ inspectionOnly = false }: { inspectionOnly?: boolean
               />
             </label>
           </div>
+          {/* CD-041: the manual copy lives with the other career file actions, not at the foot of every screen. */}
+          <section className="career-panel settings-actions" aria-label="Manual career copy">
+            <h3>Career copy</h3>
+            <p>Save a separate copy of this career under a new name. The current career carries on unchanged.</p>
+            <div className="action-row">
+              <label>
+                Copy name{" "}
+                <input
+                  value={copyName}
+                  maxLength={120}
+                  onChange={(event) => setCopyName(event.currentTarget.value)}
+                />
+              </label>
+              <button
+                disabled={busy || service.isReadOnly() || !copyName.trim()}
+                onClick={() =>
+                  void action(async () => {
+                    await service.createManualCopy(copyName);
+                    setCopyName("");
+                  })
+                }
+              >
+                Save career copy
+              </button>
+            </div>
+          </section>
           {checkpointInspectorSection}
         </section>
       )}
-      {/* Below the screen content, so the next required action stays in the first view at 150% text. */}
-      <section className="career-panel" aria-label="Manual career copy">
-        <label>
-          Copy name{" "}
-          <input
-            value={copyName}
-            maxLength={120}
-            onChange={(event) => setCopyName(event.currentTarget.value)}
-          />
-        </label>
-        <button
-          disabled={busy || service.isReadOnly() || !copyName.trim()}
-          onClick={() =>
-            void action(async () => {
-              await service.createManualCopy(copyName);
-              setCopyName("");
-            })
-          }
-        >
-          Save career copy
-        </button>
-      </section>
           <section className="career-disclosure compact" aria-label="Model disclosure">
         Fictional players and clubs. Results come from the game's own model, not from real cricket.
         <AboutDetails summary="About the model">

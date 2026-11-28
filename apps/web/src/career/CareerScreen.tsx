@@ -6,6 +6,7 @@ import { CareerStoriesPanel } from "./CareerStoriesPanel.js";
 import {
   CareerApplicationService,
 } from "./service.js";
+import { NoValue } from "../NoValue.js";
 
 
 /** The career Career screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
@@ -31,7 +32,7 @@ export function CareerScreen(props: CareerScreenProps) {
   } = props;
   return (
         <section aria-labelledby="career-heading">
-          <h2 id="career-heading">Career</h2>
+          <h2 id="career-heading">Stories</h2>
           <div className="career-summary-grid">
             <div className="career-panel">
               <h3>Season status</h3>
@@ -177,17 +178,17 @@ export function CareerScreen(props: CareerScreenProps) {
                           <td>
                             {managedRow
                               ? `#${managedRow.rank} (${managedRow.wins}W-${managedRow.losses}L, ${managedRow.points} pts)`
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td>
                             {topRuns
                               ? `${service.playerName(topRuns.playerId)} (${topRuns.value})`
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td>
                             {topWkts
                               ? `${service.playerName(topWkts.playerId)} (${topWkts.value})`
-                              : "–"}
+                              : <NoValue />}
                           </td>
                           <td data-testid={`season-awards-cell-${record.seasonNumber}`}>
                             {(() => {
@@ -331,7 +332,7 @@ export function CareerScreen(props: CareerScreenProps) {
                               View replay
                             </button>
                           ) : (
-                            "–"
+                            <NoValue />
                           )}
                         </td>
                       </tr>

@@ -30,6 +30,8 @@ import {
   type AuctionState,
 } from "./auction.js";
 import "../career/career.css";
+import { NoValue } from "../NoValue.js";
+import { ModeMasthead } from "../ModeMasthead.js";
 
 /**
  * Stage 15 Tournaments (owner decision 17 November 2026, answer 5a). Curated fictional competitions played match by
@@ -483,23 +485,7 @@ export function TournamentsApp() {
 
   return (
     <main className="career-shell" data-testid="tournaments-screen">
-      <header className="career-masthead">
-        <div>
-          <p className="eyebrow">LORD CRICKET XXVI</p>
-          <h1>
-            <span>Tournaments</span>
-          </h1>
-        </div>
-        <a className="button-link" href="#career">
-          Career
-        </a>
-        <a className="button-link" href="#scenarios">
-          Scenario challenges
-        </a>
-        <a className="button-link" href="#exhibition">
-          Exhibition matches
-        </a>
-      </header>
+      <ModeMasthead title="Tournaments" back={{ label: "Title screen", href: "#title" }} />
       {problem && <p role="alert">{problem}</p>}
       {auction ? (
         <AuctionPanel
@@ -951,7 +937,7 @@ function AuctionPanel(props: {
                 <PlayerPortrait playerId={lotPlayer.playerId} role={lotPlayer.role} kit={lotTeamKit} size={124} />
                 <div className="auction-lot-stats" aria-hidden="true">
                   <span><strong>{strengths.batting}</strong>BAT</span>
-                  <span><strong>{strengths.bowling || "–"}</strong>BOWL</span>
+                  <span><strong>{strengths.bowling || <NoValue />}</strong>BOWL</span>
                   <span><strong>{strengths.fielding}</strong>FIELD</span>
                 </div>
               </div>

@@ -7,6 +7,7 @@ import type { RainOpenMatch } from "./rain-runtime.js";
 import type { RainWorkerRequest, RainWorkerResponse } from "./rain.worker.js";
 import { TeamCrest } from "../world/TeamCrest.js";
 import "../career/career.css";
+import { ModeMasthead } from "../ModeMasthead.js";
 
 /**
  * Stage 14 exhibitions with rain, player reviews or both (owner decisions A1a, A2a and B1a to B5a, 18 November 2026).
@@ -134,10 +135,12 @@ export function RainApp() {
     const yourTurn = v.pending && v.pending.teamId === playerTeamId;
     return (
       <main className="career-shell" aria-labelledby="rain-title">
-        <h1 id="rain-title">{v.format === "T20" ? "T20" : "One-day"} exhibition: {[v.rules.rain ? "rain" : null, v.rules.reviews ? "player reviews" : null].filter(Boolean).join(" and ")}</h1>
-        <p>
-          <button type="button" onClick={() => { setMatch(null); void reload(); }} disabled={busy}>Back to rain matches</button>
-        </p>
+        <ModeMasthead
+          titleId="rain-title"
+          eyebrow="Rain and player reviews"
+          title={`${v.format === "T20" ? "T20" : "One-day"} exhibition: ${[v.rules.rain ? "rain" : null, v.rules.reviews ? "player reviews" : null].filter(Boolean).join(" and ")}`}
+          back={{ label: "Back to rain matches", onClick: () => { setMatch(null); void reload(); }, disabled: busy }}
+        />
         <p className="muted">Exhibition only: not part of any career or tournament. The weather is fixed by the match seed, and you only see a stoppage when it happens.</p>
         {problem && <p role="alert">{problem}</p>}
         <section aria-label="Scoreboard" data-testid="rain-scoreboard">
@@ -238,7 +241,8 @@ export function RainApp() {
 
   return (
     <main className="career-shell" aria-labelledby="rain-title">
-      <h1 id="rain-title">Rain and player reviews</h1>
+      {/* CD-027: the rain screen had no masthead and no way back. */}
+      <ModeMasthead titleId="rain-title" title="Rain and player reviews" back={{ label: "Title screen", href: "#title" }} />
       <p className="muted">
         Opt-in exhibitions. With rain, the weather can stop play: overs lost shorten the innings, and the target is revised with this game&apos;s fictional resource
         table. With player reviews, umpires can get close leg-before and caught-behind decisions wrong, and each side has two unsuccessful reviews per innings. Not

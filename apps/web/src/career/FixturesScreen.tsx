@@ -3,6 +3,7 @@ import { TeamCrest } from "../world/TeamCrest.js";
 import type { ReactNode } from "react";
 import { PreMatchBriefingPanel } from "../match/TacticalBriefingPanels.js";
 import { CareerApplicationService } from "./service.js";
+import { NoValue } from "../NoValue.js";
 
 /** The career Fixtures screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
 export function FixturesScreen(props: FixturesScreenProps) {
@@ -83,7 +84,7 @@ export function FixturesScreen(props: FixturesScreenProps) {
                           {managed ? <small>Managed fixture</small> : null}
                         </td>
                         <td>
-                          {completion ? service.resultText(completion) : "–"}
+                          {completion ? service.resultText(completion) : <NoValue />}
                         </td>
                         <td>
                           {completion ? (
@@ -115,7 +116,7 @@ export function FixturesScreen(props: FixturesScreenProps) {
                               Post-match analysis
                             </button>
                           ) : (
-                            "–"
+                            <NoValue />
                           )}
                         </td>
                       </tr>

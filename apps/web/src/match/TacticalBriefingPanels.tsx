@@ -5,6 +5,8 @@ import type {
 } from "@lcxxvi/contracts";
 import type { Action } from "./protocol.js";
 import { OPPOSITION_CAPTAIN_NOTE } from "./side-control.js";
+import { NoValue } from "../NoValue.js";
+import { enumLabel, roleLabel } from "../display-labels.js";
 
 const TENDENCY_LABEL: Record<PreMatchBriefing["ground"]["pitchTendency"], string> = {
   SEAM_FRIENDLY: "Seam-leaning",
@@ -102,10 +104,10 @@ export function PreMatchBriefingPanel({
                         {team.players.map((p) => (
                           <tr key={p.playerId}>
                             <td>{p.name}</td>
-                            <td>{p.selectedInXI ? "XI" : "—"}</td>
-                            <td>{p.role}</td>
+                            <td>{p.selectedInXI ? "XI" : <NoValue />}</td>
+                            <td>{roleLabel(p.role)}</td>
                             <td>{p.batHand}HB</td>
-                            <td>{p.bowlingStyle ?? "—"}</td>
+                            <td>{p.bowlingStyle ? enumLabel(p.bowlingStyle) : <NoValue />}</td>
                             <td>{Math.round(p.fatigueBp / 100)}%</td>
                             <td>
                               {CONDITION_LABEL[p.conditionBand] ?? p.conditionBand}
@@ -374,7 +376,7 @@ export function InMatchTacticalAssistantPanel({
                       <small>
                         Econ{" "}
                         {sp.outcomes.economyX100 === null
-                          ? "—"
+                          ? <NoValue />
                           : (sp.outcomes.economyX100 / 100).toFixed(2)}{" "}
                         · {sp.outcomes.dots} dots · {sp.outcomes.singles} 1s ·{" "}
                         {sp.outcomes.boundaries} bdry ({sp.outcomes.fours}x4,{" "}
@@ -429,12 +431,12 @@ export function InMatchTacticalAssistantPanel({
                       </td>
                       <td>
                         Aggression {st.acceptedPlan.primaryAggression}/4 ·{" "}
-                        {st.acceptedPlan.primaryIntent}
+                        {enumLabel(st.acceptedPlan.primaryIntent)}
                       </td>
                       <td>
                         {st.outcomes.runs} ({st.outcomes.ballsFaced}b) · SR{" "}
                         {st.outcomes.strikeRateX100 === null
-                          ? "—"
+                          ? <NoValue />
                           : (st.outcomes.strikeRateX100 / 100).toFixed(2)}
                         <small>
                           {st.outcomes.dots} dots · {st.outcomes.singles} 1s ·{" "}
