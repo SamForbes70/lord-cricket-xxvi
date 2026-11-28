@@ -9,7 +9,11 @@ for (const roster of [false, true]) test(`${roster ? "roster" : "standard"} care
     const players = world.players.map((player: Record<string, unknown>) => Object.fromEntries(Object.entries(player).filter(([key]) => key !== "provenance")));
     await page.getByLabel("Roster JSON").setInputFiles({ name: "roster.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify({ version: "LC_ROSTER_IMPORT_V1", sourceId: "copy", world: { ...world, players } })) });
     await page.getByRole("button", { name: "Start roster career" }).click();
-  } else await page.getByRole("button", { name: /Aster Harbour/i }).click();
+  } else {
+    await page.getByRole("button", { name: /Aster Harbour/i }).click();
+    // CD-041: the standard career's manual copy is on the Settings screen.
+    await page.getByRole("button", { name: "Settings", exact: true }).click({ timeout: 30_000 });
+  }
   await expect(page.getByRole("button", { name: "Save career copy" })).toBeVisible({ timeout: 30_000 });
   await page.getByLabel("Copy name").fill("First copy");
   await page.getByRole("button", { name: "Save career copy" }).click();
@@ -29,7 +33,12 @@ for (const roster of [false, true]) test(`${roster ? "roster" : "standard"} care
   expect(copy.stateSha256).toBe(source.stateSha256);
   expect(copy.revision).toBe(source.revision);
   await page.reload();
-  await expect(page.getByRole("button", { name: "Save career copy" })).toBeVisible({ timeout: 30_000 });
+  if (roster) await expect(page.getByRole("button", { name: "Save career copy" })).toBeVisible({ timeout: 30_000 });
+  else {
+    await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible({ timeout: 30_000 });
+    await page.getByRole("button", { name: "Settings", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Save career copy" })).toBeVisible({ timeout: 30_000 });
+  }
   if (roster) {
     await page.getByRole("button", { name: /First copy/ }).click();
     await expect(page.getByText("0/56 fixtures")).toBeVisible();
@@ -68,7 +77,10 @@ for (const roster of [false, true]) for (const failure of ["stale", "locked"]) t
     const players = world.players.map((player: Record<string, unknown>) => Object.fromEntries(Object.entries(player).filter(([key]) => key !== "provenance")));
     await page.getByLabel("Roster JSON").setInputFiles({ name: "roster.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify({ version: "LC_ROSTER_IMPORT_V1", sourceId: "copy-stale", world: { ...world, players } })) });
     await page.getByRole("button", { name: "Start roster career" }).click();
-  } else await page.getByRole("button", { name: /Aster Harbour/i }).click();
+  } else {
+    await page.getByRole("button", { name: /Aster Harbour/i }).click();
+    await page.getByRole("button", { name: "Settings", exact: true }).click({ timeout: 30_000 });
+  }
   await expect(page.getByRole("button", { name: "Save career copy" })).toBeVisible({ timeout: 30_000 });
   await page.evaluate(async ({ isRoster, failure }) => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => { const r = indexedDB.open("lord-cricket-xxvi"); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); });

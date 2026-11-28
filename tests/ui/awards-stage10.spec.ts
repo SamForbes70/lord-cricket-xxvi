@@ -49,7 +49,9 @@ test("Stage 10 exhibition match award displays Player of the Match, formula brea
   await expect(matchAwardPanel).toContainText("Game award");
   await expect(page.getByTestId("match-award-winner")).toBeVisible();
   await expect(matchAwardPanel).toContainText("Bat");
-  await expect(matchAwardPanel).toContainText("not an official ICC or broadcast formula");
+  // CP02B (CD-044): the provenance line stays, in neutral words that name no real governing body.
+  await expect(matchAwardPanel).toContainText("not a formula used by any real governing body or broadcaster");
+  await expect(matchAwardPanel).not.toContainText("ICC");
 
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);
@@ -115,7 +117,9 @@ test("Stage 10 career season awards, roll of honour, player honours, replay awar
     await expect(page.getByTestId(`season-award-card-${cat}`)).toBeVisible();
   }
   await expect(page.getByTestId("season-award-card-BEST_FIELDER")).not.toContainText("p001 (");
-  await expect(seasonAwardsPanel).toContainText("not an official ICC or broadcast formula");
+  // CP02B (CD-044): the provenance line stays, in neutral words that name no real governing body.
+  await expect(seasonAwardsPanel).toContainText("not a formula used by any real governing body or broadcaster");
+  await expect(seasonAwardsPanel).not.toContainText("ICC");
 
   // Open Player of the Season winner -> verify PlayerPage Awards & honours
   const potsCard = page.getByTestId("season-award-card-PLAYER_OF_THE_SEASON");

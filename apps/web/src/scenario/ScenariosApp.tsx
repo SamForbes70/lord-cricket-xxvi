@@ -5,6 +5,7 @@ import { IndexedDbSaveRepository, sha256Text } from "@lcxxvi/persistence";
 import "../career/career.css";
 import { careerWorld } from "../career/world-state.js";
 import { ART_WASH, groundArtBackground } from "../world/ground-art.js";
+import { ModeMasthead } from "../ModeMasthead.js";
 
 /** sessionStorage key the match screen reads once to start a chosen scenario. */
 export const SCENARIO_LAUNCH_KEY = "lcxxvi-scenario-launch";
@@ -71,20 +72,7 @@ export function ScenariosApp() {
   };
   return (
     <main className="career-shell" data-testid="scenarios-screen">
-      <header className="career-masthead">
-        <div>
-          <p className="eyebrow">LORD CRICKET XXVI</p>
-          <h1>
-            Scenario <span>Challenges</span>
-          </h1>
-        </div>
-        <a className="button-link" href="#career">
-          Career
-        </a>
-        <a className="button-link" href="#exhibition">
-          Exhibition matches
-        </a>
-      </header>
+      <ModeMasthead title="Scenario challenges" back={{ label: "Title screen", href: "#title" }} />
       <p>
         Each challenge starts part-way through a match in the fictional world. Every ball before you take over was played by
         the match engine from a fixed seed, so the situation is the same each time; what happens next is up to you. Results

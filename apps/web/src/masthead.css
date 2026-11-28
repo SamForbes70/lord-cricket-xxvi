@@ -1,0 +1,68 @@
+/*
+ * CP02B (CD-026, CD-027): the mode screens' one masthead (ModeMasthead.tsx). Tokens only (tokens.css). The broadcast
+ * bar itself (dark band, gold rule) comes from the shared `.masthead` rule in floodlit.css; this file sets the inside:
+ * back control, then the eyebrow over the title, then anything at the end. The doubled class outranks the older
+ * per-screen masthead rules without !important.
+ */
+.mode-masthead.mode-masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2) var(--space-5);
+  /* Edge to edge inside the screen's gutter, as the career masthead is (pavilion.css). */
+  margin: 0 calc(-1 * var(--gutter, 0px)) var(--space-4);
+  padding: var(--space-3) var(--gutter, var(--space-5));
+}
+.mode-masthead.mode-masthead .mode-masthead-text { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; flex: 1 1 16rem; }
+.mode-masthead.mode-masthead .eyebrow {
+  order: 0;
+  margin: 0;
+  min-height: 0;
+  padding: 0;
+  font-size: var(--type-xs);
+  line-height: var(--leading-tight);
+  color: var(--accent-strong);
+}
+.mode-masthead.mode-masthead h1 {
+  order: 1;
+  margin: 0;
+  font-size: var(--type-2xl);
+  line-height: var(--leading-tight);
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+}
+.mode-masthead.mode-masthead .mode-masthead-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-left: auto; }
+
+/* The back control reads as a quiet link-button, the same in every mode, and is the first stop for keyboard focus. */
+.mode-masthead.mode-masthead .mode-masthead-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: none;
+  min-height: 40px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-default);
+  font-family: var(--font-display);
+  font-size: var(--type-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: none;
+}
+.mode-masthead.mode-masthead .mode-masthead-back:hover:not(:disabled) { border-color: var(--accent); color: var(--text-strong); }
+
+/* The match screen's single broadcast line: back, title, then the game's name. */
+.mode-masthead.mode-masthead-compact { padding-block: var(--space-1); margin-bottom: var(--space-2); }
+.mode-masthead.mode-masthead-compact .mode-masthead-text { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-4); }
+.mode-masthead.mode-masthead-compact h1 { order: 0; font-size: var(--type-xl); }
+.mode-masthead.mode-masthead-compact .eyebrow { order: 1; }
+.mode-masthead.mode-masthead-compact .mode-masthead-back { min-height: 32px; }
+
+@media (max-width: 620px) {
+  .mode-masthead.mode-masthead { padding-block: var(--space-2); gap: var(--space-2) var(--space-3); }
+  .mode-masthead.mode-masthead h1 { font-size: var(--type-xl); }
+}

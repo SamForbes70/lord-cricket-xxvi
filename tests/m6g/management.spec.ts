@@ -11,7 +11,7 @@ test("M6G management career creates, persists, navigates, progresses and complet
 
   // Each screen is reached through its place in the club; Season holds three screens.
   for (const [place, section, heading] of [
-    ["Season", "Stories", "Career"], ["Squad", null, "Squad"], ["Season", "Fixtures", "Fixtures"],
+    ["Season", "Stories", "Stories"], ["Squad", null, "Squad"], ["Season", "Fixtures", "Fixtures"],
     ["Season", "Statistics", "Statistics"], ["Settings", null, "Settings"], ["Clubhouse", null, "Clubhouse"],
   ] as const) {
     await page.getByRole("button", { name: place, exact: true }).click();

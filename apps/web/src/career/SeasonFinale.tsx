@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { SeasonAwardsSummary, SeasonTeamTableRow } from "@lcxxvi/contracts";
 import type { SeasonObjective, SeasonObjectiveStatus, SeasonReview, SquadSeasonLine } from "@lcxxvi/projections";
 import "../data-table.css";
+import { NoValue } from "../NoValue.js";
 
 export const seasonFinaleSeenKey = (save: string, season: string) => JSON.stringify(["lcxxvi-season-finale-seen", save, season]);
 
@@ -58,7 +59,8 @@ const economy = (runs: number, balls: number) => {
 };
 const overs = (balls: number) => (balls % 6 === 0 ? `${balls / 6}` : `${Math.floor(balls / 6)}.${balls % 6}`);
 /** An empty cell: a dot to the eye, "none" to a screen reader. */
-const NONE = <><span aria-hidden="true">·</span><span className="sr-only">none</span></>;
+/* CD-048: "none", not "·", which is also the dot-ball mark. */
+const NONE = <NoValue />;
 const highScore = (line: SquadSeasonLine) => (line.highScore ? `${line.highScore.runs}${line.highScore.notOut ? "*" : ""}` : NONE);
 
 /**

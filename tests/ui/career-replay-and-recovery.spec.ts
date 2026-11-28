@@ -109,9 +109,9 @@ test("V01-019 checkpoint inspector isolates corrupted generations, retains damag
   await page.getByRole("button", { name: "Squad", exact: true }).click();
   const selects = page.locator('select[id^="training-"]');
   await selects.nth(0).selectOption("BATTING_PRACTICE");
-  await expect(page.locator(".save-badge small")).toContainText("rev 1", { timeout: 30_000 });
+  await expect(page.locator(".save-badge")).toHaveAttribute("data-revision", "1", { timeout: 30_000 });
   await selects.nth(1).selectOption("BOWLING_PRACTICE");
-  await expect(page.locator(".save-badge small")).toContainText("rev 2", { timeout: 30_000 });
+  await expect(page.locator(".save-badge")).toHaveAttribute("data-revision", "2", { timeout: 30_000 });
 
   // Corrupt generation 2 in IndexedDB.
   const originalSaveId = await page.evaluate(async () => {
@@ -153,7 +153,7 @@ test("V01-019 checkpoint inspector isolates corrupted generations, retains damag
   await page.keyboard.press("Enter");
 
   await expect(page.getByRole("navigation", { name: "Career navigation" })).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator(".save-badge small")).toContainText("rev 0");
+  await expect(page.locator(".save-badge")).toHaveAttribute("data-revision", "0");
 
   // Verify damaged original save and its corrupted G2 remain untouched in IndexedDB.
   const afterRecovery = await page.evaluate(async (origId) => {
@@ -180,11 +180,12 @@ test("V01-019 checkpoint inspector isolates corrupted generations, retains damag
   expect(afterRecovery.origG2StillTampered).toBe(true);
 
   // Check keyboard reachability of manual copy, export, checkpoints and archive import on Settings + zero horizontal overflow.
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  // CD-041: the manual copy is on Settings with the other career file actions.
   const copyInput = page.getByLabel("Copy name");
   await copyInput.focus();
   await expect(copyInput).toBeFocused();
 
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
   const exportBtn = page.getByRole("button", { name: "Export .lcxxvi" });
   await exportBtn.focus();
   await expect(exportBtn).toBeFocused();

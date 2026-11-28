@@ -38,7 +38,12 @@ table.data-table[class] tbody th {
   text-transform: none;
   color: var(--text-strong);
   background-color: transparent;
+  /* CP02B: the row's own rule, not the gold header rule the base table style gives every th. */
+  border-bottom: 1px solid var(--border-subtle);
 }
+/* Row headers stripe and highlight with the rest of their row. */
+table.data-table[class] tbody tr:nth-child(even) th { background-color: rgba(255, 255, 255, 0.025); }
+table.data-table[class] tbody tr:hover th { background-color: rgba(231, 187, 95, 0.07); }
 table.data-table[class] caption {
   text-align: left;
   font-weight: 600;
@@ -48,3 +53,17 @@ table.data-table[class] caption {
 table.data-table[class] abbr { text-decoration: none; cursor: help; }
 /* A wrapper with its own border or surface hugs the table instead of framing empty space. */
 .table-wrap:has(> table.data-table) { width: fit-content; max-width: 100%; }
+
+/* CP02B (CD-030, CD-048): "none" where a figure does not exist, muted so a column of numbers still scans. */
+.no-value { color: var(--text-muted); font-size: 0.92em; font-variant-numeric: normal; }
+
+/*
+ * CP02B (CD-022 follow-up): wide statistics tables whose first one or two columns are names and the rest figures.
+ * `lead-1` or `lead-2` right-aligns every later column with tabular figures, so the long statistics tables need no
+ * class on each cell.
+ */
+table.data-table.lead-1[class] :is(th, td):nth-child(n + 2),
+table.data-table.lead-2[class] :is(th, td):nth-child(n + 3) {
+  text-align: right;
+  white-space: nowrap;
+}

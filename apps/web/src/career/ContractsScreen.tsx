@@ -8,6 +8,9 @@ import {
 import {
   CareerApplicationService,
 } from "./service.js";
+import { NoValue } from "../NoValue.js";
+import "../data-table.css";
+import { roleLabel } from "../display-labels.js";
 
 
 /** The career Contracts screen (split out of CareerApp.tsx, audit Phase 5); behaviour unchanged. */
@@ -62,7 +65,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   <p>
                     Squad size: <strong>{team?.squadIds.length ?? 0}</strong> ({
                       MIN_ACTIVE_TEAM_SQUAD_SIZE
-                    }–{MAX_ACTIVE_TEAM_SQUAD_SIZE} allowed)
+                    } to {MAX_ACTIVE_TEAM_SQUAD_SIZE} allowed)
                   </p>
                 </article>
                 <article className="career-panel" data-testid="negotiation-window-panel">
@@ -107,7 +110,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                 >
                   <h3 id="active-offers-heading">Negotiation offers (Season {persistentWorld.currentSeasonNumber})</h3>
                   <div className="table-wrap">
-                    <table className="round-table">
+                    <table className="round-table data-table">
                       <thead>
                         <tr>
                           <th>Rnd</th>
@@ -211,7 +214,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   free agency at rollover unless renewed during the open negotiation window.
                 </p>
                 <div className="table-wrap">
-                  <table className="contracts-table">
+                  <table className="contracts-table data-table">
                     <thead>
                       <tr>
                         <th>Player</th>
@@ -264,10 +267,9 @@ export function ContractsScreen(props: ContractsScreenProps) {
                                 >
                                   {player.name}
                                 </button>
-                                <small>{player.playerId}</small>
                               </td>
-                              <td>{age ?? "–"}</td>
-                              <td>{player.role.replaceAll("_", " ")}</td>
+                              <td>{age ?? <NoValue />}</td>
+                              <td>{roleLabel(player.role)}</td>
                               <td>${contract.annualWageK}k/yr</td>
                               <td>
                                 Season {contract.expiresAfterSeasonNumber}
@@ -380,11 +382,11 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   </label>
                 </div>
                 <p>
-                  Asking wages reflect public observed skills, age, and recorded statistics — never
+                  Asking wages reflect public observed skills, age, and recorded statistics, never
                   hidden future ceilings.
                 </p>
                 <div className="table-wrap">
-                  <table className="contracts-table">
+                  <table className="contracts-table data-table">
                     <thead>
                       <tr>
                         <th>Free agent</th>
@@ -437,12 +439,11 @@ export function ContractsScreen(props: ContractsScreenProps) {
                                   {fa.player.name}
                                 </button>
                                 <small>
-                                  {fa.player.playerId}
-                                  {fa.previousTeamId ? ` · Ex-${service.teamName(fa.previousTeamId)}` : " · Unattached"}
+                                  {fa.previousTeamId ? `Ex-${service.teamName(fa.previousTeamId)}` : "Unattached"}
                                 </small>
                               </td>
                               <td>{faAge}</td>
-                              <td>{fa.player.role.replaceAll("_", " ")}</td>
+                              <td>{roleLabel(fa.player.role)}</td>
                               <td>
                                 Tim {t20.timing} · Pow {t20.power} · Ctl {t20.control} · Keep{" "}
                                 {t20.keeping}
@@ -534,7 +535,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
               >
                 <h3 id="league-budgets-heading">League club wage budgets (symmetrical cap)</h3>
                 <div className="table-wrap">
-                  <table>
+                  <table className="data-table lead-1">
                     <thead>
                       <tr>
                         <th>Club</th>
@@ -597,7 +598,7 @@ export function ContractsScreen(props: ContractsScreenProps) {
                   </div>
                 </div>
                 <div className="table-wrap">
-                  <table>
+                  <table className="data-table">
                     <thead>
                       <tr>
                         <th>Seq</th>

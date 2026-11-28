@@ -4,10 +4,8 @@
  */
 .analytics-panel {
   container-type: inline-size;
-  /* The type tokens are resolved on :root, where --text-scale is 1, so the match screen's Text scale never reached
-     them. Re-declared here, they pick up the --text-scale the match screen sets, and the charts grow with the text. */
-  --type-xs: calc(0.75rem * var(--text-scale));
-  --type-sm: calc(0.875rem * var(--text-scale));
+  /* The type tokens follow the match screen's Text scale through `.text-scale-root` (tokens.css, CP02B), so the
+     charts grow with the text without re-declaring them here. */
 }
 .analytics-panel .table-wrap { overflow-x: auto; max-width: 100%; margin: 0 0 var(--space-5); }
 .analytics-panel .chart-summary,

@@ -76,7 +76,7 @@ test("Stage 8 optional sound and narration supports gesture gating, mixer contro
       timeout: 30_000,
     });
   }
-  await expect(page.getByTestId("audio-caption-banner")).not.toContainText("Ready — match audio captions");
+  await expect(page.getByTestId("audio-caption-banner")).not.toContainText("Ready: match audio captions");
 
   // Switch to full silent mode + 150% text scale, verify gameplay continues cleanly & zero horizontal overflow
   await page.getByRole("button", { name: "Sound: On" }).click();

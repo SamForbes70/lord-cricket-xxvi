@@ -10,10 +10,15 @@
  * (vermilion), positive (sky blue) against negative (vermilion), after the Okabe and Ito palette, lightened for a dark
  * ground. Every state that uses colour also carries a letter, word or shape, so colour is never the only signal.
  */
-:root {
-  --text-scale: 1;
-
-  /* Type scale (rem, at the player's text scale). */
+/*
+ * Type scale (rem, at the player's text scale). CP02B: declared on every element that sets `--text-scale` as well as on
+ * :root. A custom property's var() is resolved where the property is declared, and descendants inherit the resolved
+ * value, so tokens declared only on :root (where --text-scale is 1) stayed at 100% however the match screen's Text
+ * scale was set. Re-declaring them on the element that carries the setting (`.text-scale-root`) makes every tokenised
+ * size under it follow the setting.
+ */
+:root,
+.text-scale-root {
   --type-xs: calc(0.75rem * var(--text-scale));     /* 12 px: captions, chips, diagram labels */
   --type-sm: calc(0.875rem * var(--text-scale));    /* 14 px: secondary text, helper lines */
   --type-md: calc(1rem * var(--text-scale));        /* 16 px: body */
@@ -22,6 +27,10 @@
   --type-2xl: calc(1.75rem * var(--text-scale));    /* 28 px: section headings */
   --type-3xl: calc(2.25rem * var(--text-scale));    /* 36 px: the ball call */
   --type-display: calc(clamp(2.5rem, 1.75rem + 1.2vw, 3.5rem) * var(--text-scale)); /* the score */
+}
+
+:root {
+  --text-scale: 1;
   --leading-tight: 1.1;
   --leading-normal: 1.45;
   --tracking-caps: 0.12em;
