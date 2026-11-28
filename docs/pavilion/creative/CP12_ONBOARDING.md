@@ -107,7 +107,7 @@ Specs changed, and why each still tests the same behaviour:
 
 ## Limitations and remaining work
 
-- Quick match or Custom match with an unfinished match: decide whether they should offer "start a new match" (needs the existing new-exhibition flow from the title, a navigation and behaviour question for the owner).
+- Quick match or Custom match with an unfinished match: decide whether they should offer "start a new match" (needs the existing new-exhibition flow from the title, a navigation and behaviour question for the owner). Update: the owner approved starting a new match; done in CP12B ([CP12B_QUICK_MATCH.md](CP12B_QUICK_MATCH.md)). Quick match, Guided first match and Custom match now start a new match, and the unfinished one stays in Saved games.
 - Continue reads the career catalogues with the same full-row reads the career screen uses at boot; with many long careers the title pays that cost on each visit [Inference: not measured].
 - The imported roster career (`#roster-career`) is not considered by Continue.
 - `docs/HOW_TO_PLAY.md`'s "You want to" table still names some older career tabs (Home, Contracts); only the paragraph above it was updated.
