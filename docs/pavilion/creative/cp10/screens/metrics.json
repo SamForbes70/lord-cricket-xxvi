@@ -1,0 +1,42 @@
+{
+  "base": "local vite preview",
+  "startedAt": "2026-11-27T23:39:39.449Z",
+  "shots": [
+    "cp10-out/80-commentary-first-innings_1366x768.png",
+    "cp10-out/80-commentary-first-innings_390x844.png",
+    "cp10-out/81-commentary-full-time_1366x768.png",
+    "cp10-out/81-commentary-full-time_390x844.png",
+    "cp10-out/83-commentary-reduced-motion_1366x768.png",
+    "cp10-out/83-commentary-reduced-motion_390x844.png",
+    "cp10-out/84-career-commentary_1366x768.png",
+    "cp10-out/84-career-commentary_390x844.png",
+    "cp10-out/85-career-captains-notes_1366x768.png",
+    "cp10-out/85-career-captains-notes_390x844.png"
+  ],
+  "overflow": {
+    "80-commentary-first-innings_1366x768": 0,
+    "80-commentary-first-innings_390x844": 0,
+    "81-commentary-full-time_1366x768": 0,
+    "81-commentary-full-time_390x844": 0,
+    "83-commentary-reduced-motion_1366x768": 0,
+    "83-commentary-reduced-motion_390x844": 0,
+    "84-career-commentary_1366x768": 0,
+    "84-career-commentary_390x844": 0,
+    "85-career-captains-notes_1366x768": 0,
+    "85-career-captains-notes_390x844": 0
+  },
+  "pageErrors": [],
+  "consoleErrors": [],
+  "contrast": {
+    "line text": 13.15,
+    "ball label": 10.86,
+    "over summary": 13.15,
+    "badge": 9.73
+  },
+  "reduced": {
+    "running": 0,
+    "animated": 0,
+    "parts": 88
+  },
+  "finishedAt": "2026-11-27T23:40:20.162Z"
+}
