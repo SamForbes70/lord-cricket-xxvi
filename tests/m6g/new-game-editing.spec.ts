@@ -31,7 +31,7 @@ async function prepareEditedCareer(page: Page) {
 }
 
 test("edited career names and colours survive reload, switching and portable import", async ({ page, browser }) => {
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await expect(page.getByRole("heading", { name: "Aster Harbour", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Choose career" }).click();
@@ -70,7 +70,7 @@ test("edited career names and colours survive reload, switching and portable imp
 });
 
 test("edited match presentation survives reload and portable import", async ({ page, browser }) => {
-  await page.goto("/");
+  await page.goto("/#career");
   await prepareEditedCareer(page);
   await page.getByRole("button", { name: "Play match" }).click();
   const scoreboard = page.getByTestId("scorestrip");
@@ -101,7 +101,7 @@ test("edited match presentation survives reload and portable import", async ({ p
 });
 
 test("the editor supports keyboard focus and long names on a narrow screen", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await page.getByLabel("Text scale").selectOption("150");

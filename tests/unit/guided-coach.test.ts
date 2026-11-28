@@ -20,4 +20,12 @@ describe("guided first match coach", () => {
     const six = { latestHighlight: { dismissalKind: null, boundary: "SIX" } } as unknown as NonNullable<V["fieldPresentation"]>;
     expect(coachTip(at("READY", { fieldPresentation: six })).title).toBe("Boundary!");
   });
+  it("names the control that answers each decision, and none when the match is over (CP12, CD-052)", () => {
+    for (const phase of ["TOSS", "AWAITING_INNINGS", "AWAITING_FOLLOW_ON", "AWAITING_BATTER", "AWAITING_BOWLER", "READY"]) {
+      expect(coachTip(at(phase)).control?.length ?? 0).toBeGreaterThan(3);
+    }
+    expect(coachTip(at("TOSS")).control).toBe("Call heads or Call tails");
+    expect(coachTip(at("READY")).control).toBe("Next delivery");
+    expect(coachTip(at("COMPLETE")).control).toBeUndefined();
+  });
 });

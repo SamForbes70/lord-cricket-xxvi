@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** E6: the squad list shows what players are known for and their form, and no internal ids. */
 test("the squad list shows tags and form without player ids", async ({ page }) => {
   test.setTimeout(240_000);
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   await page.getByRole("button", { name: "Squad", exact: true }).click();
   const table = page.locator("section[aria-labelledby='squad-heading'] table").first();

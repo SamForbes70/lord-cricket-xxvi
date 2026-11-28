@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** E2: the board states an objective before the first fixture, and the standing against it moves with results. */
 test("a new career shows the board's objective before round 1 and a standing after it", async ({ page }) => {
   test.setTimeout(180_000);
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   const card = page.getByTestId("board-card");
   await expect(card).toBeVisible({ timeout: 30_000 });

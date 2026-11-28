@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** E7: each fixture on Home carries a preview built from recorded results. The rivalry rule is covered by unit tests. */
 test("the next fixture shows a preview that changes once results exist", async ({ page }) => {
   test.setTimeout(240_000);
-  await page.goto("/");
+  await page.goto("/#career");
   await page.getByRole("button", { name: /Aster Harbour/i }).click();
   const preview = page.getByTestId("fixture-preview");
   await expect(preview).toBeVisible({ timeout: 30_000 });
