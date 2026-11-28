@@ -33,8 +33,11 @@ test("Stage 3 player lifecycle promotes youth prospects, runs off-season ageing/
   await expect(prospectRows).toHaveCount(3);
   const firstProspectName = (await prospectRows.nth(0).locator("strong").innerText()).trim();
   const secondProspectName = (await prospectRows.nth(1).locator("strong").innerText()).trim();
-  const firstProspectId = (await prospectRows.nth(0).locator("small").innerText()).trim();
-  const secondProspectId = (await prospectRows.nth(1).locator("small").innerText()).trim();
+  // CD-031: the prospect id is no longer printed under the name; each row still carries it in its test id.
+  const prospectId = async (row: number) => ((await prospectRows.nth(row).getAttribute("data-testid")) ?? "").replace(/^youth-row-/, "");
+  const firstProspectId = await prospectId(0);
+  const secondProspectId = await prospectId(1);
+  await expect(academyPanel).not.toContainText(firstProspectId);
   expect(firstProspectId).toMatch(/^acad-/);
   expect(secondProspectId).toMatch(/^acad-/);
 

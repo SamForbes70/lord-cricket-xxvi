@@ -105,7 +105,8 @@ test("Stage 5 pre-match briefing, plain-language trade-offs, legal presets, and 
 
   const battingStints = page.getByTestId("batting-stint-reviews");
   await battingStints.locator("summary").click();
-  await expect(battingStints).toContainText("Aggression 2/4 · ROTATE");
+  // CP02B (CD-031): the accepted intent is shown in words ("Rotate"), not its stored spelling.
+  await expect(battingStints).toContainText("Aggression 2/4 · Rotate");
 
   // 5. Hiding tactical briefings does not mutate engine revision; reload preserves factual reviews
   const revBefore = await page.locator("#decision").getAttribute("data-revision");
