@@ -22,7 +22,7 @@ Double-click **Install-Lord-Cricket.bat** in the unzipped folder. It copies the 
 The game opens on the **title screen**, at **http://127.0.0.1:4180/#title** or at the plain address with no `#title`:
 
 - **Continue** appears once you have something to go back to: it resumes the match or career you played most recently (an unfinished match, or the career you last had open). If you left your careers with Choose career, it opens the list of saved careers instead.
-- **Quick match** starts a T20 straight away with the suggested XIs.
+- **Quick match** starts a T20 straight away with the suggested XIs. Quick match, Guided first match and Custom match always start a new match: an unfinished one is kept in **Saved games** on the match screen (Load it there), and Continue resumes it until you start another.
 - **Guided first match** is the same match with a coach above the decisions explaining each one (toss, bat or bowl, batters, bowlers, playing on). Press **End the guide** when you no longer need it.
 - The cards below lead to **Career**, **Tournaments**, **Scenarios**, **Rain and reviews** and **Custom match** (pick the format, ground and both XIs; a custom match starts with you deciding for both teams, and Tactical captain in Match settings hands a side to the computer).
 - **Settings**, beside the Sound switch, opens the display, match and sound settings: the career's own Settings screen when a career is open, otherwise the same settings on their own page.

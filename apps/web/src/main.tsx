@@ -97,6 +97,7 @@ import { createStagedRosterPack } from "@lcxxvi/simulation";
 import { isBowlingCapable, RULE_MANIFESTS, suggestedEleven, SYNTHETIC_ALPHA_PACK } from "@lcxxvi/data";
 import { AWARD_NOTICE_TEXT, enumLabel, matchPhaseLabel } from "./display-labels.js";
 import { ModeMasthead } from "./ModeMasthead.js";
+import { takeNewMatchRequest } from "./new-match-request.js";
 
 type Body = Request extends infer R
   ? R extends Request
@@ -296,6 +297,10 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
   })());
   const [superOver, setSuperOver] = useState<SuperOverView | null>(null);
   const recoverIssued = useRef(false);
+  /** CP12B: the title screen asked for a new match (Quick match, Guided first match or Custom match); taken at boot. */
+  const newMatchAsked = useRef(false);
+  /** CP12B: what a new match from the title set aside, so the player is told where it went. */
+  const [setAside, setSetAside] = useState<{ kind: "MATCH"; title: string } | { kind: "CAREER" } | null>(null);
   // Ids for requests that never commit. Commands use ui-(10000 + revision + 1) so that a reloaded page, which
   // restarts from the durable revision, cannot reuse a committed id; borrowing from that range would break it.
   const auxSerial = useRef(800_000_000);
@@ -464,6 +469,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       audioManagerRef.current?.unlockFromUserGesture();
     }
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) { endPassage(""); setPaceOverride(null); heldPanelClick.current = null; }
+    if (["BOOT", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE", "SCENARIO_START"].includes(body.type)) setSetAside(null);
     if (["BOOT", "START", "LOAD_SAVE", "IMPORT_SAVE", "DELETE_SAVE"].includes(body.type)) {
       setBatchProgress(null);
       setCommittedWindow(null);
@@ -541,6 +547,25 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
         careerStartIssued.current = true;
         try { sessionStorage.setItem("lcxxvi-career-match-launch", JSON.stringify(restored)); } catch { /* the durable binding is authoritative */ }
         if (restored.managedTeamId) setAiTeamId(restored.homeTeamId === restored.managedTeamId ? restored.awayTeamId : restored.homeTeamId);
+      }
+      if (newMatchAsked.current) {
+        // CP12B: the title screen asked for a new match, and boot restored the active one. Take the existing new
+        // exhibition path (the same BOOT fresh as the New exhibition button): the restored save is left untouched in
+        // Saved games and only the active pointer moves on. A career match cannot be set aside that way (the worker
+        // refuses), so it stays open and the player is told why. Nothing is sent to the restored match first.
+        newMatchAsked.current = false;
+        if (r.view && !r.error && careerLaunch.current) setSetAside({ kind: "CAREER" });
+        else if (r.view && !r.error && !tournamentLaunch.current && !scenarioLaunch.current) {
+          if (r.view.phase !== "COMPLETE") {
+            const saveId = r.persistence?.saveId;
+            const title = r.persistence?.saves.find((save) => save.saveId === saveId)?.title ?? "";
+            setSetAside({ kind: "MATCH", title });
+          }
+          audioBootSyncRef.current = true;
+          const requestId = auxId();
+          inflight.current = requestId;
+          w.postMessage({ version: UI_VERSION, requestId, expectedRevision: r.revision, type: "BOOT", fresh: true });
+        }
       }
       const batch = advanceBatch.current;
       // A routine pick never follows a stop the player asked for.
@@ -758,6 +783,7 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     };
     window.addEventListener("pagehide", releaseLease);
     window.addEventListener("pageshow", reacquire);
+    newMatchAsked.current = takeNewMatchRequest();
     const id = `ui-${++serial.current}`;
     inflight.current = id;
     w.postMessage({
@@ -1422,6 +1448,13 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
       {error && (
         <p className="error" role="alert" tabIndex={-1}>
           {error}
+        </p>
+      )}
+      {setAside && (
+        <p className="set-aside-note" role="status" data-testid="set-aside-note" data-kind={setAside.kind}>
+          {setAside.kind === "MATCH"
+            ? `Your unfinished match${setAside.title ? `, ${setAside.title},` : ""} is kept in Saved games below. Load it there to carry on.`
+            : "Your career match is still in progress, so a new match cannot start yet. Finish it, or abandon it below."}
         </p>
       )}
       {persistence?.recovered && (
