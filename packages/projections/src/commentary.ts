@@ -11,6 +11,23 @@ import {
   type MatchResult,
 } from "@lcxxvi/contracts";
 import { inningsSummary, overContext, wicketContext, type OverRecord } from "./commentary-context.js";
+import {
+  SECTOR_NAMES,
+  battingPlanText,
+  bowlingPlanText,
+  capitalise,
+  choose,
+  countWord,
+  fieldedStroke,
+  fnv1a32,
+  lengthLead,
+  lengthNoun,
+  ordinalWord,
+  scoringStroke,
+  sixStroke,
+  strokeWithBowler,
+  type Stroke,
+} from "./commentary-phrases.js";
 
 export const DEFAULT_REPETITION_COOLDOWN_WINDOW = 3 as const;
 
@@ -67,20 +84,17 @@ interface InningsRunningProjection {
   /** Pavilion P07: completed overs of this innings and the legal balls since the last four or six. */
   overHistory: OverRecord[];
   ballsSinceBoundary: number;
+  /** CP10: fours and sixes in the current over, legal dot balls in a row, the striker who hit the last ball for a boundary, batters sent in. */
+  overBoundaries: number;
+  dotStreak: number;
+  lastBoundaryStrikerId: string | null;
+  battersIn: number;
   batters: Map<string, BatterRunningFigures>;
   bowlers: Map<string, BowlerRunningFigures>;
 }
 
-const SECTOR_LABELS: readonly string[] = [
-  "third man",
-  "point",
-  "cover",
-  "mid-off",
-  "mid-on",
-  "mid-wicket",
-  "square leg",
-  "fine leg",
-];
+/** Recorded shot sectors by name (ADR 013 convention; the same names the wagon wheel uses). */
+const SECTOR_LABELS: readonly string[] = SECTOR_NAMES;
 
 const LENGTH_LABELS: Readonly<Record<string, string>> = {
   YORKER: "yorker",
@@ -96,15 +110,6 @@ const TRAJECTORY_LABELS: Readonly<Record<string, string>> = {
   EDGE: "off the edge",
 };
 
-function fnv1a32(input: string): number {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < input.length; i += 1) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return hash >>> 0;
-}
-
 function hex8(n: number): string {
   return (n >>> 0).toString(16).padStart(8, "0");
 }
@@ -117,9 +122,13 @@ function ballCoordinateLabel(legalBallsBefore: number): string {
   return `${Math.floor(legalBallsBefore / 6)}.${(legalBallsBefore % 6) + 1}`;
 }
 
+/** Bowling figures in the usual order, overs-maidens-runs-wickets ("4-0-18-3", or "2.3-0-14-1" part way through an over). */
 function bowlerFiguresText(fig: BowlerRunningFigures): string {
-  return `${formatOvers(fig.legalBalls)}-${fig.maidens}-${fig.runsConceded}-${fig.wickets}`;
+  const oversText = fig.legalBalls % 6 === 0 ? String(fig.legalBalls / 6) : formatOvers(fig.legalBalls);
+  return `${oversText}-${fig.maidens}-${fig.runsConceded}-${fig.wickets}`;
 }
+
+const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 function allocatedBallsForFormat(format: Format): number | null {
   if (format === "T20") return 120;
@@ -127,13 +136,20 @@ function allocatedBallsForFormat(format: Format): number | null {
   return null;
 }
 
+/**
+ * Chooses a template for one event. The starting choice comes from hashing the presentation key, the event's
+ * sequence and hash and the family, so a replay of the same events gives the same text. CP10: a template used for
+ * one of the family's recent lines is passed over for the next unused one; the window is per family (so a burst of
+ * other lines does not let a dot-ball template come straight back) and covers three quarters of the pool, up to one
+ * less than its size, never below the feed's repetition cooldown window.
+ */
 function pickTemplateWithCooldown<T extends { readonly id: string }>(
   family: string,
   templates: readonly T[],
   presentationKey: string,
   sequence: number,
   eventHash: string,
-  recentIds: string[],
+  recentIds: Map<string, string[]>,
   cooldownWindow: number,
 ): { selected: T; cooldownApplied: boolean; digest: string } {
   const raw = fnv1a32(`${presentationKey}|${sequence}|${eventHash}|${family}`);
@@ -141,8 +157,10 @@ function pickTemplateWithCooldown<T extends { readonly id: string }>(
   const baseIdx = raw % templates.length;
   let chosenIdx = baseIdx;
   let cooldownApplied = false;
-  if (templates.length > 1 && cooldownWindow > 0) {
-    const windowSlice = recentIds.slice(-cooldownWindow);
+  const history = recentIds.get(family) ?? [];
+  const span = Math.min(templates.length - 1, Math.max(cooldownWindow, Math.ceil(templates.length * 0.75)));
+  if (span > 0) {
+    const windowSlice = history.slice(-span);
     if (windowSlice.includes(templates[baseIdx]!.id)) {
       for (let step = 1; step < templates.length; step += 1) {
         const idx = (baseIdx + step) % templates.length;
@@ -155,7 +173,8 @@ function pickTemplateWithCooldown<T extends { readonly id: string }>(
     }
   }
   const selected = templates[chosenIdx]!;
-  recentIds.push(selected.id);
+  history.push(selected.id);
+  recentIds.set(family, history.slice(-16));
   return { selected, cooldownApplied, digest };
 }
 
@@ -218,7 +237,7 @@ export function projectMatchCommentary(
     input.presentationKey ??
     `lcxxvi-commentary:${input.format}:${input.teamIds[0]}:${input.teamIds[1]}:${input.groundName ?? "ground"}`;
   const presentationKeyDigest = hex8(fnv1a32(presentationKey));
-  const recentTemplateIds: string[] = [];
+  const recentTemplateIds = new Map<string, string[]>();
 
   const pName = (id: string | null | undefined): string =>
     id ? (input.playerNames[id] ?? id) : "Unknown player";
@@ -263,6 +282,10 @@ export function projectMatchCommentary(
       partnershipBalls: 0,
       overHistory: [],
       ballsSinceBoundary: 0,
+      overBoundaries: 0,
+      dotStreak: 0,
+      lastBoundaryStrikerId: null,
+      battersIn: 0,
       batters: new Map(),
       bowlers: new Map(),
     };
@@ -355,6 +378,16 @@ export function projectMatchCommentary(
       }
       if (d.boundary === "FOUR" || d.boundary === "SIX") inn.ballsSinceBoundary = 0;
       else if (d.legalBall) inn.ballsSinceBoundary += 1;
+      // CP10: boundaries in this over, back-to-back boundaries by one striker, and legal dot balls in a row.
+      const isBoundary = d.boundary === "FOUR" || d.boundary === "SIX";
+      if (isBoundary) inn.overBoundaries += 1;
+      const boundariesThisOver = inn.overBoundaries;
+      const backToBack = isBoundary && inn.lastBoundaryStrikerId === d.strikerId;
+      inn.lastBoundaryStrikerId = isBoundary ? d.strikerId : null;
+      if (d.legalBall && totalRuns === 0) inn.dotStreak += 1;
+      else if (d.legalBall || totalRuns > 0) inn.dotStreak = 0;
+      const dotStreak = inn.dotStreak;
+      const deliveryNotes: string[] = [];
       inn.partnershipRuns += totalRuns;
       if (d.legalBall || d.legality === "NO_BALL") {
         inn.partnershipBalls += 1;
@@ -569,6 +602,7 @@ export function projectMatchCommentary(
         inn.overTeamRuns = 0;
         inn.overWickets = 0;
         inn.overLegalBalls = 0;
+        inn.overBoundaries = 0;
         bowlerFig.currentOverBowlerRuns = 0;
         bowlerFig.currentOverLegalBalls = 0;
       }
@@ -577,6 +611,15 @@ export function projectMatchCommentary(
       let category: CommentaryCategory = "DELIVERY";
       let short = String(totalRuns);
       let bodyTemplates: readonly { id: string; render: () => string }[] = [];
+
+      // CP10: every phrase below is drawn from what this delivery records (length, how it came off the bat, the
+      // recorded sector, the field outcome) and the running figures; variants are chosen by hashing event data.
+      const phraseKey = `${presentationKey}|${ev.sequence}|${evHash}`;
+      const lead = lengthLead(phraseKey, d.executedLength);
+      const bowls = lead ? `${bowler} ${lead}` : `${bowler} bowls`;
+      const t = (id: string, render: () => string) => ({ id, render });
+      const when = (cond: boolean, ...items: { id: string; render: () => string }[]) => (cond ? items : []);
+      const sameWhere = (stroke: Stroke | null) => (stroke ? ` ${stroke.where}` : "");
 
       if (d.dismissal) {
         category = "DISMISSAL";
@@ -616,155 +659,110 @@ export function projectMatchCommentary(
             sourceRef: "delivery.dismissal.fielderId",
           });
         }
+        const forScore = `for ${outBatterFig.runs} (${outBatterFig.ballsFaced})`;
+        const stroke = fieldedStroke(phraseKey, d.shotSector, d.trajectory, d.executedLength);
 
         if (d.dismissal.kind === "RUN_OUT" && isNonStrikerOut) {
           family = "WICKET_RUN_OUT_NON_STRIKER";
           const throwCredit = fielderName ? ` by ${fielderName}` : "";
           const endLabel = d.dismissal.wicketEnd.toLowerCase();
           bodyTemplates = [
-            {
-              id: "W_RO_NS_1",
-              render: () =>
-                `${bowler} to ${striker}. Non-striker ${outName} is run out${throwCredit} at the ${endLabel} end for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_RO_NS_2",
-              render: () =>
-                `${bowler} to ${striker}. Mix-up in the running — non-striker ${outName} caught short${throwCredit} at the ${endLabel} end, out for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
-            {
-              id: "W_RO_NS_3",
-              render: () =>
-                `${bowler} to ${striker}. Direct trouble at the ${endLabel} end: non-striker ${outName} run out${throwCredit} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
+            t("W_RO_NS_1", () => `${bowler} to ${striker}. Non-striker ${outName} is run out${throwCredit} at the ${endLabel} end ${forScore}!`),
+            t("W_RO_NS_2", () => `${bowler} to ${striker}. Mix-up in the running: non-striker ${outName} is caught short${throwCredit} at the ${endLabel} end, out ${forScore}.`),
+            t("W_RO_NS_3", () => `${bowler} to ${striker}. Trouble at the ${endLabel} end: non-striker ${outName} run out${throwCredit} ${forScore}.`),
+            ...when(stroke !== null,
+              t("W_RO_NS_4", () => `${striker} ${stroke!.act} ${stroke!.where} and they go for a run, but non-striker ${outName} is short at the ${endLabel} end: run out${throwCredit} ${forScore}.`)),
           ];
         } else if (d.dismissal.kind === "BOWLED") {
           family = "WICKET_BOWLED";
           bodyTemplates = [
-            {
-              id: "W_BWL_1",
-              render: () =>
-                `${bowler} bowls ${outName} for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_BWL_2",
-              render: () =>
-                `${bowler} to ${striker} — through the defence, ${outName} bowled for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_BWL_3",
-              render: () =>
-                `${bowler} hits the stumps! ${outName} departs bowled for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
+            t("W_BWL_1", () => `${bowler} bowls ${outName} ${forScore}!`),
+            t("W_BWL_2", () => `Bowled! ${bowls} and ${outName} is gone ${forScore}.`),
+            t("W_BWL_3", () => `${bowler} hits the stumps. ${outName} departs, bowled ${forScore}.`),
+            t("W_BWL_4", () => `Timber! ${outName} is bowled by ${bowler} ${forScore}.`),
+            ...when(d.executedLength === "YORKER",
+              t("W_BWL_YK", () => `Yorked! ${bowler} spears it into the base of the stumps and ${outName} goes ${forScore}.`)),
+            ...when(d.executedLength === "GOOD",
+              t("W_BWL_GD", () => `${bowler} hits a good length and beats the defence: ${outName} bowled ${forScore}.`)),
+            ...when(d.executedLength === "FULL",
+              t("W_BWL_FL", () => `${bowler} pitches it up and the stumps are broken. ${outName} bowled ${forScore}.`)),
           ];
         } else if (d.dismissal.kind === "LBW") {
           family = "WICKET_LBW";
           bodyTemplates = [
-            {
-              id: "W_LBW_1",
-              render: () =>
-                `${bowler} traps ${outName} lbw for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_LBW_2",
-              render: () =>
-                `${bowler} to ${striker} — pinned in front, ${outName} out lbw for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
-            {
-              id: "W_LBW_3",
-              render: () =>
-                `Up goes the finger! ${bowler} strikes as ${outName} falls lbw for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
+            t("W_LBW_1", () => `${bowler} traps ${outName} lbw ${forScore}!`),
+            t("W_LBW_2", () => `Pinned in front! ${outName} is lbw to ${bowler} ${forScore}.`),
+            t("W_LBW_3", () => `Up goes the finger: ${bowler} has ${outName} lbw ${forScore}.`),
+            ...when(d.executedLength === "YORKER",
+              t("W_LBW_YK", () => `${bowler} fires in the yorker and hits ${outName} on the boot in front. Lbw ${forScore}.`)),
+            ...when(d.executedLength === "FULL" || d.executedLength === "GOOD",
+              t("W_LBW_PD", () => `${bowls} and ${outName} is struck on the pad in front: lbw ${forScore}.`)),
           ];
         } else if (d.dismissal.kind === "CAUGHT") {
           family = "WICKET_CAUGHT";
           const catcher = fielderName ? `caught by ${fielderName}` : "caught";
-          bodyTemplates = [
-            {
-              id: "W_CT_1",
-              render: () =>
-                `${bowler} to ${striker} — ${outName} ${catcher} for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_CT_2",
-              render: () =>
-                `Taken! ${bowler} induces the mistake and ${outName} is ${catcher} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
-            {
-              id: "W_CT_3",
-              render: () =>
-                `Wicket for ${bowler}: ${outName} departs, ${catcher}, for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
-            // Pavilion P07: more variety, matched to how the ball travelled where the delivery records it.
-            { id: "W_CT_4", render: () => `Gone! ${outName} ${catcher} off ${bowler} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).` },
-            ...(d.trajectory === "EDGE"
-              ? [{ id: "W_CT_ED", render: () => `${outName} edges ${bowler} and is ${catcher} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).` }]
-              : []),
-            ...(d.trajectory === "AERIAL"
-              ? [{ id: "W_CT_AR", render: () => `${outName} goes in the air off ${bowler} and is ${catcher} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).` }]
-              : []),
-          ];
+          const returnCatch = d.dismissal.fielderId !== null && d.dismissal.fielderId === d.bowlerId;
+          const taker = fielderName ?? "the fielder";
+          bodyTemplates = returnCatch
+            ? [
+                t("W_CB_1", () => `Caught and bowled! ${bowler} takes the return catch and ${outName} goes ${forScore}.`),
+                t("W_CB_2", () => `${outName} hits it back to ${bowler}, who holds on: caught and bowled ${forScore}.`),
+                t("W_CB_3", () => `${bowler} does it all: caught and bowled, and ${outName} is out ${forScore}.`),
+              ]
+            : [
+                t("W_CT_1", () => `${bowler} strikes: ${outName} ${catcher} ${forScore}!`),
+                t("W_CT_2", () => `Taken! ${bowler} has ${outName} ${catcher} ${forScore}.`),
+                t("W_CT_3", () => `Wicket for ${bowler}: ${outName} departs, ${catcher}, ${forScore}.`),
+                t("W_CT_4", () => `Gone! ${outName} ${catcher} off ${bowler} ${forScore}.`),
+                ...when(stroke !== null,
+                  t("W_CT_5", () => `${outName} ${stroke!.act} ${stroke!.where} and is ${catcher} ${forScore}.`)),
+                ...when(d.trajectory === "EDGE",
+                  t("W_CT_ED", () => `${outName} edges ${bowler} and ${taker} takes the catch. Out ${forScore}.`),
+                  t("W_CT_ED2", () => `${bowler} finds the edge, and ${taker} does the rest: ${outName} out ${forScore}.`)),
+                ...when(d.trajectory === "AERIAL",
+                  t("W_CT_AR", () => `${outName} goes in the air off ${bowler} and is ${catcher} ${forScore}.`),
+                  t("W_CT_AR2", () => `${outName} goes aerial${stroke ? ` ${stroke.where.replace("in the air ", "")}` : ""} and ${taker} holds on. Gone ${forScore}.`)),
+              ];
         } else if (d.dismissal.kind === "STUMPED") {
           family = "WICKET_STUMPED";
           const keeperCredit = fielderName
             ? `stumped by ${fielderName}`
             : "stumped";
           bodyTemplates = [
-            {
-              id: "W_ST_1",
-              render: () =>
-                `${bowler} deceives ${outName} — ${keeperCredit} for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_ST_2",
-              render: () =>
-                `Sharp work behind the stumps! ${outName} is ${keeperCredit} off ${bowler} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
-            {
-              id: "W_ST_3",
-              render: () =>
-                `${bowler} draws ${outName} out of the crease, ${keeperCredit} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
+            t("W_ST_1", () => `${bowler} deceives ${outName}: ${keeperCredit} ${forScore}!`),
+            t("W_ST_2", () => `Sharp work behind the stumps! ${outName} is ${keeperCredit} off ${bowler} ${forScore}.`),
+            t("W_ST_3", () => `${bowler} draws ${outName} out of the crease, ${keeperCredit} ${forScore}.`),
+            ...when(fielderName !== null,
+              t("W_ST_4", () => `${outName} is out of the crease and ${fielderName} whips off the bails. Stumped ${forScore}.`)),
           ];
         } else if (d.dismissal.kind === "RUN_OUT") {
           family = "WICKET_RUN_OUT_STRIKER";
           const throwCredit = fielderName ? ` (${fielderName})` : "";
           bodyTemplates = [
-            {
-              id: "W_RO_S_1",
-              render: () =>
-                `${bowler} to ${striker} — ${outName} run out${throwCredit} for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_RO_S_2",
-              render: () =>
-                `Quick throw${throwCredit}! ${outName} is run out for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
-            {
-              id: "W_RO_S_3",
-              render: () =>
-                `Short of the ground! ${outName} departs run out${throwCredit} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
+            t("W_RO_S_1", () => `${bowler} to ${striker}: ${outName} run out${throwCredit} ${forScore}!`),
+            t("W_RO_S_2", () => `Quick work in the field${throwCredit}! ${outName} is run out ${forScore}.`),
+            t("W_RO_S_3", () => `Short of the ground! ${outName} departs run out${throwCredit} ${forScore}.`),
+            ...when(stroke !== null,
+              t("W_RO_S_4", () => `${outName} ${stroke!.act} ${stroke!.where} and goes for the run, but is short of the ground: run out${throwCredit} ${forScore}.`)),
           ];
         } else {
           family = "WICKET_HIT_WICKET";
           bodyTemplates = [
-            {
-              id: "W_HW_1",
-              render: () =>
-                `${bowler} to ${striker} — ${outName} is out hit wicket for ${outBatterFig.runs} (${outBatterFig.ballsFaced})!`,
-            },
-            {
-              id: "W_HW_2",
-              render: () =>
-                `Unfortunate dismissal: ${outName} disturbs the stumps, out hit wicket off ${bowler} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
-            {
-              id: "W_HW_3",
-              render: () =>
-                `${outName} falls hit wicket to ${bowler} for ${outBatterFig.runs} (${outBatterFig.ballsFaced}).`,
-            },
+            t("W_HW_1", () => `${bowler} to ${striker}: ${outName} is out hit wicket ${forScore}!`),
+            t("W_HW_2", () => `Unfortunate dismissal: ${outName} disturbs the stumps, out hit wicket off ${bowler} ${forScore}.`),
+            t("W_HW_3", () => `${outName} falls hit wicket to ${bowler} ${forScore}.`),
           ];
+        }
+        if (outBatterFig.runs === 0) {
+          const duck = outBatterFig.ballsFaced === 0
+            ? "A diamond duck: out without facing a ball."
+            : outBatterFig.ballsFaced === 1 && !isNonStrikerOut
+              ? "A golden duck, first ball."
+              : choose(`${phraseKey}|duck`, ["Out for a duck.", "No score for the batter.", "A duck."]);
+          deliveryNotes.push(duck);
+        }
+        if (d.dismissal.creditedBowlerId === d.bowlerId && (bowlerFig.wickets === 2 || bowlerFig.wickets === 4)) {
+          deliveryNotes.push(`That is ${bowler}'s ${ordinalWord(bowlerFig.wickets)} wicket.`);
         }
       } else if (d.legality === "WIDE") {
         family = "DELIVERY_WIDE";
@@ -775,22 +773,15 @@ export function projectMatchCommentary(
           sourceKind: "EVENT_FIELD",
           sourceRef: "delivery.extras.wides",
         });
+        const wides = plural(totalRuns, "wide");
         bodyTemplates = [
-          {
-            id: "DLV_WD_1",
-            render: () =>
-              `${bowler} strays wide to ${striker}; ${totalRuns} wide${totalRuns === 1 ? "" : "s"} added, ball to be re-bowled.`,
-          },
-          {
-            id: "DLV_WD_2",
-            render: () =>
-              `${bowler} misses the radar against ${striker} — called wide (${totalRuns} extra${totalRuns === 1 ? "" : "s"}).`,
-          },
-          {
-            id: "DLV_WD_3",
-            render: () =>
-              `Wide signalled off ${bowler} to ${striker}: ${totalRuns} run${totalRuns === 1 ? "" : "s"} to the total.`,
-          },
+          t("DLV_WD_1", () => `${bowler} strays wide of ${striker}; ${wides} added, and the ball is bowled again.`),
+          t("DLV_WD_2", () => `${bowler} misses the radar against ${striker}: called wide (${plural(totalRuns, "extra")}).`),
+          t("DLV_WD_3", () => `Wide signalled off ${bowler} to ${striker}: ${plural(totalRuns, "run")} to the total.`),
+          ...when(lead !== null,
+            t("DLV_WD_4", () => `${bowls}, but it is called wide. ${capitalise(plural(totalRuns, "extra"))}.`)),
+          ...when(totalRuns > 1,
+            t("DLV_WD_5", () => `A wide from ${bowler}, and they add ${countWord(totalRuns - 1)} more: ${wides} in all.`)),
         ];
       } else if (d.legality === "NO_BALL") {
         family = "DELIVERY_NO_BALL";
@@ -801,196 +792,170 @@ export function projectMatchCommentary(
           sourceKind: "EVENT_FIELD",
           sourceRef: "delivery.extras.noBalls",
         });
-        const fhSuffix = freeHitEligible ? " Free Hit coming up next." : "";
+        const fhSuffix = freeHitEligible
+          ? ` ${choose(`${phraseKey}|fh`, ["Free hit to come.", "Free hit next ball.", "That brings a free hit."])}`
+          : "";
         const batNote =
           d.batRuns > 0
             ? ` plus ${d.batRuns} off the bat`
             : extrasTotal > d.extras.noBalls
-              ? ` plus ${extrasTotal - d.extras.noBalls} extra${extrasTotal - d.extras.noBalls === 1 ? "" : "s"}`
+              ? ` plus ${plural(extrasTotal - d.extras.noBalls, "extra")}`
               : "";
+        const stroke = d.batRuns > 0 ? scoringStroke(phraseKey, d.shotSector, d.trajectory, d.executedLength) : null;
         bodyTemplates = [
-          {
-            id: "DLV_NB_1",
-            render: () =>
-              `No-ball called on ${bowler} to ${striker} (${totalRuns} run${totalRuns === 1 ? "" : "s"}${batNote}).${fhSuffix}`,
-          },
-          {
-            id: "DLV_NB_2",
-            render: () =>
-              `${bowler} oversteps against ${striker}: no-ball costs ${totalRuns} run${totalRuns === 1 ? "" : "s"}${batNote}.${fhSuffix}`,
-          },
-          {
-            id: "DLV_NB_3",
-            render: () =>
-              `Front-foot no-ball from ${bowler} to ${striker}, ${totalRuns} added${batNote}.${fhSuffix}`,
-          },
+          t("DLV_NB_1", () => `No-ball called on ${bowler} to ${striker} (${plural(totalRuns, "run")}${batNote}).${fhSuffix}`),
+          t("DLV_NB_2", () => `${bowler} bowls a no-ball to ${striker}: it costs ${plural(totalRuns, "run")}${batNote}.${fhSuffix}`),
+          t("DLV_NB_3", () => `No-ball from ${bowler}, ${totalRuns} added${batNote}.${fhSuffix}`),
+          ...when(stroke !== null,
+            t("DLV_NB_4", () => `No-ball from ${bowler}, and ${striker} ${stroke!.act} ${stroke!.where} for ${plural(d.batRuns, "run")} as well; ${totalRuns} in all.${fhSuffix}`)),
         ];
       } else if (d.boundary === "SIX") {
         family = "DELIVERY_SIX";
         short = "6";
-        const where = sectorPhrase ? ` over ${sectorPhrase}` : "";
-        bodyTemplates = [
-          {
-            id: "DLV_SIX_1",
-            render: () =>
-              `${bowler} to ${striker} — launched${where} for SIX!`,
-          },
-          {
-            id: "DLV_SIX_2",
-            render: () =>
-              `SIX! ${striker} clears the rope${where} off ${bowler}.`,
-          },
-          {
-            id: "DLV_SIX_3",
-            render: () =>
-              `${striker} gets hold of ${bowler} and sends it sailing${where} for 6.`,
-          },
-          {
-            id: "DLV_SIX_4",
-            render: () =>
-              `Maximum! Clean strike by ${striker}${where} off ${bowler} for six runs.`,
-          },
-        ];
+        const six = sixStroke(phraseKey, d.shotSector, d.trajectory, d.executedLength);
+        bodyTemplates = six
+          ? [
+              t("DLV_SIX_1", () => `Six! ${striker} ${strokeWithBowler(six, bowler)}.`),
+              t("DLV_SIX_2", () => `${capitalise(six.part)} ${six.where} for six by ${striker}.`),
+              t("DLV_SIX_3", () => `${bowls}, and ${striker} sends it ${six.where} for six.`),
+              t("DLV_SIX_4", () => `${striker} clears the rope, ${six.part} ${six.where}.`),
+              t("DLV_SIX_5", () => `Maximum! ${striker} ${six.act} it ${six.where}.`),
+              t("DLV_SIX_6", () => `${striker} goes big against ${bowler}: ${six.part} ${six.where} for six.`),
+              ...when(d.trajectory === "EDGE",
+                t("DLV_SIX_ED", () => `Off the top edge and all the way: ${striker} ${six.act} ${bowler} ${six.where} for six.`)),
+            ]
+          : [
+              t("DLV_SIX_7", () => `Six! ${striker} clears the rope off ${bowler}.`),
+              t("DLV_SIX_8", () => `${bowls}, and ${striker} hits it for six.`),
+              t("DLV_SIX_9", () => `Maximum for ${striker} off ${bowler}.`),
+            ];
       } else if (d.boundary === "FOUR") {
         family = "DELIVERY_FOUR";
         short = "4";
-        const where = sectorPhrase ? ` through ${sectorPhrase}` : "";
-        bodyTemplates = [
-          {
-            id: "DLV_FOUR_1",
-            render: () =>
-              `${bowler} to ${striker} — crisp stroke${where} for FOUR!`,
-          },
-          {
-            id: "DLV_FOUR_2",
-            render: () =>
-              `FOUR! ${striker} pierces the gap${where} off ${bowler}.`,
-          },
-          {
-            id: "DLV_FOUR_3",
-            render: () =>
-              `${striker} leans on ${bowler} and races it away${where} to the boundary for 4.`,
-          },
-          {
-            id: "DLV_FOUR_4",
-            render: () =>
-              `Boundary for ${striker}! Timed neatly${where} off ${bowler}.`,
-          },
-        ];
+        const four = scoringStroke(phraseKey, d.shotSector, d.trajectory, d.executedLength);
+        bodyTemplates = four
+          ? [
+              t("DLV_FOUR_1", () => `Four! ${striker} ${strokeWithBowler(four, bowler)}.`),
+              t("DLV_FOUR_2", () => `${capitalise(four.part)} ${four.where} for four by ${striker}.`),
+              t("DLV_FOUR_3", () => `${bowls}, and ${striker} ${four.act} ${four.where} for four.`),
+              t("DLV_FOUR_4", () => `${striker} finds the boundary, ${four.part} ${four.where}.`),
+              t("DLV_FOUR_5", () => `Boundary. ${striker} ${four.act} ${four.where} and it races away.`),
+              ...when(d.trajectory === "GROUND",
+                t("DLV_FOUR_GR", () => `${striker} times it: ${four.part} ${four.where}, and nobody is stopping that. Four.`)),
+              ...when(d.trajectory === "EDGE",
+                t("DLV_FOUR_ED", () => `${bowler} finds the edge of the bat, but it runs away ${four.where} for four.`)),
+              ...when(d.trajectory === "AERIAL",
+                t("DLV_FOUR_AR", () => `${striker} takes the aerial route, ${four.part} ${four.where} for four.`)),
+            ]
+          : [
+              t("DLV_FOUR_6", () => `Four! ${striker} finds the rope off ${bowler}.`),
+              t("DLV_FOUR_7", () => `${bowls}, and ${striker} hits it to the boundary.`),
+              t("DLV_FOUR_8", () => `Boundary for ${striker} off ${bowler}.`),
+            ];
       } else if (totalRuns === 0) {
         family = "DELIVERY_DOT";
         short = "0";
-        const stopNote =
-          d.fieldOutcome === "STOP"
-            ? sectorPhrase
-              ? `, tidy stop at ${sectorPhrase}`
-              : ", tidy stop in the ring"
-            : "";
-        bodyTemplates = [
-          {
-            id: "DLV_DOT_1",
-            render: () =>
-              `${bowler} to ${striker}, defended solidly — no run${stopNote}.`,
-          },
-          {
-            id: "DLV_DOT_2",
-            render: () =>
-              `Dot ball from ${bowler}; ${striker} watchful at the crease${stopNote}.`,
-          },
-          {
-            id: "DLV_DOT_3",
-            render: () =>
-              `${bowler} hits the spot to ${striker}, no scoring opportunity${stopNote}.`,
-          },
-          {
-            id: "DLV_DOT_4",
-            render: () =>
-              `${striker} plays ${bowler} back safely — dot ball${stopNote}.`,
-          },
-          // Pavilion P07: more variety, each line drawn from what the delivery records (length, trajectory).
-          { id: "DLV_DOT_5", render: () => `Another dot: ${bowler} keeps ${striker} quiet${stopNote}.` },
-          { id: "DLV_DOT_6", render: () => `No run. ${bowler} to ${striker}${stopNote}.` },
-          ...(d.executedLength === "YORKER" ? [{ id: "DLV_DOT_YK", render: () => `${bowler} nails the yorker and ${striker} cannot score${stopNote}.` }] : []),
-          ...(d.executedLength === "SHORT" ? [{ id: "DLV_DOT_SH", render: () => `Short from ${bowler}, and nothing doing for ${striker}${stopNote}.` }] : []),
-          ...(d.executedLength === "FULL" ? [{ id: "DLV_DOT_FL", render: () => `Full from ${bowler}; ${striker} cannot find a gap${stopNote}.` }] : []),
-          ...(d.executedLength === "GOOD" ? [{ id: "DLV_DOT_GD", render: () => `Good length from ${bowler}, and ${striker} is kept honest${stopNote}.` }] : []),
-          ...(d.executedLength === "FULL_TOSS" ? [{ id: "DLV_DOT_FT", render: () => `A full toss from ${bowler}, but ${striker} cannot cash in${stopNote}.` }] : []),
-          ...(d.trajectory === "EDGE" && d.fieldOutcome !== "DROP" ? [{ id: "DLV_DOT_ED", render: () => `${striker} edges ${bowler} but it falls safe: no run${stopNote}.` }] : []),
-          ...(d.trajectory === "AERIAL" && d.fieldOutcome !== "DROP" ? [{ id: "DLV_DOT_AR", render: () => `${striker} goes in the air off ${bowler}, but there is no run${stopNote}.` }] : []),
-        ];
+        const stroke = fieldedStroke(phraseKey, d.shotSector, d.trajectory, d.executedLength);
+        const noun = lengthNoun(phraseKey, d.executedLength);
+        const fielded = d.fieldOutcome === "STOP";
+        const safe = d.fieldOutcome !== "DROP";
+        bodyTemplates = stroke
+          ? [
+              t("DLV_DOT_C1", () => `${striker} ${stroke.act} ${stroke.where}; no run.`),
+              t("DLV_DOT_C2", () => `${capitalise(stroke.part)} ${stroke.where}${fielded ? ", and it is fielded" : ""}. Dot ball.`),
+              t("DLV_DOT_C3", () => `${bowls}; ${striker} ${stroke.act} ${stroke.where}, no run.`),
+              t("DLV_DOT_C4", () => `Dot ball. ${striker} ${stroke.act} ${stroke.where}.`),
+              t("DLV_DOT_C5", () => `${bowler} gives ${striker} nothing: ${stroke.part} ${stroke.where}, no run.`),
+              t("DLV_DOT_C6", () => `${noun === "that one" ? "That one" : capitalise(noun)} from ${bowler}, ${stroke.part} ${stroke.where} by ${striker}. No run.`),
+              ...when(fielded,
+                t("DLV_DOT_ST", () => `${striker} ${stroke.act} ${stroke.where}, but it is stopped. No run.`)),
+              ...when(d.trajectory === "EDGE" && safe,
+                t("DLV_DOT_ED", () => `${striker} ${stroke.act} ${stroke.where}, but it falls safe. No run.`)),
+              ...when(d.trajectory === "AERIAL" && safe,
+                t("DLV_DOT_AR", () => `${striker} ${stroke.act} ${stroke.where}, but it is safe, and there is no run.`)),
+              ...when(d.executedLength === "YORKER",
+                t("DLV_DOT_YK", () => `${bowler} nails the yorker; ${striker} ${stroke.act} ${stroke.where}.`)),
+            ]
+          : [
+              t("DLV_DOT_N1", () => `${bowls}, and ${striker} does not get bat on it.`),
+              t("DLV_DOT_N2", () => `Nothing off the bat from ${striker}: ${noun} from ${bowler}.`),
+              t("DLV_DOT_N3", () => `${bowler} to ${striker}, ${noun}, and no bat on it. Dot ball.`),
+              t("DLV_DOT_5", () => `Another dot: ${bowler} keeps ${striker} quiet.`),
+              t("DLV_DOT_6", () => `No run. ${bowler} to ${striker}, ${noun}.`),
+              ...when(d.executedLength === "YORKER",
+                t("DLV_DOT_YK2", () => `${bowler} lands the yorker and ${striker} cannot get bat on it.`)),
+              ...when(d.executedLength === "SHORT",
+                t("DLV_DOT_SH", () => `${bowler} goes short and there is no bat on it from ${striker}.`)),
+              ...when(d.executedLength === "GOOD",
+                t("DLV_DOT_GD", () => `Good length from ${bowler}, and ${striker} is kept honest: no bat on it.`)),
+              ...when(d.executedLength === "FULL_TOSS",
+                t("DLV_DOT_FT", () => `A full toss from ${bowler}, but ${striker} cannot cash in.`)),
+            ];
+        if (input.format !== "RED_BALL" && dotStreak >= 6 && dotStreak % 3 === 0) {
+          deliveryNotes.push(`That is ${countWord(dotStreak)} dot balls in a row.`);
+        }
       } else if (d.batRuns === 0 && (d.extras.byes > 0 || d.extras.legByes > 0)) {
         family = "DELIVERY_BYES_LEGBYES";
-        const kindLabel = d.extras.legByes > 0 ? "lb" : "b";
-        const kindWord = d.extras.legByes > 0 ? "leg-bye" : "bye";
+        const legBye = d.extras.legByes > 0;
+        const kindLabel = legBye ? "lb" : "b";
+        const kindWord = legBye ? "leg bye" : "bye";
+        const extras = plural(totalRuns, kindWord);
         short = `${totalRuns}${kindLabel}`;
         bodyTemplates = [
-          {
-            id: "DLV_BLB_1",
-            render: () =>
-              `${bowler} to ${striker}: ${totalRuns} ${kindWord}${totalRuns === 1 ? "" : "s"} scampered through.`,
-          },
-          {
-            id: "DLV_BLB_2",
-            render: () =>
-              `Past the bat off ${bowler}; ${striker} and ${nonStriker} cross for ${totalRuns} ${kindWord}${totalRuns === 1 ? "" : "s"}.`,
-          },
-          {
-            id: "DLV_BLB_3",
-            render: () =>
-              `${totalRuns} ${kindWord}${totalRuns === 1 ? "" : "s"} signalled as ${bowler} goes past ${striker}.`,
-          },
+          t("DLV_BLB_1", () => `${bowler} to ${striker}: ${extras}.`),
+          t("DLV_BLB_2", () => `${legBye ? "Off the body" : "Past the bat"} off ${bowler}; ${striker} and ${nonStriker} cross for ${extras}.`),
+          t("DLV_BLB_3", () => `${capitalise(extras)} signalled from ${bowler}'s delivery to ${striker}.`),
+          ...when(lead !== null,
+            t("DLV_BLB_4", () => `${bowls}; nothing off the bat, but they take ${extras}.`)),
         ];
       } else if (totalRuns === 1) {
         family = "DELIVERY_SINGLE";
         short = "1";
-        const where = sectorPhrase ? ` toward ${sectorPhrase}` : "";
-        bodyTemplates = [
-          {
-            id: "DLV_ONE_1",
-            render: () =>
-              `${bowler} to ${striker}, worked${where} for a single.`,
-          },
-          {
-            id: "DLV_ONE_2",
-            render: () =>
-              `${striker} nudges ${bowler}${where} to rotate the strike — 1 run.`,
-          },
-          {
-            id: "DLV_ONE_3",
-            render: () =>
-              `Quick single taken by ${striker}${where} off ${bowler}.`,
-          },
-          {
-            id: "DLV_ONE_4",
-            render: () =>
-              `${striker} taps ${bowler}${where} and crosses cleanly for 1.`,
-          },
-          { id: "DLV_ONE_5", render: () => `${striker} takes one${where} off ${bowler}.` },
-          { id: "DLV_ONE_6", render: () => `${bowler} to ${striker}, pushed${where} for one.` },
-          { id: "DLV_ONE_7", render: () => `One more for ${striker}${where} off ${bowler}.` },
-          { id: "DLV_ONE_8", render: () => `${striker} keeps the scoreboard moving with a single${where}.` },
-        ];
+        const stroke = scoringStroke(phraseKey, d.shotSector, d.trajectory, d.executedLength);
+        bodyTemplates = stroke
+          ? [
+              t("DLV_ONE_1", () => `${striker} ${stroke.act} ${stroke.where} for a single.`),
+              t("DLV_ONE_2", () => `${capitalise(stroke.part)} ${stroke.where}, and ${striker} takes one.`),
+              t("DLV_ONE_3", () => `${bowls}; ${striker} ${stroke.act} ${stroke.where} for one.`),
+              t("DLV_ONE_4", () => `Single. ${striker} ${stroke.act} ${stroke.where}.`),
+              t("DLV_ONE_5", () => `${striker} keeps the strike moving, ${stroke.part} ${stroke.where}.`),
+              t("DLV_ONE_6", () => `One more for ${striker}, ${stroke.part} ${stroke.where}.`),
+              t("DLV_ONE_7", () => `${striker} and ${nonStriker} swap ends: ${stroke.part} ${stroke.where} for one.`),
+              ...when(stroke.object,
+                t("DLV_ONE_8", () => `${striker} ${strokeWithBowler(stroke, bowler)} for one.`)),
+            ]
+          : [
+              t("DLV_ONE_9", () => `${striker} takes a single off ${bowler}.`),
+              t("DLV_ONE_10", () => `One run for ${striker}.`),
+              t("DLV_ONE_11", () => `${bowls}; ${striker} picks up a single.`),
+            ];
       } else {
         family = "DELIVERY_MULTI_RUN";
         short = String(totalRuns);
-        const where = sectorPhrase ? ` into ${sectorPhrase}` : "";
-        bodyTemplates = [
-          {
-            id: "DLV_MULTI_1",
-            render: () =>
-              `${bowler} to ${striker}, placed${where} and they come back for ${totalRuns} runs.`,
-          },
-          {
-            id: "DLV_MULTI_2",
-            render: () =>
-              `Good running between ${striker} and ${nonStriker}${where} off ${bowler} — ${totalRuns} runs.`,
-          },
-          {
-            id: "DLV_MULTI_3",
-            render: () =>
-              `${striker} works ${bowler}${where} in the gap for ${totalRuns} runs.`,
-          },
-        ];
+        const stroke = scoringStroke(phraseKey, d.shotSector, d.trajectory, d.executedLength);
+        const n = countWord(totalRuns);
+        bodyTemplates = stroke
+          ? [
+              t("DLV_MULTI_1", () => `${striker} ${stroke.act} ${stroke.where} and they come back for ${n}.`),
+              t("DLV_MULTI_2", () => `Good running: ${stroke.part} ${stroke.where}, and ${striker} and ${nonStriker} take ${n}.`),
+              t("DLV_MULTI_3", () => `${bowls}; ${striker} ${stroke.act} ${stroke.where} for ${n}.`),
+              t("DLV_MULTI_4", () => `${capitalise(n)} runs: ${striker} ${stroke.act} ${stroke.where}.`),
+              t("DLV_MULTI_5", () => `${capitalise(stroke.part)}${sameWhere(stroke)} by ${striker}, and they run ${n}.`),
+              ...when(stroke.object,
+                t("DLV_MULTI_6", () => `${striker} ${strokeWithBowler(stroke, bowler)} for ${n}.`)),
+            ]
+          : [
+              t("DLV_MULTI_7", () => `${striker} and ${nonStriker} run ${n} off ${bowler}.`),
+              t("DLV_MULTI_8", () => `${capitalise(n)} runs for ${striker}.`),
+              t("DLV_MULTI_9", () => `${bowls}; ${striker} picks up ${n}.`),
+            ];
+      }
+
+      if ((d.boundary === "FOUR" || d.boundary === "SIX") && !d.dismissal && d.legality !== "WIDE") {
+        if (boundariesThisOver >= 3) deliveryNotes.push(`That is the ${ordinalWord(boundariesThisOver)} boundary of the over.`);
+        else if (backToBack) deliveryNotes.push(`Back-to-back boundaries for ${striker}.`);
+        else if (milestoneNotes.length === 0 && choose(`${phraseKey}|score`, [true, false]))
+          deliveryNotes.push(`Up to ${batterFig.runs} from ${plural(batterFig.ballsFaced, "ball")}.`);
       }
 
       if (milestoneTags.length > 0 && category === "DELIVERY") {
@@ -1007,14 +972,18 @@ export function projectMatchCommentary(
         cooldownWindow,
       );
 
+      const at = sectorPhrase ? ` at ${sectorPhrase}` : "";
       const dropNotice =
         !d.dismissal && d.fieldOutcome === "DROP"
-          ? " Dropped chance in the field!"
+          ? ` ${choose(`${phraseKey}|drop`, [`Dropped! ${striker} is given a life.`, `Put down! A chance goes begging${at}.`, `A catch goes down${at}, and ${striker} survives.`])}`
           : !d.dismissal && d.fieldOutcome === "MISS"
-            ? " Misfield concedes extra ground."
+            ? totalRuns > 0
+              ? ` A misfield${at} helps them on their way.`
+              : ` Fumbled${at}, but no run.`
             : "";
       const milestoneSuffix =
         milestoneNotes.length > 0 ? ` ${milestoneNotes.join(" ")}` : "";
+      const notesSuffix = deliveryNotes.length > 0 ? ` ${deliveryNotes.join(" ")}` : "";
 
       // Pavilion P07: at a wicket, one line on the stand it broke, the new batter's task or the wickets left.
       const wicketLine = d.dismissal
@@ -1023,26 +992,28 @@ export function projectMatchCommentary(
         : null;
       if (wicketLine) factSlots.push({ slot: wicketLine.slot, value: wicketLine.text, sourceKind: "PARTNERSHIP_PROJECTION", sourceRef: "innings.partnership" });
       // Keep `Innings X, ...` prefix strictly on DELIVERY_RECORDED for match-ui invariant compatibility
-      const standardText = `Innings ${d.inningsIndex + 1}, ${coord}: ${picked.selected.render()}${dropNotice}${milestoneSuffix}${wicketLine ? ` ${wicketLine.text}` : ""}`;
+      const freeHitLead = wasFreeHit ? "Free hit. " : "";
+      const standardText = `Innings ${d.inningsIndex + 1}, ${coord}: ${freeHitLead}${picked.selected.render()}${dropNotice}${notesSuffix}${milestoneSuffix}${wicketLine ? ` ${wicketLine.text}` : ""}`;
 
       const techParts: string[] = [];
       if (wasFreeHit) techParts.push("free-hit delivery");
       if (lengthPhrase) techParts.push(`${lengthPhrase} length`);
       if (trajectoryPhrase) techParts.push(trajectoryPhrase);
-      if (sectorPhrase) techParts.push(`sector: ${sectorPhrase}`);
+      if (sectorPhrase) techParts.push(`towards ${sectorPhrase}`);
       const techClause = techParts.length > 0 ? ` [${techParts.join(", ")}]` : "";
 
       const standClause = d.dismissal
         ? `Stand ended on ${standBeforeWicket.runs} (${standBeforeWicket.balls}b)`
         : `Stand ${inn.partnershipRuns} (${inn.partnershipBalls}b)`;
+      const ballsLeft = inn.allocatedBalls !== null ? Math.max(0, inn.allocatedBalls - inn.legalBalls) : null;
       const chaseClause =
-        inn.targetToWin !== null && inn.runs < inn.targetToWin
-          ? inn.allocatedBalls !== null
-            ? ` · Need ${inn.targetToWin - inn.runs} off ${Math.max(0, inn.allocatedBalls - inn.legalBalls)}b`
-            : ` · Need ${inn.targetToWin - inn.runs} more to win`
+        inn.targetToWin !== null && inn.runs < inn.targetToWin && ballsLeft !== 0
+          ? ballsLeft !== null
+            ? `. Need ${inn.targetToWin - inn.runs} off ${ballsLeft}b`
+            : `. Need ${inn.targetToWin - inn.runs} more to win`
           : "";
 
-      const detailedText = `${standardText}${techClause} — Score ${inn.runs}/${inn.wickets}; ${striker} ${batterFig.runs} (${batterFig.ballsFaced}), ${bowler} ${bowlerFiguresText(bowlerFig)}, ${standClause}${chaseClause}.`;
+      const detailedText = `${standardText}${techClause} Score ${inn.runs}/${inn.wickets}; ${striker} ${batterFig.runs} (${batterFig.ballsFaced}), ${bowler} ${bowlerFiguresText(bowlerFig)}. ${standClause}${chaseClause}.`;
 
       entries.push({
         adapterVersion: COMMENTARY_ADAPTER_VERSION,
@@ -1080,6 +1051,7 @@ export function projectMatchCommentary(
       inn.overTeamRuns = 0;
       inn.overWickets = 0;
       inn.overLegalBalls = 0;
+      inn.overBoundaries = 0;
       bowlerFig.currentOverBowlerRuns = 0;
       bowlerFig.currentOverLegalBalls = 0;
 
@@ -1088,63 +1060,39 @@ export function projectMatchCommentary(
         : [];
       const teamName = tName(inn.battingTeamId);
       const figs = bowlerFiguresText(bowlerFig);
+      const ballsLeft = inn.allocatedBalls !== null ? Math.max(0, inn.allocatedBalls - inn.legalBalls) : null;
+      // No equation once the overs are used up: the innings is over, and "needed from 0 balls" says nothing.
       const chaseTail =
-        inn.targetToWin !== null && inn.runs < inn.targetToWin
-          ? inn.allocatedBalls !== null
-            ? ` (${inn.targetToWin - inn.runs} needed from ${Math.max(0, inn.allocatedBalls - inn.legalBalls)} balls)`
+        inn.targetToWin !== null && inn.runs < inn.targetToWin && ballsLeft !== 0
+          ? ballsLeft !== null
+            ? ` (${inn.targetToWin - inn.runs} needed from ${plural(ballsLeft, "ball")})`
             : ` (${inn.targetToWin - inn.runs} needed to win)`
           : "";
+      const score = `${inn.runs}/${inn.wickets}`;
+      const offOver = `${plural(overRuns, "run")}${overWkts > 0 ? ` and ${overWkts === 1 ? "a wicket" : `${countWord(overWkts)} wickets`}` : ""}`;
 
       const family = isMaiden ? "OVER_MAIDEN" : "OVER_SUMMARY";
       const templates = isMaiden
         ? [
-            {
-              id: "OV_MDN_1",
-              render: () =>
-                `End of over ${overNum} (maiden from ${bowler}): ${teamName} ${inn.runs}/${inn.wickets}${chaseTail}.`,
-            },
-            {
-              id: "OV_MDN_2",
-              render: () =>
-                `Maiden over! ${bowler} closes over ${overNum} without conceding off the bat or bowling extras — ${teamName} ${inn.runs}/${inn.wickets}${chaseTail}.`,
-            },
-            {
-              id: "OV_MDN_3",
-              render: () =>
-                `Over ${overNum} complete, a probing maiden by ${bowler}. ${teamName} stand at ${inn.runs}/${inn.wickets}${chaseTail}.`,
-            },
+            { id: "OV_MDN_1", render: () => `End of over ${overNum} (maiden from ${bowler}): ${teamName} ${score}${chaseTail}.` },
+            { id: "OV_MDN_2", render: () => `Maiden over! ${bowler} closes over ${overNum} without conceding a run. ${teamName} ${score}${chaseTail}.` },
+            { id: "OV_MDN_3", render: () => `Over ${overNum} complete, a probing maiden by ${bowler}. ${teamName} stand at ${score}${chaseTail}.` },
+            { id: "OV_MDN_4", render: () => `A maiden from ${bowler}, who is now ${figs}. ${teamName} ${score}${chaseTail}.` },
           ]
         : [
-            {
-              id: "OV_SUM_1",
-              render: () =>
-                `End of over ${overNum} (${overRuns} run${overRuns === 1 ? "" : "s"}${overWkts > 0 ? `, ${overWkts} wkt${overWkts === 1 ? "" : "s"}` : ""}): ${teamName} ${inn.runs}/${inn.wickets}${chaseTail}.`,
-            },
-            {
-              id: "OV_SUM_2",
-              render: () =>
-                `Over ${overNum} complete — ${overRuns} off it${overWkts > 0 ? ` and ${overWkts} wicket${overWkts === 1 ? "" : "s"}` : ""}. ${teamName} are ${inn.runs}/${inn.wickets}${chaseTail}.`,
-            },
-            {
-              id: "OV_SUM_3",
-              render: () =>
-                `After ${overNum} over${overNum === 1 ? "" : "s"}, ${teamName} move to ${inn.runs}/${inn.wickets} (${overRuns} from ${bowler}'s over)${chaseTail}.`,
-            },
-            {
-              id: "OV_SUM_4",
-              render: () =>
-                `${overRuns} from the over${overWkts > 0 ? ` and ${overWkts} down` : ""}. ${teamName} ${inn.runs}/${inn.wickets} after ${overNum}${chaseTail}.`,
-            },
-            {
-              id: "OV_SUM_5",
-              render: () =>
-                `${bowler}'s over costs ${overRuns}${overWkts > 0 ? ` but brings ${overWkts} wicket${overWkts === 1 ? "" : "s"}` : ""}; ${teamName} are ${inn.runs}/${inn.wickets}${chaseTail}.`,
-            },
-            {
-              id: "OV_SUM_6",
-              render: () =>
-                `That is over ${overNum}: ${overRuns} run${overRuns === 1 ? "" : "s"} off it, ${teamName} on ${inn.runs}/${inn.wickets}${chaseTail}.`,
-            },
+            { id: "OV_SUM_1", render: () => `End of over ${overNum}: ${offOver}. ${teamName} ${score}${chaseTail}.` },
+            { id: "OV_SUM_2", render: () => `Over ${overNum} done, ${offOver} from it. ${teamName} are ${score}${chaseTail}.` },
+            { id: "OV_SUM_3", render: () => `After ${plural(overNum, "over")}, ${teamName} are ${score} (${overRuns} from ${bowler}'s over)${chaseTail}.` },
+            { id: "OV_SUM_4", render: () => `${capitalise(offOver)} from the over. ${teamName} ${score} after ${overNum}${chaseTail}.` },
+            { id: "OV_SUM_5", render: () => `${bowler}'s over costs ${overRuns}${overWkts > 0 ? ` but brings ${overWkts === 1 ? "a wicket" : `${countWord(overWkts)} wickets`}` : ""}; ${teamName} are ${score}${chaseTail}.` },
+            { id: "OV_SUM_6", render: () => `That is over ${overNum}: ${offOver} off it, ${teamName} on ${score}${chaseTail}.` },
+            { id: "OV_SUM_7", render: () => `${bowler} finishes the over with figures of ${figs}. ${teamName} ${score}${chaseTail}.` },
+            ...(overRuns >= 1 && overRuns <= 3 && overWkts === 0
+              ? [{ id: "OV_SUM_TIGHT", render: () => `A tight over from ${bowler}, just ${plural(overRuns, "run")}. ${teamName} ${score}${chaseTail}.` }]
+              : []),
+            ...(overRuns >= 12
+              ? [{ id: "OV_SUM_DEAR", render: () => `${overRuns} from the over: a costly one for ${bowler}. ${teamName} ${score}${chaseTail}.` }]
+              : []),
           ];
 
       const picked = pickTemplateWithCooldown(
@@ -1158,7 +1106,7 @@ export function projectMatchCommentary(
       );
       // Pavilion P07: one line of match context when the innings has a story to tell.
       const context = overContext({
-        format: input.format, overs: inn.overHistory, runs: inn.runs, legalBalls: inn.legalBalls, targetToWin: inn.targetToWin,
+        format: input.format, overs: inn.overHistory, runs: inn.runs, wickets: inn.wickets, legalBalls: inn.legalBalls, targetToWin: inn.targetToWin,
         bowlerName: bowler, bowlerFigures: figs, bowlerLegalBalls: bowlerFig.legalBalls, ballsSinceBoundary: inn.ballsSinceBoundary,
       });
       const standardText = context ? `${picked.selected.render()} ${context.text}` : picked.selected.render();
@@ -1228,8 +1176,11 @@ export function projectMatchCommentary(
           {
             id: "INN_START_2",
             render: () =>
-              `Opening innings ${p.inningsIndex + 1} — ${teamName} take the crease${targetClause}.`,
+              `Innings ${p.inningsIndex + 1} under way: ${teamName} take the crease${targetClause}.`,
           },
+          ...(inn.targetToWin !== null
+            ? [{ id: "INN_START_3", render: () => `${teamName} need ${inn.targetToWin} to win${inn.allocatedBalls !== null ? ` from ${Math.floor(inn.allocatedBalls / 6)} overs` : ""}. Innings ${p.inningsIndex + 1} begins.` }]
+            : []),
         ],
         presentationKey,
         ev.sequence,
@@ -1464,14 +1415,25 @@ export function projectMatchCommentary(
       const playerId = (ev.payload as { playerId: string }).playerId;
       const batter = pName(playerId);
       const inn = ensureInnings(activeInningsIndex);
+      // CP10: the batting position comes from the order of selections in this innings.
+      inn.battersIn += 1;
+      const position = inn.battersIn;
+      const score = `${inn.runs}/${inn.wickets}`;
       const picked = pickTemplateWithCooldown(
         "BATTER_SELECTED",
-        [
-          { id: "BAT_SEL_1", render: () => `${batter} comes in to bat.` },
-          { id: "BAT_SEL_2", render: () => `${batter} walks to the crease.` },
-          { id: "BAT_SEL_3", render: () => `In comes ${batter}, with the score ${inn.runs}/${inn.wickets}.` },
-          { id: "BAT_SEL_4", render: () => `${batter} makes the walk out at ${inn.runs}/${inn.wickets}.` },
-        ],
+        position <= 2 && inn.legalBalls === 0
+          ? [
+              { id: "BAT_SEL_O1", render: () => `${batter} opens the batting.` },
+              { id: "BAT_SEL_O2", render: () => `${batter} walks out to open.` },
+              { id: "BAT_SEL_O3", render: () => `${batter} will open for ${tName(inn.battingTeamId)}.` },
+            ]
+          : [
+              { id: "BAT_SEL_1", render: () => `${batter} comes in to bat at number ${position}.` },
+              { id: "BAT_SEL_2", render: () => `${batter} walks to the crease.` },
+              { id: "BAT_SEL_3", render: () => `In comes ${batter}, with the score ${score}.` },
+              { id: "BAT_SEL_4", render: () => `${batter} makes the walk out at ${score}.` },
+              { id: "BAT_SEL_5", render: () => `${batter} is next in, at number ${position}, with ${tName(inn.battingTeamId)} ${score}.` },
+            ],
         presentationKey,
         ev.sequence,
         evHash,
@@ -1511,7 +1473,11 @@ export function projectMatchCommentary(
       const bowlerSoFar = getBowler(inn, playerId);
       const figs = bowlerFiguresText(bowlerSoFar);
       // Pavilion P07: a returning bowler is introduced with the figures so far; a new one as new to the attack.
+      // CP10: and the over they are to bowl, the new ball, or the last over of their allowance.
       const returning = bowlerSoFar.legalBalls > 0;
+      const nextOver = Math.floor(inn.legalBalls / 6) + 1;
+      const quotaBalls = input.format === "T20" ? 24 : input.format === "ODI" ? 60 : null;
+      const lastOver = quotaBalls !== null && bowlerSoFar.legalBalls === quotaBalls - 6;
       const picked = pickTemplateWithCooldown(
         "BOWLER_SELECTED",
         returning
@@ -1520,13 +1486,21 @@ export function projectMatchCommentary(
               { id: "BWL_SEL_R1", render: () => `${bowler} returns (${figs}).` },
               { id: "BWL_SEL_R2", render: () => `Back comes ${bowler}, ${figs} so far.` },
               { id: "BWL_SEL_R3", render: () => `${bowler} has the ball again (${figs}).` },
+              { id: "BWL_SEL_R4", render: () => `${bowler} is back for over ${nextOver}, with figures of ${figs}.` },
+              ...(lastOver ? [{ id: "BWL_SEL_LAST", render: () => `${bowler} to bowl the last over of the allowance (${figs}).` }] : []),
             ]
-          : [
-              { id: "BWL_SEL_1", render: () => `${bowler} will bowl.` },
-              { id: "BWL_SEL_2", render: () => `${bowler} comes into the attack.` },
-              { id: "BWL_SEL_N1", render: () => `${bowler} into the attack for the first time.` },
-              { id: "BWL_SEL_N2", render: () => `First over of the innings for ${bowler}.` },
-            ],
+          : nextOver <= 2
+            ? [
+                { id: "BWL_SEL_NEW1", render: () => `${bowler} ${nextOver === 1 ? "will open the bowling" : "shares the new ball"}.` },
+                { id: "BWL_SEL_NEW2", render: () => `${bowler} ${nextOver === 1 ? "takes the new ball" : "will bowl from the other end"}.` },
+                { id: "BWL_SEL_N2", render: () => `First over of the innings for ${bowler}.` },
+              ]
+            : [
+                { id: "BWL_SEL_2", render: () => `${bowler} comes into the attack.` },
+                { id: "BWL_SEL_N1", render: () => `${bowler} into the attack for the first time.` },
+                { id: "BWL_SEL_N3", render: () => `Change of bowling: ${bowler} to bowl over ${nextOver}.` },
+                { id: "BWL_SEL_N4", render: () => `A first over for ${bowler}, the ${ordinalWord(nextOver)} of the innings.` },
+              ],
         presentationKey,
         ev.sequence,
         evHash,
@@ -1696,7 +1670,7 @@ export function projectMatchCommentary(
         intent: string;
       };
       const batter = pName(p.playerId);
-      const text = `Batting plan updated for ${batter}: aggression ${p.aggression}, ${p.intent.toLowerCase()} intent.`;
+      const text = battingPlanText(batter, p.aggression, p.intent);
       entries.push({
         adapterVersion: COMMENTARY_ADAPTER_VERSION,
         sequence: ev.sequence,
@@ -1736,7 +1710,7 @@ export function projectMatchCommentary(
         effort: string;
       };
       const bowler = pName(p.bowlerId);
-      const text = `Bowling plan for ${bowler}: ${p.line.toLowerCase()} line, ${p.length.toLowerCase().replaceAll("_", " ")} length (${p.effort.toLowerCase()} effort).`;
+      const text = bowlingPlanText(bowler, p.line, p.length, p.effort);
       entries.push({
         adapterVersion: COMMENTARY_ADAPTER_VERSION,
         sequence: ev.sequence,
@@ -1794,7 +1768,7 @@ export function projectMatchCommentary(
         short: "Field adjusted",
         text,
         detailed: slotSummary
-          ? `${text} Key ring/slip posts include ${slotSummary}.`
+          ? `${text} Fielders now include ${slotSummary}.`
           : text,
         factSlots: [
           {

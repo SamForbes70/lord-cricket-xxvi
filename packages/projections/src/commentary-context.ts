@@ -4,7 +4,8 @@
  * The over summary states the over and the score; this adds the story of the innings when there is one, and
  * nothing when there is not. Every line is worked out from the deliveries already committed (the running figures
  * the commentary projection keeps), so it never says anything the scorecard would not back up. Pure and
- * deterministic: no randomness, no ratings. At most one line per over, chosen by the priority below.
+ * deterministic: no randomness, no ratings. At most one line per over, chosen by the priority below. CP10 adds the
+ * end of the powerplay, after a collapse and before the death overs.
  */
 export interface OverRecord {
   runs: number;
@@ -17,6 +18,8 @@ export interface OverContextInput {
   overs: readonly OverRecord[];
   /** Innings totals after the over. */
   runs: number;
+  /** CP10: wickets down after the over, for the end of the powerplay; optional for callers that predate it. */
+  wickets?: number;
   legalBalls: number;
   targetToWin: number | null;
   bowlerName: string;
@@ -28,11 +31,14 @@ export interface OverContextInput {
 
 export interface OverContext {
   /** Fact-slot name for the commentary entry. */
-  slot: "bowledOut" | "collapse" | "deathOvers" | "askingRate" | "expensiveOver" | "boundaryDrought";
+  slot: "bowledOut" | "collapse" | "powerplayEnd" | "deathOvers" | "askingRate" | "expensiveOver" | "boundaryDrought";
   text: string;
 }
 
-const SHAPE = { T20: { balls: 120, deathFrom: 90, quota: 24 }, ODI: { balls: 300, deathFrom: 240, quota: 60 } } as const;
+const SHAPE = {
+  T20: { balls: 120, deathFrom: 90, quota: 24, powerplayTo: 36 },
+  ODI: { balls: 300, deathFrom: 240, quota: 60, powerplayTo: 60 },
+} as const;
 const COLLAPSE_WINDOW_OVERS = 4;
 const COLLAPSE_WICKETS = 3;
 const EXPENSIVE_MIN_RUNS = 12;
@@ -65,6 +71,15 @@ export function overContext(input: OverContextInput): OverContext | null {
     const previous = input.overs.slice(-COLLAPSE_WINDOW_OVERS - 1, -1).reduce((n, o) => n + o.wickets, 0);
     if (wickets >= COLLAPSE_WICKETS && previous < COLLAPSE_WICKETS)
       return { slot: "collapse", text: `${wickets} wickets for ${runs} run${runs === 1 ? "" : "s"} in the last ${recent.length} overs.` };
+  }
+
+  // CP10: the close of the fielding-restriction overs (the first 6 of a T20, the first 10 of a one-day innings).
+  if (input.legalBalls === shape.powerplayTo) {
+    const overs = shape.powerplayTo / 6;
+    const score = input.wickets === undefined ? `${input.runs} runs` : `${input.runs}/${input.wickets}`;
+    // The field rules the live field shows: one powerplay in a T20, Powerplay 1 of three in a one-day innings.
+    const name = input.format === "ODI" ? "the first powerplay" : "the powerplay";
+    return { slot: "powerplayEnd", text: `That ends ${name}: ${score} from the first ${overs} overs.` };
   }
 
   if (input.legalBalls === shape.deathFrom) return { slot: "deathOvers", text: "Into the death overs." };
