@@ -313,6 +313,7 @@ export function createMatchController(
         format: "T20",
         matchId: s.setup.matchId,
         commentaryEntries: cachedCommentary,
+        events: s.events,
       }).cues;
       cachedAssistant = projectInMatchTacticalAssistant({
         format: "T20",

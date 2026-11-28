@@ -17,6 +17,8 @@ import {
   findAudioAssetById,
   selectDispatchableAudioCues,
 } from "@lcxxvi/projections";
+import type { MomentKind } from "./match-moments.js";
+import { MOMENT_STING_LEAD_SEC, momentStingTones, type MomentStingMode } from "./moment-sound.js";
 
 export const AUDIO_PREFERENCES_STORAGE_KEY = "lcxxvi-audio-preferences";
 
@@ -30,6 +32,15 @@ export type AudioDecisionRecord = {
   readonly caption: string;
 };
 
+/** CP09: what happened to the last match moment's sting. Not a cue: it adds no caption and is never queued. */
+export type MomentStingStatus = "PLAYED" | "MUTED_OR_ZERO_VOLUME" | "AWAITING_GESTURE" | "BACKGROUND_TAB_SUPPRESSED" | "UNAVAILABLE";
+
+export type MomentStingRecord = {
+  readonly kind: MomentKind;
+  readonly mode: MomentStingMode;
+  readonly status: MomentStingStatus;
+};
+
 export type AudioManagerSnapshot = {
   readonly playbackArmed: boolean;
   readonly degradedReason: string | null;
@@ -40,6 +51,7 @@ export type AudioManagerSnapshot = {
   readonly lastCaption: string | null;
   readonly lastStatus: AudioPlaybackDecisionStatus | null;
   readonly recentDecisions: readonly AudioDecisionRecord[];
+  readonly lastMomentSting: MomentStingRecord | null;
 };
 
 export interface AudioParamPort {
@@ -341,6 +353,7 @@ export class CricketAudioManager {
   private lastCaption: string | null = null;
   private lastStatus: AudioPlaybackDecisionStatus | null = null;
   private readonly recentDecisions: AudioDecisionRecord[] = [];
+  private lastMomentSting: MomentStingRecord | null = null;
   private uiClickSeq = 0;
   private queuedAwaitingGesture: AudioCue | null = null;
   private readonly listeners = new Set<() => void>();
@@ -403,6 +416,7 @@ export class CricketAudioManager {
       lastCaption: this.lastCaption,
       lastStatus: this.lastStatus,
       recentDecisions: [...this.recentDecisions],
+      lastMomentSting: this.lastMomentSting,
     };
   }
 
@@ -599,6 +613,54 @@ export class CricketAudioManager {
       ttlMs: 1_500,
     };
     return this.dispatchSingleCue(cue);
+  }
+
+  /**
+   * CP09: the sting for a match moment, at the effects volume. It follows the same rules as the cues: silent while
+   * muted or at zero effects volume, never before the player's first click or key press (browser autoplay policy;
+   * a moment seen before then is not saved up to play later), and not in a background tab. Pure presentation.
+   */
+  playMomentSting(kind: MomentKind, mode: MomentStingMode): MomentStingRecord {
+    const finish = (status: MomentStingStatus): MomentStingRecord => {
+      this.lastMomentSting = { kind, mode, status };
+      this.notify();
+      return this.lastMomentSting;
+    };
+    if (this.getVisibilityState() === "hidden") return finish("BACKGROUND_TAB_SUPPRESSED");
+    if (this.preferences.muted || this.preferences.effectsVolume <= 0) return finish("MUTED_OR_ZERO_VOLUME");
+    if (!this.playbackArmed) return finish("AWAITING_GESTURE");
+    if (!this.audioContext) {
+      try {
+        this.audioContext = this.createAudioContext();
+      } catch {
+        this.audioContext = null;
+      }
+    }
+    const ctx = this.audioContext;
+    if (!ctx) return finish("UNAVAILABLE");
+    try {
+      const start = ctx.currentTime + MOMENT_STING_LEAD_SEC;
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(Math.max(0.001, Math.min(0.65, (this.preferences.effectsVolume / 100) * 0.4)), ctx.currentTime);
+      master.connect(ctx.destination);
+      for (const t of momentStingTones(kind, mode)) {
+        const osc = ctx.createOscillator();
+        const env = ctx.createGain();
+        osc.type = t.type;
+        osc.frequency.setValueAtTime(t.hz, start + t.delaySec);
+        // A short attack and an exponential fall, so no note clicks on or off.
+        env.gain.setValueAtTime(0.0001, start + t.delaySec);
+        env.gain.exponentialRampToValueAtTime?.(t.level, start + t.delaySec + 0.012);
+        env.gain.exponentialRampToValueAtTime?.(0.0001, start + t.delaySec + t.durationSec);
+        osc.connect(env);
+        env.connect(master);
+        osc.start(start + t.delaySec);
+        osc.stop(start + t.delaySec + t.durationSec + 0.02);
+      }
+      return finish("PLAYED");
+    } catch {
+      return finish("UNAVAILABLE");
+    }
   }
 
   private async dispatchSingleCue(cue: AudioCue): Promise<AudioDecisionRecord> {
