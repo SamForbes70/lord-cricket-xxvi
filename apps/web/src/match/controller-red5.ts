@@ -217,6 +217,7 @@ export function createRed5MatchController(
         format: "RED_BALL",
         matchId: s.setup.matchId,
         commentaryEntries: cachedCommentary,
+        events: s.events,
       }).cues;
       cachedAssistant = projectInMatchTacticalAssistant({
         format: "RED_BALL",

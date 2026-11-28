@@ -266,8 +266,60 @@ function factValue(entry: CommentaryEntry, slotName: string): string | undefined
   return entry.factSlots.find((slot) => slot.slot === slotName)?.value;
 }
 
+/** A committed match event, as the commentary projection receives it. */
+export interface AudioSourceEvent {
+  readonly sequence: number;
+  readonly type: string;
+  readonly payload: unknown;
+}
+
+/**
+ * CP09: what a delivery's sound depends on, read from the authoritative delivery record. `batRuns` are the runs
+ * credited to the bat (byes, leg byes, wides and no-ball penalties do not make a bat-on-ball knock); `boundary` is the
+ * recorded boundary, "4", "6" or null.
+ */
+export interface DeliveryAudioFacts {
+  readonly batRuns: number;
+  readonly boundary: "4" | "6" | null;
+}
+
+/** The delivery facts of one committed DELIVERY_RECORDED event, or null for any other event. */
+export function deliveryAudioFactsFromEvent(event: AudioSourceEvent): DeliveryAudioFacts | null {
+  if (event.type !== "DELIVERY_RECORDED") return null;
+  const d = (event.payload as { event?: { batRuns?: unknown; boundary?: unknown } } | null)?.event;
+  if (!d) return null;
+  const batRuns = typeof d.batRuns === "number" && Number.isFinite(d.batRuns) ? d.batRuns : 0;
+  return { batRuns, boundary: d.boundary === "SIX" ? "6" : d.boundary === "FOUR" ? "4" : null };
+}
+
+/**
+ * The same facts from a delivery commentary entry's event-field slots (`boundary` and `runs`, copied by the
+ * commentary projection from the delivery record). Used only when the caller has no events to hand.
+ */
+function deliveryAudioFactsFromEntry(entry: CommentaryEntry): DeliveryAudioFacts {
+  const boundary = factValue(entry, "boundary");
+  const runs = Number(factValue(entry, "runs") ?? "0");
+  return {
+    batRuns: Number.isFinite(runs) ? runs : 0,
+    boundary: boundary === "6" ? "6" : boundary === "4" ? "4" : null,
+  };
+}
+
+const CHIME_MILESTONE_TAGS: ReadonlySet<string> = new Set([
+  "BATTER_FIFTY",
+  "BATTER_CENTURY",
+  "BATTER_150",
+  "BATTER_DOUBLE_CENTURY",
+  "PARTNERSHIP_FIFTY",
+  "PARTNERSHIP_CENTURY",
+  "PARTNERSHIP_150",
+  "BOWLER_THREE_FOR",
+  "BOWLER_FIVE_FOR",
+]);
+
 function classifyCueForCommentaryEntry(
   entry: CommentaryEntry,
+  facts: DeliveryAudioFacts | null,
 ): {
   cueKind: AudioCueKind;
   channel: AudioChannel;
@@ -302,27 +354,12 @@ function classifyCueForCommentaryEntry(
       narrationText: entry.text,
     };
   }
-  if (
-    entry.milestoneTags.some((tag) =>
-      [
-        "BATTER_FIFTY",
-        "BATTER_CENTURY",
-        "BATTER_150",
-        "BATTER_DOUBLE_CENTURY",
-        "PARTNERSHIP_FIFTY",
-        "PARTNERSHIP_CENTURY",
-        "PARTNERSHIP_150",
-        "BOWLER_THREE_FOR",
-        "BOWLER_FIVE_FOR",
-      ].includes(tag),
-    )
-  ) {
-    const boundary = factValue(entry, "boundary");
+  if (entry.milestoneTags.some((tag) => CHIME_MILESTONE_TAGS.has(tag))) {
     const tagLabel = entry.milestoneTags.join(", ").replace(/_/g, " ").toLowerCase();
     return {
       cueKind: "MILESTONE_CHIME",
       channel: "CROWD",
-      priority: boundary === "6" ? 88 : 82,
+      priority: facts?.boundary === "6" ? 88 : 82,
       caption: `Milestone (${tagLabel}): ${entry.short}`,
       narrationText: entry.text,
     };
@@ -336,9 +373,10 @@ function classifyCueForCommentaryEntry(
       narrationText: entry.short,
     };
   }
-  if (entry.category === "DELIVERY") {
-    const boundary = factValue(entry, "boundary");
-    const runs = Number(factValue(entry, "runs") ?? "0");
+  // CP09: a delivery carrying only a maiden, all-out or winning-runs tag is filed under MILESTONE by the commentary;
+  // it is still a ball, so it sounds as one (it used to make no sound at all).
+  if (entry.category === "DELIVERY" || (entry.category === "MILESTONE" && entry.eventType === "DELIVERY_RECORDED")) {
+    const { boundary, batRuns } = facts ?? deliveryAudioFactsFromEntry(entry);
     if (boundary === "6") {
       return {
         cueKind: "BOUNDARY_SIX",
@@ -357,7 +395,7 @@ function classifyCueForCommentaryEntry(
         narrationText: entry.text,
       };
     }
-    if (runs > 0) {
+    if (batRuns > 0) {
       return {
         cueKind: "BAT_BALL_SINGLE",
         channel: "EFFECTS",
@@ -375,10 +413,18 @@ function classifyCueForCommentaryEntry(
   return null;
 }
 
+/**
+ * Audio cues for the latest committed commentary entries. Pure and deterministic: the same entries and events always
+ * give the same cues, in the same order, with the same identifiers; nothing here draws a random number or reads a
+ * clock. CP09: a delivery's sound (dot, runs, four, six) is decided by the committed delivery record in `events`
+ * (matched by sequence), not by commentary wording; captions and narration still use the commentary's text. Without
+ * `events`, the delivery entries' event-field slots give the same answer.
+ */
 export function projectMatchAudioCues(input: {
   readonly format: Format;
   readonly matchId: string;
   readonly commentaryEntries: readonly CommentaryEntry[];
+  readonly events?: readonly AudioSourceEvent[];
   readonly maxCues?: number;
 }): AudioCueQueue {
   const maxCues = input.maxCues ?? 48;
@@ -386,9 +432,16 @@ export function projectMatchAudioCues(input: {
     (left, right) => left.sequence - right.sequence,
   );
   const sliced = maxCues > 0 ? ordered.slice(-maxCues) : ordered;
+  const wanted = new Set(sliced.map((entry) => entry.sequence));
+  const deliveryFacts = new Map<number, DeliveryAudioFacts>();
+  for (const event of input.events ?? []) {
+    if (!wanted.has(event.sequence)) continue;
+    const facts = deliveryAudioFactsFromEvent(event);
+    if (facts) deliveryFacts.set(event.sequence, facts);
+  }
   const cues: AudioCue[] = [];
   for (const entry of sliced) {
-    const classified = classifyCueForCommentaryEntry(entry);
+    const classified = classifyCueForCommentaryEntry(entry, deliveryFacts.get(entry.sequence) ?? null);
     if (!classified) continue;
     const asset = findAudioAssetByCueKind(classified.cueKind);
     if (!asset) continue;

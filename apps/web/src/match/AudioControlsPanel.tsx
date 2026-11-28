@@ -48,6 +48,11 @@ export function AudioControlsPanel({
       className="audio-presentation-bar"
       aria-label="Audio and captions"
       data-testid="match-audio-panel"
+      data-moment-sting={
+        snapshot.lastMomentSting
+          ? `${snapshot.lastMomentSting.kind}:${snapshot.lastMomentSting.mode}:${snapshot.lastMomentSting.status}`
+          : undefined
+      }
     >
       <div className="audio-bar-top">
         <div className="audio-bar-actions">

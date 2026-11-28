@@ -62,6 +62,7 @@ import { ART_WASH, groundArtBackground } from "./world/ground-art.js";
 import { PlayerPortrait } from "./world/PlayerPortrait.js";
 import { BroadcastStage, stageShows } from "./match/BroadcastStage.js";
 import { MatchMomentBanner, type ShownMoment } from "./match/MatchMomentBanner.js";
+import { momentStingMode } from "./match/moment-sound.js";
 import { continuesFrom, momentBaseline, readMomentsPreference, settleMoment, writeMomentsPreference, type MomentBaseline, type MomentsPreference } from "./match/match-moments.js";
 import { batterStatusText } from "./match/dismissal-text.js";
 import { playerOfTheMatch, resultFacts, topPerformances, turningPointLines } from "./match/result-card.js";
@@ -851,10 +852,16 @@ export function MatchApp({ onInspectCareer, onReturnCareer }: { onInspectCareer?
     if (momentBatching || view.revision === base.revision) return;
     const settled = settleMoment(base, view);
     momentBase.current = momentBaseline(view);
-    if (settled.moment && momentsPref !== "off") setShownMoment({ moment: settled.moment, summary: settled.summary, token: ++momentToken.current });
+    if (settled.moment && momentsPref !== "off") {
+      setShownMoment({ moment: settled.moment, summary: settled.summary, token: ++momentToken.current });
+      // CP09: the moment's sting, after the ball's own cue. Brief, or Full under reduced motion, is one soft note.
+      const reduce = highlightMotion === "REDUCED" || (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
+      const stingMode = momentStingMode(momentsPref, reduce);
+      if (stingMode) audioManagerRef.current?.playMomentSting(settled.moment.kind, stingMode);
+    }
     // A ball bowled since makes the moment on screen out of date: it goes, so nothing stale lingers over the play.
     else if ((view.fieldPresentation?.latestHighlight?.sequence ?? 0) > base.lastSequence) setShownMoment(null);
-  }, [view, momentBatching, momentsPref]);
+  }, [view, momentBatching, momentsPref, highlightMotion]);
   useEffect(() => { if (momentsPref === "off" || momentBatching) setShownMoment(null); }, [momentsPref, momentBatching]);
   // One durable AI action per worker request. Poll again only when the engine revision advances;
   // a no-op never spins. The user remains responsible for advancing the match clock.

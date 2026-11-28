@@ -426,7 +426,23 @@ export function projectMatchCommentary(
           sourceKind: "INNINGS_PROJECTION",
           sourceRef: "innings.scoreAfter",
         },
+        // CP09: the delivery's bat runs and boundary, copied from the record, so a reader of the feed alone (the
+        // audio cue projection without events) classifies the ball from recorded facts rather than from wording.
+        {
+          slot: "runs",
+          value: String(d.batRuns),
+          sourceKind: "EVENT_FIELD",
+          sourceRef: "delivery.batRuns",
+        },
       ];
+      if (d.boundary === "FOUR" || d.boundary === "SIX") {
+        factSlots.push({
+          slot: "boundary",
+          value: d.boundary === "SIX" ? "6" : "4",
+          sourceKind: "EVENT_FIELD",
+          sourceRef: "delivery.boundary",
+        });
+      }
 
       // Batter milestones
       if (d.batRuns > 0) {

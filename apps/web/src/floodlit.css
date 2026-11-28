@@ -504,10 +504,12 @@ body .captain-station .field-read { color: var(--fl-muted); }
 .title-sound { display: flex; justify-content: center; margin-top: 14px; }
 .title-sound button[aria-pressed="true"] { border-color: var(--fl-gold); color: var(--fl-gold-hi); }
 /* E5: the first-run sound question, in the page flow so it never covers another control. */
-.title-sound-question { max-width: 560px; margin: 18px auto 0; padding: 14px 18px; border: 1px solid var(--fl-gold); border-radius: 12px; text-align: center; }
-.title-sound-question h2 { margin: 0 0 4px; font-size: 1.1rem; }
-.title-sound-question p { margin: 0 0 10px; }
-.title-sound-question-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+/* CP09 (CD-028): a compact bar at the top of the title screen, so the question is in view on first launch. */
+.title-sound-question { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 12px; padding: 8px 14px; border: 1px solid var(--fl-gold); border-radius: 10px; }
+.title-sound-question-text { min-width: 0; flex: 1 1 18rem; }
+.title-sound-question h2 { margin: 0; font-size: 1rem; }
+.title-sound-question p { margin: 2px 0 0; font-size: 0.9rem; }
+.title-sound-question-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 @media (prefers-reduced-motion: no-preference) {
   .title-screen, .career-shell, [data-testid="scenarios-screen"], [data-testid="tournaments-screen"], .broadcast-stage { animation: fl-fade-in 0.3s ease-out both; }
   .auction-lot-card { animation: fl-lot-in 0.5s cubic-bezier(0.2, 1.3, 0.4, 1) both; }

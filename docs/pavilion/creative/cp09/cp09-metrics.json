@@ -1,0 +1,29 @@
+{
+  "base": "http://127.0.0.1:4201",
+  "startedAt": "2026-11-28T02:00:38.830Z",
+  "title": {
+    "1366x768": {
+      "questionTop": 18,
+      "questionBottom": 78,
+      "viewportHeight": 768,
+      "fullyInView": true,
+      "overflowX": 0
+    },
+    "390x844": {
+      "questionTop": 18,
+      "questionBottom": 149,
+      "viewportHeight": 844,
+      "fullyInView": true,
+      "overflowX": 0
+    }
+  },
+  "match": {
+    "oversFinished": 1,
+    "caption": "Audio caption: FOUR! 0.3 · 4",
+    "momentKind": "FOUR",
+    "momentSting": "FOUR:full:PLAYED",
+    "statusPill": "Audio active"
+  },
+  "pageErrors": [],
+  "consoleErrors": []
+}
